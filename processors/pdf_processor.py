@@ -104,9 +104,22 @@ class PDFProcessor:
                     for i, page in enumerate(chapter_pages):
                         page_num = i + 63  # Actual page number
                         
-                        # Extract text
-                        page_text = page.extract_text() or ""
-                        content['text'] += f"\n--- Page {page_num} ---\n{page_text}"
+                        # Extract text with better formatting preservation
+                        page_text = page.extract_text(
+                            layout=True,
+                            x_tolerance=3,
+                            y_tolerance=3
+                        ) or ""
+                        
+                        # Better section header detection
+                        if page_text:
+                            # Look for section headers (4.1, 4.2, etc.)
+                            import re
+                            section_headers = re.findall(r'^4\.\d+\.?\d*\s+[A-Z].*$', page_text, re.MULTILINE)
+                            if section_headers:
+                                content['text'] += f"\n--- Page {page_num} (Sections: {len(section_headers)}) ---\n{page_text}"
+                            else:
+                                content['text'] += f"\n--- Page {page_num} ---\n{page_text}"
                         
                         # Extract tables
                         tables = page.extract_tables()
