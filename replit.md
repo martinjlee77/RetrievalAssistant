@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a Streamlit-based proof of concept application for processing ASC 606 (Revenue from Contracts with Customers) PDF documents. The application focuses on extracting, analyzing, and validating content from Chapter 4: Performance Obligations, providing a comprehensive system for handling accounting document processing with quality assurance.
+This project is a RAG-based contract analysis tool that generates complete ASC 606 revenue recognition analyses. The system takes revenue contracts as input and produces structured professional memos following the 5-step ASC 606 model, using authoritative FASB guidance and Big 4 interpretative publications as primary sources, with LLM general knowledge as fallback for edge cases.
 
 ## User Preferences
 
