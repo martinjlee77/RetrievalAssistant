@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Configure page
 st.set_page_config(
-    page_title="Accounting Standards Contract Analyzer",
+    page_title="Technical Accounting Analyzer",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -45,7 +45,7 @@ class ContractAnalyzerApp:
         }
     
     def run(self):
-        st.title("📊 Accounting Standards Contract Analyzer")
+        st.title("📊 Technical Accounting Analyzer")
         st.markdown("**Professional contract analysis under US GAAP accounting standards**")
         
         # Sidebar for standard selection
@@ -102,51 +102,61 @@ class ContractAnalyzerApp:
         with col2:
             st.subheader("2. Contract Information")
             
-            # Basic contract details
-            contract_name = st.text_input(
-                "Contract Name/Title",
-                placeholder="e.g., Software License Agreement with ABC Corp",
-                help="Enter a descriptive name for the contract"
+            # Required contract details
+            analysis_title = st.text_input(
+                "Analysis Title / Contract ID *",
+                placeholder="e.g., Q4 Project Phoenix SOW, ABC Corp Master Agreement",
+                help="A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo."
             )
             
-            contract_parties = st.text_input(
-                "Contracting Parties",
-                placeholder="e.g., XYZ Company (Provider) and ABC Corp (Customer)",
-                help="Enter the main parties to the contract"
+            customer_name = st.text_input(
+                "Customer Name *",
+                placeholder="e.g., ABC Corporation",
+                help="The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo."
+            )
+            
+            effective_date = st.date_input(
+                "Effective Date *",
+                help="The date the contract is legally in effect. This establishes the 'contract inception' date for the analysis, which is the anchor point for all ASC 606 assessments."
             )
             
             col2a, col2b = st.columns(2)
             
             with col2a:
-                contract_date = st.date_input(
-                    "Contract Date",
-                    help="The date the contract was signed or became effective"
+                contract_start = st.date_input(
+                    "Contract Start Date *",
+                    help="The beginning of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
                 )
             
             with col2b:
-                contract_value = st.number_input(
-                    "Contract Value ($)",
-                    min_value=0.0,
-                    format="%.2f",
-                    help="Total contract value (if applicable)"
+                contract_end = st.date_input(
+                    "Contract End Date *",
+                    help="The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
                 )
             
-            contract_type = st.selectbox(
-                "Contract Type",
-                options=[
-                    "Software License",
-                    "Service Agreement",
-                    "Product Sales",
-                    "Subscription Service",
-                    "Construction Contract",
-                    "Professional Services",
-                    "Other"
-                ],
-                help="Select the primary type of contract"
-            )
+            col2c, col2d = st.columns(2)
             
-            if contract_type == "Other":
-                other_type = st.text_input("Please specify:", placeholder="Enter contract type")
+            with col2c:
+                transaction_price = st.number_input(
+                    "Total Transaction Price *",
+                    min_value=0.0,
+                    format="%.2f",
+                    help="The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price)."
+                )
+            
+            with col2d:
+                currency = st.selectbox(
+                    "Currency *",
+                    options=["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"],
+                    help="The currency of the contract. This is critical context for the transaction price and any financial figures mentioned in the memo."
+                )
+            
+            arrangement_description = st.text_area(
+                "Brief Description of the Arrangement *",
+                placeholder="e.g., A three-year subscription to our SaaS platform with one-time professional services for implementation.",
+                height=100,
+                help="A one- or two-sentence, plain-English summary of the deal. This is a powerful input that gives the LLM immediate, high-level context of the business purpose, helping it better interpret the legal language and structure of the contract."
+            )
         
         # Contract upload section
         st.subheader("3. Upload Contract Document")
@@ -213,22 +223,29 @@ class ContractAnalyzerApp:
                 st.error("Please upload a contract document")
                 return
             
-            if not contract_name.strip():
-                st.error("Please enter a contract name")
+            if not analysis_title.strip():
+                st.error("Please enter an analysis title/contract ID")
                 return
             
-            if not contract_parties.strip():
-                st.error("Please enter the contracting parties")
+            if not customer_name.strip():
+                st.error("Please enter the customer name")
+                return
+            
+            if not arrangement_description.strip():
+                st.error("Please enter a brief description of the arrangement")
                 return
             
             # Store contract data
             st.session_state.contract_data = {
                 'standard': selected_standard,
-                'contract_name': contract_name,
-                'contract_parties': contract_parties,
-                'contract_date': contract_date.isoformat(),
-                'contract_value': contract_value,
-                'contract_type': contract_type if contract_type != "Other" else other_type,
+                'analysis_title': analysis_title,
+                'customer_name': customer_name,
+                'effective_date': effective_date.isoformat(),
+                'contract_start': contract_start.isoformat(),
+                'contract_end': contract_end.isoformat(),
+                'transaction_price': transaction_price,
+                'currency': currency,
+                'arrangement_description': arrangement_description,
                 'analysis_depth': analysis_depth,
                 'include_citations': include_citations,
                 'output_format': output_format,
@@ -291,13 +308,14 @@ class ContractAnalyzerApp:
         info_col1, info_col2 = st.columns(2)
         
         with info_col1:
-            st.write(f"**Name:** {contract_data['contract_name']}")
-            st.write(f"**Parties:** {contract_data['contract_parties']}")
-            st.write(f"**Date:** {contract_data['contract_date']}")
+            st.write(f"**Analysis Title:** {contract_data['analysis_title']}")
+            st.write(f"**Customer:** {contract_data['customer_name']}")
+            st.write(f"**Effective Date:** {contract_data['effective_date']}")
+            st.write(f"**Contract Period:** {contract_data['contract_start']} to {contract_data['contract_end']}")
         
         with info_col2:
-            st.write(f"**Value:** ${contract_data['contract_value']:,.2f}")
-            st.write(f"**Type:** {contract_data['contract_type']}")
+            st.write(f"**Transaction Price:** {contract_data['currency']} {contract_data['transaction_price']:,.2f}")
+            st.write(f"**Description:** {contract_data['arrangement_description']}")
             st.write(f"**File:** {contract_data['uploaded_file']}")
         
         # Placeholder for actual analysis content
