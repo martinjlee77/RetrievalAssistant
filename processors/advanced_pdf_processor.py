@@ -59,9 +59,25 @@ class AdvancedPDFProcessor:
         
         # Step 2: Specialized table extraction
         self.logger.info("Extracting tables using specialized tools...")
+        
+        # Convert TableRegion objects to dictionaries for table extractor
+        table_regions_dict = []
+        table_regions = structure.get('table_regions', [])
+        
+        for region in table_regions:
+            if hasattr(region, 'bbox'):  # TableRegion dataclass
+                table_regions_dict.append({
+                    'bbox': region.bbox,
+                    'page_number': region.page_number,
+                    'confidence': region.confidence,
+                    'caption': region.caption
+                })
+            else:  # Already a dictionary
+                table_regions_dict.append(region)
+        
         tables = self.table_extractor.extract_tables_from_pdf(
             pdf_path, 
-            structure['table_regions']
+            table_regions_dict
         )
         
         # Step 3: Structure-aware chunking
