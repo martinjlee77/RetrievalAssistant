@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
+from typing import Dict, List, Any
 
 from processors.advanced_pdf_processor import AdvancedPDFProcessor
 from processors.chunk_processor import ChunkProcessor
