@@ -336,11 +336,11 @@ class ASC606ProcessingApp:
         st.subheader("Detailed Quality Metrics")
         
         quality_df = pd.DataFrame([
-            {"Metric": "Character Accuracy", "Score": quality_results['character_accuracy'], "Threshold": 95},
-            {"Metric": "Section Hierarchy", "Score": quality_results['section_hierarchy'], "Threshold": 90},
-            {"Metric": "Cross-references", "Score": quality_results['cross_references'], "Threshold": 85},
-            {"Metric": "Table Formatting", "Score": quality_results['table_formatting'], "Threshold": 80},
-            {"Metric": "Example Integrity", "Score": quality_results['example_integrity'], "Threshold": 90}
+            {"Metric": "Text Quality", "Score": quality_results['text_quality'], "Threshold": 85},
+            {"Metric": "Structure Quality", "Score": quality_results['structure_quality'], "Threshold": 80},
+            {"Metric": "Table Quality", "Score": quality_results['table_quality'], "Threshold": 75},
+            {"Metric": "Example Quality", "Score": quality_results['example_quality'], "Threshold": 70},
+            {"Metric": "Coverage Quality", "Score": quality_results['coverage_quality'], "Threshold": 90}
         ])
         
         st.dataframe(quality_df, use_container_width=True)

@@ -59,6 +59,7 @@ class TableExtractor:
             if not tables or len(tables) == 0:
                 camelot_kwargs['flavor'] = 'stream'
                 camelot_kwargs.pop('line_scale', None)  # Not applicable for stream
+                camelot_kwargs.pop('copy_text', None)  # Not applicable for stream
                 tables = camelot.read_pdf(pdf_path, **camelot_kwargs)
             
             if tables and len(tables) > 0:
@@ -144,7 +145,7 @@ class TableExtractor:
         df = df.fillna('')
         
         # Clean whitespace
-        df = df.applymap(lambda x: str(x).strip() if isinstance(x, str) else x)
+        df = df.map(lambda x: str(x).strip() if isinstance(x, str) else x)
         
         # Remove rows that are mostly empty
         df = df[df.astype(str).ne('').sum(axis=1) > len(df.columns) * 0.3]
