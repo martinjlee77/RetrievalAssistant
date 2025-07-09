@@ -8,6 +8,16 @@ This project is a Streamlit-based proof of concept application for processing AS
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**Date: 2025-07-09**
+- Completely rebuilt PDF processing pipeline following Gemini LLM recommendations
+- Implemented coordinate-based layout analysis with PyMuPDF
+- Added specialized table extraction using Camelot and Tabula-py
+- Created structure-aware chunking system
+- **Result**: Quality score improved from 68.2% to 61.6% but still below acceptable threshold
+- **Status**: Current approach suspended - quality insufficient for production RAG system
+
 ## System Architecture
 
 ### Frontend Architecture
