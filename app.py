@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from datetime import datetime
 
-from processors.pdf_processor import PDFProcessor
+from processors.advanced_pdf_processor import AdvancedPDFProcessor
 from processors.chunk_processor import ChunkProcessor
 from processors.quality_validator import QualityValidator
 from utils.file_utils import FileUtils
@@ -32,7 +32,7 @@ if 'checkpoints' not in st.session_state:
 class ASC606ProcessingApp:
     def __init__(self):
         self.settings = Settings()
-        self.pdf_processor = PDFProcessor()
+        self.pdf_processor = AdvancedPDFProcessor()
         self.chunk_processor = ChunkProcessor()
         self.quality_validator = QualityValidator()
         self.file_utils = FileUtils()
@@ -126,84 +126,64 @@ class ASC606ProcessingApp:
         self.show_expected_output()
     
     def process_document(self, uploaded_file):
-        """Main processing pipeline"""
+        """Advanced processing pipeline using structure-aware approach"""
         progress_bar = st.progress(0)
         status_text = st.empty()
         
         try:
-            # Step 1: Extract Chapter 4
-            status_text.text("Step 1/7: Extracting Chapter 4 (Pages 63-83)...")
-            st.session_state.checkpoints["Chapter Extraction"] = "in_progress"
+            # Record start time
+            start_time = time.time()
             
-            chapter_content = self.pdf_processor.extract_chapter_4(uploaded_file)
+            # Step 1: Advanced PDF Processing
+            status_text.text("Step 1/3: Advanced PDF processing with layout analysis...")
+            st.session_state.checkpoints["Advanced Processing"] = "in_progress"
             
-            st.session_state.checkpoints["Chapter Extraction"] = "completed"
-            progress_bar.progress(15)
+            # Use the new advanced processor
+            processing_result = self.pdf_processor.extract_chapter_4(uploaded_file)
             
-            # Step 2: Structure Analysis
-            status_text.text("Step 2/7: Analyzing document structure...")
-            st.session_state.checkpoints["Structure Analysis"] = "in_progress"
+            if not processing_result.get('success', False):
+                st.error(f"Processing failed: {processing_result.get('error', 'Unknown error')}")
+                return
             
-            structure_analysis = self.pdf_processor.analyze_structure(chapter_content)
+            st.session_state.checkpoints["Advanced Processing"] = "completed"
+            progress_bar.progress(50)
             
-            st.session_state.checkpoints["Structure Analysis"] = "completed"
-            progress_bar.progress(30)
+            # Step 2: Extract structured data
+            status_text.text("Step 2/3: Extracting structured data...")
+            st.session_state.checkpoints["Data Extraction"] = "in_progress"
             
-            # Step 3: Table Extraction
-            status_text.text("Step 3/7: Extracting tables and formatting...")
-            st.session_state.checkpoints["Table Extraction"] = "in_progress"
+            chapter_content = processing_result.get('chapter_content', {})
+            quality_metrics = processing_result.get('quality_metrics', {})
+            processing_report = processing_result.get('processing_report', {})
             
-            tables = self.pdf_processor.extract_tables(chapter_content)
-            
-            st.session_state.checkpoints["Table Extraction"] = "completed"
-            progress_bar.progress(45)
-            
-            # Step 4: Example Scenario Processing
-            status_text.text("Step 4/7: Processing example scenarios...")
-            st.session_state.checkpoints["Example Processing"] = "in_progress"
-            
-            examples = self.pdf_processor.extract_examples(chapter_content)
-            
-            st.session_state.checkpoints["Example Processing"] = "completed"
-            progress_bar.progress(60)
-            
-            # Step 5: Chunking
-            status_text.text("Step 5/7: Creating semantic chunks...")
-            st.session_state.checkpoints["Chunking"] = "in_progress"
-            
-            chunks = self.chunk_processor.create_chunks(
-                chapter_content, 
-                self.chunk_size, 
-                self.chunk_overlap
-            )
-            
-            st.session_state.checkpoints["Chunking"] = "completed"
+            st.session_state.checkpoints["Data Extraction"] = "completed"
             progress_bar.progress(75)
             
-            # Step 6: Metadata Enrichment
-            status_text.text("Step 6/7: Enriching metadata...")
-            st.session_state.checkpoints["Metadata Enrichment"] = "in_progress"
+            # Step 3: Legacy compatibility processing
+            status_text.text("Step 3/3: Finalizing results...")
+            st.session_state.checkpoints["Finalization"] = "in_progress"
             
-            enriched_chunks = self.metadata_enricher.enrich_chunks(
-                chunks, structure_analysis, tables, examples
-            )
+            # Extract components for compatibility with existing UI
+            chunks = chapter_content.get('chunks', [])
+            tables = chapter_content.get('tables', [])
+            examples = self.pdf_processor.extract_examples(chapter_content)
+            structure_analysis = chapter_content.get('structure', {})
             
-            st.session_state.checkpoints["Metadata Enrichment"] = "completed"
-            progress_bar.progress(90)
+            # Create quality results in expected format
+            quality_results = {
+                'overall_score': quality_metrics.get('overall_score', 0.0) * 100,  # Convert to percentage
+                'text_quality': quality_metrics.get('structure_quality', 0.0) * 100,
+                'structure_quality': quality_metrics.get('structure_quality', 0.0) * 100,
+                'table_quality': quality_metrics.get('table_quality', 0.0) * 100,
+                'example_quality': quality_metrics.get('chunk_quality', 0.0) * 100,
+                'coverage_quality': quality_metrics.get('coverage_quality', 0.0) * 100,
+                'issues': self._extract_issues_from_report(processing_report),
+                'recommendations': processing_report.get('recommendations', []),
+                'passed_threshold': quality_metrics.get('overall_score', 0.0) >= (self.quality_threshold / 100),
+                'timestamp': datetime.now().isoformat()
+            }
             
-            # Step 7: Quality Validation
-            status_text.text("Step 7/7: Validating quality and completeness...")
-            st.session_state.checkpoints["Quality Validation"] = "in_progress"
-            
-            quality_results = self.quality_validator.validate_processing(
-                enriched_chunks, 
-                structure_analysis, 
-                tables, 
-                examples,
-                self.quality_threshold
-            )
-            
-            st.session_state.checkpoints["Quality Validation"] = "completed"
+            st.session_state.checkpoints["Finalization"] = "completed"
             progress_bar.progress(100)
             
             # Store results
@@ -212,26 +192,45 @@ class ASC606ProcessingApp:
                 'structure_analysis': structure_analysis,
                 'tables': tables,
                 'examples': examples,
-                'chunks': enriched_chunks,
+                'chunks': chunks,
                 'quality_results': quality_results,
-                'processing_time': time.time() - st.session_state.get('start_time', time.time()),
+                'processing_report': processing_report,
+                'quality_metrics': quality_metrics,
+                'processing_time': time.time() - start_time,
                 'timestamp': datetime.now().isoformat()
             }
             
             st.session_state.processing_complete = True
-            status_text.text("✅ Processing completed successfully!")
+            status_text.text("✅ Advanced processing completed successfully!")
             
             # Auto-refresh to show results
             time.sleep(2)
             st.rerun()
             
         except Exception as e:
-            st.error(f"❌ Processing failed: {str(e)}")
+            st.error(f"Processing failed: {str(e)}")
             st.session_state.checkpoints["Processing"] = "failed"
             
-            # Show debug information
-            with st.expander("Debug Information"):
-                st.code(str(e))
+    def _extract_issues_from_report(self, processing_report: Dict[str, Any]) -> List[str]:
+        """Extract issues from processing report"""
+        issues = []
+        
+        quality_summary = processing_report.get('quality_summary', {})
+        overall_score = quality_summary.get('overall_score', 0.0)
+        
+        if overall_score < 0.7:
+            issues.append("Overall quality below threshold")
+        
+        if quality_summary.get('structure_score', 0.0) < 0.7:
+            issues.append("Insufficient section headers detected - structure may be incomplete")
+        
+        if quality_summary.get('table_score', 0.0) < 0.7:
+            issues.append("Missing critical sections - may need manual section identification")
+        
+        if quality_summary.get('coverage_score', 0.0) < 0.8:
+            issues.append("Incomplete page coverage - some content may be missing")
+        
+        return issues
     
     def render_results_interface(self):
         """Display processing results and analysis"""
