@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a RAG-based contract analysis tool that generates complete ASC 606 revenue recognition analyses. The system takes revenue contracts as input and produces structured professional memos following the 5-step ASC 606 model, using authoritative FASB guidance and Big 4 interpretative publications as primary sources, with LLM general knowledge as fallback for edge cases.
+This project is a multi-standard accounting analysis platform that generates complete contract analyses under various accounting standards (ASC 606, ASC 842, etc.). The system takes contracts as input and produces structured professional memos following the specific methodology of each standard, using authoritative FASB guidance and Big 4 interpretative publications as primary sources, with LLM general knowledge as fallback for edge cases.
 
 ## User Preferences
 
