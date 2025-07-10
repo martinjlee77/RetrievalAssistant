@@ -56,7 +56,7 @@ class ContractAnalyzerApp:
         # Configure page settings
         st.set_page_config(
             page_title="Technical Accounting Analyzer",
-            page_icon="📊",
+            page_icon="📄",
             layout="wide",
             initial_sidebar_state="expanded"
         )
@@ -74,7 +74,7 @@ class ContractAnalyzerApp:
     def run(self):
         self.render_sidebar()
 
-        st.title(f"📊 {st.session_state.selected_standard} - Revenue Contract Analyzer")
+        st.title(f"📄 {st.session_state.selected_standard} - Revenue Contract Analyzer")
 
         if st.session_state.analysis_results is None:
             self.render_upload_interface()
@@ -108,12 +108,20 @@ class ContractAnalyzerApp:
             st.caption(f"Version: {self.APP_CONFIG['version']}\n\nLast Updated: {self.APP_CONFIG['last_updated']}")
 
     def render_upload_interface(self):
+        # Show completion status and required field notice
+        st.info("**Required fields are marked with * — Complete tabs 1 and 2 to enable analysis**")
+        
         # --- CHANGE 2: Use a form for all inputs ---
         # This prevents the app from re-running on every widget interaction.
         with st.form(key="contract_form"):
 
             # --- CHANGE 3: Organize inputs into clear tabs ---
-            tab1, tab2, tab3 = st.tabs(["1. Contract Details", "2. Upload Document", "3. Analysis Options"])
+            # Track completion status for visual indicators
+            tab1, tab2, tab3 = st.tabs([
+                "1. Contract Details ⚠️", 
+                "2. Upload Document ⚠️", 
+                "3. Analysis Options (Optional)"
+            ])
 
             with tab1:
                 st.subheader("Key Contract Information")
@@ -182,14 +190,27 @@ class ContractAnalyzerApp:
                     height=100
                 )
 
-            # The submit button for the form
-            submitted = st.form_submit_button("🔍 Analyze Contract", type="primary", use_container_width=True)
+            # Check if required fields are completed before enabling submit
+            # This will be evaluated when the form is submitted
+            submitted = st.form_submit_button("📋 Analyze Contract", type="primary", use_container_width=True)
 
         if submitted:
             # --- CHANGE 4: Validate inputs using Pydantic model ---
             try:
+                # Check all required fields are completed
+                missing_fields = []
+                if not analysis_title.strip():
+                    missing_fields.append("Analysis Title")
+                if not customer_name.strip():
+                    missing_fields.append("Customer Name") 
+                if not arrangement_description.strip():
+                    missing_fields.append("Brief Description")
                 if not uploaded_file:
-                    st.error("Please upload a contract document.")
+                    missing_fields.append("Contract Document")
+                
+                if missing_fields:
+                    st.error(f"Please complete the following required fields: {', '.join(missing_fields)}")
+                    st.warning("💡 **Tip:** Make sure to fill out both Tab 1 (Contract Details) and Tab 2 (Upload Document)")
                     return
 
                 # Create an instance of our Pydantic model
