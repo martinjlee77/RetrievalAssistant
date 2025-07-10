@@ -112,118 +112,144 @@ class ContractAnalyzerApp:
             st.caption(f"Version: {self.APP_CONFIG['version']}\n\nLast Updated: {self.APP_CONFIG['last_updated']}")
 
     def render_upload_interface(self):
-        # --- CHANGE 2: Use a form for all inputs ---
-        # This prevents the app from re-running on every widget interaction.
-        with st.form(key="contract_form"):
+        # --- CHANGE 3: Organize inputs into clear tabs ---
+        # Dynamic tab status that updates immediately
+        tab1, tab2, tab3 = st.tabs([
+            "1. Contract Details", 
+            "2. Upload Document", 
+            "3. Analysis Options (Optional)"
+        ])
 
-            # --- CHANGE 3: Organize inputs into clear tabs ---
-            # Update tab labels based on completion status
-            tab1_status = "✅" if st.session_state.get('tab1_complete', False) else "⚠️"
-            tab2_status = "✅" if st.session_state.get('tab2_complete', False) else "⚠️"
+        with tab1:
+            # Show completion status in tab content
+            tab1_complete = bool(
+                st.session_state.get('analysis_title', '') and 
+                st.session_state.get('customer_name', '') and 
+                st.session_state.get('arrangement_description', '')
+            )
+            status1 = "✅ Complete" if tab1_complete else "⚠️ Required fields missing"
+            st.caption(status1)
             
-            tab1, tab2, tab3 = st.tabs([
-                f"1. Contract Details {tab1_status}", 
-                f"2. Upload Document {tab2_status}", 
-                "3. Analysis Options (Optional)"
-            ])
+            st.subheader("Key Contract Information")
+            col1, col2 = st.columns(2)
+            analysis_title = col1.text_input(
+                "Analysis Title / Contract ID *", 
+                value=st.session_state.get('analysis_title', ''),
+                placeholder="e.g., Q4 Project Phoenix SOW",
+                help="A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo.",
+                key="analysis_title"
+            )
+            customer_name = col2.text_input(
+                "Customer Name *", 
+                value=st.session_state.get('customer_name', ''),
+                placeholder="e.g., ABC Corporation",
+                help="The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo.",
+                key="customer_name"
+            )
 
-            with tab1:
-                st.subheader("Key Contract Information")
-                col1, col2 = st.columns(2)
-                analysis_title = col1.text_input(
-                    "Analysis Title / Contract ID *", 
-                    placeholder="e.g., Q4 Project Phoenix SOW",
-                    help="A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo."
-                )
-                customer_name = col2.text_input(
-                    "Customer Name *", 
-                    placeholder="e.g., ABC Corporation",
-                    help="The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo."
-                )
+            col3, col4 = st.columns(2)
+            contract_start = col3.date_input(
+                "Contract Start Date *",
+                value=st.session_state.get('contract_start', None),
+                help="The beginning of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'",
+                key="contract_start"
+            )
+            contract_end = col4.date_input(
+                "Contract End Date *",
+                value=st.session_state.get('contract_end', None),
+                help="The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'",
+                key="contract_end"
+            )
 
-                col3, col4 = st.columns(2)
-                contract_start = col3.date_input(
-                    "Contract Start Date *",
-                    help="The beginning of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
-                )
-                contract_end = col4.date_input(
-                    "Contract End Date *",
-                    help="The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
-                )
+            col5, col6 = st.columns(2)
+            transaction_price = col5.number_input(
+                "Total Transaction Price *", 
+                value=st.session_state.get('transaction_price', 0.0),
+                min_value=0.0, 
+                format="%.2f",
+                help="The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price).",
+                key="transaction_price"
+            )
+            currency_options = ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"]
+            currency_index = currency_options.index(st.session_state.get('currency', 'USD')) if st.session_state.get('currency', 'USD') in currency_options else 0
+            currency = col6.selectbox(
+                "Currency *", 
+                currency_options,
+                index=currency_index,
+                help="The currency of the contract. This is critical context for the transaction price and any financial figures mentioned in the memo.",
+                key="currency"
+            )
 
-                col5, col6 = st.columns(2)
-                transaction_price = col5.number_input(
-                    "Total Transaction Price *", 
-                    min_value=0.0, 
-                    format="%.2f",
-                    help="The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price)."
-                )
-                currency = col6.selectbox(
-                    "Currency *", 
-                    ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"],
-                    help="The currency of the contract. This is critical context for the transaction price and any financial figures mentioned in the memo."
-                )
+            arrangement_description = st.text_area(
+                "Brief Description of the Arrangement *",
+                value=st.session_state.get('arrangement_description', ''),
+                placeholder="e.g., A three-year SaaS subscription with one-time implementation services.",
+                height=100,
+                help="A one- or two-sentence, plain-English summary of the deal. This is a powerful input that gives the LLM immediate, high-level context of the business purpose, helping it better interpret the legal language and structure of the contract.",
+                key="arrangement_description"
+            )
 
-                arrangement_description = st.text_area(
-                    "Brief Description of the Arrangement *",
-                    placeholder="e.g., A three-year SaaS subscription with one-time implementation services.",
-                    height=100,
-                    help="A one- or two-sentence, plain-English summary of the deal. This is a powerful input that gives the LLM immediate, high-level context of the business purpose, helping it better interpret the legal language and structure of the contract."
-                )
-
-            with tab2:
-                st.subheader("Contract Document")
-                uploaded_file = st.file_uploader(
-                    "Upload your contract in PDF or Word format *",
-                    type=['pdf', 'docx', 'doc']
-                )
-
-            with tab3:
-                st.subheader("Analysis Configuration")
-                col7, col8 = st.columns(2)
-                analysis_depth = col7.selectbox("Analysis Depth", ["Standard Analysis", "Detailed Analysis"])
-                output_format = col8.selectbox("Output Format", ["Professional Memo", "Executive Summary"])
-
-                col7.markdown("<br>", unsafe_allow_html=True) # Spacer
-                include_citations = col7.checkbox("Include Citations", value=True)
-                include_examples = col8.checkbox("Include Examples", value=False)
-
-                additional_notes = st.text_area(
-                    "Additional Instructions (Optional)",
-                    placeholder="e.g., Focus specifically on variable consideration and the series guidance.",
-                    height=100
-                )
-
-            # Check completion status for button styling and text
-            tab1_ready = bool(analysis_title and customer_name and arrangement_description)
-            tab2_ready = bool(uploaded_file)
-            both_tabs_ready = tab1_ready and tab2_ready
+        with tab2:
+            # Show completion status in tab content
+            tab2_complete = bool(st.session_state.get('uploaded_file_name', ''))
+            status2 = "✅ Complete" if tab2_complete else "⚠️ File upload required"
+            st.caption(status2)
             
-            # Button appearance changes based on readiness
-            if both_tabs_ready:
-                button_text = "📋 Analyze Contract"
-                button_type = "primary"
-                button_help = "All required fields completed - ready to analyze!"
-            else:
-                button_text = "📋 Complete Required Fields First"
-                button_type = "secondary" 
-                button_help = "Please complete tabs 1 and 2 before analyzing"
-            
-            submitted = st.form_submit_button(
-                button_text, 
-                type=button_type, 
-                use_container_width=True,
-                help=button_help
+            st.subheader("Contract Document")
+            uploaded_file = st.file_uploader(
+                "Upload your contract in PDF or Word format *",
+                type=['pdf', 'docx', 'doc'],
+                key="uploaded_file"
             )
             
-            # Small helper text at bottom
-            st.caption("* Required fields — Complete tabs 1 and 2 to enable analysis")
+            # Store filename when file is uploaded
+            if uploaded_file:
+                st.session_state.uploaded_file_name = uploaded_file.name
+            elif 'uploaded_file_name' not in st.session_state:
+                st.session_state.uploaded_file_name = ''
+
+        with tab3:
+            st.subheader("Analysis Configuration")
+            col7, col8 = st.columns(2)
+            analysis_depth = col7.selectbox("Analysis Depth", ["Standard Analysis", "Detailed Analysis"])
+            output_format = col8.selectbox("Output Format", ["Professional Memo", "Executive Summary"])
+
+            col7.markdown("<br>", unsafe_allow_html=True) # Spacer
+            include_citations = col7.checkbox("Include Citations", value=True)
+            include_examples = col8.checkbox("Include Examples", value=False)
+
+            additional_notes = st.text_area(
+                "Additional Instructions (Optional)",
+                placeholder="e.g., Focus specifically on variable consideration and the series guidance.",
+                height=100
+            )
+
+        # Check completion status for button styling and text
+        tab1_ready = bool(analysis_title and customer_name and arrangement_description)
+        tab2_ready = bool(uploaded_file)
+        both_tabs_ready = tab1_ready and tab2_ready
+        
+        # Button appearance changes based on readiness
+        if both_tabs_ready:
+            button_text = "📋 Analyze Contract"
+            button_type = "primary"
+            button_help = "All required fields completed - ready to analyze!"
+        else:
+            button_text = "📋 Complete Required Fields First"
+            button_type = "secondary" 
+            button_help = "Please complete tabs 1 and 2 before analyzing"
+        
+        submitted = st.button(
+            button_text, 
+            type=button_type, 
+            use_container_width=True,
+            help=button_help
+        )
+        
+        # Small helper text at bottom
+        st.caption("* Required fields — Complete tabs 1 and 2 to enable analysis")
 
         if submitted:
-            # Update completion status in session state for next render
-            st.session_state.tab1_complete = bool(analysis_title and customer_name and arrangement_description)
-            st.session_state.tab2_complete = bool(uploaded_file)
-            
             # --- CHANGE 4: Validate inputs using Pydantic model ---
             try:
                 # Check all required fields are completed
