@@ -18,6 +18,8 @@ if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
 if 'contract_data' not in st.session_state:
     st.session_state.contract_data = None
+if 'selected_standard' not in st.session_state:
+    st.session_state.selected_standard = 'ASC 606'  # Default to ASC 606
 
 class ContractAnalyzerApp:
     def __init__(self):
@@ -58,16 +60,39 @@ class ContractAnalyzerApp:
             self.render_analysis_results()
     
     def render_sidebar(self):
-        st.sidebar.header("📋 Available Standards")
+        st.sidebar.header("📋 Accounting Standards")
+        
+        # Current standard selection
+        st.sidebar.subheader("Currently Selected:")
+        current_standard = st.session_state.selected_standard
+        current_info = self.available_standards[current_standard]
+        
+        st.sidebar.success(f"✅ **{current_standard}**")
+        st.sidebar.write(f"**{current_info['name']}**")
+        st.sidebar.write(f"*{current_info['description']}*")
+        
+        st.sidebar.divider()
+        
+        # Standard selection
+        st.sidebar.subheader("Select Standard:")
         
         for standard_code, standard_info in self.available_standards.items():
-            with st.sidebar.expander(f"{standard_code}: {standard_info['name']}", expanded=(standard_code == 'ASC 606')):
-                st.write(f"**Description:** {standard_info['description']}")
-                
-                if standard_info['status'] == 'available':
-                    st.success("✅ Available")
-                else:
-                    st.info("🔄 Coming Soon")
+            if standard_info['status'] == 'available':
+                if st.sidebar.button(
+                    f"{standard_code}: {standard_info['name']}", 
+                    key=f"select_{standard_code}",
+                    disabled=(standard_code == st.session_state.selected_standard),
+                    use_container_width=True
+                ):
+                    st.session_state.selected_standard = standard_code
+                    st.rerun()
+            else:
+                st.sidebar.button(
+                    f"{standard_code}: {standard_info['name']} (Coming Soon)", 
+                    key=f"disabled_{standard_code}",
+                    disabled=True,
+                    use_container_width=True
+                )
         
         st.sidebar.divider()
         
@@ -80,86 +105,73 @@ class ContractAnalyzerApp:
     def render_upload_interface(self):
         st.header("📄 Contract Upload & Analysis Setup")
         
-        # Standard selection
-        col1, col2 = st.columns([1, 2])
+        # Show current standard
+        current_standard = st.session_state.selected_standard
+        current_info = self.available_standards[current_standard]
         
-        with col1:
-            st.subheader("1. Select Accounting Standard")
-            
-            # Filter available standards
-            available_options = {k: v for k, v in self.available_standards.items() if v['status'] == 'available'}
-            
-            selected_standard = st.selectbox(
-                "Choose standard for analysis:",
-                options=list(available_options.keys()),
-                format_func=lambda x: f"{x}: {available_options[x]['name']}",
-                help="Select the accounting standard applicable to your contract"
-            )
-            
-            if selected_standard:
-                st.info(f"**Selected:** {available_options[selected_standard]['description']}")
+        st.info(f"**Analyzing under:** {current_standard} - {current_info['name']}")
         
-        with col2:
-            st.subheader("2. Contract Information")
+        # Contract information section
+        st.subheader("1. Contract Information")
             
-            # Required contract details
-            analysis_title = st.text_input(
-                "Analysis Title / Contract ID *",
-                placeholder="e.g., Q4 Project Phoenix SOW, ABC Corp Master Agreement",
-                help="A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo."
+        # Required contract details
+        analysis_title = st.text_input(
+            "Analysis Title / Contract ID *",
+            placeholder="e.g., Q4 Project Phoenix SOW, ABC Corp Master Agreement",
+            help="A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo."
+        )
+        
+        customer_name = st.text_input(
+            "Customer Name *",
+            placeholder="e.g., ABC Corporation",
+            help="The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo."
+        )
+        
+        effective_date = st.date_input(
+            "Effective Date *",
+            help="The date the contract is legally in effect. This establishes the 'contract inception' date for the analysis, which is the anchor point for all ASC 606 assessments."
+        )
+        
+        col2a, col2b = st.columns(2)
+        
+        with col2a:
+            contract_start = st.date_input(
+                "Contract Start Date *",
+                help="The beginning of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
             )
-            
-            customer_name = st.text_input(
-                "Customer Name *",
-                placeholder="e.g., ABC Corporation",
-                help="The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo."
+        
+        with col2b:
+            contract_end = st.date_input(
+                "Contract End Date *",
+                help="The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
             )
-            
-            effective_date = st.date_input(
-                "Effective Date *",
-                help="The date the contract is legally in effect. This establishes the 'contract inception' date for the analysis, which is the anchor point for all ASC 606 assessments."
+        
+        col2c, col2d = st.columns(2)
+        
+        with col2c:
+            transaction_price = st.number_input(
+                "Total Transaction Price *",
+                min_value=0.0,
+                format="%.2f",
+                help="The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price)."
             )
-            
-            col2a, col2b = st.columns(2)
-            
-            with col2a:
-                contract_start = st.date_input(
-                    "Contract Start Date *",
-                    help="The beginning of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
-                )
-            
-            with col2b:
-                contract_end = st.date_input(
-                    "Contract End Date *",
-                    help="The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'"
-                )
-            
-            col2c, col2d = st.columns(2)
-            
-            with col2c:
-                transaction_price = st.number_input(
-                    "Total Transaction Price *",
-                    min_value=0.0,
-                    format="%.2f",
-                    help="The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price)."
-                )
-            
-            with col2d:
-                currency = st.selectbox(
-                    "Currency *",
-                    options=["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"],
-                    help="The currency of the contract. This is critical context for the transaction price and any financial figures mentioned in the memo."
-                )
-            
-            arrangement_description = st.text_area(
-                "Brief Description of the Arrangement *",
-                placeholder="e.g., A three-year subscription to our SaaS platform with one-time professional services for implementation.",
-                height=100,
-                help="A one- or two-sentence, plain-English summary of the deal. This is a powerful input that gives the LLM immediate, high-level context of the business purpose, helping it better interpret the legal language and structure of the contract."
+        
+        with col2d:
+            currency = st.selectbox(
+                "Currency *",
+                options=["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"],
+                help="The currency of the contract. This is critical context for the transaction price and any financial figures mentioned in the memo."
             )
+        
+        arrangement_description = st.text_area(
+            "Brief Description of the Arrangement *",
+            placeholder="e.g., A three-year subscription to our SaaS platform with one-time professional services for implementation.",
+            height=100,
+            help="A one- or two-sentence, plain-English summary of the deal. This is a powerful input that gives the LLM immediate, high-level context of the business purpose, helping it better interpret the legal language and structure of the contract."
+        )
         
         # Contract upload section
-        st.subheader("3. Upload Contract Document")
+        st.subheader("2. Upload Contract Document")
         
         uploaded_file = st.file_uploader(
             "Choose contract file",
@@ -174,7 +186,7 @@ class ContractAnalyzerApp:
             st.write(f"**File type:** {uploaded_file.type}")
         
         # Analysis options
-        st.subheader("4. Analysis Options")
+        st.subheader("3. Analysis Options")
         
         col3, col4 = st.columns(2)
         
@@ -205,7 +217,7 @@ class ContractAnalyzerApp:
             )
         
         # Additional notes
-        st.subheader("5. Additional Instructions (Optional)")
+        st.subheader("4. Additional Instructions (Optional)")
         
         additional_notes = st.text_area(
             "Special considerations or focus areas",
@@ -237,7 +249,7 @@ class ContractAnalyzerApp:
             
             # Store contract data
             st.session_state.contract_data = {
-                'standard': selected_standard,
+                'standard': st.session_state.selected_standard,
                 'analysis_title': analysis_title,
                 'customer_name': customer_name,
                 'effective_date': effective_date.isoformat(),
