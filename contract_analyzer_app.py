@@ -190,17 +190,17 @@ class ContractAnalyzerApp:
             )
 
         with tab2:
-            st.subheader("Contract Document")
+            # Show completion status in tab content - check actual file upload
             uploaded_file = st.file_uploader(
                 "Upload your contract in PDF or Word format *",
                 type=['pdf', 'docx', 'doc'],
                 key="uploaded_file"
             )
-            
-            # Show completion status in tab content - check actual file upload
             tab2_complete = uploaded_file is not None
             status2 = "✅ Complete" if tab2_complete else "⚠️ File upload required"
             st.caption(status2)
+            
+            st.subheader("Contract Document")
             
             # Store filename when file is uploaded
             if uploaded_file:
