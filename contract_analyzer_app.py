@@ -70,6 +70,10 @@ class ContractAnalyzerApp:
             st.session_state.contract_data = None
         if 'selected_standard' not in st.session_state:
             st.session_state.selected_standard = 'ASC 606'
+        if 'tab1_complete' not in st.session_state:
+            st.session_state.tab1_complete = False
+        if 'tab2_complete' not in st.session_state:
+            st.session_state.tab2_complete = False
 
     def run(self):
         self.render_sidebar()
@@ -108,18 +112,18 @@ class ContractAnalyzerApp:
             st.caption(f"Version: {self.APP_CONFIG['version']}\n\nLast Updated: {self.APP_CONFIG['last_updated']}")
 
     def render_upload_interface(self):
-        # Show completion status and required field notice
-        st.info("**Required fields are marked with * — Complete tabs 1 and 2 to enable analysis**")
-        
         # --- CHANGE 2: Use a form for all inputs ---
         # This prevents the app from re-running on every widget interaction.
         with st.form(key="contract_form"):
 
             # --- CHANGE 3: Organize inputs into clear tabs ---
-            # Track completion status for visual indicators
+            # Update tab labels based on completion status
+            tab1_status = "✅" if st.session_state.get('tab1_complete', False) else "⚠️"
+            tab2_status = "✅" if st.session_state.get('tab2_complete', False) else "⚠️"
+            
             tab1, tab2, tab3 = st.tabs([
-                "1. Contract Details ⚠️", 
-                "2. Upload Document ⚠️", 
+                f"1. Contract Details {tab1_status}", 
+                f"2. Upload Document {tab2_status}", 
                 "3. Analysis Options (Optional)"
             ])
 
@@ -190,11 +194,36 @@ class ContractAnalyzerApp:
                     height=100
                 )
 
-            # Check if required fields are completed before enabling submit
-            # This will be evaluated when the form is submitted
-            submitted = st.form_submit_button("📋 Analyze Contract", type="primary", use_container_width=True)
+            # Check completion status for button styling and text
+            tab1_ready = bool(analysis_title and customer_name and arrangement_description)
+            tab2_ready = bool(uploaded_file)
+            both_tabs_ready = tab1_ready and tab2_ready
+            
+            # Button appearance changes based on readiness
+            if both_tabs_ready:
+                button_text = "📋 Analyze Contract"
+                button_type = "primary"
+                button_help = "All required fields completed - ready to analyze!"
+            else:
+                button_text = "📋 Complete Required Fields First"
+                button_type = "secondary" 
+                button_help = "Please complete tabs 1 and 2 before analyzing"
+            
+            submitted = st.form_submit_button(
+                button_text, 
+                type=button_type, 
+                use_container_width=True,
+                help=button_help
+            )
+            
+            # Small helper text at bottom
+            st.caption("* Required fields — Complete tabs 1 and 2 to enable analysis")
 
         if submitted:
+            # Update completion status in session state for next render
+            st.session_state.tab1_complete = bool(analysis_title and customer_name and arrangement_description)
+            st.session_state.tab2_complete = bool(uploaded_file)
+            
             # --- CHANGE 4: Validate inputs using Pydantic model ---
             try:
                 # Check all required fields are completed
