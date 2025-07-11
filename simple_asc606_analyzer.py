@@ -106,15 +106,60 @@ class SimpleASC606Analyzer:
             if questions_file.exists():
                 from docx import Document
                 doc = Document(questions_file)
-                questions_content = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
-                self.logger.info("Loaded comprehensive ASC 606 review questions")
-                return questions_content
+                questions_content = []
+                
+                for paragraph in doc.paragraphs:
+                    text = paragraph.text.strip()
+                    if text:
+                        # Clean up formatting issues
+                        text = re.sub(r'\s+', ' ', text)  # Replace multiple spaces with single space
+                        questions_content.append(text)
+                
+                formatted_questions = "\n".join(questions_content)
+                self.logger.info(f"Loaded comprehensive ASC 606 review questions ({len(questions_content)} items)")
+                return formatted_questions
             else:
                 self.logger.warning("ASC 606 review questions file not found")
-                return ""
+                return self._get_fallback_questions()
         except Exception as e:
             self.logger.error(f"Error loading review questions: {e}")
-            return ""
+            return self._get_fallback_questions()
+    
+    def _get_fallback_questions(self) -> str:
+        """Fallback professional questions if file loading fails"""
+        return """
+        PROFESSIONAL ASC 606 REVIEW FRAMEWORK:
+        
+        Step 1 - Contract Identification:
+        - Does the arrangement represent a contract with a customer?
+        - Are the parties committed to perform their obligations?
+        - Can each party's rights be identified?
+        - Are payment terms identifiable?
+        - Does the contract have commercial substance?
+        - Is collection of consideration probable?
+        
+        Step 2 - Performance Obligations:
+        - What are the promised goods or services?
+        - Are the goods/services capable of being distinct?
+        - Are they distinct in the context of the contract?
+        - Is the entity acting as principal or agent?
+        
+        Step 3 - Transaction Price:
+        - What is the fixed consideration amount?
+        - Is there any variable consideration?
+        - Are there significant financing components?
+        - Is there noncash consideration?
+        
+        Step 4 - Price Allocation:
+        - Are there multiple performance obligations?
+        - What are the standalone selling prices?
+        - How should discounts be allocated?
+        
+        Step 5 - Revenue Recognition:
+        - Are performance obligations satisfied over time or at a point in time?
+        - When does control transfer to the customer?
+        - What is the appropriate recognition pattern?
+        """
     
     def _get_relevant_guidance(self, query: str) -> Dict[str, str]:
         """Get relevant guidance for a query, categorized by source type"""
@@ -203,10 +248,12 @@ class SimpleASC606Analyzer:
             Please analyze this contract following the ASC 606 five-step model. Use the source hierarchy above - prioritize authoritative sources, then interpretative guidance, then general knowledge only as fallback.
             
             ANALYSIS APPROACH:
-            1. Use the comprehensive review framework questions to guide your analysis
-            2. Address each relevant question from the framework for the contract's specific circumstances
-            3. Base answers on the authoritative and interpretative guidance provided
-            4. Clearly indicate source basis for each conclusion
+            1. Perform a comprehensive ASC 606 analysis covering all relevant aspects
+            2. Use the review framework questions as a professional checklist to ensure thoroughness
+            3. Address questions that are relevant to this specific contract's circumstances
+            4. Go beyond the checklist if the contract has unique characteristics requiring additional analysis
+            5. Base all conclusions on the authoritative and interpretative guidance provided
+            6. Clearly indicate source basis for each conclusion
             
             Return as JSON with this structure:
             {{
