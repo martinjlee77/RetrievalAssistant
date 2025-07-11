@@ -318,6 +318,9 @@ class SimpleASC606Analyzer:
             # Parse the response
             analysis_result = json.loads(response.choices[0].message.content)
             
+            # Debug: Log the source transparency to see what's being returned
+            self.logger.info(f"Source transparency from GPT: {analysis_result.get('source_transparency', {})}")
+            
             # Generate professional memo
             memo = self._generate_professional_memo(analysis_result, contract_data)
             

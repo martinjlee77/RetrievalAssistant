@@ -458,12 +458,20 @@ class ContractAnalyzerApp:
         # Source transparency metrics
         analysis_result = results['asc606_analysis']
         source_transparency = getattr(analysis_result, 'source_transparency', {})
+        
+        # Debug: Show what we're getting
+        st.write(f"Debug - Source transparency: {source_transparency}")
+        
         authoritative_count = len(source_transparency.get('authoritative_sources_used', []))
         interpretative_count = len(source_transparency.get('interpretative_sources_used', []))
         general_knowledge_count = len(source_transparency.get('general_knowledge_areas', []))
         
+        # Check citations as fallback indicator
+        citations = getattr(analysis_result, 'citations', [])
+        has_citations = len(citations) > 0
+        
         col4.metric("Source Quality", 
-                   "Authoritative" if authoritative_count > 0 else 
+                   "Authoritative" if authoritative_count > 0 or has_citations else 
                    "Interpretative" if interpretative_count > 0 else 
                    "General Knowledge")
         
