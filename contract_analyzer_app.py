@@ -223,22 +223,32 @@ class ContractAnalyzerApp:
 
         with tab2:
             # Show completion status at the very top first - use session state for persistence
-            tab2_complete = bool(st.session_state.get('uploaded_file_name',
-                                                      ''))
+            tab2_complete = bool(st.session_state.get('uploaded_files_names', []))
             status2 = "✅ Complete" if tab2_complete else "⚠️ File upload required"
             st.caption(status2)
 
-            st.subheader("Contract Document")
-            uploaded_file = st.file_uploader(
-                "Upload your contract in PDF or Word format *",
+            st.subheader("Contract Documents")
+            st.write("Upload up to 5 related documents (contract, invoices, change orders, etc.)")
+            
+            uploaded_files = st.file_uploader(
+                "Upload your documents in PDF or Word format *",
                 type=['pdf', 'docx', 'doc'],
-                key="uploaded_file")
+                accept_multiple_files=True,
+                key="uploaded_files",
+                help="You can upload multiple files: main contract, invoices, change orders, amendments, etc.")
 
-            # Store filename when file is uploaded
-            if uploaded_file:
-                st.session_state.uploaded_file_name = uploaded_file.name
-            elif 'uploaded_file_name' not in st.session_state:
-                st.session_state.uploaded_file_name = ''
+            # Handle multiple files and enforce limit
+            if uploaded_files:
+                if len(uploaded_files) > 5:
+                    st.error("❌ Please upload a maximum of 5 files at once.")
+                    st.session_state.uploaded_files_names = []
+                else:
+                    st.session_state.uploaded_files_names = [f.name for f in uploaded_files]
+                    st.success(f"✅ {len(uploaded_files)} file(s) uploaded successfully:")
+                    for i, file in enumerate(uploaded_files, 1):
+                        st.write(f"{i}. {file.name}")
+            elif 'uploaded_files_names' not in st.session_state:
+                st.session_state.uploaded_files_names = []
 
         with tab3:
             st.subheader("Analysis Configuration")
@@ -261,7 +271,7 @@ class ContractAnalyzerApp:
         # Check completion status for button styling and text
         tab1_ready = bool(analysis_title and customer_name
                           and arrangement_description)
-        tab2_ready = bool(uploaded_file)
+        tab2_ready = bool(uploaded_files)
         both_tabs_ready = tab1_ready and tab2_ready
 
         # Button appearance changes based on readiness
@@ -294,8 +304,8 @@ class ContractAnalyzerApp:
                     missing_fields.append("Customer Name")
                 if not arrangement_description.strip():
                     missing_fields.append("Brief Description")
-                if not uploaded_file:
-                    missing_fields.append("Contract Document")
+                if not uploaded_files:
+                    missing_fields.append("Contract Documents")
 
                 if missing_fields:
                     st.error(
@@ -315,7 +325,7 @@ class ContractAnalyzerApp:
                     transaction_price=transaction_price,
                     currency=currency,
                     arrangement_description=arrangement_description,
-                    uploaded_file_name=uploaded_file.name,
+                    uploaded_file_name=", ".join([f.name for f in uploaded_files]),
                     analysis_depth=analysis_depth,
                     output_format=output_format,
                     include_citations=include_citations,
@@ -323,7 +333,7 @@ class ContractAnalyzerApp:
                     additional_notes=additional_notes)
                 # Store the validated data model in session state
                 st.session_state.contract_data = contract_data
-                self.process_contract(uploaded_file)
+                self.process_contract(uploaded_files)
 
             except ValidationError as e:
                 # Pydantic raises an error if fields are missing or types are wrong
@@ -335,21 +345,54 @@ class ContractAnalyzerApp:
             # The original code had a NameError because `effective_date` wasn't defined.
             # This is now prevented by using the Pydantic model, which only includes defined fields.
 
-    def process_contract(self, uploaded_file):
-        with st.spinner("Analyzing contract... This may take a moment."):
+    def process_contract(self, uploaded_files):
+        with st.spinner("Analyzing contract documents... This may take a moment."):
             start_time = time.time()
             
             try:
-                # Step 1: Extract text from document
-                st.info("📄 Extracting text from document...")
-                extraction_result = self.extractor.extract_text(uploaded_file)
+                # Step 1: Extract text from all documents
+                st.info(f"📄 Extracting text from {len(uploaded_files)} document(s)...")
                 
-                if extraction_result.get('error'):
-                    st.error(f"Document extraction failed: {extraction_result['error']}")
+                all_extracted_text = []
+                all_metadata = []
+                
+                for i, uploaded_file in enumerate(uploaded_files, 1):
+                    st.write(f"Processing file {i}/{len(uploaded_files)}: {uploaded_file.name}")
+                    
+                    extraction_result = self.extractor.extract_text(uploaded_file)
+                    
+                    if extraction_result.get('error'):
+                        st.error(f"Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                        continue
+                    
+                    # Add file identifier to the text
+                    file_text = f"\n\n=== DOCUMENT {i}: {uploaded_file.name} ===\n{extraction_result['text']}\n=== END DOCUMENT {i} ===\n"
+                    all_extracted_text.append(file_text)
+                    all_metadata.append({
+                        'filename': uploaded_file.name,
+                        'extraction_method': extraction_result.get('method', 'unknown'),
+                        'word_count': extraction_result.get('word_count', 0),
+                        'char_count': len(extraction_result.get('text', ''))
+                    })
+                
+                if not all_extracted_text:
+                    st.error("❌ No documents could be processed successfully.")
                     return
                 
-                # Step 2: Validate extraction quality
-                validation = self.extractor.validate_extraction(extraction_result)
+                # Combine all extracted text
+                combined_text = "\n".join(all_extracted_text)
+                
+                # Step 2: Create combined extraction result
+                combined_extraction = {
+                    'text': combined_text,
+                    'method': 'multi-document',
+                    'word_count': sum(meta['word_count'] for meta in all_metadata),
+                    'files_processed': len(all_extracted_text),
+                    'files_metadata': all_metadata
+                }
+                
+                # Step 3: Validate extraction quality
+                validation = self.extractor.validate_extraction(combined_extraction)
                 if not validation['is_valid']:
                     st.warning("⚠️ Document extraction quality issues detected:")
                     for issue in validation['issues']:
@@ -358,15 +401,15 @@ class ContractAnalyzerApp:
                     if not st.button("Continue with analysis anyway"):
                         return
                 
-                # Step 3: Perform ASC 606 analysis
+                # Step 4: Perform ASC 606 analysis
                 st.info("🔍 Performing ASC 606 analysis...")
                 contract_data = st.session_state.contract_data.__dict__
                 analysis_result = self.analyzer.analyze_contract(
-                    extraction_result['text'], 
+                    combined_extraction['text'], 
                     contract_data
                 )
                 
-                # Step 4: Quality validation
+                # Step 5: Quality validation
                 st.info("✅ Validating analysis quality...")
                 quality_result = self.analyzer.validate_analysis_quality(analysis_result)
                 
@@ -376,12 +419,12 @@ class ContractAnalyzerApp:
                 st.session_state.analysis_results = {
                     'asc606_analysis': analysis_result,
                     'quality_validation': quality_result,
-                    'extraction_info': extraction_result,
+                    'extraction_info': combined_extraction,
                     'processing_time': processing_time,
                     'analysis_date': time.strftime('%Y-%m-%d %H:%M:%S')
                 }
                 
-                st.success("✅ Contract analysis completed!")
+                st.success(f"✅ Contract analysis completed! Processed {len(uploaded_files)} document(s).")
                 
             except Exception as e:
                 st.error(f"Analysis failed: {str(e)}")
