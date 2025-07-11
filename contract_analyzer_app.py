@@ -456,7 +456,8 @@ class ContractAnalyzerApp:
         col3.metric("Quality Score", f"{results['quality_validation']['quality_score']}/100")
         
         # Source transparency metrics
-        source_transparency = getattr(analysis, 'source_transparency', {})
+        analysis_result = results['asc606_analysis']
+        source_transparency = getattr(analysis_result, 'source_transparency', {})
         authoritative_count = len(source_transparency.get('authoritative_sources_used', []))
         interpretative_count = len(source_transparency.get('interpretative_sources_used', []))
         general_knowledge_count = len(source_transparency.get('general_knowledge_areas', []))
