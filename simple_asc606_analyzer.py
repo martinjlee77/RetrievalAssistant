@@ -370,7 +370,7 @@ class SimpleASC606Analyzer:
     
     def _structure_analysis_result(self, analysis_result: Dict[str, Any], memo: str) -> ASC606Analysis:
         """Structure the analysis result"""
-        return ASC606Analysis(
+        structured_analysis = ASC606Analysis(
             contract_overview=analysis_result.get('contract_overview', {}),
             step1_contract_identification=analysis_result.get('step1_contract_identification', {}),
             step2_performance_obligations=analysis_result.get('step2_performance_obligations', {}),
@@ -382,6 +382,11 @@ class SimpleASC606Analyzer:
             citations=analysis_result.get('citations', []),
             not_applicable_items=[]
         )
+        
+        # Add source transparency as attribute
+        structured_analysis.source_transparency = analysis_result.get('source_transparency', {})
+        
+        return structured_analysis
     
     def validate_analysis_quality(self, analysis: ASC606Analysis) -> Dict[str, Any]:
         """Validate analysis quality"""
