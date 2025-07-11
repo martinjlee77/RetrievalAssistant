@@ -39,6 +39,7 @@ class SimpleASC606Analyzer:
         self.client = OpenAI(api_key=OPENAI_API_KEY)
         self.setup_logging()
         self.authoritative_sources = self._load_authoritative_sources()
+        self.review_questions = self._load_comprehensive_questions()
         
     def setup_logging(self):
         """Setup logging for analysis tracking"""
@@ -97,6 +98,23 @@ class SimpleASC606Analyzer:
         
         self.logger.info(f"Loaded {len(sources)} authoritative sources")
         return sources
+    
+    def _load_comprehensive_questions(self) -> str:
+        """Load the comprehensive ASC 606 questions framework"""
+        try:
+            questions_file = Path("attached_assets/contract_review_questions_1752253743809.docx")
+            if questions_file.exists():
+                from docx import Document
+                doc = Document(questions_file)
+                questions_content = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+                self.logger.info("Loaded comprehensive ASC 606 review questions")
+                return questions_content
+            else:
+                self.logger.warning("ASC 606 review questions file not found")
+                return ""
+        except Exception as e:
+            self.logger.error(f"Error loading review questions: {e}")
+            return ""
     
     def _get_relevant_guidance(self, query: str) -> Dict[str, str]:
         """Get relevant guidance for a query, categorized by source type"""
@@ -168,6 +186,10 @@ class SimpleASC606Analyzer:
             Authoritative: {recognition_guidance.get('authoritative', 'None available')}
             Interpretative: {recognition_guidance.get('interpretative', 'None available')}
             
+            COMPREHENSIVE REVIEW FRAMEWORK:
+            Use these professional questions to guide your analysis:
+            {self.review_questions[:3000]}
+            
             CONTRACT INFORMATION:
             - Title: {contract_data.get('analysis_title', 'N/A')}
             - Customer: {contract_data.get('customer_name', 'N/A')}
@@ -179,6 +201,12 @@ class SimpleASC606Analyzer:
             {contract_text[:2000]}
             
             Please analyze this contract following the ASC 606 five-step model. Use the source hierarchy above - prioritize authoritative sources, then interpretative guidance, then general knowledge only as fallback.
+            
+            ANALYSIS APPROACH:
+            1. Use the comprehensive review framework questions to guide your analysis
+            2. Address each relevant question from the framework for the contract's specific circumstances
+            3. Base answers on the authoritative and interpretative guidance provided
+            4. Clearly indicate source basis for each conclusion
             
             Return as JSON with this structure:
             {{
