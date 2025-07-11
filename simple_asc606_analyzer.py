@@ -102,22 +102,20 @@ class SimpleASC606Analyzer:
     def _load_comprehensive_questions(self) -> str:
         """Load the comprehensive ASC 606 questions framework"""
         try:
-            questions_file = Path("attached_assets/contract_review_questions_1752253743809.docx")
+            # Look for the new text file
+            questions_file = Path("attached_assets/contract_review_questions_1752258616680.txt")
             if questions_file.exists():
-                from docx import Document
-                doc = Document(questions_file)
-                questions_content = []
-                
-                for paragraph in doc.paragraphs:
-                    text = paragraph.text.strip()
-                    if text:
-                        # Clean up formatting issues
-                        text = re.sub(r'\s+', ' ', text)  # Replace multiple spaces with single space
-                        questions_content.append(text)
-                
-                formatted_questions = "\n".join(questions_content)
-                self.logger.info(f"Loaded comprehensive ASC 606 review questions ({len(questions_content)} items)")
-                return formatted_questions
+                with open(questions_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # Clean up formatting and add proper line breaks for better readability
+                    formatted_content = re.sub(r'(\d+\.\d+)', r'\n\n\1', content)  # Add newlines before section numbers
+                    formatted_content = re.sub(r'(Step \d+:)', r'\n\n=== \1 ===', formatted_content)  # Add clear step separators
+                    formatted_content = re.sub(r'([a-z])\?([A-Z])', r'\1?\n\2', formatted_content)  # Add line breaks after questions
+                    formatted_content = re.sub(r'\s+', ' ', formatted_content)  # Clean up extra spaces
+                    formatted_content = re.sub(r' \n', '\n', formatted_content)  # Clean up space before newlines
+                    
+                self.logger.info(f"Loaded comprehensive ASC 606 review questions ({len(formatted_content)} chars)")
+                return formatted_content
             else:
                 self.logger.warning("ASC 606 review questions file not found")
                 return self._get_fallback_questions()
