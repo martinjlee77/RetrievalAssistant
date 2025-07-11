@@ -98,9 +98,10 @@ class SimpleASC606Analyzer:
         self.logger.info(f"Loaded {len(sources)} authoritative sources")
         return sources
     
-    def _get_relevant_guidance(self, query: str) -> str:
-        """Get relevant guidance for a query"""
-        relevant_content = []
+    def _get_relevant_guidance(self, query: str) -> Dict[str, str]:
+        """Get relevant guidance for a query, categorized by source type"""
+        authoritative_content = []
+        interpretative_content = []
         
         # Simple text matching for relevant sections
         query_lower = query.lower()
@@ -108,10 +109,17 @@ class SimpleASC606Analyzer:
         for source_name, content in self.authoritative_sources.items():
             # Check if content contains relevant keywords
             if any(keyword in content.lower() for keyword in query_lower.split()):
-                # Take first 1000 chars of relevant content
-                relevant_content.append(f"**{source_name.upper()}**\n{content[:1000]}")
+                # Categorize by source type
+                if source_name == "ey_guidance":
+                    interpretative_content.append(f"**EY INTERPRETATIVE GUIDANCE**\n{content[:1000]}")
+                else:
+                    authoritative_content.append(f"**ASC 606 - {source_name.upper()}**\n{content[:1000]}")
         
-        return "\n\n".join(relevant_content)
+        return {
+            "authoritative": "\n\n".join(authoritative_content) if authoritative_content else "",
+            "interpretative": "\n\n".join(interpretative_content) if interpretative_content else "",
+            "has_guidance": bool(authoritative_content or interpretative_content)
+        }
     
     def analyze_contract(self, contract_text: str, contract_data: Dict[str, Any]) -> ASC606Analysis:
         """
@@ -127,26 +135,38 @@ class SimpleASC606Analyzer:
             allocation_guidance = self._get_relevant_guidance("allocate transaction price")
             recognition_guidance = self._get_relevant_guidance("revenue recognition control transfer")
             
-            # Create analysis prompt with authoritative context
+            # Create analysis prompt with three-tier source hierarchy
             analysis_prompt = f"""
-            You are performing an ASC 606 analysis using authoritative sources.
+            You are performing an ASC 606 analysis as a senior accounting professional.
             
-            AUTHORITATIVE GUIDANCE:
+            SOURCE HIERARCHY (in order of authority):
+            1. AUTHORITATIVE: ASC 606 official FASB standards (highest authority)
+            2. INTERPRETATIVE: EY publication Big 4 professional guidance (secondary authority)
+            3. GENERAL KNOWLEDGE: LLM general ASC 606 knowledge (fallback for edge cases only)
+            
+            TRANSPARENCY REQUIREMENT: Clearly indicate which source type supports each analysis point.
+            
+            GUIDANCE PROVIDED:
             
             CONTRACT IDENTIFICATION:
-            {contract_guidance}
+            Authoritative: {contract_guidance.get('authoritative', 'None available')}
+            Interpretative: {contract_guidance.get('interpretative', 'None available')}
             
             PERFORMANCE OBLIGATIONS:
-            {obligations_guidance}
+            Authoritative: {obligations_guidance.get('authoritative', 'None available')}
+            Interpretative: {obligations_guidance.get('interpretative', 'None available')}
             
             TRANSACTION PRICE:
-            {price_guidance}
+            Authoritative: {price_guidance.get('authoritative', 'None available')}
+            Interpretative: {price_guidance.get('interpretative', 'None available')}
             
             PRICE ALLOCATION:
-            {allocation_guidance}
+            Authoritative: {allocation_guidance.get('authoritative', 'None available')}
+            Interpretative: {allocation_guidance.get('interpretative', 'None available')}
             
             REVENUE RECOGNITION:
-            {recognition_guidance}
+            Authoritative: {recognition_guidance.get('authoritative', 'None available')}
+            Interpretative: {recognition_guidance.get('interpretative', 'None available')}
             
             CONTRACT INFORMATION:
             - Title: {contract_data.get('analysis_title', 'N/A')}
@@ -158,7 +178,7 @@ class SimpleASC606Analyzer:
             CONTRACT TEXT:
             {contract_text[:2000]}
             
-            Please analyze this contract following the ASC 606 five-step model using ONLY the authoritative guidance provided above.
+            Please analyze this contract following the ASC 606 five-step model. Use the source hierarchy above - prioritize authoritative sources, then interpretative guidance, then general knowledge only as fallback.
             
             Return as JSON with this structure:
             {{
@@ -170,27 +190,37 @@ class SimpleASC606Analyzer:
                 "step1_contract_identification": {{
                     "contract_exists": "boolean",
                     "rationale": "string",
-                    "key_findings": ["list"]
+                    "key_findings": ["list"],
+                    "source_basis": "authoritative|interpretative|general_knowledge"
                 }},
                 "step2_performance_obligations": {{
                     "identified_obligations": ["list"],
                     "distinctness_analysis": "string",
-                    "key_judgments": ["list"]
+                    "key_judgments": ["list"],
+                    "source_basis": "authoritative|interpretative|general_knowledge"
                 }},
                 "step3_transaction_price": {{
                     "fixed_consideration": "number",
                     "variable_consideration": "string",
-                    "key_estimates": ["list"]
+                    "key_estimates": ["list"],
+                    "source_basis": "authoritative|interpretative|general_knowledge"
                 }},
                 "step4_price_allocation": {{
                     "allocation_method": "string",
-                    "key_assumptions": ["list"]
+                    "key_assumptions": ["list"],
+                    "source_basis": "authoritative|interpretative|general_knowledge"
                 }},
                 "step5_revenue_recognition": {{
                     "recognition_pattern": "string",
-                    "implementation_steps": ["list"]
+                    "implementation_steps": ["list"],
+                    "source_basis": "authoritative|interpretative|general_knowledge"
                 }},
-                "citations": ["list of ASC paragraphs cited"]
+                "citations": ["list of specific ASC paragraphs and EY publication sections cited"],
+                "source_transparency": {{
+                    "authoritative_sources_used": ["list"],
+                    "interpretative_sources_used": ["list"],
+                    "general_knowledge_areas": ["list of topics requiring general knowledge fallback"]
+                }}
             }}
             """
             

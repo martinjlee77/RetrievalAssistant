@@ -396,11 +396,31 @@ class ContractAnalyzerApp:
         contract: ContractData = st.session_state.contract_data
         results = st.session_state.analysis_results
 
-        # Display key metrics
-        col1, col2, col3 = st.columns(3)
+        # Display key metrics with source transparency
+        col1, col2, col3, col4 = st.columns(4)
         col1.metric("Analysis Type", st.session_state.selected_standard)
         col2.metric("Processing Time", f"{results['processing_time']:.1f}s")
         col3.metric("Quality Score", f"{results['quality_validation']['quality_score']}/100")
+        
+        # Source transparency metrics
+        source_transparency = getattr(analysis, 'source_transparency', {})
+        authoritative_count = len(source_transparency.get('authoritative_sources_used', []))
+        interpretative_count = len(source_transparency.get('interpretative_sources_used', []))
+        general_knowledge_count = len(source_transparency.get('general_knowledge_areas', []))
+        
+        col4.metric("Source Quality", 
+                   "Authoritative" if authoritative_count > 0 else 
+                   "Interpretative" if interpretative_count > 0 else 
+                   "General Knowledge")
+        
+        # Source transparency alert
+        if general_knowledge_count > 0:
+            st.warning(f"⚠️ {general_knowledge_count} analysis areas used general knowledge fallback")
+            with st.expander("View General Knowledge Areas"):
+                for area in source_transparency.get('general_knowledge_areas', []):
+                    st.write(f"• {area}")
+        else:
+            st.success("✅ Analysis based on authoritative and interpretative sources")
 
         # Display a summary of the inputs
         with st.expander("Show Original Contract Details", expanded=False):
