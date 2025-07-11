@@ -1,8 +1,11 @@
 import streamlit as st
 import time
+import json
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
+from asc606_analyzer import ASC606Analyzer
+from document_extractor import DocumentExtractor
 
 
 # --- CHANGE 4: Use Pydantic for robust data modeling ---
@@ -64,6 +67,9 @@ class ContractAnalyzerApp:
                            initial_sidebar_state="expanded")
         # Initialize session state safely
         self.initialize_session_state()
+        # Initialize analysis components
+        self.analyzer = ASC606Analyzer()
+        self.extractor = DocumentExtractor()
 
     def initialize_session_state(self):
         if 'analysis_results' not in st.session_state:
@@ -319,19 +325,57 @@ class ContractAnalyzerApp:
 
     def process_contract(self, uploaded_file):
         with st.spinner("Analyzing contract... This may take a moment."):
-            # In a real app, this is where you would:
-            # 1. Read the file bytes: `file_content = uploaded_file.read()`
-            # 2. Extract text from the PDF/DOCX
-            # 3. Call your backend/LLM API with the text and contract_data
-            time.sleep(3)  # Simulate processing time
-
-            # Mock results
-            st.session_state.analysis_results = {
-                'processing_time': 3.2,
-                'sections_analyzed': 5,
-                'issues_identified': 3,
-            }
-        st.success("✅ Contract analysis completed!")
+            start_time = time.time()
+            
+            try:
+                # Step 1: Extract text from document
+                st.info("📄 Extracting text from document...")
+                extraction_result = self.extractor.extract_text(uploaded_file)
+                
+                if extraction_result.get('error'):
+                    st.error(f"Document extraction failed: {extraction_result['error']}")
+                    return
+                
+                # Step 2: Validate extraction quality
+                validation = self.extractor.validate_extraction(extraction_result)
+                if not validation['is_valid']:
+                    st.warning("⚠️ Document extraction quality issues detected:")
+                    for issue in validation['issues']:
+                        st.write(f"• {issue}")
+                    
+                    if not st.button("Continue with analysis anyway"):
+                        return
+                
+                # Step 3: Perform ASC 606 analysis
+                st.info("🔍 Performing ASC 606 analysis...")
+                contract_data = st.session_state.contract_data.__dict__
+                analysis_result = self.analyzer.analyze_contract(
+                    extraction_result['text'], 
+                    contract_data
+                )
+                
+                # Step 4: Quality validation
+                st.info("✅ Validating analysis quality...")
+                quality_result = self.analyzer.validate_analysis_quality(analysis_result)
+                
+                processing_time = time.time() - start_time
+                
+                # Store results
+                st.session_state.analysis_results = {
+                    'asc606_analysis': analysis_result,
+                    'quality_validation': quality_result,
+                    'extraction_info': extraction_result,
+                    'processing_time': processing_time,
+                    'analysis_date': time.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                
+                st.success("✅ Contract analysis completed!")
+                
+            except Exception as e:
+                st.error(f"Analysis failed: {str(e)}")
+                st.error("Please check your document and try again.")
+                return
+        
         st.rerun()
 
     def render_analysis_results(self):
@@ -344,7 +388,7 @@ class ContractAnalyzerApp:
         col1, col2, col3 = st.columns(3)
         col1.metric("Analysis Type", st.session_state.selected_standard)
         col2.metric("Processing Time", f"{results['processing_time']:.1f}s")
-        col3.metric("Key Issues Found", results['issues_identified'])
+        col3.metric("Quality Score", f"{results['quality_validation']['quality_score']}/100")
 
         # Display a summary of the inputs
         with st.expander("Show Original Contract Details", expanded=False):
@@ -358,29 +402,138 @@ class ContractAnalyzerApp:
             )
             st.write(f"**File:** {contract.uploaded_file_name}")
 
-        # Placeholder for the actual analysis output, now using tabs
-        st.subheader("ASC 606 - 5 Step Analysis")
+        # Display ASC 606 analysis results
+        analysis = results['asc606_analysis']
+        quality = results['quality_validation']
+        
+        # Quality indicator
+        if quality['quality_score'] >= 80:
+            st.success(f"✅ High Quality Analysis (Score: {quality['quality_score']}/100)")
+        elif quality['quality_score'] >= 60:
+            st.warning(f"⚠️ Moderate Quality Analysis (Score: {quality['quality_score']}/100)")
+        else:
+            st.error(f"❌ Low Quality Analysis (Score: {quality['quality_score']}/100)")
+
+        # ASC 606 Five-Step Analysis
+        st.subheader("🔍 ASC 606 Five-Step Analysis")
         step1, step2, step3, step4, step5 = st.tabs([
-            "Step 1: Contract", "Step 2: Perf. Obligations", "Step 3: Price",
-            "Step 4: Allocate", "Step 5: Recognize"
+            "Step 1: Contract", "Step 2: Performance Obligations", "Step 3: Transaction Price",
+            "Step 4: Price Allocation", "Step 5: Revenue Recognition"
         ])
+        
         with step1:
-            st.info(
-                "Analysis of Step 1 (Identify the Contract) will appear here.")
+            step1_data = analysis.step1_contract_identification
+            st.write("**Contract Identification Analysis**")
+            st.write(f"**Contract Exists:** {'Yes' if step1_data.get('contract_exists') else 'No'}")
+            st.write(f"**Rationale:** {step1_data.get('rationale', 'Not provided')}")
+            st.write(f"**Combination Required:** {'Yes' if step1_data.get('combination_required') else 'No'}")
+            st.write(f"**Modifications Present:** {'Yes' if step1_data.get('modifications_present') else 'No'}")
+            
+            if step1_data.get('key_findings'):
+                st.write("**Key Findings:**")
+                for finding in step1_data['key_findings']:
+                    st.write(f"• {finding}")
+        
         with step2:
-            st.info(
-                "Analysis of Step 2 (Identify Performance Obligations) will appear here."
-            )
+            step2_data = analysis.step2_performance_obligations
+            st.write("**Performance Obligations Analysis**")
+            
+            if step2_data.get('identified_obligations'):
+                st.write("**Identified Performance Obligations:**")
+                for i, obligation in enumerate(step2_data['identified_obligations'], 1):
+                    st.write(f"{i}. {obligation}")
+            
+            st.write(f"**Distinctness Analysis:** {step2_data.get('distinctness_analysis', 'Not provided')}")
+            st.write(f"**Principal vs Agent Analysis:** {step2_data.get('principal_agent_analysis', 'Not provided')}")
+            
+            if step2_data.get('key_judgments'):
+                st.write("**Key Judgments:**")
+                for judgment in step2_data['key_judgments']:
+                    st.write(f"• {judgment}")
+        
         with step3:
-            st.info(
-                "Analysis of Step 3 (Determine Transaction Price) will appear here."
-            )
+            step3_data = analysis.step3_transaction_price
+            st.write("**Transaction Price Analysis**")
+            
+            if step3_data.get('fixed_consideration'):
+                st.write(f"**Fixed Consideration:** {contract.currency} {step3_data['fixed_consideration']:,.2f}")
+            
+            st.write(f"**Variable Consideration:** {step3_data.get('variable_consideration', 'Not provided')}")
+            st.write(f"**Constraint Analysis:** {step3_data.get('constraint_analysis', 'Not provided')}")
+            st.write(f"**Financing Components:** {step3_data.get('financing_components', 'Not provided')}")
+            
+            if step3_data.get('key_estimates'):
+                st.write("**Key Estimates:**")
+                for estimate in step3_data['key_estimates']:
+                    st.write(f"• {estimate}")
+        
         with step4:
-            st.info(
-                "Analysis of Step 4 (Allocate Transaction Price) will appear here."
-            )
+            step4_data = analysis.step4_price_allocation
+            st.write("**Price Allocation Analysis**")
+            
+            st.write(f"**Allocation Method:** {step4_data.get('allocation_method', 'Not provided')}")
+            
+            if step4_data.get('standalone_selling_prices'):
+                st.write("**Standalone Selling Prices:**")
+                ssp = step4_data['standalone_selling_prices']
+                if isinstance(ssp, dict):
+                    for obligation, price in ssp.items():
+                        st.write(f"• {obligation}: {price}")
+                else:
+                    st.write(f"• {ssp}")
+            
+            if step4_data.get('key_assumptions'):
+                st.write("**Key Assumptions:**")
+                for assumption in step4_data['key_assumptions']:
+                    st.write(f"• {assumption}")
+        
         with step5:
-            st.info("Analysis of Step 5 (Recognize Revenue) will appear here.")
+            step5_data = analysis.step5_revenue_recognition
+            st.write("**Revenue Recognition Analysis**")
+            
+            st.write(f"**Recognition Pattern:** {step5_data.get('recognition_pattern', 'Not provided')}")
+            st.write(f"**Control Transfer Analysis:** {step5_data.get('control_transfer_analysis', 'Not provided')}")
+            st.write(f"**Timing Determination:** {step5_data.get('timing_determination', 'Not provided')}")
+            
+            if step5_data.get('implementation_steps'):
+                st.write("**Implementation Steps:**")
+                for i, step in enumerate(step5_data['implementation_steps'], 1):
+                    st.write(f"{i}. {step}")
+
+        # Professional memo section
+        st.subheader("📋 Professional Memo")
+        with st.expander("View Complete Professional Memo", expanded=False):
+            st.text_area("Professional Accounting Memo", 
+                        value=analysis.professional_memo, 
+                        height=400, 
+                        disabled=True)
+
+        # Export options
+        st.subheader("📥 Export Options")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("📄 Download Professional Memo", use_container_width=True):
+                st.download_button(
+                    label="Download Memo as Text",
+                    data=analysis.professional_memo,
+                    file_name=f"ASC606_Analysis_{contract.analysis_title.replace(' ', '_')}.txt",
+                    mime="text/plain"
+                )
+        
+        with col2:
+            if st.button("📊 Download Full Analysis", use_container_width=True):
+                full_analysis = {
+                    'contract_data': contract.__dict__,
+                    'analysis_results': analysis.__dict__,
+                    'quality_assessment': quality
+                }
+                st.download_button(
+                    label="Download Analysis as JSON",
+                    data=json.dumps(full_analysis, indent=2, default=str),
+                    file_name=f"ASC606_Full_Analysis_{contract.analysis_title.replace(' ', '_')}.json",
+                    mime="application/json"
+                )
 
         st.divider()
         if st.button("🔄 Analyze Another Contract", use_container_width=True):

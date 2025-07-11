@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "camelot-py>=1.0.0",
     "docx>=0.2.4",
+    "openai>=1.95.0",
     "pandas>=2.3.1",
     "pdfminer-six>=20250506",
     "pdfplumber>=0.11.7",
