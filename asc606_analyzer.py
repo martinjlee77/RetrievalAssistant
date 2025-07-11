@@ -1,6 +1,6 @@
 """
 ASC 606 Contract Analysis Engine
-Integrates GPT-4o with comprehensive ASC 606 framework for professional contract analysis
+RAG-powered professional contract analysis using authoritative ASC 606 sources
 """
 
 import os
@@ -10,6 +10,9 @@ from datetime import datetime
 import logging
 from openai import OpenAI
 from dataclasses import dataclass
+
+# Import RAG system
+from rag_system import initialize_rag_system, search_asc606_guidance, asc606_kb
 
 # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
 # do not change this unless explicitly requested by the user
@@ -36,7 +39,8 @@ class ASC606Analyzer:
     def __init__(self):
         self.client = OpenAI(api_key=OPENAI_API_KEY)
         self.setup_logging()
-        self.load_authoritative_guidance()
+        self.rag_initialized = False
+        self.initialize_rag_system()
     
     def setup_logging(self):
         """Setup logging for analysis tracking"""
@@ -46,14 +50,25 @@ class ASC606Analyzer:
         )
         self.logger = logging.getLogger(__name__)
     
-    def load_authoritative_guidance(self):
-        """Load ASC 606 authoritative guidance and reference materials"""
-        # This will be populated with the 13 ASC 606 txt files and EY guidance
-        self.asc606_guidance = {
-            "authoritative_text": "ASC 606 authoritative guidance will be loaded here",
-            "ey_interpretative_guidance": "EY interpretative guidance will be loaded here",
-            "comprehensive_questions": self._load_comprehensive_questions()
-        }
+    def initialize_rag_system(self):
+        """Initialize RAG system with authoritative ASC 606 sources"""
+        try:
+            self.logger.info("Initializing RAG system with authoritative ASC 606 sources...")
+            
+            rag_results = initialize_rag_system()
+            
+            if rag_results["status"] == "success" and rag_results["ready_for_analysis"]:
+                self.rag_initialized = True
+                self.logger.info("RAG system successfully initialized")
+                self.logger.info(f"Knowledge base contains {rag_results['load_results']['total_chunks']} chunks")
+                self.logger.info(f"Sources loaded: {rag_results['load_results']['sources_loaded']}")
+            else:
+                self.logger.error("RAG system initialization failed")
+                self.logger.error(f"Error: {rag_results.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            self.logger.error(f"Error initializing RAG system: {str(e)}")
+            self.rag_initialized = False
     
     def _load_comprehensive_questions(self) -> str:
         """Load the comprehensive ASC 606 questions framework"""
@@ -131,7 +146,7 @@ class ASC606Analyzer:
     
     def analyze_contract(self, contract_text: str, contract_data: Dict[str, Any]) -> ASC606Analysis:
         """
-        Perform comprehensive ASC 606 analysis on contract
+        Perform comprehensive ASC 606 analysis on contract using RAG system
         
         Args:
             contract_text: Extracted text from contract document
@@ -140,19 +155,22 @@ class ASC606Analyzer:
         Returns:
             ASC606Analysis: Complete analysis results
         """
-        self.logger.info(f"Starting ASC 606 analysis for contract: {contract_data.get('analysis_title', 'Unknown')}")
+        self.logger.info(f"Starting RAG-powered ASC 606 analysis for contract: {contract_data.get('analysis_title', 'Unknown')}")
+        
+        if not self.rag_initialized:
+            raise Exception("RAG system not initialized. Cannot perform analysis without authoritative sources.")
         
         try:
-            # Generate the master analysis prompt
-            analysis_prompt = self._create_master_analysis_prompt(contract_text, contract_data)
+            # Generate contextual analysis using RAG
+            analysis_prompt = self._create_rag_analysis_prompt(contract_text, contract_data)
             
-            # Call GPT-4o for analysis
+            # Call GPT-4o for analysis with RAG context
             response = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {
                         "role": "system",
-                        "content": self._get_system_prompt()
+                        "content": self._get_rag_system_prompt()
                     },
                     {
                         "role": "user",
@@ -177,15 +195,20 @@ class ASC606Analyzer:
             self.logger.error(f"Error in ASC 606 analysis: {str(e)}")
             raise Exception(f"Analysis failed: {str(e)}")
     
-    def _get_system_prompt(self) -> str:
-        """Get the system prompt for ASC 606 analysis"""
+    def _get_rag_system_prompt(self) -> str:
+        """Get the RAG-enhanced system prompt for ASC 606 analysis"""
         return """
         You are a senior manager at a Big 4 accounting firm specializing in ASC 606 revenue recognition. 
         You have deep expertise in applying ASC 606 to complex contractual arrangements and preparing 
         professional accounting memos for clients.
         
-        Your task is to analyze contracts following the ASC 606 five-step methodology and provide 
-        comprehensive professional analysis suitable for Big 4 audit and advisory work.
+        CRITICAL: You must base your analysis EXCLUSIVELY on the authoritative ASC 606 guidance and 
+        EY interpretative materials provided in the context. Do not rely on general knowledge - 
+        only use the specific guidance provided from the knowledge base.
+        
+        Your task is to analyze contracts following the ASC 606 five-step methodology using the 
+        authoritative sources provided and provide comprehensive professional analysis suitable 
+        for Big 4 audit and advisory work.
         
         RESPONSE FORMAT: Return your analysis as a JSON object with the following structure:
         {
@@ -245,6 +268,72 @@ class ASC606Analyzer:
         - Maintain audit-ready documentation standards
         """
     
+    def _create_rag_analysis_prompt(self, contract_text: str, contract_data: Dict[str, Any]) -> str:
+        """Create RAG-enhanced analysis prompt with authoritative context"""
+        
+        # Generate relevant context from knowledge base for each step
+        step1_context = search_asc606_guidance(
+            f"contract identification criteria enforceable rights obligations {contract_data.get('customer_name', '')}"
+        )
+        
+        step2_context = search_asc606_guidance(
+            f"performance obligations distinct goods services {contract_data.get('arrangement_description', '')}"
+        )
+        
+        step3_context = search_asc606_guidance(
+            f"transaction price variable consideration {contract_data.get('transaction_price', '')}"
+        )
+        
+        step4_context = search_asc606_guidance(
+            f"allocate transaction price performance obligations standalone selling price"
+        )
+        
+        step5_context = search_asc606_guidance(
+            f"revenue recognition control transfer over time point in time"
+        )
+        
+        # Build comprehensive prompt with RAG context
+        prompt = f"""
+        AUTHORITATIVE ASC 606 GUIDANCE CONTEXT:
+
+        **STEP 1 - CONTRACT IDENTIFICATION:**
+        {step1_context}
+
+        **STEP 2 - PERFORMANCE OBLIGATIONS:**
+        {step2_context}
+
+        **STEP 3 - TRANSACTION PRICE:**
+        {step3_context}
+
+        **STEP 4 - PRICE ALLOCATION:**
+        {step4_context}
+
+        **STEP 5 - REVENUE RECOGNITION:**
+        {step5_context}
+
+        CONTRACT ANALYSIS REQUEST:
+        
+        Contract Information:
+        - Analysis Title: {contract_data.get('analysis_title', 'N/A')}
+        - Customer: {contract_data.get('customer_name', 'N/A')}
+        - Arrangement: {contract_data.get('arrangement_description', 'N/A')}
+        - Contract Period: {contract_data.get('contract_start', 'N/A')} to {contract_data.get('contract_end', 'N/A')}
+        - Transaction Price: {contract_data.get('currency', 'USD')} {contract_data.get('transaction_price', 'N/A')}
+        - Analysis Depth: {contract_data.get('analysis_depth', 'Standard')}
+
+        CONTRACT TEXT:
+        {contract_text[:3000]}  # Limit contract text to avoid token limits
+
+        INSTRUCTIONS:
+        Using ONLY the authoritative ASC 606 guidance provided above, perform a comprehensive 
+        analysis following the five-step methodology. Base all conclusions on the specific 
+        guidance provided - do not use general knowledge or assumptions.
+
+        For each step, cite specific ASC 606 paragraphs and EY guidance where applicable.
+        """
+        
+        return prompt
+
     def _create_master_analysis_prompt(self, contract_text: str, contract_data: Dict[str, Any]) -> str:
         """Create the master analysis prompt"""
         return f"""

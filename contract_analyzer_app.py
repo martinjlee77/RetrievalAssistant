@@ -4,7 +4,7 @@ import json
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
-from asc606_analyzer import ASC606Analyzer
+from simple_asc606_analyzer import SimpleASC606Analyzer
 from document_extractor import DocumentExtractor
 
 
@@ -68,8 +68,11 @@ class ContractAnalyzerApp:
         # Initialize session state safely
         self.initialize_session_state()
         # Initialize analysis components
-        self.analyzer = ASC606Analyzer()
+        self.analyzer = SimpleASC606Analyzer()
         self.extractor = DocumentExtractor()
+        
+        # Store RAG initialization status
+        self.rag_status = "ready" if self.analyzer.authoritative_sources else "failed"
 
     def initialize_session_state(self):
         if 'analysis_results' not in st.session_state:
@@ -126,6 +129,15 @@ class ContractAnalyzerApp:
             st.caption(
                 f"Version: {self.APP_CONFIG['version']}\n\nLast Updated: {self.APP_CONFIG['last_updated']}"
             )
+            
+            # RAG System Status
+            st.subheader("📚 Knowledge Base")
+            if self.analyzer.authoritative_sources:
+                st.success("✅ Authoritative Sources Loaded")
+                st.caption(f"Using {len(self.analyzer.authoritative_sources)} ASC 606 sources")
+            else:
+                st.error("❌ Sources Failed to Load")
+                st.caption("Check ASC 606 files in attached_assets")
 
     def render_upload_interface(self):
         # --- CHANGE 3: Organize inputs into clear tabs ---
