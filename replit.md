@@ -45,11 +45,18 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Processing Pipeline**: Modular processor architecture with separate concerns
 - **Core Components**:
-  - PDF extraction and parsing
-  - Intelligent chunking with semantic awareness
+  - Multi-document text extraction (PDF/Word)
+  - RAG-powered analysis using authoritative ASC 606 sources
+  - Professional memo generation with source transparency
   - Quality validation and scoring
   - Metadata enrichment
 - **Error Handling**: Comprehensive logging and graceful error recovery
+- **Performance**: Cached analyzer initialization to prevent RAG system reloading
+
+### Future Architecture Considerations
+- **Database Integration**: Planned for storing analysis history, user preferences, and cached results
+- **Multi-tenant Support**: User accounts and organization-level access controls
+- **Audit Trail**: Complete tracking of analyses for compliance and review purposes
 
 ## Key Components
 
