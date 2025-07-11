@@ -67,12 +67,21 @@ class ContractAnalyzerApp:
                            initial_sidebar_state="expanded")
         # Initialize session state safely
         self.initialize_session_state()
-        # Initialize analysis components
-        self.analyzer = SimpleASC606Analyzer()
+        # Initialize analysis components with caching
+        self.analyzer = self.get_cached_analyzer()
         self.extractor = DocumentExtractor()
         
         # Store RAG initialization status
         self.rag_status = "ready" if self.analyzer.authoritative_sources else "failed"
+
+    @st.cache_resource
+    def get_cached_analyzer(_self):
+        """Get cached analyzer instance to prevent reinitialization on every input change"""
+        return SimpleASC606Analyzer()
+
+    def update_form_state(self):
+        """Update form state without triggering full rerun"""
+        pass
 
     def initialize_session_state(self):
         if 'analysis_results' not in st.session_state:
@@ -164,7 +173,8 @@ class ContractAnalyzerApp:
                 placeholder="e.g., Q4 Project Phoenix SOW",
                 help=
                 "A unique, user-friendly name for this specific analysis. This allows you and the system to easily track and reference this specific contract memo.",
-                key="analysis_title")
+                key="analysis_title",
+                on_change=self.update_form_state)
             customer_name = col2.text_input(
                 "Customer Name *",
                 value=st.session_state.get('customer_name', ''),
