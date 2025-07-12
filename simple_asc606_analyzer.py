@@ -245,7 +245,7 @@ REVENUE RECOGNITION:
 **YOUR MANDATORY INSTRUCTIONS:**
 
 1. **VALIDATE THE HYPOTHESIS:**
-   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
+   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Note: User has provided {len(contract_data.get('performance_obligations', []))} performance obligations. Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
    - **Contract Modification:** Does the text contain language about amendments, addendums, or changes that contradict the user's "is_modification" flag?
    - **Transaction Price:** Does the contract's pricing structure match the user's breakdown of fixed vs. variable consideration? Is there evidence of a financing component the user missed?
 
@@ -276,7 +276,7 @@ REVENUE RECOGNITION:
         "discrepancies": [
             {{
                 "area": "Performance Obligations",
-                "user_input": "User identified one PO: 'SaaS Platform & Implementation'",
+                "user_input": "User identified {len(contract_data.get('performance_obligations', []))} performance obligations: {[po.get('name', 'Unknown') for po in contract_data.get('performance_obligations', [])]}" if contract_data.get('performance_obligations') else "User identified no performance obligations",
                 "ai_recommendation": "Identified two distinct POs: 1. Software Subscription (Over Time), 2. Implementation Service (Point in Time).",
                 "rationale": "The contract separates the delivery and payment for the subscription and the one-time service. Per ASC 606-10-25-19, these are distinct as the customer can benefit from each on its own and they are separately identifiable in the contract.",
                 "supporting_quote": "Section 3.1 states 'The total fee for the Implementation Service is $20,000, due upon completion.' and Section 4.1 states 'The Annual Subscription Fee is $100,000, payable annually.'"
@@ -354,7 +354,7 @@ REVENUE RECOGNITION:
             analysis_result = json.loads(response.choices[0].message.content)
             
             # Generate professional memo
-            memo = self._generate_professional_memo(analysis_result, contract_data)
+            memo = self._generate_professional_memo(analysis_result, contract_data, contract_text)
             
             # Structure the complete analysis
             return self._structure_analysis_result(analysis_result, memo)
@@ -363,7 +363,7 @@ REVENUE RECOGNITION:
             self.logger.error(f"Error in ASC 606 analysis: {str(e)}")
             raise Exception(f"Analysis failed: {str(e)}")
     
-    def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any]) -> str:
+    def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any], contract_text: str) -> str:
         """Generate premium, audit-ready professional memo"""
         # Extract the validated analysis sections
         validated_analysis = {
@@ -388,6 +388,11 @@ You are a Director at a top-tier accounting advisory firm, tasked with writing a
 {json.dumps(validated_analysis, indent=2)}
 ```
 
+**CONTRACT TEXT FOR DIRECT QUOTES:**
+```
+{contract_text[:10000]}
+```
+
 **MANDATORY INSTRUCTIONS:**
 
 1. **Structure and Tone:**
@@ -404,8 +409,8 @@ You are a Director at a top-tier accounting advisory firm, tasked with writing a
    - For every major conclusion within each of the 5 steps, you MUST use the "Conclusion-Rationale-Evidence" framework:
      - **Conclusion:** State the clear finding.
      - **Rationale:** Explain the accounting logic.
-     - **Contractual Evidence:** Provide a direct, verbatim quote from the contract text that supports your conclusion. You must infer the relevant quotes from the main analysis data provided.
-     - **Authoritative Guidance:** Cite the specific ASC 606 paragraph (e.g., ASC 606-10-25-19) from the 'citations' list.
+     - **Contractual Evidence:** Provide a direct, verbatim quote from the contract text that supports your conclusion. Extract actual quotes from the contractual_evidence section and contract text provided.
+     - **Authoritative Guidance:** Cite the specific ASC 606 paragraph (e.g., ASC 606-10-25-19) from the 'citations' list. Include the actual paragraph number.
 
 3. **Content Requirements for the "Financial & Operational Impact" Section:**
    - Create a subsection titled "Illustrative Journal Entries". Provide key journal entries (e.g., upon invoicing, upon satisfaction of a PO, periodic recognition) with clear debits and credits.

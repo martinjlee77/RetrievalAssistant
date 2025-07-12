@@ -219,15 +219,6 @@ class ContractAnalyzerApp:
                 "The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'",
                 key="contract_end")
 
-            col5, col6 = st.columns(2)
-            transaction_price = col5.number_input(
-                "Total Transaction Price *",
-                value=st.session_state.get('transaction_price', 0.0),
-                min_value=0.0,
-                format="%.2f",
-                help=
-                "The total fixed value of the contract. Leave as 0 if the price is entirely variable. This gives the LLM a key financial data point to anchor its analysis for Steps 3 (Determine Price) and 4 (Allocate Price).",
-                key="transaction_price")
             currency_options = [
                 "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"
             ]
@@ -235,7 +226,7 @@ class ContractAnalyzerApp:
                 st.session_state.get(
                     'currency', 'USD')) if st.session_state.get(
                         'currency', 'USD') in currency_options else 0
-            currency = col6.selectbox(
+            currency = st.selectbox(
                 "Currency *",
                 currency_options,
                 index=currency_index,
