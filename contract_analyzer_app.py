@@ -554,10 +554,9 @@ class ContractAnalyzerApp:
                 
                 # Step 4: Perform ASC 606 analysis
                 st.info("🔍 Performing ASC 606 analysis...")
-                contract_data = st.session_state.contract_data.__dict__
                 analysis_result = self.analyzer.analyze_contract(
                     combined_extraction['text'], 
-                    contract_data
+                    st.session_state.contract_data
                 )
                 
                 # Step 5: Quality validation

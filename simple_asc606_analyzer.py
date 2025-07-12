@@ -185,11 +185,11 @@ class SimpleASC606Analyzer:
             "has_guidance": bool(authoritative_content or interpretative_content)
         }
     
-    def analyze_contract(self, contract_text: str, contract_data: Dict[str, Any]) -> ASC606Analysis:
+    def analyze_contract(self, contract_text: str, contract_data) -> ASC606Analysis:
         """
         Perform ASC 606 analysis using authoritative sources
         """
-        self.logger.info(f"Starting analysis for contract: {contract_data.get('analysis_title', 'Unknown')}")
+        self.logger.info(f"Starting analysis for contract: {contract_data.analysis_title}")
         
         try:
             # Get relevant guidance for the analysis
@@ -213,7 +213,7 @@ You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your primar
 
 **USER'S PRELIMINARY ASSESSMENT (HYPOTHESIS):**
 ```json
-{json.dumps(contract_data, indent=2, default=str)}
+{json.dumps(contract_data.model_dump(), indent=2, default=str)}
 ```
 
 **CONTRACT DOCUMENT TEXT:**
@@ -245,7 +245,7 @@ REVENUE RECOGNITION:
 **YOUR MANDATORY INSTRUCTIONS:**
 
 1. **VALIDATE THE HYPOTHESIS:**
-   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Note: User has provided {len(contract_data.get('performance_obligations', []))} performance obligations. Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
+   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Note: User has provided {len(contract_data.performance_obligations)} performance obligations. Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
    - **Contract Modification:** Does the text contain language about amendments, addendums, or changes that contradict the user's "is_modification" flag?
    - **Transaction Price:** Does the contract's pricing structure match the user's breakdown of fixed vs. variable consideration? Is there evidence of a financing component the user missed?
 
@@ -276,7 +276,7 @@ REVENUE RECOGNITION:
         "discrepancies": [
             {{
                 "area": "Performance Obligations",
-                "user_input": "User identified {len(contract_data.get('performance_obligations', []))} performance obligations: {[po.get('name', 'Unknown') for po in contract_data.get('performance_obligations', [])]}" if contract_data.get('performance_obligations') else "User identified no performance obligations",
+                "user_input": "User identified {len(contract_data.performance_obligations)} performance obligations: {[po.name for po in contract_data.performance_obligations]}" if contract_data.performance_obligations else "User identified no performance obligations",
                 "ai_recommendation": "Identified two distinct POs: 1. Software Subscription (Over Time), 2. Implementation Service (Point in Time).",
                 "rationale": "The contract separates the delivery and payment for the subscription and the one-time service. Per ASC 606-10-25-19, these are distinct as the customer can benefit from each on its own and they are separately identifiable in the contract.",
                 "supporting_quote": "Section 3.1 states 'The total fee for the Implementation Service is $20,000, due upon completion.' and Section 4.1 states 'The Annual Subscription Fee is $100,000, payable annually.'"
@@ -379,9 +379,9 @@ REVENUE RECOGNITION:
 You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. The memo must be comprehensive, defensible, and actionable.
 
 **Client and Contract Details:**
-- **Memo For:** {contract_data.get('customer_name', 'Client')} Management & Auditors
+- **Memo For:** {contract_data.customer_name} Management & Auditors
 - **Date:** {datetime.now().strftime('%B %d, %Y')}
-- **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.get('analysis_title', 'Contract Analysis')}'
+- **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.analysis_title}'
 
 **Validated Analysis Data (Your Source of Truth):**
 ```json
