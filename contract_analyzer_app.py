@@ -11,13 +11,23 @@ from document_extractor import DocumentExtractor
 # --- CHANGE 4: Use Pydantic for robust data modeling ---
 # This class defines the data structure for our contract inputs.
 # It provides automatic validation and makes the code self-documenting.
+class PerformanceObligation(BaseModel):
+    name: str
+    type: str  # License, Service, Good, etc.
+    timing: str  # Point in Time, Over Time
+    ssp: float  # Standalone selling price
+
+class VariableConsideration(BaseModel):
+    type: str  # Performance Bonus, Penalty, etc.
+    estimated_amount: float
+
 class ContractData(BaseModel):
+    # Basic contract information
     analysis_title: str
     customer_name: str
     arrangement_description: str
     contract_start: date
     contract_end: date
-    transaction_price: float
     currency: str
     analysis_depth: str
     output_format: str
@@ -25,6 +35,18 @@ class ContractData(BaseModel):
     include_examples: bool
     additional_notes: Optional[str] = ""
     uploaded_file_name: str
+    
+    # New Trust, but Verify fields
+    is_modification: bool = False
+    performance_obligations: List[PerformanceObligation] = []
+    fixed_consideration: float = 0.0
+    variable_consideration: Optional[VariableConsideration] = None
+    financing_component: bool = False
+    material_rights: bool = False
+    customer_options: bool = False
+    
+    # Legacy field for backward compatibility
+    transaction_price: Optional[float] = None
 
 
 # --- Main Application Class ---
@@ -151,9 +173,9 @@ class ContractAnalyzerApp:
     def render_upload_interface(self):
         # --- CHANGE 3: Organize inputs into clear tabs ---
         # Dynamic tab status that updates immediately
-        tab1, tab2, tab3 = st.tabs([
+        tab1, tab2, tab3, tab4 = st.tabs([
             "1. Contract Details", "2. Upload Document",
-            "3. Analysis Options (Optional)"
+            "3. Preliminary Assessment", "4. Analysis Options (Optional)"
         ])
 
         with tab1:
@@ -261,6 +283,108 @@ class ContractAnalyzerApp:
                 st.session_state.uploaded_files_names = []
 
         with tab3:
+            st.subheader("📋 Preliminary Assessment")
+            st.write("Provide your initial analysis - the AI will verify against the contract text")
+            
+            # Contract modification section
+            st.subheader("Contract Nature")
+            is_modification = st.checkbox(
+                "Is this a contract modification or amendment?",
+                value=st.session_state.get('is_modification', False),
+                help="Check if this contract modifies or amends an existing agreement",
+                key="is_modification"
+            )
+            
+            # Performance obligations section
+            st.subheader("Performance Obligations")
+            st.write("Identify the distinct performance obligations in this contract:")
+            
+            # Initialize performance obligations in session state if not exists
+            if 'performance_obligations' not in st.session_state:
+                st.session_state.performance_obligations = []
+            
+            # Add new performance obligation
+            with st.expander("Add Performance Obligation"):
+                col1, col2 = st.columns(2)
+                new_po_name = col1.text_input("Performance Obligation Name", placeholder="e.g., Software License")
+                new_po_type = col2.selectbox("Type", ["License", "Service", "Good", "Other"])
+                
+                col3, col4 = st.columns(2)
+                new_po_timing = col3.selectbox("Recognition Timing", ["Point in Time", "Over Time"])
+                new_po_ssp = col4.number_input("Standalone Selling Price", min_value=0.0, format="%.2f")
+                
+                if st.button("Add Performance Obligation"):
+                    if new_po_name and new_po_ssp > 0:
+                        st.session_state.performance_obligations.append({
+                            'name': new_po_name,
+                            'type': new_po_type,
+                            'timing': new_po_timing,
+                            'ssp': new_po_ssp
+                        })
+                        st.success(f"Added: {new_po_name}")
+                        st.rerun()
+            
+            # Display current performance obligations
+            if st.session_state.performance_obligations:
+                st.write("**Current Performance Obligations:**")
+                for i, po in enumerate(st.session_state.performance_obligations):
+                    col1, col2 = st.columns([4, 1])
+                    col1.write(f"**{po['name']}** ({po['type']}) - {po['timing']} - {currency} {po['ssp']:,.2f}")
+                    if col2.button("Remove", key=f"remove_po_{i}"):
+                        st.session_state.performance_obligations.pop(i)
+                        st.rerun()
+            
+            # Transaction price section
+            st.subheader("Transaction Price")
+            col1, col2 = st.columns(2)
+            
+            fixed_consideration = col1.number_input(
+                "Fixed Consideration",
+                value=st.session_state.get('fixed_consideration', 0.0),
+                min_value=0.0,
+                format="%.2f",
+                help="The guaranteed, fixed amount in the contract",
+                key="fixed_consideration"
+            )
+            
+            has_variable = col2.checkbox(
+                "Has Variable Consideration?",
+                value=st.session_state.get('has_variable_consideration', False),
+                key="has_variable_consideration"
+            )
+            
+            if has_variable:
+                col3, col4 = st.columns(2)
+                variable_type = col3.selectbox(
+                    "Variable Consideration Type",
+                    ["Performance Bonus", "Penalty", "Usage-based", "Other"],
+                    key="variable_type"
+                )
+                variable_amount = col4.number_input(
+                    "Estimated Variable Amount",
+                    value=st.session_state.get('variable_amount', 0.0),
+                    min_value=0.0,
+                    format="%.2f",
+                    key="variable_amount"
+                )
+            
+            # Additional elements
+            st.subheader("Additional Elements")
+            col1, col2 = st.columns(2)
+            
+            financing_component = col1.checkbox(
+                "Significant Financing Component?",
+                value=st.session_state.get('financing_component', False),
+                key="financing_component"
+            )
+            
+            material_rights = col2.checkbox(
+                "Material Rights Present?",
+                value=st.session_state.get('material_rights', False),
+                key="material_rights"
+            )
+
+        with tab4:
             st.subheader("Analysis Configuration")
             col7, col8 = st.columns(2)
             analysis_depth = col7.selectbox(
@@ -326,13 +450,31 @@ class ContractAnalyzerApp:
                     )
                     return
 
+                # Create performance obligations list
+                performance_obligations = []
+                for po in st.session_state.get('performance_obligations', []):
+                    performance_obligations.append(PerformanceObligation(
+                        name=po['name'],
+                        type=po['type'],
+                        timing=po['timing'],
+                        ssp=po['ssp']
+                    ))
+                
+                # Create variable consideration if applicable
+                variable_consideration = None
+                if st.session_state.get('has_variable_consideration', False):
+                    variable_consideration = VariableConsideration(
+                        type=st.session_state.get('variable_type', 'Performance Bonus'),
+                        estimated_amount=st.session_state.get('variable_amount', 0.0)
+                    )
+                
                 # Create an instance of our Pydantic model
                 contract_data = ContractData(
                     analysis_title=analysis_title,
                     customer_name=customer_name,
                     contract_start=contract_start,
                     contract_end=contract_end,
-                    transaction_price=transaction_price,
+                    transaction_price=transaction_price,  # Keep for backward compatibility
                     currency=currency,
                     arrangement_description=arrangement_description,
                     uploaded_file_name=", ".join([f.name for f in uploaded_files]),
@@ -340,7 +482,15 @@ class ContractAnalyzerApp:
                     output_format=output_format,
                     include_citations=include_citations,
                     include_examples=include_examples,
-                    additional_notes=additional_notes)
+                    additional_notes=additional_notes,
+                    # New Trust, but Verify fields
+                    is_modification=st.session_state.get('is_modification', False),
+                    performance_obligations=performance_obligations,
+                    fixed_consideration=st.session_state.get('fixed_consideration', 0.0),
+                    variable_consideration=variable_consideration,
+                    financing_component=st.session_state.get('financing_component', False),
+                    material_rights=st.session_state.get('material_rights', False)
+                )
                 # Store the validated data model in session state
                 st.session_state.contract_data = contract_data
                 self.process_contract(uploaded_files)
@@ -505,6 +655,36 @@ class ContractAnalyzerApp:
         else:
             st.error(f"❌ Low Quality Analysis (Score: {quality['quality_score']}/100)")
 
+        # NEW: Trust, but Verify Reconciliation Analysis
+        reconciliation = getattr(analysis, 'reconciliation_analysis', {})
+        if reconciliation and (reconciliation.get('confirmations') or reconciliation.get('discrepancies')):
+            st.subheader("🔍 Trust, but Verify Reconciliation")
+            
+            # Confirmations
+            confirmations = reconciliation.get('confirmations', [])
+            if confirmations:
+                st.success(f"✅ {len(confirmations)} items confirmed")
+                with st.expander("View Confirmations"):
+                    for conf in confirmations:
+                        st.write(f"**{conf.get('area', 'Unknown')}:** {conf.get('detail', 'No detail')}")
+            
+            # Discrepancies
+            discrepancies = reconciliation.get('discrepancies', [])
+            if discrepancies:
+                st.warning(f"⚠️ {len(discrepancies)} discrepancies found")
+                with st.expander("View Discrepancies and AI Corrections", expanded=True):
+                    for i, disc in enumerate(discrepancies, 1):
+                        st.write(f"**Discrepancy {i}: {disc.get('area', 'Unknown')}**")
+                        st.write(f"*Your Input:* {disc.get('user_input', 'No input recorded')}")
+                        st.write(f"*AI Recommendation:* {disc.get('ai_recommendation', 'No recommendation')}")
+                        st.write(f"*Rationale:* {disc.get('rationale', 'No rationale provided')}")
+                        if disc.get('supporting_quote'):
+                            st.code(f"Contract Quote: {disc['supporting_quote']}")
+                        st.divider()
+            
+            if not confirmations and not discrepancies:
+                st.info("No preliminary assessment data to reconcile")
+        
         # ASC 606 Five-Step Analysis
         st.subheader("🔍 ASC 606 Five-Step Analysis")
         step1, step2, step3, step4, step5 = st.tabs([

@@ -21,6 +21,9 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 @dataclass
 class ASC606Analysis:
     """Structure for ASC 606 analysis results"""
+    # NEW: Add reconciliation analysis
+    reconciliation_analysis: Dict[str, List[Dict[str, Any]]]
+    
     contract_overview: Dict[str, Any]
     step1_contract_identification: Dict[str, Any]
     step2_performance_obligations: Dict[str, Any]
@@ -196,106 +199,132 @@ class SimpleASC606Analyzer:
             allocation_guidance = self._get_relevant_guidance("allocate transaction price")
             recognition_guidance = self._get_relevant_guidance("revenue recognition control transfer")
             
-            # Create analysis prompt with three-tier source hierarchy
+            # Create NEW Trust, but Verify analysis prompt
             analysis_prompt = f"""
-            You are performing an ASC 606 analysis as a senior accounting professional.
-            
-            SOURCE HIERARCHY (in order of authority):
-            1. AUTHORITATIVE: ASC 606 official FASB standards (highest authority)
-            2. INTERPRETATIVE: EY publication Big 4 professional guidance (secondary authority)
-            3. GENERAL KNOWLEDGE: LLM general ASC 606 knowledge (fallback for edge cases only)
-            
-            TRANSPARENCY REQUIREMENT: Clearly indicate which source type supports each analysis point.
-            
-            GUIDANCE PROVIDED:
-            
-            CONTRACT IDENTIFICATION:
-            Authoritative: {contract_guidance.get('authoritative', 'None available')}
-            Interpretative: {contract_guidance.get('interpretative', 'None available')}
-            
-            PERFORMANCE OBLIGATIONS:
-            Authoritative: {obligations_guidance.get('authoritative', 'None available')}
-            Interpretative: {obligations_guidance.get('interpretative', 'None available')}
-            
-            TRANSACTION PRICE:
-            Authoritative: {price_guidance.get('authoritative', 'None available')}
-            Interpretative: {price_guidance.get('interpretative', 'None available')}
-            
-            PRICE ALLOCATION:
-            Authoritative: {allocation_guidance.get('authoritative', 'None available')}
-            Interpretative: {allocation_guidance.get('interpretative', 'None available')}
-            
-            REVENUE RECOGNITION:
-            Authoritative: {recognition_guidance.get('authoritative', 'None available')}
-            Interpretative: {recognition_guidance.get('interpretative', 'None available')}
-            
-            COMPREHENSIVE REVIEW FRAMEWORK:
-            Use these professional questions to guide your analysis:
-            {self.review_questions[:3000]}
-            
-            CONTRACT INFORMATION:
-            - Title: {contract_data.get('analysis_title', 'N/A')}
-            - Customer: {contract_data.get('customer_name', 'N/A')}
-            - Arrangement: {contract_data.get('arrangement_description', 'N/A')}
-            - Period: {contract_data.get('contract_start', 'N/A')} to {contract_data.get('contract_end', 'N/A')}
-            - Price: {contract_data.get('currency', 'USD')} {contract_data.get('transaction_price', 'N/A')}
-            
-            CONTRACT TEXT:
-            {contract_text[:2000]}
-            
-            Please analyze this contract following the ASC 606 five-step model. Use the source hierarchy above - prioritize authoritative sources, then interpretative guidance, then general knowledge only as fallback.
-            
-            ANALYSIS APPROACH:
-            1. Perform a comprehensive ASC 606 analysis covering all relevant aspects
-            2. Use the review framework questions as a professional checklist to ensure thoroughness
-            3. Address questions that are relevant to this specific contract's circumstances
-            4. Go beyond the checklist if the contract has unique characteristics requiring additional analysis
-            5. Base all conclusions on the authoritative and interpretative guidance provided
-            6. Clearly indicate source basis for each conclusion
-            
-            Return as JSON with this structure:
+You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your primary task is to perform a "Trust, but Verify" analysis. You will compare the user's preliminary assessment with the contract documents, identify any discrepancies, and produce a final, evidence-based analysis.
+
+**SOURCE HIERARCHY (in order of authority):**
+1.  **CONTRACT TEXT:** The provided contract document(s) are the ultimate source of truth for this specific arrangement.
+2.  **AUTHORITATIVE GUIDANCE:** ASC 606 official FASB standards.
+3.  **INTERPRETATIVE GUIDANCE:** Big 4 professional guidance (e.g., EY).
+4.  **USER PRELIMINARY ASSESSMENT:** A hypothesis to be tested, not a fact.
+
+---
+
+**USER'S PRELIMINARY ASSESSMENT (HYPOTHESIS):**
+```json
+{json.dumps(contract_data, indent=2, default=str)}
+```
+
+**CONTRACT DOCUMENT TEXT:**
+{contract_text[:15000]}
+
+**RELEVANT AUTHORITATIVE & INTERPRETATIVE GUIDANCE:**
+(You have been provided with key excerpts from ASC 606 and EY publications. Use them to support your reasoning.)
+
+CONTRACT IDENTIFICATION:
+{contract_guidance.get('authoritative', 'None available')}
+{contract_guidance.get('interpretative', 'None available')}
+
+PERFORMANCE OBLIGATIONS:
+{obligations_guidance.get('authoritative', 'None available')}
+{obligations_guidance.get('interpretative', 'None available')}
+
+TRANSACTION PRICE:
+{price_guidance.get('authoritative', 'None available')}
+{price_guidance.get('interpretative', 'None available')}
+
+PRICE ALLOCATION:
+{allocation_guidance.get('authoritative', 'None available')}
+{allocation_guidance.get('interpretative', 'None available')}
+
+REVENUE RECOGNITION:
+{recognition_guidance.get('authoritative', 'None available')}
+{recognition_guidance.get('interpretative', 'None available')}
+
+**YOUR MANDATORY INSTRUCTIONS:**
+
+1. **VALIDATE THE HYPOTHESIS:**
+   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
+   - **Contract Modification:** Does the text contain language about amendments, addendums, or changes that contradict the user's "is_modification" flag?
+   - **Transaction Price:** Does the contract's pricing structure match the user's breakdown of fixed vs. variable consideration? Is there evidence of a financing component the user missed?
+
+2. **GENERATE A RECONCILIATION ANALYSIS:**
+   - For each major judgment area (e.g., Performance Obligations), determine if you **Confirm** or **Challenge** the user's input.
+   - If you **Challenge**, you MUST create a "discrepancy" entry. Each discrepancy must include:
+     * **area:** The part of the analysis being challenged (e.g., "Performance Obligations").
+     * **user_input:** What the user provided.
+     * **ai_recommendation:** Your evidence-based conclusion.
+     * **rationale:** A clear explanation of why your conclusion is correct, referencing ASC 606 concepts.
+     * **supporting_quote:** A direct quote from the contract text that proves your point. This is non-negotiable.
+
+3. **PRODUCE THE FINAL VALIDATED ANALYSIS:**
+   - After the reconciliation, construct the final five-step analysis based on YOUR validated conclusions. If you challenged the user, your final analysis must reflect your recommendation, not the user's original input.
+
+4. **STRICT JSON OUTPUT:**
+   - Provide your entire response in a single, valid JSON object. Do not include any text outside the JSON structure.
+
+**JSON OUTPUT STRUCTURE:**
+{{
+    "reconciliation_analysis": {{
+        "confirmations": [
             {{
-                "contract_overview": {{
-                    "nature_of_arrangement": "string",
-                    "key_terms": ["list"],
-                    "complexity_assessment": "string"
-                }},
-                "step1_contract_identification": {{
-                    "contract_exists": "boolean",
-                    "rationale": "string",
-                    "key_findings": ["list"],
-                    "source_basis": "authoritative|interpretative|general_knowledge"
-                }},
-                "step2_performance_obligations": {{
-                    "identified_obligations": ["list"],
-                    "distinctness_analysis": "string",
-                    "key_judgments": ["list"],
-                    "source_basis": "authoritative|interpretative|general_knowledge"
-                }},
-                "step3_transaction_price": {{
-                    "fixed_consideration": "number",
-                    "variable_consideration": "string",
-                    "key_estimates": ["list"],
-                    "source_basis": "authoritative|interpretative|general_knowledge"
-                }},
-                "step4_price_allocation": {{
-                    "allocation_method": "string",
-                    "key_assumptions": ["list"],
-                    "source_basis": "authoritative|interpretative|general_knowledge"
-                }},
-                "step5_revenue_recognition": {{
-                    "recognition_pattern": "string",
-                    "implementation_steps": ["list"],
-                    "source_basis": "authoritative|interpretative|general_knowledge"
-                }},
-                "citations": ["list of specific ASC paragraphs and EY publication sections cited"],
-                "source_transparency": {{
-                    "authoritative_sources_used": ["list"],
-                    "interpretative_sources_used": ["list"],
-                    "general_knowledge_areas": ["list of topics requiring general knowledge fallback"]
-                }}
+                "area": "string (e.g., Transaction Price)",
+                "detail": "string (e.g., The fixed consideration amount of $110,000 was confirmed.)"
             }}
-            """
+        ],
+        "discrepancies": [
+            {{
+                "area": "Performance Obligations",
+                "user_input": "User identified one PO: 'SaaS Platform & Implementation'",
+                "ai_recommendation": "Identified two distinct POs: 1. Software Subscription (Over Time), 2. Implementation Service (Point in Time).",
+                "rationale": "The contract separates the delivery and payment for the subscription and the one-time service. Per ASC 606-10-25-19, these are distinct as the customer can benefit from each on its own and they are separately identifiable in the contract.",
+                "supporting_quote": "Section 3.1 states 'The total fee for the Implementation Service is $20,000, due upon completion.' and Section 4.1 states 'The Annual Subscription Fee is $100,000, payable annually.'"
+            }}
+        ]
+    }},
+    "contract_overview": {{
+        "nature_of_arrangement": "string",
+        "key_terms": ["list"],
+        "complexity_assessment": "string"
+    }},
+    "step1_contract_identification": {{
+        "contract_exists": true,
+        "rationale": "string",
+        "key_findings": ["list"],
+        "source_basis": "authoritative|interpretative|general_knowledge"
+    }},
+    "step2_performance_obligations": {{
+        "identified_obligations": ["list reflecting AI's final conclusion"],
+        "distinctness_analysis": "string reflecting AI's final conclusion",
+        "key_judgments": ["list"],
+        "source_basis": "authoritative|interpretative|general_knowledge"
+    }},
+    "step3_transaction_price": {{
+        "fixed_consideration": "number",
+        "variable_consideration": "string",
+        "key_estimates": ["list"],
+        "source_basis": "authoritative|interpretative|general_knowledge"
+    }},
+    "step4_price_allocation": {{
+        "allocation_method": "Relative SSP Method",
+        "allocation_table": {{ "PO Name 1": "price", "PO Name 2": "price" }},
+        "key_assumptions": ["list, including SSP rationale"],
+        "source_basis": "authoritative|interpretative|general_knowledge"
+    }},
+    "step5_revenue_recognition": {{
+        "recognition_pattern_by_po": {{ "PO Name 1": "pattern", "PO Name 2": "pattern" }},
+        "implementation_steps": ["list"],
+        "source_basis": "authoritative|interpretative|general_knowledge"
+    }},
+    "citations": ["list of specific ASC paragraphs and EY publication sections cited"],
+    "source_transparency": {{
+        "authoritative_sources_used": ["list"],
+        "interpretative_sources_used": ["list"],
+        "general_knowledge_areas": ["list"]
+    }}
+}}
+"""
             
             # Call GPT-4o for analysis
             response = self.client.chat.completions.create(
@@ -329,20 +358,30 @@ class SimpleASC606Analyzer:
             raise Exception(f"Analysis failed: {str(e)}")
     
     def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any]) -> str:
-        """Generate professional memo"""
+        """Generate professional memo based on validated analysis"""
+        # Extract the validated analysis sections
+        validated_analysis = {
+            "step1": analysis_result.get('step1_contract_identification'),
+            "step2": analysis_result.get('step2_performance_obligations'),
+            "step3": analysis_result.get('step3_transaction_price'),
+            "step4": analysis_result.get('step4_price_allocation'),
+            "step5": analysis_result.get('step5_revenue_recognition')
+        }
+        
         memo_prompt = f"""
-        Create a professional accounting memo based on this ASC 606 analysis:
-        
+        Create a professional accounting memo based on the following validated ASC 606 analysis. The analysis has already reconciled user inputs with the contract text, so this data represents the final conclusions.
+
         MEMORANDUM
-        
-        TO: {contract_data.get('customer_name', 'Client')} Management
-        FROM: Accounting Advisory Team
+        TO: Accounting Department
+        FROM: AI-Powered ASC 606 Advisor
         DATE: {datetime.now().strftime('%B %d, %Y')}
-        RE: ASC 606 Analysis - {contract_data.get('analysis_title', 'Contract Analysis')}
-        
-        Based on the analysis: {json.dumps(analysis_result, indent=2)}
-        
-        Create a professional memo with executive summary, analysis by step, and implementation guidance.
+        RE: ASC 606 Analysis for {contract_data.get('analysis_title', 'Contract Analysis')}
+
+        VALIDATED ANALYSIS DATA: 
+        {json.dumps(validated_analysis, indent=2)}
+
+        TASK:
+        Write a clear, professional memo. Start with an executive summary, then detail the analysis for each of the five steps, and conclude with key judgments and implementation guidance. Do not mention the reconciliation process itself; just present the final, correct analysis.
         """
         
         try:
@@ -369,8 +408,11 @@ class SimpleASC606Analyzer:
             return f"Error generating memo: {str(e)}"
     
     def _structure_analysis_result(self, analysis_result: Dict[str, Any], memo: str) -> ASC606Analysis:
-        """Structure the analysis result"""
+        """Structure the analysis result with reconciliation data"""
         structured_analysis = ASC606Analysis(
+            # NEW: extract the reconciliation part
+            reconciliation_analysis=analysis_result.get('reconciliation_analysis', {'confirmations': [], 'discrepancies': []}),
+            
             contract_overview=analysis_result.get('contract_overview', {}),
             step1_contract_identification=analysis_result.get('step1_contract_identification', {}),
             step2_performance_obligations=analysis_result.get('step2_performance_obligations', {}),
