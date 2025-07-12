@@ -772,11 +772,43 @@ class ContractAnalyzerApp:
                     st.write(f"{i}. {step}")
 
         # Professional memo section
-        st.subheader("📋 Professional Memo")
+        st.subheader("📋 Premium Professional Memo")
+        
+        # Show memo preview with key sections
+        memo_text = analysis.professional_memo
+        if memo_text:
+            # Extract key sections for preview
+            if "Executive Summary" in memo_text:
+                summary_start = memo_text.find("Executive Summary")
+                summary_end = memo_text.find("\n\n", summary_start + 50)
+                if summary_end > summary_start:
+                    summary = memo_text[summary_start:summary_end]
+                    st.info(f"📝 **Memo Preview:**\n{summary[:300]}...")
+            
+            # Display memo structure
+            sections = []
+            if "Executive Summary" in memo_text:
+                sections.append("Executive Summary")
+            if "Background of the Arrangement" in memo_text:
+                sections.append("Background of the Arrangement")
+            if "Detailed ASC 606 Five-Step Analysis" in memo_text:
+                sections.append("Detailed ASC 606 Five-Step Analysis")
+            if "Key Judgments and Estimates" in memo_text:
+                sections.append("Key Judgments and Estimates")
+            if "Financial & Operational Impact" in memo_text:
+                sections.append("Financial & Operational Impact")
+            if "Illustrative Journal Entries" in memo_text:
+                sections.append("Illustrative Journal Entries")
+            if "Conclusion" in memo_text:
+                sections.append("Conclusion")
+            
+            if sections:
+                st.success(f"✅ **Premium Memo Structure:** {', '.join(sections)}")
+            
         with st.expander("View Complete Professional Memo", expanded=False):
-            st.text_area("Professional Accounting Memo", 
+            st.text_area("Audit-Ready Professional Accounting Memo", 
                         value=analysis.professional_memo, 
-                        height=400, 
+                        height=600, 
                         disabled=True)
 
         # Export options

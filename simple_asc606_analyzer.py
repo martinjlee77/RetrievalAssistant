@@ -317,6 +317,12 @@ REVENUE RECOGNITION:
         "implementation_steps": ["list"],
         "source_basis": "authoritative|interpretative|general_knowledge"
     }},
+    "contractual_evidence": {{
+        "key_contract_quotes": ["list of verbatim quotes from contract that support major conclusions"],
+        "pricing_terms": ["quotes related to transaction price and payment terms"],
+        "performance_terms": ["quotes related to performance obligations and deliverables"],
+        "timing_terms": ["quotes related to timing and control transfer"]
+    }},
     "citations": ["list of specific ASC paragraphs and EY publication sections cited"],
     "source_transparency": {{
         "authoritative_sources_used": ["list"],
@@ -358,31 +364,55 @@ REVENUE RECOGNITION:
             raise Exception(f"Analysis failed: {str(e)}")
     
     def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any]) -> str:
-        """Generate professional memo based on validated analysis"""
+        """Generate premium, audit-ready professional memo"""
         # Extract the validated analysis sections
         validated_analysis = {
-            "step1": analysis_result.get('step1_contract_identification'),
-            "step2": analysis_result.get('step2_performance_obligations'),
-            "step3": analysis_result.get('step3_transaction_price'),
-            "step4": analysis_result.get('step4_price_allocation'),
-            "step5": analysis_result.get('step5_revenue_recognition')
+            "step1": analysis_result.get('step1_contract_identification', {}),
+            "step2": analysis_result.get('step2_performance_obligations', {}),
+            "step3": analysis_result.get('step3_transaction_price', {}),
+            "step4": analysis_result.get('step4_price_allocation', {}),
+            "step5": analysis_result.get('step5_revenue_recognition', {}),
+            "citations": analysis_result.get('citations', [])
         }
         
         memo_prompt = f"""
-        Create a professional accounting memo based on the following validated ASC 606 analysis. The analysis has already reconciled user inputs with the contract text, so this data represents the final conclusions.
+You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. The memo must be comprehensive, defensible, and actionable.
 
-        MEMORANDUM
-        TO: Accounting Department
-        FROM: AI-Powered ASC 606 Advisor
-        DATE: {datetime.now().strftime('%B %d, %Y')}
-        RE: ASC 606 Analysis for {contract_data.get('analysis_title', 'Contract Analysis')}
+**Client and Contract Details:**
+- **Memo For:** {contract_data.get('customer_name', 'Client')} Management & Auditors
+- **Date:** {datetime.now().strftime('%B %d, %Y')}
+- **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.get('analysis_title', 'Contract Analysis')}'
 
-        VALIDATED ANALYSIS DATA: 
-        {json.dumps(validated_analysis, indent=2)}
+**Validated Analysis Data (Your Source of Truth):**
+```json
+{json.dumps(validated_analysis, indent=2)}
+```
 
-        TASK:
-        Write a clear, professional memo. Start with an executive summary, then detail the analysis for each of the five steps, and conclude with key judgments and implementation guidance. Do not mention the reconciliation process itself; just present the final, correct analysis.
-        """
+**MANDATORY INSTRUCTIONS:**
+
+1. **Structure and Tone:**
+   - Use a formal, professional tone.
+   - The memo MUST be structured with the following sections, in this exact order:
+     - **Executive Summary:** A brief, high-level overview of the arrangement and the key accounting conclusions (e.g., number of POs, total transaction price, recognition timing). Highlight any significant judgments.
+     - **Background of the Arrangement:** Briefly describe the contract based on the provided data.
+     - **Detailed ASC 606 Five-Step Analysis:** Analyze each of the 5 steps in its own subsection.
+     - **Key Judgments and Estimates:** A dedicated section summarizing the most significant judgments made.
+     - **Financial & Operational Impact:** Include illustrative journal entries and practical next steps.
+     - **Conclusion:** A final summary statement.
+
+2. **Content Requirements for the "Detailed Analysis" Section:**
+   - For every major conclusion within each of the 5 steps, you MUST use the "Conclusion-Rationale-Evidence" framework:
+     - **Conclusion:** State the clear finding.
+     - **Rationale:** Explain the accounting logic.
+     - **Contractual Evidence:** Provide a direct, verbatim quote from the contract text that supports your conclusion. You must infer the relevant quotes from the main analysis data provided.
+     - **Authoritative Guidance:** Cite the specific ASC 606 paragraph (e.g., ASC 606-10-25-19) from the 'citations' list.
+
+3. **Content Requirements for the "Financial & Operational Impact" Section:**
+   - Create a subsection titled "Illustrative Journal Entries". Provide key journal entries (e.g., upon invoicing, upon satisfaction of a PO, periodic recognition) with clear debits and credits.
+   - Create a subsection titled "System and Process Considerations" with 2-3 bullet points on what the company needs to do operationally (e.g., "Configure ERP system for monthly amortization schedule," "Track completion of implementation milestones").
+
+Generate the complete professional memo based on these strict instructions.
+"""
         
         try:
             response = self.client.chat.completions.create(
@@ -390,7 +420,7 @@ REVENUE RECOGNITION:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are writing a professional accounting memo. Use clear, professional language."
+                        "content": "You are a Director at a top-tier accounting advisory firm writing audit-ready professional memos. Your memos must be defensible, comprehensive, and actionable."
                     },
                     {
                         "role": "user",
@@ -398,7 +428,7 @@ REVENUE RECOGNITION:
                     }
                 ],
                 temperature=0.1,
-                max_tokens=2000
+                max_tokens=4000  # Increased for comprehensive memo
             )
             
             return response.choices[0].message.content
