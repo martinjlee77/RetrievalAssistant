@@ -38,22 +38,33 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend Architecture
-- **Framework**: Streamlit web application
-- **Layout**: Wide layout with expandable sidebar configuration
-- **State Management**: Streamlit session state for processing results and checkpoints
-- **User Interface**: Clean, professional interface with progress tracking and results visualization
+### Clean, Streamlined Architecture
+- **Frontend**: Single Streamlit application (`contract_analyzer_app.py`)
+- **Backend**: Lightweight ASC 606 analyzer (`simple_asc606_analyzer.py`)
+- **Document Processing**: Multi-format text extraction (`document_extractor.py`)
+- **Knowledge Base**: Authoritative ASC 606 sources in `attached_assets/`
 
-### Backend Architecture
-- **Processing Pipeline**: Modular processor architecture with separate concerns
-- **Core Components**:
-  - Multi-document text extraction (PDF/Word)
-  - RAG-powered analysis using authoritative ASC 606 sources
-  - Professional memo generation with source transparency
-  - Quality validation and scoring
-  - Metadata enrichment
-- **Error Handling**: Comprehensive logging and graceful error recovery
-- **Performance**: Cached analyzer initialization to prevent RAG system reloading
+### Core Components
+- **Multi-document Processing**: Handles up to 5 files (contracts, invoices, amendments)
+- **RAG-Powered Analysis**: Uses 10 authoritative ASC 606 sources + EY interpretative guidance
+- **Professional Memo Generation**: Creates Big 4 quality accounting memos
+- **Source Transparency**: Tracks and displays authoritative vs interpretative source usage
+- **Performance Optimization**: Cached analyzer prevents RAG system reloading
+
+### File Structure
+```
+├── contract_analyzer_app.py      # Main Streamlit application
+├── simple_asc606_analyzer.py     # ASC 606 analysis engine
+├── document_extractor.py         # PDF/Word text extraction
+├── attached_assets/               # Authoritative sources
+│   ├── 05_overview_background_*.txt
+│   ├── 10_objectives_*.txt
+│   ├── [7 more ASC 606 sections]
+│   ├── contract_review_questions_*.txt
+│   └── ey-frdbb3043-09-24-2024_revised4RAG_*.docx
+├── pyproject.toml                # Dependencies
+└── replit.md                     # Project documentation
+```
 
 ### Future Architecture Considerations
 - **Database Integration**: Planned for storing analysis history, user preferences, and cached results
