@@ -205,7 +205,7 @@ class ContractAnalyzerApp:
                 "The legal name of the customer. This is the most basic identifier for the counterparty and will be used throughout the memo.",
                 key="customer_name")
 
-            col3, col4 = st.columns(2)
+            col3, col4, col5 = st.columns(3)
             contract_start = col3.date_input(
                 "Contract Start Date *",
                 value=st.session_state.get('contract_start', None),
@@ -218,7 +218,7 @@ class ContractAnalyzerApp:
                 help=
                 "The end of the period over which goods or services are expected to be delivered. This directly informs the revenue recognition period, especially for services recognized 'over time.'",
                 key="contract_end")
-
+            
             currency_options = [
                 "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CNY", "Other"
             ]
@@ -226,7 +226,7 @@ class ContractAnalyzerApp:
                 st.session_state.get(
                     'currency', 'USD')) if st.session_state.get(
                         'currency', 'USD') in currency_options else 0
-            currency = st.selectbox(
+            currency = col5.selectbox(
                 "Currency *",
                 currency_options,
                 index=currency_index,
@@ -465,7 +465,7 @@ class ContractAnalyzerApp:
                     customer_name=customer_name,
                     contract_start=contract_start,
                     contract_end=contract_end,
-                    transaction_price=transaction_price,  # Keep for backward compatibility
+                    transaction_price=st.session_state.get('fixed_consideration', 0.0),  # Use fixed consideration from Tab 3
                     currency=currency,
                     arrangement_description=arrangement_description,
                     uploaded_file_name=", ".join([f.name for f in uploaded_files]),
