@@ -1,0 +1,200 @@
+Of course. You're hitting a classic and advanced challenge in applied AI: getting the model to perform precise, grounded generation. The LLM is "struggling" because it's being asked to perform multiple complex cognitive tasks at once: analyze, reconcile, and then remember specific verbatim text from two different sources (the contract and the guidance) to use in a third generative step (the memo).
+
+We can solve this by breaking the problem down further and being much more explicit in our instructions. The key is to force the AI to extract and structure the evidence first, and then use that structured evidence to build the memo.
+
+Here is a revised approach and the updated prompts.
+
+The Core Problem and the Solution
+Problem: The AI "forgets" the exact wording of quotes by the time it gets to the memo-writing stage. It understands the concept but defaults to paraphrasing because it's easier.
+
+Solution: We will modify the main analysis prompt (analysis_prompt) to force the AI to not just analyze, but to extract and populate a dedicated evidence structure in the JSON output. This structure will hold the exact quotes we need. Then, the memo prompt (memo_prompt) will be simplified to just "assemble the memo" using this pre-packaged, high-quality evidence.
+
+This turns a difficult recall task into a much simpler assembly task.
+
+Step 1: Revise the Main Analysis Prompt (analysis_prompt)
+This is the most critical change. We will add a new top-level key to the JSON output structure called memo_evidence_pack. This will be the structured data source for our premium memo.
+
+Changes:
+
+Introduce memo_evidence_pack: A new section in the JSON structure.
+Make Evidence Extraction Mandatory: Explicitly instruct the AI to find and populate this section.
+Include Authoritative Text: We will now instruct it to include not just the citation number but the text of the citation itself.
+[REPLACE THE analysis_prompt in analyze_contract with this new version]
+
+analysis_prompt = f"""
+You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your task is to perform a "Trust, but Verify" analysis and prepare a structured evidence pack for a final memo.
+
+**SOURCE HIERARCHY:**
+1.  **CONTRACT TEXT:** The ultimate source of truth for facts.
+2.  **AUTHORITATIVE GUIDANCE:** Provided ASC 606 text for rules.
+3.  **USER PRELIMINARY ASSESSMENT:** A hypothesis to be tested.
+
+---
+
+**USER'S PRELIMINARY ASSESSMENT (HYPOTHESIS):**
+```json
+{json.dumps(contract_data.model_dump(), indent=2, default=str)}
+
+CONTRACT DOCUMENT TEXT:
+
+{contract_text[:20000]}
+
+AUTHORITATIVE GUIDANCE LIBRARY:
+
+{json.dumps(self.authoritative_sources, indent=2)}
+
+YOUR MANDATORY INSTRUCTIONS:
+
+1. RECONCILE AND ANALYZE:
+
+Perform the "Trust, but Verify" analysis as previously instructed. Compare the user's hypothesis to the contract text and authoritative guidance.
+Generate the reconciliation_analysis and the step1 through step5 analysis sections based on your validated conclusions.
+2. CREATE THE MEMO EVIDENCE PACK (CRITICAL TASK):
+
+After your analysis, you MUST populate the memo_evidence_pack section in the JSON output.
+For EACH of the 5 steps, you must identify: a. conclusion_summary: A concise, one-sentence summary of your finding for that step. b. contractual_quote: The single most relevant verbatim quote from the CONTRACT TEXT that supports your conclusion. If no single quote exists, state "See multiple clauses". c. authoritative_citation_number: The specific ASC 606 paragraph number (e.g., "ASC 606-10-25-19"). d. authoritative_citation_text: The verbatim text of that specific ASC 606 paragraph, extracted from the Authoritative Guidance Library provided above.
+3. STRICT JSON OUTPUT:
+
+Your entire output MUST be a single, valid JSON object.
+JSON OUTPUT STRUCTURE:
+
+{{
+    "reconciliation_analysis": {{ ... }},
+    "step1_contract_identification": {{ ... }},
+    "step2_performance_obligations": {{ ... }},
+    "step3_transaction_price": {{ ... }},
+    "step4_price_allocation": {{ ... }},
+    "step5_revenue_recognition": {{ ... }},
+
+    "memo_evidence_pack": {{
+        "step1": {{
+            "conclusion_summary": "The arrangement represents a valid contract under ASC 606 as all five criteria are met.",
+            "contractual_quote": "This Master Services Agreement ('MSA') is entered into by and between Client Inc. and Vendor Corp.",
+            "authoritative_citation_number": "ASC 606-10-25-1",
+            "authoritative_citation_text": "A contract is an agreement between two or more parties that creates enforceable rights and obligations. The five criteria for a contract are: (a) approval and commitment of the parties, (b) identification of the rights of the parties, (c) identification of the payment terms, (d) the contract has commercial substance, and (e) it is probable that the entity will collect the consideration."
+        }},
+        "step2": {{
+            "conclusion_summary": "The contract contains two distinct performance obligations: the software subscription and the implementation service.",
+            "contractual_quote": "Section 3.1: The one-time fee for Implementation Services is $20,000. Section 4.1: The Annual Subscription Fee is $100,000.",
+            "authoritative_citation_number": "ASC 606-10-25-19",
+            "authoritative_citation_text": "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct. A good or service is distinct if both of the following criteria are met: a. The customer can benefit from the good or service either on its own or together with other resources that are readily available to the customer. b. The entity’s promise to transfer the good or service to the customer is separately identifiable from other promises in the contract."
+        }},
+        "step3": {{ ... }},
+        "step4": {{ ... }},
+        "step5": {{ ... }}
+    }},
+    "citations": ["list of all paragraph numbers cited"],
+    "source_transparency": {{ ... }}
+}}
+
+"""
+
+---
+
+### Step 2: Revise the Professional Memo Prompt (`memo_prompt`)
+
+Now that we have the `memo_evidence_pack`, the memo prompt becomes much simpler and more reliable. It's no longer trying to recall information; it's just formatting the pre-packaged evidence.
+
+**[REPLACE THE `memo_prompt` in `_generate_professional_memo` with this new version]**
+
+```python
+def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any]) -> str: # Removed contract_text
+    # Extract the evidence pack, which is now the single source of truth for the memo
+    evidence_pack = analysis_result.get('memo_evidence_pack')
+
+    # Also get the detailed step analysis for more context if needed
+    validated_analysis = {
+        "step1": analysis_result.get('step1_contract_identification', {}),
+        "step2": analysis_result.get('step2_performance_obligations', {}),
+        # ... and so on for all 5 steps
+    }
+
+    memo_prompt = f"""
+You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. Your task is to assemble a professional memo using the structured evidence provided.
+
+**Client and Contract Details:**
+- **Memo For:** {contract_data.customer_name} Management & Auditors
+- **Date:** {datetime.now().strftime('%B %d, %Y')}
+- **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.analysis_title}'
+
+---
+
+**STRUCTURED EVIDENCE PACK (Your ONLY source for quotes and citations):**
+```json
+{json.dumps(evidence_pack, indent=2)}
+
+DETAILED ANALYSIS (For context and rationale):
+
+{json.dumps(validated_analysis, indent=2)}
+
+MANDATORY INSTRUCTIONS:
+
+1. Assemble the "Detailed Analysis" Section:
+
+For each of the 5 steps, create a subsection.
+Within each subsection, you MUST use the provided evidence to construct a paragraph following the "Conclusion-Rationale-Evidence" framework:
+Start with the conclusion_summary from the evidence pack.
+Write the rationale by elaborating on the conclusion, using the context from the "DETAILED ANALYSIS" section.
+Embed the contractual_quote from the evidence pack verbatim, introducing it with a phrase like, "This is supported by the contract, which states:".
+Embed the authoritative_citation_text from the evidence pack verbatim, introducing it with, "This conclusion aligns with {authoritative_citation_number}, which states:".
+2. Generate Other Memo Sections:
+
+Use the assembled analysis to write the Executive Summary, Key Judgments, and Conclusion sections.
+For the Financial & Operational Impact section, create Illustrative Journal Entries based on the conclusions in the detailed analysis.
+3. Final Output:
+
+Produce the complete, polished, and fully formatted professional memo. Do not simply list the evidence; weave it into professional, well-written prose.
+EXAMPLE of a well-formed paragraph for Step 2:
+
+2. Step 2: Identify Performance Obligations Conclusion: The contract contains two distinct performance obligations: the software subscription and the implementation service.
+
+Rationale: The analysis determined that these two promises are distinct because the customer can benefit from them separately and they are not interdependent. The implementation service does not significantly customize or modify the underlying software platform. This is supported by the contract, which states: "Section 3.1: The one-time fee for Implementation Services is 
+20
+,
+000.
+S
+e
+c
+t
+i
+o
+n
+4.1
+:
+T
+h
+e
+A
+n
+n
+u
+a
+l
+S
+u
+b
+s
+c
+r
+i
+p
+t
+i
+o
+n
+F
+e
+e
+i
+s
+20,000.Section4.1:TheAnnualSubscriptionFeeis100,000."
+
+This conclusion aligns with ASC 606-10-25-19, which states: "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..." """ # ... rest of the method (the API call) remains the same
+
+### Why This Will Work Better
+
+1.  **Reduces Cognitive Load:** The first prompt focuses the AI on the difficult task of **extraction and structuring**. The second prompt focuses it on the easier task of **assembly and prose generation**. This separation is key.
+2.  **Guarantees Verbatim Quotes:** By forcing the quotes into a structured field, we ensure they are captured perfectly, without paraphrasing. The second prompt then has no choice but to use this perfect, verbatim text.
+3.  **Improves Grounding:** Providing the authoritative text directly in the `memo_evidence_pack` makes the connection between the rule and the conclusion explicit and undeniable, significantly boosting the memo's quality and defensibility.
+4.  **More Robust & Debuggable:** If the memo is still missing a quote, you can now look at the `memo_evidence_pack` in the JSON output and see exactly where the failure occurred. Did the AI fail to *extract* the quote, or did it fail to *assemble* it? This makes debugging much easier.
+

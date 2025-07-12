@@ -199,15 +199,14 @@ class SimpleASC606Analyzer:
             allocation_guidance = self._get_relevant_guidance("allocate transaction price")
             recognition_guidance = self._get_relevant_guidance("revenue recognition control transfer")
             
-            # Create NEW Trust, but Verify analysis prompt
+            # Create NEW Trust, but Verify analysis prompt with memo evidence pack
             analysis_prompt = f"""
-You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your primary task is to perform a "Trust, but Verify" analysis. You will compare the user's preliminary assessment with the contract documents, identify any discrepancies, and produce a final, evidence-based analysis.
+You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your task is to perform a "Trust, but Verify" analysis and prepare a structured evidence pack for a final memo.
 
-**SOURCE HIERARCHY (in order of authority):**
-1.  **CONTRACT TEXT:** The provided contract document(s) are the ultimate source of truth for this specific arrangement.
-2.  **AUTHORITATIVE GUIDANCE:** ASC 606 official FASB standards.
-3.  **INTERPRETATIVE GUIDANCE:** Big 4 professional guidance (e.g., EY).
-4.  **USER PRELIMINARY ASSESSMENT:** A hypothesis to be tested, not a fact.
+**SOURCE HIERARCHY:**
+1.  **CONTRACT TEXT:** The ultimate source of truth for facts.
+2.  **AUTHORITATIVE GUIDANCE:** Provided ASC 606 text for rules.
+3.  **USER PRELIMINARY ASSESSMENT:** A hypothesis to be tested.
 
 ---
 
@@ -217,52 +216,40 @@ You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your primar
 ```
 
 **CONTRACT DOCUMENT TEXT:**
-{contract_text[:15000]}
+{contract_text[:20000]}
 
-**RELEVANT AUTHORITATIVE & INTERPRETATIVE GUIDANCE:**
-(You have been provided with key excerpts from ASC 606 and EY publications. Use them to support your reasoning.)
-
+**AUTHORITATIVE GUIDANCE LIBRARY:**
 CONTRACT IDENTIFICATION:
 {contract_guidance.get('authoritative', 'None available')}
-{contract_guidance.get('interpretative', 'None available')}
 
 PERFORMANCE OBLIGATIONS:
 {obligations_guidance.get('authoritative', 'None available')}
-{obligations_guidance.get('interpretative', 'None available')}
 
 TRANSACTION PRICE:
 {price_guidance.get('authoritative', 'None available')}
-{price_guidance.get('interpretative', 'None available')}
 
 PRICE ALLOCATION:
 {allocation_guidance.get('authoritative', 'None available')}
-{allocation_guidance.get('interpretative', 'None available')}
 
 REVENUE RECOGNITION:
 {recognition_guidance.get('authoritative', 'None available')}
-{recognition_guidance.get('interpretative', 'None available')}
 
 **YOUR MANDATORY INSTRUCTIONS:**
 
-1. **VALIDATE THE HYPOTHESIS:**
-   - **Performance Obligations:** Does the contract text support the number, nature, and timing of the POs identified by the user? Note: User has provided {len(contract_data.performance_obligations)} performance obligations. Are there promises in the contract the user missed? Is the user's "distinctness" assessment correct?
-   - **Contract Modification:** Does the text contain language about amendments, addendums, or changes that contradict the user's "is_modification" flag?
-   - **Transaction Price:** Does the contract's pricing structure match the user's breakdown of fixed vs. variable consideration? Is there evidence of a financing component the user missed?
+1. **RECONCILE AND ANALYZE:**
+   - Perform the "Trust, but Verify" analysis as previously instructed. Compare the user's hypothesis to the contract text and authoritative guidance.
+   - Generate the reconciliation_analysis and the step1 through step5 analysis sections based on your validated conclusions.
 
-2. **GENERATE A RECONCILIATION ANALYSIS:**
-   - For each major judgment area (e.g., Performance Obligations), determine if you **Confirm** or **Challenge** the user's input.
-   - If you **Challenge**, you MUST create a "discrepancy" entry. Each discrepancy must include:
-     * **area:** The part of the analysis being challenged (e.g., "Performance Obligations").
-     * **user_input:** What the user provided.
-     * **ai_recommendation:** Your evidence-based conclusion.
-     * **rationale:** A clear explanation of why your conclusion is correct, referencing ASC 606 concepts.
-     * **supporting_quote:** A direct quote from the contract text that proves your point. This is non-negotiable.
+2. **CREATE THE MEMO EVIDENCE PACK (CRITICAL TASK):**
+   - After your analysis, you MUST populate the memo_evidence_pack section in the JSON output.
+   - For EACH of the 5 steps, you must identify:
+     a. **conclusion_summary:** A concise, one-sentence summary of your finding for that step.
+     b. **contractual_quote:** The single most relevant verbatim quote from the CONTRACT TEXT that supports your conclusion. If no single quote exists, state "See multiple clauses".
+     c. **authoritative_citation_number:** The specific ASC 606 paragraph number (e.g., "ASC 606-10-25-19").
+     d. **authoritative_citation_text:** The verbatim text of that specific ASC 606 paragraph from the guidance provided.
 
-3. **PRODUCE THE FINAL VALIDATED ANALYSIS:**
-   - After the reconciliation, construct the final five-step analysis based on YOUR validated conclusions. If you challenged the user, your final analysis must reflect your recommendation, not the user's original input.
-
-4. **STRICT JSON OUTPUT:**
-   - Provide your entire response in a single, valid JSON object. Do not include any text outside the JSON structure.
+3. **STRICT JSON OUTPUT:**
+   - Your entire output MUST be a single, valid JSON object.
 
 **JSON OUTPUT STRUCTURE:**
 {{
@@ -282,11 +269,6 @@ REVENUE RECOGNITION:
                 "supporting_quote": "Section 3.1 states 'The total fee for the Implementation Service is $20,000, due upon completion.' and Section 4.1 states 'The Annual Subscription Fee is $100,000, payable annually.'"
             }}
         ]
-    }},
-    "contract_overview": {{
-        "nature_of_arrangement": "string",
-        "key_terms": ["list"],
-        "complexity_assessment": "string"
     }},
     "step1_contract_identification": {{
         "contract_exists": true,
@@ -317,13 +299,39 @@ REVENUE RECOGNITION:
         "implementation_steps": ["list"],
         "source_basis": "authoritative|interpretative|general_knowledge"
     }},
-    "contractual_evidence": {{
-        "key_contract_quotes": ["list of verbatim quotes from contract that support major conclusions"],
-        "pricing_terms": ["quotes related to transaction price and payment terms"],
-        "performance_terms": ["quotes related to performance obligations and deliverables"],
-        "timing_terms": ["quotes related to timing and control transfer"]
+    "memo_evidence_pack": {{
+        "step1": {{
+            "conclusion_summary": "The arrangement represents a valid contract under ASC 606 as all five criteria are met.",
+            "contractual_quote": "This Master Services Agreement ('MSA') is entered into by and between Client Inc. and Vendor Corp.",
+            "authoritative_citation_number": "ASC 606-10-25-1",
+            "authoritative_citation_text": "A contract is an agreement between two or more parties that creates enforceable rights and obligations..."
+        }},
+        "step2": {{
+            "conclusion_summary": "The contract contains two distinct performance obligations: the software subscription and the implementation service.",
+            "contractual_quote": "Section 3.1: The one-time fee for Implementation Services is $20,000. Section 4.1: The Annual Subscription Fee is $100,000.",
+            "authoritative_citation_number": "ASC 606-10-25-19",
+            "authoritative_citation_text": "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..."
+        }},
+        "step3": {{
+            "conclusion_summary": "string",
+            "contractual_quote": "verbatim quote from contract",
+            "authoritative_citation_number": "ASC 606 paragraph number",
+            "authoritative_citation_text": "verbatim text of ASC paragraph"
+        }},
+        "step4": {{
+            "conclusion_summary": "string",
+            "contractual_quote": "verbatim quote from contract",
+            "authoritative_citation_number": "ASC 606 paragraph number",
+            "authoritative_citation_text": "verbatim text of ASC paragraph"
+        }},
+        "step5": {{
+            "conclusion_summary": "string",
+            "contractual_quote": "verbatim quote from contract",
+            "authoritative_citation_number": "ASC 606 paragraph number",
+            "authoritative_citation_text": "verbatim text of ASC paragraph"
+        }}
     }},
-    "citations": ["list of specific ASC paragraphs and EY publication sections cited"],
+    "citations": ["list of all paragraph numbers cited"],
     "source_transparency": {{
         "authoritative_sources_used": ["list"],
         "interpretative_sources_used": ["list"],
@@ -364,8 +372,11 @@ REVENUE RECOGNITION:
             raise Exception(f"Analysis failed: {str(e)}")
     
     def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any], contract_text: str) -> str:
-        """Generate premium, audit-ready professional memo"""
-        # Extract the validated analysis sections
+        """Generate premium, audit-ready professional memo using structured evidence pack"""
+        # Extract the evidence pack, which is now the single source of truth for the memo
+        evidence_pack = analysis_result.get('memo_evidence_pack', {})
+        
+        # Also get the detailed step analysis for more context if needed
         validated_analysis = {
             "step1": analysis_result.get('step1_contract_identification', {}),
             "step2": analysis_result.get('step2_performance_obligations', {}),
@@ -376,45 +387,51 @@ REVENUE RECOGNITION:
         }
         
         memo_prompt = f"""
-You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. The memo must be comprehensive, defensible, and actionable.
+You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. Your task is to assemble a professional memo using the structured evidence provided.
 
 **Client and Contract Details:**
 - **Memo For:** {contract_data.customer_name} Management & Auditors
 - **Date:** {datetime.now().strftime('%B %d, %Y')}
 - **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.analysis_title}'
 
-**Validated Analysis Data (Your Source of Truth):**
+---
+
+**STRUCTURED EVIDENCE PACK (Your ONLY source for quotes and citations):**
+```json
+{json.dumps(evidence_pack, indent=2)}
+```
+
+**DETAILED ANALYSIS (For context and rationale):**
 ```json
 {json.dumps(validated_analysis, indent=2)}
 ```
 
-**CONTRACT TEXT FOR DIRECT QUOTES:**
-```
-{contract_text[:10000]}
-```
-
 **MANDATORY INSTRUCTIONS:**
 
-1. **Structure and Tone:**
-   - Use a formal, professional tone.
-   - The memo MUST be structured with the following sections, in this exact order:
-     - **Executive Summary:** A brief, high-level overview of the arrangement and the key accounting conclusions (e.g., number of POs, total transaction price, recognition timing). Highlight any significant judgments.
-     - **Background of the Arrangement:** Briefly describe the contract based on the provided data.
-     - **Detailed ASC 606 Five-Step Analysis:** Analyze each of the 5 steps in its own subsection.
-     - **Key Judgments and Estimates:** A dedicated section summarizing the most significant judgments made.
-     - **Financial & Operational Impact:** Include illustrative journal entries and practical next steps.
-     - **Conclusion:** A final summary statement.
+1. **Assemble the "Detailed Analysis" Section:**
+   - For each of the 5 steps, create a subsection.
+   - Within each subsection, you MUST use the provided evidence to construct a paragraph following the "Conclusion-Rationale-Evidence" framework:
+     - Start with the **conclusion_summary** from the evidence pack.
+     - Write the **rationale** by elaborating on the conclusion, using the context from the "DETAILED ANALYSIS" section.
+     - Embed the **contractual_quote** from the evidence pack verbatim, introducing it with a phrase like, "This is supported by the contract, which states:".
+     - Embed the **authoritative_citation_text** from the evidence pack verbatim, introducing it with, "This conclusion aligns with {authoritative_citation_number}, which states:".
 
-2. **Content Requirements for the "Detailed Analysis" Section:**
-   - For every major conclusion within each of the 5 steps, you MUST use the "Conclusion-Rationale-Evidence" framework:
-     - **Conclusion:** State the clear finding.
-     - **Rationale:** Explain the accounting logic.
-     - **Contractual Evidence:** Provide a direct, verbatim quote from the contract text that supports your conclusion. Extract actual quotes from the contractual_evidence section and contract text provided.
-     - **Authoritative Guidance:** Cite the specific ASC 606 paragraph (e.g., ASC 606-10-25-19) from the 'citations' list. Include the actual paragraph number.
+2. **Generate Other Memo Sections:**
+   - Use the assembled analysis to write the Executive Summary, Key Judgments, and Conclusion sections.
+   - For the Financial & Operational Impact section, create Illustrative Journal Entries based on the conclusions in the detailed analysis.
 
-3. **Content Requirements for the "Financial & Operational Impact" Section:**
-   - Create a subsection titled "Illustrative Journal Entries". Provide key journal entries (e.g., upon invoicing, upon satisfaction of a PO, periodic recognition) with clear debits and credits.
-   - Create a subsection titled "System and Process Considerations" with 2-3 bullet points on what the company needs to do operationally (e.g., "Configure ERP system for monthly amortization schedule," "Track completion of implementation milestones").
+3. **Final Output:**
+   - Produce the complete, polished, and fully formatted professional memo. Do not simply list the evidence; weave it into professional, well-written prose.
+
+**EXAMPLE of a well-formed paragraph for Step 2:**
+
+**Step 2: Identify Performance Obligations**
+
+**Conclusion:** The contract contains two distinct performance obligations: the software subscription and the implementation service.
+
+**Rationale:** The analysis determined that these two promises are distinct because the customer can benefit from them separately and they are not interdependent. The implementation service does not significantly customize or modify the underlying software platform. This is supported by the contract, which states: "Section 3.1: The one-time fee for Implementation Services is $20,000. Section 4.1: The Annual Subscription Fee is $100,000."
+
+This conclusion aligns with ASC 606-10-25-19, which states: "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..."
 
 Generate the complete professional memo based on these strict instructions.
 """
