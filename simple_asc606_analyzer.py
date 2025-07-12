@@ -414,7 +414,7 @@ You are a Director at a top-tier accounting advisory firm, tasked with writing a
      - Start with the **conclusion_summary** from the evidence pack.
      - Write the **rationale** by elaborating on the conclusion, using the context from the "DETAILED ANALYSIS" section.
      - Embed the **contractual_quote** from the evidence pack verbatim, introducing it with a phrase like, "This is supported by the contract, which states:".
-     - Embed the **authoritative_citation_text** from the evidence pack verbatim, introducing it with, "This conclusion aligns with {authoritative_citation_number}, which states:".
+     - Embed the **authoritative_citation_text** from the evidence pack verbatim, introducing it with the corresponding citation number from the evidence pack.
 
 2. **Generate Other Memo Sections:**
    - Use the assembled analysis to write the Executive Summary, Key Judgments, and Conclusion sections.
@@ -431,7 +431,7 @@ You are a Director at a top-tier accounting advisory firm, tasked with writing a
 
 **Rationale:** The analysis determined that these two promises are distinct because the customer can benefit from them separately and they are not interdependent. The implementation service does not significantly customize or modify the underlying software platform. This is supported by the contract, which states: "Section 3.1: The one-time fee for Implementation Services is $20,000. Section 4.1: The Annual Subscription Fee is $100,000."
 
-This conclusion aligns with ASC 606-10-25-19, which states: "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..."
+This conclusion aligns with the authoritative guidance, which states: "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..."
 
 Generate the complete professional memo based on these strict instructions.
 """
