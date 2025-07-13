@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-13**
+- ✅ **DYNAMIC SEMANTIC QUERY GENERATION**: Implemented adaptive semantic search per Gemini's feedback
+- ✅ Added contract-specific term extraction for each ASC 606 step to enhance search relevance
+- ✅ Enhanced hybrid RAG system with intelligent query generation that adapts to contract content
+- ✅ Included comprehensive logging for dynamic term extraction and debugging
+- ✅ Addressed Gemini's key recommendation about hardcoded semantic queries
+- **Status**: Advanced hybrid RAG system with adaptive intelligence and context-aware guidance retrieval
+
 **Date: 2025-07-12**
 - ✅ Implemented comprehensive "Trust, but Verify" analysis system following Gemini's recommendations
 - ✅ Upgraded data models with new Pydantic classes for performance obligations and variable consideration
@@ -39,8 +47,12 @@ Preferred communication style: Simple, everyday language.
 - ✅ Added two-stage citation approach: Stage 1 (extract verbatim quotes), Stage 2 (assemble analysis)
 - ✅ Enhanced guidance retrieval with semantic search within ASC 606 step-specific filters
 - ✅ Integrated HybridASC606Analyzer with structured evidence packs and authoritative citations
-- **Status**: Production-ready hybrid RAG system with guaranteed verbatim citations and audit-ready evidence traceability
-- **Next Step**: System ready for professional contract analysis with Big 4 quality standards
+- ✅ **DYNAMIC SEMANTIC QUERY GENERATION**: Implemented contract-specific term extraction per Gemini's feedback
+- ✅ Added adaptive semantic search that extracts contract-specific terminology for each ASC 606 step
+- ✅ Enhanced search relevance by combining static ASC 606 terms with dynamic contract language
+- ✅ Included detailed logging for dynamic term extraction to track system intelligence
+- **Status**: Production-ready hybrid RAG system with adaptive semantic search and guaranteed verbatim citations
+- **Next Step**: System ready for professional contract analysis with intelligent, context-aware guidance retrieval
 
 **Date: 2025-07-11**
 - ✅ Implemented comprehensive RAG system using authoritative ASC 606 sources

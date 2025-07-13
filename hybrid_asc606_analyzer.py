@@ -32,6 +32,50 @@ class HybridASC606Analyzer:
         )
         self.logger = logging.getLogger(__name__)
     
+    def _extract_contract_terms(self, contract_text: str, step_context: str) -> List[str]:
+        """
+        Extract contract-specific terms relevant to a particular ASC 606 step
+        This makes semantic search more precise and adaptable
+        """
+        step_descriptions = {
+            "contract_identification": "contract formation, enforceability, legal validity, agreement terms",
+            "performance_obligations": "deliverables, services, goods, obligations, commitments, work to be performed",
+            "transaction_price": "payment terms, pricing, fees, consideration, amounts, variable payments",
+            "price_allocation": "allocation methods, relative values, standalone prices, bundling",
+            "revenue_recognition": "timing, milestones, completion, transfer of control, satisfaction"
+        }
+        
+        description = step_descriptions.get(step_context, "relevant contract terms")
+        
+        prompt = f"""Extract 5-7 key terms from this contract that are most relevant to {description}.
+
+Focus on:
+- Specific terminology used in this contract (not generic accounting terms)
+- Industry-specific language
+- Unique aspects of this arrangement
+- Terms that would help find relevant ASC 606 guidance
+
+Contract text:
+{contract_text[:2000]}...
+
+Return only the terms as a comma-separated list, no explanations."""
+
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=100,
+                temperature=0.1
+            )
+            
+            terms_text = response.choices[0].message.content.strip()
+            terms = [term.strip() for term in terms_text.split(',')]
+            return terms[:7]  # Limit to 7 terms max
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting contract terms: {e}")
+            return []
+
     def analyze_contract(self, contract_text: str, contract_data) -> ASC606Analysis:
         """
         Perform ASC 606 analysis using hybrid RAG system with two-stage citation approach
@@ -42,30 +86,46 @@ class HybridASC606Analyzer:
             # STAGE 1: Extract contract evidence for each step
             contract_evidence = self._extract_contract_evidence(contract_text)
             
-            # Get relevant guidance using hybrid search for each step
+            # Extract contract-specific terms for dynamic semantic search
+            self.logger.info("Extracting dynamic contract terms for semantic search...")
+            contract_terms = self._extract_contract_terms(contract_text, "contract_identification")
+            obligations_terms = self._extract_contract_terms(contract_text, "performance_obligations")
+            price_terms = self._extract_contract_terms(contract_text, "transaction_price")
+            allocation_terms = self._extract_contract_terms(contract_text, "price_allocation")
+            recognition_terms = self._extract_contract_terms(contract_text, "revenue_recognition")
+            
+            # Log extracted terms for debugging
+            self.logger.info(f"Dynamic terms extracted:")
+            self.logger.info(f"  Contract: {contract_terms}")
+            self.logger.info(f"  Obligations: {obligations_terms}")
+            self.logger.info(f"  Price: {price_terms}")
+            self.logger.info(f"  Allocation: {allocation_terms}")
+            self.logger.info(f"  Recognition: {recognition_terms}")
+            
+            # Get relevant guidance using hybrid search with dynamic queries
             contract_guidance = self._get_step_guidance(
                 contract_text, "contract_identification", 
-                "contract criteria enforceability commercial substance"
+                f"contract criteria enforceability commercial substance {' '.join(contract_terms)}"
             )
             
             obligations_guidance = self._get_step_guidance(
                 contract_text, "performance_obligations",
-                "performance obligations distinct separately identifiable"
+                f"performance obligations distinct separately identifiable {' '.join(obligations_terms)}"
             )
             
             price_guidance = self._get_step_guidance(
                 contract_text, "transaction_price",
-                "transaction price variable consideration financing"
+                f"transaction price variable consideration financing {' '.join(price_terms)}"
             )
             
             allocation_guidance = self._get_step_guidance(
                 contract_text, "price_allocation",
-                "allocate transaction price standalone selling price"
+                f"allocate transaction price standalone selling price {' '.join(allocation_terms)}"
             )
             
             recognition_guidance = self._get_step_guidance(
                 contract_text, "revenue_recognition",
-                "revenue recognition control transfer over time point in time"
+                f"revenue recognition control transfer over time point in time {' '.join(recognition_terms)}"
             )
             
             # STAGE 2: Create analysis prompt with hybrid guidance and extracted evidence
