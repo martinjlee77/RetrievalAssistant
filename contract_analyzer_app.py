@@ -94,12 +94,17 @@ class ContractAnalyzerApp:
         self.extractor = DocumentExtractor()
         
         # Store RAG initialization status
-        self.rag_status = "ready" if self.analyzer.authoritative_sources else "failed"
+        try:
+            kb_stats = self.analyzer.get_knowledge_base_stats()
+            self.rag_status = "ready" if kb_stats.get("status") == "ready" else "failed"
+        except:
+            self.rag_status = "failed"
 
     @st.cache_resource
     def get_cached_analyzer(_self):
         """Get cached analyzer instance to prevent reinitialization on every input change"""
-        return SimpleASC606Analyzer()
+        from hybrid_asc606_analyzer import HybridASC606Analyzer
+        return HybridASC606Analyzer()
 
     def update_form_state(self):
         """Update form state without triggering full rerun"""
@@ -163,12 +168,16 @@ class ContractAnalyzerApp:
             
             # RAG System Status
             st.subheader("📚 Knowledge Base")
-            if self.analyzer.authoritative_sources:
-                st.success("✅ Authoritative Sources Loaded")
-                st.caption(f"Using {len(self.analyzer.authoritative_sources)} ASC 606 sources")
+            if self.rag_status == "ready":
+                st.success("✅ Hybrid RAG System Loaded")
+                try:
+                    kb_stats = self.analyzer.get_knowledge_base_stats()
+                    st.caption(f"Using {kb_stats.get('total_chunks', 0)} semantic chunks")
+                except:
+                    st.caption("Hybrid RAG system active")
             else:
-                st.error("❌ Sources Failed to Load")
-                st.caption("Check ASC 606 files in attached_assets")
+                st.error("❌ Knowledge Base Failed to Load")
+                st.caption("Please restart the application")
 
     def render_upload_interface(self):
         # --- CHANGE 3: Organize inputs into clear tabs ---
