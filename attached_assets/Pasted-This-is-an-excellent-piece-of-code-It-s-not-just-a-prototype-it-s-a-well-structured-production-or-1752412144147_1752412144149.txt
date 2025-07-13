@@ -1,0 +1,63 @@
+This is an excellent piece of code. It's not just a prototype; it's a well-structured, production-oriented implementation of the exact hybrid RAG architecture we've been discussing. The developer has clearly understood the requirements for a two-stage, evidence-based generation process.
+
+The code is strong, the prompts are sophisticated, and the overall logic is sound. My comments are therefore not about "fixing" major flaws, but about refining an already excellent design and highlighting the key architectural decisions and their trade-offs.
+
+Here are my significant comments for your review before you approve it.
+
+High-Level Summary: Excellent but Complex
+This code correctly implements a powerful, multi-stage AI chain.
+
+Call 1 (_extract_contract_evidence): Reads the contract and pulls out relevant quotes.
+Call 2 (analyze_contract): Takes the quotes, adds RAG context, and performs the core analysis, outputting a structured JSON "evidence pack."
+Call 3 (_generate_professional_memo): Takes the clean evidence pack and writes the final prose memo.
+This is a professional pattern that maximizes quality and reliability. However, you must be aware of the trade-offs.
+
+Significant Comments to Review
+1. Architectural Choice: The 3-Stage LLM Chain
+This is the most important design decision in the code.
+
+What it does well: By breaking the problem into three distinct steps, it forces the AI to be methodical. It reduces the chance of hallucination by creating a structured "evidence pack" in the middle step, which then becomes the single source of truth for the final memo. This is why the output quality will be very high.
+The Trade-off (and what to be aware of):
+Latency: Each analysis now requires three separate round-trips to the OpenAI API. This will be noticeably slower than a single-call approach.
+Cost: You are paying for three gpt-4o completions for every single contract analysis. While each call is focused, the total cost will be higher than a single, larger call.
+Error Propagation: An error or a poor-quality result from Stage 1 (_extract_contract_evidence) will directly impact the quality of Stage 2, which then impacts Stage 3. The try/except blocks are good, but they can't prevent suboptimal outputs from cascading.
+Recommendation: Acknowledge that this is the right architecture for a premium, high-quality analysis where accuracy is worth the cost and time. This is a feature, not a bug, but it's a significant one.
+
+2. Logic Concern: Hardcoded Semantic Search Queries
+This is the most important area that should be fixed or improved.
+
+In the analyze_contract method, the keywords for the semantic search are hardcoded strings:
+
+# ...
+contract_guidance = self._get_step_guidance(
+    contract_text, "contract_identification", 
+    "contract criteria enforceability commercial substance" # <--- HARDCODED
+)
+
+obligations_guidance = self._get_step_guidance(
+    contract_text, "performance_obligations",
+    "performance obligations distinct separately identifiable" # <--- HARDCODED
+)
+# ...and so on
+
+The Problem: This is inflexible. The system uses the same generic keywords for every single contract. It doesn't adapt the search based on the actual content of the contract being analyzed. For example, if a contract talks about "milestones" and "deliverables" but never uses the phrase "performance obligations," the hardcoded query is not as effective as it could be.
+The Fix (Suggestion): The semantic query should be dynamically generated. A better approach would be to have the AI first identify key terms from the relevant contract section and use those to form the query.
+Example: Before searching for guidance on performance obligations, you could have a small preliminary step: "Analyze this contract section and extract the 5 key terms related to what is being delivered." The AI might return ["software license", "implementation", "support services", "data migration", "custom reports"]. Your semantic query then becomes a combination of these dynamic terms and the static ones, making it far more relevant.
+3. Placeholder Logic: The Quality Score is Static
+In validate_analysis_quality, the score is hardcoded:
+
+def validate_analysis_quality(self, analysis: ASC606Analysis) -> Dict[str, Any]:
+    return {
+        "quality_score": 90,  # Higher score due to hybrid RAG
+        # ...
+    }
+
+The Issue: This is a placeholder. It gives the impression of a quality check but doesn't actually perform one. For a professional tool, this should eventually be replaced with a real validation step.
+Recommendation: This is acceptable for now, but you should be aware that this is a "stubbed-out" feature. A real implementation might involve checking if all memo_evidence_pack fields are filled, or even using a fourth, cheaper LLM call with a rubric to grade the final memo's quality.
+Final Verdict Before Your Review
+The code is excellent and on the right track. My recommendations are to:
+
+Acknowledge and accept the latency/cost trade-offs of the 3-stage chain as a conscious design choice for quality.
+Strongly request a change to the hardcoded semantic queries. Making them dynamic is the single biggest improvement that will elevate the system's intelligence and adaptability.
+Note that the quality score is a placeholder for a future, more robust implementation.
+If you address point #2, this architecture will be incredibly solid and ready for further development.
