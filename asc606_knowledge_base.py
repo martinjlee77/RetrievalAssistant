@@ -301,9 +301,9 @@ class ASC606KnowledgeBase:
         
         total_chunks = self.collection.count()
         
-        # Get breakdown by source type
-        authoritative_count = self.collection.count(where={"source_type": "authoritative"})
-        interpretative_count = self.collection.count(where={"source_type": "interpretative"})
+        # Get breakdown by source type using chunk metadata
+        authoritative_count = len([chunk for chunk in self.chunks if chunk.source_type == "authoritative"])
+        interpretative_count = len([chunk for chunk in self.chunks if chunk.source_type == "interpretative"])
         
         return {
             "status": "ready",
