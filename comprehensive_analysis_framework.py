@@ -13,11 +13,18 @@ def get_comprehensive_analysis_prompt(contract_evidence: dict, guidance_sections
 You are a "Big 4" accounting advisor with deep expertise in ASC 606. Your task is to perform a comprehensive, forensic analysis that systematically addresses every aspect of the ASC 606 framework.
 
 **CRITICAL INSTRUCTIONS:**
-1. You must address EVERY question in the comprehensive framework below
-2. For each step, provide detailed analysis with specific contract evidence
+
+**BASELINE ANALYSIS:** You must address EVERY question in the comprehensive framework below. This is your minimum requirement and establishes the floor for analysis quality.
+
+**EMERGENT ANALYSIS:** Your analysis is NOT limited to this framework. As a "Big 4" expert, you are expected to identify and analyze any other unique, unusual, or material issues present in the contract that are not covered by the standard questions. Use your expertise to spot novel accounting issues that require professional judgment.
+
+**EXECUTION REQUIREMENTS:**
+1. Address every question in the framework systematically
+2. Provide detailed analysis with specific contract evidence
 3. Use the two-stage citation approach: contract quotes + ASC 606 guidance
 4. If any question is not applicable, explicitly state why with reasoning
-5. Be thorough and methodical - this is an audit-ready analysis
+5. Identify and analyze any unique contract provisions not covered by standard questions
+6. Be thorough and methodical - this is an audit-ready analysis
 
 **EXTRACTED CONTRACT EVIDENCE (Use these verbatim quotes):**
 {format_contract_evidence(contract_evidence)}
@@ -161,7 +168,15 @@ e) Is it probable that the entity will collect substantially all consideration?
         }},
         "contract_enforceability": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
         "contract_combinations": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
-        "contract_modifications": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
+        "contract_modifications": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
+        "additional_considerations": [
+            {{
+                "issue_identified": "Description of any unique, unusual, or material issue not covered by standard questions",
+                "rationale": "Why this issue is significant and requires attention",
+                "contractual_quote": "Relevant verbatim quote from the contract",
+                "authoritative_citation": "Applicable ASC 606 guidance or principle"
+            }}
+        ]
     }},
     "step2_performance_obligations": {{
         "conclusion": "Summary of identified performance obligations",
@@ -173,7 +188,15 @@ e) Is it probable that the entity will collect substantially all consideration?
         }},
         "principal_agent_analysis": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
         "warranties_analysis": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
-        "customer_options": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
+        "customer_options": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
+        "additional_considerations": [
+            {{
+                "issue_identified": "Description of any unique, unusual, or material issue not covered by standard questions",
+                "rationale": "Why this issue is significant and requires attention",
+                "contractual_quote": "Relevant verbatim quote from the contract",
+                "authoritative_citation": "Applicable ASC 606 guidance or principle"
+            }}
+        ]
     }},
     "step3_transaction_price": {{
         "conclusion": "Summary of transaction price determination",
@@ -185,14 +208,30 @@ e) Is it probable that the entity will collect substantially all consideration?
         }},
         "financing_component": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
         "noncash_consideration": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
-        "consideration_payable_to_customer": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
+        "consideration_payable_to_customer": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
+        "additional_considerations": [
+            {{
+                "issue_identified": "Description of any unique, unusual, or material issue not covered by standard questions",
+                "rationale": "Why this issue is significant and requires attention",
+                "contractual_quote": "Relevant verbatim quote from the contract",
+                "authoritative_citation": "Applicable ASC 606 guidance or principle"
+            }}
+        ]
     }},
     "step4_price_allocation": {{
         "conclusion": "Summary of price allocation approach",
         "multiple_performance_obligations": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
         "variable_consideration_allocation": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
         "discount_allocation": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
-        "standalone_selling_price": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
+        "standalone_selling_price": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
+        "additional_considerations": [
+            {{
+                "issue_identified": "Description of any unique, unusual, or material issue not covered by standard questions",
+                "rationale": "Why this issue is significant and requires attention",
+                "contractual_quote": "Relevant verbatim quote from the contract",
+                "authoritative_citation": "Applicable ASC 606 guidance or principle"
+            }}
+        ]
     }},
     "step5_revenue_recognition": {{
         "conclusion": "Summary of revenue recognition approach",
@@ -201,11 +240,26 @@ e) Is it probable that the entity will collect substantially all consideration?
             "point_in_time_analysis": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
         }},
         "customer_acceptance": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
-        "recognition_pattern": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}}
+        "recognition_pattern": {{"conclusion": "", "rationale": "", "contractual_quote": "", "authoritative_citation": ""}},
+        "additional_considerations": [
+            {{
+                "issue_identified": "Description of any unique, unusual, or material issue not covered by standard questions",
+                "rationale": "Why this issue is significant and requires attention",
+                "contractual_quote": "Relevant verbatim quote from the contract",
+                "authoritative_citation": "Applicable ASC 606 guidance or principle"
+            }}
+        ]
     }}
 }}
 
-You must provide a comprehensive analysis that addresses every question systematically. Do not skip any elements - if not applicable, state why with reasoning.
+**FINAL INSTRUCTIONS:**
+1. Address every question in the framework systematically - this is your baseline requirement
+2. For each step, populate the `additional_considerations` array with any unique, unusual, or material issues you identify that are not covered by the standard questions
+3. If no additional considerations are identified for a step, return an empty array: `"additional_considerations": []`
+4. Your expertise should shine through in identifying novel accounting issues that require professional judgment
+5. Do not skip any elements - if not applicable, state why with reasoning
+
+**REMEMBER:** The framework is your minimum standard, not your maximum capability. Use your expertise to identify issues that would concern a Big 4 audit partner.
 """
 
 def format_contract_evidence(evidence: dict) -> str:
