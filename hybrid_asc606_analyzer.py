@@ -333,91 +333,106 @@ Extract only the most relevant quotes for each step. If a step has no relevant c
     
     def _generate_professional_memo(self, analysis_result: Dict[str, Any], contract_data: Dict[str, Any], contract_text: str) -> str:
         """Generate premium, audit-ready professional memo using structured evidence pack"""
-        # Extract the evidence pack, which is now the single source of truth for the memo
-        evidence_pack = analysis_result.get('memo_evidence_pack', {})
+        from datetime import datetime
+        import json
         
-        # Also get the detailed step analysis for more context if needed
+        # Get the comprehensive analysis result
         validated_analysis = {
             "step1": analysis_result.get('step1_contract_identification', {}),
             "step2": analysis_result.get('step2_performance_obligations', {}),
             "step3": analysis_result.get('step3_transaction_price', {}),
             "step4": analysis_result.get('step4_price_allocation', {}),
             "step5": analysis_result.get('step5_revenue_recognition', {}),
-            "citations": analysis_result.get('citations', [])
+            "contract_overview": analysis_result.get('contract_overview', {}),
+            "reconciliation_analysis": analysis_result.get('reconciliation_analysis', {})
         }
         
         memo_prompt = f"""
-You are a Director at a top-tier accounting advisory firm, tasked with writing a formal, audit-ready accounting memo. Your task is to assemble a professional memo using the structured evidence provided.
+You are a Senior Manager at a "Big 4" accounting advisory firm. Your task is to write a formal, audit-ready accounting memorandum based on the structured analysis workpaper provided.
 
-**Client and Contract Details:**
+**TONE AND STYLE GUIDE (CRITICAL):**
+- **Formal and Professional:** Use a formal, objective, and evidentiary tone. Avoid conversational language.
+- **Show, Don't Just Tell:** Do not simply state conclusions. Elaborate on the rationale by connecting the contract facts to the accounting principles.
+- **The "CREW" Framework (Conclusion-Rule-Evidence-Work/Why):** For each major point, follow this structure:
+    1. **Conclusion:** State the accounting conclusion.
+    2. **Rule:** Cite the relevant authoritative guidance (e.g., "ASC 606-10-25-1 states...").
+    3. **Evidence:** Cite the specific, verbatim contract quote that provides the factual basis.
+    4. **Work/Why:** This is the most important part. Provide 1-2 sentences of analysis explaining **HOW** the evidence (contract) applies to the rule (ASC 606), leading to the conclusion.
+- **Integrate Interpretative Guidance:** Where applicable, especially in areas of judgment, reference the provided interpretative guidance to strengthen your analysis (e.g., "This approach is consistent with EY interpretative guidance, which clarifies...").
+- **Use Structure:** Employ bullet points and sub-headings to break down complex analyses (e.g., for the five criteria of a contract or the two criteria for distinctness) for enhanced readability.
+
+---
+
+**CLIENT AND CONTRACT DETAILS:**
 - **Memo For:** {contract_data.customer_name} Management & Auditors
 - **Date:** {datetime.now().strftime('%B %d, %Y')}
 - **Subject:** ASC 606 Revenue Recognition Analysis for '{contract_data.analysis_title}'
 
 ---
 
-**STRUCTURED EVIDENCE PACK (Your ONLY source for quotes and citations):**
-```json
-{json.dumps(evidence_pack, indent=2)}
-```
-
-**DETAILED ANALYSIS (For context and rationale):**
+**COMPLETED ANALYSIS WORKPAPER (Your ONLY source for facts, quotes, and citations):**
 ```json
 {json.dumps(validated_analysis, indent=2)}
 ```
 
-**MANDATORY INSTRUCTIONS:**
+**MANDATORY MEMO STRUCTURE & INSTRUCTIONS:**
 
-1. **Assemble the "Detailed Analysis" Section:**
-   - For each of the 5 steps, create a subsection.
-   - Within each subsection, you MUST use the provided evidence to construct a paragraph following the "Conclusion-Rationale-Evidence" framework:
-     - Start with the **conclusion_summary** from the evidence pack.
-     - Write the **rationale** by elaborating on the conclusion, using the context from the "DETAILED ANALYSIS" section.
-     - Embed the **contractual_quote** from the evidence pack verbatim, introducing it with a phrase like, "This is supported by the contract, which states:".
-     - Embed the **authoritative_citation_text** from the evidence pack verbatim, introducing it with the corresponding citation number from the evidence pack.
+**1. Executive Summary:**
+Write a concise, high-level overview of the arrangement and the key accounting conclusions for each of the five steps.
 
-2. **Generate Other Memo Sections:**
-   - Use the assembled analysis to write the Executive Summary, Key Judgments, and Conclusion sections.
-   - For the Financial & Operational Impact section, create Illustrative Journal Entries based on the conclusions in the detailed analysis.
+**2. Background:**
+Briefly describe the nature of the contract and the parties involved.
 
-3. **Final Output:**
-   - Produce the complete, polished, and fully formatted professional memo. Do not simply list the evidence; weave it into professional, well-written prose.
+**3. Detailed Analysis (The Core of the Memo):**
+For EACH of the 5 steps, create a formal section (e.g., "Step 1: Identification of the Contract with the Customer").
+For each sub-point within a step (e.g., for each of the five criteria in Step 1), you MUST use the "CREW" framework described in the style guide.
+Weave the analysis into professional prose. Do not just list the JSON data. Transform the structured data from the workpaper into a polished, narrative analysis.
 
-**EXAMPLE of a well-formed paragraph for Step 2:**
+**4. Key Accounting Judgments:**
+Summarize the most significant judgments made during the analysis (e.g., determination of distinct performance obligations, estimation of standalone selling prices). Elaborate on why these were areas of judgment and how they were resolved.
 
-**Step 2: Identify Performance Obligations**
+**5. Financial Statement Impact:**
+Provide illustrative journal entries with clear explanations for each entry.
 
-**Conclusion:** The contract contains two distinct performance obligations: the software subscription and the implementation service.
+**6. Conclusion:**
+Provide a final concluding paragraph summarizing the overall compliance with ASC 606.
 
-**Rationale:** The analysis determined that these two promises are distinct because the customer can benefit from them separately and they are not interdependent. The implementation service does not significantly customize or modify the underlying software platform. This is supported by the contract, which states: "Section 3.1: The one-time fee for Implementation Services is $20,000. Section 4.1: The Annual Subscription Fee is $100,000."
+**EXAMPLE OF "CREW" FRAMEWORK APPLIED TO ONE POINT IN STEP 1:**
 
-This conclusion aligns with the authoritative guidance, which states: "An entity shall account for a promise to transfer a good or service to a customer as a performance obligation if the good or service is distinct..."
+**Step 1: Identification of the Contract with the Customer**
 
-Generate the complete professional memo based on these strict instructions.
+The arrangement between {contract_data.customer_name} represents a valid contract under ASC 606 as all five criteria specified in the guidance have been met.
+
+**Approval and Commitment (Criterion a):** The contract has been approved by both parties who are committed to their respective obligations. The authoritative guidance in ASC 606-10-25-1(a) requires that a contract's parties have approved the contract and are committed to perform their respective obligations. The factual basis for this is found in the contract, which states, "[Insert verbatim contract quote from analysis]." This demonstrates the mutual commitment required under the standard because both parties have executed the agreement with clear performance obligations and enforcement mechanisms.
+
+**Identification of Rights (Criterion b):** [Continue analysis for b, c, d, e in the same detailed format] ...
+
+**Generate the complete, audit-ready professional memo based on these strict instructions. The final output should be a document that a CFO would be comfortable presenting to their audit committee.**
 """
         
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a Director at a top-tier accounting advisory firm writing audit-ready professional memos. Your memos must be defensible, comprehensive, and actionable."
+                        "content": "You are a Senior Manager at a Big 4 accounting advisory firm. You write formal, audit-ready accounting memoranda with deep analytical rigor, following the CREW framework (Conclusion-Rule-Evidence-Work/Why) for every major point. Your memos are used by CFOs and audit committees."
                     },
                     {
                         "role": "user",
                         "content": memo_prompt
                     }
                 ],
-                temperature=0.1,
-                max_tokens=4000
+                temperature=0.3,  # Slightly creative for professional writing style
+                max_tokens=4000   # Sufficient for comprehensive memo
             )
             
             return response.choices[0].message.content
             
         except Exception as e:
-            self.logger.error(f"Error generating memo: {str(e)}")
+            self.logger.error(f"Error generating professional memo: {e}")
             return f"Error generating memo: {str(e)}"
+
     
     def _structure_analysis_result(self, analysis_result: Dict[str, Any], memo: str) -> ASC606Analysis:
         """Structure the analysis result with hybrid RAG data"""
