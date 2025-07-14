@@ -684,91 +684,84 @@ class ContractAnalyzerApp:
             if not confirmations and not discrepancies:
                 st.info("No preliminary assessment data to reconcile")
         
-        # ASC 606 Five-Step Analysis
-        st.subheader("🔍 ASC 606 Five-Step Analysis")
-        step1, step2, step3, step4, step5 = st.tabs([
-            "Step 1: Contract", "Step 2: Performance Obligations", "Step 3: Transaction Price",
-            "Step 4: Price Allocation", "Step 5: Revenue Recognition"
-        ])
+        # ASC 606 Analysis Summary
+        st.subheader("🔍 ASC 606 Analysis Summary")
         
-        with step1:
-            step1_data = analysis.step1_contract_identification
-            st.write("**Contract Identification Analysis**")
-            st.write(f"**Contract Exists:** {'Yes' if step1_data.get('contract_exists') else 'No'}")
-            st.write(f"**Rationale:** {step1_data.get('rationale', 'Not provided')}")
-            st.write(f"**Combination Required:** {'Yes' if step1_data.get('combination_required') else 'No'}")
-            st.write(f"**Modifications Present:** {'Yes' if step1_data.get('modifications_present') else 'No'}")
-            
-            if step1_data.get('key_findings'):
-                st.write("**Key Findings:**")
-                for finding in step1_data['key_findings']:
-                    st.write(f"• {finding}")
+        # Extract key conclusions from each step
+        def extract_conclusion(step_data):
+            """Extract conclusion from step data, handling both old and new formats"""
+            if isinstance(step_data, dict):
+                return step_data.get('conclusion', 'Analysis completed')
+            return str(step_data)
         
-        with step2:
-            step2_data = analysis.step2_performance_obligations
-            st.write("**Performance Obligations Analysis**")
-            
-            if step2_data.get('identified_obligations'):
-                st.write("**Identified Performance Obligations:**")
-                for i, obligation in enumerate(step2_data['identified_obligations'], 1):
-                    st.write(f"{i}. {obligation}")
-            
-            st.write(f"**Distinctness Analysis:** {step2_data.get('distinctness_analysis', 'Not provided')}")
-            st.write(f"**Principal vs Agent Analysis:** {step2_data.get('principal_agent_analysis', 'Not provided')}")
-            
-            if step2_data.get('key_judgments'):
-                st.write("**Key Judgments:**")
-                for judgment in step2_data['key_judgments']:
-                    st.write(f"• {judgment}")
+        # Create a clean summary view
+        summary_cols = st.columns(5)
         
-        with step3:
-            step3_data = analysis.step3_transaction_price
-            st.write("**Transaction Price Analysis**")
+        with summary_cols[0]:
+            st.metric("Step 1", "Contract", help="Contract identification completed")
+            step1_conclusion = extract_conclusion(analysis.step1_contract_identification)
+            st.caption(step1_conclusion[:50] + "..." if len(step1_conclusion) > 50 else step1_conclusion)
             
-            if step3_data.get('fixed_consideration'):
-                st.write(f"**Fixed Consideration:** {contract.currency} {step3_data['fixed_consideration']:,.2f}")
+        with summary_cols[1]:
+            st.metric("Step 2", "Performance Obligations", help="Performance obligations identified")
+            step2_conclusion = extract_conclusion(analysis.step2_performance_obligations)
+            st.caption(step2_conclusion[:50] + "..." if len(step2_conclusion) > 50 else step2_conclusion)
             
-            st.write(f"**Variable Consideration:** {step3_data.get('variable_consideration', 'Not provided')}")
-            st.write(f"**Constraint Analysis:** {step3_data.get('constraint_analysis', 'Not provided')}")
-            st.write(f"**Financing Components:** {step3_data.get('financing_components', 'Not provided')}")
+        with summary_cols[2]:
+            st.metric("Step 3", "Transaction Price", help="Transaction price determined")
+            step3_conclusion = extract_conclusion(analysis.step3_transaction_price)
+            st.caption(step3_conclusion[:50] + "..." if len(step3_conclusion) > 50 else step3_conclusion)
             
-            if step3_data.get('key_estimates'):
-                st.write("**Key Estimates:**")
-                for estimate in step3_data['key_estimates']:
-                    st.write(f"• {estimate}")
+        with summary_cols[3]:
+            st.metric("Step 4", "Price Allocation", help="Price allocation method applied")
+            step4_conclusion = extract_conclusion(analysis.step4_price_allocation)
+            st.caption(step4_conclusion[:50] + "..." if len(step4_conclusion) > 50 else step4_conclusion)
+            
+        with summary_cols[4]:
+            st.metric("Step 5", "Revenue Recognition", help="Revenue recognition pattern determined")
+            step5_conclusion = extract_conclusion(analysis.step5_revenue_recognition)
+            st.caption(step5_conclusion[:50] + "..." if len(step5_conclusion) > 50 else step5_conclusion)
         
-        with step4:
-            step4_data = analysis.step4_price_allocation
-            st.write("**Price Allocation Analysis**")
-            
-            st.write(f"**Allocation Method:** {step4_data.get('allocation_method', 'Not provided')}")
-            
-            if step4_data.get('standalone_selling_prices'):
-                st.write("**Standalone Selling Prices:**")
-                ssp = step4_data['standalone_selling_prices']
-                if isinstance(ssp, dict):
-                    for obligation, price in ssp.items():
-                        st.write(f"• {obligation}: {price}")
-                else:
-                    st.write(f"• {ssp}")
-            
-            if step4_data.get('key_assumptions'):
-                st.write("**Key Assumptions:**")
-                for assumption in step4_data['key_assumptions']:
-                    st.write(f"• {assumption}")
+        # Additional considerations section
+        st.subheader("🎯 Key Insights & Additional Considerations")
         
-        with step5:
-            step5_data = analysis.step5_revenue_recognition
-            st.write("**Revenue Recognition Analysis**")
+        additional_insights = []
+        
+        # Collect additional considerations from each step
+        for step_name, step_data in [
+            ("Contract Identification", analysis.step1_contract_identification),
+            ("Performance Obligations", analysis.step2_performance_obligations),
+            ("Transaction Price", analysis.step3_transaction_price),
+            ("Price Allocation", analysis.step4_price_allocation),
+            ("Revenue Recognition", analysis.step5_revenue_recognition)
+        ]:
+            if isinstance(step_data, dict) and step_data.get('additional_considerations'):
+                for consideration in step_data['additional_considerations']:
+                    if consideration.get('issue_identified'):
+                        additional_insights.append({
+                            'step': step_name,
+                            'issue': consideration['issue_identified'],
+                            'rationale': consideration.get('rationale', ''),
+                            'quote': consideration.get('contractual_quote', ''),
+                            'citation': consideration.get('authoritative_citation', '')
+                        })
+        
+        if additional_insights:
+            st.success(f"✅ {len(additional_insights)} additional considerations identified beyond standard analysis")
             
-            st.write(f"**Recognition Pattern:** {step5_data.get('recognition_pattern', 'Not provided')}")
-            st.write(f"**Control Transfer Analysis:** {step5_data.get('control_transfer_analysis', 'Not provided')}")
-            st.write(f"**Timing Determination:** {step5_data.get('timing_determination', 'Not provided')}")
-            
-            if step5_data.get('implementation_steps'):
-                st.write("**Implementation Steps:**")
-                for i, step in enumerate(step5_data['implementation_steps'], 1):
-                    st.write(f"{i}. {step}")
+            for i, insight in enumerate(additional_insights, 1):
+                with st.expander(f"💡 {insight['step']}: {insight['issue'][:60]}..."):
+                    st.write(f"**Issue:** {insight['issue']}")
+                    st.write(f"**Rationale:** {insight['rationale']}")
+                    if insight['quote']:
+                        st.code(f"Contract Quote: {insight['quote']}")
+                    if insight['citation']:
+                        st.info(f"📚 Authority: {insight['citation']}")
+        else:
+            st.info("Standard ASC 606 analysis completed - no unique considerations identified")
+        
+        # Note about detailed analysis
+        st.info("💡 **Note:** The complete detailed analysis with all supporting evidence, contract quotes, and authoritative citations is available in the Professional Memo below.")
 
         # Professional memo section
         st.subheader("📋 Premium Professional Memo")
