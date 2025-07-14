@@ -11,8 +11,23 @@ from typing import Dict, List, Any, Optional
 from pathlib import Path
 from openai import OpenAI
 from asc606_knowledge_base import get_knowledge_base, ASC606KnowledgeBase
-from simple_asc606_analyzer import ASC606Analysis
 from comprehensive_analysis_framework import get_comprehensive_analysis_prompt
+from dataclasses import dataclass
+
+@dataclass
+class ASC606Analysis:
+    """Structure for ASC 606 analysis results"""
+    reconciliation_analysis: Dict[str, List[Dict[str, Any]]]
+    contract_overview: Dict[str, Any]
+    step1_contract_identification: Dict[str, Any]
+    step2_performance_obligations: Dict[str, Any]
+    step3_transaction_price: Dict[str, Any]
+    step4_price_allocation: Dict[str, Any]
+    step5_revenue_recognition: Dict[str, Any]
+    professional_memo: str
+    implementation_guidance: List[str]
+    citations: List[str]
+    not_applicable_items: List[str]
 
 
 class HybridASC606Analyzer:
@@ -63,7 +78,7 @@ Return only the terms as a comma-separated list, no explanations."""
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o", #gpt-4o or o4-mini
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=100,
                 temperature=0.1

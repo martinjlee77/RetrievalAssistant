@@ -4,7 +4,7 @@ import json
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
-from simple_asc606_analyzer import SimpleASC606Analyzer
+# Removed SimpleASC606Analyzer - now using hybrid system only
 from document_extractor import DocumentExtractor
 
 
