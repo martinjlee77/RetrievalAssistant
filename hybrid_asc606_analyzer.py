@@ -407,6 +407,11 @@ Provide a final concluding paragraph summarizing the overall compliance with ASC
 - Based on the nature of the contract, identify any practical expedients available under ASC 606 that were or could have been applied (e.g., the expedient for significant financing components, or for contracts with a term of one year or less).
 - Briefly explain the impact of applying each identified expedient.
 
+**8. Unique Considerations:**
+- Review the additional_considerations from each step in the analysis to identify any unique or non-standard accounting issues.
+- If no unique considerations were identified, state: "No unique considerations were identified beyond standard ASC 606 analysis."
+- If unique considerations exist, describe each one with the rationale and supporting evidence.
+
 **EXAMPLE OF "CREW" FRAMEWORK APPLIED TO ONE POINT IN STEP 1:**
 
 **Step 1: Identification of the Contract with the Customer**

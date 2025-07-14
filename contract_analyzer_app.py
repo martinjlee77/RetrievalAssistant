@@ -616,10 +616,8 @@ class ContractAnalyzerApp:
         citations = getattr(analysis_result, 'citations', [])
         has_citations = len(citations) > 0
         
-        col4.metric("Source Quality", 
-                   "Authoritative" if authoritative_count > 0 or has_citations else 
-                   "Interpretative" if interpretative_count > 0 else 
-                   "General Knowledge")
+        # Always show "Hybrid RAG" for the enhanced system
+        col4.metric("Source Quality", "Hybrid RAG")
         
         # Source transparency alert
         if general_knowledge_count > 0:
@@ -694,33 +692,38 @@ class ContractAnalyzerApp:
                 return step_data.get('conclusion', 'Analysis completed')
             return str(step_data)
         
-        # Create a clean summary view
+        # Create a clean summary view with better spacing
         summary_cols = st.columns(5)
         
         with summary_cols[0]:
-            st.metric("Step 1", "Contract", help="Contract identification completed")
+            st.write("**Step 1**")
+            st.write("Contract")
             step1_conclusion = extract_conclusion(analysis.step1_contract_identification)
-            st.caption(step1_conclusion[:50] + "..." if len(step1_conclusion) > 50 else step1_conclusion)
+            st.write(step1_conclusion[:80] + "..." if len(step1_conclusion) > 80 else step1_conclusion)
             
         with summary_cols[1]:
-            st.metric("Step 2", "Performance Obligations", help="Performance obligations identified")
+            st.write("**Step 2**")
+            st.write("Performance...")
             step2_conclusion = extract_conclusion(analysis.step2_performance_obligations)
-            st.caption(step2_conclusion[:50] + "..." if len(step2_conclusion) > 50 else step2_conclusion)
+            st.write(step2_conclusion[:80] + "..." if len(step2_conclusion) > 80 else step2_conclusion)
             
         with summary_cols[2]:
-            st.metric("Step 3", "Transaction Price", help="Transaction price determined")
+            st.write("**Step 3**")
+            st.write("Transaction...")
             step3_conclusion = extract_conclusion(analysis.step3_transaction_price)
-            st.caption(step3_conclusion[:50] + "..." if len(step3_conclusion) > 50 else step3_conclusion)
+            st.write(step3_conclusion[:80] + "..." if len(step3_conclusion) > 80 else step3_conclusion)
             
         with summary_cols[3]:
-            st.metric("Step 4", "Price Allocation", help="Price allocation method applied")
+            st.write("**Step 4**")
+            st.write("Price Alloc...")
             step4_conclusion = extract_conclusion(analysis.step4_price_allocation)
-            st.caption(step4_conclusion[:50] + "..." if len(step4_conclusion) > 50 else step4_conclusion)
+            st.write(step4_conclusion[:80] + "..." if len(step4_conclusion) > 80 else step4_conclusion)
             
         with summary_cols[4]:
-            st.metric("Step 5", "Revenue Recognition", help="Revenue recognition pattern determined")
+            st.write("**Step 5**")
+            st.write("Revenue R...")
             step5_conclusion = extract_conclusion(analysis.step5_revenue_recognition)
-            st.caption(step5_conclusion[:50] + "..." if len(step5_conclusion) > 50 else step5_conclusion)
+            st.write(step5_conclusion[:80] + "..." if len(step5_conclusion) > 80 else step5_conclusion)
         
         # Additional considerations section
         st.subheader("🎯 Key Insights & Additional Considerations")
