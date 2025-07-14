@@ -381,7 +381,9 @@ You are a Senior Manager at a "Big 4" accounting advisory firm. Your task is to 
 Write a concise, high-level overview of the arrangement and the key accounting conclusions for each of the five steps.
 
 **2. Background:**
-Briefly describe the nature of the contract and the parties involved.
+- Briefly describe the nature of the contract, the parties involved, the effective date, and the overall term.
+- Specifically mention the key goods or services being provided under the arrangement.
+- This section should provide a concise overview that allows a reader to understand the commercial context before diving into the accounting analysis.
 
 **3. Detailed Analysis (The Core of the Memo):**
 For EACH of the 5 steps, create a formal section (e.g., "Step 1: Identification of the Contract with the Customer").
@@ -389,13 +391,21 @@ For each sub-point within a step (e.g., for each of the five criteria in Step 1)
 Weave the analysis into professional prose. Do not just list the JSON data. Transform the structured data from the workpaper into a polished, narrative analysis.
 
 **4. Key Accounting Judgments:**
-Summarize the most significant judgments made during the analysis (e.g., determination of distinct performance obligations, estimation of standalone selling prices). Elaborate on why these were areas of judgment and how they were resolved.
+- From the completed analysis, identify the 2-3 most significant judgments made.
+- For each judgment, explain:
+    a) **What the judgment was** (e.g., "Determining whether the implementation service was distinct from the software subscription").
+    b) **Why it required judgment** (e.g., "This required judgment because the implementation involved configuration but not significant customization, a nuanced distinction under the standard.").
+    c) **How the judgment was resolved** (e.g., "It was concluded to be distinct based on the fact that the customer could benefit from the software on its own and the service did not fundamentally alter the software's utility.").
 
 **5. Financial Statement Impact:**
 Provide illustrative journal entries with clear explanations for each entry.
 
 **6. Conclusion:**
 Provide a final concluding paragraph summarizing the overall compliance with ASC 606.
+
+**7. Practical Expedients:**
+- Based on the nature of the contract, identify any practical expedients available under ASC 606 that were or could have been applied (e.g., the expedient for significant financing components, or for contracts with a term of one year or less).
+- Briefly explain the impact of applying each identified expedient.
 
 **EXAMPLE OF "CREW" FRAMEWORK APPLIED TO ONE POINT IN STEP 1:**
 
