@@ -1,0 +1,182 @@
+Part 1: Recommended Restructuring for a Multi-Standard Platform
+Your current structure is a single "view" that handles everything for ASC 606. To expand, we need to evolve this into a platform with a central "hub" and modular "spokes" for each standard.
+
+A. UI and Page Restructuring (The User's View)
+The goal is to create a clear, intuitive user journey.
+
+Create a Main Dashboard (Home.py): This will be the new entry point for your application. It should serve as a navigation hub. Your expertise-card HTML is perfect for this.
+
+Use Streamlit's Multi-Page App Feature: Create a pages/ directory. Each new standard will be a separate file in this directory.
+
+Here is the proposed new file structure for your UI:
+
+├── Home.py                  # New! The main dashboard/landing page.
+├── pages/
+│   ├── 1_ASC_606_Revenue.py     # Your existing app logic will move here.
+│   ├── 2_ASC_842_Leases.py      # New page for the Leases module.
+│   └── 3_ASC_805_Business_Combinations.py # New page for BizCombs.
+│   └── ... etc.
+├── core/                      # New! For shared backend logic.
+│   ├── analyzers.py
+│   ├── knowledge_base.py
+│   └── document_processing.py
+└── ... (your other files)
+
+How it works:
+
+Home.py: When a user lands on the app, they see the dashboard you designed. Clicking on "Revenue Recognition (ASC 606)" navigates them to that specific page.
+
+# In Home.py
+import streamlit as st
+
+st.set_page_config(page_title="Technical Accounting AI Platform", layout="wide")
+
+st.title("Welcome to the AI-Powered Accounting Analysis Platform")
+st.markdown("Select an accounting standard below to begin your analysis.")
+
+# Use your excellent card layout here
+st.markdown("""
+    <div class="expertise-grid">
+        <div class="expertise-card">
+            <h3><a href="/1_ASC_606_Revenue" target="_self">Revenue Recognition (ASC 606)</a></h3>
+            <p>Analyze complex contracts for performance obligations, variable consideration, and proper recognition timing.</p>
+        </div>
+        <div class="expertise-card-disabled">
+            <h3>Leases (ASC 842) - Coming Soon</h3>
+            <p>Classify leases as operating or finance and generate amortization schedules and journal entries automatically.</p>
+        </div>
+        ... etc ...
+    </div>
+""", unsafe_allow_html=True)
+
+pages/1_ASC_606_Revenue.py: The contents of your current contract_analyzer_app.py will be moved into this file (after refactoring, as described in Part B). The sidebar will now be specific to the context of ASC 606, showing analysis history or options for that standard.
+
+B. Backend and Code Architecture Refactoring (The Developer's View)
+To support the new UI, the backend needs to be more modular. Your code is well-structured with classes and Pydantic models, which makes this much easier.
+
+Step 1: Abstract the Analyzer Logic
+
+Your HybridASC606Analyzer is brilliant, but it's specific. We need a way to load the correct analyzer for the selected standard.
+
+Create an Analyzer Factory: A function that returns the right analyzer instance.
+
+# In a new file, e.g., core/analyzers.py
+
+def get_analyzer(standard: str):
+    if standard == "ASC 606":
+        from .asc606_analyzer import HybridASC606Analyzer
+        return HybridASC606Analyzer()
+    elif standard == "ASC 842":
+        from .asc842_analyzer import LeaseAnalyzer # You would create this
+        return LeaseAnalyzer()
+    # Add other standards here
+    else:
+        raise ValueError(f"No analyzer available for standard: {standard}")
+
+# Your Streamlit page would then use this
+# In pages/1_ASC_606_Revenue.py
+# analyzer = get_analyzer("ASC 606")
+
+Step 2: Generalize the Knowledge Base
+
+Your asc606_knowledge_base.py is hardcoded for one standard. It needs to support multiple.
+
+Recommendation: Use a single ChromaDB database but with different collections, or add a standard metadata field to your chunks. The metadata approach is more efficient.
+
+# In asc606_knowledge_base.py (rename to core/knowledge_base.py)
+
+class KnowledgeBaseManager:
+    def __init__(self):
+        # ... setup ChromaDB client ...
+
+    def get_collection(self, standard: str):
+        # Returns the ChromaDB collection for a specific standard
+        return self.client.get_or_create_collection(name=f"kb_{standard.lower()}")
+
+    def search_relevant_guidance(self, standard: str, query: str, step_context: str, n_results=5):
+        collection = self.get_collection(standard)
+        # Your search logic now operates on the correct collection
+        # or uses a metadata filter: where={"standard": standard}
+        # ...
+
+Step 3: Organize Prompts and Frameworks
+
+Your comprehensive_analysis_framework.py is the "brain" for ASC 606. Each standard will need its own brain.
+
+Create a prompts/ directory:
+
+prompts/
+├── asc606_framework.py
+└── asc842_framework.py
+└── ...
+
+Each file will contain the specific questions, JSON structure, and memo generation prompts for its standard. The get_analyzer factory would be responsible for loading the correct framework along with the analyzer.
+
+Step 4: Centralize Data Models
+
+Your Pydantic models in contract_analyzer_app.py are great. Move them to a central file and create new ones for each standard.
+
+Create a core/models.py file:
+
+# In core/models.py
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import date
+
+# --- ASC 606 Models ---
+class PerformanceObligation(BaseModel):
+    # ... your existing model ...
+
+class ContractData(BaseModel):
+    # ... your existing model ...
+
+# --- ASC 842 Models (Example) ---
+class LeasePayment(BaseModel):
+    payment_date: date
+    amount: float
+
+class LeaseData(BaseModel):
+    analysis_title: str
+    lessor_name: str
+    asset_description: str
+    lease_term_months: int
+    discount_rate: float
+    payments: List[LeasePayment]
+    # ... etc.
+
+Step 5: Refactor the Main App Class
+
+The ContractAnalyzerApp class should be slimmed down to be a generic "Page Controller". Much of its logic will move into the specialized modules.
+
+Before: ContractAnalyzerApp knows everything about ASC 606.
+After: Each page (pages/1_ASC_606_Revenue.py) will have its own lightweight controller or a set of rendering functions that call the centralized, modular backend components.
+Here’s a sketch of what pages/1_ASC_606_Revenue.py might look like:
+
+# In pages/1_ASC_606_Revenue.py
+import streamlit as st
+from core.analyzers import get_analyzer
+from core.models import ContractData # Import from central location
+from core.ui_helpers import render_analysis_results # A new helper function
+
+STANDARD = "ASC 606"
+st.title(f"📄 {STANDARD} - Revenue Contract Analyzer")
+
+# Initialize the correct analyzer (cached)
+@st.cache_resource
+def load_analyzer():
+    return get_analyzer(STANDARD)
+
+analyzer = load_analyzer()
+
+if 'analysis_results' not in st.session_state:
+    # Render the input forms specific to ASC 606
+    # This logic comes from your current render_upload_interface()
+    # It will use the Pydantic ContractData model
+    # ...
+else:
+    # The render_analysis_results function can be generalized
+    # and placed in a ui_helpers.py file since the output
+    # structure (metrics, memo, download) will be similar across standards.
+    render_analysis_results(st.session_state.analysis_results)
+
+By following this hub-and-spoke model, you create a platform that is robust, scalable, and a pleasure for both you to maintain and your users to navigate.
