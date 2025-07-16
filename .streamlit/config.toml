@@ -3,5 +3,9 @@ headless = true
 address = "0.0.0.0"
 port = 5000
 
-[ui]
-hideTopBar = false
+[theme]
+base = "light"
+primaryColor = "#C5A565"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8F9FA"
+textColor = "#212529"

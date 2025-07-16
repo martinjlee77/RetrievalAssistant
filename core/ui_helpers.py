@@ -23,10 +23,15 @@ def load_custom_css():
         --border-color: #e0e0e0;
     }
 
-    /* Global Styling */
+    /* Global Styling - Light Background */
     html, body, [class*="st-"] {
         font-family: var(--body-font);
         color: var(--text-color);
+        background-color: white !important;
+    }
+    
+    .stApp {
+        background-color: white !important;
     }
 
     h1, h2, h3, h4, h5, h6 {
