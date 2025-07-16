@@ -8,6 +8,7 @@ import json
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
+from streamlit_navigation_bar import st_navbar
 
 # Import core components
 from core.analyzers import get_analyzer
@@ -33,44 +34,36 @@ st.set_page_config(
 # Load custom styling
 load_custom_css()
 
-# Add top navigation bar instead of sidebar
-st.markdown("""
-<div style="
-    background: linear-gradient(90deg, #0A2B4C 0%, #1a3f5f 100%);
-    padding: 1rem 2rem;
-    margin: -1rem -1rem 2rem -1rem;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="color: white; font-size: 1.1rem; font-weight: 600;">
-            ASC 606 Revenue Recognition Analysis
-        </div>
-        <div style="display: flex; gap: 1rem;">
-            <a href="/" style="color: #C5A565; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: all 0.3s ease;">
-                🏠 Home
-            </a>
-            <span style="color: white; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border-radius: 4px;">
-                📈 ASC 606 Rev Rec
-            </span>
-            <a href="/ASC_842_Leases" style="color: #C5A565; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: all 0.3s ease;">
-                🏢 ASC 842 Leases
-            </a>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# Navigation bar using streamlit-navigation-bar component
+page = st_navbar(
+    ["Home", "ASC 606 Revenue", "ASC 842 Leases"],
+    selected="ASC 606 Revenue",
+    styles={
+        "nav": {
+            "background-color": "#0A2B4C",
+            "padding": "1rem 2rem",
+        },
+        "div": {
+            "color": "white",
+            "font-weight": "600",
+        },
+        "span": {
+            "color": "#C5A565",
+            "font-weight": "600",
+        },
+        "active": {
+            "background-color": "#C5A565",
+            "color": "white",
+            "font-weight": "700",
+        }
+    }
+)
 
-# Add navigation buttons that work
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    if st.button("🏠 Home", use_container_width=True):
-        st.switch_page("Home.py")
-with col2:
-    st.button("📈 ASC 606 Rev Rec", use_container_width=True, disabled=True)
-with col3:
-    if st.button("🏢 ASC 842 Leases", use_container_width=True):
-        st.switch_page("pages/2_ASC_842_Leases.py")
+# Handle navigation
+if page == "Home":
+    st.switch_page("Home.py")
+elif page == "ASC 842 Leases":
+    st.switch_page("pages/2_ASC_842_Leases.py")
 
 # Available standards configuration
 AVAILABLE_STANDARDS = {

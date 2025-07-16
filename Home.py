@@ -3,6 +3,7 @@ Multi-Standard Accounting Analysis Platform - Home Dashboard
 """
 
 import streamlit as st
+from streamlit_navigation_bar import st_navbar
 
 # Configure page
 st.set_page_config(
@@ -276,6 +277,37 @@ def load_css():
 
 # Load styling
 load_css()
+
+# Navigation bar using streamlit-navigation-bar component
+page = st_navbar(
+    ["Home", "ASC 606 Revenue", "ASC 842 Leases"],
+    selected="Home",
+    styles={
+        "nav": {
+            "background-color": "#0A2B4C",
+            "padding": "1rem 2rem",
+        },
+        "div": {
+            "color": "white",
+            "font-weight": "600",
+        },
+        "span": {
+            "color": "#C5A565",
+            "font-weight": "600",
+        },
+        "active": {
+            "background-color": "#C5A565",
+            "color": "white",
+            "font-weight": "700",
+        }
+    }
+)
+
+# Handle navigation
+if page == "ASC 606 Revenue":
+    st.switch_page("pages/1_ASC_606_Revenue.py")
+elif page == "ASC 842 Leases":
+    st.switch_page("pages/2_ASC_842_Leases.py")
 
 # JavaScript solution to remove keyboard_double_arrow_right text
 st.markdown("""
