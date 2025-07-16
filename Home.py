@@ -41,6 +41,39 @@ def load_css():
         background-color: white !important;
     }
 
+    /* Enhanced button styling for cards */
+    .stButton>button {
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        font-family: var(--body-font) !important;
+        padding: 1.5rem !important;
+        border: 2px solid var(--secondary-color) !important;
+        background-color: white !important;
+        color: var(--primary-color) !important;
+        transition: all 0.3s ease !important;
+        text-align: center !important;
+        white-space: pre-line !important;
+        height: auto !important;
+        min-height: 150px !important;
+    }
+
+    .stButton>button:hover {
+        background-color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+        color: white !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4) !important;
+    }
+
+    .stButton>button:disabled {
+        background-color: #f8f9fa !important;
+        border-color: #e0e0e0 !important;
+        color: #666 !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--heading-font);
         color: var(--primary-color);

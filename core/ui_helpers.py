@@ -34,6 +34,25 @@ def load_custom_css():
         background-color: white !important;
     }
 
+    /* Hide sidebar expand/collapse button and nav */
+    button[title="View app in fullscreen mode"] {
+        display: none;
+    }
+    
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
+    
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+
+    /* Enhanced button hover effects */
+    .stButton>button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4) !important;
+    }
+
     h1, h2, h3, h4, h5, h6 {
         font-family: var(--heading-font);
         color: var(--primary-color);
