@@ -185,30 +185,30 @@ standards = {
     }
 }
 
-# Generate cards HTML
-cards_html = '<div class="expertise-grid">'
+# Generate cards with proper Streamlit navigation
+st.markdown('<div class="expertise-grid">', unsafe_allow_html=True)
 
-for code, info in standards.items():
-    if info['status'] == 'available':
-        cards_html += f"""
-        <div class="expertise-card" onclick="window.open('/{info['page'].replace('pages/', '').replace('.py', '')}', '_self')">
-            <h3>{info['name']} ({code})</h3>
-            <p>{info['description']}</p>
-            <span class="status-badge status-available">Available Now</span>
-        </div>
-        """
-    else:
-        cards_html += f"""
-        <div class="expertise-card-disabled">
-            <h3>{info['name']} ({code})</h3>
-            <p>{info['description']}</p>
-            <span class="status-badge status-coming-soon">Coming Soon</span>
-        </div>
-        """
+# Create columns for card layout
+cols = st.columns(2)
 
-cards_html += '</div>'
+for i, (code, info) in enumerate(standards.items()):
+    with cols[i % 2]:
+        if info['status'] == 'available':
+            if st.button(
+                f"**{info['name']} ({code})**\n\n{info['description']}\n\n✅ Available Now",
+                key=f"nav_{code}",
+                use_container_width=True,
+                help=f"Click to access {code} analysis"
+            ):
+                # Navigate to the appropriate page
+                if code == 'ASC 606':
+                    st.switch_page("pages/1_ASC_606_Revenue.py")
+                elif code == 'ASC 842':
+                    st.switch_page("pages/2_ASC_842_Leases.py")
+        else:
+            st.info(f"**{info['name']} ({code})**\n\n{info['description']}\n\n⏳ Coming Soon")
 
-st.markdown(cards_html, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Quick Stats Section
 st.markdown("---")
