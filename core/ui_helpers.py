@@ -70,6 +70,49 @@ def load_custom_css():
         color: #fff;
     }
 
+    /* Input Field Styling */
+    .stTextInput>div>div>input {
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        font-family: var(--body-font) !important;
+        background-color: white !important;
+        color: var(--text-color) !important;
+    }
+
+    .stTextInput>div>div>input:focus {
+        border-color: var(--secondary-color) !important;
+        box-shadow: 0 0 0 3px rgba(197, 165, 101, 0.1) !important;
+    }
+
+    .stTextArea>div>div>textarea {
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        font-family: var(--body-font) !important;
+        background-color: white !important;
+        color: var(--text-color) !important;
+    }
+
+    .stTextArea>div>div>textarea:focus {
+        border-color: var(--secondary-color) !important;
+        box-shadow: 0 0 0 3px rgba(197, 165, 101, 0.1) !important;
+    }
+
+    .stSelectbox>div>div>div {
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        background-color: white !important;
+    }
+
+    .stDateInput>div>div>input {
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.75rem !important;
+        background-color: white !important;
+        color: var(--text-color) !important;
+    }
+
     /* Primary Analysis Button */
     .analyze-button {
         background: linear-gradient(135deg, var(--secondary-color), #af8f4d);

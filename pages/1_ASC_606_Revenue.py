@@ -25,13 +25,28 @@ from document_extractor import DocumentExtractor
 # Page configuration
 st.set_page_config(
     page_title="ASC 606 Revenue Analysis | Controller.cpa",
-    page_icon="📊",
+    page_icon="📈",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Load custom styling
 load_custom_css()
+
+# Add sidebar navigation
+with st.sidebar:
+    st.markdown("## Navigation")
+    
+    if st.button("🏠 Home", use_container_width=True):
+        st.switch_page("Home.py")
+    
+    st.markdown("---")
+    
+    if st.button("📈 ASC 606 Rev Rec", use_container_width=True, disabled=True):
+        pass  # Already on this page
+    
+    if st.button("🏢 ASC 842 Leases", use_container_width=True):
+        st.switch_page("pages/2_ASC_842_Leases.py")
 
 # Available standards configuration
 AVAILABLE_STANDARDS = {

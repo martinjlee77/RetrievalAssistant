@@ -7,7 +7,7 @@ import streamlit as st
 # Configure page
 st.set_page_config(
     page_title="Controller.cpa | Technical Accounting AI Platform",
-    page_icon="⚡",
+    page_icon="🏠",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -200,60 +200,26 @@ cols = st.columns(2)
 for i, (code, info) in enumerate(standards.items()):
     with cols[i % 2]:
         if info['status'] == 'available':
-            # Create consistent styled card for available standards
-            st.markdown(f"""
-            <div style="
-                background: white;
-                border: 2px solid #C5A565;
-                border-radius: 8px;
-                padding: 1.5rem;
-                text-align: center;
-                margin-bottom: 1rem;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            " onclick="location.href='#'">
-                <h3 style="color: #0A2B4C; margin-bottom: 1rem; font-family: 'Poppins', sans-serif;">{info['name']} ({code})</h3>
-                <p style="color: #666; margin-bottom: 1rem; line-height: 1.6;">{info['description']}</p>
-                <span style="
-                    background: #d4edda;
-                    color: #155724;
-                    padding: 0.25rem 0.75rem;
-                    border-radius: 20px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                ">✅ Available Now</span>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Add invisible button for navigation
-            if st.button(f"Access {code}", key=f"nav_{code}", help=f"Click to access {code} analysis"):
+            # Create clickable card for available standards
+            if st.button(
+                f"{info['name']} ({code})\n\n{info['description']}\n\n✅ Available Now",
+                key=f"nav_{code}",
+                use_container_width=True,
+                help=f"Click to access {code} analysis"
+            ):
                 if code == 'ASC 606':
                     st.switch_page("pages/1_ASC_606_Revenue.py")
                 elif code == 'ASC 842':
                     st.switch_page("pages/2_ASC_842_Leases.py")
         else:
-            # Style coming soon cards consistently
-            st.markdown(f"""
-            <div style="
-                background: #f8f9fa;
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                padding: 1.5rem;
-                text-align: center;
-                margin-bottom: 1rem;
-            ">
-                <h3 style="color: #0A2B4C; margin-bottom: 1rem; font-family: 'Poppins', sans-serif;">{info['name']} ({code})</h3>
-                <p style="color: #666; margin-bottom: 1rem; line-height: 1.6;">{info['description']}</p>
-                <span style="
-                    background: #fff3cd;
-                    color: #856404;
-                    padding: 0.25rem 0.75rem;
-                    border-radius: 20px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                ">⏳ Coming Soon</span>
-            </div>
-            """, unsafe_allow_html=True)
+            # Create disabled card for coming soon standards
+            st.button(
+                f"{info['name']} ({code})\n\n{info['description']}\n\n⏳ Coming Soon",
+                key=f"disabled_{code}",
+                use_container_width=True,
+                disabled=True,
+                help=f"{code} analysis coming soon"
+            )
 
 st.markdown('</div>', unsafe_allow_html=True)
 
