@@ -8,7 +8,6 @@ import json
 from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
-from streamlit_navigation_bar import st_navbar
 
 # Import core components
 from core.analyzers import get_analyzer
@@ -34,36 +33,17 @@ st.set_page_config(
 # Load custom styling
 load_custom_css()
 
-# Navigation bar using streamlit-navigation-bar component
-page = st_navbar(
-    ["Home", "ASC 606 Revenue", "ASC 842 Leases"],
-    selected="ASC 606 Revenue",
-    styles={
-        "nav": {
-            "background-color": "#0A2B4C",
-            "padding": "1rem 2rem",
-        },
-        "div": {
-            "color": "white",
-            "font-weight": "600",
-        },
-        "span": {
-            "color": "#C5A565",
-            "font-weight": "600",
-        },
-        "active": {
-            "background-color": "#C5A565",
-            "color": "white",
-            "font-weight": "700",
-        }
-    }
-)
-
-# Handle navigation
-if page == "Home":
-    st.switch_page("Home.py")
-elif page == "ASC 842 Leases":
-    st.switch_page("pages/2_ASC_842_Leases.py")
+# Navigation buttons using standard Streamlit
+col1, col2, col3 = st.columns([1, 1, 1])
+with col1:
+    if st.button("🏠 Home", use_container_width=True):
+        st.switch_page("Home.py")
+with col2:
+    if st.button("📈 ASC 606 Revenue", use_container_width=True, type="primary"):
+        pass  # Already on this page
+with col3:
+    if st.button("🏢 ASC 842 Leases", use_container_width=True):
+        st.switch_page("pages/2_ASC_842_Leases.py")
 
 # Available standards configuration
 AVAILABLE_STANDARDS = {
