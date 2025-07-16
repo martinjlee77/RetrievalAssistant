@@ -42,7 +42,11 @@ def load_custom_css():
         visibility: hidden !important;
     }
     
-    /* Hide Streamlit's internal sidebar controls */
+    /* Completely hide Streamlit's sidebar and navigation */
+    [data-testid="stSidebar"] {
+        display: none !important;
+    }
+    
     [data-testid="collapsedControl"] {
         display: none !important;
     }
@@ -52,6 +56,11 @@ def load_custom_css():
     }
     
     [data-testid="stSidebarNavItems"] {
+        display: none !important;
+    }
+    
+    /* Hide sidebar collapse button completely */
+    section[data-testid="stSidebar"] {
         display: none !important;
     }
     

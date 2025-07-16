@@ -27,24 +27,48 @@ st.set_page_config(
     page_title="ASC 606 Revenue Analysis | Controller.cpa",
     page_icon="📈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Load custom styling
 load_custom_css()
 
-# Add sidebar navigation
-with st.sidebar:
-    st.markdown("## Navigation")
-    
+# Add top navigation bar instead of sidebar
+st.markdown("""
+<div style="
+    background: linear-gradient(90deg, #0A2B4C 0%, #1a3f5f 100%);
+    padding: 1rem 2rem;
+    margin: -1rem -1rem 2rem -1rem;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="color: white; font-size: 1.1rem; font-weight: 600;">
+            ASC 606 Revenue Recognition Analysis
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="/" style="color: #C5A565; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: all 0.3s ease;">
+                🏠 Home
+            </a>
+            <span style="color: white; padding: 0.5rem 1rem; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                📈 ASC 606 Rev Rec
+            </span>
+            <a href="/ASC_842_Leases" style="color: #C5A565; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: all 0.3s ease;">
+                🏢 ASC 842 Leases
+            </a>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Add navigation buttons that work
+col1, col2, col3 = st.columns([1, 1, 1])
+with col1:
     if st.button("🏠 Home", use_container_width=True):
         st.switch_page("Home.py")
-    
-    st.markdown("---")
-    
-    if st.button("📈 ASC 606 Rev Rec", use_container_width=True, disabled=True):
-        pass  # Already on this page
-    
+with col2:
+    st.button("📈 ASC 606 Rev Rec", use_container_width=True, disabled=True)
+with col3:
     if st.button("🏢 ASC 842 Leases", use_container_width=True):
         st.switch_page("pages/2_ASC_842_Leases.py")
 
