@@ -7,7 +7,7 @@ import streamlit as st
 # Configure page
 st.set_page_config(
     page_title="Technical Accounting AI Platform",
-    page_icon="🏢",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -130,16 +130,17 @@ def load_css():
 
     .hero-title {
         font-family: var(--heading-font);
-        font-size: 3rem;
+        font-size: 2.8rem;
         font-weight: 700;
         color: var(--primary-color);
         margin-bottom: 1rem;
     }
 
     .hero-subtitle {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         color: #666;
         margin-bottom: 2rem;
+        font-weight: 400;
     }
     """
     st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
@@ -206,7 +207,28 @@ for i, (code, info) in enumerate(standards.items()):
                 elif code == 'ASC 842':
                     st.switch_page("pages/2_ASC_842_Leases.py")
         else:
-            st.info(f"**{info['name']} ({code})**\n\n{info['description']}\n\n⏳ Coming Soon")
+            # Style coming soon cards consistently
+            st.markdown(f"""
+            <div style="
+                background: #f8f9fa;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 1.5rem;
+                text-align: center;
+                margin-bottom: 1rem;
+            ">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;">{info['name']} ({code})</h3>
+                <p style="color: #666; margin-bottom: 1rem;">{info['description']}</p>
+                <span style="
+                    background: #fff3cd;
+                    color: #856404;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                ">⏳ Coming Soon</span>
+            </div>
+            """, unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 

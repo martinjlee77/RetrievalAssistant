@@ -27,7 +27,7 @@ st.set_page_config(
     page_title="ASC 606 Revenue Analysis | Controller.cpa",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Load custom styling
@@ -74,14 +74,15 @@ def get_cached_analyzer():
 analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
-# Render sidebar
-render_standard_sidebar('ASC 606', AVAILABLE_STANDARDS)
+# Clean header (matching your design preference)
+st.markdown("""
+<div style="text-align: center; padding: 2rem 0 1rem 0;">
+    <h1 style="font-size: 2.2rem; color: #0A2B4C; margin-bottom: 0.5rem; font-family: 'Poppins', sans-serif;">ASC 606 Revenue Recognition Analysis</h1>
+    <p style="font-size: 1rem; color: #666; margin-bottom: 1rem; font-weight: 400;">AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations</p>
+</div>
+""", unsafe_allow_html=True)
 
-# Render header
-render_branded_header(
-    "ASC 606 Revenue Recognition Analysis",
-    "AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations"
-)
+st.markdown("---")
 
 # Main application logic
 if st.session_state.analysis_results is None:
