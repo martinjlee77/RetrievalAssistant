@@ -76,6 +76,18 @@ def load_custom_css():
         overflow: hidden !important;
     }
     
+    /* Hide navigation menu hover tooltips */
+    [data-testid="stSidebar"] .stButton button:hover:after,
+    [data-testid="stSidebar"] .stButton button:hover:before,
+    [data-testid="stSidebar"] .stButton button[title*="keyboard"] {
+        display: none !important;
+    }
+    
+    /* Hide any tooltip or title attribute containing keyboard text */
+    [title*="keyboard_double_arrow_right"] {
+        display: none !important;
+    }
+    
     /* White overlay to cover any remaining text at top */
     .stApp:before {
         content: "";
@@ -295,6 +307,20 @@ def load_custom_css():
             if (element.textContent && element.textContent.includes('keyboard_double_arrow_right')) {
                 element.style.display = 'none';
             }
+            
+            // Remove title attributes that contain the problematic text
+            if (element.getAttribute && element.getAttribute('title') && 
+                element.getAttribute('title').includes('keyboard_double_arrow_right')) {
+                element.removeAttribute('title');
+            }
+        });
+        
+        // Special handling for navigation tooltips
+        const navButtons = document.querySelectorAll('[data-testid="stSidebar"] button');
+        navButtons.forEach(button => {
+            if (button.title && button.title.includes('keyboard_double_arrow_right')) {
+                button.title = '';
+            }
         });
     }
     
@@ -315,6 +341,15 @@ def load_custom_css():
     setTimeout(removeKeyboardArrowText, 100);
     setTimeout(removeKeyboardArrowText, 500);
     setTimeout(removeKeyboardArrowText, 1000);
+    
+    // Special handling for hover states and navigation
+    document.addEventListener('mouseover', function(event) {
+        setTimeout(removeKeyboardArrowText, 10);
+    });
+    
+    document.addEventListener('mouseout', function(event) {
+        setTimeout(removeKeyboardArrowText, 10);
+    });
     </script>
     """, unsafe_allow_html=True)
 
