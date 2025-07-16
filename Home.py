@@ -16,8 +16,9 @@ st.set_page_config(
 def load_css():
     """Load custom CSS for brand consistency"""
     css = """
-    /* Import Google Fonts */
+    /* Import Google Fonts and Material Icons */
     @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
     /* Brand Color Variables */
     :root {
@@ -39,6 +40,24 @@ def load_css():
     
     .stApp {
         background-color: white !important;
+    }
+
+    /* Fix sidebar collapse button - hide problematic text */
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+    
+    [data-testid="stSidebarNavItems"] {
+        display: none !important;
+    }
+    
+    button[kind="header"] {
+        display: none !important;
+    }
+    
+    /* Hide any text that says keyboard_double_arrow_right */
+    *:contains("keyboard_double_arrow_right") {
+        display: none !important;
     }
 
     /* Enhanced button styling for cards */
@@ -63,6 +82,27 @@ def load_css():
         color: white !important;
         transform: translateY(-3px) !important;
         box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Force hover effect with animation */
+    .stButton>button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    
+    .stButton>button:hover {
+        animation: buttonHover 0.3s ease forwards !important;
+    }
+    
+    @keyframes buttonHover {
+        0% {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        100% {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4);
+        }
     }
 
     .stButton>button:disabled {

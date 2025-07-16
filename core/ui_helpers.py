@@ -9,8 +9,9 @@ from typing import Dict, Any, List
 def load_custom_css():
     """Load custom CSS for brand consistency across all pages"""
     css = """
-    /* Import Google Fonts */
+    /* Import Google Fonts and Material Icons */
     @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
+    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
     /* Brand Color Variables */
     :root {
@@ -34,16 +35,36 @@ def load_custom_css():
         background-color: white !important;
     }
 
-    /* Hide sidebar expand/collapse button and nav */
-    button[title="View app in fullscreen mode"] {
-        display: none;
+    /* Fix sidebar collapse button - hide problematic elements */
+    [data-testid="collapsedControl"] {
+        display: none !important;
     }
     
     [data-testid="stSidebarNav"] {
-        display: none;
+        display: none !important;
     }
     
-    [data-testid="collapsedControl"] {
+    [data-testid="stSidebarNavItems"] {
+        display: none !important;
+    }
+    
+    button[kind="header"] {
+        display: none !important;
+    }
+    
+    /* Hide any text containing keyboard_double_arrow_right */
+    [data-testid="stSidebar"] *:contains("keyboard_double_arrow_right") {
+        display: none !important;
+    }
+    
+    /* Alternative: Replace broken icon with working one */
+    [data-testid="collapsedControl"]:before {
+        content: "☰";
+        font-size: 18px;
+        color: #666;
+    }
+    
+    [data-testid="collapsedControl"] span {
         display: none !important;
     }
 
