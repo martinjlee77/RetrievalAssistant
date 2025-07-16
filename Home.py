@@ -42,7 +42,13 @@ def load_css():
         background-color: white !important;
     }
 
-    /* Fix sidebar collapse button - hide problematic text */
+    /* Fix keyboard_double_arrow_right text appearing at top of page */
+    /* Target all possible elements that might contain this text */
+    body *:contains("keyboard_double_arrow_right") {
+        display: none !important;
+    }
+    
+    /* Hide Streamlit's internal sidebar controls */
     [data-testid="collapsedControl"] {
         display: none !important;
     }
@@ -51,13 +57,46 @@ def load_css():
         display: none !important;
     }
     
+    [data-testid="stSidebarNav"] {
+        display: none !important;
+    }
+    
+    /* Hide any header buttons that might contain the text */
     button[kind="header"] {
         display: none !important;
     }
     
-    /* Hide any text that says keyboard_double_arrow_right */
-    *:contains("keyboard_double_arrow_right") {
+    /* More aggressive hiding - target any element with this specific text */
+    div:contains("keyboard_double_arrow_right"),
+    span:contains("keyboard_double_arrow_right"),
+    p:contains("keyboard_double_arrow_right"),
+    button:contains("keyboard_double_arrow_right") {
         display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    /* Hide the top navigation area where the text might appear */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    /* Alternative approach - hide any text nodes with this content */
+    [data-testid="stSidebar"] {
+        position: relative;
+    }
+    
+    [data-testid="stSidebar"]:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: white;
+        z-index: 9999;
     }
 
     /* Enhanced button styling for cards */
@@ -85,24 +124,36 @@ def load_css():
         transition: all 0.3s ease !important;
     }
     
-    /* Force hover effect with animation */
+    /* Enhanced hover effect for buttons */
     .stButton>button {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: transform, box-shadow !important;
     }
     
     .stButton>button:hover {
-        animation: buttonHover 0.3s ease forwards !important;
+        background-color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+        color: white !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4) !important;
     }
     
-    @keyframes buttonHover {
-        0% {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        100% {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4);
-        }
+    /* Force button interaction */
+    .stButton>button:active {
+        transform: translateY(-1px) !important;
+    }
+    
+    /* Ensure button styles apply */
+    div[data-testid="stButton"] button {
+        transition: all 0.3s ease !important;
+    }
+    
+    div[data-testid="stButton"] button:hover {
+        background-color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+        color: white !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(197, 165, 101, 0.4) !important;
     }
 
     .stButton>button:disabled {
@@ -225,6 +276,61 @@ def load_css():
 
 # Load styling
 load_css()
+
+# JavaScript solution to remove keyboard_double_arrow_right text
+st.markdown("""
+<script>
+function removeKeyboardArrowText() {
+    // Find all text nodes containing the problematic text
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    const textNodes = [];
+    let node;
+    
+    while (node = walker.nextNode()) {
+        if (node.nodeValue && node.nodeValue.includes('keyboard_double_arrow_right')) {
+            textNodes.push(node);
+        }
+    }
+    
+    // Remove or hide the text nodes
+    textNodes.forEach(textNode => {
+        textNode.parentNode.style.display = 'none';
+    });
+    
+    // Also check for any elements with this text content
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+        if (element.textContent && element.textContent.includes('keyboard_double_arrow_right')) {
+            element.style.display = 'none';
+        }
+    });
+}
+
+// Run immediately and on DOM changes
+removeKeyboardArrowText();
+
+// Observer for dynamic content
+const observer = new MutationObserver(function(mutations) {
+    removeKeyboardArrowText();
+});
+
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// Run again after delays to catch late-loading content
+setTimeout(removeKeyboardArrowText, 100);
+setTimeout(removeKeyboardArrowText, 500);
+setTimeout(removeKeyboardArrowText, 1000);
+</script>
+""", unsafe_allow_html=True)
 
 # Header Section
 st.markdown("""

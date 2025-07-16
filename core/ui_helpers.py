@@ -35,7 +35,14 @@ def load_custom_css():
         background-color: white !important;
     }
 
-    /* Fix sidebar collapse button - hide problematic elements */
+    /* Comprehensive fix for keyboard_double_arrow_right text */
+    /* Hide any element containing this text */
+    body *:contains("keyboard_double_arrow_right") {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Hide Streamlit's internal sidebar controls */
     [data-testid="collapsedControl"] {
         display: none !important;
     }
@@ -48,24 +55,37 @@ def load_custom_css():
         display: none !important;
     }
     
+    /* Hide header elements that might contain the text */
     button[kind="header"] {
         display: none !important;
     }
     
-    /* Hide any text containing keyboard_double_arrow_right */
-    [data-testid="stSidebar"] *:contains("keyboard_double_arrow_right") {
+    header[data-testid="stHeader"] {
         display: none !important;
     }
     
-    /* Alternative: Replace broken icon with working one */
-    [data-testid="collapsedControl"]:before {
-        content: "☰";
-        font-size: 18px;
-        color: #666;
+    /* Target specific text content */
+    div:contains("keyboard_double_arrow_right"),
+    span:contains("keyboard_double_arrow_right"),
+    p:contains("keyboard_double_arrow_right"),
+    button:contains("keyboard_double_arrow_right") {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
     }
     
-    [data-testid="collapsedControl"] span {
-        display: none !important;
+    /* White overlay to cover any remaining text at top */
+    .stApp:before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: white;
+        z-index: 9999;
     }
 
     /* Enhanced button hover effects */
@@ -242,6 +262,61 @@ def load_custom_css():
     }
     """
     st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
+    
+    # JavaScript solution to remove keyboard_double_arrow_right text
+    st.markdown("""
+    <script>
+    function removeKeyboardArrowText() {
+        // Find all text nodes containing the problematic text
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        const textNodes = [];
+        let node;
+        
+        while (node = walker.nextNode()) {
+            if (node.nodeValue && node.nodeValue.includes('keyboard_double_arrow_right')) {
+                textNodes.push(node);
+            }
+        }
+        
+        // Remove or hide the text nodes
+        textNodes.forEach(textNode => {
+            textNode.parentNode.style.display = 'none';
+        });
+        
+        // Also check for any elements with this text content
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(element => {
+            if (element.textContent && element.textContent.includes('keyboard_double_arrow_right')) {
+                element.style.display = 'none';
+            }
+        });
+    }
+    
+    // Run immediately and on DOM changes
+    removeKeyboardArrowText();
+    
+    // Observer for dynamic content
+    const observer = new MutationObserver(function(mutations) {
+        removeKeyboardArrowText();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    // Run again after delays to catch late-loading content
+    setTimeout(removeKeyboardArrowText, 100);
+    setTimeout(removeKeyboardArrowText, 500);
+    setTimeout(removeKeyboardArrowText, 1000);
+    </script>
+    """, unsafe_allow_html=True)
 
 def render_branded_header(title: str, subtitle: str = None):
     """Render branded header for all pages"""
