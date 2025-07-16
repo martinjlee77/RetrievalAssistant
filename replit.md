@@ -10,6 +10,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-16**
+- ✅ **MULTI-STANDARD PLATFORM TRANSFORMATION**: Complete restructuring to hub-and-spoke architecture per Gemini's recommendations
+- ✅ Created Home.py dashboard with Controller.cpa branding and expertise cards
+- ✅ Implemented Streamlit multi-page architecture with pages/ directory structure
+- ✅ Built comprehensive core/ module system with analyzers, models, knowledge base, and UI helpers
+- ✅ Enhanced UX with two-column layout removing preliminary assessment friction
+- ✅ Applied premium styling with custom CSS, Google Fonts, and Controller.cpa brand colors
+- ✅ Integrated ASC 842 placeholder analyzer ready for authoritative source documents
+- ✅ Maintained full ASC 606 functionality through pages/1_ASC_606_Revenue.py
+- ✅ Abstracted BaseAnalyzer class with analyzer factory pattern for extensibility
+- ✅ Unified knowledge base manager supporting multiple standards with ChromaDB collections
+- ✅ Streamlined contract input workflow with single analyze button and improved validation
+- **Status**: Production-ready multi-standard platform with premium UX and scalable architecture
+
 **Date: 2025-07-13**
 - ✅ **DYNAMIC SEMANTIC QUERY GENERATION**: Implemented adaptive semantic search per Gemini's feedback
 - ✅ Added contract-specific term extraction for each ASC 606 step to enhance search relevance
@@ -114,12 +128,13 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Hybrid RAG Architecture
-- **Frontend**: Single Streamlit application (`contract_analyzer_app.py`)
-- **Backend**: Hybrid ASC 606 analyzer (`hybrid_asc606_analyzer.py`) with two-stage citation system
-- **Knowledge Base**: ChromaDB vector database (`asc606_knowledge_base.py`) with semantic search
-- **Document Processing**: Multi-format text extraction (`document_extractor.py`)
-- **Source Documents**: Authoritative ASC 606 sources in `attached_assets/`
+### Multi-Standard Platform Architecture
+- **Frontend**: Home.py dashboard with multi-page Streamlit architecture
+- **Core System**: Modular core/ directory with analyzers, models, knowledge base, and UI helpers
+- **Standard-Specific Pages**: pages/ directory containing dedicated analysis interfaces
+- **Knowledge Base**: Multi-standard ChromaDB manager supporting collections per standard
+- **Document Processing**: Unified document extractor supporting all standards
+- **Source Documents**: Standard-specific authoritative sources in `attached_assets/`
 
 ### Core Components
 - **Hybrid RAG System**: Combines metadata filtering with semantic search for precise results
@@ -132,11 +147,22 @@ Preferred communication style: Simple, everyday language.
 
 ### File Structure
 ```
-├── contract_analyzer_app.py              # Main Streamlit application
-├── hybrid_asc606_analyzer.py             # Hybrid RAG analysis engine
-├── asc606_knowledge_base.py              # ChromaDB vector database system
-├── comprehensive_analysis_framework.py   # Analysis framework and prompts
-├── document_extractor.py                 # PDF/Word text extraction
+├── Home.py                               # Main dashboard/landing page
+├── pages/                                # Standard-specific analysis pages
+│   ├── 1_ASC_606_Revenue.py             # ASC 606 revenue recognition
+│   ├── 2_ASC_842_Leases.py              # ASC 842 lease analysis (placeholder)
+│   └── [future ASC standards]
+├── core/                                 # Shared backend logic
+│   ├── analyzers.py                     # Analyzer factory and base classes
+│   ├── models.py                        # Centralized data models
+│   ├── knowledge_base.py                # Multi-standard knowledge base manager
+│   ├── ui_helpers.py                    # Shared UI components and styling
+│   └── analyzers/                       # Standard-specific analyzers
+│       └── asc842_analyzer.py           # ASC 842 placeholder analyzer
+├── hybrid_asc606_analyzer.py             # ASC 606 hybrid RAG engine
+├── asc606_knowledge_base.py              # ASC 606 ChromaDB system
+├── comprehensive_analysis_framework.py   # ASC 606 analysis framework
+├── document_extractor.py                 # Multi-format document processing
 ├── attached_assets/                      # Authoritative sources (cleaned)
 │   ├── 05_overview_background_*.txt      # ASC 606 sections
 │   ├── 10_objectives_*.txt
@@ -144,8 +170,8 @@ Preferred communication style: Simple, everyday language.
 │   ├── contract_review_questions_*.txt   # Analysis framework
 │   └── ey-frdbb3043-09-24-2024_*.docx   # EY interpretative guidance
 ├── asc606_knowledge_base/                # ChromaDB vector database files
-├── pyproject.toml                       # Dependencies
-└── replit.md                            # Project documentation
+├── pyproject.toml                        # Dependencies
+└── replit.md                             # Project documentation
 ```
 
 ### Future Architecture Considerations

@@ -12,29 +12,15 @@ from pathlib import Path
 from openai import OpenAI
 from asc606_knowledge_base import get_knowledge_base, ASC606KnowledgeBase
 from comprehensive_analysis_framework import get_comprehensive_analysis_prompt
-from dataclasses import dataclass
-
-@dataclass
-class ASC606Analysis:
-    """Structure for ASC 606 analysis results"""
-    reconciliation_analysis: Dict[str, List[Dict[str, Any]]]
-    contract_overview: Dict[str, Any]
-    step1_contract_identification: Dict[str, Any]
-    step2_performance_obligations: Dict[str, Any]
-    step3_transaction_price: Dict[str, Any]
-    step4_price_allocation: Dict[str, Any]
-    step5_revenue_recognition: Dict[str, Any]
-    professional_memo: str
-    implementation_guidance: List[str]
-    citations: List[str]
-    not_applicable_items: List[str]
+from core.analyzers import BaseAnalyzer
+from core.models import ASC606Analysis
 
 
-class HybridASC606Analyzer:
+class HybridASC606Analyzer(BaseAnalyzer):
     """Hybrid ASC 606 analyzer using metadata filtering + semantic search"""
     
     def __init__(self):
-        self.setup_logging()
+        super().__init__("ASC 606")
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.knowledge_base = get_knowledge_base()
         # Legacy compatibility attribute
@@ -93,6 +79,10 @@ Return only the terms as a comma-separated list, no explanations."""
             return []
 
     def analyze_contract(self, contract_text: str, contract_data) -> ASC606Analysis:
+        """Analyze contract for ASC 606 compliance - main entry point"""
+        return self.analyze_document(contract_text, contract_data.__dict__)
+    
+    def analyze_document(self, document_text: str, document_data: Dict[str, Any]) -> ASC606Analysis:
         """
         Perform ASC 606 analysis using hybrid RAG system with two-stage citation approach
         """
