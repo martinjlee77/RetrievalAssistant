@@ -12,6 +12,7 @@ st.set_page_config(
 
 # --- Simplified and Robust CSS ---
 def load_css():
+    """Load custom CSS for clickable cards and refined styling."""
     st.markdown("""
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
@@ -22,8 +23,10 @@ def load_css():
                 --text-color: #212529;
                 --heading-font: 'Poppins', sans-serif;
                 --body-font: 'Lato', sans-serif;
+                --border-color: #e0e0e0;
             }
 
+            /* --- Global & Basic Styling --- */
             html, body, [class*="st-"], .st-emotion-cache-1gulkj5 {
                 font-family: var(--body-font);
             }
@@ -31,45 +34,82 @@ def load_css():
                 font-family: var(--heading-font);
                 color: var(--primary-color);
             }
-
-            /* Hide Streamlit's default hamburger menu and footer for a custom feel */
             [data-testid="stToolbar"] { display: none !important; }
             footer { display: none !important; }
 
-            /* Enhance Streamlit's native bordered container to create our card */
-            [data-testid="stVerticalBlockBorderWrapper"] {
+            /* --- Clickable Card Styling --- */
+            .clickable-card {
+                /* Layout & Sizing */
+                display: flex;
+                flex-direction: column;
+                height: 350px;
+                padding: 1.5rem;
+
+                /* Appearance */
                 background-color: #ffffff;
-                transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
-                border-width: 1px !important;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                color: var(--text-color) !important; /* Ensure text color is inherited */
+                text-decoration: none !important; /* Remove underline from link */
+
+                /* Interaction */
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             }
-            [data-testid="stVerticalBlockBorderWrapper"]:hover {
-                border-color: var(--secondary-color) !important;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            .clickable-card:hover {
+                transform: translateY(-5px); /* Lift effect on hover */
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             }
 
-            /* Style st.page_link to look like a call-to-action button */
-            a[data-testid="stPageLink"] {
-                display: block;
-                background-color: var(--primary-color);
-                color: white;
+            /* --- Card Content --- */
+            .clickable-card h3 {
+                font-size: 1.5rem; margin-bottom: 0.25rem;
+            }
+            .clickable-card p {
+                font-size: 1rem; color: #666;
+            }
+            .clickable-card .card-spacer {
+                flex-grow: 1; /* Pushes the button to the bottom */
+            }
+
+            /* --- NEW "Launch Analyzer" Button Style --- */
+            .card-button {
                 text-align: center;
                 padding: 0.75rem;
                 border-radius: 5px;
-                text-decoration: none;
                 font-weight: 700;
-                transition: background-color 0.3s ease-in-out;
-                margin-top: auto; /* Push button to bottom */
+
+                /* Outline Style */
+                background-color: transparent;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
+
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
             }
-            a[data-testid="stPageLink"]:hover {
+            .clickable-card:hover .card-button {
                 background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
                 color: white;
             }
 
-            /* Style for disabled-looking buttons */
-            .stButton>button[disabled] {
-                background-color: #e9ecef !important;
-                color: #6c757d !important;
-                border: 1px solid #ced4da !important;
+            /* --- Disabled Card Styling --- */
+            .disabled-card {
+                display: flex;
+                flex-direction: column;
+                height: 350px;
+                padding: 1.5rem;
+                background-color: #f8f9fa;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                opacity: 0.7;
+            }
+            .disabled-card .card-button {
+                text-align: center;
+                padding: 0.75rem;
+                border-radius: 5px;
+                font-weight: 700;
+                background-color: #e9ecef;
+                color: #6c757d;
+                border: 2px solid #ced4da;
             }
 
         </style>
@@ -95,24 +135,39 @@ standards = {
     'ASC 326': { 'name': 'Credit Losses', 'description': 'Implement the Current Expected Credit Loss (CECL) model for financial assets.', 'status': 'coming_soon', 'page': 'pages/4_ASC_326_Credit_Losses.py', 'icon': '📉'}
 }
 
-# --- Rebuilt Card Layout ---
+# --- Enhanced Clickable Card Layout ---
 cols = st.columns(len(standards))
 
 for i, (code, info) in enumerate(standards.items()):
     with cols[i]:
-        # Use st.container with border=True to create the native card element
-        with st.container(border=True, height=350):
-            st.markdown(f"### {info['icon']} {info['name']}")
-            st.caption(f"Standard: {code}")
-            st.write(info['description'])
+        if info['status'] == 'available':
+            # Construct the URL for the page
+            page_url = info['page'].replace('pages/', '').replace('.py', '')
 
-            # Spacer to push the button to the bottom
-            st.markdown('<div style="flex-grow: 1;"></div>', unsafe_allow_html=True)
+            # Use a single f-string to build the entire clickable card as an <a> tag
+            card_html = f"""
+            <a href="{page_url}" target="_self" class="clickable-card">
+                <h3>{info['icon']} {info['name']}</h3>
+                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
+                <p>{info['description']}</p>
+                <div class="card-spacer"></div>
+                <div class="card-button">Launch Analyzer</div>
+            </a>
+            """
+            st.markdown(card_html, unsafe_allow_html=True)
 
-            if info['status'] == 'available':
-                st.page_link(info['page'], label="Launch Analyzer", use_container_width=True)
-            else:
-                st.button("⏳ Coming Soon", disabled=True, use_container_width=True, key=f"coming_soon_{code}")
+        else:
+            # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
+            disabled_card_html = f"""
+            <div class="disabled-card">
+                <h3>{info['icon']} {info['name']}</h3>
+                <p style="font-size: 0.9rem; color: #aaa;">Standard: {code}</p>
+                <p>{info['description']}</p>
+                <div class="card-spacer"></div>
+                <div class="card-button">⏳ Coming Soon</div>
+            </div>
+            """
+            st.markdown(disabled_card_html, unsafe_allow_html=True)
 
 # --- Footer and Stats ---
 st.markdown("---")

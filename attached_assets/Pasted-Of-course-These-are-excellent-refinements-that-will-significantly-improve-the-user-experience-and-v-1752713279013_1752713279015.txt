@@ -1,0 +1,166 @@
+Of course! These are excellent refinements that will significantly improve the user experience and visual polish of the home page.
+
+You've correctly identified that making the entire card clickable provides a more intuitive and fluid interaction. The "outline" style for the button is also a great choice for a modern, clean aesthetic.
+
+To achieve this, we need to move away from using Streamlit's components (st.container, st.page_link) for the card structure itself and instead, build the entire clickable card using a single, styled st.markdown element. This gives us the full control needed for this advanced interaction.
+
+Here is the updated code, with detailed explanations of the changes.
+
+Step 1: Update the CSS in load_css()
+We'll replace the old CSS with a new set of rules specifically designed for our new clickable card structure.
+
+.clickable-card: This is the core new style. It styles an <a> tag to look and behave like a card. It uses Flexbox to arrange the content vertically and allows the "button" to be pushed to the bottom.
+.card-button: This is the new "outline" style for the "Launch Analyzer" text. It starts with a border and text color and fills with the brand's secondary (gold) color on hover.
+.disabled-card: A style for the non-clickable "Coming Soon" cards.
+# In your Home.py, replace the entire load_css function with this new version:
+
+def load_css():
+    """Load custom CSS for clickable cards and refined styling."""
+    st.markdown("""
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
+
+            :root {
+                --primary-color: #0A2B4C;
+                --secondary-color: #C5A565;
+                --text-color: #212529;
+                --heading-font: 'Poppins', sans-serif;
+                --body-font: 'Lato', sans-serif;
+                --border-color: #e0e0e0;
+            }
+
+            /* --- Global & Basic Styling --- */
+            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 {
+                font-family: var(--body-font);
+            }
+            h1, h2, h3, h4, h5, h6 {
+                font-family: var(--heading-font);
+                color: var(--primary-color);
+            }
+            [data-testid="stToolbar"] { display: none !important; }
+            footer { display: none !important; }
+
+            /* --- Clickable Card Styling --- */
+            .clickable-card {
+                /* Layout & Sizing */
+                display: flex;
+                flex-direction: column;
+                height: 350px;
+                padding: 1.5rem;
+
+                /* Appearance */
+                background-color: #ffffff;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                color: var(--text-color) !important; /* Ensure text color is inherited */
+                text-decoration: none !important; /* Remove underline from link */
+
+                /* Interaction */
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+            .clickable-card:hover {
+                transform: translateY(-5px); /* Lift effect on hover */
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            }
+
+            /* --- Card Content --- */
+            .clickable-card h3 {
+                font-size: 1.5rem; margin-bottom: 0.25rem;
+            }
+            .clickable-card p {
+                font-size: 1rem; color: #666;
+            }
+            .clickable-card .card-spacer {
+                flex-grow: 1; /* Pushes the button to the bottom */
+            }
+
+            /* --- NEW "Launch Analyzer" Button Style --- */
+            .card-button {
+                text-align: center;
+                padding: 0.75rem;
+                border-radius: 5px;
+                font-weight: 700;
+
+                /* Outline Style */
+                background-color: transparent;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
+
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            }
+            .clickable-card:hover .card-button {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+                color: white;
+            }
+
+            /* --- Disabled Card Styling --- */
+            .disabled-card {
+                display: flex;
+                flex-direction: column;
+                height: 350px;
+                padding: 1.5rem;
+                background-color: #f8f9fa;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                opacity: 0.7;
+            }
+            .disabled-card .card-button {
+                text-align: center;
+                padding: 0.75rem;
+                border-radius: 5px;
+                font-weight: 700;
+                background-color: #e9ecef;
+                color: #6c757d;
+                border: 2px solid #ced4da;
+            }
+
+        </style>
+    """, unsafe_allow_html=True)
+
+Step 2: Update the Card Generation Logic
+Now, we'll replace the card generation loop. Instead of st.container and st.page_link, we'll construct the HTML for each card inside a single st.markdown call.
+
+# In your Home.py, replace the "Rebuilt Card Layout" section with this new version:
+
+# --- Rebuilt Card Layout ---
+cols = st.columns(len(standards))
+
+for i, (code, info) in enumerate(standards.items()):
+    with cols[i]:
+        if info['status'] == 'available':
+            # Construct the URL for the page. Assumes pages are in the /pages directory.
+            # e.g., 'pages/1_ASC_606_Revenue.py' -> '/1_ASC_606_Revenue'
+            page_url = info['page'].replace('pages/', '').replace('.py', '')
+
+            # Use a single f-string to build the entire clickable card as an <a> tag
+            card_html = f"""
+            <a href="{page_url}" target="_self" class="clickable-card">
+                <h3>{info['icon']} {info['name']}</h3>
+                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
+                <p>{info['description']}</p>
+                <div class="card-spacer"></div>
+                <div class="card-button">Launch Analyzer</div>
+            </a>
+            """
+            st.markdown(card_html, unsafe_allow_html=True)
+
+        else:
+            # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
+            disabled_card_html = f"""
+            <div class="disabled-card">
+                <h3>{info['icon']} {info['name']}</h3>
+                <p style="font-size: 0.9rem; color: #aaa;">Standard: {code}</p>
+                <p>{info['description']}</p>
+                <div class="card-spacer"></div>
+                <div class="card-button">⏳ Coming Soon</div>
+            </div>
+            """
+            st.markdown(disabled_card_html, unsafe_allow_html=True)
+
+Summary of Key Changes and Improvements
+Entire Card is Clickable: By wrapping all the card content inside a single <a> tag, the entire visual area becomes a single, seamless link.
+Elegant Hover Effect: The whole card now lifts and gets a subtle shadow on hover, clearly indicating interactivity. The "Launch Analyzer" button simultaneously changes its style on the same hover event, creating a unified effect.
+Refined Button Style: The "Launch Analyzer" button now has a professional "outline" style that fills in on hover, which is less visually heavy than a solid block of color.
+Semantic HTML: We are now using an anchor tag (<a>) for what it's meant for: navigation. This is better for accessibility and web standards.
+No More st.button or st.page_link for Cards: The logic is cleaner and fully controlled by our custom CSS, which is exactly what's needed for this level of design customization.
