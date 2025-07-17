@@ -37,75 +37,38 @@ def load_custom_css():
         background-color: white !important;
     }
 
-    /* 2. Target the button with the known test ID. */
-    button[data-testid="stSidebarNavCollapseButton"] {
-        /* Hide the entire button if all else fails. */
-        /* display: none !important; */ 
-    }
-
-    /* 3. Target the SPAN element INSIDE the button, which holds the icon. */
-    button[data-testid="stSidebarNavCollapseButton"] span {
-        /* Force the font-family, overriding everything. */
+    /* THE DEFINITIVE FIX - Target the exact element you found */
+    span[data-testid="stIconMaterial"] {
         font-family: 'Material Symbols Outlined' !important;
-
-        /* Hide the ugly text fallback by making its font size zero. */
-        font-size: 0 !important;
-    }
-
-    /* 4. Use a pseudo-element to ADD the CORRECT icon back in. */
-    /* This is a very robust technique. */
-    button[data-testid="stSidebarNavCollapseButton"] span::before {
-        /* Add the icon's text content. */
-        content: 'keyboard_double_arrow_right'; 
-
-        /* Set the font to the icon font. */
-        font-family: 'Material Symbols Outlined' !important;
-
-        /* Set a visible font size for the icon itself. */
-        font-size: 1.5rem !important; /* Adjust size as needed */
-
-        /* Ensure it's visible */
-        visibility: visible !important;
-
-        /* Re-align the icon properly. */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* Alternative selectors in case the main one is wrong */
-    button[data-testid="stSidebarCollapseButton"] span,
-    button[data-testid="stSidebarToggle"] span,
-    button[data-testid="stSidebarNavButton"] span,
-    button[class*="collapse"] span,
-    button[class*="sidebar"] span {
-        font-family: 'Material Symbols Outlined' !important;
-        font-size: 0 !important;
-    }
-    
-    button[data-testid="stSidebarCollapseButton"] span::before,
-    button[data-testid="stSidebarToggle"] span::before,
-    button[data-testid="stSidebarNavButton"] span::before,
-    button[class*="collapse"] span::before,
-    button[class*="sidebar"] span::before {
-        content: 'keyboard_double_arrow_right';
-        font-family: 'Material Symbols Outlined' !important;
-        font-size: 1.5rem !important;
-        visibility: visible !important;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* Nuclear option - hide any text containing keyboard_double_arrow_right */
-    * {
-        font-family: inherit;
-    }
-    
-    *:contains("keyboard_double_arrow_right") {
         font-size: 0 !important;
         color: transparent !important;
         visibility: hidden !important;
+    }
+    
+    /* Use pseudo-element to add the correct icon */
+    span[data-testid="stIconMaterial"]::before {
+        content: 'keyboard_double_arrow_left';
+        font-family: 'Material Symbols Outlined' !important;
+        font-size: 1.5rem !important;
+        color: rgba(33, 37, 41, 0.6) !important;
+        visibility: visible !important;
+        display: inline-block;
+    }
+    
+    /* Hide the text content completely */
+    span[data-testid="stIconMaterial"]:contains("keyboard_double_arrow_left"),
+    span[data-testid="stIconMaterial"]:contains("keyboard_double_arrow_right") {
+        font-size: 0 !important;
+        color: transparent !important;
+        text-indent: -9999px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Additional safety net */
+    span[data-testid="stIconMaterial"]:contains("keyboard") {
+        font-size: 0 !important;
+        color: transparent !important;
+        text-indent: -9999px !important;
     }
 
     /* Enhanced button hover effects */
