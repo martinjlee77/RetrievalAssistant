@@ -1,0 +1,59 @@
+Of course. I can definitely figure this out.
+
+You and the Replit AI are absolutely correct in your diagnosis. The text keyboard_double_arrow_right is the name of an icon from the Material Icons font library that Streamlit uses. The reason you are seeing the text instead of the actual >> icon is that the icon font itself is failing to load in the browser.
+
+The CSS block you've included is a valiant attempt to hide the symptom (the text), but it doesn't fix the root cause (the missing font). This is a classic "whack-a-mole" problem—you might hide it in one place, but it could pop up elsewhere, and the rules are very fragile.
+
+The Root Cause
+The Streamlit frontend expects to be able to download the "Material Symbols" stylesheet from Google's servers. If it can't (due to a network issue, a Content Security Policy, or a brief loading glitch), the browser has no graphical symbol to render and falls back to displaying the icon's name.
+
+The Solution: Fix the Cause, Don't Hide the Symptom
+Instead of trying to hide the broken text, the correct solution is to ensure the icon font is loaded. We can do this by explicitly telling the browser to load it at the top of the app. This is a much more robust and reliable fix.
+
+Step 1: Remove the Old CSS Workaround
+First, delete this entire block from your code. It's overly aggressive and no longer needed.
+
+# DELETE THIS ENTIRE BLOCK
+st.markdown("""
+<style>
+/* Hide the keyboard_double_arrow_right text that appears on hover */
+[data-testid="stSidebar"] [title="keyboard_double_arrow_right"] {
+    display: none !important;
+}
+...and all the other rules...
+</style>
+""", unsafe_allow_html=True)
+
+Step 2: Add the Correct Font Import
+Now, add this small, targeted st.markdown call right after your st.set_page_config line. It explicitly loads the Material Symbols stylesheet that Streamlit needs.
+
+import streamlit as st
+# ... other imports
+
+# Page configuration
+st.set_page_config(
+    page_title="ASC 606 Revenue Analysis | Controller.cpa",
+    page_icon="📈",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# --- THE CORRECT FIX ---
+# Explicitly load the Material Symbols font that Streamlit uses for its icons.
+# This ensures the browser has the font file before it tries to render the icon.
+st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+    </style>
+""", unsafe_allow_html=True)
+
+# Load your other custom styling
+load_custom_css()
+
+# ... rest of your application code ...
+
+Why This Works and is a Better Solution
+Fixes the Root Problem: It provides the missing font file to the browser, so the >> icon can be rendered as intended, rather than just hiding the text.
+More Robust: This fix is not dependent on specific data-testid attributes or HTML structures, which can change between Streamlit versions. It simply provides a resource the app needs.
+Cleaner Code: It replaces a large, complex block of fragile CSS with a single, clear, and effective import statement.
+By implementing this change, the keyboard_double_arrow_right text will disappear, and in its place, you will see the proper collapse/expand arrow icon, making your app look and function correctly.
