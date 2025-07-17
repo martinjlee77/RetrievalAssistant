@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="Controller.cpa | Technical Accounting AI Platform",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Custom CSS for branding and styling
@@ -277,73 +277,9 @@ def load_css():
 # Load styling
 load_css()
 
-# Simple navigation with sidebar
-with st.sidebar:
-    st.markdown("### Navigation")
-    
-    if st.button("🏠 Home", use_container_width=True, type="primary"):
-        pass  # Already on home page
-    
-    if st.button("📈 ASC 606 Revenue", use_container_width=True):
-        st.switch_page("pages/1_ASC_606_Revenue.py")
-    
-    if st.button("🏢 ASC 842 Leases", use_container_width=True):
-        st.switch_page("pages/2_ASC_842_Leases.py")
+# No navigation menu on Home page per user preference
 
-# JavaScript solution to remove keyboard_double_arrow_right text
-st.markdown("""
-<script>
-function removeKeyboardArrowText() {
-    // Find all text nodes containing the problematic text
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT,
-        null,
-        false
-    );
-    
-    const textNodes = [];
-    let node;
-    
-    while (node = walker.nextNode()) {
-        if (node.nodeValue && node.nodeValue.includes('keyboard_double_arrow_right')) {
-            textNodes.push(node);
-        }
-    }
-    
-    // Remove or hide the text nodes
-    textNodes.forEach(textNode => {
-        textNode.parentNode.style.display = 'none';
-    });
-    
-    // Also check for any elements with this text content
-    const allElements = document.querySelectorAll('*');
-    allElements.forEach(element => {
-        if (element.textContent && element.textContent.includes('keyboard_double_arrow_right')) {
-            element.style.display = 'none';
-        }
-    });
-}
-
-// Run immediately and on DOM changes
-removeKeyboardArrowText();
-
-// Observer for dynamic content
-const observer = new MutationObserver(function(mutations) {
-    removeKeyboardArrowText();
-});
-
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// Run again after delays to catch late-loading content
-setTimeout(removeKeyboardArrowText, 100);
-setTimeout(removeKeyboardArrowText, 500);
-setTimeout(removeKeyboardArrowText, 1000);
-</script>
-""", unsafe_allow_html=True)
+# No JavaScript needed on Home page
 
 # Header Section
 st.markdown("""

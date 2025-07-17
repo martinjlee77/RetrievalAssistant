@@ -46,6 +46,38 @@ with st.sidebar:
     if st.button("🏢 ASC 842 Leases", use_container_width=True):
         st.switch_page("pages/2_ASC_842_Leases.py")
 
+# CSS solution to hide keyboard_double_arrow_right text
+st.markdown("""
+<style>
+/* Hide the keyboard_double_arrow_right text that appears on hover */
+[data-testid="stSidebar"] [title="keyboard_double_arrow_right"] {
+    display: none !important;
+}
+
+/* Hide any element containing this text */
+[data-testid="stSidebar"] *:contains("keyboard_double_arrow_right") {
+    display: none !important;
+}
+
+/* Hide Material UI icons that show this text */
+.MuiSvgIcon-root[data-testid="keyboard_double_arrow_right"] {
+    display: none !important;
+}
+
+/* Hide tooltip content */
+[role="tooltip"]:contains("keyboard_double_arrow_right") {
+    display: none !important;
+}
+
+/* Hide any text content that contains keyboard_double_arrow_right */
+*:contains("keyboard_double_arrow_right") {
+    font-size: 0 !important;
+    color: transparent !important;
+    visibility: hidden !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Available standards configuration
 AVAILABLE_STANDARDS = {
     'ASC 606': {
