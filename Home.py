@@ -1,159 +1,85 @@
 """
-Multi-Standard Accounting Analysis Platform - Home Dashboard
+Multi-Standard Accounting Analysis Platform - Home Dashboard (Simplified & Standard)
 """
 import streamlit as st
 
+# Configure the page. initial_sidebar_state="expanded" is key here.
 st.set_page_config(
     page_title="Controller.cpa | Technical Accounting AI Platform",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded" # Keep the navigation visible by default
 )
 
-# --- Simplified and Robust CSS ---
-def load_css():
-    """Load custom CSS for the 'Invisible Button' card technique."""
+# Optional: A tiny bit of CSS for custom fonts, but no layout hacks.
+def load_minimal_css():
     st.markdown("""
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
 
-            :root {
-                --primary-color: #0A2B4C;
-                --secondary-color: #C5A565;
-                --text-color: #212529;
-                --heading-font: 'Poppins', sans-serif;
-                --body-font: 'Lato', sans-serif;
-                --border-color: #e0e0e0;
+            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 {
+                font-family: 'Lato', sans-serif;
             }
-
-            /* --- Global & Basic Styling --- */
-            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 { font-family: var(--body-font); }
-            h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font); color: var(--primary-color); }
+            h1, h2, h3, h4, h5, h6 {
+                font-family: 'Poppins', sans-serif;
+                color: #0A2B4C; /* Primary Color */
+            }
+            /* Hide Streamlit's default hamburger menu and footer for a cleaner look */
             [data-testid="stToolbar"] { display: none !important; }
             footer { display: none !important; }
-
-            /* --- Card Container (The Visual Border) --- */
-            [data-testid="stVerticalBlockBorderWrapper"] {
-                background-color: #ffffff;
-                border: 1px solid var(--border-color) !important;
-                border-radius: 8px;
-                padding: 0 !important; /* Remove container padding to let the button control it */
-                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            }
-
-            /* --- Card Content Styling --- */
-            .card-content {
-                padding: 1.5rem 1.5rem 0 1.5rem;
-            }
-            
-            /* --- Enhanced Button Styling --- */
-            .stButton > button {
-                background-color: transparent !important;
-                border: 2px solid var(--primary-color) !important;
-                color: var(--primary-color) !important;
-                text-align: center;
-                padding: 0.75rem !important;
-                border-radius: 5px;
-                font-weight: 700;
-                transition: all 0.2s ease-in-out;
-                margin: 0 1.5rem 1.5rem 1.5rem !important;
-            }
-
-            /* --- THE HOVER EFFECT: Style the CONTAINER when ANY element inside is hovered --- */
-            [data-testid="stVerticalBlockBorderWrapper"]:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            }
-            
-            /* --- Button hover effect --- */
-            [data-testid="stVerticalBlockBorderWrapper"]:hover .stButton > button {
-                background-color: var(--secondary-color) !important;
-                border-color: var(--secondary-color) !important;
-                color: white !important;
-            }
-
-            /* --- Card Content Styling --- */
-            .card-content h3 { 
-                font-size: 1.5rem; 
-                margin-bottom: 0.25rem; 
-                color: var(--primary-color); 
-            }
-            .card-content p { 
-                font-size: 1rem; 
-                color: #666; 
-                margin-bottom: 0.5rem;
-            }
-
-            /* --- Disabled Card Styling --- */
-            .stButton > button[disabled] {
-                opacity: 0.7;
-                background-color: #f8f9fa !important;
-                border: 1px solid var(--border-color) !important;
-            }
-            .stButton > button[disabled] .card-launch-button {
-                background-color: #e9ecef;
-                color: #6c757d;
-                border: 2px solid #ced4da;
-            }
         </style>
     """, unsafe_allow_html=True)
 
-load_css()
+load_minimal_css()
 
 # --- Header Section ---
-st.markdown("""
-<div style="text-align: center; padding: 1rem 0 2rem 0;">
-    <h1 style="font-size: 2.8rem; margin-bottom: 0.5rem;">Controller.cpa</h1>
-    <p style="font-size: 1.2rem; color: #666;">AI-Powered Technical Accounting Analysis Platform</p>
-</div>
-""", unsafe_allow_html=True)
-
+st.title("Controller.cpa Platform")
+st.markdown("### Welcome to Your AI-Powered Technical Accounting Co-Pilot")
+st.write(
+    "Select an accounting standard from the navigation menu on the left to begin your analysis, "
+    "or use the quick links below to jump directly into a tool."
+)
 st.markdown("---")
 
-# --- Standards Definition ---
-standards = {
-    'ASC 606': { 'name': 'Revenue', 'description': 'Analyze contracts for performance obligations, variable consideration, and proper recognition timing.', 'status': 'available', 'page': 'pages/1_ASC_606_Revenue.py', 'icon': '📈'},
-    'ASC 842': { 'name': 'Leases', 'description': 'Classify leases as operating or finance and generate amortization schedules automatically.', 'status': 'available', 'page': 'pages/2_ASC_842_Leases.py', 'icon': '🏢'},
-    'ASC 815': { 'name': 'Derivatives', 'description': 'Analyze instruments for derivative characteristics and apply appropriate accounting.', 'status': 'coming_soon', 'page': 'pages/3_ASC_815_Derivatives.py', 'icon': '⚖️'},
-    'ASC 326': { 'name': 'Credit Losses', 'description': 'Implement the Current Expected Credit Loss (CECL) model for financial assets.', 'status': 'coming_soon', 'page': 'pages/4_ASC_326_Credit_Losses.py', 'icon': '📉'}
-}
 
-# --- Invisible Button Card Layout ---
-cols = st.columns(len(standards))
+# --- Main Content: Call-to-Action Containers ---
+st.subheader("Available Analysis Tools")
 
-for i, (code, info) in enumerate(standards.items()):
-    with cols[i]:
-        # Use a container to create the border and hover shadow effect
-        with st.container(border=True):
+# We use standard columns and containers for a clean, card-like layout
+col1, col2 = st.columns(2)
 
-            # Display the card content first
-            st.markdown(f"""
-            <div class="card-content">
-                <h3>{info['icon']} {info['name']}</h3>
-                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
-                <p>{info['description']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Add spacer
-            st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
+with col1:
+    with st.container(border=True):
+        st.markdown("#### 📈 ASC 606: Revenue from Contracts with Customers")
+        st.write(
+            "Analyze complex contracts for performance obligations, variable "
+            "consideration, and proper recognition timing using the 5-step model."
+        )
+        # st.page_link is the standard, correct way to link to other pages
+        st.page_link("pages/1_ASC_606_Revenue.py", label="Go to ASC 606 Analyzer", icon="➡️")
 
-            # Create a button for navigation
-            if info['status'] == 'available':
-                if st.button("🚀 Launch Analyzer", key=f"nav_{code}", use_container_width=True):
-                    st.switch_page(info['page'])
-            else:
-                # For disabled cards, the button is just disabled.
-                st.button("⏳ Coming Soon", key=f"nav_{code}", use_container_width=True, disabled=True)
+with col2:
+    with st.container(border=True):
+        st.markdown("#### 🏢 ASC 842: Leases")
+        st.write(
+            "Classify leases as operating or finance and generate amortization "
+            "schedules and journal entries automatically."
+        )
+        st.page_link("pages/2_ASC_842_Leases.py", label="Go to ASC 842 Analyzer", icon="➡️")
+
+# You can add more containers here for future standards
+# st.markdown("...")
+
 
 # --- Footer and Stats ---
 st.markdown("---")
-st.markdown("### Platform at a Glance")
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Active Analyzers", "2")
-col2.metric("Knowledge Base", "1,510+", "Chunks")
-col3.metric("Avg. Analysis Time", "~30s")
-col4.metric("Platform Version", "2.0")
+st.subheader("Platform at a Glance")
+
+stat_cols = st.columns(4)
+stat_cols[0].metric("Active Analyzers", "2")
+stat_cols[1].metric("Knowledge Base", "1,510+", "Chunks")
+stat_cols[2].metric("Avg. Analysis Time", "~30s")
+stat_cols[3].metric("Platform Version", "2.0")
 
 st.markdown("---")
 st.markdown('<p style="text-align: center; color: #666;">&copy; 2024 Controller.cpa. All Rights Reserved.</p>', unsafe_allow_html=True)
