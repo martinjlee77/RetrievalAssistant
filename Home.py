@@ -41,50 +41,47 @@ def load_css():
                 transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             }
 
-            /* --- The Invisible Button (The Clickable Area) --- */
+            /* --- Card Content Styling --- */
+            .card-content {
+                padding: 1.5rem 1.5rem 0 1.5rem;
+            }
+            
+            /* --- Enhanced Button Styling --- */
             .stButton > button {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch; /* Make content fill width */
-                width: 100%;
-                height: 350px;
-                padding: 1.5rem !important; /* Add padding inside the button */
-
-                /* Make the button itself transparent and borderless */
                 background-color: transparent !important;
-                border: none !important;
-                color: var(--text-color) !important; /* Set default text color */
-                text-align: left; /* Align text to the left */
+                border: 2px solid var(--primary-color) !important;
+                color: var(--primary-color) !important;
+                text-align: center;
+                padding: 0.75rem !important;
+                border-radius: 5px;
+                font-weight: 700;
+                transition: all 0.2s ease-in-out;
+                margin: 0 1.5rem 1.5rem 1.5rem !important;
             }
 
-            /* --- THE HOVER EFFECT: Style the CONTAINER when the button INSIDE is hovered --- */
-            [data-testid="stVerticalBlockBorderWrapper"]:has(button:hover) {
+            /* --- THE HOVER EFFECT: Style the CONTAINER when ANY element inside is hovered --- */
+            [data-testid="stVerticalBlockBorderWrapper"]:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             }
-
-            /* --- Card Content (The HTML inside the button label) --- */
-            .card-content h3 { font-size: 1.5rem; margin-bottom: 0.25rem; color: var(--primary-color); }
-            .card-content p { font-size: 1rem; color: #666; }
-            .card-content .card-spacer { flex-grow: 1; }
-
-            /* --- Inner "Launch Analyzer" Button Styling --- */
-            .card-launch-button {
-                text-align: center;
-                padding: 0.75rem;
-                border-radius: 5px;
-                font-weight: 700;
-                background-color: transparent;
-                border: 2px solid var(--primary-color);
-                color: var(--primary-color);
-                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            
+            /* --- Button hover effect --- */
+            [data-testid="stVerticalBlockBorderWrapper"]:hover .stButton > button {
+                background-color: var(--secondary-color) !important;
+                border-color: var(--secondary-color) !important;
+                color: white !important;
             }
 
-            /* Style the inner button when the main button is hovered */
-            .stButton > button:hover .card-launch-button {
-                background-color: var(--secondary-color);
-                border-color: var(--secondary-color);
-                color: white;
+            /* --- Card Content Styling --- */
+            .card-content h3 { 
+                font-size: 1.5rem; 
+                margin-bottom: 0.25rem; 
+                color: var(--primary-color); 
+            }
+            .card-content p { 
+                font-size: 1rem; 
+                color: #666; 
+                margin-bottom: 0.5rem;
             }
 
             /* --- Disabled Card Styling --- */
@@ -129,26 +126,25 @@ for i, (code, info) in enumerate(standards.items()):
         # Use a container to create the border and hover shadow effect
         with st.container(border=True):
 
-            # The label for the button will be the entire card's content, built with HTML
-            card_content_html = f"""
+            # Display the card content first
+            st.markdown(f"""
             <div class="card-content">
                 <h3>{info['icon']} {info['name']}</h3>
                 <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
                 <p>{info['description']}</p>
-                <div class="card-spacer"></div>
-                <div class="card-launch-button">
-                    {'🚀 Launch Analyzer' if info['status'] == 'available' else '⏳ Coming Soon'}
-                </div>
             </div>
-            """
+            """, unsafe_allow_html=True)
+            
+            # Add spacer
+            st.markdown('<div style="margin-top: 2rem;"></div>', unsafe_allow_html=True)
 
-            # Create a button that fills the container. When clicked, it navigates.
+            # Create a button for navigation
             if info['status'] == 'available':
-                if st.button(card_content_html, key=f"nav_{code}", use_container_width=True):
+                if st.button("🚀 Launch Analyzer", key=f"nav_{code}", use_container_width=True):
                     st.switch_page(info['page'])
             else:
                 # For disabled cards, the button is just disabled.
-                st.button(card_content_html, key=f"nav_{code}", use_container_width=True, disabled=True)
+                st.button("⏳ Coming Soon", key=f"nav_{code}", use_container_width=True, disabled=True)
 
 # --- Footer and Stats ---
 st.markdown("---")
