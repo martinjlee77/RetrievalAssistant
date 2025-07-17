@@ -1,0 +1,150 @@
+Of course. My apologies, the previous approach was flawed. You have correctly identified the problem: the cards look clickable, but they are not actually navigating.
+
+Let's debug this. The root cause is a fundamental limitation in how Streamlit works. My previous suggestion of using a raw <a> tag or a JavaScript onclick event with a manually constructed URL (/1_ASC_606_Revenue) is incorrect. Streamlit's multipage app routing is handled internally, and these standard web methods cannot trigger it properly.
+
+The only reliable way to navigate between pages in a Streamlit app is by using a component that has a server-side callback, such as st.button paired with st.switch_page.
+
+The challenge, then, is to make an st.button look and feel like it's an entire card, including the desired hover effects on the card's border and shadow.
+
+The Definitive Solution: The "Invisible Button" Technique
+This is the correct and most robust way to achieve your goal. We will create a full-sized, transparent button that sits inside a styled container. The hover effect will be applied to the container when the invisible button inside it is hovered.
+
+The Structure: We'll use an st.container to draw the card's border and hold its shape.
+The Clickable Element: We'll place a single st.button inside the container. This button's label will be the entire HTML content of your card.
+The Styling Trick:
+We will make the st.button itself completely transparent and remove its own border and padding.
+We will use the advanced CSS :has() pseudo-class to style the container when the button inside it is hovered. This creates the illusion that the entire card is reacting.
+Step 1: Replace Your load_css() Function
+This new CSS is specifically designed for the "Invisible Button" technique.
+
+# In your Home.py, replace the entire load_css function with this new, correct version.
+
+def load_css():
+    """Load custom CSS for the 'Invisible Button' card technique."""
+    st.markdown("""
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
+
+            :root {
+                --primary-color: #0A2B4C;
+                --secondary-color: #C5A565;
+                --text-color: #212529;
+                --heading-font: 'Poppins', sans-serif;
+                --body-font: 'Lato', sans-serif;
+                --border-color: #e0e0e0;
+            }
+
+            /* --- Global & Basic Styling --- */
+            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 { font-family: var(--body-font); }
+            h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font); color: var(--primary-color); }
+            [data-testid="stToolbar"] { display: none !important; }
+            footer { display: none !important; }
+
+            /* --- Card Container (The Visual Border) --- */
+            [data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: #ffffff;
+                border: 1px solid var(--border-color) !important;
+                border-radius: 8px;
+                padding: 0 !important; /* Remove container padding to let the button control it */
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+
+            /* --- The Invisible Button (The Clickable Area) --- */
+            .stButton > button {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch; /* Make content fill width */
+                width: 100%;
+                height: 350px;
+                padding: 1.5rem !important; /* Add padding inside the button */
+
+                /* Make the button itself transparent and borderless */
+                background-color: transparent !important;
+                border: none !important;
+                color: var(--text-color) !important; /* Set default text color */
+                text-align: left; /* Align text to the left */
+            }
+
+            /* --- THE HOVER EFFECT: Style the CONTAINER when the button INSIDE is hovered --- */
+            [data-testid="stVerticalBlockBorderWrapper"]:has(button:hover) {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            }
+
+            /* --- Card Content (The HTML inside the button label) --- */
+            .card-content h3 { font-size: 1.5rem; margin-bottom: 0.25rem; color: var(--primary-color); }
+            .card-content p { font-size: 1rem; color: #666; }
+            .card-content .card-spacer { flex-grow: 1; }
+
+            /* --- Inner "Launch Analyzer" Button Styling --- */
+            .card-launch-button {
+                text-align: center;
+                padding: 0.75rem;
+                border-radius: 5px;
+                font-weight: 700;
+                background-color: transparent;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            }
+
+            /* Style the inner button when the main button is hovered */
+            .stButton > button:hover .card-launch-button {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+                color: white;
+            }
+
+            /* --- Disabled Card Styling --- */
+            .stButton > button[disabled] {
+                opacity: 0.7;
+                background-color: #f8f9fa !important;
+                border: 1px solid var(--border-color) !important;
+            }
+            .stButton > button[disabled] .card-launch-button {
+                background-color: #e9ecef;
+                color: #6c757d;
+                border: 2px solid #ced4da;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+Step 2: Update Your Card Generation Logic
+Now, we will use st.container to create the visual frame and a single st.button inside it to provide the content and the click action.
+
+# In your Home.py, replace the card generation loop with this correct version:
+
+# --- Rebuilt Card Layout ---
+cols = st.columns(len(standards))
+
+for i, (code, info) in enumerate(standards.items()):
+    with cols[i]:
+        # Use a container to create the border and hover shadow effect
+        with st.container(border=True):
+
+            # The label for the button will be the entire card's content, built with HTML
+            card_content_html = f"""
+            <div class="card-content">
+                <h3>{info['icon']} {info['name']}</h3>
+                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
+                <p>{info['description']}</p>
+                <div class="card-spacer"></div>
+                <div class="card-launch-button">
+                    {'🚀 Launch Analyzer' if info['status'] == 'available' else '⏳ Coming Soon'}
+                </div>
+            </div>
+            """
+
+            # Create a button that fills the container. When clicked, it navigates.
+            if info['status'] == 'available':
+                if st.button(card_content_html, key=f"nav_{code}", use_container_width=True):
+                    st.switch_page(info['page'])
+            else:
+                # For disabled cards, the button is just disabled.
+                st.button(card_content_html, key=f"nav_{code}", use_container_width=True, disabled=True)
+
+Summary of the Fix
+Reliable Navigation: We are now using st.button and st.switch_page, which is the only guaranteed method for page navigation triggered by a user click in Streamlit.
+Correct Hover Effect: The CSS now targets the container (stVerticalBlockBorderWrapper) when the button inside it is hovered (:has(button:hover)). This creates the desired effect where the entire card appears to lift and glow.
+Clean Separation: The Python code (st.container and st.button) defines the structure and action, while the CSS defines the appearance. This is a much more stable and maintainable pattern.
+This solution works with Streamlit's architecture instead of fighting against it, ensuring your app will be both beautifully styled and functionally robust.

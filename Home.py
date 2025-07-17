@@ -12,7 +12,7 @@ st.set_page_config(
 
 # --- Simplified and Robust CSS ---
 def load_css():
-    """Load custom CSS for clickable cards and refined styling."""
+    """Load custom CSS for the 'Invisible Button' card technique."""
     st.markdown("""
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
@@ -27,80 +27,49 @@ def load_css():
             }
 
             /* --- Global & Basic Styling --- */
-            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 {
-                font-family: var(--body-font);
-            }
-            h1, h2, h3, h4, h5, h6 {
-                font-family: var(--heading-font);
-                color: var(--primary-color);
-            }
+            html, body, [class*="st-"], .st-emotion-cache-1gulkj5 { font-family: var(--body-font); }
+            h1, h2, h3, h4, h5, h6 { font-family: var(--heading-font); color: var(--primary-color); }
             [data-testid="stToolbar"] { display: none !important; }
             footer { display: none !important; }
 
-            /* --- Card Wrapper Styling --- */
-            .card-wrapper {
-                transition: all 0.2s ease-in-out;
+            /* --- Card Container (The Visual Border) --- */
+            [data-testid="stVerticalBlockBorderWrapper"] {
+                background-color: #ffffff;
+                border: 1px solid var(--border-color) !important;
+                border-radius: 8px;
+                padding: 0 !important; /* Remove container padding to let the button control it */
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             }
-            
-            /* --- Card Container Styling --- */
-            .clickable-card-container {
-                /* Layout & Sizing */
+
+            /* --- The Invisible Button (The Clickable Area) --- */
+            .stButton > button {
                 display: flex;
                 flex-direction: column;
-                height: 280px;
+                align-items: stretch; /* Make content fill width */
+                width: 100%;
+                height: 350px;
+                padding: 1.5rem !important; /* Add padding inside the button */
 
-                /* Appearance */
-                background-color: #ffffff;
-                border: 1px solid var(--border-color);
-                border-radius: 8px 8px 0 0;
+                /* Make the button itself transparent and borderless */
+                background-color: transparent !important;
+                border: none !important;
+                color: var(--text-color) !important; /* Set default text color */
+                text-align: left; /* Align text to the left */
+            }
 
-                /* Interaction */
-                transition: all 0.2s ease-in-out;
-            }
-            
-            /* Card wrapper hover effects */
-            .card-wrapper:hover {
-                transform: translateY(-5px); /* Lift effect on hover */
-            }
-            
-            .card-wrapper:hover .clickable-card-container {
+            /* --- THE HOVER EFFECT: Style the CONTAINER when the button INSIDE is hovered --- */
+            [data-testid="stVerticalBlockBorderWrapper"]:has(button:hover) {
+                transform: translateY(-5px);
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-                border-color: var(--secondary-color);
-            }
-            
-            .card-wrapper:hover .card-button-area {
-                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-                border-color: var(--secondary-color);
             }
 
-            /* --- Card Content --- */
-            .clickable-card-content {
-                padding: 1.5rem;
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            .clickable-card-content h3 {
-                font-size: 1.5rem; margin-bottom: 0.25rem;
-            }
-            .clickable-card-content p {
-                font-size: 1rem; color: #666;
-            }
-            .clickable-card-content .card-spacer {
-                flex-grow: 1; /* Pushes the button to the bottom */
-            }
+            /* --- Card Content (The HTML inside the button label) --- */
+            .card-content h3 { font-size: 1.5rem; margin-bottom: 0.25rem; color: var(--primary-color); }
+            .card-content p { font-size: 1rem; color: #666; }
+            .card-content .card-spacer { flex-grow: 1; }
 
-            /* --- Card Button Area and Button Styling --- */
-            .card-button-area {
-                padding: 0 1.5rem 1.5rem 1.5rem;
-                background-color: #ffffff;
-                border: 1px solid var(--border-color);
-                border-top: none;
-                border-radius: 0 0 8px 8px;
-                transition: all 0.2s ease-in-out;
-            }
-            
-            .card-button {
+            /* --- Inner "Launch Analyzer" Button Styling --- */
+            .card-launch-button {
                 text-align: center;
                 padding: 0.75rem;
                 border-radius: 5px;
@@ -108,37 +77,27 @@ def load_css():
                 background-color: transparent;
                 border: 2px solid var(--primary-color);
                 color: var(--primary-color);
-                transition: all 0.2s ease-in-out;
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
             }
-            
-            /* Button hover when hovering the card wrapper */
-            .card-wrapper:hover .card-button {
+
+            /* Style the inner button when the main button is hovered */
+            .stButton > button:hover .card-launch-button {
                 background-color: var(--secondary-color);
                 border-color: var(--secondary-color);
                 color: white;
             }
 
             /* --- Disabled Card Styling --- */
-            .disabled-card {
-                display: flex;
-                flex-direction: column;
-                height: 350px;
-                padding: 1.5rem;
-                background-color: #f8f9fa;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
+            .stButton > button[disabled] {
                 opacity: 0.7;
+                background-color: #f8f9fa !important;
+                border: 1px solid var(--border-color) !important;
             }
-            .disabled-card .card-button {
-                text-align: center;
-                padding: 0.75rem;
-                border-radius: 5px;
-                font-weight: 700;
+            .stButton > button[disabled] .card-launch-button {
                 background-color: #e9ecef;
                 color: #6c757d;
                 border: 2px solid #ced4da;
             }
-
         </style>
     """, unsafe_allow_html=True)
 
@@ -162,44 +121,34 @@ standards = {
     'ASC 326': { 'name': 'Credit Losses', 'description': 'Implement the Current Expected Credit Loss (CECL) model for financial assets.', 'status': 'coming_soon', 'page': 'pages/4_ASC_326_Credit_Losses.py', 'icon': '📉'}
 }
 
-# --- Enhanced Clickable Card Layout ---
+# --- Invisible Button Card Layout ---
 cols = st.columns(len(standards))
 
 for i, (code, info) in enumerate(standards.items()):
     with cols[i]:
-        if info['status'] == 'available':
-            # Create a fully clickable card using JavaScript navigation
-            page_url = info['page'].replace('pages/', '').replace('.py', '')
-            
-            card_html = f"""
-            <div class="card-wrapper" onclick="window.location.href='{page_url}';" style="cursor: pointer;">
-                <div class="clickable-card-container">
-                    <div class="clickable-card-content">
-                        <h3>{info['icon']} {info['name']}</h3>
-                        <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
-                        <p>{info['description']}</p>
-                        <div class="card-spacer"></div>
-                    </div>
-                </div>
-                <div class="card-button-area">
-                    <div class="card-button">🚀 Launch Analyzer</div>
-                </div>
-            </div>
-            """
-            st.markdown(card_html, unsafe_allow_html=True)
+        # Use a container to create the border and hover shadow effect
+        with st.container(border=True):
 
-        else:
-            # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
-            disabled_card_html = f"""
-            <div class="disabled-card">
+            # The label for the button will be the entire card's content, built with HTML
+            card_content_html = f"""
+            <div class="card-content">
                 <h3>{info['icon']} {info['name']}</h3>
-                <p style="font-size: 0.9rem; color: #aaa;">Standard: {code}</p>
+                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
                 <p>{info['description']}</p>
                 <div class="card-spacer"></div>
-                <div class="card-button">⏳ Coming Soon</div>
+                <div class="card-launch-button">
+                    {'🚀 Launch Analyzer' if info['status'] == 'available' else '⏳ Coming Soon'}
+                </div>
             </div>
             """
-            st.markdown(disabled_card_html, unsafe_allow_html=True)
+
+            # Create a button that fills the container. When clicked, it navigates.
+            if info['status'] == 'available':
+                if st.button(card_content_html, key=f"nav_{code}", use_container_width=True):
+                    st.switch_page(info['page'])
+            else:
+                # For disabled cards, the button is just disabled.
+                st.button(card_content_html, key=f"nav_{code}", use_container_width=True, disabled=True)
 
 # --- Footer and Stats ---
 st.markdown("---")
