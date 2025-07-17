@@ -7,9 +7,9 @@ import json
 from typing import Dict, Any, List
 
 def load_custom_css():
-    """Load custom CSS for brand consistency across all pages"""
+    """Final attempt to fix and hide the sidebar icon issue."""
     css = """
-    /* --- THE FIX: Load icon font FIRST --- */
+    /* 1. Attempt to load the font, just in case CSP was a red herring. */
     @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
     
     /* Import Google Fonts */
@@ -37,82 +37,75 @@ def load_custom_css():
         background-color: white !important;
     }
 
-    /* Comprehensive fix for keyboard_double_arrow_right text */
-    /* Hide any element containing this text */
-    body *:contains("keyboard_double_arrow_right") {
-        display: none !important;
-        visibility: hidden !important;
+    /* 2. Target the button with the known test ID. */
+    button[data-testid="stSidebarNavCollapseButton"] {
+        /* Hide the entire button if all else fails. */
+        /* display: none !important; */ 
+    }
+
+    /* 3. Target the SPAN element INSIDE the button, which holds the icon. */
+    button[data-testid="stSidebarNavCollapseButton"] span {
+        /* Force the font-family, overriding everything. */
+        font-family: 'Material Symbols Outlined' !important;
+
+        /* Hide the ugly text fallback by making its font size zero. */
+        font-size: 0 !important;
+    }
+
+    /* 4. Use a pseudo-element to ADD the CORRECT icon back in. */
+    /* This is a very robust technique. */
+    button[data-testid="stSidebarNavCollapseButton"] span::before {
+        /* Add the icon's text content. */
+        content: 'keyboard_double_arrow_right'; 
+
+        /* Set the font to the icon font. */
+        font-family: 'Material Symbols Outlined' !important;
+
+        /* Set a visible font size for the icon itself. */
+        font-size: 1.5rem !important; /* Adjust size as needed */
+
+        /* Ensure it's visible */
+        visibility: visible !important;
+
+        /* Re-align the icon properly. */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    /* Hide Streamlit's internal sidebar controls that cause the keyboard issue */
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-    
-    [data-testid="stSidebarNav"] {
-        display: none !important;
-    }
-    
-    [data-testid="stSidebarNavItems"] {
-        display: none !important;
-    }
-    
-    /* Hide header elements that might contain the text */
-    button[kind="header"] {
-        display: none !important;
-    }
-    
-    header[data-testid="stHeader"] {
-        display: none !important;
-    }
-    
-    /* Target specific text content */
-    div:contains("keyboard_double_arrow_right"),
-    span:contains("keyboard_double_arrow_right"),
-    p:contains("keyboard_double_arrow_right"),
-    button:contains("keyboard_double_arrow_right") {
-        display: none !important;
-        visibility: hidden !important;
-        height: 0 !important;
-        width: 0 !important;
-        overflow: hidden !important;
-    }
-    
-    /* Hide navigation menu hover tooltips */
-    [data-testid="stSidebar"] .stButton button:hover:after,
-    [data-testid="stSidebar"] .stButton button:hover:before,
-    [data-testid="stSidebar"] .stButton button[title*="keyboard"] {
-        display: none !important;
-    }
-    
-    /* Hide any tooltip or title attribute containing keyboard text */
-    [title*="keyboard_double_arrow_right"] {
-        display: none !important;
-    }
-    
-    /* --- THE "FORCE IT" FIX --- */
-    /* This rule is extremely specific and uses !important to override any other styles. */
-    /* It targets the span inside the sidebar's collapse button. */
-    button[data-testid="stSidebarNavCollapseButton"] > span {
+    /* Alternative selectors in case the main one is wrong */
+    button[data-testid="stSidebarCollapseButton"] span,
+    button[data-testid="stSidebarToggle"] span,
+    button[data-testid="stSidebarNavButton"] span,
+    button[class*="collapse"] span,
+    button[class*="sidebar"] span {
         font-family: 'Material Symbols Outlined' !important;
         font-size: 0 !important;
-        color: transparent !important;
-        visibility: hidden !important;
-        display: none !important;
     }
     
-    /* Hide any sidebar collapse button entirely */
-    button[data-testid="stSidebarNavCollapseButton"] {
-        display: none !important;
-        visibility: hidden !important;
+    button[data-testid="stSidebarCollapseButton"] span::before,
+    button[data-testid="stSidebarToggle"] span::before,
+    button[data-testid="stSidebarNavButton"] span::before,
+    button[class*="collapse"] span::before,
+    button[class*="sidebar"] span::before {
+        content: 'keyboard_double_arrow_right';
+        font-family: 'Material Symbols Outlined' !important;
+        font-size: 1.5rem !important;
+        visibility: visible !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    /* Force hide any element containing keyboard text */
+    /* Nuclear option - hide any text containing keyboard_double_arrow_right */
+    * {
+        font-family: inherit;
+    }
+    
     *:contains("keyboard_double_arrow_right") {
-        display: none !important;
-        visibility: hidden !important;
         font-size: 0 !important;
         color: transparent !important;
+        visibility: hidden !important;
     }
 
     /* Enhanced button hover effects */
