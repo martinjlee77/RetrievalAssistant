@@ -37,33 +37,38 @@ def load_css():
             [data-testid="stToolbar"] { display: none !important; }
             footer { display: none !important; }
 
+            /* --- Card Wrapper Styling --- */
+            .card-wrapper {
+                transition: all 0.2s ease-in-out;
+            }
+            
             /* --- Card Container Styling --- */
             .clickable-card-container {
                 /* Layout & Sizing */
                 display: flex;
                 flex-direction: column;
                 height: 280px;
-                margin-bottom: 1rem;
 
                 /* Appearance */
                 background-color: #ffffff;
                 border: 1px solid var(--border-color);
-                border-radius: 8px;
+                border-radius: 8px 8px 0 0;
 
                 /* Interaction */
                 transition: all 0.2s ease-in-out;
             }
             
-            /* Card wrapper to capture hover events */
-            .card-wrapper:hover .clickable-card-container {
+            /* Card wrapper hover effects */
+            .card-wrapper:hover {
                 transform: translateY(-5px); /* Lift effect on hover */
+            }
+            
+            .card-wrapper:hover .clickable-card-container {
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
                 border-color: var(--secondary-color);
             }
             
-            /* Also apply hover when directly hovering the card */
-            .clickable-card-container:hover {
-                transform: translateY(-5px); /* Lift effect on hover */
+            .card-wrapper:hover .card-button-area {
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
                 border-color: var(--secondary-color);
             }
@@ -85,33 +90,32 @@ def load_css():
                 flex-grow: 1; /* Pushes the button to the bottom */
             }
 
-            /* --- Enhanced Page Link Styling --- */
-            a[data-testid="stPageLink"] {
-                display: block;
-                background-color: transparent !important;
-                border: 2px solid var(--primary-color) !important;
-                color: var(--primary-color) !important;
+            /* --- Card Button Area and Button Styling --- */
+            .card-button-area {
+                padding: 0 1.5rem 1.5rem 1.5rem;
+                background-color: #ffffff;
+                border: 1px solid var(--border-color);
+                border-top: none;
+                border-radius: 0 0 8px 8px;
+                transition: all 0.2s ease-in-out;
+            }
+            
+            .card-button {
                 text-align: center;
                 padding: 0.75rem;
                 border-radius: 5px;
-                text-decoration: none;
                 font-weight: 700;
+                background-color: transparent;
+                border: 2px solid var(--primary-color);
+                color: var(--primary-color);
                 transition: all 0.2s ease-in-out;
-                margin-top: 0 !important;
-            }
-            
-            /* Button hover when hovering the button directly */
-            a[data-testid="stPageLink"]:hover {
-                background-color: var(--secondary-color) !important;
-                border-color: var(--secondary-color) !important;
-                color: white !important;
             }
             
             /* Button hover when hovering the card wrapper */
-            .card-wrapper:hover a[data-testid="stPageLink"] {
-                background-color: var(--secondary-color) !important;
-                border-color: var(--secondary-color) !important;
-                color: white !important;
+            .card-wrapper:hover .card-button {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+                color: white;
             }
 
             /* --- Disabled Card Styling --- */
@@ -164,30 +168,25 @@ cols = st.columns(len(standards))
 for i, (code, info) in enumerate(standards.items()):
     with cols[i]:
         if info['status'] == 'available':
-            # Create a container that wraps both the card and button
-            st.markdown(f'<div class="card-wrapper">', unsafe_allow_html=True)
+            # Create a fully clickable card using JavaScript navigation
+            page_url = info['page'].replace('pages/', '').replace('.py', '')
             
-            # Create clickable card content
             card_html = f"""
-            <div class="clickable-card-container">
-                <div class="clickable-card-content">
-                    <h3>{info['icon']} {info['name']}</h3>
-                    <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
-                    <p>{info['description']}</p>
-                    <div class="card-spacer"></div>
+            <div class="card-wrapper" onclick="window.location.href='{page_url}';" style="cursor: pointer;">
+                <div class="clickable-card-container">
+                    <div class="clickable-card-content">
+                        <h3>{info['icon']} {info['name']}</h3>
+                        <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
+                        <p>{info['description']}</p>
+                        <div class="card-spacer"></div>
+                    </div>
+                </div>
+                <div class="card-button-area">
+                    <div class="card-button">🚀 Launch Analyzer</div>
                 </div>
             </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
-            
-            # Use st.page_link for proper navigation
-            st.page_link(
-                info['page'], 
-                label="🚀 Launch Analyzer",
-                use_container_width=True
-            )
-            
-            st.markdown('</div>', unsafe_allow_html=True)
 
         else:
             # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
