@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-17**
+- ✅ **KEYBOARD ICON TEXT BUG FIX**: Resolved persistent "keyboard_double_arrow_left" text display issue
+- ✅ Identified exact HTML element using browser developer tools: `span[data-testid="stIconMaterial"]`
+- ✅ Implemented precise CSS selector targeting the Material Icons font loading issue
+- ✅ Used pseudo-element technique to display correct icon while hiding broken text
+- ✅ Applied comprehensive CSS rules with multiple fallback approaches
+- ✅ Maintained Material Icons font import for proper icon rendering
+- ✅ Cleaned up navigation structure with Home page having no sidebar menu
+- ✅ Preserved functional sidebar navigation on ASC 606 and ASC 842 pages
+- **Status**: All navigation display issues resolved, app fully functional with clean UI
+
 **Date: 2025-07-16**
 - ✅ **MULTI-STANDARD PLATFORM TRANSFORMATION**: Complete restructuring to hub-and-spoke architecture per Gemini's recommendations
 - ✅ Created Home.py dashboard with Controller.cpa branding and expertise cards
