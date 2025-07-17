@@ -51,11 +51,21 @@ def load_css():
                 border-radius: 8px;
 
                 /* Interaction */
-                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                transition: all 0.2s ease-in-out;
             }
+            
+            /* Card wrapper to capture hover events */
+            .card-wrapper:hover .clickable-card-container {
+                transform: translateY(-5px); /* Lift effect on hover */
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                border-color: var(--secondary-color);
+            }
+            
+            /* Also apply hover when directly hovering the card */
             .clickable-card-container:hover {
                 transform: translateY(-5px); /* Lift effect on hover */
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                border-color: var(--secondary-color);
             }
 
             /* --- Card Content --- */
@@ -89,7 +99,16 @@ def load_css():
                 transition: all 0.2s ease-in-out;
                 margin-top: 0 !important;
             }
+            
+            /* Button hover when hovering the button directly */
             a[data-testid="stPageLink"]:hover {
+                background-color: var(--secondary-color) !important;
+                border-color: var(--secondary-color) !important;
+                color: white !important;
+            }
+            
+            /* Button hover when hovering the card wrapper */
+            .card-wrapper:hover a[data-testid="stPageLink"] {
                 background-color: var(--secondary-color) !important;
                 border-color: var(--secondary-color) !important;
                 color: white !important;
@@ -145,7 +164,10 @@ cols = st.columns(len(standards))
 for i, (code, info) in enumerate(standards.items()):
     with cols[i]:
         if info['status'] == 'available':
-            # Create clickable card with st.page_link embedded inside
+            # Create a container that wraps both the card and button
+            st.markdown(f'<div class="card-wrapper">', unsafe_allow_html=True)
+            
+            # Create clickable card content
             card_html = f"""
             <div class="clickable-card-container">
                 <div class="clickable-card-content">
@@ -164,6 +186,8 @@ for i, (code, info) in enumerate(standards.items()):
                 label="🚀 Launch Analyzer",
                 use_container_width=True
             )
+            
+            st.markdown('</div>', unsafe_allow_html=True)
 
         else:
             # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
