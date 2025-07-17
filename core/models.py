@@ -20,7 +20,7 @@ class VariableConsideration(BaseModel):
     estimated_amount: float
 
 class ContractData(BaseModel):
-    """Simplified contract data model - removed preliminary assessment"""
+    """Contract data model including preliminary assessment fields"""
     # Basic Contract Information
     analysis_title: str
     customer_name: str
@@ -36,6 +36,15 @@ class ContractData(BaseModel):
     include_citations: bool = True
     include_examples: bool = False
     additional_notes: Optional[str] = ""
+    
+    # Preliminary Assessment Fields
+    is_modification: bool = False
+    performance_obligations: List[Dict[str, Any]] = []
+    fixed_consideration: float = 0.0
+    variable_consideration: Optional[Dict[str, Any]] = None
+    financing_component: bool = False
+    material_rights: bool = False
+    customer_options: bool = False
 
 @dataclass
 class ASC606Analysis:

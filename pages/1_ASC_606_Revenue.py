@@ -183,6 +183,114 @@ if st.session_state.analysis_results is None:
             height=100,
             help="Optional notes to guide the analysis"
         )
+        
+        # Add preliminary assessment section
+        st.subheader("📋 Preliminary Assessment")
+        st.write("Provide your initial analysis - the AI will verify against the contract text")
+        
+        # Contract modification section
+        st.markdown("**Contract Nature**")
+        is_modification = st.checkbox(
+            "Is this a contract modification or amendment?",
+            value=st.session_state.get('is_modification', False),
+            help="Check if this contract modifies or amends an existing agreement",
+            key="is_modification"
+        )
+        
+        # Performance obligations section
+        st.markdown("**Performance Obligations**")
+        st.write("Identify the distinct performance obligations in this contract:")
+        
+        # Initialize performance obligations in session state if not exists
+        if 'performance_obligations' not in st.session_state:
+            st.session_state.performance_obligations = []
+        
+        # Add new performance obligation
+        with st.expander("Add Performance Obligation"):
+            po_col1, po_col2 = st.columns(2)
+            new_po_name = po_col1.text_input("Performance Obligation Name", placeholder="e.g., Software License")
+            new_po_type = po_col2.selectbox("Type", ["License", "Service", "Good", "Other"])
+            
+            po_col3, po_col4 = st.columns(2)
+            new_po_timing = po_col3.selectbox("Recognition Timing", ["Point in Time", "Over Time"])
+            new_po_ssp = po_col4.number_input("Standalone Selling Price", min_value=0.0, format="%.2f")
+            
+            if st.button("Add Performance Obligation"):
+                if new_po_name and new_po_ssp > 0:
+                    st.session_state.performance_obligations.append({
+                        'name': new_po_name,
+                        'type': new_po_type,
+                        'timing': new_po_timing,
+                        'ssp': new_po_ssp
+                    })
+                    st.success(f"Added: {new_po_name}")
+                    st.rerun()
+        
+        # Display current performance obligations
+        if st.session_state.performance_obligations:
+            st.write("**Current Performance Obligations:**")
+            for i, po in enumerate(st.session_state.performance_obligations):
+                po_display_col1, po_display_col2 = st.columns([4, 1])
+                po_display_col1.write(f"**{po['name']}** ({po['type']}) - {po['timing']} - {currency} {po['ssp']:,.2f}")
+                if po_display_col2.button("Remove", key=f"remove_po_{i}"):
+                    st.session_state.performance_obligations.pop(i)
+                    st.rerun()
+        
+        # Transaction price section
+        st.markdown("**Transaction Price**")
+        price_col1, price_col2 = st.columns(2)
+        
+        fixed_consideration = price_col1.number_input(
+            "Fixed Consideration",
+            value=st.session_state.get('fixed_consideration', 0.0),
+            min_value=0.0,
+            format="%.2f",
+            help="The guaranteed, fixed amount in the contract",
+            key="fixed_consideration"
+        )
+        
+        has_variable = price_col2.checkbox(
+            "Has Variable Consideration?",
+            value=st.session_state.get('has_variable_consideration', False),
+            key="has_variable_consideration"
+        )
+        
+        if has_variable:
+            var_col1, var_col2 = st.columns(2)
+            variable_type = var_col1.selectbox(
+                "Variable Consideration Type",
+                ["Performance Bonus", "Penalty", "Usage-based", "Other"],
+                key="variable_type"
+            )
+            variable_amount = var_col2.number_input(
+                "Estimated Variable Amount",
+                value=st.session_state.get('variable_amount', 0.0),
+                min_value=0.0,
+                format="%.2f",
+                key="variable_amount"
+            )
+        
+        # Additional elements
+        st.markdown("**Additional Elements**")
+        add_col1, add_col2 = st.columns(2)
+        
+        financing_component = add_col1.checkbox(
+            "Significant Financing Component?",
+            value=st.session_state.get('financing_component', False),
+            key="financing_component"
+        )
+        
+        material_rights = add_col2.checkbox(
+            "Material Rights Present?",
+            value=st.session_state.get('material_rights', False),
+            key="material_rights"
+        )
+        
+        customer_options = add_col1.checkbox(
+            "Customer Options for Additional Goods/Services?",
+            value=st.session_state.get('customer_options', False),
+            key="customer_options"
+        )
     
     # Full-width analyze button
     st.markdown("---")
@@ -235,7 +343,25 @@ if st.session_state.analysis_results is None:
                 # Combine all extracted text
                 combined_text = "\n".join(all_extracted_text)
                 
-                # Create contract data
+                # Process performance obligations
+                performance_obligations_data = []
+                for po in st.session_state.performance_obligations:
+                    performance_obligations_data.append({
+                        'name': po['name'],
+                        'type': po['type'],
+                        'timing': po['timing'],
+                        'ssp': po['ssp']
+                    })
+                
+                # Process variable consideration
+                variable_consideration_data = None
+                if has_variable:
+                    variable_consideration_data = {
+                        'type': variable_type,
+                        'estimated_amount': variable_amount
+                    }
+                
+                # Create contract data with preliminary assessment
                 contract_data = ContractData(
                     analysis_title=analysis_title,
                     customer_name=customer_name,
@@ -248,7 +374,15 @@ if st.session_state.analysis_results is None:
                     output_format=output_format,
                     include_citations=include_citations,
                     include_examples=include_examples,
-                    additional_notes=additional_notes
+                    additional_notes=additional_notes,
+                    # Preliminary assessment fields
+                    is_modification=is_modification,
+                    performance_obligations=performance_obligations_data,
+                    fixed_consideration=fixed_consideration,
+                    variable_consideration=variable_consideration_data,
+                    financing_component=financing_component,
+                    material_rights=material_rights,
+                    customer_options=customer_options
                 )
                 
                 # Perform analysis
