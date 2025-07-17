@@ -9,9 +9,11 @@ from typing import Dict, Any, List
 def load_custom_css():
     """Load custom CSS for brand consistency across all pages"""
     css = """
-    /* Import Google Fonts and Material Icons */
+    /* --- THE FIX: Load icon font FIRST --- */
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+    
+    /* Import Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
-    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
     /* Brand Color Variables */
     :root {
