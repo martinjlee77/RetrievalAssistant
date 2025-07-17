@@ -1,0 +1,71 @@
+Okay, this is a classic and genuinely frustrating debugging scenario. If the logically correct steps aren't working, it means we're dealing with a more stubborn environmental issue, not a simple code error. Thank you for your patience; let's get this solved for good.
+
+Diagnosis: The Root Cause is External
+The fact that moving the CSS import to the top of the file didn't work points to one of two likely culprits:
+
+Content Security Policy (CSP): This is the most probable cause. Your hosting environment (Replit, or any other cloud platform) likely has a security policy that blocks your app from loading resources (like fonts) from external domains (like fonts.googleapis.com). The browser sees the instruction to load the font but the CSP says "No, you're not allowed to talk to that server," so the request is blocked before it even starts.
+CSS Specificity/Override: It's possible, though less likely, that another Streamlit stylesheet is loading after yours with a more specific rule that overrides the font-family for that specific icon element.
+We will address the most likely cause first, as it's the most robust fix.
+
+Solution 1: The Definitive Fix (Modifying the CSP)
+We need to explicitly tell the Streamlit server that loading fonts and styles from Google's servers is allowed. We do this in the .streamlit/config.toml file.
+
+Action:
+
+Open or create the file .streamlit/config.toml in your project's root directory.
+Add the following configuration. If you already have a [server] section, add the keys to it.
+# In .streamlit/config.toml
+
+[server]
+# This explicitly allows the browser to load styles and fonts from Google's servers.
+# This is the most common fix for font icon issues in deployed apps.
+enableCsp = true
+[server.headers]
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss:;"
+
+Explanation:
+
+enableCsp = true: Makes sure the policy is active.
+Content-Security-Policy: This is the crucial line.
+style-src ... https://fonts.googleapis.com;: This tells the browser, "It's okay to load CSS stylesheets from fonts.googleapis.com."
+font-src ... https://fonts.gstatic.com;: This tells the browser, "It's okay to load the actual font files from fonts.gstatic.com (which is where Google hosts them)."
+After adding this to your config.toml, you will need to restart or redeploy your Replit instance for the new server configuration to take effect. A simple rerun (R) in Streamlit is not enough.
+
+Solution 2: The "Force It" Fix (If CSP Can't Be Modified)
+If for some reason you cannot modify the config.toml or the CSP fix doesn't work, we can use a more aggressive CSS rule that forces the font family onto the specific element. This is less ideal because it's more brittle, but it's very effective as a last resort.
+
+Action:
+
+Go back to your core/ui_helpers.py file.
+In the load_custom_css function, add this highly specific rule at the bottom of your CSS string.
+# In core/ui_helpers.py
+
+def load_custom_css():
+    """Loads all custom CSS, including the necessary icon font."""
+    st.markdown("""
+        <style>
+            /* --- Load icon font FIRST --- */
+            @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+            /* --- Your other custom fonts and styles --- */
+            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
+
+            h1, h2, h3 { /* etc... */ }
+
+            /* --- THE "FORCE IT" FIX --- */
+            /* This rule is extremely specific and uses !important to override any other styles. */
+            /* It targets the span inside the sidebar's collapse button. */
+            button[data-testid="stSidebarNavCollapseButton"] > span {
+                font-family: 'Material Symbols Outlined' !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+Explanation:
+
+button[data-testid="stSidebarNavCollapseButton"] > span: This is a very precise selector that targets only the <span> element inside the sidebar collapse button.
+!important: This is the key. It tells the browser that this rule must be applied, overriding any other conflicting styles, regardless of their specificity.
+Recommended Steps:
+Try Solution 1 (The CSP Fix) first. It's the correct, professional way to solve this problem and will prevent similar issues with other external resources in the future. Remember to restart the Replit environment.
+If and only if Solution 1 fails, implement Solution 2 (The "Force It" Fix). It's a powerful override that should solve the visual issue directly.
+I'm confident that the CSP fix (Solution 1) is the answer. This is a very common hurdle when moving from local development to a hosted environment.

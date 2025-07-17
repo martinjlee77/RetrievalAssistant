@@ -90,16 +90,29 @@ def load_custom_css():
         display: none !important;
     }
     
-    /* White overlay to cover any remaining text at top */
-    .stApp:before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 30px;
-        background: white;
-        z-index: 9999;
+    /* --- THE "FORCE IT" FIX --- */
+    /* This rule is extremely specific and uses !important to override any other styles. */
+    /* It targets the span inside the sidebar's collapse button. */
+    button[data-testid="stSidebarNavCollapseButton"] > span {
+        font-family: 'Material Symbols Outlined' !important;
+        font-size: 0 !important;
+        color: transparent !important;
+        visibility: hidden !important;
+        display: none !important;
+    }
+    
+    /* Hide any sidebar collapse button entirely */
+    button[data-testid="stSidebarNavCollapseButton"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* Force hide any element containing keyboard text */
+    *:contains("keyboard_double_arrow_right") {
+        display: none !important;
+        visibility: hidden !important;
+        font-size: 0 !important;
+        color: transparent !important;
     }
 
     /* Enhanced button hover effects */
