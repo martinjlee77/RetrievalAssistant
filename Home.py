@@ -14,11 +14,8 @@ st.set_page_config(
 )
 
 # --- Header Section ---
-st.title("AI-Powered Technical Accounting")
-st.subheader("Instant Analysis. Expert Review.")
-st.write(
-    "Leverage the industry-leading AI platform to solve complex accounting issues. Save hundreds of hours, reduce reporting risk, and gain confidence with optional partner-level review. Select an analysis module below to begin."
-)
+st.title("Controller.cpa Platform")
+st.subheader("Welcome back. Please select an analysis tool below to begin.")
 
 # --- Main Content: Call-to-Action Containers ---
 st.divider()
@@ -29,44 +26,27 @@ col1, col2 = st.columns(2)
 
 with col1:
     with st.container(border=True):
-        st.markdown("##### 📄 ASC 606: Revenue from Contracts with Customers")
+        st.markdown("##### 📄 ASC 606 - Revenue from Contracts with Customers")
         st.write(
             "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and industry interpretative guidance."
         )
-        # st.page_link is the standard, correct way to link to other pages
-        st.page_link("pages/1_ASC_606_Revenue.py",
-                     label="Go to ASC 606 Analyzer",
-                     icon="➡️")
+        # The button is colored using your theme's primaryColor.
+        if st.button("➡️ Go to ASC 606 Analyzer",
+                     type="primary",
+                     key="asc606_button"):
+            st.switch_page("pages/1_ASC_606_Revenue.py")
 
 with col2:
     with st.container(border=True):
-        st.markdown("##### 🏢 ASC 842: Leases")
+        st.markdown("##### 🏢 ASC 842 - Leases")
         st.write(
             "Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities with full support."
         )
-        st.page_link("pages/2_ASC_842_Leases.py",
-                     label="Go to ASC 842 Analyzer",
-                     icon="➡️")
+        if st.button("➡️ Go to ASC 842 Analyzer",
+                     type="primary",
+                     key="asc842_button"):
+            st.switch_page("pages/2_ASC_842_Leases.py")
 
-# --- How It Works Section ---
-st.divider()
-st.subheader("Your AI Analyst, Backed by Expert Review")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("#### 1. AI Analysis")
-    st.write(
-        "Upload your contract or input your facts. Our AI instantly analyzes the data against authoritative literature, delivering a detailed technical memo in minutes."
-    )
-
-with col2:
-    st.markdown("#### 2. Expert Review (Optional)")
-    st.write(
-        "Engage a seasoned CPA expert to review the AI's output, challenge assumptions, and provide a final sign-off for ultimate peace of mind."
-    )
-
-# You can add more containers here for future standards
 
 # --- Footer and Stats ---
 st.divider()

@@ -13,9 +13,6 @@ from pydantic import BaseModel, ValidationError
 from core.analyzers import get_analyzer
 from core.models import ContractData, ASC606Analysis
 from core.ui_helpers import (
-    load_custom_css, 
-    render_branded_header, 
-    render_standard_sidebar,
     render_analysis_metrics,
     render_step_analysis,
     render_professional_memo
@@ -30,21 +27,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load custom styling
-load_custom_css()
-
-# Simple navigation with sidebar
+# --- Sidebar Branding (Consistent with all pages) ---
 with st.sidebar:
-    st.markdown("### Navigation")
-    
-    if st.button("🏠 Home", use_container_width=True):
-        st.switch_page("Home.py")
-    
-    if st.button("📈 ASC 606 Revenue", use_container_width=True, type="primary"):
-        pass  # Already on this page
-    
-    if st.button("🏢 ASC 842 Leases", use_container_width=True):
-        st.switch_page("pages/2_ASC_842_Leases.py")
+    st.title("Controller.cpa")
+    st.divider()
 
 # Material Icons font is now loaded in load_custom_css()
 
@@ -89,13 +75,9 @@ def get_cached_analyzer():
 analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
-# Clean header (matching your design preference)
-st.markdown("""
-<div style="text-align: center; padding: 2rem 0 1rem 0;">
-    <h1 style="font-size: 2.2rem; color: #0A2B4C; margin-bottom: 0.5rem; font-family: 'Poppins', sans-serif;">ASC 606 Revenue Recognition Analysis</h1>
-    <p style="font-size: 1rem; color: #666; margin-bottom: 1rem; font-weight: 400;">AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations</p>
-</div>
-""", unsafe_allow_html=True)
+# Standard header
+st.title("ASC 606 Revenue Recognition Analysis")
+st.write("AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations")
 
 st.markdown("---")
 
