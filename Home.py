@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="Controller.cpa | Technical Accounting AI Platform",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Custom CSS for branding and styling
@@ -277,15 +277,16 @@ def load_css():
 # Load styling
 load_css()
 
-# Navigation buttons using standard Streamlit
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
+# Simple navigation with sidebar
+with st.sidebar:
+    st.markdown("### Navigation")
+    
     if st.button("🏠 Home", use_container_width=True, type="primary"):
         pass  # Already on home page
-with col2:
+    
     if st.button("📈 ASC 606 Revenue", use_container_width=True):
         st.switch_page("pages/1_ASC_606_Revenue.py")
-with col3:
+    
     if st.button("🏢 ASC 842 Leases", use_container_width=True):
         st.switch_page("pages/2_ASC_842_Leases.py")
 
