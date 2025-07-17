@@ -37,58 +37,62 @@ def load_css():
             [data-testid="stToolbar"] { display: none !important; }
             footer { display: none !important; }
 
-            /* --- Clickable Card Styling --- */
-            .clickable-card {
+            /* --- Card Container Styling --- */
+            .clickable-card-container {
                 /* Layout & Sizing */
                 display: flex;
                 flex-direction: column;
-                height: 350px;
-                padding: 1.5rem;
+                height: 280px;
+                margin-bottom: 1rem;
 
                 /* Appearance */
                 background-color: #ffffff;
                 border: 1px solid var(--border-color);
                 border-radius: 8px;
-                color: var(--text-color) !important; /* Ensure text color is inherited */
-                text-decoration: none !important; /* Remove underline from link */
 
                 /* Interaction */
                 transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             }
-            .clickable-card:hover {
+            .clickable-card-container:hover {
                 transform: translateY(-5px); /* Lift effect on hover */
                 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             }
 
             /* --- Card Content --- */
-            .clickable-card h3 {
+            .clickable-card-content {
+                padding: 1.5rem;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+            .clickable-card-content h3 {
                 font-size: 1.5rem; margin-bottom: 0.25rem;
             }
-            .clickable-card p {
+            .clickable-card-content p {
                 font-size: 1rem; color: #666;
             }
-            .clickable-card .card-spacer {
+            .clickable-card-content .card-spacer {
                 flex-grow: 1; /* Pushes the button to the bottom */
             }
 
-            /* --- NEW "Launch Analyzer" Button Style --- */
-            .card-button {
+            /* --- Enhanced Page Link Styling --- */
+            a[data-testid="stPageLink"] {
+                display: block;
+                background-color: transparent !important;
+                border: 2px solid var(--primary-color) !important;
+                color: var(--primary-color) !important;
                 text-align: center;
                 padding: 0.75rem;
                 border-radius: 5px;
+                text-decoration: none;
                 font-weight: 700;
-
-                /* Outline Style */
-                background-color: transparent;
-                border: 2px solid var(--primary-color);
-                color: var(--primary-color);
-
-                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                transition: all 0.2s ease-in-out;
+                margin-top: 0 !important;
             }
-            .clickable-card:hover .card-button {
-                background-color: var(--secondary-color);
-                border-color: var(--secondary-color);
-                color: white;
+            a[data-testid="stPageLink"]:hover {
+                background-color: var(--secondary-color) !important;
+                border-color: var(--secondary-color) !important;
+                color: white !important;
             }
 
             /* --- Disabled Card Styling --- */
@@ -141,20 +145,25 @@ cols = st.columns(len(standards))
 for i, (code, info) in enumerate(standards.items()):
     with cols[i]:
         if info['status'] == 'available':
-            # Construct the URL for the page
-            page_url = info['page'].replace('pages/', '').replace('.py', '')
-
-            # Use a single f-string to build the entire clickable card as an <a> tag
+            # Create clickable card with st.page_link embedded inside
             card_html = f"""
-            <a href="{page_url}" target="_self" class="clickable-card">
-                <h3>{info['icon']} {info['name']}</h3>
-                <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
-                <p>{info['description']}</p>
-                <div class="card-spacer"></div>
-                <div class="card-button">Launch Analyzer</div>
-            </a>
+            <div class="clickable-card-container">
+                <div class="clickable-card-content">
+                    <h3>{info['icon']} {info['name']}</h3>
+                    <p style="font-size: 0.9rem; color: #888;">Standard: {code}</p>
+                    <p>{info['description']}</p>
+                    <div class="card-spacer"></div>
+                </div>
+            </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
+            
+            # Use st.page_link for proper navigation
+            st.page_link(
+                info['page'], 
+                label="🚀 Launch Analyzer",
+                use_container_width=True
+            )
 
         else:
             # For "Coming Soon", we use a <div> instead of an <a> tag so it's not clickable
