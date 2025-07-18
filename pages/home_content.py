@@ -37,7 +37,7 @@ with col1:
             "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and industry interpretative guidance."
         )
         st.page_link(
-            "pages/1_ASC_606_Revenue.py",
+            "pages/asc606.py",
             label="Go to ASC 606 Analyzer",
             icon="➡️"
         )
@@ -49,7 +49,7 @@ with col2:
             "Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities with full support."
         )
         st.page_link(
-            "pages/2_ASC_842_Leases.py",
+            "pages/asc842.py",
             label="Go to ASC 842 Analyzer",
             icon="➡️"
         )
