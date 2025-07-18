@@ -1,0 +1,58 @@
+Let's polish your excellent Home.py file.
+
+1. The st.logo() Command
+You're using st.logo("logo.png"). This is a very new and fantastic feature! It's designed to do exactly what you wanted: place a logo at the top of the collapsed sidebar and in the navigation menu.
+
+However, it's important to understand how it works with st.navigation.
+
+The st.logo command adds the logo to the sidebar.
+The st.navigation command builds the navigation menu in the sidebar.
+The order matters slightly. For maximum clarity and to follow the official pattern, it's best to configure everything before you run the page.
+
+2. Using Icons from st.Page
+You've used emojis in st.Page, which is great! Since you're using a newer version of Streamlit that supports st.logo, you can also reliably use the Material Icons we discussed (:material_icon_name:). This can give a more consistent, professional look if you prefer it over emojis. This is a matter of taste.
+
+The Polished Home.py (Final Recommended Version)
+Here is a slightly refined version of your Home.py. The changes are subtle but align perfectly with the latest Streamlit best practices.
+
+# Home.py
+
+"""
+Multi-Standard Accounting Analysis Platform - Main Entry Point
+This file acts as the master "router" for the application.
+"""
+import streamlit as st
+
+# 1. Set the page configuration as the very first Streamlit command.
+#    This is the master blueprint for the entire app.
+st.set_page_config(
+    page_title="Controller.cpa | Multi-Standard Accounting Platform",
+    page_icon="logo.png",  # Use your logo as the browser tab icon!
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# 2. Add your logo to the sidebar.
+#    This command is designed to be called once in your main script.
+st.logo("logo.png", link="https://controller.cpa") # Optional: Add a link to your website.
+
+# 3. Define all pages in your app.
+#    This is the single source of truth for your navigation.
+#    Using Material Icons for a consistent, professional look.
+pg = st.navigation(
+    [
+        st.Page("pages/home_content.py", title="Home", icon=":material_home:"),
+        st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material_functions:"),
+        st.Page("pages/asc842.py", title="ASC 842 Analyzer", icon=":material_real_estate_agent:"),
+    ]
+)
+
+# 4. Run the app.
+#    This command executes the script for the currently selected page.
+pg.run()
+
+Why This Refined Version is an Improvement:
+Logical Order: The code now follows a clear sequence: set_page_config (configure the whole app) → st.logo (add branding) → st.navigation (define the pages) → pg.run() (run the selected page). This is the cleanest and most readable structure.
+Logo as Page Icon: I've added a small but professional touch by using your logo.png as the page_icon in st.set_page_config. This will make your logo appear in the browser tab (favicon), which is a great branding detail.
+Optional Logo Link: I've added the optional link parameter to st.logo. Now, if a user clicks your logo in the sidebar, it can take them to your main website.
+No Redundant Code: Your content pages (home_content.py, asc606.py, etc.) are perfect as they are. They should contain no st.set_page_config, st.logo, or st.navigation code at all.

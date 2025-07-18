@@ -1,26 +1,33 @@
 """
 Multi-Standard Accounting Analysis Platform - Main Entry Point
+This file acts as the master "router" for the application.
 """
 import streamlit as st
 
-# Define all pages
-home_page = st.Page("pages/home_content.py", title="Home", icon=":material/home:")
-asc606_page = st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material/functions:")
-asc842_page = st.Page("pages/asc842.py", title="ASC 842 Analyzer", icon=":material/real_estate_agent:")
-
-# Create navigation
-pg = st.navigation([home_page, asc606_page, asc842_page])
-
-# Page configuration
+# 1. Set the page configuration as the very first Streamlit command.
+#    This is the master blueprint for the entire app.
 st.set_page_config(
     page_title="Controller.cpa | Multi-Standard Accounting Platform",
-    page_icon="🏠",
+    page_icon="logo.png",  # Use your logo as the browser tab icon!
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Add logo to upper left corner of sidebar
-st.logo("logo.png")
+# 2. Add your logo to the sidebar.
+#    This command is designed to be called once in your main script.
+st.logo("logo.png", link="https://controller.cpa")  # Optional: Add a link to your website.
 
-# Run the selected page
+# 3. Define all pages in your app.
+#    This is the single source of truth for your navigation.
+#    Using Material Icons for a consistent, professional look.
+pg = st.navigation(
+    [
+        st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
+        st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material/functions:"),
+        st.Page("pages/asc842.py", title="ASC 842 Analyzer", icon=":material/real_estate_agent:"),
+    ]
+)
+
+# 4. Run the app.
+#    This command executes the script for the currently selected page.
 pg.run()
