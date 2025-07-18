@@ -58,9 +58,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ Removed redundant st.image() calls in favor of official st.logo() API
 - ✅ **DIRECTORY CLEANUP**: Cleaned up file structure and naming conventions
 - ✅ Renamed 1_ASC_606_Revenue.py to asc606.py and 2_ASC_842_Leases.py to asc842.py
-- ✅ Separated Home.py (navigation entry point) from pages/home_content.py (content)
+- ✅ Renamed Home.py to home.py for consistent lowercase naming throughout
+- ✅ Separated home.py (navigation entry point) from pages/home_content.py (content)
 - ✅ Removed unused navigation.py and contract_analyzer_app.py files
-- ✅ Updated all file references throughout the codebase
+- ✅ Updated all file references and workflow configuration throughout the codebase
 - **Status**: Professional, stable platform using standard Streamlit features exclusively
 
 **Date: 2025-07-16**
@@ -200,7 +201,7 @@ Preferred communication style: Simple, everyday language.
 
 ### File Structure
 ```
-├── Home.py                               # Main entry point with navigation
+├── home.py                               # Main entry point with navigation
 ├── pages/                                # Standard-specific analysis pages
 │   ├── home_content.py                   # Home page content
 │   ├── asc606.py                         # ASC 606 revenue recognition
