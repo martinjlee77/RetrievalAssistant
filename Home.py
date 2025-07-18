@@ -21,9 +21,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Add logo to upper left corner of sidebar
+st.logo("logo.png")
+
 # Add branding to sidebar
 with st.sidebar:
-    st.image("logo.png", width=150)
     st.title("Controller.cpa")
     st.divider()
 
