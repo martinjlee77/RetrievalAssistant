@@ -20,14 +20,6 @@ from core.ui_helpers import (
 from document_extractor import DocumentExtractor
 from navigation import build_sidebar
 
-# Page configuration
-st.set_page_config(
-    page_title="ASC 606 Revenue Analysis | Controller.cpa",
-    page_icon="📈",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 # Build centralized sidebar navigation
 build_sidebar()
 

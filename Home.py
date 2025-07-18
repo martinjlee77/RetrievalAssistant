@@ -48,11 +48,11 @@ with col1:
         st.write(
             "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and industry interpretative guidance."
         )
-        # The button is colored using your theme's primaryColor.
-        if st.button("➡️ Go to ASC 606 Analyzer",
-                     type="primary",
-                     key="asc606_button"):
-            st.switch_page("pages/1_ASC_606_Revenue.py")
+        st.page_link(
+            "pages/1_ASC_606_Revenue.py",
+            label="Go to ASC 606 Analyzer",
+            icon="➡️"
+        )
 
 with col2:
     with st.container(border=True):
@@ -60,10 +60,11 @@ with col2:
         st.write(
             "Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities with full support."
         )
-        if st.button("➡️ Go to ASC 842 Analyzer",
-                     type="primary",
-                     key="asc842_button"):
-            st.switch_page("pages/2_ASC_842_Leases.py")
+        st.page_link(
+            "pages/2_ASC_842_Leases.py",
+            label="Go to ASC 842 Analyzer",
+            icon="➡️"
+        )
 
 # --- Footer and Stats ---
 st.divider()

@@ -5,14 +5,6 @@ ASC 842 Lease Analysis Page - Coming Soon
 import streamlit as st
 from navigation import build_sidebar
 
-# Page configuration
-st.set_page_config(
-    page_title="ASC 842 Lease Analysis | Controller.cpa",
-    page_icon="🏢",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
 # Build centralized sidebar navigation
 build_sidebar()
 
