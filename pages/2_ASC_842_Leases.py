@@ -3,7 +3,7 @@ ASC 842 Lease Analysis Page - Coming Soon
 """
 
 import streamlit as st
-# No custom CSS imports needed
+from navigation import build_sidebar
 
 # Page configuration
 st.set_page_config(
@@ -13,10 +13,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Sidebar Branding (Consistent with all pages) ---
-with st.sidebar:
-    st.title("Controller.cpa")
-    st.divider()
+# Build centralized sidebar navigation
+build_sidebar()
 
 # Standard header
 st.title("ASC 842 Lease Analysis")

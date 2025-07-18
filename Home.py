@@ -2,16 +2,34 @@
 Multi-Standard Accounting Analysis Platform - Home Dashboard
 """
 import streamlit as st
+from datetime import datetime
+from navigation import build_sidebar
+from zoneinfo import ZoneInfo
 
-st.write(f"Running Streamlit Version: {st.__version__}")
-
-# Configure the page. initial_sidebar_state="expanded" is key here.
+# Page configuration
 st.set_page_config(
-    page_title="Controller.cpa | Technical Accounting AI Platform",
+    page_title="Controller.cpa | Multi-Standard Accounting Platform",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="expanded"  # Keep the navigation visible by default
+    initial_sidebar_state="expanded"
 )
+
+# --- Single Line Date/Time Header ---
+# Get the current time, convert it to Eastern Time, and format it.
+now_est = datetime.now(ZoneInfo("America/New_York"))
+
+# Format string with Time first, then Date.
+# %I:%M %p is 12-hour time, %Z is timezone, %A is Weekday, etc.
+formatted_time = now_est.strftime("%I:%M %p %Z  |  %A, %B %d, %Y")
+
+# Display it using st.markdown() to get the standard text color.
+st.markdown(formatted_time)
+
+# Streamlit version - DELETE THIS LINE IN PRODUCTION
+st.write(f"Running Streamlit Version: {st.__version__}")
+
+# Build centralized sidebar navigation
+build_sidebar()
 
 # --- Header Section ---
 st.title("Controller.cpa Platform")
@@ -46,7 +64,6 @@ with col2:
                      type="primary",
                      key="asc842_button"):
             st.switch_page("pages/2_ASC_842_Leases.py")
-
 
 # --- Footer and Stats ---
 st.divider()

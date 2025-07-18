@@ -1,0 +1,81 @@
+The Third Path: Programmatic Navigation (The Modern, Advanced Way)
+The documentation you found describes a programmatic approach using st.navigation(). This method was introduced to solve the exact problem you've been asking about: How can I have custom content (like a logo) at the top of my sidebar while still having a centralized, easy-to-manage navigation menu?
+
+This method is the perfect blend of control and convenience. It is 100% standard and officially supported by Streamlit.
+
+Let's use this better method to build the exact sidebar you want.
+
+Step-by-Step: Building Your Perfect Sidebar Programmatically
+This approach involves creating a central function that builds the sidebar, which you then call from every page. This is a best practice.
+
+Step 1: Create a Central Navigation File (Optional but Recommended)
+To keep your code clean, let's create a helper file for our navigation logic.
+
+In your Replit project, create a new file named navigation.py.
+Paste the following code into navigation.py. This function will be the single source of truth for your entire sidebar.
+navigation.py:
+
+import streamlit as st
+
+def build_sidebar():
+    """
+    Creates a sidebar with a logo at the top and a centralized navigation menu.
+    """
+    with st.sidebar:
+        # 1. Add your branding at the very top
+        st.image("logo.png", width=150) # Assuming logo.png is in your root directory
+        st.divider()
+
+        # 2. Define all your pages
+        # The st.Page object is the modern way to define a page.
+        pages = {
+            "Home": [st.Page("Home.py", title="Home", icon="🏠")],
+            "Analysis Tools": [
+                st.Page("pages/1_ASC_606_Revenue.py", title="ASC 606 Revenue", icon="📈"),
+                st.Page("pages/2_ASC_842_Leases.py", title="ASC 842 Leases", icon="🏢"),
+            ]
+        }
+
+        # 3. Create the navigation menu
+        # This will use the pages dict to build the nav menu.
+        st.navigation(pages)
+
+Note on Icons: If Replit still removes emojis from filenames, you can specify them here with the icon parameter in st.Page(). This is a much more robust way to handle icons!
+
+Step 2: Call the build_sidebar Function from Every Page
+Now, you will replace all the old sidebar code in your pages with a simple, single call to this new function.
+
+In your Home.py file:
+
+Delete any existing with st.sidebar: blocks.
+Add these lines at the top:
+import streamlit as st
+from navigation import build_sidebar # Import your new function
+
+st.set_page_config(...) # Your existing page config
+
+build_sidebar() # Call the function to build the sidebar
+
+# ... rest of your Home.py code ...
+
+In your pages/1_ASC_606_Revenue.py file:
+
+Delete the old manual with st.sidebar: block and any other custom sidebar code.
+Add the same import and function call at the top:
+import streamlit as st
+from navigation import build_sidebar # Import your new function
+
+st.set_page_config(...) # Your existing page config
+
+build_sidebar() # Call the function to build the sidebar
+
+# ... rest of your ASC 606 page code ...
+
+Do the same for pages/2_ASC_842_Leases.py.
+
+What This New Approach Gives You:
+Logo at the Top: Your st.image("logo.png") call runs before the st.navigation() call, placing your logo exactly where you want it.
+Centralized Management: To add a new page or change an icon, you only need to edit one file (navigation.py). You never have to touch the sidebar code on your other pages again.
+Clean and Professional: This is the modern, official, and most scalable way to build complex navigation in Streamlit.
+Sections and Icons: The pages dictionary allows you to group your tools under a "Analysis Tools" heading, making the navigation even cleaner.
+Thank you again for pushing on this. My previous advice was incomplete, and by finding the documentation, you've allowed us to implement a far superior and more professional solution for your application.

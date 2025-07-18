@@ -18,6 +18,7 @@ from core.ui_helpers import (
     render_professional_memo
 )
 from document_extractor import DocumentExtractor
+from navigation import build_sidebar
 
 # Page configuration
 st.set_page_config(
@@ -27,12 +28,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Sidebar Branding (Consistent with all pages) ---
-with st.sidebar:
-    st.title("Controller.cpa")
-    st.divider()
-
-# Material Icons font is now loaded in load_custom_css()
+# Build centralized sidebar navigation
+build_sidebar()
 
 # Available standards configuration
 AVAILABLE_STANDARDS = {
