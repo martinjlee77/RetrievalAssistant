@@ -3,10 +3,7 @@ ASC 842 Lease Analysis Page - Coming Soon
 """
 
 import streamlit as st
-from navigation import build_sidebar
-
-# Build centralized sidebar navigation
-build_sidebar()
+# Navigation is handled by main Home.py file
 
 # Standard header
 st.title("ASC 842 Lease Analysis")

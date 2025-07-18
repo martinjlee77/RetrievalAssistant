@@ -18,10 +18,7 @@ from core.ui_helpers import (
     render_professional_memo
 )
 from document_extractor import DocumentExtractor
-from navigation import build_sidebar
-
-# Build centralized sidebar navigation
-build_sidebar()
+# Navigation is handled by main Home.py file
 
 # Available standards configuration
 AVAILABLE_STANDARDS = {

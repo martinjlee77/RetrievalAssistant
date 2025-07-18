@@ -1,34 +1,23 @@
 """
-Multi-Standard Accounting Analysis Platform - Main Entry Point
+Home page content for the Controller.cpa platform
 """
 import streamlit as st
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-# Define all pages
-home_page = st.Page("pages/home_content.py", title="Home", icon=":material/home:")
-asc606_page = st.Page("pages/1_ASC_606_Revenue.py", title="ASC 606 Revenue", icon=":material/functions:")
-asc842_page = st.Page("pages/2_ASC_842_Leases.py", title="ASC 842 Leases", icon=":material/real_estate_agent:")
+# --- Single Line Date/Time Header ---
+# Get the current time, convert it to Eastern Time, and format it.
+now_est = datetime.now(ZoneInfo("America/New_York"))
 
-# Create navigation
-pg = st.navigation([home_page, asc606_page, asc842_page])
+# Format string with Time first, then Date.
+# %I:%M %p is 12-hour time, %Z is timezone, %A is Weekday, etc.
+formatted_time = now_est.strftime("%I:%M %p %Z  |  %A, %B %d, %Y")
 
-# Page configuration
-st.set_page_config(
-    page_title="Controller.cpa | Multi-Standard Accounting Platform",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Display it using st.markdown() to get the standard text color.
+st.markdown(formatted_time)
 
-# Add branding to sidebar
-with st.sidebar:
-    st.image("logo.png", width=150)
-    st.title("Controller.cpa")
-    st.divider()
-
-# Run the selected page
-pg.run()
+# Streamlit version - DELETE THIS LINE IN PRODUCTION
+st.write(f"Running Streamlit Version: {st.__version__}")
 
 # --- Header Section ---
 st.title("Controller.cpa Platform")
