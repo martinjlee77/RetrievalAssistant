@@ -38,7 +38,7 @@ def make_llm_call(
                 model=model,
                 messages=messages,
                 temperature=temperature,
-                response_format=response_format,
+                response_format=response_format if response_format else {"type": "text"},
                 max_tokens=max_tokens
             )
         return response.choices[0].message.content
@@ -63,7 +63,8 @@ def handle_llm_error(error: Exception):
         st.error(f"🚫 AI service error: {str(error)}")
     
     # Log error for debugging (in production, send to logging service)
-    st.write(f"Debug info: {error}")
+    if st.session_state.get("debug_mode", False):
+        st.write(f"Debug info: {error}")
 
 @st.cache_data(ttl=3600)  # Cache for 1 hour
 def cached_llm_call(

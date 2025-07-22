@@ -138,7 +138,7 @@ class PromptEnhancer:
         return base_prompt
     
     @staticmethod
-    def add_debugging_context(prompt: str, debug_info: str = None) -> str:
+    def add_debugging_context(prompt: str, debug_info: Optional[str] = None) -> str:
         """Add debugging context for prompt engineering"""
         if debug_info and st.session_state.get("debug_mode", False):
             return f"{prompt}\n\nDEBUG INFO: {debug_info}"
