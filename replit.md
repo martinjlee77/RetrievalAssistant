@@ -228,39 +228,35 @@ Preferred communication style: Simple, everyday language.
 - **Source Transparency**: Tracks hybrid RAG chunks used and relevance scores
 - **Performance Optimization**: Cached analyzer and persistent vector database
 
-### File Structure
+### Final Clean File Structure
 ```
-├── home.py                               # Main entry point with navigation
+├── index.html                            # Frontend landing page (serves first)
+├── about.html                            # About page
+├── contact.html                          # Contact page  
+├── pricing.html                          # Pricing page
+├── tools.html                            # Tools overview page
+├── style.css                             # Frontend styling
+├── home.py                               # Streamlit app entry point with navigation
 ├── pages/                                # Streamlit pages
 │   ├── home_content.py                   # Home page dashboard content
 │   ├── asc606.py                         # ASC 606 revenue recognition
 │   ├── asc842.py                         # ASC 842 lease analysis (placeholder)
 │   ├── login.py                          # User login page (placeholder)
 │   └── register.py                       # User registration page (placeholder)
-├── assets/                               # Static assets (following best practices)
-│   ├── css/
-│   │   └── style.css                     # Frontend styling
-│   ├── images/
-│   │   └── logo.png                      # Controller.cpa logo
-│   └── html_templates/                   # Static HTML pages
-│       ├── index.html                    # Landing page
-│       ├── about.html                    # About us page
-│       ├── contact.html                  # Contact form
-│       ├── pricing.html                  # Pricing information
-│       └── tools.html                    # Tools overview
-├── utils/                                # Streamlit best practices utilities
-│   ├── llm.py                           # OpenAI API calls and error handling
+├── assets/                               # Static assets
+│   └── images/
+│       └── logo.png                      # Controller.cpa logo
+├── utils/                                # Core utilities (following best practices)
+│   ├── llm.py                           # OpenAI API calls, knowledge base, debugging tools
 │   ├── prompt.py                        # Centralized prompt templates
-│   └── auth.py                          # Authentication utilities (placeholder)
+│   ├── auth.py                          # Authentication utilities (placeholder)
+│   ├── document_extractor.py            # Multi-format document processing
+│   └── asc606_analyzer.py               # Consolidated ASC 606 hybrid analyzer
 ├── core/                                 # Shared backend logic
 │   ├── analyzers.py                     # Analyzer factory and base classes
 │   ├── models.py                        # Centralized data models
 │   ├── knowledge_base.py                # Multi-standard knowledge base manager
 │   └── ui_helpers.py                    # Shared UI components and styling
-├── hybrid_asc606_analyzer.py             # ASC 606 hybrid RAG engine
-├── asc606_knowledge_base.py              # ASC 606 ChromaDB system
-├── comprehensive_analysis_framework.py   # ASC 606 analysis framework
-├── document_extractor.py                 # Multi-format document processing
 ├── attached_assets/                      # Authoritative sources (cleaned)
 │   ├── 05_overview_background_*.txt      # ASC 606 Background & Overview
 │   ├── 10_objectives_*.txt               # ASC 606 Objectives

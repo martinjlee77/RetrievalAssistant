@@ -17,7 +17,7 @@ from core.ui_helpers import (
     render_step_analysis,
     render_professional_memo
 )
-from document_extractor import DocumentExtractor
+from utils.document_extractor import DocumentExtractor
 from utils.llm import create_debug_sidebar
 # Navigation is handled by main Home.py file
 
