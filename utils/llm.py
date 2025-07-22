@@ -180,6 +180,33 @@ def validate_api_key() -> bool:
     except Exception:
         return False
 
+def get_knowledge_base():
+    """Get or initialize the ASC 606 knowledge base (consolidated from legacy file)"""
+    # Import here to avoid circular imports
+    import chromadb
+    from chromadb.config import Settings
+    import os
+    
+    persist_directory = "asc606_knowledge_base"
+    
+    try:
+        client = chromadb.PersistentClient(
+            path=persist_directory,
+            settings=Settings(anonymized_telemetry=False)
+        )
+        collection = client.get_or_create_collection(
+            name="asc606_paragraphs",
+            metadata={"description": "ASC 606 paragraphs with metadata filtering"},
+            embedding_function=chromadb.utils.embedding_functions.OpenAIEmbeddingFunction(
+                api_key=os.environ.get("OPENAI_API_KEY"),
+                model_name="text-embedding-3-small"
+            )
+        )
+        return collection
+    except Exception as e:
+        st.error(f"Failed to load knowledge base: {e}")
+        return None
+
 def extract_contract_terms(
     client: OpenAI,
     contract_text: str, 

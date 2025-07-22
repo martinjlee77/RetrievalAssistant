@@ -40,8 +40,8 @@ def get_analyzer(standard: str) -> BaseAnalyzer:
     """Factory function to get the appropriate analyzer for a standard"""
     
     if standard == "ASC 606":
-        from hybrid_asc606_analyzer import HybridASC606Analyzer
-        return HybridASC606Analyzer()
+        from utils.asc606_analyzer import ASC606Analyzer
+        return ASC606Analyzer()
     
     elif standard == "ASC 842":
         from core.analyzers.asc842_analyzer import ASC842Analyzer
