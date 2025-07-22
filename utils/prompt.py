@@ -1,6 +1,6 @@
 """
-Prompt Templates and Management - Following Streamlit Best Practices
-Centralized prompt templates for consistent AI interactions
+Centralized Prompt Management for Multi-Standard Platform
+Provides reusable prompt templates with dynamic context injection
 """
 from typing import Dict, List, Any, Optional
 import streamlit as st

@@ -18,6 +18,7 @@ from core.ui_helpers import (
     render_professional_memo
 )
 from document_extractor import DocumentExtractor
+from utils.llm import create_debug_sidebar
 # Navigation is handled by main Home.py file
 
 # Available standards configuration
@@ -64,6 +65,9 @@ extractor = DocumentExtractor()
 # Standard header
 st.title("ASC 606 Revenue Recognition Analysis")
 st.write("AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations")
+
+# Add debugging controls in sidebar
+debug_config = create_debug_sidebar()
 
 st.markdown("---")
 
@@ -286,8 +290,9 @@ if st.session_state.analysis_results is None:
             st.stop()
         
         # Process the analysis
-        with st.spinner("🔍 Analyzing contract..."):
+        with st.status("🔍 Analyzing contract...", expanded=True) as status:
             try:
+                st.write("📄 Extracting text from uploaded documents...")
                 # Extract text from uploaded files
                 all_extracted_text = []
                 all_metadata = []
@@ -310,6 +315,9 @@ if st.session_state.analysis_results is None:
                 
                 # Combine all extracted text
                 combined_text = "\n".join(all_extracted_text)
+                
+                st.write("🧠 Processing contract data and preliminary assessment...")
+                time.sleep(0.5)  # Brief pause for UX
                 
                 # Process performance obligations
                 performance_obligations_data = []
@@ -353,14 +361,28 @@ if st.session_state.analysis_results is None:
                     customer_options=customer_options
                 )
                 
-                # Perform analysis
-                analysis_results = analyzer.analyze_contract(combined_text, contract_data)
+                st.write("⚡ Running AI analysis with hybrid RAG system...")
+                
+                # Pass debug configuration to analyzer
+                analysis_results = analyzer.analyze_contract(
+                    combined_text, 
+                    contract_data,
+                    debug_config=debug_config
+                )
                 
                 # Store results in session state
                 st.session_state.analysis_results = analysis_results
                 st.session_state.contract_data = contract_data
                 
-                st.success("✅ Analysis complete!")
+                status.update(label="✅ Analysis complete!", state="complete")
+                st.success("Analysis completed successfully!")
+                
+                # Show debugging information if enabled
+                if debug_config.get("show_raw_response") and hasattr(analysis_results, 'raw_response'):
+                    with st.expander("🔧 Raw AI Response (Debug)", expanded=False):
+                        st.text(analysis_results.raw_response)
+                
+                time.sleep(1)  # Brief pause before rerun
                 st.rerun()
                 
             except Exception as e:
@@ -382,8 +404,21 @@ else:
             st.session_state.contract_data = None
             st.rerun()
     
-    # Render analysis metrics
-    render_analysis_metrics(analysis_results.__dict__)
+    # Render analysis metrics with better formatting
+    with st.container(border=True):
+        st.markdown("**📊 Analysis Overview**")
+        
+        metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
+        
+        with metrics_col1:
+            st.metric("Source Quality", analysis_results.source_quality or "Hybrid RAG")
+        with metrics_col2:
+            st.metric("Analysis Depth", contract_data.analysis_depth.title())
+        with metrics_col3:
+            st.metric("Currency", contract_data.currency)
+        with metrics_col4:
+            citations_count = len(analysis_results.citations) if analysis_results.citations else 0
+            st.metric("Citations", citations_count)
     
     st.markdown("---")
     
@@ -398,12 +433,35 @@ else:
         ("Revenue Recognition", analysis_results.step5_revenue_recognition)
     ]
     
-    for step_name, step_data in steps:
-        render_step_analysis(step_name, step_data)
+    # Enhanced step analysis display
+    for i, (step_name, step_data) in enumerate(steps, 1):
+        with st.expander(f"**Step {i}: {step_name}**", expanded=False):
+            if isinstance(step_data, dict):
+                # Pretty print JSON data
+                st.json(step_data)
+            else:
+                # Display text data with markdown
+                st.markdown(step_data)
     
-    # Professional Memo
+    # Professional Memo with improved formatting
     st.markdown("---")
-    render_professional_memo(analysis_results.professional_memo)
+    st.subheader("📋 Professional Accounting Memo")
+    
+    if analysis_results.professional_memo:
+        with st.container(border=True):
+            # Format memo with proper markdown
+            st.markdown(analysis_results.professional_memo)
+            
+            # Download button for memo
+            memo_bytes = analysis_results.professional_memo.encode('utf-8')
+            st.download_button(
+                label="📄 Download Memo",
+                data=memo_bytes,
+                file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.txt",
+                mime="text/plain"
+            )
+    else:
+        st.info("No memo generated for this analysis.")
     
     # Additional Analysis Details
     st.markdown("---")
