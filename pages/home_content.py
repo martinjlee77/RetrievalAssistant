@@ -1,23 +1,21 @@
-"""
-Home page content for the Controller.cpa platform
-"""
 import streamlit as st
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+
 # --- Single Line Date/Time Header ---
 # Get the current time, convert it to Eastern Time, and format it.
-now_est = datetime.now(ZoneInfo("America/New_York"))
+# now_est = datetime.now(ZoneInfo("America/New_York"))
 
 # Format string with Time first, then Date.
 # %I:%M %p is 12-hour time, %Z is timezone, %A is Weekday, etc.
-formatted_time = now_est.strftime("%I:%M %p %Z  |  %A, %B %d, %Y")
+# formatted_time = now_est.strftime("%I:%M %p %Z  |  %A, %B %d, %Y")
 
 # Display it using st.markdown() to get the standard text color.
-st.markdown(formatted_time)
+# st.markdown(formatted_time)
 
 # Streamlit version - DELETE THIS LINE IN PRODUCTION
-st.write(f"Running Streamlit Version: {st.__version__}")
+# st.write(f"Running Streamlit Version: {st.__version__}")
 
 # --- Header Section ---
 st.title("Controller.cpa Platform")
