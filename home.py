@@ -15,7 +15,7 @@ st.set_page_config(
 
 # 2. Add your logo to the sidebar.
 #    This command is designed to be called once in your main script.
-st.logo("assets/images/logo.png", link="https://controller.cpa")  # Optional: Add a link to your website.
+st.logo("assets/images/logo.png")  # Logo in sidebar (no internal linking supported by Streamlit)
 
 # 3. Define all pages in your app.
 #    This is the single source of truth for your navigation.
