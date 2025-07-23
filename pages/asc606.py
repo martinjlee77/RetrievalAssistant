@@ -21,30 +21,6 @@ from utils.document_extractor import DocumentExtractor
 from utils.llm import create_debug_sidebar
 # Navigation is handled by main Home.py file
 
-# Available standards configuration
-AVAILABLE_STANDARDS = {
-    'ASC 606': {
-        'name': 'Revenue from Contracts with Customers',
-        'description': 'Analyze revenue recognition under the 5-step model',
-        'status': 'available'
-    },
-    'ASC 842': {
-        'name': 'Leases',
-        'description': 'Analyze lease classification and measurement',
-        'status': 'coming_soon'
-    },
-    'ASC 815': {
-        'name': 'Derivatives and Hedging',
-        'description': 'Analyze derivative instruments and hedging activities',
-        'status': 'coming_soon'
-    },
-    'ASC 326': {
-        'name': 'Credit Losses',
-        'description': 'Analyze current expected credit losses',
-        'status': 'coming_soon'
-    }
-}
-
 # Initialize session state
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
@@ -64,24 +40,25 @@ extractor = DocumentExtractor()
 
 # Standard header
 st.title("ASC 606 Revenue Recognition Analysis")
-st.write("AI-powered contract analysis using authoritative FASB guidance and Big 4 interpretations")
+st.write("AI-powered (hybrid RAG using ChatGPT-4o) contract analysis using authoritative FASB guidance and industry leading interpretations.")
 
 # Add debugging controls in sidebar
 debug_config = create_debug_sidebar()
-
-st.markdown("---")
 
 # Main application logic
 if st.session_state.analysis_results is None:
     # Render upload interface
     st.header("Start New ASC 606 Analysis")
-    st.write("Complete the required fields and upload your document, then click Analyze.")
+    st.write("Complete the required fields(*) then click Analyze.")
     
-    col1, col2 = st.columns(2, gap="large")
+    # Create three tabs
+    tab1, tab2, tab3 = st.tabs([
+        "📋 Contract Details & Upload",
+        "📝 Preliminary Assessment", 
+        "⚙️ Analysis Configuration"
+    ])
     
-    with col1:
-        st.subheader("📋 Required Information")
-        
+    with tab1:
         analysis_title = st.text_input(
             "Analysis Title / Contract ID *",
             placeholder="e.g., Q4 Project Phoenix SOW",
@@ -122,40 +99,7 @@ if st.session_state.analysis_results is None:
             help="Upload contracts, amendments, invoices, or related documents (max 5 files)"
         )
     
-    with col2:
-        st.subheader("⚙️ Analysis Configuration")
-        
-        analysis_depth = st.selectbox(
-            "Analysis Depth",
-            ["Standard Analysis", "Detailed Analysis", "Comprehensive Analysis"],
-            help="Choose the level of detail for your analysis"
-        )
-        
-        output_format = st.selectbox(
-            "Output Format",
-            ["Professional Memo", "Executive Summary", "Technical Analysis"],
-            help="Select the format for your analysis results"
-        )
-        
-        include_citations = st.checkbox(
-            "Include Citations",
-            value=True,
-            help="Include authoritative source citations in the analysis"
-        )
-        
-        include_examples = st.checkbox(
-            "Include Examples",
-            value=False,
-            help="Include practical examples and illustrations"
-        )
-        
-        additional_notes = st.text_area(
-            "Additional Notes",
-            placeholder="Any specific requirements or context for this analysis...",
-            height=100,
-            help="Optional notes to guide the analysis"
-        )
-        
+    with tab2:
         # Add preliminary assessment section
         st.subheader("📋 Preliminary Assessment")
         st.write("Provide your initial analysis - the AI will verify against the contract text")
@@ -262,6 +206,40 @@ if st.session_state.analysis_results is None:
             "Customer Options for Additional Goods/Services?",
             value=st.session_state.get('customer_options', False),
             key="customer_options"
+        )
+    
+    with tab3:
+        st.subheader("⚙️ Analysis Configuration")
+        
+        analysis_depth = st.selectbox(
+            "Analysis Depth",
+            ["Standard Analysis", "Detailed Analysis", "Comprehensive Analysis"],
+            help="Choose the level of detail for your analysis"
+        )
+        
+        output_format = st.selectbox(
+            "Output Format",
+            ["Professional Memo", "Executive Summary", "Technical Analysis"],
+            help="Select the format for your analysis results"
+        )
+        
+        include_citations = st.checkbox(
+            "Include Citations",
+            value=True,
+            help="Include authoritative source citations in the analysis"
+        )
+        
+        include_examples = st.checkbox(
+            "Include Examples",
+            value=False,
+            help="Include practical examples and illustrations"
+        )
+        
+        additional_notes = st.text_area(
+            "Additional Notes",
+            placeholder="Any specific requirements or context for this analysis...",
+            height=100,
+            help="Optional notes to guide the analysis"
         )
     
     # Full-width analyze button

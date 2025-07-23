@@ -1,0 +1,45 @@
+Replit AI Coder Prompt: Refactor Streamlit UI to a Tabbed Layout
+Objective: Refactor the existing two-column input form on the ASC 606 analysis page into a more organized, single-column tabbed layout. This will improve user experience by reducing initial clutter and grouping related inputs logically. The final "Analyze Contract" button should be placed outside and below the tabs so it's always visible.
+
+Instructions:
+
+Please perform the following refactoring steps on the main application page script:
+
+Remove the Two-Column Layout: Delete the col1, col2 = st.columns(2, gap="large") and the associated with col1: and with col2: blocks. All input elements should now be placed within a single-column structure.
+
+Create Three Tabs: Immediately after the st.header("Start New ASC 606 Analysis") and its descriptive text, create three tabs using st.tabs. The tabs should be named:
+
+"📋 Contract Details & Upload"
+"📝 Preliminary Assessment"
+"⚙️ Analysis Configuration"
+Relocate Input Fields into the Correct Tabs: Move the existing Streamlit input widgets into the corresponding with tabX: blocks as follows:
+
+Inside with tab1: ("📋 Contract Details & Upload"):
+
+analysis_title (st.text_input)
+customer_name (st.text_input)
+arrangement_description (st.text_area)
+The two-column layout for contract_start and contract_end (st.date_input)
+currency (st.selectbox)
+The st.subheader("📄 Document Upload")
+uploaded_files (st.file_uploader)
+Inside with tab2: ("📝 Preliminary Assessment"):
+
+The st.subheader("📋 Preliminary Assessment") and its descriptive text.
+The st.markdown("**Contract Nature**") section, including the is_modification checkbox.
+The st.markdown("**Performance Obligations**") section, including the expander to add new POs and the logic to display the current list.
+The st.markdown("**Transaction Price**") section, including the fixed_consideration input and the conditional variable_consideration inputs.
+The st.markdown("**Additional Elements**") section, including the three checkboxes (financing_component, material_rights, customer_options).
+Inside with tab3: ("⚙️ Analysis Configuration"):
+
+The st.subheader("⚙️ Analysis Configuration")
+analysis_depth (st.selectbox)
+output_format (st.selectbox)
+include_citations (st.checkbox)
+include_examples (st.checkbox)
+additional_notes (st.text_area)
+Position the "Analyze" Button Correctly: The st.markdown("---") separator and the st.button("🔍 Analyze Contract", ...) should be placed outside and after the tab block. This ensures the button is always visible to the user, regardless of which tab they have selected. The validation logic and the st.status block should remain directly inside the if st.button(...) block as they are now.
+
+Ensure State Persistence: Verify that all widgets that use st.session_state or have a key parameter continue to do so. The refactoring should not affect the state management of the application.
+
+Please apply these changes to the code. The rest of the logic for processing and displaying results should remain unchanged.
