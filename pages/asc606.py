@@ -242,29 +242,52 @@ if st.session_state.analysis_results is None:
             help="Optional notes to guide the analysis"
         )
     
+    # Validation function
+    def validate_form(data):
+        """Gathers all validation errors into a list."""
+        errors = []
+        
+        # Tab 1: Contract Details & Upload validation
+        if not data['analysis_title']:
+            errors.append("Analysis Title is required.")
+        if not data['customer_name']:
+            errors.append("Customer Name is required.")
+        if not data['arrangement_description']:
+            errors.append("Arrangement Description is required.")
+        if not data['uploaded_files']:
+            errors.append("At least one document must be uploaded.")
+        if data['uploaded_files'] and len(data['uploaded_files']) > 5:
+            errors.append("Please upload a maximum of 5 files.")
+        
+        # Tab 2: Preliminary Assessment validation
+        if data['fixed_consideration'] is None:
+            errors.append("Fixed Consideration is required (can be 0).")
+        if not data['performance_obligations']:
+            errors.append("At least one Performance Obligation must be added.")
+        
+        return errors
+
     # Full-width analyze button
     st.markdown("---")
     
     if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
-        # Validation
-        if not analysis_title:
-            st.error("Please provide an analysis title")
-            st.stop()
+        # Create form data dictionary for validation
+        form_data = {
+            "analysis_title": analysis_title,
+            "customer_name": customer_name, 
+            "arrangement_description": arrangement_description,
+            "uploaded_files": uploaded_files,
+            "fixed_consideration": fixed_consideration,
+            "performance_obligations": st.session_state.performance_obligations
+        }
         
-        if not customer_name:
-            st.error("Please provide a customer name")
-            st.stop()
+        # Validate all fields at once
+        validation_errors = validate_form(form_data)
         
-        if not arrangement_description:
-            st.error("Please provide an arrangement description")
-            st.stop()
-        
-        if not uploaded_files:
-            st.error("Please upload at least one document")
-            st.stop()
-        
-        if len(uploaded_files) > 5:
-            st.error("Please upload a maximum of 5 files")
+        if validation_errors:
+            st.error("Please fix the following issues:")
+            for error in validation_errors:
+                st.error(f"• {error}")
             st.stop()
         
         # Process the analysis
