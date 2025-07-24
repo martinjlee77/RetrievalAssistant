@@ -20,8 +20,8 @@ class VariableConsideration(BaseModel):
     estimated_amount: float
 
 class ContractData(BaseModel):
-    """Contract data model including preliminary assessment fields"""
-    # Basic Contract Information
+    """Contract data model matching the new UI structure with toggles"""
+    # Basic Contract Information  
     analysis_title: str
     customer_name: str
     arrangement_description: str
@@ -29,35 +29,27 @@ class ContractData(BaseModel):
     contract_end: date
     currency: str
     uploaded_file_name: str
-    contract_types: Optional[List[str]] = None
+    contract_types: List[str]
+    analysis_depth: str
+    output_format: str
+    additional_notes: Optional[str] = None
     
-    # Analysis Configuration
-    analysis_depth: str = "Standard Analysis"
-    output_format: str = "Professional Memo"
-    include_citations: bool = True
-    include_examples: bool = False
-    additional_notes: Optional[str] = ""
-    
-    # Preliminary Assessment Fields
-    is_modification: bool = False
-    is_combined_contract: bool = False
-    performance_obligations: List[Dict[str, Any]] = []
-    fixed_consideration: float = 0.0
-    variable_consideration: Optional[Dict[str, Any]] = None
-    financing_component: bool = False
-    material_rights: bool = False
-    customer_options: bool = False
-    collectibility_assessment: str = "Probable"
-    has_consideration_payable: bool = False
-    consideration_payable_amount: float = 0.0
-    
-    # Enhanced ASC 606 Assessment Fields (Optional)
-    original_contract_uploaded: Optional[str] = None
-    principal_agent_involved: bool = False
+    # All fields below correspond to the new UI toggles and text areas
+    collectibility: bool
+    is_combined_contract: bool
+    is_modification: bool
+    original_contract_uploaded: Optional[bool] = None
+    principal_agent_involved: bool
     principal_agent_details: Optional[str] = None
-    noncash_consideration_involved: bool = False
+    variable_consideration_involved: bool
+    variable_consideration_details: Optional[str] = None
+    financing_component_involved: bool
+    financing_component_details: Optional[str] = None
+    noncash_consideration_involved: bool
     noncash_consideration_details: Optional[str] = None
-    ssp_represents_contract_price: bool = True
+    consideration_payable_involved: bool
+    consideration_payable_details: Optional[str] = None
+    ssp_represents_contract_price: bool
     revenue_recognition_timing_details: Optional[str] = None
 
 @dataclass

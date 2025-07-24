@@ -1,0 +1,161 @@
+Instructions for the Replit Developer
+Hello,
+
+Thank you for your work on the asc606.py file. We need to make several important updates to align the application with the final design specifications. The goal is to create a more compact, user-friendly interface and ensure the backend data processing is robust and correct.
+
+Please follow these four steps carefully.
+
+Instruction 1: Overhaul the User Interface in Tab 2
+Problem: The current "Analysis Questions" tab is a long, scrolling list of dropdowns. This feels daunting to the user.
+
+Solution: We will replace the entire layout with st.expander for each of the 5 steps and use st.toggle for all "Yes/No" questions. This makes the form feel much shorter and more interactive.
+
+Action: Replace the entire contents of the with tab2: block with the following code:
+
+# Place this code inside the "with tab2:" block
+st.write("Your answers provide crucial context for the AI analysis. **Required fields are marked with an asterisk (*).**")
+
+# Initialize all optional detail variables to None to prevent errors
+original_contract_uploaded = None
+principal_agent_details = None
+variable_consideration_details = None
+financing_component_details = None
+noncash_consideration_details = None
+consideration_payable_details = None
+
+with st.expander("**Step 1: Identify the Contract**", expanded=True):
+    col1, col2 = st.columns(2, gap="medium")
+    with col1:
+        collectibility = st.toggle("Collectibility is probable *", value=True, help="A contract does not exist under ASC 606 if collection is not probable.")
+        is_modification = st.toggle("This is a contract modification *", value=False)
+    with col2:
+        is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True)
+        if is_modification:
+            original_contract_uploaded = st.toggle("Is the original contract uploaded?", value=False)
+
+with st.expander("**Step 2: Identify Performance Obligations**"):
+    st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
+    principal_agent_involved = st.toggle("Is a third party involved in providing goods or services?")
+    if principal_agent_involved:
+        principal_agent_details = st.text_area("Describe the arrangement and specify who controls the good/service:", placeholder="e.g., We are an agent for Party X's software...", label_visibility="collapsed")
+
+with st.expander("**Step 3: Determine the Transaction Price**"):
+    col3, col4 = st.columns(2, gap="medium")
+    with col3:
+        variable_consideration_involved = st.toggle("Includes variable consideration?")
+        noncash_consideration_involved = st.toggle("Includes noncash consideration?")
+    with col4:
+        financing_component_involved = st.toggle("Includes significant financing?")
+        consideration_payable_involved = st.toggle("Includes consideration payable?")
+
+    if variable_consideration_involved:
+        variable_consideration_details = st.text_area("Details on variable consideration:", placeholder="e.g., A $10,000 bonus is 90% probable.", label_visibility="collapsed")
+    if financing_component_involved:
+        financing_component_details = st.text_area("Details on financing component:", placeholder="e.g., Customer pays upfront for a 3-year service.", label_visibility="collapsed")
+    if noncash_consideration_involved:
+        noncash_consideration_details = st.text_area("Details on noncash consideration:", placeholder="e.g., Customer provides equipment valued at $50K.", label_visibility="collapsed")
+    if consideration_payable_involved:
+        consideration_payable_details = st.text_area("Details on consideration payable:", placeholder="e.g., Customer receives a $5,000 credit for marketing.", label_visibility="collapsed")
+
+with st.expander("**Step 4: Allocate the Transaction Price**"):
+    ssp_represents_contract_price = st.toggle("Do contract prices represent Standalone Selling Price (SSP)?", value=True, help="SSP is the price at which you would sell a good or service separately.")
+
+with st.expander("**Step 5: Recognize Revenue**"):
+    revenue_recognition_timing_details = st.text_area("Describe when control transfers for each major performance obligation:", placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
+
+st.markdown("---"); st.info("Continue to the **⚙️ 3. Analyze** tab.", icon="➡️")
+
+Instruction 2: Correct the ContractData Model
+Problem: The ContractData model used by the application is likely incorrect. It needs to match the new UI elements (e.g., st.toggle provides a boolean True/False, not a string like "Yes").
+
+Solution: Use the following Pydantic model. This is the single source of truth for our data structure.
+
+Action: Ensure this ContractData class definition is present and correct at the top of your script.
+
+# This Pydantic model must be defined correctly in the script
+from pydantic import BaseModel
+
+class ContractData(BaseModel):
+    analysis_title: str; customer_name: str; arrangement_description: str
+    contract_start: date; contract_end: date; currency: str
+    uploaded_file_name: str; contract_types: List[str]
+    analysis_depth: str; output_format: str; additional_notes: Optional[str] = None
+    # All fields below correspond to the new UI toggles and text areas
+    collectibility: bool
+    is_combined_contract: bool
+    is_modification: bool
+    original_contract_uploaded: Optional[bool] = None
+    principal_agent_involved: bool
+    principal_agent_details: Optional[str] = None
+    variable_consideration_involved: bool
+    variable_consideration_details: Optional[str] = None
+    financing_component_involved: bool
+    financing_component_details: Optional[str] = None
+    noncash_consideration_involved: bool
+    noncash_consideration_details: Optional[str] = None
+    consideration_payable_involved: bool
+    consideration_payable_details: Optional[str] = None
+    ssp_represents_contract_price: bool
+    revenue_recognition_timing_details: Optional[str] = None
+
+Instruction 3: Fix the Validation and Data Processing in Tab 3
+Problem: The "Analyze" button logic is broken. The validate_form function is incorrect, and the code that creates the ContractData object does not correctly gather data from the new UI.
+
+Solution: We need to replace the validation function and the ContractData instantiation logic.
+
+Action: Inside the with tab3: block, replace the existing validate_form function and the ContractData(...) creation block with the following corrected code:
+
+# This code should be inside the "with tab3:" block
+
+# 1. Replace the existing validation function with this one:
+def validate_form():
+    """Validate required fields from Tab 1"""
+    errors = []
+    if not analysis_title: errors.append("Analysis Title is required (Tab 1).")
+    if not customer_name: errors.append("Customer Name is required (Tab 1).")
+    if not arrangement_description: errors.append("Arrangement Description is required (Tab 1).")
+    if not contract_types: errors.append("At least one Document Type must be selected (Tab 1).")
+    if not uploaded_files: errors.append("At least one document must be uploaded (Tab 1).")
+    return errors
+
+st.markdown("---")
+if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
+    validation_errors = validate_form() # Call the corrected function
+    if validation_errors:
+        st.error("Please fix the following issues before submitting:"); [st.warning(f"• {e}") for e in validation_errors]; st.stop()
+
+    with st.status("🔍 Analyzing contract...", expanded=True) as status:
+        try:
+            # ... text extraction logic ...
+            st.write("📄 Extracting text from documents...")
+            all_extracted_text = [extractor.extract_text(f)['text'] for f in uploaded_files if extractor.extract_text(f).get('text')]
+            if not all_extracted_text: st.error("No text could be extracted."); st.stop()
+            combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
+
+            st.write("🧠 Processing your answers...")
+
+            # 2. Replace the ContractData creation logic with this block:
+            contract_data = ContractData(
+                analysis_title=analysis_title, customer_name=customer_name, arrangement_description=arrangement_description, contract_start=contract_start,
+                contract_end=contract_end, currency=currency, uploaded_file_name=", ".join([f.name for f in uploaded_files]), contract_types=contract_types,
+                analysis_depth=analysis_depth, output_format=output_format, additional_notes=additional_notes,
+                # All data from Tab 2 is now correctly passed from the new UI
+                collectibility=collectibility, is_combined_contract=is_combined_contract, is_modification=is_modification, original_contract_uploaded=original_contract_uploaded,
+                principal_agent_involved=principal_agent_involved, principal_agent_details=principal_agent_details,
+                variable_consideration_involved=variable_consideration_involved, variable_consideration_details=variable_consideration_details,
+                financing_component_involved=financing_component_involved, financing_component_details=financing_component_details,
+                noncash_consideration_involved=noncash_consideration_involved, noncash_consideration_details=noncash_consideration_details,
+                consideration_payable_involved=consideration_payable_involved, consideration_payable_details=consideration_payable_details,
+                ssp_represents_contract_price=ssp_represents_contract_price, revenue_recognition_timing_details=revenue_recognition_timing_details
+            )
+
+            st.write("⚡ Running AI analysis...")
+            # ... rest of the analysis execution ...
+            analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
+            st.session_state.analysis_results = analysis_results; st.session_state.contract_data = contract_data
+            status.update(label="✅ Analysis complete!", state="complete")
+            time.sleep(1); st.rerun()
+        except Exception as e:
+            st.error(f"An unexpected error occurred during analysis: {str(e)}"); st.exception(e); st.stop()
+
+By following these three instructions, the application will match the final design: it will be more compact, more user-friendly, and functionally correct. Thank you.

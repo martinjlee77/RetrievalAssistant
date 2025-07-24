@@ -97,137 +97,60 @@ if st.session_state.analysis_results is None:
                 "Once the fields above are complete, continue to the **📝 Step 2: Analysis Questions** tab.",
                 icon="➡️")
 
-    # Tab 2: ASC 606 Analysis Questions (Gemini's Clean Layout)
+    # Tab 2: Analysis Questions (New Compact Design with Expanders)
     with tab2:
-        st.write(
-            "This section helps our AI understand key details about the contract that may not be explicitly stated in the documents. Your answers will guide the analysis."
-        )
-        st.markdown("---")
+        st.write("Your answers provide crucial context for the AI analysis. **Required fields are marked with an asterisk (*).**")
 
-        collectibility_assessment = st.selectbox(
-            "Is it probable that the entity will collect the consideration?",
-            options=["Probable", "Not Probable"],  # Removed "Uncertain" per Gemini
-            index=0,
-            help="If collection of the full contract price is not probable, a contract may still exist for a lesser amount that is probable of collection."
-        )
-        
-        is_combined_contract_dropdown = st.selectbox(
-            "Should all uploaded documents be evaluated together as a single deal?",
-            options=["Yes", "No"], 
-            index=0,
-            help="Multiple documents may need to be combined per ASC 606-10-25-9"
-        )
-        is_combined_contract = is_combined_contract_dropdown == "Yes"
-        
-        is_modification_dropdown = st.selectbox(
-            "Is this a modification to an existing contract?",
-            options=["Yes", "No"], 
-            index=1,
-            help="Contract modifications require special accounting per ASC 606-10-25-10"
-        )
-        is_modification = is_modification_dropdown == "Yes"
-        
+        # Initialize all optional detail variables to None to prevent errors
         original_contract_uploaded = None
-        if is_modification:
-            original_contract_uploaded = st.selectbox(
-                "Have you also uploaded the original contract documents?",
-                options=["Yes", "No"], 
-                index=1
-            )
-        st.markdown("---")
-
-        st.info("The AI will analyze the contract(s) to identify distinct goods or services (performance obligations), including any customer options that may represent a **material right**.", icon="🤖")
-        
-        principal_agent_involved = st.selectbox(
-            "Is a third party involved in providing any goods or services to the end customer?",
-            options=["No", "Yes"], 
-            index=0,
-            help="This helps determine if you should recognize revenue gross or net"
-        )
-        
         principal_agent_details = None
-        if principal_agent_involved == "Yes":
-            principal_agent_details = st.text_area(
-                "Please describe the arrangement. Specify which party controls the good or service before transfer:",
-                placeholder="e.g., We are an agent for Party X's software, and they handle fulfillment and support."
-            )
-        st.markdown("---")
-
-        has_variable_consideration = st.selectbox(
-            "Does the contract include any variable consideration?",
-            options=["No", "Yes"], 
-            index=0,
-            help="Variable consideration includes volume discounts, performance bonuses, penalties, etc."
-        )
-        
         variable_consideration_details = None
-        if has_variable_consideration == "Yes":
-            variable_consideration_details = st.text_area(
-                "Please provide details on the variable consideration and your estimate:",
-                placeholder="e.g., A $10,000 performance bonus is included, which we estimate is 90% probable based on past performance."
-            )
-            
-        financing_component = st.selectbox(
-            "Does the contract include a significant financing component?",
-            options=["No", "Yes"], 
-            index=0,
-            help="This applies when payment timing provides significant financing benefit"
-        )
-        
         financing_component_details = None
-        if financing_component == "Yes":
-            financing_component_details = st.text_area(
-                "Please provide details on the financing component:",
-                placeholder="e.g., Customer pays $120K upfront for 3-year service valued at $150K, creating a 10% discount rate."
-            )
-            
-        noncash_consideration_involved = st.selectbox(
-            "Does the contract include any noncash consideration?",
-            options=["No", "Yes"], 
-            index=0,
-            help="Such as equity, customer-provided materials, etc."
-        )
-        
         noncash_consideration_details = None
-        if noncash_consideration_involved == "Yes":
-            noncash_consideration_details = st.text_area(
-                "Please describe the noncash consideration and provide its estimated fair value:",
-                placeholder="e.g., Customer provides equipment valued at $50K as partial payment."
-            )
-            
-        has_consideration_payable = st.selectbox(
-            "Does the contract include consideration payable to the customer?",
-            options=["No", "Yes"], 
-            index=0,
-            help="Such as rebates, coupons, or other payments to the customer"
-        )
-        
         consideration_payable_details = None
-        if has_consideration_payable == "Yes":
-            # Corrected to be a text area as requested per Gemini feedback
-            consideration_payable_details = st.text_area(
-                "Please describe the consideration and provide its amount. Note: This typically reduces the transaction price.",
-                placeholder="e.g., Customer receives a $5,000 upfront credit for marketing activities."
-            )
-        st.markdown("---")
 
-        ssp_represents_contract_price = st.selectbox(
-            "Do the prices in the contract represent their Standalone Selling Price (SSP)?",
-            options=["Yes", "No"],  # Removed "Uncertain" per Gemini feedback
-            index=0,
-            help="SSP is the price at which you would sell a good or service separately. If contract prices are reasonable estimates, select 'Yes'."
-        )
-        st.markdown("---")
+        with st.expander("**Step 1: Identify the Contract**", expanded=True):
+            col1, col2 = st.columns(2, gap="medium")
+            with col1:
+                collectibility = st.toggle("Collectibility is probable *", value=True, help="A contract does not exist under ASC 606 if collection is not probable.")
+                is_modification = st.toggle("This is a contract modification *", value=False)
+            with col2:
+                is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True)
+                if is_modification:
+                    original_contract_uploaded = st.toggle("Is the original contract uploaded?", value=False)
 
-        revenue_recognition_timing_details = st.text_area(
-            "Please describe when control transfers for each major performance obligation:",
-            placeholder="e.g., Software license is delivered upfront, Support services are provided evenly over 12 months.",
-            help="This helps the AI understand your specific timing considerations"
-        )
+        with st.expander("**Step 2: Identify Performance Obligations**"):
+            st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
+            principal_agent_involved = st.toggle("Is a third party involved in providing goods or services?")
+            if principal_agent_involved:
+                principal_agent_details = st.text_area("Describe the arrangement and specify who controls the good/service:", placeholder="e.g., We are an agent for Party X's software...", label_visibility="collapsed")
+
+        with st.expander("**Step 3: Determine the Transaction Price**"):
+            col3, col4 = st.columns(2, gap="medium")
+            with col3:
+                variable_consideration_involved = st.toggle("Includes variable consideration?")
+                noncash_consideration_involved = st.toggle("Includes noncash consideration?")
+            with col4:
+                financing_component_involved = st.toggle("Includes significant financing?")
+                consideration_payable_involved = st.toggle("Includes consideration payable?")
+
+            if variable_consideration_involved:
+                variable_consideration_details = st.text_area("Details on variable consideration:", placeholder="e.g., A $10,000 bonus is 90% probable.", label_visibility="collapsed")
+            if financing_component_involved:
+                financing_component_details = st.text_area("Details on financing component:", placeholder="e.g., Customer pays upfront for a 3-year service.", label_visibility="collapsed")
+            if noncash_consideration_involved:
+                noncash_consideration_details = st.text_area("Details on noncash consideration:", placeholder="e.g., Customer provides equipment valued at $50K.", label_visibility="collapsed")
+            if consideration_payable_involved:
+                consideration_payable_details = st.text_area("Details on consideration payable:", placeholder="e.g., Customer receives a $5,000 credit for marketing.", label_visibility="collapsed")
+
+        with st.expander("**Step 4: Allocate the Transaction Price**"):
+            ssp_represents_contract_price = st.toggle("Do contract prices represent Standalone Selling Price (SSP)?", value=True, help="SSP is the price at which you would sell a good or service separately.")
+
+        with st.expander("**Step 5: Recognize Revenue**"):
+            revenue_recognition_timing_details = st.text_area("Describe when control transfers for each major performance obligation:", placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
+
         st.markdown("---")
-        
-        with st.container(border=True):
-            st.info("After completing your assessment, proceed to the **⚙️ Step 3: Analyze** tab to run the analysis.", icon="➡️")
+        st.info("Continue to the **⚙️ 3. Analyze** tab.", icon="➡️")
 
     # Tab 3: Analysis Configuration and Execution
     with tab3:
@@ -258,101 +181,58 @@ if st.session_state.analysis_results is None:
         )
 
         def validate_form():
-            """Validate required fields"""
+            """Validate required fields from Tab 1"""
             errors = []
-            if not analysis_title:
-                errors.append("Analysis Title is required")
-            if not customer_name:
-                errors.append("Customer Name is required")
-            if not arrangement_description:
-                errors.append("Arrangement Description is required")
-            if not contract_types:
-                errors.append("At least one Contract Document Type must be selected")
-            if not uploaded_files:
-                errors.append("At least one document must be uploaded")
+            if not analysis_title: errors.append("Analysis Title is required (Tab 1).")
+            if not customer_name: errors.append("Customer Name is required (Tab 1).")
+            if not arrangement_description: errors.append("Arrangement Description is required (Tab 1).")
+            if not contract_types: errors.append("At least one Document Type must be selected (Tab 1).")
+            if not uploaded_files: errors.append("At least one document must be uploaded (Tab 1).")
             return errors
 
         st.markdown("---")
-        st.write("Click the button below to begin the AI analysis. This may take a few moments.")
-        
         if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
-            validation_errors = validate_form()
-            
+            validation_errors = validate_form() # Call the corrected function
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")
-                for error in validation_errors:
-                    st.warning(f"• {error}")
+                [st.warning(f"• {e}") for e in validation_errors]
                 st.stop()
 
             with st.status("🔍 Analyzing contract...", expanded=True) as status:
                 try:
-                    st.write("📄 Extracting text from uploaded documents...")
-                    all_extracted_text = []
-                    for file in uploaded_files:
-                        result = extractor.extract_text(file)
-                        if result.get('text'):
-                            all_extracted_text.append(result['text'])
-                    
-                    if not all_extracted_text:
-                        st.error("No text could be extracted from the uploaded documents")
+                    # Text extraction logic
+                    st.write("📄 Extracting text from documents...")
+                    all_extracted_text = [extractor.extract_text(f)['text'] for f in uploaded_files if extractor.extract_text(f).get('text')]
+                    if not all_extracted_text: 
+                        st.error("No text could be extracted.")
                         st.stop()
-                    
                     combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
-                    st.write("🧠 Processing contract data and your answers...")
 
-                    # Create contract data object
-                    try:
-                        contract_data = ContractData(
-                            analysis_title=analysis_title,
-                            customer_name=customer_name,
-                            arrangement_description=arrangement_description,
-                            contract_start=contract_start,
-                            contract_end=contract_end,
-                            currency=currency,
-                            uploaded_file_name=", ".join([f.name for f in uploaded_files]),
-                            contract_types=contract_types,
-                            analysis_depth=analysis_depth,
-                            output_format=output_format,
-                            include_citations=include_citations,
-                            include_examples=include_examples,
-                            additional_notes=additional_notes,
-                            # Preliminary Assessment Data
-                            collectibility=collectibility_assessment == "Probable",
-                            is_combined_contract=is_combined_contract,
-                            is_modification=is_modification,
-                            original_contract_uploaded=original_contract_uploaded == "Yes" if original_contract_uploaded else None,
-                            # Enhanced fields
-                            financing_component=financing_component == "Yes",
-                            financing_component_details=financing_component_details,
-                            variable_consideration=has_variable_consideration == "Yes",
-                            variable_consideration_details=variable_consideration_details,
-                            material_rights=False,  # Let AI analyze
-                            customer_options=False,  # Let AI analyze
-                            collectibility_assessment=collectibility_assessment,
-                            has_consideration_payable=(has_consideration_payable == "Yes"),
-                            consideration_payable_amount=0.0,  # Let AI extract from contract
-                            # Enhanced ASC 606 Assessment Fields
-                            principal_agent_involved=(principal_agent_involved == "Yes"),
-                            principal_agent_details=principal_agent_details,
-                            noncash_consideration_involved=(noncash_consideration_involved == "Yes"),
-                            noncash_consideration_details=noncash_consideration_details,
-                            ssp_represents_contract_price=(ssp_represents_contract_price == "Yes"),
-                            revenue_recognition_timing_details=revenue_recognition_timing_details
-                        )
-                    except ValidationError as e:
-                        st.error(f"Data validation error: {e}")
-                        st.stop()
+                    st.write("🧠 Processing your answers...")
+
+                    # Corrected ContractData creation logic
+                    contract_data = ContractData(
+                        analysis_title=analysis_title, customer_name=customer_name, arrangement_description=arrangement_description, contract_start=contract_start,
+                        contract_end=contract_end, currency=currency, uploaded_file_name=", ".join([f.name for f in uploaded_files]), contract_types=contract_types,
+                        analysis_depth=analysis_depth, output_format=output_format, additional_notes=additional_notes,
+                        # All data from Tab 2 is now correctly passed from the new UI
+                        collectibility=collectibility, is_combined_contract=is_combined_contract, is_modification=is_modification, original_contract_uploaded=original_contract_uploaded,
+                        principal_agent_involved=principal_agent_involved, principal_agent_details=principal_agent_details,
+                        variable_consideration_involved=variable_consideration_involved, variable_consideration_details=variable_consideration_details,
+                        financing_component_involved=financing_component_involved, financing_component_details=financing_component_details,
+                        noncash_consideration_involved=noncash_consideration_involved, noncash_consideration_details=noncash_consideration_details,
+                        consideration_payable_involved=consideration_payable_involved, consideration_payable_details=consideration_payable_details,
+                        ssp_represents_contract_price=ssp_represents_contract_price, revenue_recognition_timing_details=revenue_recognition_timing_details
+                    )
 
                     st.write("⚡ Running AI analysis...")
+                    # Rest of the analysis execution
                     analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
-                    
                     st.session_state.analysis_results = analysis_results
                     st.session_state.contract_data = contract_data
                     status.update(label="✅ Analysis complete!", state="complete")
-                    st.success("Analysis completed successfully!")
                     time.sleep(1)
                     st.rerun()
-                    
                 except Exception as e:
                     st.error(f"An unexpected error occurred during analysis: {str(e)}")
                     st.exception(e)
