@@ -11,6 +11,15 @@ class ASC606PromptTemplates:
     @staticmethod
     def get_analysis_prompt(contract_text: str, user_inputs: Optional[Dict] = None) -> str:
         """Main ASC 606 analysis prompt template"""
+        
+        # Extract contract types for context
+        contract_types_info = ""
+        if user_inputs and user_inputs.get('contract_types'):
+            contract_types_info = f"""
+        DOCUMENT TYPES PROVIDED: {', '.join(user_inputs['contract_types'])}
+        Note: The uploaded documents include {', '.join(user_inputs['contract_types'])}. Consider the relationship between these document types when analyzing the arrangement.
+        """
+        
         return f"""
         You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
         
@@ -19,7 +28,9 @@ class ASC606PromptTemplates:
         CONTRACT TEXT:
         {contract_text}
         
-        {f"USER INPUTS: {user_inputs}" if user_inputs else ""}
+        {contract_types_info}
+        
+        {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
         
         Provide a comprehensive analysis following these steps:
         1. Contract Identification (ASC 606-10-25-1)
@@ -33,6 +44,9 @@ class ASC606PromptTemplates:
         - Supporting quotes from the contract
         - Relevant ASC 606 citations
         - Professional judgment rationale
+        
+        When analyzing multiple document types (MSA + SOW, Purchase Orders, Amendments, etc.), 
+        consider how they work together to form the complete contractual arrangement.
         
         Format your response in professional memo style suitable for audit workpapers.
         """

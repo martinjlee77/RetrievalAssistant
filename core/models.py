@@ -29,6 +29,7 @@ class ContractData(BaseModel):
     contract_end: date
     currency: str
     uploaded_file_name: str
+    contract_types: Optional[List[str]] = None
     
     # Analysis Configuration
     analysis_depth: str = "Standard Analysis"

@@ -89,8 +89,8 @@ if st.session_state.analysis_results is None:
             currency = st.selectbox(
                 "Currency *",
                 ["USD", "EUR", "GBP", "CAD", "AUD", "KWR","JPY", "Other"],
-                help="Primary currency for the contract"
-            )
+            help="Primary currency for the contract"
+        )
 
         col5, col6 = st.columns(2, gap = "small")
         with col5:
@@ -109,12 +109,13 @@ if st.session_state.analysis_results is None:
         # File upload
         st.subheader("📄 Document Upload")
         uploaded_files = st.file_uploader(
-            "Upload Documents",
+            "Upload All Related Contract Documents *",
             type=['pdf', 'docx', 'txt'],
             accept_multiple_files=True,
-            help="Upload contracts, amendments, invoices, or related documents (max 5 files)"
+            help="Crucial: Upload the complete set of related documents for this arrangement (e.g., the MSA, all SOWs, and any amendments)."
         )
-    
+
+    # Tab 2: Preliminary Assessment
     with tab2:
         # Add preliminary assessment section
         st.subheader("📋 Preliminary Assessment")
@@ -270,6 +271,8 @@ if st.session_state.analysis_results is None:
             errors.append("Customer Name is required.")
         if not data['arrangement_description']:
             errors.append("Arrangement Description is required.")
+        if not data['contract_types']:
+            errors.append("At least one Contract Document Type must be selected.")
         if not data['uploaded_files']:
             errors.append("At least one document must be uploaded.")
         if data['uploaded_files'] and len(data['uploaded_files']) > 5:
@@ -292,6 +295,7 @@ if st.session_state.analysis_results is None:
             "analysis_title": analysis_title,
             "customer_name": customer_name, 
             "arrangement_description": arrangement_description,
+            "contract_types": contract_types,
             "uploaded_files": uploaded_files,
             "fixed_consideration": fixed_consideration,
             "performance_obligations": st.session_state.performance_obligations
@@ -363,6 +367,7 @@ if st.session_state.analysis_results is None:
                     contract_end=contract_end,
                     currency=currency,
                     uploaded_file_name=", ".join([f.name for f in uploaded_files]),
+                    contract_types=contract_types,
                     analysis_depth=analysis_depth,
                     output_format=output_format,
                     include_citations=include_citations,
