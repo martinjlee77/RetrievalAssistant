@@ -35,6 +35,38 @@ class ASC606PromptTemplates:
         Important: The contract includes consideration payable to the customer. This must be considered in transaction price determination per ASC 606-10-32-25.
         """
         
+        # Combined contract analysis
+        combined_contract_info = ""
+        if user_inputs and user_inputs.get('is_combined_contract'):
+            combined_contract_info = f"""
+        COMBINED CONTRACT ANALYSIS: Required
+        Important: Management has determined these documents should be evaluated as a single combined contract per ASC 606-10-25-9. Consider all uploaded documents as one arrangement.
+        """
+        
+        # Contract modification analysis
+        modification_info = ""
+        if user_inputs and user_inputs.get('is_modification'):
+            modification_info = f"""
+        CONTRACT MODIFICATION: Yes
+        Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance.
+        """
+        
+        # Additional elements analysis
+        additional_elements_info = ""
+        elements = []
+        if user_inputs and user_inputs.get('financing_component'):
+            elements.append("Significant Financing Component (ASC 606-10-32-15)")
+        if user_inputs and user_inputs.get('material_rights'):
+            elements.append("Material Rights (ASC 606-10-55-42)")
+        if user_inputs and user_inputs.get('customer_options'):
+            elements.append("Customer Options for Additional Goods/Services")
+            
+        if elements:
+            additional_elements_info = f"""
+        ADDITIONAL ELEMENTS IDENTIFIED: {', '.join(elements)}
+        Important: Management has identified these additional elements requiring special ASC 606 consideration.
+        """
+        
         return f"""
         You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
         
@@ -48,6 +80,12 @@ class ASC606PromptTemplates:
         {collectibility_info}
         
         {consideration_payable_info}
+        
+        {combined_contract_info}
+        
+        {modification_info}
+        
+        {additional_elements_info}
         
         {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
         
@@ -70,9 +108,14 @@ class ASC606PromptTemplates:
         Pay special attention to:
         - Collectibility assessment provided by management
         - Contract identification criteria (ASC 606-10-25-1)
+        - Combined contract evaluation per ASC 606-10-25-9 (if applicable)
+        - Contract modification accounting per ASC 606-10-25-10 (if applicable)
         - Performance obligation identification and timing
         - Variable consideration estimates and constraints
-        - Consideration payable to customer (if applicable) per ASC 606-10-32-25
+        - Consideration payable to customer per ASC 606-10-32-25 (if applicable)
+        - Significant financing components per ASC 606-10-32-15 (if applicable)
+        - Material rights per ASC 606-10-55-42 (if applicable)
+        - Customer options for additional goods/services (if applicable)
         
         Format your response in professional memo style suitable for audit workpapers.
         """

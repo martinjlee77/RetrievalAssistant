@@ -40,6 +40,7 @@ class ContractData(BaseModel):
     
     # Preliminary Assessment Fields
     is_modification: bool = False
+    is_combined_contract: bool = False
     performance_obligations: List[Dict[str, Any]] = []
     fixed_consideration: float = 0.0
     variable_consideration: Optional[Dict[str, Any]] = None

@@ -51,8 +51,8 @@ if st.session_state.analysis_results is None:
 
     # Create three tabs
     tab1, tab2, tab3 = st.tabs([
-        "📋 Contract Details & Upload", "📝 Preliminary Assessment",
-        "⚙️ Analysis Configuration"
+        "📋 Contract Details & Upload (1 of 3)", "📝 Preliminary Assessment (2 of 3)",
+        "⚙️ Analysis Configuration (3 of 3)"
     ])
 
     # Tab 1: Contract Details & Upload
@@ -350,7 +350,8 @@ if st.session_state.analysis_results is None:
             "fixed_consideration": fixed_consideration,
             "performance_obligations": st.session_state.performance_obligations,
             "collectibility_assessment": collectibility_assessment,
-            "has_consideration_payable": has_consideration_payable
+            "has_consideration_payable": has_consideration_payable,
+            "is_combined_contract": is_combined_contract
         }
 
         # Validate all fields at once
@@ -440,6 +441,7 @@ if st.session_state.analysis_results is None:
                     additional_notes=additional_notes,
                     # Preliminary assessment fields
                     is_modification=is_modification,
+                    is_combined_contract=is_combined_contract,
                     performance_obligations=performance_obligations_data,
                     fixed_consideration=fixed_consideration,
                     variable_consideration=variable_consideration_data,
