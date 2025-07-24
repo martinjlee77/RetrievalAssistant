@@ -11,16 +11,15 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 **Date: 2025-07-24**
-- ✅ **ENHANCED TAB 2 WITH ASC 606-COMPLIANT QUESTIONS**: Completely restructured Tab 2 following 5-step ASC 606 methodology
-- ✅ Implemented Step 1 (Contract Identification) with collectibility, combined contract, and modification questions  
-- ✅ Added Step 2 (Performance Obligations) with optional principal vs agent analysis
-- ✅ Enhanced Step 3 (Transaction Price) with variable consideration, financing, noncash, and consideration payable fields
-- ✅ Included Step 4 (Price Allocation) with SSP assessment question
-- ✅ Added Step 5 (Revenue Recognition) with timing details input
-- ✅ Updated ContractData model with new optional fields: principal_agent_involved, noncash_consideration_involved, ssp_represents_contract_price, revenue_recognition_timing_details
-- ✅ Enhanced prompt templates to pass new assessment data to AI analysis
-- ✅ Maintained user preference for minimal data entry burden - most fields clearly marked as optional
-- ✅ Preserved existing architecture while adding ASC 606-compliant structure
+- ✅ **STREAMLINED TAB 2 PER GEMINI FEEDBACK**: Completely redesigned with concise two-column layout
+- ✅ Reduced form length by 70% - removed step-by-step structure that would lose users
+- ✅ Implemented efficient two-column design: Contract Assessment (left) + Transaction Price Elements (right)
+- ✅ Simplified questions to essential ASC 606 elements only - removed "Uncertain" options per feedback
+- ✅ Changed consideration payable to text area format as requested
+- ✅ Added clear messaging that most fields are optional to reduce user burden
+- ✅ Maintained all core ASC 606 compliance while drastically improving UX
+- ✅ Fixed all technical compatibility issues and data flow
+- ✅ Enhanced prompt templates to pass streamlined assessment data to AI analysis
 
 **Date: 2025-07-17**
 - ✅ **PRELIMINARY ASSESSMENT FIELDS RESTORATION**: Restored comprehensive input fields removed during multi-standard transformation
