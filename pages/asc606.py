@@ -116,8 +116,7 @@ if st.session_state.analysis_results is None:
                 is_modification = st.toggle("This is a contract modification *", value=False)
             with col2:
                 is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True)
-                if is_modification:
-                    original_contract_uploaded = st.toggle("Is the original contract uploaded?", value=False)
+                original_contract_uploaded = st.toggle("Is the original contract uploaded?", value=False, disabled=not is_modification)
 
         with st.expander("**Step 2: Identify Performance Obligations**"):
             st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
