@@ -23,7 +23,7 @@ st.logo("assets/images/logo.png")  # Logo in sidebar (no internal linking suppor
 pg = st.navigation(
     [
         st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
-        st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material/functions:"),
+        st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material/contract:"),
         st.Page("pages/asc842.py", title="ASC 842 Analyzer", icon=":material/real_estate_agent:"),
         st.Page("pages/login.py", title="Login", icon=":material/login:"),
         st.Page("pages/register.py", title="Register", icon=":material/person_add:"),

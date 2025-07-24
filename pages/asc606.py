@@ -57,37 +57,53 @@ if st.session_state.analysis_results is None:
         "📝 Preliminary Assessment", 
         "⚙️ Analysis Configuration"
     ])
-    
+
+    # Tab 1: Contract Details & Upload
     with tab1:
-        analysis_title = st.text_input(
-            "Analysis Title / Contract ID *",
+        
+        # Contract details section
+        col1, col2 = st.columns(2, gap="small")
+        with col1:
+            analysis_title = st.text_input(
+                "Analysis Title *",
             placeholder="e.g., Q4 Project Phoenix SOW",
             help="A unique name to identify this analysis"
-        )
-        
-        customer_name = st.text_input(
-            "Customer Name *",
+                )
+        with col2:
+            customer_name = st.text_input(
+                "Customer Name *",
             placeholder="e.g., ABC Corporation"
-        )
+                )
         
+        col3, col4 = st.columns(2, gap="small")
+        with col3:
+            contract_types = st.multiselect(
+                    "Contract Document Types Included *",
+                    [
+                        "Master Agreement", "Master Services Agreement (MSA)", "Statement of Work (SOW)", "Software as a Service (SaaS) Agreement", "Software License Agreement", "Professional Services Agreement", "Sales Order / Order Form", "Purchase Order (PO)", "Contract Amendment / Addendum", "Change Order", "Reseller / Partner Agreement", "Invoice", "Other"
+                    ],
+                    help="Select all document types that are part of this analysis. This helps the AI understand the relationship between the uploaded files."
+                )
+
+        with col4:
+            currency = st.selectbox(
+                "Currency *",
+                ["USD", "EUR", "GBP", "CAD", "AUD", "KWR","JPY", "Other"],
+                help="Primary currency for the contract"
+            )
+
+        col5, col6 = st.columns(2, gap = "small")
+        with col5:
+            contract_start = st.date_input("Contract Start Date *")
+        with col6:
+            contract_end = st.date_input("Contract End Date *")
+
+       
         arrangement_description = st.text_area(
             "Arrangement Description *",
             placeholder="e.g., Three-year SaaS subscription with implementation services",
             height=100,
-            help="Brief description of the contractual arrangement"
-        )
-        
-        # Date inputs
-        sub_col1, sub_col2 = st.columns(2)
-        with sub_col1:
-            contract_start = st.date_input("Contract Start Date *")
-        with sub_col2:
-            contract_end = st.date_input("Contract End Date *")
-        
-        currency = st.selectbox(
-            "Currency *",
-            ["USD", "EUR", "GBP", "CAD", "AUD", "JPY"],
-            help="Primary currency for the contract"
+            help="Description of the contractual arrangement - more detail is better to provide context for the AI"
         )
         
         # File upload
