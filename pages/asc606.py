@@ -49,15 +49,16 @@ debug_config = create_debug_sidebar()
 # Main application logic
 if st.session_state.analysis_results is None:
 
-    # Create three tabs
+    ## Set up the tabs
     tab1, tab2, tab3 = st.tabs([
-        "📋 Contract Details & Upload (1 of 3)", "📝 Preliminary Assessment (2 of 3)",
-        "⚙️ Analysis Configuration (3 of 3)"
+        "**📋 Step 1: Contract Details & Upload**",
+        "**📝 Step 2: Preliminary Assessment**",
+        "**⚙️ Step 3: Analysis & Submission**"
     ])
 
     # Tab 1: Contract Details & Upload
     with tab1:
-
+        # ... (all the existing content of tab1 remains here) ...
         # Contract details section
         col1, col2 = st.columns(2, gap="small")
         with col1:
@@ -117,8 +118,16 @@ if st.session_state.analysis_results is None:
             "Crucial: Upload the complete set of related documents for this arrangement (e.g., the MSA, all SOWs, and any amendments)."
         )
 
+        # Guidance for Tab 1
+        st.markdown("---")
+        with st.container(border=True):
+            st.info(
+                "Once the fields above are complete, continue to the **📝 Step 2: Preliminary Assessment** tab.",
+                icon="➡️")
+
     # Tab 2: Preliminary Assessment
     with tab2:
+
         st.write(
             "Provide your initial analysis - the AI will verify against the contract text."
         )
@@ -126,47 +135,37 @@ if st.session_state.analysis_results is None:
         col1, col2 = st.columns(2, gap="large")
 
         # --- Column 1: Judgment & Flags Panel ---
-        # This column is for quick, scannable checklist items.
         with col1:
-            # Group all high-level judgments together
             st.markdown("##### Key Contract Judgments")
-
             collectibility_assessment = st.radio(
                 "Collectibility Assessment *",
                 ["Probable", "Not Probable", "Uncertain"],
                 index=0,
-                horizontal=True, # This makes it look very clean and modern!
-                help="Management's assessment of whether it is probable that the entity will collect substantially all of the consideration."
+                horizontal=True,
+                help=
+                "Management's assessment of whether it is probable that the entity will collect substantially all of the consideration."
             )
-
             is_combined_contract = st.checkbox(
                 "Evaluate as a single combined contract?",
                 help=
                 "Check if the uploaded documents were entered into at or near the same time and should be accounted for as a single arrangement per ASC 606-10-25-9."
             )
-
             is_modification = st.checkbox(
                 "Is this a contract modification or amendment?",
                 value=st.session_state.get('is_modification', False),
                 help=
                 "Check if this contract modifies or amends an existing agreement.",
                 key="is_modification")
-            
             st.divider()
-            
-            # Group all other scenario-specific flags together
             st.markdown("##### Additional Elements Check")
-
             financing_component = st.checkbox(
                 "Significant Financing Component?",
                 value=st.session_state.get('financing_component', False),
                 key="financing_component")
-
             material_rights = st.checkbox("Material Rights for future items?",
                                           value=st.session_state.get(
                                               'material_rights', False),
                                           key="material_rights")
-
             customer_options = st.checkbox(
                 "Other Customer Options for additional goods/services?",
                 value=st.session_state.get('customer_options', False),
@@ -174,10 +173,7 @@ if st.session_state.analysis_results is None:
 
         # --- Column 2: Interactive Details Panel ---
         with col2:
-            # Performance Obligations Section
             st.markdown("##### Performance Obligations")
-
-            # Initialize performance obligations in session state if not exists
             if 'performance_obligations' not in st.session_state:
                 st.session_state.performance_obligations = []
 
@@ -213,7 +209,6 @@ if st.session_state.analysis_results is None:
                         st.success(f"Added: {new_po_name}")
                         st.rerun()
 
-            # Display current performance obligations
             if st.session_state.performance_obligations:
                 st.write("**Current Performance Obligations:**")
                 for i, po in enumerate(
@@ -227,10 +222,8 @@ if st.session_state.analysis_results is None:
                                               help="Remove this PO"):
                         st.session_state.performance_obligations.pop(i)
                         st.rerun()
-            st.divider()            
-            # Transaction Price Section
+            st.divider()
             st.markdown("##### Transaction Price")
-
             fixed_consideration = st.number_input(
                 "Fixed Consideration *",
                 value=st.session_state.get('fixed_consideration', 0.0),
@@ -238,15 +231,12 @@ if st.session_state.analysis_results is None:
                 format="%.2f",
                 help="The guaranteed, fixed amount in the contract.",
                 key="fixed_consideration")
-
             has_variable = st.checkbox("Includes Variable Consideration?",
                                        value=st.session_state.get(
                                            'has_variable_consideration',
                                            False),
                                        key="has_variable_consideration")
-
             if has_variable:
-                # These inputs appear conditionally, which is a good pattern
                 var_col1, var_col2 = st.columns(2)
                 variable_type = var_col1.selectbox(
                     "Variable Consideration Type",
@@ -258,8 +248,6 @@ if st.session_state.analysis_results is None:
                     min_value=0.0,
                     format="%.2f",
                     key="variable_amount")
-
-            # Consideration payable is logically part of the transaction price
             has_consideration_payable = st.checkbox(
                 "Includes Consideration Payable to Customer?",
                 help=
@@ -271,31 +259,36 @@ if st.session_state.analysis_results is None:
                     min_value=0.0,
                     format="%.2f",
                     key="consideration_payable_amount")
+
+        # Guidance for Tab 2
+        st.markdown("---")
+        with st.container(border=True):
+            st.info(
+                "After completing your assessment, proceed to the **⚙️ Step 3: Analysis & Submission** tab to run the analysis.",
+                icon="➡️"
+            )
+            
     with tab3:
         st.subheader("⚙️ Analysis Configuration")
-
+        # ... (all the existing content of tab3 remains here) ...
         analysis_depth = st.selectbox(
             "Analysis Depth", [
                 "Standard Analysis", "Detailed Analysis",
                 "Comprehensive Analysis"
             ],
             help="Choose the level of detail for your analysis")
-
         output_format = st.selectbox(
             "Output Format",
             ["Professional Memo", "Executive Summary", "Technical Analysis"],
             help="Select the format for your analysis results")
-
         include_citations = st.checkbox(
             "Include Citations",
             value=True,
             help="Include authoritative source citations in the analysis")
-
         include_examples = st.checkbox(
             "Include Examples",
             value=False,
             help="Include practical examples and illustrations")
-
         additional_notes = st.text_area(
             "Additional Notes",
             placeholder=
@@ -303,181 +296,170 @@ if st.session_state.analysis_results is None:
             height=100,
             help="Optional notes to guide the analysis")
 
-    # Validation function
-    def validate_form(data):
-        """Gathers all validation errors into a list."""
-        errors = []
+        # Validation function
+        def validate_form(data):
+            """Gathers all validation errors into a list."""
+            errors = []
+            if not data['analysis_title']:
+                errors.append("Analysis Title is required (Step 1).")
+            if not data['customer_name']:
+                errors.append("Customer Name is required (Step 1).")
+            if not data['arrangement_description']:
+                errors.append("Arrangement Description is required (Step 1).")
+            if not data['contract_types']:
+                errors.append(
+                    "At least one Contract Document Type must be selected (Step 1)."
+                )
+            if not data['uploaded_files']:
+                errors.append(
+                    "At least one document must be uploaded (Step 1).")
+            if data['uploaded_files'] and len(data['uploaded_files']) > 5:
+                errors.append("Please upload a maximum of 5 files (Step 1).")
+            if data['fixed_consideration'] is None:
+                errors.append("Fixed Consideration is required (Step 2).")
+            if not data['performance_obligations']:
+                errors.append(
+                    "At least one Performance Obligation must be added (Step 2)."
+                )
+            if not data['collectibility_assessment']:
+                errors.append(
+                    "Collectibility Assessment is required (Step 2).")
+            return errors
 
-        # Tab 1: Contract Details & Upload validation
-        if not data['analysis_title']:
-            errors.append("Analysis Title is required.")
-        if not data['customer_name']:
-            errors.append("Customer Name is required.")
-        if not data['arrangement_description']:
-            errors.append("Arrangement Description is required.")
-        if not data['contract_types']:
-            errors.append(
-                "At least one Contract Document Type must be selected.")
-        if not data['uploaded_files']:
-            errors.append("At least one document must be uploaded.")
-        if data['uploaded_files'] and len(data['uploaded_files']) > 5:
-            errors.append("Please upload a maximum of 5 files.")
+        ## MODIFICATION 4: Move the entire analysis button and logic block INSIDE Tab 3.
+        st.markdown("---")
+        st.write(
+            "Click the button below to begin the AI analysis. This may take a few moments."
+        )
+        if st.button("🔍 Analyze Contract",
+                     use_container_width=True,
+                     type="primary"):
+            form_data = {
+                "analysis_title": analysis_title,
+                "customer_name": customer_name,
+                "arrangement_description": arrangement_description,
+                "contract_types": contract_types,
+                "uploaded_files": uploaded_files,
+                "fixed_consideration": fixed_consideration,
+                "performance_obligations":
+                st.session_state.performance_obligations,
+                "collectibility_assessment": collectibility_assessment,
+                "has_consideration_payable": has_consideration_payable,
+                "is_combined_contract": is_combined_contract
+            }
 
-        # Tab 2: Preliminary Assessment validation
-        if data['fixed_consideration'] is None:
-            errors.append("Fixed Consideration is required (can be 0).")
-        if not data['performance_obligations']:
-            errors.append("At least one Performance Obligation must be added.")
-        if not data['collectibility_assessment']:
-            errors.append("Collectibility Assessment is required.")
-        # Note: has_consideration_payable is optional, no validation needed
+            validation_errors = validate_form(form_data)
 
-        return errors
-
-    # Full-width analyze button
-    st.markdown("---")
-
-    if st.button("🔍 Analyze Contract",
-                 use_container_width=True,
-                 type="primary"):
-        # Create form data dictionary for validation
-        form_data = {
-            "analysis_title": analysis_title,
-            "customer_name": customer_name,
-            "arrangement_description": arrangement_description,
-            "contract_types": contract_types,
-            "uploaded_files": uploaded_files,
-            "fixed_consideration": fixed_consideration,
-            "performance_obligations": st.session_state.performance_obligations,
-            "collectibility_assessment": collectibility_assessment,
-            "has_consideration_payable": has_consideration_payable,
-            "is_combined_contract": is_combined_contract
-        }
-
-        # Validate all fields at once
-        validation_errors = validate_form(form_data)
-
-        if validation_errors:
-            st.error("Please fix the following issues:")
-            for error in validation_errors:
-                st.error(f"• {error}")
-            st.stop()
-
-        # Process the analysis
-        with st.status("🔍 Analyzing contract...", expanded=True) as status:
-            try:
-                st.write("📄 Extracting text from uploaded documents...")
-                # Extract text from uploaded files
-                all_extracted_text = []
-                all_metadata = []
-
-                for uploaded_file in uploaded_files:
-                    extraction_result = extractor.extract_text(uploaded_file)
-
-                    if extraction_result.get('text'):
-                        all_extracted_text.append(extraction_result['text'])
-                        all_metadata.append({
-                            'file_name':
-                            uploaded_file.name,
-                            'method':
-                            extraction_result.get('method', 'unknown'),
-                            'word_count':
-                            extraction_result.get('word_count', 0),
-                            'char_count':
-                            len(extraction_result.get('text', ''))
-                        })
-
-                if not all_extracted_text:
-                    st.error(
-                        "No text could be extracted from the uploaded documents"
-                    )
-                    st.stop()
-
-                # Combine all extracted text
-                combined_text = "\n".join(all_extracted_text)
-
-                st.write(
-                    "🧠 Processing contract data and preliminary assessment...")
-                time.sleep(0.5)  # Brief pause for UX
-
-                # Process performance obligations
-                performance_obligations_data = []
-                for po in st.session_state.performance_obligations:
-                    performance_obligations_data.append({
-                        'name': po['name'],
-                        'type': po['type'],
-                        'timing': po['timing'],
-                        'ssp': po['ssp']
-                    })
-
-                # Process variable consideration
-                variable_consideration_data = None
-                if has_variable:
-                    variable_consideration_data = {
-                        'type': variable_type,
-                        'estimated_amount': variable_amount
-                    }
-                    
-                # Process consideration payable to customer  
-                consideration_payable_amount = 0.0
-                if has_consideration_payable:
-                    consideration_payable_amount = st.session_state.get('consideration_payable_amount', 0.0) if 'consideration_payable_amount' in st.session_state else 0.0
-
-                # Create contract data with preliminary assessment
-                contract_data = ContractData(
-                    analysis_title=analysis_title,
-                    customer_name=customer_name,
-                    arrangement_description=arrangement_description,
-                    contract_start=contract_start,
-                    contract_end=contract_end,
-                    currency=currency,
-                    uploaded_file_name=", ".join(
-                        [f.name for f in uploaded_files]),
-                    contract_types=contract_types,
-                    analysis_depth=analysis_depth,
-                    output_format=output_format,
-                    include_citations=include_citations,
-                    include_examples=include_examples,
-                    additional_notes=additional_notes,
-                    # Preliminary assessment fields
-                    is_modification=is_modification,
-                    is_combined_contract=is_combined_contract,
-                    performance_obligations=performance_obligations_data,
-                    fixed_consideration=fixed_consideration,
-                    variable_consideration=variable_consideration_data,
-                    financing_component=financing_component,
-                    material_rights=material_rights,
-                    customer_options=customer_options,
-                    collectibility_assessment=collectibility_assessment,
-                    has_consideration_payable=has_consideration_payable,
-                    consideration_payable_amount=consideration_payable_amount)
-
-                st.write("⚡ Running AI analysis with hybrid RAG system...")
-
-                # Pass debug configuration to analyzer
-                analysis_results = analyzer.analyze_contract(
-                    combined_text, contract_data, debug_config=debug_config)
-
-                # Store results in session state
-                st.session_state.analysis_results = analysis_results
-                st.session_state.contract_data = contract_data
-
-                status.update(label="✅ Analysis complete!", state="complete")
-                st.success("Analysis completed successfully!")
-
-                # Show debugging information if enabled
-                if debug_config.get("show_raw_response") and hasattr(
-                        analysis_results, 'raw_response'):
-                    with st.expander("🔧 Raw AI Response (Debug)",
-                                     expanded=False):
-                        st.text(analysis_results.raw_response)
-
-                time.sleep(1)  # Brief pause before rerun
-                st.rerun()
-
-            except Exception as e:
-                st.error(f"Analysis failed: {str(e)}")
+            if validation_errors:
+                st.error("Please fix the following issues before submitting:")
+                for error in validation_errors:
+                    st.warning(
+                        f"• {error}")  # Using warning for better visibility
                 st.stop()
+
+            # Process the analysis
+            with st.status("🔍 Analyzing contract...", expanded=True) as status:
+                try:
+                    # ... (the entire try/except block for analysis remains here) ...
+                    st.write("📄 Extracting text from uploaded documents...")
+                    all_extracted_text = []
+                    all_metadata = []
+                    for uploaded_file in uploaded_files:
+                        extraction_result = extractor.extract_text(
+                            uploaded_file)
+                        if extraction_result.get('text'):
+                            all_extracted_text.append(
+                                extraction_result['text'])
+                            all_metadata.append({
+                                'file_name':
+                                uploaded_file.name,
+                                'method':
+                                extraction_result.get('method', 'unknown'),
+                                'word_count':
+                                extraction_result.get('word_count', 0),
+                                'char_count':
+                                len(extraction_result.get('text', ''))
+                            })
+                    if not all_extracted_text:
+                        st.error(
+                            "No text could be extracted from the uploaded documents"
+                        )
+                        st.stop()
+                    combined_text = "\n".join(all_extracted_text)
+                    st.write(
+                        "🧠 Processing contract data and preliminary assessment..."
+                    )
+                    time.sleep(0.5)
+                    performance_obligations_data = []
+                    for po in st.session_state.performance_obligations:
+                        performance_obligations_data.append({
+                            'name':
+                            po['name'],
+                            'type':
+                            po['type'],
+                            'timing':
+                            po['timing'],
+                            'ssp':
+                            po['ssp']
+                        })
+                    variable_consideration_data = None
+                    if has_variable:
+                        variable_consideration_data = {
+                            'type': variable_type,
+                            'estimated_amount': variable_amount
+                        }
+                    consideration_payable_amount = 0.0
+                    if has_consideration_payable:
+                        consideration_payable_amount = st.session_state.get(
+                            'consideration_payable_amount', 0.0
+                        ) if 'consideration_payable_amount' in st.session_state else 0.0
+                    contract_data = ContractData(
+                        analysis_title=analysis_title,
+                        customer_name=customer_name,
+                        arrangement_description=arrangement_description,
+                        contract_start=contract_start,
+                        contract_end=contract_end,
+                        currency=currency,
+                        uploaded_file_name=", ".join(
+                            [f.name for f in uploaded_files]),
+                        contract_types=contract_types,
+                        analysis_depth=analysis_depth,
+                        output_format=output_format,
+                        include_citations=include_citations,
+                        include_examples=include_examples,
+                        additional_notes=additional_notes,
+                        is_modification=is_modification,
+                        is_combined_contract=is_combined_contract,
+                        performance_obligations=performance_obligations_data,
+                        fixed_consideration=fixed_consideration,
+                        variable_consideration=variable_consideration_data,
+                        financing_component=financing_component,
+                        material_rights=material_rights,
+                        customer_options=customer_options,
+                        collectibility_assessment=collectibility_assessment,
+                        has_consideration_payable=has_consideration_payable,
+                        consideration_payable_amount=
+                        consideration_payable_amount)
+                    st.write("⚡ Running AI analysis with hybrid RAG system...")
+                    analysis_results = analyzer.analyze_contract(
+                        combined_text,
+                        contract_data,
+                        debug_config=debug_config)
+                    st.session_state.analysis_results = analysis_results
+                    st.session_state.contract_data = contract_data
+                    status.update(label="✅ Analysis complete!",
+                                  state="complete")
+                    st.success("Analysis completed successfully!")
+                    if debug_config.get("show_raw_response") and hasattr(
+                            analysis_results, 'raw_response'):
+                        with st.expander("🔧 Raw AI Response (Debug)",
+                                         expanded=False):
+                            st.text(analysis_results.raw_response)
+                    time.sleep(1)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Analysis failed: {str(e)}")
+                    st.stop()
 
 else:
     # Render analysis results

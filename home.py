@@ -4,32 +4,109 @@ This file acts as the master "router" for the application.
 """
 import streamlit as st
 
-# 1. Set the page configuration as the very first Streamlit command.
-#    This is the master blueprint for the entire app.
+
+# Function to load and inject custom CSS
+def load_custom_css():
+
+    # Brand colors
+    primary_color = "#0A2B4C"  # Deep Sapphire Blue (for text)
+    secondary_color = "#C5A565"  # Muted Gold (for active background)
+    bg_color = "#F8F9FA"  # Very Light Gray (for sidebar background)
+
+    css = f"""
+        <style>
+            /* --- Main Sidebar Style --- */
+            [data-testid="stSidebar"] {{
+                background-color: {bg_color};
+                border-right: 1px solid #e0e0e0;
+            }}
+
+            /* --- Sidebar Logo --- */
+            [data-testid="stLogo"] {{
+                padding-bottom: 20px;
+            }}
+
+            /* --- Sidebar Navigation Links --- */
+            [data-testid="stSidebarNav"] ul {{
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }}
+
+            [data-testid="stSidebarNav"] ul li a {{
+                display: flex;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                font-size: 1.1rem;
+                font-weight: 500;
+                color: {primary_color};
+                border-radius: 8px;
+                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                text-decoration: none;
+            }}
+
+            /* --- Hover effect for navigation links --- */
+            [data-testid="stSidebarNav"] ul li a:hover {{
+                background-color: #e9ecef;
+                color: {primary_color};
+            }}
+
+            /*
+            * THE ELEGANT SOLUTION:
+            * Use the brand's lighter secondary color for the active link's background.
+            * Then, set the active link's text and icon to the primary dark blue for
+            * a high-contrast, on-brand, and professional look.
+            *
+            * NO !important sledgehammers needed. This is much safer.
+            */
+            [data-testid="stSidebarNav"] ul li a[aria-current="page"] {{
+                background-color: {secondary_color};
+                color: {primary_color};
+                font-weight: 700;
+            }}
+
+            [data-testid="stSidebarNav"] ul li a[aria-current="page"] svg {{
+                fill: {primary_color};
+            }}
+
+            /* --- Login/Register links (optional special styling) --- */
+            [data-testid="stSidebarNav"] ul li:nth-last-child(1) a,
+            [data-testid="stSidebarNav"] ul li:nth-last-child(2) a {{
+                border-top: 1px solid #ddd;
+                margin-top: 20px;
+                padding-top: 20px;
+            }}
+        </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
+# 1. Set the page configuration
 st.set_page_config(
     page_title="Controller.cpa | Multi-Standard Accounting Platform",
-    page_icon="assets/images/logo.png",  # Use your logo as the browser tab icon!
+    page_icon="assets/images/logo.png",
     layout="wide",
-    initial_sidebar_state="expanded"
-)
+    initial_sidebar_state="expanded")
 
-# 2. Add your logo to the sidebar.
-#    This command is designed to be called once in your main script.
-st.logo("assets/images/logo.png")  # Logo in sidebar (no internal linking supported by Streamlit)
+# 2. Inject our custom CSS
+load_custom_css()
 
-# 3. Define all pages in your app.
-#    This is the single source of truth for your navigation.
-#    Using Material Icons for a consistent, professional look.
-pg = st.navigation(
-    [
-        st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
-        st.Page("pages/asc606.py", title="ASC 606 Analyzer", icon=":material/contract:"),
-        st.Page("pages/asc842.py", title="ASC 842 Analyzer", icon=":material/real_estate_agent:"),
-        st.Page("pages/login.py", title="Login", icon=":material/login:"),
-        st.Page("pages/register.py", title="Register", icon=":material/person_add:"),
-    ]
-)
+# 3. Add your logo to the sidebar.
+st.logo("assets/images/logo.png")
 
-# 4. Run the app.
-#    This command executes the script for the currently selected page.
+# 4. Define all pages in your app.
+pg = st.navigation([
+    st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
+    st.Page("pages/asc606.py",
+            title="ASC 606 Analyzer",
+            icon=":material/description:"),
+    st.Page("pages/asc842.py",
+            title="ASC 842 Analyzer",
+            icon=":material/real_estate_agent:"),
+    st.Page("pages/login.py", title="Login", icon=":material/login:"),
+    st.Page("pages/register.py",
+            title="Register",
+            icon=":material/person_add:"),
+])
+
+# 5. Run the app.
 pg.run()
