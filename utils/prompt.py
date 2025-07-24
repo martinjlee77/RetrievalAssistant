@@ -12,12 +12,19 @@ class ASC606PromptTemplates:
     def get_analysis_prompt(contract_text: str, user_inputs: Optional[Dict] = None) -> str:
         """Main ASC 606 analysis prompt template"""
         
-        # Extract contract types for context
+        # Extract contract types and collectibility for context
         contract_types_info = ""
         if user_inputs and user_inputs.get('contract_types'):
             contract_types_info = f"""
         DOCUMENT TYPES PROVIDED: {', '.join(user_inputs['contract_types'])}
         Note: The uploaded documents include {', '.join(user_inputs['contract_types'])}. Consider the relationship between these document types when analyzing the arrangement.
+        """
+        
+        collectibility_info = ""
+        if user_inputs and user_inputs.get('collectibility_assessment'):
+            collectibility_info = f"""
+        MANAGEMENT'S COLLECTIBILITY ASSESSMENT: {user_inputs['collectibility_assessment']}
+        Important: Management has assessed that collection of consideration is "{user_inputs['collectibility_assessment']}". This is fundamental to Step 1 contract identification under ASC 606-10-25-1(e).
         """
         
         return f"""
@@ -29,6 +36,8 @@ class ASC606PromptTemplates:
         {contract_text}
         
         {contract_types_info}
+        
+        {collectibility_info}
         
         {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
         
@@ -47,6 +56,12 @@ class ASC606PromptTemplates:
         
         When analyzing multiple document types (MSA + SOW, Purchase Orders, Amendments, etc.), 
         consider how they work together to form the complete contractual arrangement.
+        
+        Pay special attention to:
+        - Collectibility assessment provided by management
+        - Contract identification criteria (ASC 606-10-25-1)
+        - Performance obligation identification and timing
+        - Variable consideration estimates and constraints
         
         Format your response in professional memo style suitable for audit workpapers.
         """

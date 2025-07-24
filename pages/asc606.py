@@ -327,6 +327,8 @@ if st.session_state.analysis_results is None:
             errors.append("Fixed Consideration is required (can be 0).")
         if not data['performance_obligations']:
             errors.append("At least one Performance Obligation must be added.")
+        if not data['collectibility_assessment']:
+            errors.append("Collectibility Assessment is required.")
 
         return errors
 
@@ -344,7 +346,8 @@ if st.session_state.analysis_results is None:
             "contract_types": contract_types,
             "uploaded_files": uploaded_files,
             "fixed_consideration": fixed_consideration,
-            "performance_obligations": st.session_state.performance_obligations
+            "performance_obligations": st.session_state.performance_obligations,
+            "collectibility_assessment": collectibility_assessment
         }
 
         # Validate all fields at once
@@ -434,7 +437,8 @@ if st.session_state.analysis_results is None:
                     variable_consideration=variable_consideration_data,
                     financing_component=financing_component,
                     material_rights=material_rights,
-                    customer_options=customer_options)
+                    customer_options=customer_options,
+                    collectibility_assessment=collectibility_assessment)
 
                 st.write("⚡ Running AI analysis with hybrid RAG system...")
 

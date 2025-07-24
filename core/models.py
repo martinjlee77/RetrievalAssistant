@@ -46,6 +46,7 @@ class ContractData(BaseModel):
     financing_component: bool = False
     material_rights: bool = False
     customer_options: bool = False
+    collectibility_assessment: str = "Probable"
 
 @dataclass
 class ASC606Analysis:
