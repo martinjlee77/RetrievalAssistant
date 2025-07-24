@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-24**
+- ✅ **ENHANCED TAB 2 WITH ASC 606-COMPLIANT QUESTIONS**: Completely restructured Tab 2 following 5-step ASC 606 methodology
+- ✅ Implemented Step 1 (Contract Identification) with collectibility, combined contract, and modification questions  
+- ✅ Added Step 2 (Performance Obligations) with optional principal vs agent analysis
+- ✅ Enhanced Step 3 (Transaction Price) with variable consideration, financing, noncash, and consideration payable fields
+- ✅ Included Step 4 (Price Allocation) with SSP assessment question
+- ✅ Added Step 5 (Revenue Recognition) with timing details input
+- ✅ Updated ContractData model with new optional fields: principal_agent_involved, noncash_consideration_involved, ssp_represents_contract_price, revenue_recognition_timing_details
+- ✅ Enhanced prompt templates to pass new assessment data to AI analysis
+- ✅ Maintained user preference for minimal data entry burden - most fields clearly marked as optional
+- ✅ Preserved existing architecture while adding ASC 606-compliant structure
+
 **Date: 2025-07-17**
 - ✅ **PRELIMINARY ASSESSMENT FIELDS RESTORATION**: Restored comprehensive input fields removed during multi-standard transformation
 - ✅ Added Contract Nature section with modification/amendment checkbox

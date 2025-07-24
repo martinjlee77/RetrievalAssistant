@@ -51,20 +51,44 @@ class ASC606PromptTemplates:
         Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance.
         """
         
+        # Enhanced ASC 606 assessment fields
+        enhanced_assessment_info = ""
+        enhanced_elements = []
+        
+        # Principal vs Agent
+        if user_inputs and user_inputs.get('principal_agent_involved'):
+            principal_details = user_inputs.get('principal_agent_details', '')
+            enhanced_elements.append(f"Principal vs Agent Analysis Required: {principal_details}")
+        
+        # Noncash consideration
+        if user_inputs and user_inputs.get('noncash_consideration_involved'):
+            noncash_details = user_inputs.get('noncash_consideration_details', '')
+            enhanced_elements.append(f"Noncash Consideration Present: {noncash_details}")
+        
+        # SSP assessment
+        if user_inputs and user_inputs.get('ssp_represents_contract_price') is not None:
+            ssp_status = "Yes" if user_inputs.get('ssp_represents_contract_price') else "No" 
+            enhanced_elements.append(f"SSP Represents Contract Price: {ssp_status}")
+        
+        # Revenue recognition timing
+        if user_inputs and user_inputs.get('revenue_recognition_timing_details'):
+            timing_details = user_inputs.get('revenue_recognition_timing_details')
+            enhanced_elements.append(f"Revenue Recognition Timing Details: {timing_details}")
+        
         # Additional elements analysis
-        additional_elements_info = ""
-        elements = []
+        additional_elements = []
         if user_inputs and user_inputs.get('financing_component'):
-            elements.append("Significant Financing Component (ASC 606-10-32-15)")
+            additional_elements.append("Significant Financing Component (ASC 606-10-32-15)")
         if user_inputs and user_inputs.get('material_rights'):
-            elements.append("Material Rights (ASC 606-10-55-42)")
+            additional_elements.append("Material Rights (ASC 606-10-55-42)")
         if user_inputs and user_inputs.get('customer_options'):
-            elements.append("Customer Options for Additional Goods/Services")
+            additional_elements.append("Customer Options for Additional Goods/Services")
             
-        if elements:
-            additional_elements_info = f"""
-        ADDITIONAL ELEMENTS IDENTIFIED: {', '.join(elements)}
-        Important: Management has identified these additional elements requiring special ASC 606 consideration.
+        if enhanced_elements or additional_elements:
+            all_elements = enhanced_elements + additional_elements
+            enhanced_assessment_info = f"""
+        ENHANCED ASC 606 ASSESSMENT: {'; '.join(all_elements)}
+        Important: Management has provided specific ASC 606 guidance requiring detailed analysis.
         """
         
         return f"""
@@ -85,7 +109,7 @@ class ASC606PromptTemplates:
         
         {modification_info}
         
-        {additional_elements_info}
+        {enhanced_assessment_info}
         
         {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
         

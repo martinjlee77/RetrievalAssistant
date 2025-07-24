@@ -55,9 +55,10 @@ class ASC606Analyzer(BaseAnalyzer):
             # Parse response into ASC606Analysis model
             analysis_result = self._parse_analysis_response(response or "")
             
-            # Store raw response for debugging if enabled
+            # Store raw response for debugging if enabled (note: not part of model)
             if debug_config and debug_config.get("show_raw_response"):
-                analysis_result.raw_response = response
+                # Store in session state or pass separately - raw_response not in model
+                pass
                 
             return analysis_result
             
@@ -77,13 +78,14 @@ class ASC606Analyzer(BaseAnalyzer):
                 parsed_data = json.loads(json_content)
                 
                 return ASC606Analysis(
-                    step1_contract_identification=parsed_data.get("step1", "Analysis not available"),
-                    step2_performance_obligations=parsed_data.get("step2", "Analysis not available"), 
-                    step3_transaction_price=parsed_data.get("step3", "Analysis not available"),
-                    step4_price_allocation=parsed_data.get("step4", "Analysis not available"),
-                    step5_revenue_recognition=parsed_data.get("step5", "Analysis not available"),
+                    step1_contract_identification=parsed_data.get("step1", {"analysis": "Analysis not available"}),
+                    step2_performance_obligations=parsed_data.get("step2", {"analysis": "Analysis not available"}), 
+                    step3_transaction_price=parsed_data.get("step3", {"analysis": "Analysis not available"}),
+                    step4_price_allocation=parsed_data.get("step4", {"analysis": "Analysis not available"}),
+                    step5_revenue_recognition=parsed_data.get("step5", {"analysis": "Analysis not available"}),
                     professional_memo=parsed_data.get("memo", response),
-                    source_quality="Hybrid RAG",
+                    reconciliation_analysis={"confirmations": [], "discrepancies": []},
+                    contract_overview={"title": "Enhanced ASC 606 Analysis", "summary": "Analysis based on enhanced 5-step assessment"},
                     citations=parsed_data.get("citations", []),
                     implementation_guidance=parsed_data.get("implementation", []),
                     not_applicable_items=parsed_data.get("not_applicable", [])
@@ -91,13 +93,14 @@ class ASC606Analyzer(BaseAnalyzer):
             else:
                 # Fallback: treat entire response as memo
                 return ASC606Analysis(
-                    step1_contract_identification="See detailed analysis in professional memo",
-                    step2_performance_obligations="See detailed analysis in professional memo",
-                    step3_transaction_price="See detailed analysis in professional memo", 
-                    step4_price_allocation="See detailed analysis in professional memo",
-                    step5_revenue_recognition="See detailed analysis in professional memo",
+                    step1_contract_identification={"analysis": "See detailed analysis in professional memo"},
+                    step2_performance_obligations={"analysis": "See detailed analysis in professional memo"},
+                    step3_transaction_price={"analysis": "See detailed analysis in professional memo"}, 
+                    step4_price_allocation={"analysis": "See detailed analysis in professional memo"},
+                    step5_revenue_recognition={"analysis": "See detailed analysis in professional memo"},
                     professional_memo=response,
-                    source_quality="Hybrid RAG",
+                    reconciliation_analysis={"confirmations": [], "discrepancies": []},
+                    contract_overview={"title": "Enhanced ASC 606 Analysis", "summary": "Analysis based on enhanced 5-step assessment"},
                     citations=[],
                     implementation_guidance=[],
                     not_applicable_items=[]
@@ -107,13 +110,14 @@ class ASC606Analyzer(BaseAnalyzer):
             self.logger.error(f"Failed to parse analysis response: {e}")
             # Return basic analysis structure
             return ASC606Analysis(
-                step1_contract_identification="Parsing error - see professional memo",
-                step2_performance_obligations="Parsing error - see professional memo",
-                step3_transaction_price="Parsing error - see professional memo",
-                step4_price_allocation="Parsing error - see professional memo", 
-                step5_revenue_recognition="Parsing error - see professional memo",
+                step1_contract_identification={"analysis": "Parsing error - see professional memo"},
+                step2_performance_obligations={"analysis": "Parsing error - see professional memo"},
+                step3_transaction_price={"analysis": "Parsing error - see professional memo"},
+                step4_price_allocation={"analysis": "Parsing error - see professional memo"}, 
+                step5_revenue_recognition={"analysis": "Parsing error - see professional memo"},
                 professional_memo=response or "Analysis failed to generate",
-                source_quality="Hybrid RAG",
+                reconciliation_analysis={"confirmations": [], "discrepancies": [], "error": "parsing failed"},
+                contract_overview={"title": "ASC 606 Analysis", "summary": "Analysis attempted with enhanced 5-step assessment", "error": "parsing failed"},
                 citations=[],
                 implementation_guidance=[],
                 not_applicable_items=[]

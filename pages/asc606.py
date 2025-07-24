@@ -125,155 +125,182 @@ if st.session_state.analysis_results is None:
                 "Once the fields above are complete, continue to the **📝 Step 2: Preliminary Assessment** tab.",
                 icon="➡️")
 
-    # Tab 2: Preliminary Assessment
+    # Tab 2: Enhanced ASC 606 Analysis Questions
     with tab2:
-        st.write(
-            "Provide your initial analysis - the AI will verify against the contract text."
-        )
-        # Create our two main columns for organization
-        col1, col2 = st.columns(2, gap="small")
-
-        # --- Column 1: Judgment & Flags Panel ---
+        st.subheader("📊 ASC 606 Analysis Questions")
+        st.write("This section helps our AI understand key details about the contract that may not be explicitly stated in the documents. **Required fields are marked with ***")
+        
+        # Step 1: Identify the Contract
+        st.markdown("### Step 1: Identify the Contract")
+        
+        col1, col2 = st.columns(2)
         with col1:
-            # We wrap each section in a bordered container for structure.
-            with st.container(border=True):
-                st.markdown("##### Key Contract Elements")
-                collectibility_assessment = st.radio(
-                    "Collectibility Assessment *",
-                    ["Probable", "Not Probable", "Uncertain"],
-                    index=0,
-                    horizontal=True,
-                    help=
-                    "Management's assessment of whether it is probable that the entity will collect substantially all of the consideration."
-                )
-                is_combined_contract = st.checkbox(
-                    "Evaluate as a single combined contract?",
-                    help=
-                    "Check if the uploaded documents were entered into at or near the same time and should be accounted for as a single arrangement per ASC 606-10-25-9."
-                )
-                is_modification = st.checkbox(
-                    "Is this a contract modification or amendment?",
-                    value=st.session_state.get('is_modification', False),
-                    help=
-                    "Check if this contract modifies or amends an existing agreement.",
-                    key="is_modification")
-
-                financing_component = st.checkbox(
-                    "Significant Financing Component?",
-                    value=st.session_state.get('financing_component', False),
-                    key="financing_component")
-                material_rights = st.checkbox(
-                    "Material Rights for future items?",
-                    value=st.session_state.get('material_rights', False),
-                    key="material_rights")
-                customer_options = st.checkbox(
-                    "Other Customer Options for additional goods/services?",
-                    value=st.session_state.get('customer_options', False),
-                    key="customer_options")
-
-        # --- Column 2: Interactive Details Panel ---
+            collectibility_assessment = st.selectbox(
+                "1.1 Is it probable that you will collect the consideration? *",
+                options=["Probable", "Not Probable", "Uncertain"],
+                index=0,
+                help="If collection of the full contract price is not probable, a contract may still exist for a lesser amount that is probable of collection."
+            )
+        
         with col2:
-            with st.container(border=True):
-                st.markdown("##### Performance Obligations")
-                if 'performance_obligations' not in st.session_state:
-                    st.session_state.performance_obligations = []
-
-                with st.expander("Add a Performance Obligation"):
-                    po_col1, po_col2 = st.columns(2)
-                    new_po_name = po_col1.text_input(
-                        "PO Name", placeholder="e.g., Software License")
-                    new_po_type = po_col2.selectbox(
-                        "Type", ["Good", "Service", "License", "Other"],
-                        key="po_type")
-
-                    po_col3, po_col4 = st.columns(2)
-                    new_po_timing = po_col3.selectbox(
-                        "Timing", ["Point in Time", "Over Time"],
-                        key="po_timing")
-                    new_po_ssp = po_col4.number_input(
-                        "Standalone Selling Price (SSP)",
-                        min_value=0.0,
-                        format="%.2f",
-                        key="po_ssp")
-
-                    if st.button("Add PO"):
-                        if new_po_name and new_po_ssp > 0:
-                            st.session_state.performance_obligations.append({
-                                'name':
-                                new_po_name,
-                                'type':
-                                new_po_type,
-                                'timing':
-                                new_po_timing,
-                                'ssp':
-                                new_po_ssp
-                            })
-                            st.success(f"Added: {new_po_name}")
-                            st.rerun()
-
-                if st.session_state.performance_obligations:
-                    st.write("**Current Performance Obligations:**")
-                    for i, po in enumerate(
-                            st.session_state.performance_obligations):
-                        po_display_col1, po_display_col2 = st.columns([4, 1])
-                        po_display_col1.write(
-                            f"**{i+1}. {po['name']}** ({po['type']}) - {po['ssp']:,.2f}"
-                        )
-                        if po_display_col2.button("✖️",
-                                                  key=f"remove_po_{i}",
-                                                  help="Remove this PO"):
-                            st.session_state.performance_obligations.pop(i)
-                            st.rerun()
-
-            # Add a little vertical space between the containers
-            st.markdown("")
-
-            with st.container(border=True):
-                st.markdown("##### Transaction Price")
-                fixed_consideration = st.number_input(
-                    "Fixed Consideration *",
-                    value=st.session_state.get('fixed_consideration', 0.0),
-                    min_value=0.0,
-                    format="%.2f",
-                    help="The guaranteed, fixed amount in the contract.",
-                    key="fixed_consideration")
-                has_variable = st.checkbox("Includes Variable Consideration?",
-                                           value=st.session_state.get(
-                                               'has_variable_consideration',
-                                               False),
-                                           key="has_variable_consideration")
-                if has_variable:
-                    var_col1, var_col2 = st.columns(2)
-                    variable_type = var_col1.selectbox(
-                        "Variable Consideration Type", [
-                            "Performance Bonus", "Penalty", "Usage-based",
-                            "Other"
-                        ],
-                        key="variable_type")
-                    variable_amount = var_col2.number_input(
-                        "Estimated Variable Amount",
-                        value=st.session_state.get('variable_amount', 0.0),
-                        min_value=0.0,
-                        format="%.2f",
-                        key="variable_amount")
-                has_consideration_payable = st.checkbox(
-                    "Includes Consideration Payable to Customer?",
-                    help=
-                    "Check if the contract includes payments to the customer (e.g., rebates, coupons)."
+            is_combined_contract_dropdown = st.selectbox(
+                "1.2 Should all uploaded documents be evaluated together as a single deal? *",
+                options=["Yes", "No"],
+                index=0,
+                help="Multiple documents may need to be combined per ASC 606-10-25-9"
+            )
+            is_combined_contract = is_combined_contract_dropdown == "Yes"
+        
+        col3, col4 = st.columns(2)
+        with col3:
+            is_modification_dropdown = st.selectbox(
+                "1.3 Is this a modification to an existing contract? *",
+                options=["Yes", "No"],
+                index=1,
+                help="Contract modifications require special accounting per ASC 606-10-25-10"
+            )
+            is_modification = is_modification_dropdown == "Yes"
+        
+        with col4:
+            original_contract_uploaded = None
+            if is_modification:
+                original_contract_uploaded = st.selectbox(
+                    "Have you also uploaded the original contract documents?",
+                    options=["Yes", "No"],
+                    index=1,
+                    key="original_contract_uploaded"
                 )
-                if has_consideration_payable:
-                    consideration_payable_amount = st.number_input(
-                        "Total Consideration Payable to Customer",
-                        min_value=0.0,
-                        format="%.2f",
-                        key="consideration_payable_amount")
-
+        
+        st.markdown("---")
+        
+        # Step 2: Identify Performance Obligations
+        st.markdown("### Step 2: Identify Performance Obligations")
+        st.info("The AI will analyze your contract(s) to identify distinct goods or services (performance obligations), including any customer options that may represent a material right.", icon="🤖")
+        
+        # Principal vs Agent - Optional
+        principal_agent_involved = st.selectbox(
+            "2.1 Is a third party involved in providing goods/services to the end customer? (Optional)",
+            options=["No", "Yes"],
+            index=0,
+            help="This helps determine if you should recognize revenue gross or net"
+        )
+        
+        principal_agent_details = None
+        if principal_agent_involved == "Yes":
+            principal_agent_details = st.text_area(
+                "Please describe the arrangement. Specify which party controls the good or service before transfer:",
+                placeholder="e.g., We are an agent for Party X's software, and they handle fulfillment and support.",
+                key="principal_agent_details",
+                help="This helps the AI perform principal vs. agent analysis"
+            )
+        
+        st.markdown("---")
+        
+        # Step 3: Determine the Transaction Price
+        st.markdown("### Step 3: Determine the Transaction Price")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            has_variable_consideration = st.selectbox(
+                "3.1 Does the contract include any variable consideration? (Optional)",
+                options=["No", "Yes"],
+                index=0,
+                help="Variable consideration includes volume discounts, performance bonuses, penalties, etc."
+            )
+        
+        with col2:
+            financing_component = st.selectbox(
+                "3.2 Does the contract include a significant financing component? (Optional)",
+                options=["No", "Yes"],
+                index=0,
+                help="This applies when payment timing provides significant financing benefit"
+            )
+        
+        # Variable consideration details
+        variable_consideration_details = None
+        if has_variable_consideration == "Yes":
+            variable_consideration_details = st.text_area(
+                "Please provide details on the variable consideration and your estimate:",
+                placeholder="e.g., A $10,000 performance bonus is included, which we estimate is 90% probable based on past performance.",
+                key="variable_consideration_details"
+            )
+        
+        # Financing component details  
+        financing_component_details = None
+        if financing_component == "Yes":
+            financing_component_details = st.text_area(
+                "Please provide details on the financing component:",
+                placeholder="e.g., Customer pays $120K upfront for 3-year service valued at $150K, creating a 10% discount rate.",
+                key="financing_component_details"
+            )
+        
+        col3, col4 = st.columns(2)
+        with col3:
+            noncash_consideration_involved = st.selectbox(
+                "3.3 Does the contract include noncash consideration? (Optional)",
+                options=["No", "Yes"],
+                index=0,
+                help="Such as equity, customer-provided materials, etc."
+            )
+        
+        with col4:
+            has_consideration_payable = st.selectbox(
+                "3.4 Does the contract include consideration payable to customer? (Optional)",
+                options=["No", "Yes"],  
+                index=0,
+                help="Such as rebates, coupons, or other payments to the customer"
+            )
+        
+        # Noncash consideration details
+        noncash_consideration_details = None
+        if noncash_consideration_involved == "Yes":
+            noncash_consideration_details = st.text_area(
+                "Please describe the noncash consideration and provide its estimated fair value:",
+                placeholder="e.g., Customer provides equipment valued at $50K as partial payment.",
+                key="noncash_consideration_details"
+            )
+        
+        # Consideration payable details
+        consideration_payable_amount = 0.0
+        if has_consideration_payable == "Yes":
+            consideration_payable_amount = st.number_input(
+                "Total Consideration Payable to Customer:",
+                min_value=0.0,
+                format="%.2f",
+                key="consideration_payable_amount"
+            )
+        
+        st.markdown("---")
+        
+        # Step 4: Allocate the Transaction Price
+        st.markdown("### Step 4: Allocate the Transaction Price")
+        
+        ssp_represents_contract_price = st.selectbox(
+            "4.1 Do the prices in the contract represent standalone selling prices (SSP)? (Optional)",
+            options=["Yes", "No", "Uncertain"],
+            index=0,
+            help="SSP is the price at which you would sell a good or service separately. If contract prices are reasonable estimates of standalone value, select 'Yes'."
+        )
+        
+        st.markdown("---")
+        
+        # Step 5: Recognize Revenue
+        st.markdown("### Step 5: Recognize Revenue")
+        
+        revenue_recognition_timing_details = st.text_area(
+            "5.1 Please describe when control transfers for each major performance obligation (Optional):",
+            placeholder="e.g., Software license is delivered upfront, Support services are provided evenly over 12 months.",
+            help="This helps the AI understand your specific timing considerations",
+            key="revenue_recognition_timing_details"
+        )
+        
         # Guidance for Tab 2
         st.markdown("---")
         with st.container(border=True):
             st.info(
                 "After completing your assessment, proceed to the **⚙️ Step 3: Analysis & Submission** tab to run the analysis.",
-                icon="➡️")
+                icon="➡️"
+            )
 
     with tab3:
         st.subheader("⚙️ Analysis Configuration")
@@ -437,16 +464,23 @@ if st.session_state.analysis_results is None:
                         additional_notes=additional_notes,
                         is_modification=is_modification,
                         is_combined_contract=is_combined_contract,
-                        performance_obligations=performance_obligations_data,
-                        fixed_consideration=fixed_consideration,
-                        variable_consideration=variable_consideration_data,
-                        financing_component=financing_component,
-                        material_rights=material_rights,
-                        customer_options=customer_options,
+                        performance_obligations=[],  # Let AI analyze from contract
+                        fixed_consideration=0.0,  # Let AI extract from contract
+                        variable_consideration=None,
+                        financing_component=(financing_component == "Yes"),
+                        material_rights=False,  # Let AI analyze
+                        customer_options=False,  # Let AI analyze
                         collectibility_assessment=collectibility_assessment,
-                        has_consideration_payable=has_consideration_payable,
-                        consideration_payable_amount=
-                        consideration_payable_amount)
+                        has_consideration_payable=(has_consideration_payable == "Yes"),
+                        consideration_payable_amount=consideration_payable_amount,
+                        # Enhanced ASC 606 Assessment Fields
+                        original_contract_uploaded=original_contract_uploaded,
+                        principal_agent_involved=(principal_agent_involved == "Yes"),
+                        principal_agent_details=principal_agent_details,
+                        noncash_consideration_involved=(noncash_consideration_involved == "Yes"),
+                        noncash_consideration_details=noncash_consideration_details,
+                        ssp_represents_contract_price=(ssp_represents_contract_price == "Yes"),
+                        revenue_recognition_timing_details=revenue_recognition_timing_details)
                     st.write("⚡ Running AI analysis with hybrid RAG system...")
                     analysis_results = analyzer.analyze_contract(
                         combined_text,

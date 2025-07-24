@@ -50,6 +50,15 @@ class ContractData(BaseModel):
     collectibility_assessment: str = "Probable"
     has_consideration_payable: bool = False
     consideration_payable_amount: float = 0.0
+    
+    # Enhanced ASC 606 Assessment Fields (Optional)
+    original_contract_uploaded: Optional[str] = None
+    principal_agent_involved: bool = False
+    principal_agent_details: Optional[str] = None
+    noncash_consideration_involved: bool = False
+    noncash_consideration_details: Optional[str] = None
+    ssp_represents_contract_price: bool = True
+    revenue_recognition_timing_details: Optional[str] = None
 
 @dataclass
 class ASC606Analysis:
