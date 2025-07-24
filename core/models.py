@@ -47,6 +47,8 @@ class ContractData(BaseModel):
     material_rights: bool = False
     customer_options: bool = False
     collectibility_assessment: str = "Probable"
+    has_consideration_payable: bool = False
+    consideration_payable_amount: float = 0.0
 
 @dataclass
 class ASC606Analysis:

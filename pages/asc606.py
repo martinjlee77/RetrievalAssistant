@@ -269,7 +269,8 @@ if st.session_state.analysis_results is None:
                 consideration_payable_amount = st.number_input(
                     "Total Consideration Payable to Customer",
                     min_value=0.0,
-                    format="%.2f")
+                    format="%.2f",
+                    key="consideration_payable_amount")
     with tab3:
         st.subheader("⚙️ Analysis Configuration")
 
@@ -329,6 +330,7 @@ if st.session_state.analysis_results is None:
             errors.append("At least one Performance Obligation must be added.")
         if not data['collectibility_assessment']:
             errors.append("Collectibility Assessment is required.")
+        # Note: has_consideration_payable is optional, no validation needed
 
         return errors
 
@@ -347,7 +349,8 @@ if st.session_state.analysis_results is None:
             "uploaded_files": uploaded_files,
             "fixed_consideration": fixed_consideration,
             "performance_obligations": st.session_state.performance_obligations,
-            "collectibility_assessment": collectibility_assessment
+            "collectibility_assessment": collectibility_assessment,
+            "has_consideration_payable": has_consideration_payable
         }
 
         # Validate all fields at once
@@ -413,6 +416,11 @@ if st.session_state.analysis_results is None:
                         'type': variable_type,
                         'estimated_amount': variable_amount
                     }
+                    
+                # Process consideration payable to customer  
+                consideration_payable_amount = 0.0
+                if has_consideration_payable:
+                    consideration_payable_amount = st.session_state.get('consideration_payable_amount', 0.0) if 'consideration_payable_amount' in st.session_state else 0.0
 
                 # Create contract data with preliminary assessment
                 contract_data = ContractData(
@@ -438,7 +446,9 @@ if st.session_state.analysis_results is None:
                     financing_component=financing_component,
                     material_rights=material_rights,
                     customer_options=customer_options,
-                    collectibility_assessment=collectibility_assessment)
+                    collectibility_assessment=collectibility_assessment,
+                    has_consideration_payable=has_consideration_payable,
+                    consideration_payable_amount=consideration_payable_amount)
 
                 st.write("⚡ Running AI analysis with hybrid RAG system...")
 

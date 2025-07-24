@@ -27,6 +27,14 @@ class ASC606PromptTemplates:
         Important: Management has assessed that collection of consideration is "{user_inputs['collectibility_assessment']}". This is fundamental to Step 1 contract identification under ASC 606-10-25-1(e).
         """
         
+        consideration_payable_info = ""
+        if user_inputs and user_inputs.get('has_consideration_payable'):
+            amount = user_inputs.get('consideration_payable_amount', 0)
+            consideration_payable_info = f"""
+        CONSIDERATION PAYABLE TO CUSTOMER: Yes (${amount:,.2f})
+        Important: The contract includes consideration payable to the customer. This must be considered in transaction price determination per ASC 606-10-32-25.
+        """
+        
         return f"""
         You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
         
@@ -38,6 +46,8 @@ class ASC606PromptTemplates:
         {contract_types_info}
         
         {collectibility_info}
+        
+        {consideration_payable_info}
         
         {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
         
@@ -62,6 +72,7 @@ class ASC606PromptTemplates:
         - Contract identification criteria (ASC 606-10-25-1)
         - Performance obligation identification and timing
         - Variable consideration estimates and constraints
+        - Consideration payable to customer (if applicable) per ASC 606-10-32-25
         
         Format your response in professional memo style suitable for audit workpapers.
         """
