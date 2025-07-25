@@ -59,9 +59,11 @@ class ASC606PromptTemplates:
         # Contract modification analysis
         modification_info = ""
         if user_inputs and user_inputs.get('is_modification'):
+            original_uploaded_status = "Yes" if user_inputs.get('original_contract_uploaded') else "No"
             modification_info = f"""
         CONTRACT MODIFICATION: Yes
-        Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance.
+        - Original Contract Uploaded: {original_uploaded_status}
+        - Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance. If the original contract is not uploaded, state that your analysis of the modification may be limited.
         """
         
         # Build comprehensive assessment from all UI fields
