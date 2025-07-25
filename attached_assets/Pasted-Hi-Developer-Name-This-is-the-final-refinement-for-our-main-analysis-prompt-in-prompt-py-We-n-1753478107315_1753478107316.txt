@@ -1,0 +1,43 @@
+Hi [Developer Name],
+
+This is the final refinement for our main analysis prompt in prompt.py. We need to add one last critical instruction to ensure the AI doesn't feel constrained by our reference guide and uses its full analytical capability.
+
+Please add the following instruction to the prompt. The best place for it is within the "YOUR TASK" section, as it's a core directive on how to perform the analysis.
+
+Action: Update the get_analysis_prompt function in prompt.py. Find the "YOUR TASK" section and add the new sentence I've marked below.
+
+Example Code for prompt.py (showing only the relevant "YOUR TASK" section):
+
+# ... inside the get_analysis_prompt function ...
+
+        # --- RESTRUCTURE THE FINAL PROMPT RETURN ---
+        return f"""You are a senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
+
+        Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis.
+
+        **EXPERT REFERENCE GUIDE (Minimum Scope of Analysis):**
+        ---
+        {expert_guidance_topics}
+        ---
+
+        **YOUR TASK:**
+        Analyze the provided contract text below. Write a professional accounting memo that follows the 5-step ASC 606 model. As you write your analysis for each of the 5 steps, you must address all **relevant topics** from the Expert Reference Guide.
+
+        **Crucially, you are not limited to the guide. You must also identify and analyze any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.**
+
+        - If a topic from the guide is relevant to the contract, discuss it in your analysis with supporting quotes and citations.
+        - If a topic from the guide is **not applicable** (e.g., the contract has no significant financing component), you must explicitly state that it was considered and is not present. This demonstrates thoroughness.
+
+        **CONTRACT TEXT TO ANALYZE:**
+        ---
+        {contract_text}
+        ---
+
+        # ... rest of the prompt remains the same ...
+        """
+
+Why This Final Change is So Important
+Sets the Floor, Not the Ceiling: It clearly reframes the guide as the minimum standard of quality, not the absolute limit of the analysis.
+Unleashes the AI's Full Power: The instruction "Crucially, you are not limited to the guide..." explicitly gives the LLM permission to use its own extensive training to spot novel or unusual contract clauses that might not be in a standard checklist. This is how you find the "gotchas" in complex contracts.
+Future-Proofs the Application: As new and creative contract terms are invented, your application can handle them without you needing to constantly update the contract_review_questions.txt file. The AI can adapt to what it sees.
+With this final addition, your prompt is now exceptionally robust. It establishes a high baseline for quality with the guide, mandates professional "negative assurance," and empowers the AI to go beyond the baseline to handle unique situations. This is the definition of a professional-grade AI instruction.

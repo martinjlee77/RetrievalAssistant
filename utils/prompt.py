@@ -12,6 +12,17 @@ class ASC606PromptTemplates:
     def get_analysis_prompt(contract_text: str, user_inputs: Optional[Dict] = None) -> str:
         """Main ASC 606 analysis prompt template"""
         
+        # Load expert guidance topics from contract review questions
+        expert_guidance_topics = ""
+        try:
+            import os
+            guidance_file = "attached_assets/contract_review_questions_1752258616680.txt"
+            if os.path.exists(guidance_file):
+                with open(guidance_file, 'r', encoding='utf-8') as f:
+                    expert_guidance_topics = f.read()
+        except Exception as e:
+            expert_guidance_topics = "Expert guidance not available"
+        
         # Extract contract types and collectibility for context
         contract_types_info = ""
         if user_inputs and user_inputs.get('contract_types'):
@@ -142,13 +153,28 @@ class ASC606PromptTemplates:
         - Note materiality of bonuses, penalties, discounts, and other variable elements
         """
         
-        return f"""You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
-        
-        Analyze the following contract according to the 5-step ASC 606 framework:
-        
-        CONTRACT TEXT:
+        return f"""You are a senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
+
+        Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis.
+
+        **EXPERT REFERENCE GUIDE (Minimum Scope of Analysis):**
+        ---
+        {expert_guidance_topics}
+        ---
+
+        **YOUR TASK:**
+        Analyze the provided contract text below. Write a professional accounting memo that follows the 5-step ASC 606 model. As you write your analysis for each of the 5 steps, you must address all **relevant topics** from the Expert Reference Guide.
+
+        **Crucially, you are not limited to the guide. You must also identify and analyze any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.**
+
+        - If a topic from the guide is relevant to the contract, discuss it in your analysis with supporting quotes and citations.
+        - If a topic from the guide is **not applicable** (e.g., the contract has no significant financing component), you must explicitly state that it was considered and is not present. This demonstrates thoroughness.
+
+        **CONTRACT TEXT TO ANALYZE:**
+        ---
         {contract_text}
-        
+        ---
+
         {contract_types_info}
         {collectibility_info}
         {consideration_payable_info}
