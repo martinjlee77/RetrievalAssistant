@@ -99,7 +99,7 @@ if st.session_state.analysis_results is None:
 
     # Tab 2: Analysis Questions (New Compact Design with Expanders)
     with tab2:
-        st.write("Your answers provide crucial context for the AI analysis. **Required fields are marked with an asterisk (*).**")
+        st.write("Your answers provide crucial context for the AI analysis.")
 
         # Initialize all optional detail variables to None to prevent errors
         original_contract_uploaded = None
@@ -109,22 +109,22 @@ if st.session_state.analysis_results is None:
         noncash_consideration_details = None
         consideration_payable_details = None
 
-        with st.expander("**Step 1: Identify the Contract**", expanded=True):
+        with st.expander("**Step 1: Identify the Contract (required)**", expanded=True):
             col1, col2 = st.columns(2, gap="medium")
             with col1:
                 collectibility = st.toggle("Collectibility is probable *", value=True, help="A contract does not exist under ASC 606 if collection is not probable.")
                 is_modification = st.toggle("This is a contract modification *", value=False)
             with col2:
                 is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True)
-                original_contract_uploaded = st.toggle("Is the original contract uploaded?", value=False, disabled=not is_modification)
+                original_contract_uploaded = st.toggle("Is the original contract uploaded? *", value=False, disabled=not is_modification)
 
-        with st.expander("**Step 2: Identify Performance Obligations**"):
+        with st.expander("**Step 2: Identify Performance Obligations (optional)**"):
             st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
             principal_agent_involved = st.toggle("Is a third party involved in providing goods or services?")
             if principal_agent_involved:
                 principal_agent_details = st.text_area("Describe the arrangement and specify who controls the good/service:", placeholder="e.g., We are an agent for Party X's software...", label_visibility="collapsed")
 
-        with st.expander("**Step 3: Determine the Transaction Price**"):
+        with st.expander("**Step 3: Determine the Transaction Price (optional)**"):
             col3, col4 = st.columns(2, gap="medium")
             with col3:
                 variable_consideration_involved = st.toggle("Includes variable consideration?")
@@ -153,30 +153,54 @@ if st.session_state.analysis_results is None:
 
     # Tab 3: Analysis Configuration and Execution
     with tab3:
-        st.subheader("⚙️ Analysis Configuration")
-        col1, col2 = st.columns(2, gap="small")
-        with col1:
-            analysis_depth = st.selectbox(
-                "Analysis Depth",
-                ["Standard Analysis", "Detailed Analysis", "Comprehensive Analysis"],
-                help="Choose the level of detail for your analysis"
-            )
-            include_citations = st.checkbox("Include Citations", value=True,
-                                           help="Include ASC 606 citations in the analysis")
-        with col2:
-            output_format = st.selectbox(
-                "Output Format",
-                ["Professional Memo", "Executive Summary", "Technical Analysis"],
-                help="Choose the format for your analysis output"
-            )
-            include_examples = st.checkbox("Include Examples", value=False,
-                                          help="Include illustrative examples in the analysis")
+        # Define the detailed help text as a constant for clarity
+        AUDIENCE_HELP_TEXT = """
+        Select the primary audience for the final memo. This adjusts the tone, focus, and level of technical detail. The underlying five-step analysis remains comprehensive for all options.
 
-        additional_notes = st.text_area(
-            "Additional Notes (Optional)",
-            placeholder="Any specific requirements or context for this analysis...",
-            height=100,
-            help="Provide any additional context or specific requirements"
+        • **Technical Accounting Team / Audit File (Default):**
+          - **Focus:** Deep technical compliance and audit readiness.
+          - **Content:** Assumes expert knowledge. Includes detailed step-by-step reasoning, direct quotations from ASC 606, and precise citations (e.g., ASC 606-10-55-34). This is the most detailed and formal output, suitable for internal accounting records and external auditors.
+
+        • **Management Review:**
+          - **Focus:** Key judgments, financial impact, and business implications.
+          - **Content:** Summarizes critical conclusions upfront. Uses less technical jargon and focuses on the "so what" for decision-makers like the CFO or Controller. It answers questions like, "How does this contract affect our revenue forecast?"
+
+        • **Deal Desk / Sales Team:**
+          - **Focus:** Explaining the revenue recognition impact of specific contract terms.
+          - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
+        """
+
+        st.subheader("⚙️ Step 3: Steer the Analysis")
+        st.write(
+            "The output will always be a comprehensive professional memo. Use these optional settings to guide the AI's focus and tailor the final report to your specific needs."
+        )
+
+        # Key Focus Areas - The most important steering input
+        key_focus_areas = st.text_area(
+            "1. Key Questions or Areas of Focus (Optional)",
+            placeholder=(
+                "Example: 'The main uncertainty is whether the implementation services are distinct from the "
+                "SaaS license. Please analyze this thoroughly, referencing the criteria in ASC 606-10-25-21.'"
+            ),
+            height=125,
+            help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis."
+        )
+
+        # Audience Selection with new detailed help text
+        memo_audience = st.selectbox(
+            "2. Tailor Memo for Audience (Optional)",
+            ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
+            index=0,  # Default to the most comprehensive option
+            help=AUDIENCE_HELP_TEXT
+        )
+
+        # Materiality Threshold for financial significance
+        materiality_threshold = st.number_input(
+            "3. Materiality Threshold (in contract currency, Optional)",
+            min_value=0,
+            value=1000,
+            step=1000,
+            help="The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly."
         )
 
         def validate_form():
@@ -191,7 +215,7 @@ if st.session_state.analysis_results is None:
 
         st.markdown("---")
         if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
-            validation_errors = validate_form() # Call the corrected function
+            validation_errors = validate_form()
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")
                 [st.warning(f"• {e}") for e in validation_errors]
@@ -207,14 +231,17 @@ if st.session_state.analysis_results is None:
                         st.stop()
                     combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
 
-                    st.write("🧠 Processing your answers...")
+                    st.write("🧠 Processing your answers and guidance...")
 
-                    # Corrected ContractData creation logic
+                    # Create the ContractData object with the new steering fields
                     contract_data = ContractData(
                         analysis_title=analysis_title, customer_name=customer_name, arrangement_description=arrangement_description, contract_start=contract_start,
                         contract_end=contract_end, currency=currency, uploaded_file_name=", ".join([f.name for f in uploaded_files]), contract_types=contract_types,
-                        analysis_depth=analysis_depth, output_format=output_format, additional_notes=additional_notes,
-                        # All data from Tab 2 is now correctly passed from the new UI
+                        # New steering fields from Tab 3
+                        key_focus_areas=key_focus_areas,
+                        memo_audience=memo_audience,
+                        materiality_threshold=materiality_threshold,
+                        # All data from Tab 2
                         collectibility=collectibility, is_combined_contract=is_combined_contract, is_modification=is_modification, original_contract_uploaded=original_contract_uploaded,
                         principal_agent_involved=principal_agent_involved, principal_agent_details=principal_agent_details,
                         variable_consideration_involved=variable_consideration_involved, variable_consideration_details=variable_consideration_details,
@@ -225,7 +252,6 @@ if st.session_state.analysis_results is None:
                     )
 
                     st.write("⚡ Running AI analysis...")
-                    # Rest of the analysis execution
                     analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
                     st.session_state.analysis_results = analysis_results
                     st.session_state.contract_data = contract_data
@@ -258,7 +284,7 @@ else:
         with metrics_col1:
             st.metric("Source Quality", getattr(analysis_results, 'source_quality', 'N/A'))
         with metrics_col2:
-            st.metric("Analysis Depth", contract_data.analysis_depth.title())
+            st.metric("Audience", contract_data.memo_audience.split(' / ')[0])
         with metrics_col3:
             st.metric("Currency", contract_data.currency)
 

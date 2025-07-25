@@ -91,6 +91,51 @@ class ASC606PromptTemplates:
         Important: Management has provided specific ASC 606 guidance requiring detailed analysis.
         """
         
+        # Build steering information for AI focus
+        steering_info = ""
+        if user_inputs:
+            # Key focus areas - most important steering input
+            if user_inputs.get('key_focus_areas'):
+                steering_info += f"""
+        SPECIFIC FOCUS AREAS (HIGH PRIORITY):
+        {user_inputs['key_focus_areas']}
+        
+        Important: The user has specifically requested focus on the above areas. Pay special attention to these questions/clauses/risks and provide detailed analysis with supporting citations.
+        """
+            
+            # Audience tailoring
+            memo_audience = user_inputs.get('memo_audience', 'Technical Accounting Team / Audit File')
+            if memo_audience == 'Management Review':
+                steering_info += """
+        MEMO AUDIENCE: Management Review
+        - Focus on key judgments, financial impact, and business implications
+        - Use less technical jargon and emphasize the "so what" for decision-makers
+        - Summarize critical conclusions upfront
+        """
+            elif memo_audience == 'Deal Desk / Sales Team':
+                steering_info += """
+        MEMO AUDIENCE: Deal Desk / Sales Team
+        - Focus on explaining revenue recognition impact of specific contract terms
+        - Translate complex accounting rules into practical guidance for deal structuring
+        - Explain how different clauses affect revenue timing
+        """
+            else:  # Technical Accounting Team / Audit File (default)
+                steering_info += """
+        MEMO AUDIENCE: Technical Accounting Team / Audit File
+        - Provide deep technical compliance and audit readiness
+        - Include detailed step-by-step reasoning and precise ASC 606 citations
+        - Use full technical detail suitable for expert accountants and auditors
+        """
+            
+            # Materiality threshold
+            if user_inputs.get('materiality_threshold'):
+                threshold = user_inputs['materiality_threshold']
+                steering_info += f"""
+        MATERIALITY THRESHOLD: {threshold:,} ({user_inputs.get('currency', 'USD')})
+        - Focus detailed analysis on contract elements exceeding this threshold
+        - Note materiality of bonuses, penalties, discounts, and other variable elements
+        """
+        
         return f"""
         You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
         
@@ -111,7 +156,7 @@ class ASC606PromptTemplates:
         
         {enhanced_assessment_info}
         
-        {f"USER PRELIMINARY ASSESSMENT: {user_inputs}" if user_inputs else ""}
+        {steering_info}
         
         Provide a comprehensive analysis following these steps:
         1. Contract Identification (ASC 606-10-25-1)

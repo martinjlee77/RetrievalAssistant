@@ -34,6 +34,11 @@ class ContractData(BaseModel):
     output_format: str
     additional_notes: Optional[str] = None
     
+    # New steering fields from Tab 3
+    key_focus_areas: Optional[str] = None
+    memo_audience: str = "Technical Accounting Team / Audit File"
+    materiality_threshold: Optional[int] = None
+    
     # All fields below correspond to the new UI toggles and text areas
     collectibility: bool
     is_combined_contract: bool
