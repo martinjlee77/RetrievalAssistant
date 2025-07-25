@@ -1,6 +1,6 @@
 """
 LLM Utilities - Following Streamlit Best Practices
-Handles OpenAI API calls, error handling, and caching
+Handles OpenAI API calls, error handling, caching, and file conversion utilities
 """
 import os
 import streamlit as st
@@ -8,6 +8,9 @@ from openai import OpenAI
 from typing import Dict, List, Any, Optional, Union, cast
 import json
 import time
+import io
+from docx import Document
+from fpdf import FPDF
 
 # Initialize OpenAI client
 @st.cache_resource
@@ -179,6 +182,32 @@ def validate_api_key() -> bool:
         return True
     except Exception:
         return False
+
+def create_docx_from_text(text_content):
+    """Creates a .docx file in memory from a string of text."""
+    document = Document()
+    document.add_paragraph(text_content)
+    bio = io.BytesIO()
+    document.save(bio)
+    bio.seek(0)
+    return bio.getvalue()
+
+def create_pdf_from_text(text_content, title=""):
+    """Creates a PDF file in memory from a string of text."""
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=11)
+
+    if title:
+        pdf.set_font("Arial", 'B', 16)
+        pdf.cell(0, 10, title, 0, 1, 'C')
+        pdf.ln(10)
+        pdf.set_font("Arial", size=11)
+
+    # Add text to PDF, handling multiple lines
+    pdf.multi_cell(0, 5, text_content)
+
+    return pdf.output(dest='S').encode('latin-1')
 
 def get_knowledge_base():
     """Get or initialize the ASC 606 knowledge base (consolidated from legacy file)"""

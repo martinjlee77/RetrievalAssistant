@@ -12,11 +12,20 @@ try:
     from core.models import ContractData, ASC606Analysis
     from utils.asc606_analyzer import ASC606Analyzer
     from utils.document_extractor import DocumentExtractor
-    from utils.llm import create_debug_sidebar
+    from utils.llm import create_debug_sidebar, create_docx_from_text, create_pdf_from_text
 except ImportError:
     # Handle missing imports gracefully
     st.error("Core components not found. Please ensure all required modules are available.")
     st.stop()
+
+def format_dict_as_markdown(data: dict) -> str:
+    """Converts a dictionary to a readable Markdown bulleted list."""
+    markdown_str = ""
+    for key, value in data.items():
+        # Format the key (e.g., 'is_enforceable' -> 'Is Enforceable')
+        formatted_key = key.replace('_', ' ').replace('-', ' ').title()
+        markdown_str += f"- **{formatted_key}:** {value}\n"
+    return markdown_str
 
 # Initialize session state
 if 'analysis_results' not in st.session_state:
@@ -330,7 +339,7 @@ else:
     with col1:
         st.subheader(f"📊 Analysis Results: {contract_data.analysis_title}")
     with col2:
-        if st.button("🔄 New Analysis", use_container_width=True):
+        if st.button("🔄 Start New Analysis", use_container_width=True):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
@@ -340,7 +349,11 @@ else:
         st.markdown("**📊 Analysis Overview**")
         metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
         with metrics_col1:
-            st.metric("Source Quality", getattr(analysis_results, 'source_quality', 'N/A'))
+            st.metric(
+                "Source Quality",
+                getattr(analysis_results, 'source_quality', 'N/A'),
+                help="This score (out of 100) reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
+            )
         with metrics_col2:
             st.metric("Audience", contract_data.memo_audience.split(' / ')[0])
         with metrics_col3:
@@ -361,7 +374,7 @@ else:
     for i, (step_name, step_data) in enumerate(steps, 1):
         with st.expander(f"**Step {i}: {step_name}**", expanded=(i==1)):
             if isinstance(step_data, dict):
-                st.json(step_data)
+                st.markdown(format_dict_as_markdown(step_data))
             else:
                 st.markdown(str(step_data))
 
@@ -372,12 +385,26 @@ else:
     if memo:
         with st.container(border=True):
             st.markdown(memo)
-            st.download_button(
-                label="📄 Download Memo",
-                data=memo.encode('utf-8'),
-                file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.txt",
-                mime="text/plain"
-            )
+            # Create columns for the download buttons
+            dl_col1, dl_col2 = st.columns(2)
+
+            with dl_col1:
+                st.download_button(
+                    label="📄 Download as .docx",
+                    data=create_docx_from_text(memo),
+                    file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True
+                )
+
+            with dl_col2:
+                st.download_button(
+                    label="📋 Download as .pdf",
+                    data=create_pdf_from_text(memo, title=contract_data.analysis_title),
+                    file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
     else:
         st.info("No memo generated for this analysis.")
 
