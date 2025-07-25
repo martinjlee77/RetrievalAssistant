@@ -68,6 +68,7 @@ class ASC606Analysis:
     implementation_guidance: List[str]
     citations: List[str]
     not_applicable_items: List[str]
+    source_quality: str = "Hybrid RAG"  # Add missing field
 
 # ==================== ASC 842 MODELS ====================
 

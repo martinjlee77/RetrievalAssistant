@@ -12,7 +12,8 @@ from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
 from core.models import ASC606Analysis
-from utils.llm import make_llm_call, get_knowledge_base, extract_contract_terms, query_knowledge_base
+from utils.llm import make_llm_call, extract_contract_terms
+from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
 import streamlit as st
 
@@ -23,27 +24,24 @@ class ASC606Analyzer:
     def __init__(self):
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.logger = logging.getLogger(__name__)
-        self.knowledge_base = None
+        self.kb_manager = None
         self._initialize_knowledge_base()
     
     def _initialize_knowledge_base(self):
-        """Initialize the ChromaDB knowledge base for RAG"""
+        """Initialize the knowledge base manager for RAG"""
         try:
-            self.knowledge_base = get_knowledge_base()
-            if self.knowledge_base:
-                self.logger.info("Knowledge base initialized successfully")
-            else:
-                self.logger.warning("Knowledge base failed to initialize")
+            self.kb_manager = get_knowledge_base_manager()
+            self.logger.info("Knowledge base manager initialized successfully")
         except Exception as e:
-            self.logger.error(f"Knowledge base initialization failed: {e}")
-            self.knowledge_base = None
+            self.logger.error(f"Knowledge base manager initialization failed: {e}")
+            self.kb_manager = None
     
     def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
         """Analyze contract using full RAG workflow with ASC 606 framework"""
         try:
             # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
             retrieved_context = ""
-            if self.knowledge_base:
+            if self.kb_manager:
                 # Extract contract-specific terms for better RAG results
                 contract_terms = extract_contract_terms(
                     client=self.client,
@@ -52,11 +50,11 @@ class ASC606Analyzer:
                 )
                 
                 if contract_terms:
-                    # Query knowledge base with extracted terms
-                    rag_results = query_knowledge_base(
-                        collection=self.knowledge_base,
-                        query_terms=contract_terms,
-                        step_context="ASC 606 comprehensive analysis",
+                    # Query knowledge base with extracted terms using improved manager
+                    rag_results = self.kb_manager.search_relevant_guidance(
+                        standard="ASC 606",
+                        query_texts=contract_terms,  # Pass as list for better search
+                        step_context="comprehensive_analysis",
                         n_results=8
                     )
                     
@@ -218,20 +216,19 @@ class ASC606Analyzer:
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """Get knowledge base statistics for debugging purposes"""
         try:
-            if self.knowledge_base:
-                # Get collection info
-                count = self.knowledge_base.count()
-                return {
-                    "total_chunks": count,
-                    "collection_name": "asc606_paragraphs",
-                    "status": "loaded",
+            if self.kb_manager:
+                # Get ASC 606 collection stats from manager
+                stats = self.kb_manager.get_collection_stats("ASC 606")
+                stats.update({
                     "type": "ChromaDB with OpenAI embeddings",
-                    "rag_enabled": True
-                }
+                    "rag_enabled": True,
+                    "manager_type": "KnowledgeBaseManager"
+                })
+                return stats
             else:
                 return {
                     "status": "not_loaded", 
-                    "error": "Knowledge base not initialized",
+                    "error": "Knowledge base manager not initialized",
                     "rag_enabled": False
                 }
         except Exception as e:
