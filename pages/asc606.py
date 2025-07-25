@@ -35,9 +35,10 @@ analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
 # Standard header
-st.title("ASC 606 Contract Analysis")
+st.title("ASC 606: Revenue Contract Analysis")
 st.write(
-    "Contract analysis using authoritative FASB guidance and industry leading interpretations. Complete the **required fields(*)** then click Analyze Contract."
+    "**Powered by Authoritative FASB Codification & Industry Interpretive Guidance.**\n\n"
+    "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and configure your analysis."
 )
 
 debug_config = create_debug_sidebar()
@@ -46,9 +47,9 @@ debug_config = create_debug_sidebar()
 if st.session_state.analysis_results is None:
 
     tab1, tab2, tab3 = st.tabs([
-        "**📋 Step 1: Upload Contract**",
-        "**📝 Step 2: Analysis Questions**",
-        "**⚙️ Step 3: Analyze**"
+        "**① Contract & Documents**",
+        "**② Key Considerations**",
+        "**③ Configure & Run**"
     ])
 
     with tab1:
@@ -60,7 +61,8 @@ if st.session_state.analysis_results is None:
                 help="A unique name to identify this analysis")
         with col2:
             customer_name = st.text_input("Customer Name *",
-                                          placeholder="e.g., ABC Corporation")
+                                          placeholder="e.g., ABC Corporation",
+                                          help="The legal entity name of the customer as it appears on the contract.")
         col3, col4 = st.columns(2, gap="small")
         with col3:
             contract_types = st.multiselect(
@@ -77,14 +79,16 @@ if st.session_state.analysis_results is None:
                                      help="Primary currency for the contract")
         col5, col6 = st.columns(2, gap="small")
         with col5:
-            contract_start = st.date_input("Contract Start Date *")
+            contract_start = st.date_input("Contract Start Date *",
+                                           help="The effective start date of the contractual period being analyzed.")
         with col6:
-            contract_end = st.date_input("Contract End Date *")
+            contract_end = st.date_input("Contract End Date *",
+                                         help="The effective end date of the contractual period being analyzed.")
         arrangement_description = st.text_area(
-            "Arrangement Description *",
-            placeholder="e.g., Three-year SaaS subscription with implementation services",
+            "Overall Arrangement Summary (Optional)",
+            placeholder='e.g., "New 3-year SaaS license with one-time setup fee."',
             height=100,
-            help="Description of the contractual arrangement - more detail is better to provide context for the AI"
+            help="Provide a one-sentence summary of the deal. This gives the AI crucial high-level context before it analyzes the details."
         )
         st.subheader("📄 Document Upload")
         uploaded_files = st.file_uploader(
@@ -94,12 +98,12 @@ if st.session_state.analysis_results is None:
         st.markdown("---")
         with st.container(border=True):
             st.info(
-                "Once the fields above are complete, continue to the **📝 Step 2: Analysis Questions** tab.",
+                "Once the fields above are complete, continue to the **② Key Considerations** tab.",
                 icon="➡️")
 
     # Tab 2: Analysis Questions (New Compact Design with Expanders)
     with tab2:
-        st.write("Your answers provide crucial context for the AI analysis.")
+        st.write("Your answers address key areas of judgment and provide crucial context for the AI.")
 
         # Initialize all optional detail variables to None to prevent errors
         original_contract_uploaded = None
@@ -113,14 +117,17 @@ if st.session_state.analysis_results is None:
             col1, col2 = st.columns(2, gap="medium")
             with col1:
                 collectibility = st.toggle("Collectibility is probable *", value=True, help="A contract does not exist under ASC 606 if collection is not probable.")
-                is_modification = st.toggle("This is a contract modification *", value=False)
+                is_modification = st.toggle("This is a contract modification *", value=False,
+                                            help="Select if this is an amendment, addendum, or change order that modifies an existing contract.")
             with col2:
-                is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True)
+                is_combined_contract = st.toggle("Evaluate docs as one contract? *", value=True,
+                                                 help="Per ASC 606-10-25-9, contracts entered into at or near the same time with the same customer should be combined if certain criteria are met. Select if these documents should be treated as a single accounting contract.")
                 original_contract_uploaded = st.toggle("Is the original contract uploaded? *", value=False, disabled=not is_modification)
 
         with st.expander("**Step 2: Identify Performance Obligations (optional)**"):
             st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
-            principal_agent_involved = st.toggle("Is a third party involved in providing goods or services?")
+            principal_agent_involved = st.toggle("Is a third party involved in providing goods or services?",
+                                                  help="Select if another party is involved in providing the goods or services to your end customer (e.g., you are reselling another company's product).")
             if principal_agent_involved:
                 principal_agent_details = st.text_area("Describe the arrangement and specify who controls the good/service:", placeholder="e.g., We are an agent for Party X's software...", label_visibility="collapsed")
 
@@ -149,7 +156,7 @@ if st.session_state.analysis_results is None:
             revenue_recognition_timing_details = st.text_area("Describe when control transfers for each major performance obligation:", placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
 
         st.markdown("---")
-        st.info("Continue to the **⚙️ 3. Analyze** tab.", icon="➡️")
+        st.info("Continue to the **③ Configure & Run** tab.", icon="➡️")
 
     # Tab 3: Analysis Configuration and Execution
     with tab3:
@@ -170,45 +177,47 @@ if st.session_state.analysis_results is None:
           - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
         """
 
-        st.subheader("⚙️ Step 3: Steer the Analysis")
+        st.subheader("⚙️ Configure & Run Analysis")
         st.write(
-            "The output will always be a comprehensive professional memo. Use these optional settings to guide the AI's focus and tailor the final report to your specific needs."
+            "Finalize your analysis by providing optional focus areas and audience preferences before generating the memo."
         )
 
         # Key Focus Areas - The most important steering input
         key_focus_areas = st.text_area(
-            "1. Key Questions or Areas of Focus (Optional)",
+            "Key Focus Areas / Specific Questions (Optional)",
             placeholder=(
                 "Example: 'The main uncertainty is whether the implementation services are distinct from the "
                 "SaaS license. Please analyze this thoroughly, referencing the criteria in ASC 606-10-25-21.'"
             ),
-            height=125,
+            height=100,
             help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis."
         )
 
-        # Audience Selection with new detailed help text
-        memo_audience = st.selectbox(
-            "2. Tailor Memo for Audience (Optional)",
-            ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
-            index=0,  # Default to the most comprehensive option
-            help=AUDIENCE_HELP_TEXT
-        )
-
-        # Materiality Threshold for financial significance
-        materiality_threshold = st.number_input(
-            "3. Materiality Threshold (in contract currency, Optional)",
-            min_value=0,
-            value=1000,
-            step=1000,
-            help="The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly."
-        )
+        col7, col8 = st.columns(2, gap="small")
+        with col7:
+            memo_audience = st.selectbox(
+                "Tailor Memo for Audience (Optional)",
+                ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
+                index=0,  # Default to the most comprehensive option
+                help=AUDIENCE_HELP_TEXT
+            )
+            
+        with col8:
+            # Materiality Threshold for financial significance
+            materiality_threshold = st.number_input(
+                "Materiality Threshold (Optional)",
+                min_value=0,
+                value=1000,
+                step=1000,
+                help="The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly."
+            )
 
         def validate_form():
             """Validate required fields from Tab 1"""
             errors = []
             if not analysis_title: errors.append("Analysis Title is required (Tab 1).")
             if not customer_name: errors.append("Customer Name is required (Tab 1).")
-            if not arrangement_description: errors.append("Arrangement Description is required (Tab 1).")
+            # arrangement_description is now optional
             if not contract_types: errors.append("At least one Document Type must be selected (Tab 1).")
             if not uploaded_files: errors.append("At least one document must be uploaded (Tab 1).")
             return errors
