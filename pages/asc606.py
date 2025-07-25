@@ -90,7 +90,7 @@ if st.session_state.analysis_results is None:
             height=100,
             help="Provide a one-sentence summary of the deal. This gives the AI crucial high-level context before it analyzes the details."
         )
-        st.subheader("📄 Document Upload")
+        st.subheader(":material/upload_file: Upload Documents")
         uploaded_files = st.file_uploader(
             "Upload All Related Contract Documents *", type=['pdf', 'docx', 'txt'], accept_multiple_files=True,
             help="Crucial: Upload the complete set of related documents for this arrangement."
@@ -98,11 +98,11 @@ if st.session_state.analysis_results is None:
         st.markdown("---")
         with st.container(border=True):
             st.info(
-                "Once the fields above are complete, continue to the **② Key Considerations** tab.",
-                icon="➡️")
+                "Once the fields above are complete, continue to the **2️⃣ Provide Context** tab.")
 
     # Tab 2: Analysis Questions (New Compact Design with Expanders)
     with tab2:
+        st.subheader(":material/checklist: Address 5-Step Model")
         st.write("Your answers address key areas of judgment and provide crucial context for the AI.")
 
         # Initialize all optional detail variables to None to prevent errors
@@ -156,7 +156,7 @@ if st.session_state.analysis_results is None:
             revenue_recognition_timing_details = st.text_area("Describe when control transfers for each major performance obligation:", placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
 
         st.markdown("---")
-        st.info("Continue to the **③ Configure & Run** tab.", icon="➡️")
+        st.info("Continue to the **3️⃣ Generate the Memo** tab.")
 
     # Tab 3: Analysis Configuration and Execution
     with tab3:
@@ -177,7 +177,7 @@ if st.session_state.analysis_results is None:
           - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
         """
 
-        st.subheader("⚙️ Configure & Run Analysis")
+        st.subheader("⚙️ Set Analysis Focus & Audience")
         st.write(
             "Finalize your analysis by providing optional focus areas and audience preferences before generating the memo."
         )
@@ -193,8 +193,8 @@ if st.session_state.analysis_results is None:
             help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis."
         )
 
-        col7, col8 = st.columns(2, gap="small")
-        with col7:
+        col1, col2 = st.columns(2, gap="small")
+        with col1:
             memo_audience = st.selectbox(
                 "Tailor Memo for Audience (Optional)",
                 ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
@@ -202,7 +202,7 @@ if st.session_state.analysis_results is None:
                 help=AUDIENCE_HELP_TEXT
             )
             
-        with col8:
+        with col2:
             # Materiality Threshold for financial significance
             materiality_threshold = st.number_input(
                 "Materiality Threshold (Optional)",
@@ -223,7 +223,7 @@ if st.session_state.analysis_results is None:
             return errors
 
         st.markdown("---")
-        if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
+        if st.button("📝 Generate the Memo", use_container_width=True, type="primary"):
             validation_errors = validate_form()
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")
@@ -247,7 +247,7 @@ if st.session_state.analysis_results is None:
                         analysis_title=analysis_title, customer_name=customer_name, arrangement_description=arrangement_description, contract_start=contract_start,
                         contract_end=contract_end, currency=currency, uploaded_file_name=", ".join([f.name for f in uploaded_files]), contract_types=contract_types,
                         # New steering fields from Tab 3
-                        key_focus_areas=key_focus_areas,
+                        key_focus_areas=key_focus_areas or "",
                         memo_audience=memo_audience,
                         materiality_threshold=materiality_threshold,
                         # All data from Tab 2

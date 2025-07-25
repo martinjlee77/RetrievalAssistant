@@ -10,6 +10,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-25**
+- ✅ **COMPREHENSIVE UI/UX TEXT & COPY OVERHAUL**: Implemented complete text modernization per user specifications  
+- ✅ Updated main title to "ASC 606: Revenue Contract Analysis" with professional powered-by subtitle
+- ✅ Changed tab names to circled numbers: "① Contract & Documents", "② Key Considerations", "③ Configure & Run"
+- ✅ Made arrangement description optional with improved label and contextual help text
+- ✅ Added comprehensive help text to all input fields (customer name, contract dates, modification toggles)
+- ✅ Updated all instructional text throughout interface for clarity and professionalism
+- ✅ **ENHANCED TAB 3 AI STEERING CONTROLS**: Transformed analysis from generic to targeted investigation
+- ✅ Added "Key Focus Areas / Specific Questions" text area - most powerful LLM steering input
+- ✅ Replaced output format with "Tailor Memo for Audience" dropdown with detailed help text
+- ✅ Added materiality threshold number input for financial significance assessment
+- ✅ **COMPLETE SYSTEM INTEGRATION FIXES**: Resolved all field mapping and prompt integration issues
+- ✅ Updated ContractData model to include new steering fields (key_focus_areas, memo_audience, materiality_threshold)
+- ✅ Enhanced prompt template to utilize all UI fields including new steering inputs for targeted analysis
+- ✅ Fixed validation function to exclude arrangement_description (now optional per UI changes)
+- ✅ Resolved dependency issues and ensured smooth LLM integration across all components
+- ✅ Verified all input fields properly flow from UI → ContractData model → LLM prompt → analysis output
+
 **Date: 2025-07-24**
 - ✅ **COMPACT UI REDESIGN WITH EXPANDERS & TOGGLES**: Implemented user's detailed instructions for improved UX
 - ✅ Replaced long scrolling form with st.expander for each 5-step section - feels much shorter and interactive

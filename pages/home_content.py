@@ -32,7 +32,7 @@ with col1:
     with st.container(border=True):
         st.markdown("##### 📄 ASC 606 - Revenue from Contracts with Customers")
         st.write(
-            "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and industry interpretative guidance."
+            "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and leading interpretative guidance."
         )
         st.page_link(
             "pages/asc606.py",
@@ -63,4 +63,4 @@ stat_cols[2].metric("Knowledge Sources", "FASB/ Industry", "Hybrid RAG")
 stat_cols[3].metric("Avg. Analysis Time", "~30s")
 
 st.divider()
-st.caption("© 2024 Controller.cpa. All Rights Reserved.")
+st.caption("© 2025 Controller.cpa. All Rights Reserved.")

@@ -9,20 +9,19 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
-from core.analyzers import BaseAnalyzer
+# from core.analyzers import BaseAnalyzer  # Removed dependency
 from core.models import ASC606Analysis
-from utils.llm import get_knowledge_base, extract_contract_terms, make_llm_call
+from utils.llm import make_llm_call
 from utils.prompt import ASC606PromptTemplates
 import streamlit as st
 
 
-class ASC606Analyzer(BaseAnalyzer):
-    """ASC 606 analyzer using hybrid RAG system"""
+class ASC606Analyzer:
+    """ASC 606 analyzer using direct LLM calls"""
     
     def __init__(self):
-        super().__init__("ASC 606")
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        self.knowledge_base = get_knowledge_base()
+        self.logger = logging.getLogger(__name__)
         # Legacy compatibility
         self.authoritative_sources = {"hybrid_rag": "loaded"}
     

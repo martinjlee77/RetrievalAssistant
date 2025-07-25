@@ -11,8 +11,10 @@ def load_custom_css():
     # Brand colors
     primary_color = "#0A2B4C"  # Deep Sapphire Blue (for text)
     secondary_color = "#C5A565"  # Muted Gold (for active background)
-    bg_color = "#F8F9FA"  # Very Light Gray (for sidebar background)
+    bg_color = "#E9ECEF"  # Very Light Gray (for sidebar background)
+    # F8F9FA, F0F2F5, E9ECEF, DEE2E6
 
+    
     css = f"""
         <style>
             /* --- Main Sidebar Style --- */
@@ -21,54 +23,27 @@ def load_custom_css():
                 border-right: 1px solid #e0e0e0;
             }}
 
-            /* --- Sidebar Logo --- */
-            [data-testid="stLogo"] {{
-                padding-bottom: 20px;
-            }}
-
-            /* --- Sidebar Navigation Links --- */
-            [data-testid="stSidebarNav"] ul {{
-                padding-top: 20px;
-                padding-bottom: 20px;
-            }}
-
+            /* --- Sidebar Navigation Links General Style --- */
             [data-testid="stSidebarNav"] ul li a {{
-                display: flex;
-                align-items: center;
-                padding: 0.75rem 1rem;
-                font-size: 1.1rem;
-                font-weight: 500;
-                color: {primary_color};
-                border-radius: 8px;
+            
+                padding: 0.5rem 0.75rem;
                 transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
                 text-decoration: none;
+                border-radius: 8px;
             }}
 
             /* --- Hover effect for navigation links --- */
             [data-testid="stSidebarNav"] ul li a:hover {{
-                background-color: #e9ecef;
-                color: {primary_color};
+                background-color: #F8F9FA;
             }}
 
-            /*
-            * THE ELEGANT SOLUTION:
-            * Use the brand's lighter secondary color for the active link's background.
-            * Then, set the active link's text and icon to the primary dark blue for
-            * a high-contrast, on-brand, and professional look.
-            *
-            * NO !important sledgehammers needed. This is much safer.
-            */
+            /* --- Active Page Link Style --- */
             [data-testid="stSidebarNav"] ul li a[aria-current="page"] {{
                 background-color: {secondary_color};
-                color: {primary_color};
-                font-weight: 700;
+                font-weight: 800;
             }}
 
-            [data-testid="stSidebarNav"] ul li a[aria-current="page"] svg {{
-                fill: {primary_color};
-            }}
-
-            /* --- Login/Register links (optional special styling) --- */
+            /* --- Login/Register links separator --- */
             [data-testid="stSidebarNav"] ul li:nth-last-child(1) a,
             [data-testid="stSidebarNav"] ul li:nth-last-child(2) a {{
                 border-top: 1px solid #ddd;
@@ -78,7 +53,6 @@ def load_custom_css():
         </style>
     """
     st.markdown(css, unsafe_allow_html=True)
-
 
 # 1. Set the page configuration
 st.set_page_config(
@@ -98,10 +72,10 @@ pg = st.navigation([
     st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
     st.Page("pages/asc606.py",
             title="ASC 606 Analyzer",
-            icon=":material/description:"),
+            icon=":material/arrow_forward:"),
     st.Page("pages/asc842.py",
             title="ASC 842 Analyzer",
-            icon=":material/real_estate_agent:"),
+            icon=":material/arrow_forward:"),
     st.Page("pages/login.py", title="Login", icon=":material/login:"),
     st.Page("pages/register.py",
             title="Register",

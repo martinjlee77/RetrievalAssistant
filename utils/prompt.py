@@ -21,17 +21,19 @@ class ASC606PromptTemplates:
         """
         
         collectibility_info = ""
-        if user_inputs and user_inputs.get('collectibility_assessment'):
+        if user_inputs and user_inputs.get('collectibility') is not None:
+            collectibility_status = "probable" if user_inputs.get('collectibility') else "not probable"
             collectibility_info = f"""
-        MANAGEMENT'S COLLECTIBILITY ASSESSMENT: {user_inputs['collectibility_assessment']}
-        Important: Management has assessed that collection of consideration is "{user_inputs['collectibility_assessment']}". This is fundamental to Step 1 contract identification under ASC 606-10-25-1(e).
+        COLLECTIBILITY ASSESSMENT: {collectibility_status}
+        Important: Management has assessed that collection of consideration is {collectibility_status}. This is fundamental to Step 1 contract identification under ASC 606-10-25-1(e).
         """
         
         consideration_payable_info = ""
-        if user_inputs and user_inputs.get('has_consideration_payable'):
-            amount = user_inputs.get('consideration_payable_amount', 0)
+        if user_inputs and user_inputs.get('consideration_payable_involved'):
+            details = user_inputs.get('consideration_payable_details', '')
             consideration_payable_info = f"""
-        CONSIDERATION PAYABLE TO CUSTOMER: Yes (${amount:,.2f})
+        CONSIDERATION PAYABLE TO CUSTOMER: Yes
+        Details: {details}
         Important: The contract includes consideration payable to the customer. This must be considered in transaction price determination per ASC 606-10-32-25.
         """
         
@@ -51,44 +53,48 @@ class ASC606PromptTemplates:
         Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance.
         """
         
-        # Enhanced ASC 606 assessment fields
+        # Build comprehensive assessment from all UI fields
         enhanced_assessment_info = ""
-        enhanced_elements = []
+        assessment_elements = []
+        
+        # Contract basics
+        if user_inputs and user_inputs.get('arrangement_description'):
+            assessment_elements.append(f"Arrangement Summary: {user_inputs['arrangement_description']}")
         
         # Principal vs Agent
         if user_inputs and user_inputs.get('principal_agent_involved'):
             principal_details = user_inputs.get('principal_agent_details', '')
-            enhanced_elements.append(f"Principal vs Agent Analysis Required: {principal_details}")
+            assessment_elements.append(f"Principal vs Agent Analysis Required: {principal_details}")
+        
+        # Variable consideration
+        if user_inputs and user_inputs.get('variable_consideration_involved'):
+            variable_details = user_inputs.get('variable_consideration_details', '')
+            assessment_elements.append(f"Variable Consideration Present: {variable_details}")
+        
+        # Financing component
+        if user_inputs and user_inputs.get('financing_component_involved'):
+            financing_details = user_inputs.get('financing_component_details', '')
+            assessment_elements.append(f"Significant Financing Component: {financing_details}")
         
         # Noncash consideration
         if user_inputs and user_inputs.get('noncash_consideration_involved'):
             noncash_details = user_inputs.get('noncash_consideration_details', '')
-            enhanced_elements.append(f"Noncash Consideration Present: {noncash_details}")
+            assessment_elements.append(f"Noncash Consideration Present: {noncash_details}")
         
         # SSP assessment
         if user_inputs and user_inputs.get('ssp_represents_contract_price') is not None:
             ssp_status = "Yes" if user_inputs.get('ssp_represents_contract_price') else "No" 
-            enhanced_elements.append(f"SSP Represents Contract Price: {ssp_status}")
+            assessment_elements.append(f"Contract Prices Represent SSP: {ssp_status}")
         
         # Revenue recognition timing
         if user_inputs and user_inputs.get('revenue_recognition_timing_details'):
             timing_details = user_inputs.get('revenue_recognition_timing_details')
-            enhanced_elements.append(f"Revenue Recognition Timing Details: {timing_details}")
-        
-        # Additional elements analysis
-        additional_elements = []
-        if user_inputs and user_inputs.get('financing_component'):
-            additional_elements.append("Significant Financing Component (ASC 606-10-32-15)")
-        if user_inputs and user_inputs.get('material_rights'):
-            additional_elements.append("Material Rights (ASC 606-10-55-42)")
-        if user_inputs and user_inputs.get('customer_options'):
-            additional_elements.append("Customer Options for Additional Goods/Services")
+            assessment_elements.append(f"Revenue Recognition Timing: {timing_details}")
             
-        if enhanced_elements or additional_elements:
-            all_elements = enhanced_elements + additional_elements
+        if assessment_elements:
             enhanced_assessment_info = f"""
-        ENHANCED ASC 606 ASSESSMENT: {'; '.join(all_elements)}
-        Important: Management has provided specific ASC 606 guidance requiring detailed analysis.
+        DETAILED ASSESSMENT INPUTS:
+        {chr(10).join(f"• {element}" for element in assessment_elements)}
         """
         
         # Build steering information for AI focus
@@ -136,8 +142,7 @@ class ASC606PromptTemplates:
         - Note materiality of bonuses, penalties, discounts, and other variable elements
         """
         
-        return f"""
-        You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
+        return f"""You are an expert technical accountant specializing in ASC 606 Revenue Recognition.
         
         Analyze the following contract according to the 5-step ASC 606 framework:
         
@@ -145,17 +150,11 @@ class ASC606PromptTemplates:
         {contract_text}
         
         {contract_types_info}
-        
         {collectibility_info}
-        
         {consideration_payable_info}
-        
         {combined_contract_info}
-        
         {modification_info}
-        
         {enhanced_assessment_info}
-        
         {steering_info}
         
         Provide a comprehensive analysis following these steps:
