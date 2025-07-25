@@ -35,9 +35,10 @@ analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
 # Standard header
-st.title("ASC 606 Contract Analysis")
+st.title("ASC 606: Revenue Contract Analysis")
 st.write(
-    "Contract analysis using authoritative FASB guidance and industry leading interpretations. Complete the **required fields(*)** then click Analyze Contract."
+    "**Powered by Authoritative FASB Codification & Industry Interpretive Guidance**\n\n"
+    "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and configure your analysis."
 )
 
 debug_config = create_debug_sidebar()
@@ -46,12 +47,13 @@ debug_config = create_debug_sidebar()
 if st.session_state.analysis_results is None:
 
     tab1, tab2, tab3 = st.tabs([
-        "**📋 Step 1: Upload Contract**",
-        "**📝 Step 2: Analysis Questions**",
-        "**⚙️ Step 3: Analyze**"
+        "**1️⃣ Define the Contract**",
+        "**2️⃣ Provide Context**",
+        "**3️⃣ Generate the Memo**"
     ])
 
     with tab1:
+        st.subheader(":material/contract: Enter Key Contract Details")
         col1, col2 = st.columns(2, gap="small")
         with col1:
             analysis_title = st.text_input(
@@ -60,7 +62,8 @@ if st.session_state.analysis_results is None:
                 help="A unique name to identify this analysis")
         with col2:
             customer_name = st.text_input("Customer Name *",
-                                          placeholder="e.g., ABC Corporation")
+                                          placeholder="e.g., ABC Corporation",
+                                          help="The legal entity name of the customer as it appears on the contract.")
         col3, col4 = st.columns(2, gap="small")
         with col3:
             contract_types = st.multiselect(
@@ -78,14 +81,15 @@ if st.session_state.analysis_results is None:
         col5, col6 = st.columns(2, gap="small")
         with col5:
             contract_start = st.date_input("Contract Start Date *",
-                                           help="The service or license start date")
+                                           help="The effective start date of the contractual period being analyzed.")
         with col6:
-            contract_end = st.date_input("Contract End Date *")
+            contract_end = st.date_input("Contract End Date *",
+                                         help="The effective end date of the contractual period being analyzed.")
         arrangement_description = st.text_area(
-            "Arrangement Description *",
-            placeholder="e.g., Three-year SaaS subscription with implementation services",
+            "Overall Arrangement Summary (Optional)",
+            placeholder='e.g., "New 3-year SaaS license with one-time setup fee."',
             height=100,
-            help="Description of the contractual arrangement - more detail is better to provide context for the AI"
+            help="Provide a one-sentence summary of the deal. This gives the AI crucial high-level context before it analyzes the details."
         )
         st.subheader(":material/upload_file: Upload Documents")
         uploaded_files = st.file_uploader(
@@ -95,11 +99,11 @@ if st.session_state.analysis_results is None:
         st.markdown("---")
         with st.container(border=True):
             st.info(
-                "Once the fields above are complete, continue to the **📝 Step 2: Analysis Questions** tab.")
+                "Once the fields above are complete, continue to the **2️⃣ Provide Context** tab.")
 
     # Tab 2: Analysis Questions (New Compact Design with Expanders)
     with tab2:
-        st.subheader(":material/checklist: Address 5-Step Model")
+        st.subheader(":material/question_answer: Provide Key Considerations for 5-Step Model")
         st.write("Your answers address key areas of judgment and provide crucial context for the AI.")
 
         # Initialize all optional detail variables to None to prevent errors
@@ -153,7 +157,7 @@ if st.session_state.analysis_results is None:
             revenue_recognition_timing_details = st.text_area("Describe when control transfers for each major performance obligation:", placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
 
         st.markdown("---")
-        st.info("Continue to the **⚙️ Step 3: Analyze** tab.")
+        st.info("Continue to the **3️⃣ Generate the Memo** tab.")
 
     # Tab 3: Analysis Configuration and Execution
     with tab3:
@@ -174,37 +178,39 @@ if st.session_state.analysis_results is None:
           - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
         """
 
-        st.subheader("⚙️ Configure Analysis")
+        st.subheader("⚙️ Set Analysis Focus & Audience")
         st.write(
-            "Configure your analysis below and generate the memo."
+            "Finalize your analysis by providing optional focus areas and audience preferences before generating the memo."
         )
 
+        # Key Focus Areas - The most important steering input
         key_focus_areas = st.text_area(
-            "Key Focus Areas / Specific Questions",
+            "Key Focus Areas / Specific Questions (Optional)",
             placeholder=(
                 "Example: 'The main uncertainty is whether the implementation services are distinct from the "
                 "SaaS license. Please analyze this thoroughly, referencing the criteria in ASC 606-10-25-21.'"
             ),
             height=100,
-            help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified."
+            help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis."
         )
 
         col1, col2 = st.columns(2, gap="small")
         with col1:
             memo_audience = st.selectbox(
-                "Tailor Memo for Audience",
+                "Tailor Memo for Audience (Optional)",
                 ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
                 index=0,  # Default to the most comprehensive option
                 help=AUDIENCE_HELP_TEXT
             )
             
         with col2:
+            # Materiality Threshold for financial significance
             materiality_threshold = st.number_input(
-                "Materiality Threshold",
+                "Materiality Threshold (Optional)",
                 min_value=0,
                 value=1000,
                 step=1000,
-                help="The AI will use this to assess the financial significance of contract elements."
+                help="The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly."
             )
 
         def validate_form():
@@ -212,13 +218,13 @@ if st.session_state.analysis_results is None:
             errors = []
             if not analysis_title: errors.append("Analysis Title is required (Tab 1).")
             if not customer_name: errors.append("Customer Name is required (Tab 1).")
-            if not arrangement_description: errors.append("Arrangement Description is required (Tab 1).")
+            # arrangement_description is now optional
             if not contract_types: errors.append("At least one Document Type must be selected (Tab 1).")
             if not uploaded_files: errors.append("At least one document must be uploaded (Tab 1).")
             return errors
 
         st.markdown("---")
-        if st.button("📝 Generate the Memo", use_container_width=True, type="primary"):
+        if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
             validation_errors = validate_form()
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")

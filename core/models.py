@@ -24,7 +24,7 @@ class ContractData(BaseModel):
     # Basic Contract Information  
     analysis_title: str
     customer_name: str
-    arrangement_description: str
+    arrangement_description: Optional[str] = None  # Now optional per UI changes
     contract_start: date
     contract_end: date
     currency: str
