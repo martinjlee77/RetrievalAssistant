@@ -1,0 +1,42 @@
+Hi [Developer Name], I've reviewed document_extractor.py and I'm extremely impressed. The resilient, multi-method approach for PDF extraction and the inclusion of table text from Word docs are fantastic. The proactive quality validation logic is a standout feature that makes our application much more robust. Excellent work.
+
+I have a few points of feedback and suggestions for improvement that will make this module even better."
+
+1. (High Priority) The Validation Logic Isn't Being Used
+Observation: The methods validate_extraction and _detect_garbled_text are defined, but they are never actually called within the extract_text method. We have this powerful quality control system, but it's currently turned off.
+
+Business Impact: We are missing the opportunity to automatically flag low-quality uploads (like scanned PDFs) for the user, which could prevent bad analyses.
+
+Comment for Developer: "The validate_extraction method is a fantastic feature. Let's integrate it into our main workflow. Please modify the extract_text method so that after text is extracted, it's immediately passed to validate_extraction. The validation results should then be included in the final dictionary that is returned."
+
+Code Suggestion:
+
+# In the main `extract_text` method, modify the `try` block's return logic:
+
+# ... inside extract_text ...
+try:
+    if file_extension == 'pdf':
+        extraction_result = self._extract_pdf_text(uploaded_file) # Get the full dict
+    elif file_extension in ['docx']: # Note: removed 'doc'
+        extraction_result = self._extract_word_text(uploaded_file)
+    else:
+        raise ValueError(f"Unsupported file type: {file_extension}")
+
+    # --- NEW: Call the validation method here ---
+    validation = self.validate_extraction(extraction_result)
+    extraction_result['validation'] = validation # Add validation results to the dictionary
+
+    return extraction_result # Return the combined result
+
+except Exception as e:
+    # ... error handling ...
+
+2. (Important) Clarify .doc vs. .docx Support
+Observation: The code currently lists 'doc' as a supported file type (['docx', 'doc']). However, the python-docx library cannot read the old binary .doc format (from Word 97-2003). It can only read the modern XML-based .docx format.
+Business Impact: This sets a false expectation for the user. If they upload a .doc file, the app will fail, and they won't know why.
+Comment for Developer: "I've noted that our code claims to support .doc files, but the python-docx library can only handle .docx. To prevent user errors and confusion, please remove 'doc' from the list of supported extensions in the extract_text method. We should only advertise the formats we can reliably process."
+3. (Code Quality) Move the import re Statement
+Observation: In the _clean_text method, the import re statement is located inside the function.
+Business Impact: While this works, it's against standard Python conventions (PEP 8). Imports should be at the top of the file for clarity, organization, and to avoid potentially re-importing the module unnecessarily.
+Comment for Developer: "This is a minor code quality point. The import re statement is currently inside the _clean_text function. Please move it to the top of the document_extractor.py file along with the other imports."
+These three changes will take your already excellent DocumentExtractor to a truly production-ready state.
