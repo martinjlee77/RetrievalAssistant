@@ -39,12 +39,21 @@ def make_llm_call(
         with st.spinner("Analyzing with AI..."):
             # Cast messages to proper type for OpenAI
             openai_messages = cast(List[Any], messages)
-            response = client.chat.completions.create(
-                model=model,
-                messages=openai_messages,
-                temperature=temperature,
-                max_tokens=max_tokens
-            )
+            
+            # Prepare request parameters
+            request_params = {
+                "model": model,
+                "messages": openai_messages,
+                "temperature": temperature,
+            }
+            
+            # Add optional parameters if provided
+            if response_format:
+                request_params["response_format"] = response_format
+            if max_tokens:
+                request_params["max_tokens"] = max_tokens
+                
+            response = client.chat.completions.create(**request_params)
         return response.choices[0].message.content
     
     except Exception as e:
@@ -283,6 +292,46 @@ Return only the terms as a comma-separated list, no explanations."""
         
     except Exception as e:
         st.warning(f"Could not extract contract terms: {e}")
+        return []
+
+def query_knowledge_base(collection, query_terms: List[str], step_context: str, n_results: int = 5) -> List[Dict[str, Any]]:
+    """
+    Query the knowledge base using contract-specific terms
+    Part of the RAG implementation
+    """
+    try:
+        # Combine query terms into a search query
+        query_text = " ".join(query_terms)
+        
+        # Add step-specific context to improve search relevance
+        contextual_query = f"{step_context}: {query_text}"
+        
+        # Query the collection
+        results = collection.query(
+            query_texts=[contextual_query],
+            n_results=n_results,
+            include=["documents", "metadatas", "distances"]
+        )
+        
+        # Format results for prompt injection
+        formatted_results = []
+        for i, (doc, metadata, distance) in enumerate(zip(
+            results['documents'][0], 
+            results['metadatas'][0], 
+            results['distances'][0]
+        )):
+            formatted_results.append({
+                "content": doc,
+                "source": metadata.get("source", "ASC 606"),
+                "section": metadata.get("section", "Unknown"),
+                "relevance_score": 1 - distance,  # Convert distance to relevance
+                "rank": i + 1
+            })
+        
+        return formatted_results
+        
+    except Exception as e:
+        st.warning(f"Knowledge base query failed: {e}")
         return []
 
 def create_debug_sidebar() -> Dict[str, Any]:

@@ -213,6 +213,8 @@ class ASC606PromptTemplates:
         - Material rights per ASC 606-10-55-42 (if applicable)
         - Customer options for additional goods/services (if applicable)
         
+        Use any retrieved authoritative guidance provided above to support your analysis with precise citations.
+        
         Format your response in professional memo style suitable for audit workpapers.
         """
     

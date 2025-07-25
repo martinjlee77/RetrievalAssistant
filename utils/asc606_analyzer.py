@@ -1,63 +1,122 @@
 """
-ASC 606 Analyzer - Consolidated from legacy hybrid analyzer
+ASC 606 Analyzer - Hybrid RAG System with Authoritative Sources
+Implements full Retrieval-Augmented Generation workflow
 """
 
 import json
 import logging
 import os
+import re
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
-# from core.analyzers import BaseAnalyzer  # Removed dependency
 from core.models import ASC606Analysis
-from utils.llm import make_llm_call
+from utils.llm import make_llm_call, get_knowledge_base, extract_contract_terms, query_knowledge_base
 from utils.prompt import ASC606PromptTemplates
 import streamlit as st
 
 
 class ASC606Analyzer:
-    """ASC 606 analyzer using direct LLM calls"""
+    """ASC 606 analyzer using hybrid RAG with ChromaDB knowledge base"""
     
     def __init__(self):
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.logger = logging.getLogger(__name__)
-        # Legacy compatibility
-        self.authoritative_sources = {"hybrid_rag": "loaded"}
+        self.knowledge_base = None
+        self._initialize_knowledge_base()
+    
+    def _initialize_knowledge_base(self):
+        """Initialize the ChromaDB knowledge base for RAG"""
+        try:
+            self.knowledge_base = get_knowledge_base()
+            if self.knowledge_base:
+                self.logger.info("Knowledge base initialized successfully")
+            else:
+                self.logger.warning("Knowledge base failed to initialize")
+        except Exception as e:
+            self.logger.error(f"Knowledge base initialization failed: {e}")
+            self.knowledge_base = None
     
     def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
-        """Analyze contract using ASC 606 framework"""
+        """Analyze contract using full RAG workflow with ASC 606 framework"""
         try:
-            # Get analysis prompt
-            prompt = ASC606PromptTemplates.get_analysis_prompt(
+            # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
+            retrieved_context = ""
+            if self.knowledge_base:
+                # Extract contract-specific terms for better RAG results
+                contract_terms = extract_contract_terms(
+                    client=self.client,
+                    contract_text=contract_text,
+                    step_context="comprehensive_analysis"
+                )
+                
+                if contract_terms:
+                    # Query knowledge base with extracted terms
+                    rag_results = query_knowledge_base(
+                        collection=self.knowledge_base,
+                        query_terms=contract_terms,
+                        step_context="ASC 606 comprehensive analysis",
+                        n_results=8
+                    )
+                    
+                    if rag_results:
+                        # Format retrieved context for prompt injection
+                        retrieved_context = "\n\n**RETRIEVED AUTHORITATIVE GUIDANCE:**\n"
+                        for result in rag_results:
+                            retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                            retrieved_context += f"{result['content']}\n"
+                        retrieved_context += "\n---\n"
+            
+            # === STEP 2: ENHANCED PROMPT WITH RAG CONTEXT ===
+            base_prompt = ASC606PromptTemplates.get_analysis_prompt(
                 contract_text=contract_text,
                 user_inputs=contract_data.__dict__ if hasattr(contract_data, '__dict__') else {}
             )
             
-            # Make LLM call with debug config
+            # Inject retrieved context into prompt
+            enhanced_prompt = f"{base_prompt}\n\n{retrieved_context}" if retrieved_context else base_prompt
+            
+            # Add JSON formatting instruction
+            enhanced_prompt += """\n\nIMPORTANT: Format your entire response as a single JSON object with the following structure:
+{
+  "step1": {"analysis": "your analysis", "conclusion": "your conclusion"},
+  "step2": {"analysis": "your analysis", "conclusion": "your conclusion"},
+  "step3": {"analysis": "your analysis", "conclusion": "your conclusion"},
+  "step4": {"analysis": "your analysis", "conclusion": "your conclusion"},
+  "step5": {"analysis": "your analysis", "conclusion": "your conclusion"},
+  "memo": "complete professional memo text",
+  "citations": ["list of ASC citations used"],
+  "source_quality": "percentage based on authoritative sources used"
+}"""
+            
+            # === STEP 3: LLM CALL WITH JSON MODE ===
             model = debug_config.get("model", "gpt-4o") if debug_config else "gpt-4o"
             temperature = debug_config.get("temperature", 0.3) if debug_config else 0.3
-            max_tokens = debug_config.get("max_tokens", 2000) if debug_config else 2000
+            max_tokens = debug_config.get("max_tokens", 3000) if debug_config else 3000
             
             messages = [
-                {"role": "system", "content": "You are an expert ASC 606 technical accountant."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": "You are a senior technical accountant from a Big 4 firm specializing in ASC 606. Provide comprehensive analysis using authoritative sources."},
+                {"role": "user", "content": enhanced_prompt}
             ]
             
             response = make_llm_call(
                 messages=messages,
                 model=model,
                 temperature=temperature,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                response_format={"type": "json_object"}  # Use OpenAI's native JSON mode
             )
             
-            # Parse response into ASC606Analysis model
+            # === STEP 4: ROBUST PARSING ===
             analysis_result = self._parse_analysis_response(response or "")
             
-            # Store raw response for debugging if enabled (note: not part of model)
+            # Store debug information if enabled
             if debug_config and debug_config.get("show_raw_response"):
-                # Store in session state or pass separately - raw_response not in model
-                pass
+                st.session_state.raw_response = response
+                
+            if debug_config and debug_config.get("show_prompts"):
+                st.session_state.enhanced_prompt = enhanced_prompt
                 
             return analysis_result
             
@@ -66,31 +125,56 @@ class ASC606Analyzer:
             raise
     
     def _parse_analysis_response(self, response: str) -> ASC606Analysis:
-        """Parse LLM response into structured analysis"""
-        # Simple parsing - in production this would be more sophisticated
+        """Parse LLM response into structured analysis with robust JSON handling"""
         try:
-            # Try to extract JSON if present
-            if "```json" in response and "```" in response:
-                json_start = response.find("```json") + 7
-                json_end = response.find("```", json_start)
-                json_content = response[json_start:json_end].strip()
-                parsed_data = json.loads(json_content)
-                
+            # === ROBUST JSON PARSING ===
+            json_content = None
+            
+            # Method 1: Try direct JSON parsing (for JSON mode responses)
+            try:
+                json_content = json.loads(response.strip())
+            except json.JSONDecodeError:
+                pass
+            
+            # Method 2: Extract JSON from markdown code blocks
+            if not json_content:
+                json_match = re.search(r"```json\s*(\{.*?\})\s*```", response, re.DOTALL)
+                if json_match:
+                    try:
+                        json_content = json.loads(json_match.group(1))
+                    except json.JSONDecodeError:
+                        pass
+            
+            # Method 3: Find JSON object within response text
+            if not json_content:
+                json_match = re.search(r"(\{.*\})", response, re.DOTALL)
+                if json_match:
+                    try:
+                        json_content = json.loads(json_match.group(1))
+                    except json.JSONDecodeError:
+                        pass
+            
+            # === CREATE ANALYSIS OBJECT ===
+            if json_content:
                 return ASC606Analysis(
-                    step1_contract_identification=parsed_data.get("step1", {"analysis": "Analysis not available"}),
-                    step2_performance_obligations=parsed_data.get("step2", {"analysis": "Analysis not available"}), 
-                    step3_transaction_price=parsed_data.get("step3", {"analysis": "Analysis not available"}),
-                    step4_price_allocation=parsed_data.get("step4", {"analysis": "Analysis not available"}),
-                    step5_revenue_recognition=parsed_data.get("step5", {"analysis": "Analysis not available"}),
-                    professional_memo=parsed_data.get("memo", response),
+                    step1_contract_identification=json_content.get("step1", {"analysis": "Analysis not available"}),
+                    step2_performance_obligations=json_content.get("step2", {"analysis": "Analysis not available"}), 
+                    step3_transaction_price=json_content.get("step3", {"analysis": "Analysis not available"}),
+                    step4_price_allocation=json_content.get("step4", {"analysis": "Analysis not available"}),
+                    step5_revenue_recognition=json_content.get("step5", {"analysis": "Analysis not available"}),
+                    professional_memo=json_content.get("memo", response),
                     reconciliation_analysis={"confirmations": [], "discrepancies": []},
-                    contract_overview={"title": "Enhanced ASC 606 Analysis", "summary": "Analysis based on enhanced 5-step assessment"},
-                    citations=parsed_data.get("citations", []),
-                    implementation_guidance=parsed_data.get("implementation", []),
-                    not_applicable_items=parsed_data.get("not_applicable", [])
+                    contract_overview={
+                        "title": "RAG-Enhanced ASC 606 Analysis", 
+                        "summary": "Analysis using authoritative sources and enhanced 5-step assessment"
+                    },
+                    citations=json_content.get("citations", []),
+                    implementation_guidance=json_content.get("implementation", []),
+                    not_applicable_items=json_content.get("not_applicable", []),
+                    source_quality=json_content.get("source_quality", "Hybrid RAG")
                 )
             else:
-                # Fallback: treat entire response as memo
+                # Fallback: treat entire response as memo with enhanced metadata
                 return ASC606Analysis(
                     step1_contract_identification={"analysis": "See detailed analysis in professional memo"},
                     step2_performance_obligations={"analysis": "See detailed analysis in professional memo"},
@@ -99,56 +183,60 @@ class ASC606Analyzer:
                     step5_revenue_recognition={"analysis": "See detailed analysis in professional memo"},
                     professional_memo=response,
                     reconciliation_analysis={"confirmations": [], "discrepancies": []},
-                    contract_overview={"title": "Enhanced ASC 606 Analysis", "summary": "Analysis based on enhanced 5-step assessment"},
+                    contract_overview={
+                        "title": "RAG-Enhanced ASC 606 Analysis", 
+                        "summary": "Analysis using authoritative sources and enhanced 5-step assessment"
+                    },
                     citations=[],
                     implementation_guidance=[],
-                    not_applicable_items=[]
+                    not_applicable_items=[],
+                    source_quality="Hybrid RAG"
                 )
                 
         except Exception as e:
             self.logger.error(f"Failed to parse analysis response: {e}")
-            # Return basic analysis structure
+            # Return error-safe analysis structure
             return ASC606Analysis(
-                step1_contract_identification={"analysis": "Parsing error - see professional memo"},
-                step2_performance_obligations={"analysis": "Parsing error - see professional memo"},
-                step3_transaction_price={"analysis": "Parsing error - see professional memo"},
-                step4_price_allocation={"analysis": "Parsing error - see professional memo"}, 
-                step5_revenue_recognition={"analysis": "Parsing error - see professional memo"},
+                step1_contract_identification={"analysis": "Parsing error - see professional memo", "error": str(e)},
+                step2_performance_obligations={"analysis": "Parsing error - see professional memo", "error": str(e)},
+                step3_transaction_price={"analysis": "Parsing error - see professional memo", "error": str(e)},
+                step4_price_allocation={"analysis": "Parsing error - see professional memo", "error": str(e)}, 
+                step5_revenue_recognition={"analysis": "Parsing error - see professional memo", "error": str(e)},
                 professional_memo=response or "Analysis failed to generate",
                 reconciliation_analysis={"confirmations": [], "discrepancies": [], "error": "parsing failed"},
-                contract_overview={"title": "ASC 606 Analysis", "summary": "Analysis attempted with enhanced 5-step assessment", "error": "parsing failed"},
+                contract_overview={
+                    "title": "ASC 606 Analysis", 
+                    "summary": "Analysis attempted with enhanced 5-step assessment", 
+                    "error": "parsing failed"
+                },
                 citations=[],
                 implementation_guidance=[],
-                not_applicable_items=[]
+                not_applicable_items=[],
+                source_quality="Error"
             )
     
-    def analyze_document(self, document_text: str, document_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Legacy compatibility method"""
-        return self.analyze_contract(document_text, document_data).__dict__
-    
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
-        """Get knowledge base statistics"""
+        """Get knowledge base statistics for debugging purposes"""
         try:
             if self.knowledge_base:
+                # Get collection info
                 count = self.knowledge_base.count()
                 return {
                     "total_chunks": count,
                     "collection_name": "asc606_paragraphs",
                     "status": "loaded",
-                    "type": "ChromaDB with OpenAI embeddings"
+                    "type": "ChromaDB with OpenAI embeddings",
+                    "rag_enabled": True
                 }
             else:
-                return {"status": "not_loaded", "error": "Knowledge base not initialized"}
+                return {
+                    "status": "not_loaded", 
+                    "error": "Knowledge base not initialized",
+                    "rag_enabled": False
+                }
         except Exception as e:
-            return {"status": "error", "error": str(e)}
-    
-    def validate_analysis_quality(self, analysis: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate analysis quality"""
-        quality_score = 0.8  # Simplified scoring
-        
-        return {
-            "quality_score": quality_score,
-            "validation_passed": quality_score > 0.7,
-            "issues": [],
-            "recommendations": []
-        }
+            return {
+                "status": "error", 
+                "error": str(e),
+                "rag_enabled": False
+            }
