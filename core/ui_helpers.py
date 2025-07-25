@@ -7,12 +7,9 @@ import json
 from typing import Dict, Any, List
 
 def load_custom_css():
-    """Final attempt to fix and hide the sidebar icon issue."""
+    """Load optimized CSS for the RAG-enabled multi-standard platform"""
     css = """
-    /* 1. Attempt to load the font, just in case CSP was a red herring. */
-    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-    
-    /* Import Google Fonts */
+    /* Import Google Fonts for professional branding */
     @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap');
 
     /* Brand Color Variables */
@@ -37,39 +34,7 @@ def load_custom_css():
         background-color: white !important;
     }
 
-    /* THE DEFINITIVE FIX - Target the exact element you found */
-    span[data-testid="stIconMaterial"] {
-        font-family: 'Material Symbols Outlined' !important;
-        font-size: 0 !important;
-        color: transparent !important;
-        visibility: hidden !important;
-    }
-    
-    /* Use pseudo-element to add the correct icon */
-    span[data-testid="stIconMaterial"]::before {
-        content: 'keyboard_double_arrow_left';
-        font-family: 'Material Symbols Outlined' !important;
-        font-size: 1.5rem !important;
-        color: rgba(33, 37, 41, 0.6) !important;
-        visibility: visible !important;
-        display: inline-block;
-    }
-    
-    /* Hide the text content completely */
-    span[data-testid="stIconMaterial"]:contains("keyboard_double_arrow_left"),
-    span[data-testid="stIconMaterial"]:contains("keyboard_double_arrow_right") {
-        font-size: 0 !important;
-        color: transparent !important;
-        text-indent: -9999px !important;
-        overflow: hidden !important;
-    }
-    
-    /* Additional safety net */
-    span[data-testid="stIconMaterial"]:contains("keyboard") {
-        font-size: 0 !important;
-        color: transparent !important;
-        text-indent: -9999px !important;
-    }
+    /* Clean navigation styling - removed icon fixes as they're UI-specific */
 
     /* Enhanced button hover effects */
     .stButton>button:hover {
@@ -246,83 +211,7 @@ def load_custom_css():
     """
     st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
     
-    # JavaScript solution to remove keyboard_double_arrow_right text
-    st.markdown("""
-    <script>
-    function removeKeyboardArrowText() {
-        // Find all text nodes containing the problematic text
-        const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        
-        const textNodes = [];
-        let node;
-        
-        while (node = walker.nextNode()) {
-            if (node.nodeValue && node.nodeValue.includes('keyboard_double_arrow_right')) {
-                textNodes.push(node);
-            }
-        }
-        
-        // Remove or hide the text nodes
-        textNodes.forEach(textNode => {
-            textNode.parentNode.style.display = 'none';
-        });
-        
-        // Also check for any elements with this text content
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach(element => {
-            if (element.textContent && element.textContent.includes('keyboard_double_arrow_right')) {
-                element.style.display = 'none';
-            }
-            
-            // Remove title attributes that contain the problematic text
-            if (element.getAttribute && element.getAttribute('title') && 
-                element.getAttribute('title').includes('keyboard_double_arrow_right')) {
-                element.removeAttribute('title');
-            }
-        });
-        
-        // Special handling for navigation tooltips
-        const navButtons = document.querySelectorAll('[data-testid="stSidebar"] button');
-        navButtons.forEach(button => {
-            if (button.title && button.title.includes('keyboard_double_arrow_right')) {
-                button.title = '';
-            }
-        });
-    }
-    
-    // Run immediately and on DOM changes
-    removeKeyboardArrowText();
-    
-    // Observer for dynamic content
-    const observer = new MutationObserver(function(mutations) {
-        removeKeyboardArrowText();
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-    
-    // Run again after delays to catch late-loading content
-    setTimeout(removeKeyboardArrowText, 100);
-    setTimeout(removeKeyboardArrowText, 500);
-    setTimeout(removeKeyboardArrowText, 1000);
-    
-    // Special handling for hover states and navigation
-    document.addEventListener('mouseover', function(event) {
-        setTimeout(removeKeyboardArrowText, 10);
-    });
-    
-    document.addEventListener('mouseout', function(event) {
-        setTimeout(removeKeyboardArrowText, 10);
-    });
-    </script>
-    """, unsafe_allow_html=True)
+    # Removed JavaScript fixes - focused on core platform functionality
 
 def render_branded_header(title: str, subtitle: str = None):
     """Render branded header for all pages"""
@@ -361,25 +250,30 @@ def render_standard_sidebar(current_standard: str, available_standards: Dict[str
             else:
                 st.info(f"**{code}**\n\n*{info['name']}*\n\n(Coming Soon)", icon="⏳")
 
-def render_analysis_metrics(analysis_results: Dict[str, Any]):
-    """Render analysis metrics in a consistent format"""
+def render_analysis_metrics(analysis_results: Any):
+    """Render analysis metrics in a consistent format for RAG-enhanced results"""
     st.subheader("Analysis Overview")
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.metric("Source Quality", "Hybrid RAG", "Authoritative + AI")
+        # Updated to show actual source quality from RAG system
+        source_quality = getattr(analysis_results, 'source_quality', 'Hybrid RAG')
+        st.metric("Source Quality", source_quality, "RAG-Enhanced")
     
     with col2:
-        citations_count = len(analysis_results.get('citations', []))
-        st.metric("Citations", citations_count, "Source References")
+        citations = getattr(analysis_results, 'citations', [])
+        citations_count = len(citations) if citations else 0
+        st.metric("Citations", citations_count, "Authoritative Sources")
     
     with col3:
-        guidance_count = len(analysis_results.get('implementation_guidance', []))
+        guidance = getattr(analysis_results, 'implementation_guidance', [])
+        guidance_count = len(guidance) if guidance else 0
         st.metric("Guidance Items", guidance_count, "Implementation Notes")
     
     with col4:
-        memo_length = len(analysis_results.get('professional_memo', ''))
+        memo = getattr(analysis_results, 'professional_memo', '')
+        memo_length = len(memo) if memo else 0
         st.metric("Memo Length", f"{memo_length:,}", "Characters")
 
 def render_step_analysis(step_name: str, step_data: Dict[str, Any]):
@@ -437,131 +331,40 @@ def render_professional_memo(memo_content: str):
     </div>
     """, unsafe_allow_html=True)
 
-def render_upload_interface_two_column(standard: str):
-    """Render two-column upload interface"""
-    st.header(f"Start New {standard} Analysis")
-    st.write("Complete the required fields and upload your document, then click Analyze.")
+def render_rag_knowledge_base_status(kb_stats: Dict[str, Any]):
+    """Render knowledge base status for RAG system debugging"""
+    with st.expander("🔍 Knowledge Base Status", expanded=False):
+        if kb_stats.get('rag_enabled', False):
+            st.success(f"✅ RAG System Active")
+            st.write(f"**Collection:** {kb_stats.get('collection_name', 'Unknown')}")
+            st.write(f"**Total Chunks:** {kb_stats.get('total_chunks', 0):,}")
+            st.write(f"**Status:** {kb_stats.get('status', 'Unknown')}")
+            if 'manager_type' in kb_stats:
+                st.write(f"**Manager:** {kb_stats['manager_type']}")
+        else:
+            st.warning("⚠️ RAG System Not Available")
+            if 'error' in kb_stats:
+                st.error(f"Error: {kb_stats['error']}")
+
+def format_dict_as_markdown(data_dict: Dict[str, Any], indent_level: int = 0) -> str:
+    """Convert dictionary to formatted markdown for better readability"""
+    result = []
+    indent = "  " * indent_level
     
-    col1, col2 = st.columns(2, gap="large")
+    for key, value in data_dict.items():
+        formatted_key = key.replace('_', ' ').title()
+        
+        if isinstance(value, dict):
+            result.append(f"{indent}**{formatted_key}:**")
+            result.append(format_dict_as_markdown(value, indent_level + 1))
+        elif isinstance(value, list):
+            result.append(f"{indent}**{formatted_key}:**")
+            for item in value:
+                if isinstance(item, str):
+                    result.append(f"{indent}  • {item}")
+                else:
+                    result.append(f"{indent}  • {str(item)}")
+        else:
+            result.append(f"{indent}**{formatted_key}:** {value}")
     
-    with col1:
-        st.subheader("📋 Required Information")
-        
-        analysis_title = st.text_input(
-            "Analysis Title / Document ID *",
-            placeholder="e.g., Q4 Project Phoenix Contract",
-            help="A unique name to identify this analysis"
-        )
-        
-        if standard == "ASC 606":
-            customer_name = st.text_input(
-                "Customer Name *",
-                placeholder="e.g., ABC Corporation"
-            )
-            
-            arrangement_description = st.text_area(
-                "Arrangement Description *",
-                placeholder="e.g., Three-year SaaS subscription with implementation services",
-                height=100,
-                help="Brief description of the contractual arrangement"
-            )
-            
-            # Date inputs
-            sub_col1, sub_col2 = st.columns(2)
-            with sub_col1:
-                contract_start = st.date_input("Contract Start Date *")
-            with sub_col2:
-                contract_end = st.date_input("Contract End Date *")
-            
-            currency = st.selectbox(
-                "Currency *",
-                ["USD", "EUR", "GBP", "CAD", "AUD", "JPY"],
-                help="Primary currency for the contract"
-            )
-        
-        elif standard == "ASC 842":
-            lessor_name = st.text_input(
-                "Lessor Name *",
-                placeholder="e.g., Property Management Co."
-            )
-            
-            lessee_name = st.text_input(
-                "Lessee Name *",
-                placeholder="e.g., Your Company Name"
-            )
-            
-            asset_description = st.text_area(
-                "Asset Description *",
-                placeholder="e.g., Office space at 123 Main Street, 5,000 sq ft",
-                height=100,
-                help="Description of the leased asset"
-            )
-        
-        # File upload
-        st.subheader("📄 Document Upload")
-        uploaded_files = st.file_uploader(
-            "Upload Documents",
-            type=['pdf', 'docx', 'txt'],
-            accept_multiple_files=True,
-            help="Upload contracts, amendments, invoices, or related documents"
-        )
-    
-    with col2:
-        st.subheader("⚙️ Analysis Configuration")
-        
-        analysis_depth = st.selectbox(
-            "Analysis Depth",
-            ["Standard Analysis", "Detailed Analysis", "Comprehensive Analysis"],
-            help="Choose the level of detail for your analysis"
-        )
-        
-        output_format = st.selectbox(
-            "Output Format",
-            ["Professional Memo", "Executive Summary", "Technical Analysis"],
-            help="Select the format for your analysis results"
-        )
-        
-        include_citations = st.checkbox(
-            "Include Citations",
-            value=True,
-            help="Include authoritative source citations in the analysis"
-        )
-        
-        include_examples = st.checkbox(
-            "Include Examples",
-            value=False,
-            help="Include practical examples and illustrations"
-        )
-        
-        additional_notes = st.text_area(
-            "Additional Notes",
-            placeholder="Any specific requirements or context for this analysis...",
-            height=100,
-            help="Optional notes to guide the analysis"
-        )
-    
-    # Full-width analyze button
-    st.markdown("---")
-    
-    if st.button("🔍 Analyze Document", use_container_width=True, type="primary"):
-        # Validation logic would go here
-        if not analysis_title:
-            st.error("Please provide an analysis title")
-            return None
-        
-        if not uploaded_files:
-            st.error("Please upload at least one document")
-            return None
-        
-        # Return collected data
-        return {
-            'analysis_title': analysis_title,
-            'uploaded_files': uploaded_files,
-            'analysis_depth': analysis_depth,
-            'output_format': output_format,
-            'include_citations': include_citations,
-            'include_examples': include_examples,
-            'additional_notes': additional_notes
-        }
-    
-    return None
+    return "\n".join(result)
