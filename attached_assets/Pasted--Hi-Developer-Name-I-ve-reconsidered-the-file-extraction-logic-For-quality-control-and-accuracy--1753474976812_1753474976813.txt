@@ -1,0 +1,62 @@
+"Hi [Developer Name], I've reconsidered the file extraction logic. For quality control and accuracy, we cannot proceed with an analysis if any of the uploaded documents fail text extraction.
+
+Please update the 'Engine Room' code with the following logic:
+
+Iterate through the uploaded files.
+If any file fails the extraction process, immediately stop the analysis.
+Display a specific and helpful error message that tells the user exactly which file(s) failed and suggests possible ways for them to fix it."
+The Corrected "Engine Room" Code (Text Extraction Part)
+This new code block should replace the existing text extraction logic inside the with st.status(...) block.
+
+# --- Start of new code block ---
+
+# Inside the `with st.status(...)` and `try:` blocks...
+
+# 1. More robust text extraction with a "stop on failure" policy
+st.write("📄 Verifying and extracting text from documents...")
+all_extracted_text = []
+failed_files = []
+
+for f in uploaded_files:
+    try:
+        extraction_result = extractor.extract_text(f)
+        # Check if the extraction returned a valid result with actual text
+        if extraction_result and extraction_result.get('text'):
+            all_extracted_text.append(extraction_result['text'])
+        else:
+            # The file was processed but no text was found (e.g., a scanned image PDF)
+            failed_files.append(f.name)
+    except Exception:
+        # The extractor itself threw an error (e.g., corrupted or password-protected file)
+        failed_files.append(f.name)
+
+# 2. Check for failures and stop the process if any exist
+if failed_files:
+    # Construct a helpful, multi-line error message
+    error_message = (
+        f"**Text extraction failed for the following file(s):**\n"
+        f"- `{'`, `'.join(failed_files)}`\n\n"
+        "**Please check the file(s) and try again. Common reasons for failure include:**\n"
+        "- The file is password-protected.\n"
+        "- The PDF is an image-only scan with no machine-readable text.\n"
+        "- The file is corrupted or in an unsupported format."
+    )
+    st.error(error_message, icon="🚨")
+    st.stop() # Immediately halt the analysis
+
+# This part only runs if all files were successful
+combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
+
+# The rest of the "Engine Room" code (Processing answers, creating ContractData, etc.) remains the same.
+
+# --- End of new code block ---
+
+Why This New Logic is Better
+Fail-Safe: It completely prevents an analysis based on incomplete data, protecting the user and the integrity of the output.
+Actionable Error Message: It doesn't just say "Error." It tells the user:
+Which file is the problem.
+Why it might be a problem (password, scanned image, corruption). This empowers the user to fix the issue themselves without needing to contact support.
+Professional: This level of error checking and user guidance is expected in a high-quality professional tool.
+This is a fantastic decision that significantly improves the robustness and reliability of your application.
+
+We are now ready to move on to the final section: The Results Display (The Dashboard).

@@ -37,7 +37,7 @@ extractor = DocumentExtractor()
 # Standard header
 st.title("ASC 606: Revenue Contract Analysis")
 st.write(
-    "**Powered by Authoritative FASB Codification & Industry Interpretive Guidance**\n\n"
+    "**Powered by Authoritative FASB Codification & Leading Interpretive Guidance**\n\n"
     "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and configure your analysis."
 )
 
@@ -178,7 +178,7 @@ if st.session_state.analysis_results is None:
           - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
         """
 
-        st.subheader("⚙️ Set Analysis Focus & Audience")
+        st.subheader(":material/grading: Set Analysis Focus & Audience")
         st.write(
             "Finalize your analysis by providing optional focus areas and audience preferences before generating the memo."
         )
@@ -218,27 +218,66 @@ if st.session_state.analysis_results is None:
             errors = []
             if not analysis_title: errors.append("Analysis Title is required (Tab 1).")
             if not customer_name: errors.append("Customer Name is required (Tab 1).")
-            # arrangement_description is now optional
             if not contract_types: errors.append("At least one Document Type must be selected (Tab 1).")
+            if not currency: errors.append("Currency is required (Tab 1).")
+            if not contract_start: errors.append("Contract Start Date is required (Tab 1).")
+            if not contract_end: errors.append("Contract End Date is required (Tab 1).")
+            if contract_start and contract_end:
+                if contract_end < contract_start:
+                    errors.append("Contract End Date cannot be before the Contract Start Date (Tab 1).")
             if not uploaded_files: errors.append("At least one document must be uploaded (Tab 1).")
+
+            if collectibility is None: errors.append("Collectibility must be specified (Tab 2).")
+            if is_modification is None: errors.append("Contract Modification status must be specified (Tab 2).")
+            if is_modification and original_contract_uploaded is None: errors.append("When 'This is a contract modification' is on, you must also specify if the original contract is uploaded (Tab 2).")
+            if is_combined_contract is None: errors.append("Combined Contract status must be specified (Tab 2).")
+            
             return errors
 
         st.markdown("---")
+        
         if st.button("🔍 Analyze Contract", use_container_width=True, type="primary"):
             validation_errors = validate_form()
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")
                 [st.warning(f"• {e}") for e in validation_errors]
                 st.stop()
-
+            
             with st.status("🔍 Analyzing contract...", expanded=True) as status:
                 try:
-                    # Text extraction logic
-                    st.write("📄 Extracting text from documents...")
-                    all_extracted_text = [extractor.extract_text(f)['text'] for f in uploaded_files if extractor.extract_text(f).get('text')]
-                    if not all_extracted_text: 
-                        st.error("No text could be extracted.")
-                        st.stop()
+                    # Enhanced text extraction with fail-safe policy
+                    st.write("📄 Verifying and extracting text from documents...")
+                    all_extracted_text = []
+                    failed_files = []
+
+                    for f in uploaded_files:
+                        try:
+                            extraction_result = extractor.extract_text(f)
+                            # Check if the extraction returned a valid result with actual text
+                            if extraction_result and extraction_result.get('text'):
+                                all_extracted_text.append(extraction_result['text'])
+                            else:
+                                # The file was processed but no text was found (e.g., a scanned image PDF)
+                                failed_files.append(f.name)
+                        except Exception:
+                            # The extractor itself threw an error (e.g., corrupted or password-protected file)
+                            failed_files.append(f.name)
+
+                    # Check for failures and stop the process if any exist
+                    if failed_files:
+                        # Construct a helpful, multi-line error message
+                        error_message = (
+                            f"**Text extraction failed for the following file(s):**\n"
+                            f"- `{'`, `'.join(failed_files)}`\n\n"
+                            "**Please check the file(s) and try again. Common reasons for failure include:**\n"
+                            "- The file is password-protected.\n"
+                            "- The PDF is an image-only scan with no machine-readable text.\n"
+                            "- The file is corrupted or in an unsupported format."
+                        )
+                        st.error(error_message, icon="🚨")
+                        st.stop() # Immediately halt the analysis
+
+                    # This part only runs if all files were successful
                     combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
 
                     st.write("🧠 Processing your answers and guidance...")
@@ -268,10 +307,18 @@ if st.session_state.analysis_results is None:
                     status.update(label="✅ Analysis complete!", state="complete")
                     time.sleep(1)
                     st.rerun()
+             
                 except Exception as e:
-                    st.error(f"An unexpected error occurred during analysis: {str(e)}")
-                    st.exception(e)
-                    st.stop()
+                    st.error(
+                        "An unexpected error occurred during the analysis. Please try again. "
+                        "If the problem persists, please contact support."
+                    )
+
+                    # Only show the full technical error if debug mode is on
+                    if debug_config.get("show_raw_response", False):
+                        st.subheader("🔧 Technical Error Details")
+                        st.exception(e)
+                        st.stop()
 
 else:
     # Display results
