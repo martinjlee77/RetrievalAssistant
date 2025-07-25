@@ -5,6 +5,7 @@ Handles PDF and Word document text extraction for contract analysis
 
 import io
 import logging
+import re
 from typing import Optional, Dict, Any
 import PyPDF2
 import pdfplumber
@@ -31,11 +32,17 @@ class DocumentExtractor:
         
         try:
             if file_extension == 'pdf':
-                return self._extract_pdf_text(uploaded_file)
-            elif file_extension in ['docx', 'doc']:
-                return self._extract_word_text(uploaded_file)
+                extraction_result = self._extract_pdf_text(uploaded_file)
+            elif file_extension in ['docx']:
+                extraction_result = self._extract_word_text(uploaded_file)
             else:
                 raise ValueError(f"Unsupported file type: {file_extension}")
+
+            # --- NEW: Call the validation method here ---
+            validation = self.validate_extraction(extraction_result)
+            extraction_result['validation'] = validation  # Add validation results to the dictionary
+
+            return extraction_result  # Return the combined result
                 
         except Exception as e:
             self.logger.error(f"Error extracting text from {uploaded_file.name}: {str(e)}")
@@ -166,7 +173,6 @@ class DocumentExtractor:
         cleaned_text = '\n'.join(cleaned_lines)
         
         # Remove multiple consecutive newlines
-        import re
         cleaned_text = re.sub(r'\n{3,}', '\n\n', cleaned_text)
         
         return cleaned_text.strip()
