@@ -318,7 +318,8 @@ if st.session_state.analysis_results is None:
                     if debug_config.get("show_raw_response", False):
                         st.subheader("🔧 Technical Error Details")
                         st.exception(e)
-                        st.stop()
+                    # Always stop after an error, regardless of debug mode
+                    st.stop()
 
 else:
     # Display results
