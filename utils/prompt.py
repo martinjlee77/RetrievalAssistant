@@ -74,6 +74,13 @@ class ASC606PromptTemplates:
         - Cite ASC 606 official guidance under "Relevant ASC 606 citations"  
         - Cite EY professional interpretations under "Relevant industry interpretations"
         
+        **FORMATTING INSTRUCTIONS FOR PROFESSIONAL MEMO OUTPUT:**
+        To ensure proper formatting in the final document, please use these semantic markers:
+        - Wrap direct contract quotes in [QUOTE]...[/QUOTE] tags
+        - Wrap ASC 606 citations in [CITATION]...[/CITATION] tags  
+        - Use standard markdown for headers (## for main sections, ### for subsections)
+        - Use ** for bold text and standard bullet points (-)
+        
         {memo_format}
         """
     

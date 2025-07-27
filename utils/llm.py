@@ -565,8 +565,49 @@ def _parse_and_format_memo_content(document, text_content):
             run.font.color.rgb = RGBColor(51, 51, 51)
             continue
             
-        # === ASC CITATIONS FORMATTING ===
-        if 'asc 606' in line.lower() or 'asc-606' in line.lower():
+        # === SEMANTIC MARKER PARSING (ROBUST) ===
+        # Contract quotes with semantic markers
+        if line.startswith('[QUOTE]') and line.endswith('[/QUOTE]'):
+            quote_text = line[7:-8]  # Remove [QUOTE] and [/QUOTE]
+            para = document.add_paragraph()
+            para.left_indent = Pt(36)  # Indent contract quotes
+            para.right_indent = Pt(18)
+            
+            run = para.add_run(quote_text)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(11)
+            run.font.italic = True
+            run.font.color.rgb = RGBColor(51, 51, 51)
+            continue
+            
+        # ASC citations with semantic markers
+        if line.startswith('[CITATION]') and line.endswith('[/CITATION]'):
+            citation_text = line[10:-12]  # Remove [CITATION] and [/CITATION]
+            para = document.add_paragraph()
+            
+            run = para.add_run(citation_text)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(0, 102, 51)  # Green for citations
+            continue
+            
+        # === FALLBACK HEURISTIC PARSING (BACKUP) ===
+        # Keep fallback for backwards compatibility, but semantic markers take priority
+        if ('contract states' in line.lower() or 'agreement provides' in line.lower() or 
+            line.startswith('"')) and not line.startswith('['):
+            para = document.add_paragraph()
+            para.left_indent = Pt(36)
+            para.right_indent = Pt(18)
+            
+            run = para.add_run(line)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(11)
+            run.font.italic = True
+            run.font.color.rgb = RGBColor(51, 51, 51)
+            continue
+            
+        if ('asc 606' in line.lower() or 'asc-606' in line.lower()) and not line.startswith('['):
             para = document.add_paragraph()
             
             # Find and highlight ASC citations
@@ -581,20 +622,7 @@ def _parse_and_format_memo_content(document, text_content):
                 # Highlight ASC citations
                 if re.match(citation_pattern, part, re.IGNORECASE):
                     run.font.bold = True
-                    run.font.color.rgb = RGBColor(0, 102, 51)  # Green for citations
-            continue
-            
-        # === CONTRACT QUOTES FORMATTING ===
-        if line.startswith('"') or 'contract states' in line.lower() or 'agreement provides' in line.lower():
-            para = document.add_paragraph()
-            para.left_indent = Pt(36)  # Indent contract quotes
-            para.right_indent = Pt(18)
-            
-            run = para.add_run(line)
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(11)
-            run.font.italic = True
-            run.font.color.rgb = RGBColor(51, 51, 51)
+                    run.font.color.rgb = RGBColor(0, 102, 51)
             continue
             
         # === BULLET POINTS ===
@@ -645,34 +673,10 @@ def _parse_and_format_memo_content(document, text_content):
             if i % 2 == 1:
                 run.font.bold = True
     
-    # === ADD TABLE OF CONTENTS ===
-    if toc_entries:
-        # Insert TOC at the beginning (after header)
-        # Find insertion point after memo header
-        toc_paragraph = None
-        for i, paragraph in enumerate(document.paragraphs):
-            if "TECHNICAL ACCOUNTING MEMORANDUM" in paragraph.text:
-                # Insert TOC after some spacing
-                break
-        
-        # Add TOC heading
-        toc_title = document.add_paragraph()
-        toc_title_run = toc_title.add_run("TABLE OF CONTENTS")
-        toc_title_run.font.name = 'Times New Roman'
-        toc_title_run.font.size = Pt(14)
-        toc_title_run.font.bold = True
-        toc_title_run.font.color.rgb = RGBColor(0, 51, 102)
-        
-        # Add TOC entries
-        for section_num, title in toc_entries:
-            toc_entry = document.add_paragraph()
-            toc_entry.left_indent = Pt(18)
-            
-            entry_run = toc_entry.add_run(f"{section_num}. {title}")
-            entry_run.font.name = 'Times New Roman'
-            entry_run.font.size = Pt(11)
-        
-        document.add_paragraph()  # Spacing after TOC
+    # === TABLE OF CONTENTS REMOVED ===
+    # Following Gemini's feedback: TOC placement at document end is incorrect
+    # Professional accounting memos typically don't require TOC for documents under 10 pages
+    # Removed complex TOC logic to maintain clean, reliable output
 
 def _parse_and_format_pdf_content(pdf, text_content):
     """Parse LLM memo content and apply professional formatting to PDF"""
@@ -711,22 +715,43 @@ def _parse_and_format_pdf_content(pdf, text_content):
             pdf.set_text_color(0, 0, 0)
             continue
             
-        # === ASC CITATIONS ===
-        if 'asc 606' in line.lower():
+        # === SEMANTIC MARKER PARSING (ROBUST) ===
+        # Contract quotes with semantic markers
+        if line.startswith('[QUOTE]') and line.endswith('[/QUOTE]'):
+            quote_text = line[7:-8]  # Remove [QUOTE] and [/QUOTE]
+            pdf.set_font('Arial', 'I', 11)
+            pdf.set_text_color(51, 51, 51)
+            pdf.ln(3)
+            pdf.cell(20, 6, '', 0, 0)  # Indent using cell instead of margin
+            pdf.multi_cell(0, 6, quote_text)
+            pdf.set_text_color(0, 0, 0)
+            continue
+            
+        # ASC citations with semantic markers  
+        if line.startswith('[CITATION]') and line.endswith('[/CITATION]'):
+            citation_text = line[10:-12]  # Remove [CITATION] and [/CITATION]
+            pdf.set_font('Arial', 'B', 11)
+            pdf.set_text_color(0, 102, 51)  # Green for citations
+            pdf.multi_cell(0, 6, citation_text)
+            pdf.set_text_color(0, 0, 0)
+            continue
+            
+        # === FALLBACK HEURISTIC PARSING (BACKUP) ===
+        # ASC citations (fallback)
+        if ('asc 606' in line.lower()) and not line.startswith('['):
             pdf.set_font('Arial', '', 11)
             pdf.set_text_color(0, 102, 51)  # Green for citations
             pdf.multi_cell(0, 6, line)
             pdf.set_text_color(0, 0, 0)
             continue
             
-        # === CONTRACT QUOTES ===
-        if line.startswith('"') or 'contract states' in line.lower():
+        # Contract quotes (fallback)
+        if (line.startswith('"') or 'contract states' in line.lower()) and not line.startswith('['):
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
-            # Indent contract quotes
-            pdf.set_left_margin(30)
+            pdf.ln(3)
+            pdf.cell(20, 6, '', 0, 0)  # Indent using cell instead of margin
             pdf.multi_cell(0, 6, line)
-            pdf.set_left_margin(20)  # Reset margin
             pdf.set_text_color(0, 0, 0)
             continue
             

@@ -13,11 +13,14 @@ Preferred communication style: Simple, everyday language.
 **Date: 2025-07-27**
 - ✅ **PROFESSIONAL MEMO GENERATION OVERHAUL**: Implemented all 3 phases of Big 4 accounting firm quality output
 - ✅ **Phase 1 - Professional Document Structure**: Times New Roman 12pt, standard margins, headers/footers with Controller.cpa branding
-- ✅ **Phase 2 - Advanced Content Parsing**: Section numbering, table of contents, ASC citation highlighting, contract quote formatting
+- ✅ **Phase 2 - Advanced Content Parsing**: Section numbering, ASC citation highlighting, contract quote formatting with semantic markers
 - ✅ **Phase 3 - Audit-Ready Features**: Document metadata, analyst certification, signature sections, version control
 - ✅ **Enhanced Download Functions**: DOCX (39KB+) and PDF generation with complete contract data integration
 - ✅ **Unicode Compatibility**: Fixed PDF generation with Arial font for broader character support
 - ✅ **Contract Data Integration**: Memo headers now include actual customer names, analysis titles, and audience targeting
+- ✅ **ROBUST SEMANTIC MARKER SYSTEM**: Implemented Gemini's recommended [QUOTE] and [CITATION] tags for bulletproof parsing
+- ✅ **Removed Problematic TOC**: Eliminated table of contents implementation that placed content incorrectly
+- ✅ **Dual Parsing Strategy**: Semantic markers as primary, heuristic parsing as fallback for backwards compatibility
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
 - ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance
