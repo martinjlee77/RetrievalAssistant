@@ -165,7 +165,9 @@ Return your response as a single, valid JSON object with this structure:
         step3_analysis: dict,
         step4_analysis: dict,
         step5_analysis: dict,
-        contract_data,
+        analysis_title: str,
+        customer_name: str,
+        memo_audience: str,
         debug_config: dict
     ) -> str:
         """
@@ -174,9 +176,9 @@ Return your response as a single, valid JSON object with this structure:
         """
         
         return f"""
-You are an expert technical writer for a Big 4 accounting firm. You have been provided with exhaustive, step-by-step ASC 606 analysis prepared by senior technical accountants. Your task is to assemble this detailed analysis into a single, cohesive, audit-quality technical memorandum.
+You are a professional document assembler. Your task is to create a comprehensive memo by organizing the provided analysis into professional format.
 
-**CRITICAL: DO NOT PERFORM NEW ANALYSIS.** Your job is to present the provided detailed analysis clearly and professionally while preserving all the analytical depth and extensive citations.
+**TASK: ASSEMBLE ONLY.** Format the pre-analyzed content into a structured memo. Do not add new analysis.
 
 **PROVIDED DETAILED ANALYSIS DATA:**
 
@@ -196,10 +198,9 @@ You are an expert technical writer for a Big 4 accounting firm. You have been pr
 {json.dumps(step5_analysis, indent=2)}
 
 **CONTRACT CONTEXT:**
-- Customer: {getattr(contract_data, 'customer_name', 'Not provided')}
-- Analysis Title: {getattr(contract_data, 'analysis_title', 'ASC 606 Analysis')}
-- Contract Period: {getattr(contract_data, 'effective_date', 'Not provided')} to {getattr(contract_data, 'expiration_date', 'Not provided')}
-- Memo Audience: {getattr(contract_data, 'memo_audience', 'Technical Accounting Team')}
+- Customer: {customer_name}
+- Analysis Title: {analysis_title}
+- Memo Audience: {memo_audience}
 
 **YOUR TASK:**
 Write a comprehensive, impressive professional memo that showcases the depth of analysis performed. Structure the memo with these sections:

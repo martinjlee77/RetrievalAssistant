@@ -2,10 +2,9 @@
 Centralized Data Models for Multi-Standard Platform
 """
 
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, Field
 from typing import Optional, List, Dict, Any
-from datetime import date
-from dataclasses import dataclass
+from datetime import date, datetime
 
 # ==================== ASC 606 MODELS ====================
 
@@ -54,55 +53,48 @@ class ContractData(BaseModel):
     ssp_represents_contract_price: bool
     revenue_recognition_timing_details: Optional[str] = None
 
-@dataclass
-class ASC606Analysis:
-    """Structure for ASC 606 analysis results with step-by-step architecture support"""
-    # New comprehensive analysis fields
-    five_step_analysis: str = ""  # Final comprehensive memo
-    step_by_step_details: Dict[str, Any] = None  # Detailed step analysis
+class ASC606Analysis(BaseModel):
+    """Clean, consolidated ASC 606 analysis results with step-by-step architecture"""
+    
+    # Core analysis results - single source of truth
+    professional_memo: str = ""  # Final comprehensive memo
+    step_by_step_details: Dict[str, Any] = Field(default_factory=dict)  # Detailed step analysis
     
     # Analysis metadata
     source_quality: str = "General Knowledge"
     relevant_chunks: int = 0
-    analysis_timestamp: str = ""
+    analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     
-    # Legacy fields for backwards compatibility
-    reconciliation_analysis: Optional[Dict[str, List[Dict[str, Any]]]] = None
-    contract_overview: Optional[Dict[str, Any]] = None
-    step1_contract_identification: Optional[Dict[str, Any]] = None
-    step2_performance_obligations: Optional[Dict[str, Any]] = None
-    step3_transaction_price: Optional[Dict[str, Any]] = None
-    step4_price_allocation: Optional[Dict[str, Any]] = None
-    step5_revenue_recognition: Optional[Dict[str, Any]] = None
-    professional_memo: str = ""
-    implementation_guidance: Optional[List[str]] = None
-    citations: Optional[List[str]] = None
-    not_applicable_items: Optional[List[str]] = None
+    # Analysis overview
+    contract_overview: Dict[str, Any] = Field(default_factory=dict)
+    citations: List[str] = Field(default_factory=list)
+    implementation_guidance: List[str] = Field(default_factory=list)
     
-    def __post_init__(self):
-        """Initialize None fields with empty defaults"""
-        if self.step_by_step_details is None:
-            self.step_by_step_details = {}
-        if self.reconciliation_analysis is None:
-            self.reconciliation_analysis = {"confirmations": [], "discrepancies": []}
-        if self.contract_overview is None:
-            self.contract_overview = {}
-        if self.step1_contract_identification is None:
-            self.step1_contract_identification = {}
-        if self.step2_performance_obligations is None:
-            self.step2_performance_obligations = {}
-        if self.step3_transaction_price is None:
-            self.step3_transaction_price = {}
-        if self.step4_price_allocation is None:
-            self.step4_price_allocation = {}
-        if self.step5_revenue_recognition is None:
-            self.step5_revenue_recognition = {}
-        if self.implementation_guidance is None:
-            self.implementation_guidance = []
-        if self.citations is None:
-            self.citations = []
-        if self.not_applicable_items is None:
-            self.not_applicable_items = []
+    # Legacy compatibility methods
+    @property
+    def step1_contract_identification(self) -> Dict[str, Any]:
+        """Derive step 1 data from step_by_step_details"""
+        return self.step_by_step_details.get("step_1", {})
+    
+    @property
+    def step2_performance_obligations(self) -> Dict[str, Any]:
+        """Derive step 2 data from step_by_step_details"""
+        return self.step_by_step_details.get("step_2", {})
+    
+    @property
+    def step3_transaction_price(self) -> Dict[str, Any]:
+        """Derive step 3 data from step_by_step_details"""
+        return self.step_by_step_details.get("step_3", {})
+    
+    @property
+    def step4_price_allocation(self) -> Dict[str, Any]:
+        """Derive step 4 data from step_by_step_details"""
+        return self.step_by_step_details.get("step_4", {})
+    
+    @property
+    def step5_revenue_recognition(self) -> Dict[str, Any]:
+        """Derive step 5 data from step_by_step_details"""
+        return self.step_by_step_details.get("step_5", {})
 
 # ==================== ASC 842 MODELS ====================
 

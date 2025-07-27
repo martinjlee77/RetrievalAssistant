@@ -94,11 +94,41 @@ class ASC606Analyzer:
             step_results = {}
             step_mapping = StepAnalysisPrompts.get_step_guidance_mapping()
             
-            # Perform focused analysis for each ASC 606 step
+            # Perform focused analysis for each ASC 606 step with step-specific RAG
+            failed_steps = []
+            
             for step_num in range(1, 6):
                 step_info = step_mapping[step_num]
                 
                 self.logger.info(f"Analyzing Step {step_num}: {step_info['title']}")
+                
+                # CRITICAL IMPROVEMENT: Step-specific RAG query
+                step_specific_context = ""
+                if self.kb_manager and contract_terms:
+                    # Define step-specific search terms for targeted RAG
+                    step_search_terms = {
+                        1: ["contract approval", "enforceable rights", "commercial substance", "collectibility"],
+                        2: ["distinct", "performance obligations", "series", "separately identifiable", "capable of being distinct"],
+                        3: ["transaction price", "variable consideration", "financing component", "noncash consideration"],
+                        4: ["standalone selling price", "allocation", "observable price", "discount allocation"],
+                        5: ["over time", "point in time", "control transfer", "progress measurement"]
+                    }
+                    
+                    # Enhanced search with step-specific terms
+                    enhanced_terms = contract_terms + step_search_terms.get(step_num, [])
+                    
+                    step_rag_results = self.kb_manager.search_relevant_guidance(
+                        standard="ASC 606",
+                        query_texts=enhanced_terms,
+                        step_context=f"step_{step_num}",
+                        n_results=5  # Focused results per step
+                    )
+                    
+                    if step_rag_results:
+                        step_specific_context = f"\n\n**STEP {step_num} SPECIFIC GUIDANCE:**\n"
+                        for result in step_rag_results:
+                            step_specific_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                            step_specific_context += f"{result['content']}\n"
                 
                 # Generate focused prompt for this specific step
                 step_prompt = StepAnalysisPrompts.get_step_specific_analysis_prompt(
@@ -106,45 +136,59 @@ class ASC606Analyzer:
                     step_title=step_info['title'],
                     step_guidance=step_info['primary_guidance'],
                     contract_text=contract_text,
-                    rag_context=retrieved_context,
+                    rag_context=retrieved_context + step_specific_context,  # Combined general + step-specific
                     contract_data=contract_data,
                     debug_config=debug_config or {}
                 )
                 
                 # Get detailed analysis for this step
-                step_response = make_llm_call(
-                    self.client,
-                    step_prompt,
-                    temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
-                    max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
-                    model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
-                    response_format={"type": "json_object"}
-                )
-                
-                # Parse JSON response
                 try:
+                    step_response = make_llm_call(
+                        self.client,
+                        step_prompt,
+                        temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
+                        max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
+                        model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
+                        response_format={"type": "json_object"}
+                    )
+                    
+                    # Parse JSON response
                     step_analysis = json.loads(step_response)
                     step_results[f"step_{step_num}"] = step_analysis
                     self.logger.info(f"Step {step_num} analysis completed: {len(step_response)} characters")
-                except json.JSONDecodeError as e:
-                    self.logger.error(f"JSON parsing failed for Step {step_num}: {e}")
-                    # Fallback to text response
+                    
+                except (json.JSONDecodeError, Exception) as e:
+                    self.logger.error(f"Step {step_num} failed: {e}")
+                    failed_steps.append((step_num, step_info['title'], str(e)))
                     step_results[f"step_{step_num}"] = {
                         "step_name": step_info['title'],
-                        "detailed_analysis": step_response,
-                        "error": "JSON parsing failed, using raw response"
+                        "detailed_analysis": "Analysis failed - see error details",
+                        "error": str(e)
                     }
+            
+            # CRITICAL UX IMPROVEMENT: Check for failures and halt if any occurred
+            if failed_steps:
+                import streamlit as st
+                error_msg = "❌ **Analysis Failed** - The following steps encountered errors:\n\n"
+                for step_num, title, error in failed_steps:
+                    error_msg += f"• **Step {step_num} ({title})**: {error}\n"
+                error_msg += "\nPlease try again or contact support if the issue persists."
+                st.error(error_msg)
+                raise Exception(f"Analysis failed for {len(failed_steps)} step(s): {[s[0] for s in failed_steps]}")
             
             # === STEP 3: GENERATE COMPREHENSIVE MEMO ===
             self.logger.info("Generating final comprehensive memo")
             
+            # OPTIMIZATION: Lean final prompt with only essential data
             memo_prompt = StepAnalysisPrompts.get_final_memo_generation_prompt(
                 step1_analysis=step_results.get("step_1", {}),
                 step2_analysis=step_results.get("step_2", {}),
                 step3_analysis=step_results.get("step_3", {}),
                 step4_analysis=step_results.get("step_4", {}),
                 step5_analysis=step_results.get("step_5", {}),
-                contract_data=contract_data,
+                analysis_title=getattr(contract_data, 'analysis_title', 'ASC 606 Analysis'),
+                customer_name=getattr(contract_data, 'customer_name', 'Unknown'),
+                memo_audience=getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
                 debug_config=debug_config or {}
             )
             
@@ -158,26 +202,17 @@ class ASC606Analyzer:
             
             self.logger.info(f"Final memo generated: {len(final_memo)} characters")
             
-            # === STEP 4: RETURN COMPREHENSIVE ANALYSIS RESULT ===
-            # CRITICAL FIX: Properly map step results to UI fields
+            # === STEP 4: RETURN CLEAN, CONSOLIDATED ANALYSIS RESULT ===
             analysis_result = ASC606Analysis(
-                # The final memo goes into the field the UI is expecting
                 professional_memo=final_memo,
-                
-                # Populate the summary fields from the detailed step results
-                step1_contract_identification=step_results.get("step_1", {}),
-                step2_performance_obligations=step_results.get("step_2", {}),
-                step3_transaction_price=step_results.get("step_3", {}),
-                step4_price_allocation=step_results.get("step_4", {}),
-                step5_revenue_recognition=step_results.get("step_5", {}),
-                
-                # Keep the new detailed storage for debugging/future use
-                step_by_step_details=step_results,
-                
-                # Populate other metadata correctly
+                step_by_step_details=step_results,  # Single source of truth
                 source_quality="Hybrid RAG - Step Analysis" if retrieved_context else "General Knowledge - Step Analysis",
                 relevant_chunks=len(retrieved_context.split('\n\n')) if retrieved_context else 0,
-                analysis_timestamp=datetime.now().isoformat()
+                contract_overview={
+                    "title": getattr(contract_data, 'analysis_title', 'ASC 606 Analysis'),
+                    "customer": getattr(contract_data, 'customer_name', 'Unknown'),
+                    "analysis_type": "Step-by-Step Detailed Analysis"
+                }
             )
             
             # Store debug information if enabled
