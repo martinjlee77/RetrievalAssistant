@@ -66,10 +66,22 @@ class ASC606Analyzer:
                             retrieved_context += f"{result['content']}\n"
                         retrieved_context += "\n---\n"
             
-            # === STEP 2: ENHANCED PROMPT WITH RAG CONTEXT ===
+            # === STEP 2: ENHANCED PROMPT WITH COMPLETE CONTRACT DATA ===
+            from utils.contract_data_formatter import format_contract_data_for_prompt
+            
+            # Format complete contract data for prompt
+            contract_context = format_contract_data_for_prompt(contract_data)
+            
+            # Get base prompt with complete context
             base_prompt = ASC606PromptTemplates.get_analysis_prompt(
                 contract_text=contract_text,
                 user_inputs=contract_data.__dict__ if hasattr(contract_data, '__dict__') else {}
+            )
+            
+            # Inject comprehensive contract context
+            base_prompt = base_prompt.replace(
+                "**CONTRACT TEXT TO ANALYZE:**",
+                f"{contract_context}\n\n**CONTRACT TEXT TO ANALYZE:**"
             )
             
             # Inject retrieved context into prompt
@@ -201,7 +213,7 @@ class ASC606Analyzer:
                 step4_price_allocation={"analysis": "Parsing error - see professional memo", "error": str(e)}, 
                 step5_revenue_recognition={"analysis": "Parsing error - see professional memo", "error": str(e)},
                 professional_memo=response or "Analysis failed to generate",
-                reconciliation_analysis={"confirmations": [], "discrepancies": [], "error": "parsing failed"},
+                reconciliation_analysis={"confirmations": [], "discrepancies": []},
                 contract_overview={
                     "title": "ASC 606 Analysis", 
                     "summary": "Analysis attempted with enhanced 5-step assessment", 

@@ -153,11 +153,12 @@ class ASC606PromptTemplates:
         MATERIALITY THRESHOLD: {threshold:,} ({user_inputs.get('currency', 'USD')})
         - Focus detailed analysis on contract elements exceeding this threshold
         - Note materiality of bonuses, penalties, discounts, and other variable elements
+        - Include materiality analysis in your conclusions and briefly mention immaterial elements (elements below threshold)
         """
         
-        return f"""You are a senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
+        return f"""You are a professional senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
 
-        Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis.
+        Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis. Do include your analysis of any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.
 
         **EXPERT REFERENCE GUIDE (Minimum Scope of Analysis):**
         ---
@@ -170,6 +171,7 @@ class ASC606PromptTemplates:
         **Crucially, you are not limited to the guide. You must also identify and analyze any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.**
 
         - If a topic from the guide is relevant to the contract, discuss it in your analysis with supporting quotes and citations.
+        
         - If a topic from the guide is **not applicable** (e.g., the contract has no significant financing component), you must explicitly state that it was considered and is not present. This demonstrates thoroughness.
 
         **CONTRACT TEXT TO ANALYZE:**
@@ -186,11 +188,11 @@ class ASC606PromptTemplates:
         {steering_info}
         
         Provide a comprehensive analysis following these steps:
-        1. Contract Identification (ASC 606-10-25-1)
-        2. Performance Obligations (ASC 606-10-25-14)  
-        3. Transaction Price (ASC 606-10-32-2)
-        4. Allocation (ASC 606-10-32-28)
-        5. Recognition (ASC 606-10-25-23)
+        1. Identifying the Contract (ASC 606-10-25-1)
+        2. Identifying Performance Obligations (ASC 606-10-25-14)
+        3. Determine the Transaction price (ASC 606-10-32-2)
+        4. Allocation the Transaction Price (ASC 606-10-32-28)
+        5. Recognize Revenue (ASC 606-10-25-23)
         
         For each step, provide:
         - Analysis and conclusion

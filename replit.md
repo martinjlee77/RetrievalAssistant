@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-27**
+- ✅ **CRITICAL DATA FLOW FIX**: Resolved disconnect between contract_data (UI inputs) and prompt system
+- ✅ Created contract_data_formatter.py to systematically format ALL user inputs for LLM analysis
+- ✅ Enhanced ASC606Analyzer to use complete ContractData object instead of partial field extraction
+- ✅ Eliminated duplicate and incomplete data handling in prompt.py template system
+- ✅ Ensured ALL user inputs (customer name, dates, focus areas, materiality, etc.) flow to LLM
+- ✅ **CORE FOLDER MODERNIZATION COMPLETE**: Cleaned analyzers.py, ui_helpers.py, models.py architecture
+- ✅ Updated BaseAnalyzer interface for scalable multi-standard approach with shared RAG infrastructure
+- ✅ Fixed all LSP diagnostics and removed corrupted content from ui_helpers.py
+
 **Date: 2025-07-25**
 - ✅ **COMPLETE RAG SYSTEM ARCHITECTURE UPGRADE**: Implemented true Retrieval-Augmented Generation per user feedback
 - ✅ Resolved circular dependency by removing initialize_standard method from KnowledgeBaseManager

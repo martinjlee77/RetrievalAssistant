@@ -478,7 +478,8 @@ else:
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.subheader(f"📊 Analysis Results: {contract_data.analysis_title}")
+        analysis_title = contract_data.analysis_title if contract_data else "Unknown Analysis"
+        st.subheader(f"📊 Analysis Results: {analysis_title}")
     with col2:
         if st.button("🔄 Start New Analysis", use_container_width=True):
             for key in list(st.session_state.keys()):
@@ -497,9 +498,11 @@ else:
                 "This score (out of 100) reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
             )
         with metrics_col2:
-            st.metric("Audience", contract_data.memo_audience.split(' / ')[0])
+            memo_audience = contract_data.memo_audience if contract_data else "Unknown"
+            st.metric("Audience", memo_audience.split(' / ')[0])
         with metrics_col3:
-            st.metric("Currency", contract_data.currency)
+            currency = contract_data.currency if contract_data else "USD"
+            st.metric("Currency", currency)
 
     # Five-step analysis summary
     st.markdown("---")
@@ -536,22 +539,24 @@ else:
             dl_col1, dl_col2 = st.columns(2)
 
             with dl_col1:
+                analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
                 st.download_button(
                     label="📄 Download as .docx",
                     data=create_docx_from_text(memo),
                     file_name=
-                    f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
+                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
                     mime=
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     use_container_width=True)
 
             with dl_col2:
+                analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
                 st.download_button(
                     label="📋 Download as .pdf",
                     data=create_pdf_from_text(
-                        memo, title=contract_data.analysis_title),
+                        memo, title=analysis_title),
                     file_name=
-                    f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
+                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
                     mime="application/pdf",
                     use_container_width=True)
     else:
