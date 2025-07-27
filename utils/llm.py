@@ -192,31 +192,566 @@ def validate_api_key() -> bool:
     except Exception:
         return False
 
-def create_docx_from_text(text_content):
-    """Creates a .docx file in memory from a string of text."""
+def create_docx_from_text(text_content, contract_data=None):
+    """Creates a professional accounting memo in DOCX format with full Big 4 standards."""
+    from docx import Document
+    from docx.shared import Inches, Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
+    from docx.enum.table import WD_TABLE_ALIGNMENT
+    from docx.oxml.shared import OxmlElement, qn
+    from datetime import datetime
+    import re
+    
     document = Document()
-    document.add_paragraph(text_content)
+    
+    # === PHASE 1: PROFESSIONAL DOCUMENT STRUCTURE ===
+    
+    # Set default font to Times New Roman 12pt (accounting standard)
+    style = document.styles['Normal']
+    font = style.font
+    font.name = 'Times New Roman'
+    font.size = Pt(12)
+    
+    # Configure paragraph spacing (6pt after paragraphs)
+    paragraph_format = style.paragraph_format
+    paragraph_format.space_after = Pt(6)
+    paragraph_format.line_spacing = 1.15
+    
+    # Set standard accounting memo margins (1" all sides)
+    sections = document.sections
+    for section in sections:
+        section.top_margin = Inches(1)
+        section.bottom_margin = Inches(1)
+        section.left_margin = Inches(1)
+        section.right_margin = Inches(1)
+    
+    # Add header with Controller.cpa branding
+    header = document.sections[0].header
+    header_para = header.paragraphs[0]
+    header_para.text = "Controller.cpa"
+    header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    header_run = header_para.runs[0]
+    header_run.font.name = 'Times New Roman'
+    header_run.font.size = Pt(10)
+    header_run.font.color.rgb = RGBColor(70, 70, 70)
+    
+    # Add footer with page numbers
+    footer = document.sections[0].footer
+    footer_para = footer.paragraphs[0]
+    footer_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    footer_run = footer_para.runs[0] if footer_para.runs else footer_para.add_run()
+    footer_run.font.name = 'Times New Roman'
+    footer_run.font.size = Pt(10)
+    # Add page number field
+    fldChar1 = OxmlElement('w:fldChar')
+    fldChar1.set(qn('w:fldCharType'), 'begin')
+    instrText = OxmlElement('w:instrText')
+    instrText.text = "PAGE"
+    fldChar2 = OxmlElement('w:fldChar')
+    fldChar2.set(qn('w:fldCharType'), 'end')
+    footer_run._r.append(fldChar1)
+    footer_run._r.append(instrText)
+    footer_run._r.append(fldChar2)
+    
+    # === PROFESSIONAL MEMO HEADER ===
+    
+    # Main title
+    title = document.add_paragraph()
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title_run = title.add_run("TECHNICAL ACCOUNTING MEMORANDUM")
+    title_run.font.name = 'Times New Roman'
+    title_run.font.size = Pt(16)
+    title_run.font.bold = True
+    title_run.font.color.rgb = RGBColor(0, 51, 102)  # Professional blue
+    
+    document.add_paragraph()  # Spacing
+    
+    # Professional memo header table
+    header_table = document.add_table(rows=4, cols=2)
+    header_table.alignment = WD_TABLE_ALIGNMENT.LEFT
+    header_table.style = 'Table Grid'
+    
+    # Configure table width
+    header_table.columns[0].width = Inches(1.2)
+    header_table.columns[1].width = Inches(5.8)
+    
+    # Header content
+    current_date = datetime.now().strftime("%B %d, %Y")
+    analyst_name = "ASC 606 AI Analyst"
+    
+    memo_data = [
+        ("TO:", "Technical Accounting Team / Management"),
+        ("FROM:", analyst_name),
+        ("DATE:", current_date),
+        ("SUBJECT:", f"ASC 606 Revenue Recognition Analysis")
+    ]
+    
+    if contract_data:
+        memo_data[3] = ("SUBJECT:", f"ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Contract Analysis')}")
+        if hasattr(contract_data, 'memo_audience'):
+            memo_data[0] = ("TO:", contract_data.memo_audience)
+    
+    for i, (label, content) in enumerate(memo_data):
+        row = header_table.rows[i]
+        label_cell = row.cells[0]
+        content_cell = row.cells[1]
+        
+        # Format label cell
+        label_para = label_cell.paragraphs[0]
+        label_run = label_para.add_run(label)
+        label_run.font.name = 'Times New Roman'
+        label_run.font.size = Pt(11)
+        label_run.font.bold = True
+        
+        # Format content cell
+        content_para = content_cell.paragraphs[0]
+        content_run = content_para.add_run(content)
+        content_run.font.name = 'Times New Roman'
+        content_run.font.size = Pt(11)
+    
+    document.add_paragraph()  # Spacing after header
+    
+    # === PHASE 2: CONTENT PARSING AND FORMATTING ===
+    
+    # Parse and format the memo content
+    _parse_and_format_memo_content(document, text_content)
+    
+    # === PHASE 3: AUDIT-READY FEATURES ===
+    
+    # Add document metadata section
+    document.add_page_break()
+    
+    metadata_heading = document.add_paragraph()
+    metadata_run = metadata_heading.add_run("DOCUMENT METADATA")
+    metadata_run.font.name = 'Times New Roman'
+    metadata_run.font.size = Pt(14)
+    metadata_run.font.bold = True
+    metadata_run.font.color.rgb = RGBColor(0, 51, 102)
+    
+    metadata_table = document.add_table(rows=5, cols=2)
+    metadata_table.style = 'Table Grid'
+    metadata_table.columns[0].width = Inches(2)
+    metadata_table.columns[1].width = Inches(5)
+    
+    metadata_info = [
+        ("Document Version:", "Final"),
+        ("Analysis Date:", current_date),
+        ("Analyst:", analyst_name),
+        ("Review Status:", "Pending Management Review"),
+        ("File Classification:", "Internal Accounting Analysis")
+    ]
+    
+    for i, (label, content) in enumerate(metadata_info):
+        row = metadata_table.rows[i]
+        row.cells[0].text = label
+        row.cells[1].text = content
+        
+        # Format cells
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(10)
+    
+    # Add signature section
+    document.add_paragraph()
+    signature_para = document.add_paragraph()
+    signature_run = signature_para.add_run("ANALYST CERTIFICATION")
+    signature_run.font.name = 'Times New Roman'
+    signature_run.font.size = Pt(12)
+    signature_run.font.bold = True
+    
+    cert_text = document.add_paragraph()
+    cert_run = cert_text.add_run(
+        "I certify that this analysis has been prepared in accordance with ASC 606 "
+        "requirements and represents my professional judgment based on the contract "
+        "documentation provided and applicable authoritative guidance."
+    )
+    cert_run.font.name = 'Times New Roman'
+    cert_run.font.size = Pt(11)
+    cert_run.font.italic = True
+    
+    # Signature line
+    document.add_paragraph()
+    sig_line = document.add_paragraph()
+    sig_line.add_run("_" * 50)
+    sig_name = document.add_paragraph()
+    sig_name.add_run(f"{analyst_name}, Technical Accounting")
+    
     bio = io.BytesIO()
     document.save(bio)
     bio.seek(0)
     return bio.getvalue()
 
-def create_pdf_from_text(text_content, title=""):
-    """Creates a PDF file in memory from a string of text."""
-    pdf = FPDF()
+def create_pdf_from_text(text_content, title="", contract_data=None):
+    """Creates a professional accounting memo in PDF format with Big 4 standards."""
+    from fpdf import FPDF
+    from datetime import datetime
+    import re
+    
+    class ProfessionalMemo(FPDF):
+        def header(self):
+            """Add header to each page"""
+            self.set_font('Arial', 'I', 10)  # Arial supports Unicode better
+            self.set_text_color(70, 70, 70)
+            self.cell(0, 10, 'Controller.cpa', 0, 0, 'R')
+            self.ln(15)
+        
+        def footer(self):
+            """Add footer with page numbers"""
+            self.set_y(-15)
+            self.set_font('Arial', 'I', 10)
+            self.set_text_color(70, 70, 70)
+            self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+    
+    pdf = ProfessionalMemo()
     pdf.add_page()
-    pdf.set_font("Arial", size=11)
-
-    if title:
-        pdf.set_font("Arial", 'B', 16)
-        pdf.cell(0, 10, title, 0, 1, 'C')
-        pdf.ln(10)
-        pdf.set_font("Arial", size=11)
-
-    # Add text to PDF, handling multiple lines
-    pdf.multi_cell(0, 5, text_content)
-
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    # === PROFESSIONAL MEMO HEADER ===
+    
+    # Main title
+    pdf.set_font('Arial', 'B', 16)
+    pdf.set_text_color(0, 51, 102)  # Professional blue
+    pdf.cell(0, 15, 'TECHNICAL ACCOUNTING MEMORANDUM', 0, 1, 'C')
+    pdf.ln(5)
+    
+    # Reset color for body text
+    pdf.set_text_color(0, 0, 0)
+    
+    # Memo header information
+    current_date = datetime.now().strftime("%B %d, %Y")
+    analyst_name = "ASC 606 AI Analyst"
+    
+    memo_info = [
+        ("TO:", "Technical Accounting Team / Management"),
+        ("FROM:", analyst_name),
+        ("DATE:", current_date),
+        ("SUBJECT:", "ASC 606 Revenue Recognition Analysis")
+    ]
+    
+    if contract_data:
+        memo_info[3] = ("SUBJECT:", f"ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Contract Analysis')}")
+        if hasattr(contract_data, 'memo_audience'):
+            memo_info[0] = ("TO:", contract_data.memo_audience)
+    
+    # Header table simulation with consistent spacing
+    pdf.set_font('Arial', '', 11)
+    for label, content in memo_info:
+        pdf.set_font('Arial', 'B', 11)
+        pdf.cell(25, 8, label, 0, 0, 'L')
+        pdf.set_font('Arial', '', 11)
+        pdf.cell(0, 8, content, 0, 1, 'L')
+    
+    pdf.ln(8)
+    
+    # === CONTENT FORMATTING ===
+    
+    # Parse content and apply formatting
+    _parse_and_format_pdf_content(pdf, text_content)
+    
+    # === DOCUMENT METADATA PAGE ===
+    
+    pdf.add_page()
+    
+    # Metadata section
+    pdf.set_font('Arial', 'B', 14)
+    pdf.set_text_color(0, 51, 102)
+    pdf.cell(0, 12, 'DOCUMENT METADATA', 0, 1, 'L')
+    pdf.ln(5)
+    
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font('Arial', '', 11)
+    
+    metadata_info = [
+        ("Document Version:", "Final"),
+        ("Analysis Date:", current_date),
+        ("Analyst:", analyst_name),
+        ("Review Status:", "Pending Management Review"),
+        ("File Classification:", "Internal Accounting Analysis")
+    ]
+    
+    for label, content in metadata_info:
+        pdf.set_font('Arial', 'B', 11)
+        pdf.cell(50, 8, label, 0, 0, 'L')
+        pdf.set_font('Arial', '', 11)
+        pdf.cell(0, 8, content, 0, 1, 'L')
+    
+    # Certification section
+    pdf.ln(10)
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, 'ANALYST CERTIFICATION', 0, 1, 'L')
+    
+    pdf.set_font('Arial', 'I', 11)
+    certification_text = (
+        "I certify that this analysis has been prepared in accordance with ASC 606 "
+        "requirements and represents my professional judgment based on the contract "
+        "documentation provided and applicable authoritative guidance."
+    )
+    pdf.multi_cell(0, 6, certification_text)
+    
+    # Signature line
+    pdf.ln(10)
+    pdf.set_font('Arial', '', 11)
+    pdf.cell(0, 8, '_' * 50, 0, 1, 'L')
+    pdf.cell(0, 8, f'{analyst_name}, Technical Accounting', 0, 1, 'L')
+    
     return pdf.output(dest='S')
+
+def _parse_and_format_memo_content(document, text_content):
+    """Parse LLM memo content and apply professional formatting to DOCX"""
+    from docx.shared import Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    import re
+    
+    lines = text_content.split('\n')
+    current_section = None
+    toc_entries = []  # For table of contents
+    section_number = 1
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # === EXECUTIVE SUMMARY SPECIAL FORMATTING ===
+        if 'executive summary' in line.lower() and ('##' in line or line.isupper()):
+            para = document.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            # Add executive summary in highlighted box
+            run = para.add_run("EXECUTIVE SUMMARY")
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(14)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(0, 51, 102)
+            
+            # Add to TOC
+            toc_entries.append((section_number, "Executive Summary"))
+            section_number += 1
+            continue
+            
+        # === MAIN SECTION HEADERS (##) ===
+        if line.startswith('##') or (line.isupper() and len(line) > 10 and line.replace(' ', '').isalpha()):
+            header_text = line.replace('#', '').strip()
+            
+            para = document.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            # Section numbering
+            numbered_header = f"{section_number}. {header_text.upper()}"
+            run = para.add_run(numbered_header)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(14)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(0, 51, 102)
+            
+            # Add to TOC
+            toc_entries.append((section_number, header_text))
+            section_number += 1
+            continue
+            
+        # === SUB-SECTION HEADERS (###) ===
+        if line.startswith('###'):
+            sub_header_text = line.replace('#', '').strip()
+            
+            para = document.add_paragraph()
+            para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            
+            run = para.add_run(sub_header_text)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(51, 51, 51)
+            continue
+            
+        # === ASC CITATIONS FORMATTING ===
+        if 'asc 606' in line.lower() or 'asc-606' in line.lower():
+            para = document.add_paragraph()
+            
+            # Find and highlight ASC citations
+            citation_pattern = r'(ASC\s*606[-\s]\d{2}[-\s]\d{2}[-\s]\d{1,2})'
+            
+            parts = re.split(citation_pattern, line, flags=re.IGNORECASE)
+            for i, part in enumerate(parts):
+                run = para.add_run(part)
+                run.font.name = 'Times New Roman'
+                run.font.size = Pt(12)
+                
+                # Highlight ASC citations
+                if re.match(citation_pattern, part, re.IGNORECASE):
+                    run.font.bold = True
+                    run.font.color.rgb = RGBColor(0, 102, 51)  # Green for citations
+            continue
+            
+        # === CONTRACT QUOTES FORMATTING ===
+        if line.startswith('"') or 'contract states' in line.lower() or 'agreement provides' in line.lower():
+            para = document.add_paragraph()
+            para.left_indent = Pt(36)  # Indent contract quotes
+            para.right_indent = Pt(18)
+            
+            run = para.add_run(line)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(11)
+            run.font.italic = True
+            run.font.color.rgb = RGBColor(51, 51, 51)
+            continue
+            
+        # === BULLET POINTS ===
+        if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+            para = document.add_paragraph()
+            para.style = 'List Bullet'
+            
+            bullet_text = line[1:].strip() if line[0] in ['•', '-', '*'] else line
+            run = para.add_run(bullet_text)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            continue
+            
+        # === FINANCIAL TABLES ===
+        if '$' in line and ('|' in line or '\t' in line):
+            # Simple table parsing for financial data
+            table_data = line.split('|') if '|' in line else line.split('\t')
+            if len(table_data) > 1:
+                table = document.add_table(rows=1, cols=len(table_data))
+                table.style = 'Table Grid'
+                
+                for i, cell_data in enumerate(table_data):
+                    cell = table.cell(0, i)
+                    cell.text = cell_data.strip()
+                    
+                    # Format financial numbers
+                    for paragraph in cell.paragraphs:
+                        for run in paragraph.runs:
+                            run.font.name = 'Times New Roman'
+                            run.font.size = Pt(11)
+                            if '$' in cell_data:
+                                run.font.bold = True
+                continue
+                
+        # === REGULAR PARAGRAPHS ===
+        para = document.add_paragraph()
+        
+        # Apply bold formatting for **text**
+        bold_pattern = r'\*\*(.*?)\*\*'
+        parts = re.split(bold_pattern, line)
+        
+        for i, part in enumerate(parts):
+            run = para.add_run(part)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(12)
+            
+            # Make every other part bold (the captured groups)
+            if i % 2 == 1:
+                run.font.bold = True
+    
+    # === ADD TABLE OF CONTENTS ===
+    if toc_entries:
+        # Insert TOC at the beginning (after header)
+        # Find insertion point after memo header
+        toc_paragraph = None
+        for i, paragraph in enumerate(document.paragraphs):
+            if "TECHNICAL ACCOUNTING MEMORANDUM" in paragraph.text:
+                # Insert TOC after some spacing
+                break
+        
+        # Add TOC heading
+        toc_title = document.add_paragraph()
+        toc_title_run = toc_title.add_run("TABLE OF CONTENTS")
+        toc_title_run.font.name = 'Times New Roman'
+        toc_title_run.font.size = Pt(14)
+        toc_title_run.font.bold = True
+        toc_title_run.font.color.rgb = RGBColor(0, 51, 102)
+        
+        # Add TOC entries
+        for section_num, title in toc_entries:
+            toc_entry = document.add_paragraph()
+            toc_entry.left_indent = Pt(18)
+            
+            entry_run = toc_entry.add_run(f"{section_num}. {title}")
+            entry_run.font.name = 'Times New Roman'
+            entry_run.font.size = Pt(11)
+        
+        document.add_paragraph()  # Spacing after TOC
+
+def _parse_and_format_pdf_content(pdf, text_content):
+    """Parse LLM memo content and apply professional formatting to PDF"""
+    import re
+    
+    lines = text_content.split('\n')
+    section_number = 1
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # === MAIN SECTION HEADERS ===
+        if line.startswith('##') or (line.isupper() and len(line) > 10 and line.replace(' ', '').isalpha()):
+            header_text = line.replace('#', '').strip()
+            
+            pdf.ln(5)
+            pdf.set_font('Arial', 'B', 14)
+            pdf.set_text_color(0, 51, 102)
+            
+            numbered_header = f"{section_number}. {header_text.upper()}"
+            pdf.cell(0, 12, numbered_header, 0, 1, 'L')
+            pdf.set_text_color(0, 0, 0)
+            section_number += 1
+            continue
+            
+        # === SUB-SECTION HEADERS ===
+        if line.startswith('###'):
+            sub_header_text = line.replace('#', '').strip()
+            
+            pdf.ln(3)
+            pdf.set_font('Arial', 'B', 12)
+            pdf.set_text_color(51, 51, 51)
+            pdf.cell(0, 10, sub_header_text, 0, 1, 'L')
+            pdf.set_text_color(0, 0, 0)
+            continue
+            
+        # === ASC CITATIONS ===
+        if 'asc 606' in line.lower():
+            pdf.set_font('Arial', '', 11)
+            pdf.set_text_color(0, 102, 51)  # Green for citations
+            pdf.multi_cell(0, 6, line)
+            pdf.set_text_color(0, 0, 0)
+            continue
+            
+        # === CONTRACT QUOTES ===
+        if line.startswith('"') or 'contract states' in line.lower():
+            pdf.set_font('Arial', 'I', 11)
+            pdf.set_text_color(51, 51, 51)
+            # Indent contract quotes
+            pdf.set_left_margin(30)
+            pdf.multi_cell(0, 6, line)
+            pdf.set_left_margin(20)  # Reset margin
+            pdf.set_text_color(0, 0, 0)
+            continue
+            
+        # === BULLET POINTS ===
+        if line.startswith('•') or line.startswith('-') or line.startswith('*'):
+            bullet_text = line[1:].strip() if line[0] in ['•', '-', '*'] else line
+            pdf.set_font('Arial', '', 11)
+            pdf.cell(15, 6, '- ', 0, 0, 'L')  # Use dash instead of bullet
+            pdf.multi_cell(0, 6, bullet_text)
+            continue
+            
+        # === REGULAR PARAGRAPHS ===
+        pdf.set_font('Arial', '', 11)
+        
+        # Handle bold text **text**
+        if '**' in line:
+            # Simple bold handling for PDF
+            line = line.replace('**', '')
+            pdf.set_font('Arial', 'B', 11)
+            pdf.multi_cell(0, 6, line)
+            pdf.set_font('Arial', '', 11)
+        else:
+            pdf.multi_cell(0, 6, line)
+        
+        pdf.ln(2)  # Small spacing between paragraphs
 
 def get_knowledge_base():
     """Get or initialize the ASC 606 knowledge base (consolidated from legacy file)"""

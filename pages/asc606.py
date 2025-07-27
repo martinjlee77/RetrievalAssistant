@@ -542,7 +542,7 @@ else:
                 analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
                 st.download_button(
                     label="📄 Download as .docx",
-                    data=create_docx_from_text(memo),
+                    data=create_docx_from_text(memo, contract_data=contract_data),
                     file_name=
                     f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
                     mime=
@@ -554,7 +554,7 @@ else:
                 st.download_button(
                     label="📋 Download as .pdf",
                     data=create_pdf_from_text(
-                        memo, title=analysis_title),
+                        memo, title=analysis_title, contract_data=contract_data),
                     file_name=
                     f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
                     mime="application/pdf",
