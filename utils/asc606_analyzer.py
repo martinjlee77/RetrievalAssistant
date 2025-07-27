@@ -59,11 +59,34 @@ class ASC606Analyzer:
                     )
                     
                     if rag_results:
-                        # Format retrieved context for prompt injection
-                        retrieved_context = "\n\n**RETRIEVED AUTHORITATIVE GUIDANCE:**\n"
+                        # Categorize results by source type
+                        asc_results = []
+                        ey_results = []
+                        
                         for result in rag_results:
-                            retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
-                            retrieved_context += f"{result['content']}\n"
+                            source = result.get('source', '').lower()
+                            if 'ey' in source or 'ernst' in source or 'frdbb' in source:
+                                ey_results.append(result)
+                            else:
+                                asc_results.append(result)
+                        
+                        # Format retrieved context with clear categorization
+                        retrieved_context = ""
+                        
+                        if asc_results:
+                            retrieved_context += "\n\n**RETRIEVED ASC 606 AUTHORITATIVE GUIDANCE:**\n"
+                            retrieved_context += "Use these sources for 'Relevant ASC 606 citations' in your analysis:\n"
+                            for result in asc_results:
+                                retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                                retrieved_context += f"{result['content']}\n"
+                        
+                        if ey_results:
+                            retrieved_context += "\n\n**RETRIEVED INDUSTRY INTERPRETATIONS:**\n"
+                            retrieved_context += "Use these EY professional guidance sources for 'Relevant industry interpretations' in your analysis:\n"  
+                            for result in ey_results:
+                                retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                                retrieved_context += f"{result['content']}\n"
+                        
                         retrieved_context += "\n---\n"
             
             # === STEP 2: ENHANCED PROMPT WITH COMPLETE CONTRACT DATA ===
