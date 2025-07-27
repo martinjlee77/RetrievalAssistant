@@ -153,18 +153,31 @@ class ASC606Analyzer:
                 memo_prompt,
                 temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
                 max_tokens=debug_config.get('max_tokens', 6000) if debug_config else 6000,
-                model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o'
+                model=debug_config.get('memo_model', 'gpt-4o-mini') if debug_config else 'gpt-4o-mini'  # Cost optimization
             )
             
             self.logger.info(f"Final memo generated: {len(final_memo)} characters")
             
             # === STEP 4: RETURN COMPREHENSIVE ANALYSIS RESULT ===
+            # CRITICAL FIX: Properly map step results to UI fields
             analysis_result = ASC606Analysis(
-                five_step_analysis=final_memo,
+                # The final memo goes into the field the UI is expecting
+                professional_memo=final_memo,
+                
+                # Populate the summary fields from the detailed step results
+                step1_contract_identification=step_results.get("step_1", {}),
+                step2_performance_obligations=step_results.get("step_2", {}),
+                step3_transaction_price=step_results.get("step_3", {}),
+                step4_price_allocation=step_results.get("step_4", {}),
+                step5_revenue_recognition=step_results.get("step_5", {}),
+                
+                # Keep the new detailed storage for debugging/future use
+                step_by_step_details=step_results,
+                
+                # Populate other metadata correctly
                 source_quality="Hybrid RAG - Step Analysis" if retrieved_context else "General Knowledge - Step Analysis",
                 relevant_chunks=len(retrieved_context.split('\n\n')) if retrieved_context else 0,
-                analysis_timestamp=datetime.now().isoformat(),
-                step_by_step_details=step_results  # Store detailed step analysis
+                analysis_timestamp=datetime.now().isoformat()
             )
             
             # Store debug information if enabled
@@ -179,97 +192,6 @@ class ASC606Analyzer:
         except Exception as e:
             self.logger.error(f"Analysis failed: {e}")
             raise
-    
-    def _parse_analysis_response(self, response: str) -> ASC606Analysis:
-        """Parse LLM response into structured analysis with robust JSON handling"""
-        try:
-            # === ROBUST JSON PARSING ===
-            json_content = None
-            
-            # Method 1: Try direct JSON parsing (for JSON mode responses)
-            try:
-                json_content = json.loads(response.strip())
-            except json.JSONDecodeError:
-                pass
-            
-            # Method 2: Extract JSON from markdown code blocks
-            if not json_content:
-                json_match = re.search(r"```json\s*(\{.*?\})\s*```", response, re.DOTALL)
-                if json_match:
-                    try:
-                        json_content = json.loads(json_match.group(1))
-                    except json.JSONDecodeError:
-                        pass
-            
-            # Method 3: Find JSON object within response text
-            if not json_content:
-                json_match = re.search(r"(\{.*\})", response, re.DOTALL)
-                if json_match:
-                    try:
-                        json_content = json.loads(json_match.group(1))
-                    except json.JSONDecodeError:
-                        pass
-            
-            # === CREATE ANALYSIS OBJECT ===
-            if json_content:
-                return ASC606Analysis(
-                    step1_contract_identification=json_content.get("step1", {"analysis": "Analysis not available"}),
-                    step2_performance_obligations=json_content.get("step2", {"analysis": "Analysis not available"}), 
-                    step3_transaction_price=json_content.get("step3", {"analysis": "Analysis not available"}),
-                    step4_price_allocation=json_content.get("step4", {"analysis": "Analysis not available"}),
-                    step5_revenue_recognition=json_content.get("step5", {"analysis": "Analysis not available"}),
-                    professional_memo=json_content.get("memo", response),
-                    reconciliation_analysis={"confirmations": [], "discrepancies": []},
-                    contract_overview={
-                        "title": "RAG-Enhanced ASC 606 Analysis", 
-                        "summary": "Analysis using authoritative sources and enhanced 5-step assessment"
-                    },
-                    citations=json_content.get("citations", []),
-                    implementation_guidance=json_content.get("implementation", []),
-                    not_applicable_items=json_content.get("not_applicable", []),
-                    source_quality=json_content.get("source_quality", "Hybrid RAG")
-                )
-            else:
-                # Fallback: treat entire response as memo with enhanced metadata
-                return ASC606Analysis(
-                    step1_contract_identification={"analysis": "See detailed analysis in professional memo"},
-                    step2_performance_obligations={"analysis": "See detailed analysis in professional memo"},
-                    step3_transaction_price={"analysis": "See detailed analysis in professional memo"}, 
-                    step4_price_allocation={"analysis": "See detailed analysis in professional memo"},
-                    step5_revenue_recognition={"analysis": "See detailed analysis in professional memo"},
-                    professional_memo=response,
-                    reconciliation_analysis={"confirmations": [], "discrepancies": []},
-                    contract_overview={
-                        "title": "RAG-Enhanced ASC 606 Analysis", 
-                        "summary": "Analysis using authoritative sources and enhanced 5-step assessment"
-                    },
-                    citations=[],
-                    implementation_guidance=[],
-                    not_applicable_items=[],
-                    source_quality="Hybrid RAG"
-                )
-                
-        except Exception as e:
-            self.logger.error(f"Failed to parse analysis response: {e}")
-            # Return error-safe analysis structure
-            return ASC606Analysis(
-                step1_contract_identification={"analysis": "Parsing error - see professional memo", "error": str(e)},
-                step2_performance_obligations={"analysis": "Parsing error - see professional memo", "error": str(e)},
-                step3_transaction_price={"analysis": "Parsing error - see professional memo", "error": str(e)},
-                step4_price_allocation={"analysis": "Parsing error - see professional memo", "error": str(e)}, 
-                step5_revenue_recognition={"analysis": "Parsing error - see professional memo", "error": str(e)},
-                professional_memo=response or "Analysis failed to generate",
-                reconciliation_analysis={"confirmations": [], "discrepancies": []},
-                contract_overview={
-                    "title": "ASC 606 Analysis", 
-                    "summary": "Analysis attempted with enhanced 5-step assessment", 
-                    "error": "parsing failed"
-                },
-                citations=[],
-                implementation_guidance=[],
-                not_applicable_items=[],
-                source_quality="Error"
-            )
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """Get knowledge base statistics for debugging purposes"""
