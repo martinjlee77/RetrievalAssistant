@@ -497,7 +497,7 @@ def create_pdf_from_text(text_content, title="", contract_data=None):
     pdf.cell(0, 8, '_' * 50, 0, 1, 'L')
     pdf.cell(0, 8, f'{analyst_name}, Technical Accounting', 0, 1, 'L')
     
-    return pdf.output(dest='S')
+    return bytes(pdf.output(dest='S'), 'latin-1')
 
 def _parse_and_format_memo_content(document, text_content):
     """Parse LLM memo content and apply professional formatting to DOCX"""
@@ -723,8 +723,17 @@ def _parse_and_format_pdf_content(pdf, text_content):
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
             pdf.ln(3)
-            pdf.cell(15, 6, '', 0, 0)  # Indent using cell
-            pdf.multi_cell(150, 6, quote_text)  # Fixed width for multi_cell
+            # Simple approach: split long text into manageable chunks
+            words = quote_text.split()
+            current_line = ""
+            for word in words:
+                if len(current_line + word) < 70:  # Safe character limit
+                    current_line += word + " "
+                else:
+                    pdf.cell(0, 6, f"    {current_line.strip()}", 0, 1, 'L')
+                    current_line = word + " "
+            if current_line.strip():
+                pdf.cell(0, 6, f"    {current_line.strip()}", 0, 1, 'L')
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -733,7 +742,17 @@ def _parse_and_format_pdf_content(pdf, text_content):
             citation_text = line[10:-12]  # Remove [CITATION] and [/CITATION]
             pdf.set_font('Arial', 'B', 11)
             pdf.set_text_color(0, 102, 51)  # Green for citations
-            pdf.multi_cell(0, 6, citation_text)
+            # Simple approach for citations
+            words = citation_text.split()
+            current_line = ""
+            for word in words:
+                if len(current_line + word) < 80:  # Safe character limit
+                    current_line += word + " "
+                else:
+                    pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
+                    current_line = word + " "
+            if current_line.strip():
+                pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -742,7 +761,7 @@ def _parse_and_format_pdf_content(pdf, text_content):
         if ('asc 606' in line.lower()) and not line.startswith('['):
             pdf.set_font('Arial', '', 11)
             pdf.set_text_color(0, 102, 51)  # Green for citations
-            pdf.multi_cell(0, 6, line)
+            pdf.cell(0, 6, line, 0, 1, 'L')
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -751,8 +770,7 @@ def _parse_and_format_pdf_content(pdf, text_content):
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
             pdf.ln(3)
-            pdf.cell(15, 6, '', 0, 0)  # Indent using cell
-            pdf.multi_cell(150, 6, line)  # Fixed width for multi_cell
+            pdf.cell(0, 6, f"    {line}", 0, 1, 'L')  # Simple indented quote
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -760,8 +778,7 @@ def _parse_and_format_pdf_content(pdf, text_content):
         if line.startswith('•') or line.startswith('-') or line.startswith('*'):
             bullet_text = line[1:].strip() if line[0] in ['•', '-', '*'] else line
             pdf.set_font('Arial', '', 11)
-            pdf.cell(15, 6, '- ', 0, 0, 'L')  # Use dash instead of bullet
-            pdf.multi_cell(0, 6, bullet_text)
+            pdf.cell(0, 6, f"- {bullet_text}", 0, 1, 'L')  # Simple single line approach
             continue
             
         # === REGULAR PARAGRAPHS ===
@@ -772,10 +789,30 @@ def _parse_and_format_pdf_content(pdf, text_content):
             # Simple bold handling for PDF
             line = line.replace('**', '')
             pdf.set_font('Arial', 'B', 11)
-            pdf.multi_cell(0, 6, line)
+            # Safe paragraph handling
+            words = line.split()
+            current_line = ""
+            for word in words:
+                if len(current_line + word) < 80:  # Safe character limit
+                    current_line += word + " "
+                else:
+                    pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
+                    current_line = word + " "
+            if current_line.strip():
+                pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
             pdf.set_font('Arial', '', 11)
         else:
-            pdf.multi_cell(0, 6, line)
+            # Safe paragraph handling for regular text
+            words = line.split()
+            current_line = ""
+            for word in words:
+                if len(current_line + word) < 80:  # Safe character limit
+                    current_line += word + " "
+                else:
+                    pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
+                    current_line = word + " "
+            if current_line.strip():
+                pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
         
         pdf.ln(2)  # Small spacing between paragraphs
 
