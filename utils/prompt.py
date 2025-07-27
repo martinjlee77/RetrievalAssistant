@@ -26,6 +26,9 @@ class ASC606PromptTemplates:
         # Note: Contract data formatting is now handled by contract_data_formatter.py
         # This ensures ALL user inputs are systematically included in the analysis
         
+        # Determine memo format based on audience
+        memo_format = ASC606PromptTemplates._get_memo_format(user_inputs)
+        
         return f"""You are a professional senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
 
         Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis. Do include your analysis of any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.
@@ -63,6 +66,7 @@ class ASC606PromptTemplates:
         - Analysis and conclusion
         - Supporting quotes from the contract
         - Relevant ASC 606 citations
+        - Relevant industry interpretations
         - Professional judgment rationale
         
         When analyzing multiple document types (MSA + SOW, Purchase Orders, Amendments, etc.), 
@@ -82,7 +86,7 @@ class ASC606PromptTemplates:
         
         Use any retrieved authoritative guidance provided above to support your analysis with precise citations.
         
-        Format your response in professional memo style suitable for audit workpapers.
+        {memo_format}
         """
     
     @staticmethod
@@ -108,6 +112,78 @@ class ASC606PromptTemplates:
         - SEC filing support
         
         Include specific contract quotes and ASC citations throughout.
+        """
+    
+    @staticmethod
+    def _get_memo_format(user_inputs: Optional[Dict] = None) -> str:
+        """Get audience-specific memo formatting instructions"""
+        if not user_inputs:
+            return ASC606PromptTemplates._technical_memo_format()
+        
+        memo_audience = user_inputs.get('memo_audience', 'Technical Accounting Team / Audit File')
+        
+        if memo_audience == 'Management Review':
+            return ASC606PromptTemplates._management_memo_format()
+        elif memo_audience == 'Deal Desk / Sales Team':
+            return ASC606PromptTemplates._deal_desk_memo_format()
+        else:  # Technical Accounting Team / Audit File (default)
+            return ASC606PromptTemplates._technical_memo_format()
+    
+    @staticmethod
+    def _technical_memo_format() -> str:
+        """Technical accounting memo format for audit workpapers"""
+        return """
+        Format your response as a technical accounting memo with these sections:
+        1. Executive Summary (key conclusions and financial impact)
+        2. Background (contract parties, dates, nature of arrangement)
+        3. Detailed Analysis (comprehensive 5-step ASC 606 framework)
+        4. Key Judgments (critical accounting positions with rationale)
+        5. Financial Impact (revenue amounts, timing, P&L effects)
+        6. Conclusion (final recommendations and next steps)
+        
+        Use technical accounting language suitable for:
+        - Audit committee presentations
+        - External auditor documentation
+        - SEC filing support
+        - Detailed step-by-step reasoning with precise ASC 606 citations
+        """
+    
+    @staticmethod
+    def _management_memo_format() -> str:
+        """Management-focused memo format"""
+        return """
+        Format your response as a management memo with these sections:
+        1. Executive Summary (key business implications and financial impact)
+        2. Background (brief contract overview)
+        3. Key Findings (most important revenue recognition impacts)
+        4. Business Impact (revenue timing, P&L effects, cash flow)
+        5. Recommendations (actionable next steps)
+        6. Technical Summary (abbreviated 5-step analysis)
+        
+        Use business-focused language that:
+        - Emphasizes "so what" for decision-makers
+        - Minimizes technical jargon
+        - Focuses on financial and business implications
+        - Provides clear recommendations
+        """
+    
+    @staticmethod
+    def _deal_desk_memo_format() -> str:
+        """Deal desk/sales team memo format"""
+        return """
+        Format your response as a deal structuring memo with these sections:
+        1. Revenue Recognition Summary (when revenue will be recognized)
+        2. Contract Terms Impact (how specific clauses affect revenue timing)
+        3. Deal Structure Analysis (optimal ways to structure similar deals)
+        4. Revenue Acceleration Opportunities (terms that could speed recognition)
+        5. Risk Factors (terms that could delay revenue recognition)
+        6. Recommendations for Future Deals
+        
+        Use practical language that:
+        - Translates accounting rules into deal structuring guidance
+        - Explains how contract terms affect revenue timing
+        - Provides actionable insights for sales negotiations
+        - Identifies optimal deal structures for revenue recognition
         """
     
     @staticmethod
