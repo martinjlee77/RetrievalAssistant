@@ -407,6 +407,7 @@ def create_pdf_from_text(text_content, title="", contract_data=None):
     pdf = ProfessionalMemo()
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_margins(20, 20, 20)  # Set proper margins (left, top, right)
     
     # === PROFESSIONAL MEMO HEADER ===
     
@@ -722,8 +723,8 @@ def _parse_and_format_pdf_content(pdf, text_content):
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
             pdf.ln(3)
-            pdf.cell(20, 6, '', 0, 0)  # Indent using cell instead of margin
-            pdf.multi_cell(0, 6, quote_text)
+            pdf.cell(15, 6, '', 0, 0)  # Indent using cell
+            pdf.multi_cell(150, 6, quote_text)  # Fixed width for multi_cell
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -750,8 +751,8 @@ def _parse_and_format_pdf_content(pdf, text_content):
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
             pdf.ln(3)
-            pdf.cell(20, 6, '', 0, 0)  # Indent using cell instead of margin
-            pdf.multi_cell(0, 6, line)
+            pdf.cell(15, 6, '', 0, 0)  # Indent using cell
+            pdf.multi_cell(150, 6, line)  # Fixed width for multi_cell
             pdf.set_text_color(0, 0, 0)
             continue
             
