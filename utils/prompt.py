@@ -10,26 +10,11 @@ class ASC606PromptTemplates:
     
     @staticmethod
     def get_analysis_prompt(contract_text: str, user_inputs: Optional[Dict] = None) -> str:
-        """Main ASC 606 analysis prompt template"""
+        """Main ASC 606 analysis prompt template - returns template string for formatting"""
+        # Note: This returns a template string that gets formatted in the analyzer
+        # with actual data from contract_data_formatter.py and RAG system
         
-        # Load expert guidance topics from contract review questions
-        expert_guidance_topics = ""
-        try:
-            import os
-            guidance_file = "attached_assets/contract_review_questions_1752258616680.txt"
-            if os.path.exists(guidance_file):
-                with open(guidance_file, 'r', encoding='utf-8') as f:
-                    expert_guidance_topics = f.read()
-        except Exception as e:
-            expert_guidance_topics = "Expert guidance not available"
-        
-        # Note: Contract data formatting is now handled by contract_data_formatter.py
-        # This ensures ALL user inputs are systematically included in the analysis
-        
-        # Determine memo format based on audience
-        memo_format = ASC606PromptTemplates._get_memo_format(user_inputs)
-        
-        return f"""You are a professional senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
+        return """You are a professional senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
 
         Your analysis must be guided by the comprehensive list of topics and questions detailed in the 'Expert Reference Guide' below. This guide sets the **minimum standard** for a complete and professional analysis. Do include your analysis of any other unique provisions, risks, or terms within this specific contract that could impact revenue recognition under ASC 606, even if they are not explicitly listed in the guide.
 
@@ -52,8 +37,9 @@ class ASC606PromptTemplates:
         {contract_text}
         ---
 
-        
-        NOTE: Complete contract data context is injected above this section by the analyzer
+        {contract_data_context}
+
+        {rag_guidance_context}
         
         Provide a comprehensive analysis following these steps:
         1. Identifying the Contract (ASC 606-10-25-1)
@@ -90,6 +76,19 @@ class ASC606PromptTemplates:
         
         {memo_format}
         """
+    
+    @staticmethod
+    def _load_expert_guidance() -> str:
+        """Load expert guidance topics from contract review questions"""
+        try:
+            import os
+            guidance_file = "attached_assets/contract_review_questions_1752258616680.txt"
+            if os.path.exists(guidance_file):
+                with open(guidance_file, 'r', encoding='utf-8') as f:
+                    return f.read()
+        except Exception as e:
+            return "Expert guidance not available"
+        return "Expert guidance not available"
     
     @staticmethod
     def get_memo_generation_prompt(analysis_data: Dict) -> str:

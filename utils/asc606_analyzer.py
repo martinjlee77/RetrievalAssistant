@@ -95,24 +95,17 @@ class ASC606Analyzer:
             # Format complete contract data for prompt
             contract_context = format_contract_data_for_prompt(contract_data)
             
-            # Get base prompt with complete context
-            base_prompt = ASC606PromptTemplates.get_analysis_prompt(
+            # FIXED: Get base prompt with proper parameter injection
+            enhanced_prompt = ASC606PromptTemplates.get_analysis_prompt(
                 contract_text=contract_text,
                 user_inputs=contract_data.__dict__ if hasattr(contract_data, '__dict__') else {}
+            ).format(
+                contract_text=contract_text,
+                expert_guidance_topics=ASC606PromptTemplates._load_expert_guidance(),
+                contract_data_context=contract_context,
+                rag_guidance_context=retrieved_context if retrieved_context else "",
+                memo_format=ASC606PromptTemplates._get_memo_format(contract_data.__dict__ if hasattr(contract_data, '__dict__') else {})
             )
-            
-            # CRITICAL FIX: Inject contract context AND RAG results in proper sections
-            enhanced_prompt = base_prompt.replace(
-                "**CONTRACT TEXT TO ANALYZE:**",
-                f"{contract_context}\n\n**CONTRACT TEXT TO ANALYZE:**"
-            )
-            
-            # CRITICAL FIX: Inject RAG results BEFORE contract text, not after
-            if retrieved_context:
-                enhanced_prompt = enhanced_prompt.replace(
-                    "Use any retrieved guidance provided above to support your analysis with precise citations:",
-                    f"{retrieved_context}\n\nUse any retrieved guidance provided above to support your analysis with precise citations:"
-                )
             
             # Add JSON formatting instruction
             enhanced_prompt += """\n\nIMPORTANT: Format your entire response as a single JSON object with the following structure:
