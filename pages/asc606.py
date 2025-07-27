@@ -531,7 +531,7 @@ else:
     # Professional memo
     st.markdown("---")
     st.subheader("📋 Professional Accounting Memo")
-    memo = getattr(analysis_results, 'professional_memo', None)
+    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
         with st.container(border=True):
             st.markdown(memo)

@@ -56,19 +56,53 @@ class ContractData(BaseModel):
 
 @dataclass
 class ASC606Analysis:
-    """Structure for ASC 606 analysis results"""
-    reconciliation_analysis: Dict[str, List[Dict[str, Any]]]
-    contract_overview: Dict[str, Any]
-    step1_contract_identification: Dict[str, Any]
-    step2_performance_obligations: Dict[str, Any]
-    step3_transaction_price: Dict[str, Any]
-    step4_price_allocation: Dict[str, Any]
-    step5_revenue_recognition: Dict[str, Any]
-    professional_memo: str
-    implementation_guidance: List[str]
-    citations: List[str]
-    not_applicable_items: List[str]
-    source_quality: str = "Hybrid RAG"  # Add missing field
+    """Structure for ASC 606 analysis results with step-by-step architecture support"""
+    # New comprehensive analysis fields
+    five_step_analysis: str = ""  # Final comprehensive memo
+    step_by_step_details: Dict[str, Any] = None  # Detailed step analysis
+    
+    # Analysis metadata
+    source_quality: str = "General Knowledge"
+    relevant_chunks: int = 0
+    analysis_timestamp: str = ""
+    
+    # Legacy fields for backwards compatibility
+    reconciliation_analysis: Optional[Dict[str, List[Dict[str, Any]]]] = None
+    contract_overview: Optional[Dict[str, Any]] = None
+    step1_contract_identification: Optional[Dict[str, Any]] = None
+    step2_performance_obligations: Optional[Dict[str, Any]] = None
+    step3_transaction_price: Optional[Dict[str, Any]] = None
+    step4_price_allocation: Optional[Dict[str, Any]] = None
+    step5_revenue_recognition: Optional[Dict[str, Any]] = None
+    professional_memo: str = ""
+    implementation_guidance: Optional[List[str]] = None
+    citations: Optional[List[str]] = None
+    not_applicable_items: Optional[List[str]] = None
+    
+    def __post_init__(self):
+        """Initialize None fields with empty defaults"""
+        if self.step_by_step_details is None:
+            self.step_by_step_details = {}
+        if self.reconciliation_analysis is None:
+            self.reconciliation_analysis = {"confirmations": [], "discrepancies": []}
+        if self.contract_overview is None:
+            self.contract_overview = {}
+        if self.step1_contract_identification is None:
+            self.step1_contract_identification = {}
+        if self.step2_performance_obligations is None:
+            self.step2_performance_obligations = {}
+        if self.step3_transaction_price is None:
+            self.step3_transaction_price = {}
+        if self.step4_price_allocation is None:
+            self.step4_price_allocation = {}
+        if self.step5_revenue_recognition is None:
+            self.step5_revenue_recognition = {}
+        if self.implementation_guidance is None:
+            self.implementation_guidance = []
+        if self.citations is None:
+            self.citations = []
+        if self.not_applicable_items is None:
+            self.not_applicable_items = []
 
 # ==================== ASC 842 MODELS ====================
 

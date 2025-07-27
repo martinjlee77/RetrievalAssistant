@@ -15,6 +15,7 @@ from core.models import ASC606Analysis
 from utils.llm import make_llm_call, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
+from utils.step_prompts import StepAnalysisPrompts
 import streamlit as st
 
 
@@ -37,7 +38,7 @@ class ASC606Analyzer:
             self.kb_manager = None
     
     def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
-        """Analyze contract using full RAG workflow with ASC 606 framework"""
+        """Analyze contract using step-by-step detailed analysis with extensive citations"""
         try:
             # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
             retrieved_context = ""
@@ -89,64 +90,89 @@ class ASC606Analyzer:
                         
                         retrieved_context += "\n---\n"
             
-            # === STEP 2: ENHANCED PROMPT WITH COMPLETE CONTRACT DATA ===
-            from utils.contract_data_formatter import format_contract_data_for_prompt
+            # === STEP 2: STEP-BY-STEP DETAILED ANALYSIS ===
+            step_results = {}
+            step_mapping = StepAnalysisPrompts.get_step_guidance_mapping()
             
-            # Format complete contract data for prompt
-            contract_context = format_contract_data_for_prompt(contract_data)
+            # Perform focused analysis for each ASC 606 step
+            for step_num in range(1, 6):
+                step_info = step_mapping[step_num]
+                
+                self.logger.info(f"Analyzing Step {step_num}: {step_info['title']}")
+                
+                # Generate focused prompt for this specific step
+                step_prompt = StepAnalysisPrompts.get_step_specific_analysis_prompt(
+                    step_number=step_num,
+                    step_title=step_info['title'],
+                    step_guidance=step_info['primary_guidance'],
+                    contract_text=contract_text,
+                    rag_context=retrieved_context,
+                    contract_data=contract_data,
+                    debug_config=debug_config or {}
+                )
+                
+                # Get detailed analysis for this step
+                step_response = make_llm_call(
+                    self.client,
+                    step_prompt,
+                    temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
+                    max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
+                    model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
+                    response_format={"type": "json_object"}
+                )
+                
+                # Parse JSON response
+                try:
+                    step_analysis = json.loads(step_response)
+                    step_results[f"step_{step_num}"] = step_analysis
+                    self.logger.info(f"Step {step_num} analysis completed: {len(step_response)} characters")
+                except json.JSONDecodeError as e:
+                    self.logger.error(f"JSON parsing failed for Step {step_num}: {e}")
+                    # Fallback to text response
+                    step_results[f"step_{step_num}"] = {
+                        "step_name": step_info['title'],
+                        "detailed_analysis": step_response,
+                        "error": "JSON parsing failed, using raw response"
+                    }
             
-            # FIXED: Get base prompt with proper parameter injection
-            enhanced_prompt = ASC606PromptTemplates.get_analysis_prompt(
-                contract_text=contract_text,
-                user_inputs=contract_data.__dict__ if hasattr(contract_data, '__dict__') else {}
-            ).format(
-                contract_text=contract_text,
-                expert_guidance_topics=ASC606PromptTemplates._load_expert_guidance(),
-                contract_data_context=contract_context,
-                rag_guidance_context=retrieved_context if retrieved_context else "",
-                memo_format=ASC606PromptTemplates._get_memo_format(contract_data.__dict__ if hasattr(contract_data, '__dict__') else {})
+            # === STEP 3: GENERATE COMPREHENSIVE MEMO ===
+            self.logger.info("Generating final comprehensive memo")
+            
+            memo_prompt = StepAnalysisPrompts.get_final_memo_generation_prompt(
+                step1_analysis=step_results.get("step_1", {}),
+                step2_analysis=step_results.get("step_2", {}),
+                step3_analysis=step_results.get("step_3", {}),
+                step4_analysis=step_results.get("step_4", {}),
+                step5_analysis=step_results.get("step_5", {}),
+                contract_data=contract_data,
+                debug_config=debug_config or {}
             )
             
-            # Add JSON formatting instruction
-            enhanced_prompt += """\n\nIMPORTANT: Format your entire response as a single JSON object with the following structure:
-{
-  "step1": {"analysis": "your analysis", "conclusion": "your conclusion"},
-  "step2": {"analysis": "your analysis", "conclusion": "your conclusion"},
-  "step3": {"analysis": "your analysis", "conclusion": "your conclusion"},
-  "step4": {"analysis": "your analysis", "conclusion": "your conclusion"},
-  "step5": {"analysis": "your analysis", "conclusion": "your conclusion"},
-  "memo": "complete professional memo text",
-  "citations": ["list of ASC citations used"],
-  "source_quality": "percentage based on authoritative sources used"
-}"""
-            
-            # === STEP 3: LLM CALL WITH JSON MODE ===
-            model = debug_config.get("model", "gpt-4o") if debug_config else "gpt-4o"
-            temperature = debug_config.get("temperature", 0.3) if debug_config else 0.3
-            max_tokens = debug_config.get("max_tokens", 3000) if debug_config else 3000
-            
-            messages = [
-                {"role": "system", "content": "You are a senior technical accountant from a Big 4 firm specializing in ASC 606. Provide comprehensive analysis using authoritative sources."},
-                {"role": "user", "content": enhanced_prompt}
-            ]
-            
-            response = make_llm_call(
-                messages=messages,
-                model=model,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                response_format={"type": "json_object"}  # Use OpenAI's native JSON mode
+            final_memo = make_llm_call(
+                self.client,
+                memo_prompt,
+                temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
+                max_tokens=debug_config.get('max_tokens', 6000) if debug_config else 6000,
+                model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o'
             )
             
-            # === STEP 4: ROBUST PARSING ===
-            analysis_result = self._parse_analysis_response(response or "")
+            self.logger.info(f"Final memo generated: {len(final_memo)} characters")
+            
+            # === STEP 4: RETURN COMPREHENSIVE ANALYSIS RESULT ===
+            analysis_result = ASC606Analysis(
+                five_step_analysis=final_memo,
+                source_quality="Hybrid RAG - Step Analysis" if retrieved_context else "General Knowledge - Step Analysis",
+                relevant_chunks=len(retrieved_context.split('\n\n')) if retrieved_context else 0,
+                analysis_timestamp=datetime.now().isoformat(),
+                step_by_step_details=step_results  # Store detailed step analysis
+            )
             
             # Store debug information if enabled
             if debug_config and debug_config.get("show_raw_response"):
-                st.session_state.raw_response = response
+                st.session_state.raw_response = final_memo
                 
             if debug_config and debug_config.get("show_prompts"):
-                st.session_state.enhanced_prompt = enhanced_prompt
+                st.session_state.enhanced_prompt = f"Step-by-step analysis with {len(step_results)} detailed steps"
                 
             return analysis_result
             
