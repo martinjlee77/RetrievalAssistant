@@ -101,14 +101,18 @@ class ASC606Analyzer:
                 user_inputs=contract_data.__dict__ if hasattr(contract_data, '__dict__') else {}
             )
             
-            # Inject comprehensive contract context
-            base_prompt = base_prompt.replace(
+            # CRITICAL FIX: Inject contract context AND RAG results in proper sections
+            enhanced_prompt = base_prompt.replace(
                 "**CONTRACT TEXT TO ANALYZE:**",
                 f"{contract_context}\n\n**CONTRACT TEXT TO ANALYZE:**"
             )
             
-            # Inject retrieved context into prompt
-            enhanced_prompt = f"{base_prompt}\n\n{retrieved_context}" if retrieved_context else base_prompt
+            # CRITICAL FIX: Inject RAG results BEFORE contract text, not after
+            if retrieved_context:
+                enhanced_prompt = enhanced_prompt.replace(
+                    "Use any retrieved guidance provided above to support your analysis with precise citations:",
+                    f"{retrieved_context}\n\nUse any retrieved guidance provided above to support your analysis with precise citations:"
+                )
             
             # Add JSON formatting instruction
             enhanced_prompt += """\n\nIMPORTANT: Format your entire response as a single JSON object with the following structure:

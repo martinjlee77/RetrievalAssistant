@@ -11,6 +11,13 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 **Date: 2025-07-27**
+- ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
+- ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
+- ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance
+- ✅ **Complete Contract Data Flow**: Fixed contract_data_formatter.py to include ALL steering inputs (focus areas, materiality, audience)
+- ✅ **Eliminated Prompt Template Duplication**: Removed 130+ lines of redundant field extraction from prompt.py
+- ✅ **Fixed RAG Search Parameters**: Corrected Optional[str] typing issue in knowledge_base.py
+- ✅ **Enhanced Memo Format Routing**: Implemented dynamic memo formatting based on audience selection
 - ✅ **CRITICAL DATA FLOW FIX**: Resolved disconnect between contract_data (UI inputs) and prompt system
 - ✅ Created contract_data_formatter.py to systematically format ALL user inputs for LLM analysis
 - ✅ Enhanced ASC606Analyzer to use complete ContractData object instead of partial field extraction

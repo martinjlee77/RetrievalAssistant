@@ -85,7 +85,7 @@ class KnowledgeBaseManager:
         
         return self.collections[collection_name]
     
-    def search_relevant_guidance(self, standard: str, query_texts: List[str], step_context: str = None, n_results: int = 5) -> List[Dict]:
+    def search_relevant_guidance(self, standard: str, query_texts: List[str], step_context: Optional[str] = None, n_results: int = 5) -> List[Dict]:
         """
         Search for relevant guidance in a specific standard's knowledge base
         
