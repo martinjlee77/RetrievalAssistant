@@ -1,0 +1,45 @@
+TECHNICAL ACCOUNTING MEMORANDUM
+
+TO:	Technical Accounting Team / Audit File
+FROM:	ASC 606 AI Analyst
+DATE:	July 27, 2025
+SUBJECT:	ASC 606 Analysis: Netflix01
+
+EXECUTIVE SUMMARY
+The contract between Netflix and Martin Lee for streaming services meets the criteria for revenue recognition under ASC 606. Revenue of $15.49 will be recognized over the service period from 2024-09-26 to 2024-10-25.
+2. BACKGROUND
+•	**Contract Parties:** Netflix, Inc. and Martin Lee
+•	**Contract Dates:** 2024-09-26 to 2024-10-25
+•	**Nature of Arrangement:** Monthly streaming service subscription
+3. DETAILED ANALYSIS
+4. STEP 1: IDENTIFYING THE CONTRACT
+The contract is valid under ASC 606-10-25-1, with clear approval, rights, payment terms, and commercial substance.
+5. STEP 2: IDENTIFYING PERFORMANCE OBLIGATIONS
+The sole performance obligation is the provision of streaming services, which is distinct.
+6. STEP 3: DETERMINE THE TRANSACTION PRICE
+The transaction price is fixed at $15.49, with no variable consideration or financing components.
+7. STEP 4: ALLOCATION OF THE TRANSACTION PRICE
+The entire transaction price is allocated to the streaming service.
+8. STEP 5: RECOGNIZE REVENUE
+Revenue is recognized over time, equally over the month, as the service is provided.
+9. KEY JUDGMENTS
+The primary judgment involves determining the distinct nature of the streaming service and the timing of revenue recognition over the service period.
+10. FINANCIAL IMPACT
+•	**Revenue Amount:** $15.49
+•	**Timing:** Recognized over the service period
+•	**P&L Effects:** Revenue is recognized evenly over the month
+11. CONCLUSION
+The contract is compliant with ASC 606, and revenue recognition is appropriately timed and measured. No further action is required.
+ 
+DOCUMENT METADATA
+Document Version:	Final
+Analysis Date:	July 27, 2025
+Analyst:	ASC 606 AI Analyst
+Review Status:	Pending Management Review
+File Classification:	Internal Accounting Analysis
+
+ANALYST CERTIFICATION
+I certify that this analysis has been prepared in accordance with ASC 606 requirements and represents my professional judgment based on the contract documentation provided and applicable authoritative guidance.
+
+__________________________________________________
+ASC 606 AI Analyst, Technical Accounting

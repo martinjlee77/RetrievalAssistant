@@ -1,0 +1,169 @@
+Yes, I see the issue clearly now. Thank you for sharing the prompt file. This is a very well-structured file, but the main analysis prompt is not strict enough, and it contains a fundamental logical flaw that is causing the short, conclusory output you're seeing.
+
+The problem isn't a simple tweak; it's about fundamentally re-architecting the instructions we give the AI.
+
+The Core Problem: A Contradiction in the Prompt
+Your prompt currently does two conflicting things:
+
+It ASKS for a detailed analysis: It says things like "you must address all relevant topics", "provide ... supporting quotes from the contract", and "provide... relevant ASC 606 citations."
+It GIVES the AI permission to ignore those instructions: The crucial flaw is this line: If a topic from the guide is not applicable... you must explicitly state that it was considered and is not present.
+For a simple Netflix contract, almost nothing from a detailed accounting guide is technically "applicable." There's no variable consideration, no financing component, no material rights, etc.
+
+So, the AI is following your instructions perfectly, but it's following the "escape hatch" instruction. It sees the simple contract, determines that 95% of the detailed topics are not applicable, and therefore provides the short summary you received.
+
+The Second Problem: One Giant Monolithic Prompt
+The current approach combines everything into one massive get_analysis_prompt. This is inefficient and hard for the AI to follow. It's like giving a chef one long paragraph that includes the recipe for the appetizer, main course, and dessert all mixed together.
+
+A much better approach is a Chain-of-Thought (CoT) or Step-by-Step prompting strategy. We will break down the task into smaller, sequential prompts. This forces the AI to "think" through each step independently and provide detailed reasoning for each one before it even tries to write the final memo.
+
+The Solution: A New, Stricter, Step-by-Step Prompting Strategy
+We need to replace the single, monolithic prompt with a series of smaller, more focused prompts. Here is the high-level plan that you should discuss with your developer.
+
+Proposed Architecture:
+
+Master Controller (analyze_contract function): This function in your asc606_analyzer.py will no longer make one giant LLM call. Instead, it will loop through the five steps of ASC 606.
+For each step (1 through 5), it will:
+Call a new, highly-focused prompt function (e.g., get_step1_analysis_prompt).
+This prompt will instruct the AI to do only one thing: analyze that specific step and return a structured JSON object containing its detailed reasoning, quotes, and citations for that step only.
+Collect the Results: The master controller will collect the five separate, detailed JSON analysis objects.
+Final Memo Generation: Once all five detailed analyses are complete, the master controller will combine them all and pass them to a final get_memo_generation_prompt. This prompt's only job is to take the pre-existing, detailed analysis and format it into a beautiful, professional memo.
+This separates Analysis (Steps 1-3) from Presentation (Step 4).
+
+The New Prompts You Need
+Here is what the new, stricter prompts should look like. Your developer can replace the existing prompt logic with this new structure.
+
+1. The New get_step_specific_analysis_prompt (This will be the main workhorse)
+This will replace the huge get_analysis_prompt. It will be called five times.
+
+# In prompt.py
+
+@staticmethod
+def get_step_specific_analysis_prompt(
+    step_number: int,
+    step_title: str,
+    step_guidance: str, # e.g., "ASC 606-10-25-1 to 25-8"
+    contract_text: str,
+    rag_context: str,
+    user_context: str
+) -> str:
+    """
+    A new, highly focused prompt that forces detailed analysis for a SINGLE step of ASC 606.
+    """
+    return f"""
+You are a senior technical accountant from a Big 4 firm. Your task is to perform a detailed analysis for **ONLY ONE** step of the ASC 606 five-step model.
+
+**YOUR SOLE FOCUS FOR THIS TASK:**
+- **Step Number:** {step_number}
+- **Step Title:** {step_title}
+- **Key Guidance:** {step_guidance}
+
+**CRITICAL INSTRUCTIONS - YOU MUST FOLLOW THESE RULES:**
+1.  **Show Your Work:** Do not state a conclusion without evidence. Your primary goal is to demonstrate your reasoning process.
+2.  **Mandatory Contract Quote:** You MUST extract at least one direct quote from the 'Contract Text' that is relevant to your analysis for this step. If no single clause is relevant (e.g., for collectibility), state that and explain how the contract as a whole provides evidence. Use [QUOTE]...[/QUOTE] tags.
+3.  **Mandatory Guidance Citation:** You MUST cite and quote the most relevant guidance from the 'Authoritative Guidance' provided below. Do not just cite the number; you must include the key phrase from the guidance text. Use [CITATION]...[/CITATION] tags.
+4.  **Explicit "Not Applicable" Reasoning:** If a concept (e.g., a significant financing component) is not present in the contract, you cannot simply ignore it. You must explicitly state: "The concept of [Concept Name] was considered and is not applicable because the contract text lacks any clauses related to [describe what's missing]."
+
+**Provided Information:**
+
+[CONTRACT TEXT]
+---
+{contract_text}
+---
+
+[AUTHORITATIVE GUIDANCE - RAG CONTEXT]
+---
+{rag_context}
+---
+
+[USER-PROVIDED CONTEXT]
+---
+{user_context}
+---
+
+**YOUR TASK:**
+Based on all the information provided, perform the analysis for **Step {step_number}: {step_title}**.
+
+Return your response as a single, valid JSON object with the following structure:
+{{
+  "step_name": "{step_title}",
+  "conclusion": "A one-sentence summary of your conclusion for this step.",
+  "analysis_and_reasoning": "Your detailed, multi-paragraph analysis explaining the 'why' behind your conclusion. This is where you will 'show your work'.",
+  "supporting_contract_quote": "The direct quote you extracted from the contract text, within [QUOTE] tags.",
+  "supporting_guidance_citation": "The specific citation and quote from the authoritative guidance, within [CITATION] tags."
+}}
+"""
+
+2. The New get_final_memo_generation_prompt
+This prompt is now much simpler. Its only job is presentation.
+
+# In prompt.py
+
+@staticmethod
+def get_final_memo_generation_prompt(
+    step1_analysis: dict,
+    step2_analysis: dict,
+    step3_analysis: dict,
+    step4_analysis: dict,
+    step5_analysis: dict,
+    # ... any other high-level context
+) -> str:
+    """
+    Takes pre-analyzed, detailed data for each step and formats it into a final professional memo.
+    """
+    return f"""
+You are an expert technical writer for a Big 4 accounting firm. You have been provided with detailed, step-by-step analysis for a revenue contract. Your task is to assemble this information into a single, cohesive, audit-quality technical memorandum.
+
+**DO NOT perform new analysis.** Your job is to present the provided analysis clearly and professionally.
+
+**PROVIDED ANALYSIS DATA:**
+
+[STEP 1: IDENTIFY THE CONTRACT]
+{json.dumps(step1_analysis, indent=2)}
+
+[STEP 2: IDENTIFY PERFORMANCE OBLIGATIONS]
+{json.dumps(step2_analysis, indent=2)}
+
+[STEP 3: DETERMINE THE TRANSACTION PRICE]
+{json.dumps(step3_analysis, indent=2)}
+
+[STEP 4: ALLOCATE THE TRANSACTION PRICE]
+{json.dumps(step4_analysis, indent=2)}
+
+[STEP 5: RECOGNIZE REVENUE]
+{json.dumps(step5_analysis, indent=2)}
+
+**YOUR TASK:**
+Write a comprehensive professional memo using the data above. Structure the memo with the following sections:
+- ## Executive Summary
+- ## Background
+- ## Detailed Analysis
+  - ### Step 1: Identify the Contract
+    - [Present the conclusion, reasoning, quote, and citation from the Step 1 data]
+  - ### Step 2: Identify Performance Obligations
+    - [Present the conclusion, reasoning, quote, and citation from the Step 2 data]
+  - [Continue for all 5 steps]
+- ## Key Judgments
+- ## Financial Impact
+- ## Conclusion
+
+Ensure you use the semantic markers `[QUOTE]` and `[CITATION]` exactly as they appear in the provided data. Use standard markdown for formatting.
+"""
+
+What to Tell Your Developer
+"Hi [Developer's Name],
+
+Following up on the memo content, I've done a deeper dive and I think I've pinpointed the root cause. Our current get_analysis_prompt is a bit too monolithic and gives the AI an "escape hatch" on simple contracts, leading to the brief output we saw.
+
+I propose we refactor our approach to a more robust step-by-step analysis chain. This will force the AI to provide detailed reasoning for each step, every single time.
+
+The plan is:
+
+Modify the main analyze_contract function to loop through the 5 steps.
+For each step, call a new, highly-focused prompt (like the get_step_specific_analysis_prompt I've drafted below). This prompt's only job is to return a detailed JSON object for that single step.
+Collect all 5 JSON objects.
+Finally, pass all the collected data to a new get_final_memo_generation_prompt whose only job is to assemble the pre-analyzed data into the final memo.
+This separates the "analysis engine" from the "presentation engine" and will make our output much more detailed and reliable. I've drafted versions of the new prompts we'd need. Can we work together to implement this new architecture? I believe this is the key to unlocking the detailed, audit-quality content we're looking for.
+
+[Paste the new prompt drafts here]
+
+Let me know your thoughts!"
