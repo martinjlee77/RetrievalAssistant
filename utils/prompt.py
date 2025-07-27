@@ -23,138 +23,8 @@ class ASC606PromptTemplates:
         except Exception as e:
             expert_guidance_topics = "Expert guidance not available"
         
-        # Extract contract types and collectibility for context
-        contract_types_info = ""
-        if user_inputs and user_inputs.get('contract_types'):
-            contract_types_info = f"""
-        DOCUMENT TYPES PROVIDED: {', '.join(user_inputs['contract_types'])}
-        Note: The uploaded documents include {', '.join(user_inputs['contract_types'])}. Consider the relationship between these document types when analyzing the arrangement.
-        """
-        
-        collectibility_info = ""
-        if user_inputs and user_inputs.get('collectibility') is not None:
-            collectibility_status = "probable" if user_inputs.get('collectibility') else "not probable"
-            collectibility_info = f"""
-        COLLECTIBILITY ASSESSMENT: {collectibility_status}
-        Important: Management has assessed that collection of consideration is {collectibility_status}. This is fundamental to Step 1 contract identification under ASC 606-10-25-1(e).
-        """
-        
-        consideration_payable_info = ""
-        if user_inputs and user_inputs.get('consideration_payable_involved'):
-            details = user_inputs.get('consideration_payable_details', '')
-            consideration_payable_info = f"""
-        CONSIDERATION PAYABLE TO CUSTOMER: Yes
-        Details: {details}
-        Important: The contract includes consideration payable to the customer. This must be considered in transaction price determination per ASC 606-10-32-25.
-        """
-        
-        # Combined contract analysis
-        combined_contract_info = ""
-        if user_inputs and user_inputs.get('is_combined_contract'):
-            combined_contract_info = f"""
-        COMBINED CONTRACT ANALYSIS: Required
-        Important: Management has determined these documents should be evaluated as a single combined contract per ASC 606-10-25-9. Consider all uploaded documents as one arrangement.
-        """
-        
-        # Contract modification analysis
-        modification_info = ""
-        if user_inputs and user_inputs.get('is_modification'):
-            original_uploaded_status = "Yes" if user_inputs.get('original_contract_uploaded') else "No"
-            modification_info = f"""
-        CONTRACT MODIFICATION: Yes
-        - Original Contract Uploaded: {original_uploaded_status}
-        - Important: This is a contract modification/amendment. Apply ASC 606-10-25-10 through 25-13 modification accounting guidance. If the original contract is not uploaded, state that your analysis of the modification may be limited.
-        """
-        
-        # Build comprehensive assessment from all UI fields
-        enhanced_assessment_info = ""
-        assessment_elements = []
-        
-        # Contract basics
-        if user_inputs and user_inputs.get('arrangement_description'):
-            assessment_elements.append(f"Arrangement Summary: {user_inputs['arrangement_description']}")
-        
-        # Principal vs Agent
-        if user_inputs and user_inputs.get('principal_agent_involved'):
-            principal_details = user_inputs.get('principal_agent_details', '')
-            assessment_elements.append(f"Principal vs Agent Analysis Required: {principal_details}")
-        
-        # Variable consideration
-        if user_inputs and user_inputs.get('variable_consideration_involved'):
-            variable_details = user_inputs.get('variable_consideration_details', '')
-            assessment_elements.append(f"Variable Consideration Present: {variable_details}")
-        
-        # Financing component
-        if user_inputs and user_inputs.get('financing_component_involved'):
-            financing_details = user_inputs.get('financing_component_details', '')
-            assessment_elements.append(f"Significant Financing Component: {financing_details}")
-        
-        # Noncash consideration
-        if user_inputs and user_inputs.get('noncash_consideration_involved'):
-            noncash_details = user_inputs.get('noncash_consideration_details', '')
-            assessment_elements.append(f"Noncash Consideration Present: {noncash_details}")
-        
-        # SSP assessment
-        if user_inputs and user_inputs.get('ssp_represents_contract_price') is not None:
-            ssp_status = "Yes" if user_inputs.get('ssp_represents_contract_price') else "No" 
-            assessment_elements.append(f"Contract Prices Represent SSP: {ssp_status}")
-        
-        # Revenue recognition timing
-        if user_inputs and user_inputs.get('revenue_recognition_timing_details'):
-            timing_details = user_inputs.get('revenue_recognition_timing_details')
-            assessment_elements.append(f"Revenue Recognition Timing: {timing_details}")
-            
-        if assessment_elements:
-            enhanced_assessment_info = f"""
-        DETAILED ASSESSMENT INPUTS:
-        {chr(10).join(f"• {element}" for element in assessment_elements)}
-        """
-        
-        # Build steering information for AI focus
-        steering_info = ""
-        if user_inputs:
-            # Key focus areas - most important steering input
-            if user_inputs.get('key_focus_areas'):
-                steering_info += f"""
-        SPECIFIC FOCUS AREAS (HIGH PRIORITY):
-        {user_inputs['key_focus_areas']}
-        
-        Important: The user has specifically requested focus on the above areas. Pay special attention to these questions/clauses/risks and provide detailed analysis with supporting citations.
-        """
-            
-            # Audience tailoring
-            memo_audience = user_inputs.get('memo_audience', 'Technical Accounting Team / Audit File')
-            if memo_audience == 'Management Review':
-                steering_info += """
-        MEMO AUDIENCE: Management Review
-        - Focus on key judgments, financial impact, and business implications
-        - Use less technical jargon and emphasize the "so what" for decision-makers
-        - Summarize critical conclusions upfront
-        """
-            elif memo_audience == 'Deal Desk / Sales Team':
-                steering_info += """
-        MEMO AUDIENCE: Deal Desk / Sales Team
-        - Focus on explaining revenue recognition impact of specific contract terms
-        - Translate complex accounting rules into practical guidance for deal structuring
-        - Explain how different clauses affect revenue timing
-        """
-            else:  # Technical Accounting Team / Audit File (default)
-                steering_info += """
-        MEMO AUDIENCE: Technical Accounting Team / Audit File
-        - Provide deep technical compliance and audit readiness
-        - Include detailed step-by-step reasoning and precise ASC 606 citations
-        - Use full technical detail suitable for expert accountants and auditors
-        """
-            
-            # Materiality threshold
-            if user_inputs.get('materiality_threshold'):
-                threshold = user_inputs['materiality_threshold']
-                steering_info += f"""
-        MATERIALITY THRESHOLD: {threshold:,} ({user_inputs.get('currency', 'USD')})
-        - Focus detailed analysis on contract elements exceeding this threshold
-        - Note materiality of bonuses, penalties, discounts, and other variable elements
-        - Include materiality analysis in your conclusions and briefly mention immaterial elements (elements below threshold)
-        """
+        # Note: Contract data formatting is now handled by contract_data_formatter.py
+        # This ensures ALL user inputs are systematically included in the analysis
         
         return f"""You are a professional senior technical accountant from a Big 4 firm, tasked with preparing an audit-quality revenue recognition memo.
 
@@ -179,13 +49,8 @@ class ASC606PromptTemplates:
         {contract_text}
         ---
 
-        {contract_types_info}
-        {collectibility_info}
-        {consideration_payable_info}
-        {combined_contract_info}
-        {modification_info}
-        {enhanced_assessment_info}
-        {steering_info}
+        
+        NOTE: Complete contract data context is injected above this section by the analyzer
         
         Provide a comprehensive analysis following these steps:
         1. Identifying the Contract (ASC 606-10-25-1)
