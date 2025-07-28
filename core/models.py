@@ -5,6 +5,7 @@ Centralized Data Models for Multi-Standard Platform
 from pydantic import BaseModel, ValidationError, Field
 from typing import Optional, List, Dict, Any
 from datetime import date, datetime
+from dataclasses import dataclass
 
 # ==================== ASC 606 MODELS ====================
 
