@@ -510,9 +510,8 @@ else:
         from utils.html_export import enhance_markdown_for_display, convert_memo_to_html
         
         with st.container(border=True):
-            # Enhanced markdown display with better formatting
-            enhanced_memo = enhance_markdown_for_display(memo)
-            st.markdown(enhanced_memo)
+            st.markdown("**📋 Professional Memo Downloads**")
+            st.write("Your ASC 606 analysis is complete. Download in your preferred format:")
             
             # Create columns for the download buttons
             dl_col1, dl_col2, dl_col3 = st.columns(3)
