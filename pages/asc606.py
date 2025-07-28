@@ -12,7 +12,7 @@ try:
     from core.models import ContractData, ASC606Analysis
     from utils.asc606_analyzer import ASC606Analyzer
     from utils.document_extractor import DocumentExtractor
-    from utils.llm import create_debug_sidebar, create_docx_from_text, create_pdf_from_text
+    from utils.llm import create_debug_sidebar, create_docx_from_text
 except ImportError:
     # Handle missing imports gracefully
     st.error(

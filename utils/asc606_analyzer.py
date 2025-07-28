@@ -71,6 +71,7 @@ class ASC606Analyzer:
         try:
             # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
             retrieved_context = ""
+            contract_terms = []
             if self.kb_manager:
                 # Extract contract-specific terms for better RAG results
                 contract_terms = extract_contract_terms(
@@ -182,13 +183,13 @@ class ASC606Analyzer:
                     )
                     
                     # Parse JSON response
-                    step_analysis_raw = json.loads(step_response)
+                    step_analysis_raw = json.loads(step_response) if step_response else {}
                     
                     # --- GEMINI'S SANITIZATION STEP ---
                     step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
                     
                     step_results[f"step_{step_num}"] = step_analysis_sanitized
-                    self.logger.info(f"Step {step_num} analysis completed: {len(step_response)} characters")
+                    self.logger.info(f"Step {step_num} analysis completed: {len(step_response) if step_response else 0} characters")
                     
                 except (json.JSONDecodeError, Exception) as e:
                     self.logger.error(f"Step {step_num} failed: {e}")
@@ -224,7 +225,7 @@ class ASC606Analyzer:
             )
             
             # Check if analysis is inconsistent and halt if needed
-            if "ANALYSIS CONSISTENT" not in consistency_result:
+            if consistency_result and "ANALYSIS CONSISTENT" not in str(consistency_result):
                 import streamlit as st
                 st.error(f"❌ **Analysis Consistency Issue Detected**\n\n{consistency_result}\n\nPlease review the contract and try again.")
                 raise Exception(f"Analysis consistency check failed: {consistency_result[:200]}...")

@@ -245,7 +245,8 @@ def create_docx_from_text(text_content, contract_data=None):
     from docx.shared import Inches, Pt, RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
     from docx.enum.table import WD_TABLE_ALIGNMENT
-    from docx.oxml.shared import OxmlElement, qn
+    from docx.oxml.parser import OxmlElement
+    from docx.oxml.ns import qn
     from datetime import datetime
     import re
     
@@ -360,8 +361,13 @@ def create_docx_from_text(text_content, contract_data=None):
     
     # === PHASE 2: CONTENT PARSING AND FORMATTING ===
     
-    # Parse and format the memo content
-    _parse_and_format_memo_content(document, text_content)
+    # Parse and format the memo content - simplified approach
+    # Split content into paragraphs and add them to document
+    paragraphs = text_content.split('\n\n')
+    for paragraph in paragraphs:
+        if paragraph.strip():
+            p = document.add_paragraph(paragraph.strip())
+            p.style = document.styles['Normal']
     
     # === PHASE 3: AUDIT-READY FEATURES ===
     
