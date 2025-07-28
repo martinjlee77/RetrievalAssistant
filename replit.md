@@ -47,6 +47,11 @@ Preferred communication style: Simple, everyday language.
 - ✅ **ELIMINATED TOKEN LIMIT PROBLEM**: Replaced single 10K+ token call with 4 focused calls (800-1000 tokens each)
 - ✅ **GUARANTEED COMPLETE MEMOS**: Python assembles all 6 sections, ensuring Steps 3-5 always included
 - ✅ **CRITICAL CONSISTENCY CHECK**: Added Gemini's final requirement - validates all 5 steps align before memo generation
+- ✅ **GEMINI'S TWO-PRONGED FORMATTING FIX**: Implemented comprehensive solution to eliminate character spacing issues
+- ✅ **PRONG 1 - SIMPLIFIED JSON STRUCTURE**: Replaced complex nested dictionaries with pipe-separated strings to reduce LLM cognitive load
+- ✅ **PRONG 2 - SANITIZATION LAYER**: Added regex-based _sanitize_llm_json() function to clean character spacing artifacts
+- ✅ **ENHANCED FORMATTER**: Updated format_step_detail_as_markdown() to parse new pipe format with backward compatibility
+- ✅ **MULTI-LAYERED ERROR PREVENTION**: Proactive prompt simplification + reactive sanitization for robust formatting
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
 - ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance

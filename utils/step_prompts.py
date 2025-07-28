@@ -123,29 +123,21 @@ Return your response as a single, valid JSON object with this structure:
   "detailed_analysis": "Your thorough, multi-paragraph analysis demonstrating professional reasoning. This should be 3-5 substantial paragraphs showing your analytical process, consideration of alternatives, and professional judgment.",
   
   "asc_606_citations": [
-    {{
-      "paragraph": "ASC 606-XX-XX-X",
-      "full_text": "Complete text of the ASC 606 paragraph",
-      "relevance": "Explanation of how this guidance applies to this specific contract"
-    }}
+    "ASC 606-XX-XX-X | Complete text of the ASC 606 paragraph | Explanation of how this guidance applies to this specific contract"
   ],
   
   "ey_guidance_citations": [
-    {{
-      "source": "EY Publication/Section reference", 
-      "full_text": "Complete relevant text from EY guidance",
-      "relevance": "Explanation of how this EY interpretation applies"
-    }}
+    "EY Publication/Section reference | Complete relevant text from EY guidance | Explanation of how this EY interpretation applies"
   ],
   
   "supporting_contract_evidence": [
-    {{
-      "quote": "Direct quote from contract",
-      "analysis": "Detailed explanation of what this contract language means for this ASC 606 step"
-    }}
+    "Direct quote from contract | Detailed explanation of what this contract language means for this ASC 606 step"
   ],
   
-  "professional_judgments": "Explanation of any significant judgments made, alternative approaches considered, and rationale for conclusions reached",
+  "professional_judgments": [
+    "A string explaining a single professional judgment.",
+    "Another string for a second judgment."
+  ],
   
   "potential_issues_addressed": "Discussion of potential complications, edge cases, or areas requiring additional consideration"
 }}
@@ -288,44 +280,57 @@ This section must contain the comprehensive 5-step ASC 606 framework:
         parts.append(str(analysis_text))
         parts.append("")
 
-        # Supporting contract evidence
+        # Supporting contract evidence (NEW: parsing pipe-separated format)
         if step_data.get('supporting_contract_evidence'):
             parts.append("**Supporting Contract Evidence:**")
             parts.append("")
             for evidence in step_data.get('supporting_contract_evidence', []):
-                if isinstance(evidence, dict):
+                if isinstance(evidence, str):
+                    evidence_parts = evidence.split('|', 1)  # Split only once
+                    quote = evidence_parts[0].strip()
+                    analysis = evidence_parts[1].strip() if len(evidence_parts) > 1 else ""
+                    if quote:
+                        parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+                    if analysis:
+                        parts.append(f"> **Analysis:** {analysis}")
+                elif isinstance(evidence, dict):
+                    # Fallback for old format
                     quote = evidence.get('quote', '').strip()
                     analysis = evidence.get('analysis', '').strip()
                     if quote:
                         parts.append(f"> [QUOTE]{quote}[/QUOTE]")
                     if analysis:
                         parts.append(f"> **Analysis:** {analysis}")
-                elif isinstance(evidence, str):
-                    clean_evidence = evidence.strip()
-                    if clean_evidence:
-                        parts.append(f"- {clean_evidence}")
                 parts.append("")
 
-        # ASC 606 Citations
+        # ASC 606 Citations (NEW: parsing pipe-separated format)
         if step_data.get('asc_606_citations'):
             parts.append("**Authoritative Guidance:**")
             parts.append("")
             for citation in step_data.get('asc_606_citations', []):
-                if isinstance(citation, dict):
-                    paragraph = citation.get('paragraph', '').strip()
-                    full_text = citation.get('full_text', '').strip()
+                if isinstance(citation, str):
+                    citation_parts = citation.split('|', 2)  # Split max twice
+                    paragraph = citation_parts[0].strip()
+                    full_text = citation_parts[1].strip() if len(citation_parts) > 1 else ""
+                    relevance = citation_parts[2].strip() if len(citation_parts) > 2 else ""
                     if paragraph and full_text:
                         # Truncate very long citations to prevent formatting issues
                         if len(full_text) > 500:
                             full_text = full_text[:500] + "..."
                         parts.append(f"- **[CITATION]{paragraph}:** {full_text}")
-                elif isinstance(citation, str):
-                    clean_citation = citation.strip()
-                    if clean_citation:
-                        parts.append(f"- {clean_citation}")
+                    if relevance:
+                        parts.append(f"  - **Relevance:** {relevance}")
+                elif isinstance(citation, dict):
+                    # Fallback for old format
+                    paragraph = citation.get('paragraph', '').strip()
+                    full_text = citation.get('full_text', '').strip()
+                    if paragraph and full_text:
+                        if len(full_text) > 500:
+                            full_text = full_text[:500] + "..."
+                        parts.append(f"- **[CITATION]{paragraph}:** {full_text}")
             parts.append("")
 
-        # Professional judgments
+        # Professional judgments (already list format - just clean strings)
         if step_data.get('professional_judgments'):
             parts.append("**Key Professional Judgments:**")
             parts.append("")

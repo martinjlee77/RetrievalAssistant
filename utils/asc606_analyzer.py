@@ -36,6 +36,29 @@ class ASC606Analyzer:
         except Exception as e:
             self.logger.error(f"Knowledge base manager initialization failed: {e}")
             self.kb_manager = None
+
+    def _sanitize_llm_json(self, data: Any) -> Any:
+        """
+        Recursively traverses a JSON object from the LLM and cleans up
+        common string formatting issues like character splitting.
+        GEMINI'S PRONG 2: REACTIVE FIX
+        """
+        if isinstance(data, dict):
+            return {key: self._sanitize_llm_json(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self._sanitize_llm_json(item) for item in data]
+        elif isinstance(data, str):
+            # 1. Fix the "s p a c e d o u t" text issue
+            # This regex finds single characters separated by one or more spaces
+            # and joins them back together.
+            sanitized_str = re.sub(r'\b(\w)\s(?=\w\b)', r'\1', data)
+
+            # 2. Collapse multiple spaces into a single space
+            sanitized_str = re.sub(r'\s+', ' ', sanitized_str).strip()
+
+            return sanitized_str
+        else:
+            return data
     
     def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
         """Analyze contract using step-by-step detailed analysis with extensive citations"""
@@ -153,8 +176,12 @@ class ASC606Analyzer:
                     )
                     
                     # Parse JSON response
-                    step_analysis = json.loads(step_response)
-                    step_results[f"step_{step_num}"] = step_analysis
+                    step_analysis_raw = json.loads(step_response)
+                    
+                    # --- GEMINI'S SANITIZATION STEP ---
+                    step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+                    
+                    step_results[f"step_{step_num}"] = step_analysis_sanitized
                     self.logger.info(f"Step {step_num} analysis completed: {len(step_response)} characters")
                     
                 except (json.JSONDecodeError, Exception) as e:
