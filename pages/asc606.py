@@ -507,7 +507,7 @@ else:
     memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
         # Import HTML export functions
-        from utils.html_export import enhance_markdown_for_display, convert_memo_to_html
+        from utils.html_export import enhance_markdown_for_display, convert_memo_to_html, create_pdf_from_html
         
         with st.container(border=True):
             st.markdown("**📋 Professional Memo Downloads**")
@@ -540,9 +540,20 @@ else:
                 )
                 
             with dl_col3:
-                # PDF Download - TEMPORARILY DISABLED due to Unicode issues
-                st.button("📋 PDF (Coming Soon)", disabled=True, use_container_width=True)
-                st.caption("Use HTML version for best formatting")
+                # PDF Download with WeasyPrint (no more Unicode issues!)
+                try:
+                    pdf_bytes = create_pdf_from_html(html_content)
+                    st.download_button(
+                        label="📋 Download PDF",
+                        data=pdf_bytes,
+                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
+                        mime="application/pdf",
+                        use_container_width=True,
+                        help="High-quality PDF generated from HTML - perfect formatting"
+                    )
+                except Exception as e:
+                    st.button("📋 PDF Error", disabled=True, use_container_width=True)
+                    st.caption(f"PDF generation failed: {str(e)[:50]}...")
     else:
         st.info("No memo generated for this analysis.")
 

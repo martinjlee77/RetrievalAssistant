@@ -2,7 +2,7 @@ modules = ["python-3.11", "python3"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["cargo", "freetype", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "jre", "libiconv", "libjpeg_turbo", "libxcrypt", "mupdf", "openjpeg", "rustc", "swig", "xcbuild"]
+packages = ["cargo", "fontconfig", "freetype", "ghostscript", "glib", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "jre", "libiconv", "libjpeg_turbo", "libxcrypt", "mupdf", "openjpeg", "pango", "rustc", "swig", "xcbuild"]
 
 [deployment]
 deploymentTarget = "autoscale"
