@@ -203,17 +203,21 @@ You are a professional document assembler. Your task is to create a comprehensiv
 - Memo Audience: {memo_audience}
 
 **YOUR TASK:**
-Write a comprehensive, impressive professional memo that showcases the depth of analysis performed. Structure the memo with these sections:
+Write a comprehensive, professional memo following the EXACT 6-section structure below. This structure matches the established prompt.py template and ensures consistency.
 
-## Executive Summary
-- Comprehensive overview highlighting key conclusions and financial impact
-- Reference major judgments and compliance conclusions
+## 1. Executive Summary
+- Key conclusions and financial impact overview
+- Major judgments and compliance conclusions
+- Overall ASC 606 treatment summary
 
-## Background  
+## 2. Background  
 - Contract parties, dates, and nature of arrangement
 - Context for the analysis and any unique circumstances
+- Scope and objectives of the analysis
 
-## Detailed Analysis
+## 3. Detailed Analysis
+This section must contain the comprehensive 5-step ASC 606 framework:
+
 ### Step 1: Identify the Contract
 - Present the executive conclusion from Step 1 analysis
 - Include the detailed multi-paragraph analysis showing reasoning process
@@ -234,17 +238,17 @@ Write a comprehensive, impressive professional memo that showcases the depth of 
 ### Step 5: Recognize Revenue
 [Same comprehensive treatment for Step 5 data]
 
-## Key Judgments
+## 4. Key Judgments
 - Consolidate and highlight the most significant professional judgments across all steps
 - Explain alternative approaches that were considered
 - Document the rationale for final conclusions
 
-## Financial Impact
+## 5. Financial Impact
 - Quantify revenue recognition timing and amounts
 - Discuss P&L and balance sheet effects
 - Address any implementation considerations
 
-## Conclusion
+## 6. Conclusion
 - Summarize compliance with ASC 606
 - Confirm appropriateness of accounting treatment
 - Note any follow-up actions or monitoring required
