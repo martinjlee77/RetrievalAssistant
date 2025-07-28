@@ -21,9 +21,9 @@ def get_style_config() -> Dict[str, str]:
         'font_size': '12pt',
         'page_width': '8.5in',
         'margins': '1in',
-        'primary_color': '#003366',
+        'primary_color': '#000000',
         'secondary_color': '#666666',
-        'border_color': '#cccccc',
+        'border_color': '#000000',
         'line_height': '1.6',
         'header_size': '16pt',
         'subheader_size': '14pt'
@@ -121,7 +121,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             margin: 12pt 24pt;
             padding: 12pt;
             background-color: #f8f9fa;
-            border-left: 4px solid {style_config['primary_color']};
+            border-left: 0px solid {style_config['primary_color']};
             font-style: italic;
         }}
         
@@ -222,20 +222,6 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     {professional_css}
 </head>
 <body>
-    <div class="memo-header">
-        <h1>Technical Accounting Memorandum</h1>
-        <div class="memo-to-from">
-            <div>
-                <strong>TO:</strong> Technical Accounting Team / Audit File<br>
-                <strong>FROM:</strong> ASC 606 AI Analyst<br>
-            </div>
-            <div>
-                <strong>DATE:</strong> {current_date}<br>
-                <strong>SUBJECT:</strong> ASC 606 Analysis: {customer_name}
-            </div>
-        </div>
-    </div>
-    
     {html_content}
     
     <div class="memo-footer">
