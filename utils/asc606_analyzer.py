@@ -196,8 +196,8 @@ class ASC606Analyzer:
                 self.client,
                 memo_prompt,
                 temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
-                max_tokens=debug_config.get('max_tokens', 6000) if debug_config else 6000,
-                model=debug_config.get('memo_model', 'gpt-4o-mini') if debug_config else 'gpt-4o-mini'  # Cost optimization
+                max_tokens=debug_config.get('max_tokens', 16000) if debug_config else 16000,  # INCREASED for complete memo
+                model=debug_config.get('memo_model', 'gpt-4o') if debug_config else 'gpt-4o'  # Use full model for better completion
             )
             
             self.logger.info(f"Final memo generated: {len(final_memo)} characters")

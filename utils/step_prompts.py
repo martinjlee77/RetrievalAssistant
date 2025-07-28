@@ -260,9 +260,16 @@ This section must contain the comprehensive 5-step ASC 606 framework:
 - Use ** for bold text and standard bullet points (-)
 - Preserve all analytical depth - this should be a substantial, impressive memo
 
+**CRITICAL REQUIREMENTS:**
+- YOU MUST INCLUDE ALL 5 STEPS IN SECTION 3. DO NOT STOP AT STEP 2.
+- Step 3: Determine the Transaction Price
+- Step 4: Allocate the Transaction Price  
+- Step 5: Recognize Revenue
+- Each step must have the same comprehensive treatment as Steps 1 and 2
+
 **QUALITY TARGETS:**
-- Minimum 2,000 words showing comprehensive analysis
-- Extensive use of authoritative citations throughout
+- Minimum 3,000 words showing comprehensive analysis for all 5 steps
+- Extensive use of authoritative citations throughout all steps
 - Professional tone demonstrating Big 4 expertise
 - Clear demonstration of analytical rigor and professional judgment
 """

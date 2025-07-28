@@ -544,15 +544,9 @@ else:
                     use_container_width=True)
 
             with dl_col2:
-                analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
-                st.download_button(
-                    label="📋 Download as .pdf",
-                    data=create_pdf_from_text(
-                        memo, title=analysis_title, contract_data=contract_data),
-                    file_name=
-                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
-                    mime="application/pdf",
-                    use_container_width=True)
+                # PDF Download - TEMPORARILY DISABLED due to Unicode issues
+                st.info("📋 PDF Download - Coming Soon")
+                st.caption("(Temporarily disabled - use DOCX format)")
     else:
         st.info("No memo generated for this analysis.")
 
