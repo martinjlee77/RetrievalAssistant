@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Step-Specific RAG**: Targeted guidance retrieval per ASC 606 step for maximum relevance
 - ✅ **Silent Failure Detection**: Comprehensive error handling with clear user alerts for any step failures
 - ✅ **Simplified Memo Assembly**: Template-based approach for reliable, consistent professional memos
+- ✅ **CRITICAL FUNCTION SIGNATURE FIX**: Resolved make_llm_call parameter conflict causing all step failures
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
 - ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance

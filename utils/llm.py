@@ -23,27 +23,26 @@ def get_openai_client():
     return OpenAI(api_key=api_key)
 
 def make_llm_call(
-    messages: List[Dict[str, str]], 
-    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    client,
+    prompt: str,
     temperature: float = 0.3,
-    response_format: Optional[Dict[str, Any]] = None,
-    max_tokens: Optional[int] = None
+    max_tokens: Optional[int] = None,
+    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
     Make LLM API call with error handling and rate limiting
     Following Streamlit best practices for API management
     """
-    client = get_openai_client()
-    
     try:
         with st.spinner("Analyzing with AI..."):
-            # Cast messages to proper type for OpenAI
-            openai_messages = cast(List[Any], messages)
+            # Prepare messages format
+            messages = [{"role": "user", "content": prompt}]
             
             # Prepare request parameters
             request_params = {
                 "model": model,
-                "messages": openai_messages,
+                "messages": messages,
                 "temperature": temperature,
             }
             
