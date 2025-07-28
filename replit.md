@@ -82,7 +82,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **CRITICAL IMPORT FIXES**: Resolved all missing function imports and module dependency issues
 - ✅ **TYPE SAFETY IMPROVEMENTS**: Added null checks and proper error handling throughout analyzer
 - ✅ **STREAMLIT COMPATIBILITY**: Fixed session state access issues for non-Streamlit contexts
-- ✅ **ELIMINATED ALL CONCLUSION BOXES**: Removed blockquote formatting from step conclusions, contract evidence, and main conclusion
+- ✅ **ELIMINATED STEP CONCLUSION BOXES**: Removed blockquote formatting from step conclusions only (kept contract evidence boxes)
 - ✅ **PROFESSIONAL MEMO FORMATTING**: Citations black font, tighter box padding, clean paragraph conclusions
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt

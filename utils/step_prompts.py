@@ -293,7 +293,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     quote = evidence_parts[0].strip()
                     analysis = evidence_parts[1].strip() if len(evidence_parts) > 1 else ""
                     if quote:
-                        parts.append(f"*{quote}*")
+                        parts.append(f"> *{quote}*")
                         parts.append("")
                     if analysis:
                         parts.append(f"**Analysis:** {analysis}")
@@ -303,7 +303,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     quote = evidence.get('quote', '').strip()
                     analysis = evidence.get('analysis', '').strip()
                     if quote:
-                        parts.append(f"*{quote}*")
+                        parts.append(f"> *{quote}*")
                         parts.append("")
                     if analysis:
                         parts.append(f"**Analysis:** {analysis}")
@@ -551,12 +551,7 @@ Highlight the most important implications for the intended audience, focusing on
 **Implementation Considerations:**
 Any practical next steps, documentation requirements, or monitoring needed.
 
-Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis.
-
-**FORMATTING REQUIREMENTS:**
-- Write in regular paragraph format (do not use > blockquote formatting)
-- Use standard text without special markdown formatting for quotes
-- Present as normal business prose suitable for executive review"""
+Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis."""
 
     @staticmethod 
     def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:
