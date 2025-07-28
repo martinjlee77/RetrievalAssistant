@@ -323,10 +323,11 @@ if st.session_state.analysis_results is None:
                 errors.append(
                     "At least one Document Type must be selected (Tab 1).")
             if not currency: errors.append("Currency is required (Tab 1).")
-            if not contract_start:
-                errors.append("Contract Start Date is required (Tab 1).")
-            if not contract_end:
-                errors.append("Contract End Date is required (Tab 1).")
+            # Contract dates are now optional
+            # if not contract_start:
+            #     errors.append("Contract Start Date is required (Tab 1).")
+            # if not contract_end:
+            #     errors.append("Contract End Date is required (Tab 1).")
             if contract_start and contract_end:
                 if contract_end < contract_start:
                     errors.append(
@@ -336,18 +337,11 @@ if st.session_state.analysis_results is None:
                 errors.append(
                     "At least one document must be uploaded (Tab 1).")
 
-            if collectibility is None:
-                errors.append("Collectibility must be specified (Tab 2).")
-            if is_modification is None:
-                errors.append(
-                    "Contract Modification status must be specified (Tab 2).")
+            # Tab 2 fields are now optional - only validate if modification requires original contract
             if is_modification and original_contract_uploaded is None:
                 errors.append(
                     "When 'This is a contract modification' is on, you must also specify if the original contract is uploaded (Tab 2)."
                 )
-            if is_combined_contract is None:
-                errors.append(
-                    "Combined Contract status must be specified (Tab 2).")
 
             return errors
 
@@ -412,10 +406,10 @@ if st.session_state.analysis_results is None:
                         arrangement_description=arrangement_description,
                         contract_start=contract_start,
                         contract_end=contract_end,
-                        currency=currency,
+                        currency=currency or "USD",
                         uploaded_file_name=", ".join(
                             [f.name for f in uploaded_files]),
-                        contract_types=contract_types,
+                        contract_types=contract_types or [],
                         # New steering fields from Tab 3
                         key_focus_areas=key_focus_areas,
                         memo_audience=memo_audience,

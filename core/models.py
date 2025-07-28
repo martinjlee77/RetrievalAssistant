@@ -25,11 +25,11 @@ class ContractData(BaseModel):
     analysis_title: str
     customer_name: str
     arrangement_description: Optional[str] = None  # Now optional per UI changes
-    contract_start: date
-    contract_end: date
-    currency: str
-    uploaded_file_name: str
-    contract_types: List[str]
+    contract_start: Optional[date] = None
+    contract_end: Optional[date] = None
+    currency: str = "USD"
+    uploaded_file_name: str = ""
+    contract_types: List[str] = Field(default_factory=list)
     
     # New steering fields from Tab 3
     key_focus_areas: Optional[str] = None
@@ -37,21 +37,21 @@ class ContractData(BaseModel):
     materiality_threshold: Optional[int] = None
     
     # All fields below correspond to the new UI toggles and text areas
-    collectibility: bool
-    is_combined_contract: bool
-    is_modification: bool
+    collectibility: Optional[bool] = None
+    is_combined_contract: Optional[bool] = None
+    is_modification: Optional[bool] = None
     original_contract_uploaded: Optional[bool] = None
-    principal_agent_involved: bool
+    principal_agent_involved: Optional[bool] = None
     principal_agent_details: Optional[str] = None
-    variable_consideration_involved: bool
+    variable_consideration_involved: Optional[bool] = None
     variable_consideration_details: Optional[str] = None
-    financing_component_involved: bool
+    financing_component_involved: Optional[bool] = None
     financing_component_details: Optional[str] = None
-    noncash_consideration_involved: bool
+    noncash_consideration_involved: Optional[bool] = None
     noncash_consideration_details: Optional[str] = None
-    consideration_payable_involved: bool
+    consideration_payable_involved: Optional[bool] = None
     consideration_payable_details: Optional[str] = None
-    ssp_represents_contract_price: bool
+    ssp_represents_contract_price: Optional[bool] = None
     revenue_recognition_timing_details: Optional[str] = None
 
 class ASC606Analysis(BaseModel):
