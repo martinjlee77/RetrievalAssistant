@@ -265,10 +265,32 @@ class ASC606Analyzer:
                 model='gpt-4o-mini', max_tokens=1000, temperature=0.3
             )
             
-            # 5. Python Assembly of Final Memo (guaranteed complete structure)
+            # 5. Generate Financial Impact (focused LLM call)
+            financial_prompt = StepAnalysisPrompts.get_financial_impact_prompt(
+                s1, s2, s3, s4, s5, 
+                getattr(contract_data, 'customer_name', 'Customer'),
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+            )
+            financial_impact = make_llm_call(
+                self.client, financial_prompt,
+                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
+            )
+            
+            # 6. Generate Conclusion (focused LLM call)
+            conclusion_prompt = StepAnalysisPrompts.get_conclusion_prompt(
+                s1, s2, s3, s4, s5,
+                getattr(contract_data, 'customer_name', 'Customer'),
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+            )
+            conclusion = make_llm_call(
+                self.client, conclusion_prompt,
+                model='gpt-4o-mini', max_tokens=800, temperature=0.3
+            )
+            
+            # 7. Python Assembly of Final Memo (guaranteed complete structure)
             memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
 
-TO: Technical Accounting Team / Audit File
+TO: {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}
 FROM: ASC 606 AI Analyst  
 DATE: {datetime.now().strftime('%B %d, %Y')}
 SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
@@ -276,12 +298,12 @@ SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Co
             
             final_memo_sections = [
                 memo_header,
-                f"## 1. Executive Summary\n\n{executive_summary}",
-                f"## 2. Background\n\n{background}", 
-                f"## 3. Detailed Analysis\n\n{detailed_analysis}",
-                f"## 4. Key Judgments\n\n{key_judgments}",
-                f"## 5. Financial Impact\n\nBased on the analysis above, revenue recognition follows ASC 606 requirements with appropriate timing and measurement.",
-                f"## 6. Conclusion\n\nThe contract meets all ASC 606 criteria for revenue recognition. Implementation should follow the step-by-step analysis detailed above."
+                f"## 1. EXECUTIVE SUMMARY\n\n{executive_summary}",
+                f"## 2. BACKGROUND\n\n{background}", 
+                f"## 3. DETAILED ANALYSIS\n\n{detailed_analysis}",
+                f"## 4. KEY JUDGMENTS\n\n{key_judgments}",
+                f"## 5. FINANCIAL IMPACT\n\n{financial_impact}",
+                f"## 6. CONCLUSION\n\n{conclusion}"
             ]
             
             final_memo = "\n\n".join(final_memo_sections)

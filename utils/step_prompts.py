@@ -280,7 +280,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
         parts.append(str(analysis_text))
         parts.append("")
 
-        # Supporting contract evidence (NEW: parsing pipe-separated format)
+        # Supporting contract evidence (enhanced formatting)
         if step_data.get('supporting_contract_evidence'):
             parts.append("**Supporting Contract Evidence:**")
             parts.append("")
@@ -290,20 +290,23 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     quote = evidence_parts[0].strip()
                     analysis = evidence_parts[1].strip() if len(evidence_parts) > 1 else ""
                     if quote:
-                        parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+                        parts.append(f"> *{quote}*")
+                        parts.append("")
                     if analysis:
-                        parts.append(f"> **Analysis:** {analysis}")
+                        parts.append(f"**Analysis:** {analysis}")
+                        parts.append("")
                 elif isinstance(evidence, dict):
                     # Fallback for old format
                     quote = evidence.get('quote', '').strip()
                     analysis = evidence.get('analysis', '').strip()
                     if quote:
-                        parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+                        parts.append(f"> *{quote}*")
+                        parts.append("")
                     if analysis:
-                        parts.append(f"> **Analysis:** {analysis}")
-                parts.append("")
+                        parts.append(f"**Analysis:** {analysis}")
+                        parts.append("")
 
-        # ASC 606 Citations (NEW: parsing pipe-separated format)
+        # ASC 606 Citations (enhanced formatting with spacing)
         if step_data.get('asc_606_citations'):
             parts.append("**Authoritative Guidance:**")
             parts.append("")
@@ -317,9 +320,11 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                         # Truncate very long citations to prevent formatting issues
                         if len(full_text) > 500:
                             full_text = full_text[:500] + "..."
-                        parts.append(f"- **[CITATION]{paragraph}:** {full_text}")
+                        parts.append(f"**{paragraph}:** *{full_text}*")
+                        parts.append("")
                     if relevance:
-                        parts.append(f"  - **Relevance:** {relevance}")
+                        parts.append(f"**Application:** {relevance}")
+                        parts.append("")
                 elif isinstance(citation, dict):
                     # Fallback for old format
                     paragraph = citation.get('paragraph', '').strip()
@@ -327,21 +332,22 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     if paragraph and full_text:
                         if len(full_text) > 500:
                             full_text = full_text[:500] + "..."
-                        parts.append(f"- **[CITATION]{paragraph}:** {full_text}")
-            parts.append("")
+                        parts.append(f"**{paragraph}:** *{full_text}*")
+                        parts.append("")
 
-        # Professional judgments (already list format - just clean strings)
+        # Professional judgments (reduce bullet overuse)
         if step_data.get('professional_judgments'):
             parts.append("**Key Professional Judgments:**")
             parts.append("")
-            for judgment in step_data.get('professional_judgments', []):
+            for i, judgment in enumerate(step_data.get('professional_judgments', []), 1):
                 if isinstance(judgment, str):
                     clean_judgment = judgment.strip()
                     if clean_judgment:
-                        parts.append(f"- {clean_judgment}")
+                        parts.append(f"{i}. {clean_judgment}")
+                        parts.append("")
                 else:
-                    parts.append(f"- {str(judgment)}")
-            parts.append("")
+                    parts.append(f"{i}. {str(judgment)}")
+                    parts.append("")
 
         return "\n".join(parts)
 
@@ -438,7 +444,7 @@ Transform these into 3-4 well-structured judgment statements that:
 - Reference relevant ASC 606 guidance
 - Address potential alternative treatments considered
 
-Use bullet points and maintain professional accounting tone."""
+Use numbered paragraphs (not bullets) and maintain professional accounting tone."""
 
     @staticmethod
     def get_step_guidance_mapping() -> Dict[int, Dict[str, str]]:
@@ -472,3 +478,74 @@ Use bullet points and maintain professional accounting tone."""
                 "description": "Over time vs point in time recognition criteria"
             }
         }
+
+    @staticmethod
+    def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
+        """Generates focused prompt for financial impact section with suggested journal entries."""
+        
+        # Extract transaction price and timing details
+        transaction_price = "Not specified"
+        revenue_timing = "Not specified"
+        
+        if s3.get('executive_conclusion'):
+            conclusion = s3.get('executive_conclusion', '')
+            # Try to extract price information
+            import re
+            price_match = re.search(r'\$[\d,]+\.?\d*', conclusion)
+            if price_match:
+                transaction_price = price_match.group()
+        
+        if s5.get('executive_conclusion'):
+            revenue_timing = s5.get('executive_conclusion', '')
+        
+        return f"""Write a meaningful financial impact section for an ASC 606 technical accounting memo.
+
+TRANSACTION DETAILS:
+- Customer: {customer_name}
+- Transaction Price: {transaction_price}
+- Revenue Recognition: {revenue_timing}
+
+Create a comprehensive financial impact analysis that includes:
+
+**Revenue Recognition Impact:**
+Total contract value and timing of recognition, impact on financial statement presentation, any deferred revenue or contract asset implications.
+
+**Suggested Journal Entries:**
+Provide specific journal entries with realistic account names and amounts:
+- Contract inception entries (if applicable)
+- Revenue recognition entries
+- Any performance obligation and contract asset/liability entries
+
+**Key Financial Statement Effects:**
+Income statement impact (revenue, timing), balance sheet impact (contract assets, deferred revenue), cash flow statement considerations.
+
+Use clear paragraphs (not bullets) and professional accounting language suitable for {memo_audience.lower()}."""
+
+    @staticmethod
+    def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
+        """Generates focused prompt for meaningful conclusion section."""
+        
+        # Extract key conclusions from each step
+        key_points = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            conclusion = step.get('executive_conclusion', '')
+            if conclusion:
+                key_points.append(f"Step {i}: {conclusion}")
+        
+        return f"""Write a meaningful conclusion section for an ASC 606 technical accounting memo.
+
+KEY CONCLUSIONS FROM ANALYSIS:
+{chr(10).join(key_points)}
+
+Create a comprehensive conclusion that:
+
+**Overall Compliance Assessment:**
+Summarize whether the contract complies with ASC 606 and any areas of concern or complexity.
+
+**Key Takeaways for {memo_audience}:**
+Highlight the most important implications for the intended audience, focusing on actionable insights.
+
+**Implementation Considerations:**
+Any practical next steps, documentation requirements, or monitoring needed.
+
+Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis."""

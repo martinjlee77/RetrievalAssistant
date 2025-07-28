@@ -498,37 +498,19 @@ else:
             currency = contract_data.currency if contract_data else "USD"
             st.metric("Currency", currency)
 
-    # Five-step analysis summary
+    # Skip the duplicative five-step summary section per user request
     st.markdown("---")
-    st.subheader("📋 ASC 606 Five-Step Analysis Summary")
 
-    steps = [("Contract Identification",
-              getattr(analysis_results, 'step1_contract_identification',
-                      'N/A')),
-             ("Performance Obligations",
-              getattr(analysis_results, 'step2_performance_obligations',
-                      'N/A')),
-             ("Transaction Price",
-              getattr(analysis_results, 'step3_transaction_price', 'N/A')),
-             ("Price Allocation",
-              getattr(analysis_results, 'step4_price_allocation', 'N/A')),
-             ("Revenue Recognition",
-              getattr(analysis_results, 'step5_revenue_recognition', 'N/A'))]
-
-    for i, (step_name, step_data) in enumerate(steps, 1):
-        with st.expander(f"**Step {i}: {step_name}**", expanded=(i == 1)):
-            if isinstance(step_data, dict):
-                st.markdown(format_dict_as_markdown(step_data))
-            else:
-                st.markdown(str(step_data))
-
-    # Professional memo
+    # Professional memo with enhanced display
     st.markdown("---")
     st.subheader("📋 Professional Accounting Memo")
     memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
         with st.container(border=True):
-            st.markdown(memo)
+            # Display memo with enhanced formatting
+            memo_html = memo.replace('*', '').replace('**', '').replace('[QUOTE]', '').replace('[/QUOTE]', '').replace('[CITATION]', '').replace('[/CITATION]', '')
+            st.markdown(memo_html)
+            
             # Create columns for the download buttons
             dl_col1, dl_col2 = st.columns(2)
 
