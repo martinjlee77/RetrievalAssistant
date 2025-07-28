@@ -176,6 +176,54 @@ def create_debug_sidebar():
             "max_tokens": max_tokens
         }
 
+def extract_contract_terms(client, contract_text: str, step_context: str = "comprehensive_analysis") -> List[str]:
+    """
+    Extract key contract terms for enhanced RAG search
+    
+    Args:
+        client: OpenAI client
+        contract_text: Full contract text
+        step_context: Analysis step context
+        
+    Returns:
+        List of extracted contract terms for semantic search
+    """
+    try:
+        prompt = f"""
+        Extract 5-7 key terms and phrases from this contract that would be most relevant for ASC 606 revenue recognition analysis:
+        
+        CONTRACT TEXT:
+        {contract_text[:3000]}...
+        
+        Focus on:
+        - Service/product descriptions
+        - Performance obligations
+        - Payment terms
+        - Contract timing/duration
+        - Customer responsibilities
+        
+        Return only the key terms, one per line, no explanations.
+        """
+        
+        response = make_llm_call(
+            client=client,
+            prompt=prompt,
+            model="gpt-4o-mini",
+            max_tokens=200,
+            temperature=0.3
+        )
+        
+        if response:
+            # Split response into individual terms
+            terms = [term.strip() for term in response.split('\n') if term.strip()]
+            return terms[:7]  # Limit to 7 terms
+        
+        return []
+        
+    except Exception as e:
+        st.warning(f"Contract term extraction failed: {e}")
+        return []
+
 def validate_api_key() -> bool:
     """Validate OpenAI API key is properly configured"""
     try:
