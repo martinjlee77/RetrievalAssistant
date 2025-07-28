@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
 from core.models import ASC606Analysis
-from utils.llm import make_llm_call, extract_contract_terms
+from utils.llm import make_llm_call
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
 from utils.step_prompts import StepAnalysisPrompts
@@ -287,23 +287,35 @@ class ASC606Analyzer:
                 model='gpt-4o-mini', max_tokens=800, temperature=0.3
             )
             
-            # 7. Python Assembly of Final Memo (guaranteed complete structure)
+            # 7. Python Assembly of Final Memo with Professional Formatting
+            contract_data_table = self._create_contract_data_table(contract_data)
+            
             memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
+            
+**MEMORANDUM**
 
-TO: {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}
-FROM: ASC 606 AI Analyst  
-DATE: {datetime.now().strftime('%B %d, %Y')}
-SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
-"""
+**TO:** {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}  
+**FROM:** ASC 606 AI Analyst  
+**DATE:** {datetime.now().strftime('%B %d, %Y')}  
+**RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
+
+---
+
+**DOCUMENT CLASSIFICATION:** Internal Use Only  
+**REVIEW STATUS:** Preliminary Analysis  
+**PAGE:** 1 of 1
+
+---"""
             
             final_memo_sections = [
                 memo_header,
                 f"## 1. EXECUTIVE SUMMARY\n\n{executive_summary}",
-                f"## 2. BACKGROUND\n\n{background}", 
-                f"## 3. DETAILED ANALYSIS\n\n{detailed_analysis}",
-                f"## 4. KEY JUDGMENTS\n\n{key_judgments}",
-                f"## 5. FINANCIAL IMPACT\n\n{financial_impact}",
-                f"## 6. CONCLUSION\n\n{conclusion}"
+                f"## 2. CONTRACT OVERVIEW\n\n{contract_data_table}\n\n{background}", 
+                f"## 3. DETAILED ASC 606 ANALYSIS\n\n{detailed_analysis}",
+                f"## 4. KEY PROFESSIONAL JUDGMENTS\n\n{key_judgments}",
+                f"## 5. FINANCIAL IMPACT ASSESSMENT\n\n{financial_impact}",
+                f"## 6. CONCLUSION AND RECOMMENDATIONS\n\n{conclusion}",
+                f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst | **REVIEWED BY:** [To be completed] | **APPROVED BY:** [To be completed]"
             ]
             
             final_memo = "\n\n".join(final_memo_sections)
@@ -335,6 +347,25 @@ SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Co
         except Exception as e:
             self.logger.error(f"Analysis failed: {e}")
             raise
+
+    def _create_contract_data_table(self, contract_data) -> str:
+        """Create a professional contract data overview table."""
+        customer = getattr(contract_data, 'customer_name', 'Not specified')
+        start_date = getattr(contract_data, 'contract_start', 'Not specified')
+        end_date = getattr(contract_data, 'contract_end', 'Not specified')
+        currency = getattr(contract_data, 'currency', 'USD')
+        modification = getattr(contract_data, 'is_modification', False)
+        
+        return f"""**CONTRACT DATA SUMMARY**
+
+| **Element** | **Details** |
+|-------------|-------------|
+| **Customer** | {customer} |
+| **Contract Period** | {start_date} to {end_date} |
+| **Currency** | {currency} |
+| **Modification Status** | {'Yes - Amendment/Modification' if modification else 'No - Original Contract'} |
+| **Analysis Scope** | {getattr(contract_data, 'key_focus_areas', 'Standard ASC 606 five-step analysis')} |
+| **Materiality Threshold** | ${getattr(contract_data, 'materiality_threshold', 'Not specified'):,} |"""
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """Get knowledge base statistics for debugging purposes"""

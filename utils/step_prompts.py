@@ -264,9 +264,12 @@ This section must contain the comprehensive 5-step ASC 606 framework:
         parts.append(f"### Step {step_num}: {step_name}")
         parts.append("")  # Add spacing
         
-        # Executive conclusion
+        # Executive conclusion with enhanced formatting
         if step_data.get('executive_conclusion'):
-            parts.append(f"**Conclusion:** {step_data.get('executive_conclusion')}")
+            parts.append("**CONCLUSION:**")
+            conclusion_text = step_data.get('executive_conclusion', '').strip()
+            if conclusion_text:
+                parts.append(f"> {conclusion_text}")
             parts.append("")
         
         # Detailed analysis
@@ -549,3 +552,38 @@ Highlight the most important implications for the intended audience, focusing on
 Any practical next steps, documentation requirements, or monitoring needed.
 
 Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis."""
+
+    @staticmethod 
+    def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:
+        """Generates enhanced executive summary with professional dashboard format."""
+        
+        conclusions = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            conclusion = step.get('executive_conclusion', 'N/A')
+            conclusions.append(f"Step {i}: {conclusion}")
+        
+        return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
+
+ANALYSIS RESULTS:
+- Analysis: {analysis_title}
+- Customer: {customer_name}
+- Step Conclusions: {chr(10).join(conclusions)}
+
+Create an executive summary using this professional structure:
+
+**OVERALL CONCLUSION**
+[Single paragraph stating overall ASC 606 compliance and revenue recognition approach]
+
+**KEY FINDINGS**
+• Contract Status: [Valid/Invalid under ASC 606-10-25-1]
+• Performance Obligations: [Number and nature of distinct obligations]
+• Transaction Price: [Amount and any variable consideration]
+• Revenue Recognition: [Over time/Point in time with timing]
+• Critical Judgments: [1-2 most significant accounting decisions]
+
+**FINANCIAL IMPACT SUMMARY**
+• Total Contract Value: [Amount]
+• Recognition Pattern: [Monthly/Quarterly/Annual timing]
+• Balance Sheet Impact: [Contract assets/liabilities if any]
+
+Use bullet points for clarity and include specific amounts/dates where available."""
