@@ -269,7 +269,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
             parts.append("**CONCLUSION:**")
             conclusion_text = step_data.get('executive_conclusion', '').strip()
             if conclusion_text:
-                parts.append(f"> {conclusion_text}")
+                parts.append(conclusion_text)
             parts.append("")
         
         # Detailed analysis
@@ -551,7 +551,12 @@ Highlight the most important implications for the intended audience, focusing on
 **Implementation Considerations:**
 Any practical next steps, documentation requirements, or monitoring needed.
 
-Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis."""
+Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis.
+
+**FORMATTING REQUIREMENTS:**
+- Write in regular paragraph format (do not use > blockquote formatting)
+- Use standard text without special markdown formatting for quotes
+- Present as normal business prose suitable for executive review"""
 
     @staticmethod 
     def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:

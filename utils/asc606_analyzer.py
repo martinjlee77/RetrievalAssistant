@@ -294,6 +294,11 @@ class ASC606Analyzer:
                 model='gpt-4o-mini', max_tokens=800, temperature=0.3
             )
             
+            # Clean any blockquote formatting that might create boxes
+            if conclusion and isinstance(conclusion, str):
+                # Remove any leading > characters that create blockquotes
+                conclusion = '\n'.join(line.lstrip('> ') for line in conclusion.split('\n'))
+            
             # 7. Python Assembly of Final Memo with Professional Formatting
             contract_data_table = self._create_contract_data_table(contract_data)
             
