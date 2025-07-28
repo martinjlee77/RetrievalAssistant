@@ -293,7 +293,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     quote = evidence_parts[0].strip()
                     analysis = evidence_parts[1].strip() if len(evidence_parts) > 1 else ""
                     if quote:
-                        parts.append(f"> *{quote}*")
+                        parts.append(f"*{quote}*")
                         parts.append("")
                     if analysis:
                         parts.append(f"**Analysis:** {analysis}")
@@ -303,7 +303,7 @@ This section must contain the comprehensive 5-step ASC 606 framework:
                     quote = evidence.get('quote', '').strip()
                     analysis = evidence.get('analysis', '').strip()
                     if quote:
-                        parts.append(f"> *{quote}*")
+                        parts.append(f"*{quote}*")
                         parts.append("")
                     if analysis:
                         parts.append(f"**Analysis:** {analysis}")
