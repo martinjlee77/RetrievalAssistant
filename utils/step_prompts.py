@@ -266,48 +266,77 @@ This section must contain the comprehensive 5-step ASC 606 framework:
     def format_step_detail_as_markdown(step_data: dict, step_num: int, step_name: str) -> str:
         """Formats the rich JSON of a single step into professional markdown prose."""
         if not step_data or step_data.get('error'):
-            return f"### Step {step_num}: {step_name}\n**Error:** Analysis failed for this step.\n"
+            return f"### Step {step_num}: {step_name}\n\n**Error:** Analysis failed for this step.\n"
         
         parts = []
         parts.append(f"### Step {step_num}: {step_name}")
+        parts.append("")  # Add spacing
         
         # Executive conclusion
         if step_data.get('executive_conclusion'):
             parts.append(f"**Conclusion:** {step_data.get('executive_conclusion')}")
+            parts.append("")
         
         # Detailed analysis
-        parts.append("\n**Detailed Analysis & Reasoning:**")
-        parts.append(step_data.get('detailed_analysis', 'N/A'))
+        parts.append("**Detailed Analysis & Reasoning:**")
+        parts.append("")
+        analysis_text = step_data.get('detailed_analysis', 'N/A')
+        # Clean up any formatting issues in the analysis text
+        if isinstance(analysis_text, str):
+            # Fix any character splitting issues
+            analysis_text = analysis_text.replace('\n\n', '\n').strip()
+        parts.append(str(analysis_text))
+        parts.append("")
 
         # Supporting contract evidence
         if step_data.get('supporting_contract_evidence'):
-            parts.append("\n**Supporting Contract Evidence:**")
+            parts.append("**Supporting Contract Evidence:**")
+            parts.append("")
             for evidence in step_data.get('supporting_contract_evidence', []):
-                quote = evidence.get('quote', '') if isinstance(evidence, dict) else str(evidence)
-                analysis = evidence.get('analysis', '') if isinstance(evidence, dict) else ''
-                if quote:
-                    parts.append(f"> [QUOTE]{quote}[/QUOTE]")
-                if analysis:
-                    parts.append(f"> **Analysis:** {analysis}")
+                if isinstance(evidence, dict):
+                    quote = evidence.get('quote', '').strip()
+                    analysis = evidence.get('analysis', '').strip()
+                    if quote:
+                        parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+                    if analysis:
+                        parts.append(f"> **Analysis:** {analysis}")
+                elif isinstance(evidence, str):
+                    clean_evidence = evidence.strip()
+                    if clean_evidence:
+                        parts.append(f"- {clean_evidence}")
+                parts.append("")
 
         # ASC 606 Citations
         if step_data.get('asc_606_citations'):
-            parts.append("\n**Authoritative Guidance:**")
+            parts.append("**Authoritative Guidance:**")
+            parts.append("")
             for citation in step_data.get('asc_606_citations', []):
                 if isinstance(citation, dict):
-                    paragraph = citation.get('paragraph', '')
-                    full_text = citation.get('full_text', '')
+                    paragraph = citation.get('paragraph', '').strip()
+                    full_text = citation.get('full_text', '').strip()
                     if paragraph and full_text:
-                        parts.append(f"- **[CITATION]{paragraph}:** *{full_text}*")
-                else:
-                    parts.append(f"- {str(citation)}")
+                        # Truncate very long citations to prevent formatting issues
+                        if len(full_text) > 500:
+                            full_text = full_text[:500] + "..."
+                        parts.append(f"- **[CITATION]{paragraph}:** {full_text}")
+                elif isinstance(citation, str):
+                    clean_citation = citation.strip()
+                    if clean_citation:
+                        parts.append(f"- {clean_citation}")
+            parts.append("")
 
         # Professional judgments
         if step_data.get('professional_judgments'):
-            parts.append("\n**Key Professional Judgments:**")
+            parts.append("**Key Professional Judgments:**")
+            parts.append("")
             for judgment in step_data.get('professional_judgments', []):
-                judgment_text = judgment if isinstance(judgment, str) else str(judgment)
-                parts.append(f"- {judgment_text}")
+                if isinstance(judgment, str):
+                    clean_judgment = judgment.strip()
+                    if clean_judgment:
+                        parts.append(f"- {clean_judgment}")
+                else:
+                    parts.append(f"- {str(judgment)}")
+            parts.append("")
 
         return "\n".join(parts)
 

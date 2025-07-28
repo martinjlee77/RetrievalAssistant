@@ -245,8 +245,6 @@ TO: Technical Accounting Team / Audit File
 FROM: ASC 606 AI Analyst  
 DATE: {datetime.now().strftime('%B %d, %Y')}
 SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
-
----
 """
             
             final_memo_sections = [
@@ -259,7 +257,7 @@ SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Co
                 f"## 6. Conclusion\n\nThe contract meets all ASC 606 criteria for revenue recognition. Implementation should follow the step-by-step analysis detailed above."
             ]
             
-            final_memo = "\n\n---\n\n".join(final_memo_sections)
+            final_memo = "\n\n".join(final_memo_sections)
             
             self.logger.info(f"Python-assembled memo completed: {len(final_memo)} characters with all 6 sections")
             
