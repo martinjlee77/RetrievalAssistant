@@ -159,16 +159,26 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         
         /* Citation and quote styling */
         blockquote {{
-            margin: 12pt 24pt;
-            padding: 12pt;
-            background-color: #f8f9fa;
-            border-left: 0px solid {style_config['primary_color']};
-            font-style: italic;
+            font-family: 'Courier New', monospace; /* Use a monospace font to clearly separate it from narrative text */
+            font-style: normal;
+            font-size: 11pt;
+            color: #2d3748; /* A professional dark grey/blue */
+            background-color: #f7fafc; /* A very light, cool grey */
+            border: 1px solid #e2e8f0; /* Thin, subtle border */
+            border-left: 4px solid #4299e1; /* A friendly, professional blue accent */
+            border-radius: 5px; /* Soft rounded corners */
+            padding: 16pt;
+            margin: 20pt 0; /* Generous spacing to let it breathe */
         }}
         
         .citation {{
             font-weight: bold;
-            color: {style_config['primary_color']};
+            font-style: normal;
+            color: #555555; /* Not black, to reduce harshness */
+            background-color: #edf2f7; /* A very subtle highlight color */
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em; /* Slightly smaller */
         }}
         
         /* Table styling */
