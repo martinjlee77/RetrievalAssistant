@@ -766,10 +766,14 @@ def _parse_and_format_pdf_content(pdf, text_content):
             
         # Contract quotes (fallback)
         if (line.startswith('"') or 'contract states' in line.lower()) and not line.startswith('['):
+            # Clean the line for PDF compatibility
+            clean_line = line.replace('"', '"').replace('"', '"').replace(''', "'").replace(''', "'")
+            clean_line = ''.join(char if ord(char) < 128 else '?' for char in clean_line)
+            
             pdf.set_font('Arial', 'I', 11)
             pdf.set_text_color(51, 51, 51)
             pdf.ln(3)
-            pdf.cell(0, 6, f"    {line}", 0, 1, 'L')  # Simple indented quote
+            pdf.cell(0, 6, f"    {clean_line}", 0, 1, 'L')  # Simple indented quote
             pdf.set_text_color(0, 0, 0)
             continue
             
@@ -801,6 +805,14 @@ def _parse_and_format_pdf_content(pdf, text_content):
                 pdf.cell(0, 6, current_line.strip(), 0, 1, 'L')
             pdf.set_font('Arial', '', 11)
         else:
+            # Clean line of problematic Unicode characters before processing
+            line = line.replace('"', '"').replace('"', '"')  # Smart quotes
+            line = line.replace(''', "'").replace(''', "'")  # Smart apostrophes  
+            line = line.replace('–', '-').replace('—', '-')  # En/em dashes
+            line = line.replace('…', '...')  # Ellipsis
+            # Remove any remaining non-ASCII characters that could cause issues
+            line = ''.join(char if ord(char) < 128 else '?' for char in line)
+            
             # Safe paragraph handling for regular text
             words = line.split()
             current_line = ""

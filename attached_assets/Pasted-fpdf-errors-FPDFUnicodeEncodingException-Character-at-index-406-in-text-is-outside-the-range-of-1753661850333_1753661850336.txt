@@ -1,0 +1,31 @@
+fpdf.errors.FPDFUnicodeEncodingException: Character "’" at index 406 in text is outside the range of characters supported by the font used: "helvetica". Please consider using a Unicode font.
+Traceback:
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/home.py", line 86, in <module>
+    pg.run()
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/navigation/page.py", line 300, in run
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/pages/asc606.py", line 550, in <module>
+    data=create_pdf_from_text(
+         ^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/utils/llm.py", line 451, in create_pdf_from_text
+    _parse_and_format_pdf_content(pdf, text_content)
+File "/home/runner/workspace/utils/llm.py", line 763, in _parse_and_format_pdf_content
+    pdf.cell(0, 6, line, 0, 1, 'L')
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/fpdf/fpdf.py", line 221, in wrapper
+    return fn(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/fpdf/deprecation.py", line 32, in wrapper
+    return fn(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/fpdf/fpdf.py", line 3228, in cell
+    text = self.normalize_text(text)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/fpdf/fpdf.py", line 4875, in normalize_text
+    raise FPDFUnicodeEncodingException(

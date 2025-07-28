@@ -1,0 +1,70 @@
+TECHNICAL ACCOUNTING MEMORANDUM
+
+TO:	Technical Accounting Team / Audit File
+FROM:	ASC 606 AI Analyst
+DATE:	July 28, 2025
+SUBJECT:	ASC 606 Analysis: Netflix01
+
+# Memo
+•	*To:** Technical Accounting Team
+•	*From:** [Your Name]
+•	*Date:** [Current Date]
+•	*Subject:** Analysis of Netflix Subscription Contract - Martin Lee (Netflix01)
+EXECUTIVE SUMMARY
+This memo provides a comprehensive analysis of the contract between Netflix and Martin Lee, focusing on the identification of the contract, performance obligations, transaction price determination, transaction price allocation, and revenue recognition in accordance with ASC 606. The analysis concludes that the contract meets all criteria outlined in ASC 606-10-25-1, confirming its enforceability and commercial substance. The primary performance obligation is identified as the provision of streaming services over a specified period, with a fixed transaction price of $15.49 per month. Revenue is recognized over time as the service is provided, reflecting the continuous nature of the streaming service. The findings support compliance with ASC 606, ensuring accurate financial reporting and revenue recognition.
+2. BACKGROUND
+The contract under analysis involves Netflix, a leading streaming service provider, and Martin Lee, a subscriber. The service period is defined from September 26, 2024, to October 25, 2024, during which Martin Lee has access to Netflix's streaming services. This analysis is prompted by the need to ensure that the revenue recognition practices align with ASC 606, particularly given the subscription-based nature of the service. The contract is characterized by a fixed monthly fee, with no variable consideration or significant financing components, simplifying the revenue recognition process.
+3. DETAILED ANALYSIS
+4. STEP 1: IDENTIFY THE CONTRACT
+•	*Executive Conclusion:**
+The contract between Netflix and Martin Lee meets the criteria of ASC 606-10-25-1, as it is approved, creates enforceable rights and obligations, has commercial substance, and collectibility is probable based on the provided evidence.
+•	*Detailed Analysis:**
+To determine whether a contract exists under ASC 606, we must evaluate the agreement against the five criteria outlined in ASC 606-10-25-1.
+1. Contract Approval:
+The contract must be approved by all parties involved. In this case, the contract is evidenced by the invoice and payment history provided, which indicates that Martin Lee has agreed to the terms by making a payment for the Netflix service. This is supported by the Netflix Terms of Use, which states that by using the service, the user agrees to the terms, thus indicating mutual approval.
+2. Enforceable Rights and Obligations:
+The Netflix Terms of Use clearly outline the rights and obligations of both Netflix and the subscriber. For instance, Netflix is obligated to provide streaming services, while the subscriber is obligated to pay the subscription fee. The enforceability of these terms is further supported by the arbitration agreement within the Terms of Use, which provides a mechanism for resolving disputes, thus reinforcing the enforceability of the contract.
+3. Commercial Substance:
+The contract must have commercial substance, meaning that the risk, timing, or amount of the entity's future cash flows is expected to change as a result of the contract. The payment of $16.52 for a one-month subscription period indicates that Netflix will receive cash flows in exchange for providing its service, thus satisfying the commercial substance criterion.
+4. Collectibility:
+The consideration must be probable of collection. The payment history shows that Martin Lee has made a successful payment using a valid payment method, suggesting that collectibility is probable. Furthermore, the Netflix Terms of Use require a valid payment method to maintain service access, which mitigates the risk of non-collection.
+5. Specific Period:
+Finally, the contract must be for a specific period, which is evidenced by the invoice indicating a service period from September 26, 2024, to October 25, 2024. This specificity in the service period aligns with the requirement for a defined contract term.
+**ASC 606 Citations:**
+- [CITATION]ASC 606-10-25-1: "An entity shall account for a contract with a customer that is within the scope of this Topic only when all of the following criteria are met: a. The parties to the contract have approved the contract (in writing, orally, or in accordance with other customary business practices) and are committed to perform their respective obligations. b. The entity can identify each party’s rights regarding the goods or services to be transferred. c. The entity can identify the payment terms for the goods or services to be transferred. d. The contract has commercial substance (that is, the risk, timing, or amount of the entity’s future cash flows is expected to change as a result of the contract). e. It is probable that the entity will collect substantially all of the consideration to which it will be entitled in exchange for the goods or services that will be transferred to the customer.[/CITATION]
+- [CITATION]ASC 606-10-25-2: "A contract is an agreement between two or more parties that creates enforceable rights and obligations. Enforceability of the rights and obligations in a contract is a matter of law."[/CITATION]
+•	*EY Guidance Citations:**
+- [CITATION]EY Revenue Recognition Guide, Section 3.1: "The determination of whether a contract exists is critical because it establishes the scope of the revenue recognition model. A contract exists when there is an agreement between two or more parties that creates enforceable rights and obligations, and the criteria in ASC 606-10-25-1 are met."[/CITATION]
+•	*Supporting Contract Evidence:**
+•	[QUOTE]"Your membership has ended. Add a plan to restart your membership and get back to watching."[/QUOTE]
+This indicates that the contract is contingent upon active membership, which requires approval and payment, aligning with the contract approval and enforceable rights criteria.
+•	[QUOTE]"Payment History 9/26/2024 $16.52 $15.49 (+$1.03 tax) Membership for 9/26/2024-10/25/2024"[/QUOTE]
+This payment history confirms the commercial substance and collectibility criteria, as it shows a completed transaction for a defined service period.
+•	*Professional Judgments:**
+The primary judgment involved assessing the enforceability of the contract terms based on the provided Terms of Use and payment evidence. An alternative approach could involve further legal analysis of the enforceability under applicable law, but the existing arbitration clause provides sufficient assurance of enforceability.
+•	*Potential Issues Addressed:**
+One potential issue is the customer's creditworthiness, which is mitigated by the requirement for a valid payment method. Another issue could be contract modifications, but the provided evidence does not indicate any modifications. The analysis assumes the standard subscription terms apply without additional complexities.
+5. STEP 2: IDENTIFY PERFORMANCE OBLIGATIONS
+•	*Executive Conclusion:**
+The contract with Netflix contains a single performance obligation: the provision of streaming services for a specified period, as it is both capable of being distinct and distinct within the context of the contract.
+•	*Detailed Analysis:**
+To identify performance obligations under ASC 606, we must determine whether the goods or services promised in a contract are distinct. According to [CITATION]ASC 606-10-25-14: "A good or service that is promised to a customer is distinct if both of the following criteria are met: (a) The customer can benefit from the good or service either on its own or together with other resources that are readily available to the customer (i.e., the good or service is capable of being distinct); and (b) The entity's promise to transfer the good or service to the customer is separately identifiable from other promises in the contract (i.e., the promise to transfer the good or service is distinct within the context of the contract)."[/CITATION]
+In the context of the Netflix contract, the service provided is the streaming of content over a specified period. This service is capable of being distinct because the customer can benefit from the streaming service on its own, without the need for additional services or products from Netflix. The customer can access the content using any compatible device with internet access, making the service readily usable on its own.
+Furthermore, the promise to provide streaming services is distinct within the context of the contract because it is the sole service being offered, and there are no other bundled services or goods that need to be considered in conjunction with it. The contract specifies a clear service period from 9/26/24 to 10/25/24, reinforcing the separability of this service offering.
+"Date Description Service Period Amount Tax Total 9/26/24 Streaming Service 9/26/24–10/25/24 $15.49 $1.03 $16.52"
+This contract language explicitly outlines the service period and the nature of the service, which supports the identification of a single performance obligation.
+Additionally, [CITATION]ASC 606-10-25-19: "Factors that indicate that an entity's promise to transfer a good or service to a customer is separately identifiable include, but are not limited to, the following: (a) The entity does not provide a significant service of integrating the good or service with other goods or services promised in the contract into a bundle of goods or services that represent the combined output for which the customer has contracted."[/CITATION] This further supports the conclusion that the streaming service is distinct, as Netflix does not integrate this service with any other offerings in the contract.
+The EY guidance also provides clarity on identifying performance obligations in service contracts. [CITATION]EY Revenue Recognition Guide, Section 3.2: "When evaluating whether a service is distinct, entities should consider whether the service is separately identifiable from other promises in the contract and whether the customer can
+ 
+DOCUMENT METADATA
+Document Version:	Final
+Analysis Date:	July 28, 2025
+Analyst:	ASC 606 AI Analyst
+Review Status:	Pending Management Review
+File Classification:	Internal Accounting Analysis
+
+ANALYST CERTIFICATION
+I certify that this analysis has been prepared in accordance with ASC 606 requirements and represents my professional judgment based on the contract documentation provided and applicable authoritative guidance.
+
+__________________________________________________
+ASC 606 AI Analyst, Technical Accounting
