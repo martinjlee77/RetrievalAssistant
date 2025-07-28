@@ -167,15 +167,15 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             border: 1px solid #dee2e6; /* Light professional border */
             /* Removed left border line as requested */
             border-radius: 3px; /* Minimal rounded corners */
-            padding: 12pt;
-            margin: 16pt 0;
+            padding: 8pt 12pt; /* Tighter top/bottom padding, keep left/right */
+            margin: 12pt 0; /* Reduced margin for tighter appearance */
         }}
         
         .citation {{
             font-weight: bold;
             font-style: normal;
-            color: #2c5aa0; /* Professional navy blue - formal and readable */
-            background-color: #f0f4f8; /* Very subtle blue-grey background */
+            color: #000000; /* Black font as requested */
+            background-color: #f0f4f8; /* Keep the highlight background */
             padding: 1px 4px;
             border-radius: 2px;
             font-size: 1em; /* Same size as body text */
@@ -242,9 +242,9 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-style: normal;
         }}
         
-        /* Ensure conclusion section appears as regular text, not boxed */
-        h2:contains("CONCLUSION") + p,
-        h2:contains("Conclusion") + p {{
+        /* Remove any special styling from conclusion paragraphs */
+        .conclusion-content,
+        .conclusion-content p {{
             background: none !important;
             border: none !important;
             padding: 0 !important;
