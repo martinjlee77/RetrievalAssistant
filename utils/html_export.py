@@ -8,6 +8,44 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 import base64
 import io
+import re
+
+def _preprocess_markdown_for_html(memo_markdown: str) -> str:
+    """
+    Finds custom semantic tags ([QUOTE], [CITATION]) and converts them to
+    standard HTML tags with appropriate classes that our CSS can style.
+
+    This function should run BEFORE the main markdown2 conversion.
+    
+    Args:
+        memo_markdown: Raw markdown content with custom semantic tags
+        
+    Returns:
+        Processed markdown with custom tags converted to HTML
+    """
+    processed_text = memo_markdown
+
+    # 1. Convert [QUOTE]Your quote text[/QUOTE] to <blockquote>Your quote text</blockquote>
+    # The regex looks for the opening tag, captures the text inside (non-greedy),
+    # and finds the closing tag. It replaces the whole thing with an HTML blockquote.
+    processed_text = re.sub(
+        r'\[QUOTE\](.*?)\[/QUOTE\]', 
+        r'<blockquote>\1</blockquote>', 
+        processed_text, 
+        flags=re.DOTALL
+    )
+
+    # 2. Convert [CITATION]Your citation text[/CITATION] to <span class="citation">...</span>
+    # This wraps the citation in a <span> tag and gives it the "citation" class,
+    # which our CSS already knows how to style.
+    processed_text = re.sub(
+        r'\[CITATION\](.*?)\[/CITATION\]', 
+        r'<span class="citation">\1</span>', 
+        processed_text,
+        flags=re.DOTALL
+    )
+
+    return processed_text
 
 def get_style_config() -> Dict[str, str]:
     """
@@ -48,10 +86,13 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     if not memo_markdown or not memo_markdown.strip():
         raise ValueError("Empty memo content provided")
     
-    # Convert markdown to HTML with error handling
+    # Pre-process the markdown to handle our custom tags FIRST
+    preprocessed_markdown = _preprocess_markdown_for_html(memo_markdown)
+    
+    # Convert the PREPROCESSED markdown to HTML with error handling
     try:
         html_content = markdown2.markdown(
-            memo_markdown,
+            preprocessed_markdown,  # Use the pre-processed version!
             extras=[
                 'fenced-code-blocks',
                 'tables',
@@ -292,33 +333,30 @@ def create_html_download_link(html_content: str, filename: str = "asc606_memo.ht
 
 def enhance_markdown_for_display(memo_markdown: str) -> str:
     """
-    Enhance markdown content for better Streamlit display using regex
+    Enhance markdown content for better Streamlit display - NO EMOJIS for professional memos
     
     Args:
         memo_markdown: Raw markdown content
     
     Returns:
-        Enhanced markdown with better formatting
+        Enhanced markdown with better formatting (professional, no emojis)
         
     Raises:
         ValueError: If input is empty
     """
-    import re
-    
     if not memo_markdown or not memo_markdown.strip():
         raise ValueError("Empty markdown content provided")
     
     try:
-        # Use regex for more precise replacements
-        enhanced = re.sub(r'^##\s', '## 📋 ', memo_markdown, flags=re.MULTILINE)
-        enhanced = re.sub(r'^###\s', '### ⚖️ ', enhanced, flags=re.MULTILINE)
+        # Professional formatting without emojis
+        enhanced = memo_markdown
         
-        # Improve citation formatting
-        enhanced = enhanced.replace('**[CITATION]', '**📖 [CITATION]')
+        # Clean citation formatting (no emojis)
+        enhanced = enhanced.replace('**[CITATION]', '**[CITATION]')
         enhanced = enhanced.replace('[/CITATION]**', '[/CITATION]**')
         
-        # Improve quote formatting  
-        enhanced = enhanced.replace('> [QUOTE]', '> 💬 **Contract Quote:**')
+        # Clean quote formatting (no emojis)
+        enhanced = enhanced.replace('> [QUOTE]', '> **Contract Quote:**')
         enhanced = enhanced.replace('[/QUOTE]', '')
         
         # Add visual separators

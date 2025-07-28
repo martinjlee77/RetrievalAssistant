@@ -76,6 +76,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **WEASYPRINT PDF GENERATION**: Replaced problematic FPDF with HTML-to-PDF approach eliminating Unicode issues
 - ✅ **ENHANCED MARKDOWN PROCESSING**: Improved regex-based replacements for better visual formatting
 - ✅ **STREAMLINED ARCHITECTURE**: Removed legacy PDF generation code and consolidated export functionality
+- ✅ **CUSTOM TAG PREPROCESSING**: Implemented Gemini's solution for [CITATION] and [QUOTE] tags with proper HTML conversion
+- ✅ **PROFESSIONAL MEMO FORMATTING**: Removed all emojis from memo functions to maintain professional standards
+- ✅ **SEMANTIC MARKER PROCESSING**: Added _preprocess_markdown_for_html() function for clean tag-to-HTML conversion
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
 - ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance
