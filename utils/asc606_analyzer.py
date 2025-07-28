@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
 from core.models import ASC606Analysis
-from utils.llm import make_llm_call
+from utils.llm import make_llm_call, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
 from utils.step_prompts import StepAnalysisPrompts
