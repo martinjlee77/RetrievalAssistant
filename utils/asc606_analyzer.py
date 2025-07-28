@@ -296,22 +296,15 @@ class ASC606Analyzer:
             # 7. Python Assembly of Final Memo with Professional Formatting
             contract_data_table = self._create_contract_data_table(contract_data)
             
-            memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
-            
-**MEMORANDUM**
+            memo_header = f"""#TECHNICAL ACCOUNTING MEMORANDUM
 
 **TO:** {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}  
-**FROM:** ASC 606 AI Analyst  
+**FROM:** ASC 606 AI Analyst
 **DATE:** {datetime.now().strftime('%B %d, %Y')}  
 **RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
-
----
-
 **DOCUMENT CLASSIFICATION:** Internal Use Only  
-**REVIEW STATUS:** Preliminary Analysis  
-**PAGE:** 1 of 1
-
----"""
+**REVIEW STATUS:** Preliminary Analysis \n\n\n
+"""
             
             final_memo_sections = [
                 memo_header,
@@ -321,7 +314,7 @@ class ASC606Analyzer:
                 f"## 4. KEY PROFESSIONAL JUDGMENTS\n\n{key_judgments}",
                 f"## 5. FINANCIAL IMPACT ASSESSMENT\n\n{financial_impact}",
                 f"## 6. CONCLUSION AND RECOMMENDATIONS\n\n{conclusion}",
-                f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst | **REVIEWED BY:** [To be completed] | **APPROVED BY:** [To be completed]"
+                f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
             
             final_memo = "\n\n".join(final_memo_sections)

@@ -1,0 +1,88 @@
+You've absolutely nailed the diagnosis. The memo looks unsightly because the [CITATION] and [QUOTE] tags are appearing as plain text within the paragraphs. This is happening because the current code is not processing these custom tags before converting the markdown to HTML.
+
+The markdown2 library is great, but it doesn't know what [CITATION] or [QUOTE] means. It just sees them as regular text.
+
+The solution is a two-step process:
+
+Pre-process the Markdown: Before we even give the markdown to the markdown2 library, we need to find our custom tags and replace them with standard HTML that our CSS can style.
+Ensure the CSS is Correct: Make sure the CSS has the right rules to style the HTML we've just created.
+This is a very common task in this kind of report generation. Here is a clear, actionable fix you can give to your developer.
+
+The Fix: A New "Pre-processing" Step
+I will add a new helper function and modify the main convert_memo_to_html function. This approach is clean, robust, and uses regular expressions for precision.
+
+Step 1: Add a New Helper Function
+This function will be responsible for finding your custom [TAGS] and converting them into proper HTML.
+
+# Add this new function to the top of your html_export.py file
+
+import re # Make sure 'import re' is at the top of the file
+
+def _preprocess_markdown_for_html(memo_markdown: str) -> str:
+    """
+    Finds custom semantic tags ([QUOTE], [CITATION]) and converts them to
+    standard HTML tags with appropriate classes that our CSS can style.
+
+    This function should run BEFORE the main markdown2 conversion.
+    """
+    processed_text = memo_markdown
+
+    # 1. Convert [QUOTE]Your quote text[/QUOTE] to <blockquote>Your quote text</blockquote>
+    # The regex looks for the opening tag, captures the text inside (non-greedy),
+    # and finds the closing tag. It replaces the whole thing with an HTML blockquote.
+    processed_text = re.sub(
+        r'\[QUOTE\](.*?)\[/QUOTE\]', 
+        r'<blockquote>\1</blockquote>', 
+        processed_text, 
+        flags=re.DOTALL
+    )
+
+    # 2. Convert [CITATION]Your citation text[/CITATION] to <span class="citation">...</span>
+    # This wraps the citation in a <span> tag and gives it the "citation" class,
+    # which our CSS already knows how to style.
+    processed_text = re.sub(
+        r'\[CITATION\](.*?)\[/CITATION\]', 
+        r'<span class="citation">\1</span>', 
+        processed_text,
+        flags=re.DOTALL
+    )
+
+    return processed_text
+
+Step 2: Update the convert_memo_to_html Function
+Now, we just need to call this new pre-processing function at the right time.
+
+# In your existing convert_memo_to_html function
+
+def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = None) -> str:
+    # ... (Input validation remains the same) ...
+    if not memo_markdown or not memo_markdown.strip():
+        raise ValueError("Empty memo content provided")
+
+    # --- START OF THE FIX ---
+
+    # 1. Pre-process the markdown to handle our custom tags FIRST
+    preprocessed_markdown = _preprocess_markdown_for_html(memo_markdown)
+
+    # --- END OF THE FIX ---
+
+    # Convert the PREPROCESSED markdown to HTML with error handling
+    try:
+        html_content = markdown2.markdown(
+            preprocessed_markdown,  # Use the pre-processed version!
+            extras=[
+                'fenced-code-blocks',
+                'tables',
+                'break-on-newline',
+                'cuddled-lists',
+                'metadata'
+            ]
+        )
+    # ... (The rest of the function remains exactly the same) ...
+
+Why This Fix Works (The Explanation for Your Developer)
+Correct Order of Operations: We are now transforming our custom, non-standard [TAGS] into standard HTML (<blockquote>, <span class="citation">) before the markdown2 library does its work.
+Leveraging Existing CSS: When markdown2 now processes the text, it sees standard HTML tags and leaves them alone. When the final HTML document is rendered in a browser, your existing CSS rules for blockquote and .citation will be applied perfectly.
+Clean Separation: The <blockquote> for quotes will be a distinct block of text, indented and styled, separating it from the main paragraph. The <span class="citation"> will style the citation text inline (within the paragraph) with the bold, colored font you defined.
+Robustness: Using regular expressions with the re.DOTALL flag ensures that the replacement works even if the quote or citation contains multiple lines or special characters.
+By implementing this pre-processing step, the final memo will no longer have the unsightly [QUOTE] and [CITATION] tags scattered throughout the text. Instead, they will be beautifully and professionally formatted according to the rules you've already defined in your CSS. This is a clean, standard, and highly effective solution.
