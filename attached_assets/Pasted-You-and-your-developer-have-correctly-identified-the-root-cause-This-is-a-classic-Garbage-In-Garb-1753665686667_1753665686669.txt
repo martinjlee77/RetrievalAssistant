@@ -1,0 +1,172 @@
+You and your developer have correctly identified the root cause. This is a classic "Garbage In, Garbage Out" problem, but with a subtle twist. The problem is not with the Python assembly code (format_step_detail_as_markdown), but with the quality of the data being fed into it.
+
+The developer's diagnosis is spot on: the malformed text like T h e p r i m a r y j u d g m e n t... is coming directly from the LLM during the step-by-step analysis phase. The Python formatter is just faithfully (and correctly) reproducing the bad data it receives.
+
+This is a known, albeit infrequent, issue with large language models, especially when they are asked to generate large, complex JSON objects. It can be caused by a combination of factors, including API streaming artifacts, subtle temperature setting effects, or the model struggling with complex nested structures under pressure.
+
+Your developer's attempts to fix it in the formatting function were logical but were aimed at the symptom, not the cause. We need to fix the source.
+
+Here is the detailed feedback and a robust, multi-layered solution to provide your developer.
+
+The Problem: LLM JSON Generation is Unreliable Under Duress
+When we force the LLM to return a large, complex, multi-level nested JSON object (like the one in get_step_specific_analysis_prompt), we are pushing it to the edge of its capabilities. This increases the chance of it producing malformed outputs, such as:
+
+Character Spacing: The T h i s i s a n i s s u e problem.
+Truncated Strings: A string that just ends mid-sentence.
+Invalid JSON: Missing commas, brackets, or quotes that cause the json.loads() to fail.
+The current prompts are excellent at instructing the AI, but we need to make the output structure more resilient.
+
+The Solution: A Two-Pronged Approach
+We will attack this problem from both ends: (1) Simplify the AI's task to reduce the chance of errors, and (2) Add a "sanitization" layer in our Python code to catch and fix any errors that still slip through.
+
+Prong 1: Simplify the JSON Structure in step_prompts.py (The Proactive Fix)
+The most complex part of our current JSON is the nested lists of dictionaries for citations and evidence. This is a common point of failure. We can simplify this structure significantly without losing any information.
+
+Current (Complex) JSON Structure:
+
+"asc_606_citations": [
+  {
+    "paragraph": "...",
+    "full_text": "...",
+    "relevance": "..."
+  }
+]
+
+Proposed (Simpler & More Robust) JSON Structure: Let's ask the AI to return simple lists of strings, with a consistent separator character that our Python code can parse. The pipe | character is excellent for this.
+
+Revised Prompt in get_step_specific_analysis_prompt:
+
+# In step_prompts.py, inside get_step_specific_analysis_prompt, update the JSON structure block:
+
+# ... (rest of the prompt is fine) ...
+Return your response as a single, valid JSON object with this structure:
+{{
+  "executive_conclusion": "One comprehensive sentence...",
+  "detailed_analysis": "Your thorough, multi-paragraph analysis...",
+
+  "asc_606_citations": [
+    "ASC 606-XX-XX-X | Full text of the ASC 606 paragraph | Explanation of how this guidance applies"
+  ],
+
+  "ey_guidance_citations": [
+    "EY Publication/Section reference | Full relevant text from EY guidance | Explanation of how this EY interpretation applies"
+  ],
+
+  "supporting_contract_evidence": [
+    "Direct quote from contract | Detailed explanation of what this contract language means"
+  ],
+
+  "professional_judgments": [
+    "A string explaining a single professional judgment.",
+    "Another string for a second judgment."
+  ],
+
+  "potential_issues_addressed": "A single string or paragraph discussing potential issues."
+}}
+
+Why this is better:
+
+Reduces AI Cognitive Load: The AI no longer has to worry about perfectly formatting nested dictionaries with specific keys. It just has to create a simple list of formatted strings. This dramatically reduces the likelihood of syntax errors and weird formatting artifacts.
+Easier to Parse: Our Python code can now reliably split these strings by the | character.
+Prong 2: Add a "Sanitization" Layer in Python (The Reactive Fix)
+Even with a simpler prompt, the AI might occasionally produce errors. We need a robust "sanitization" function in asc606_analyzer.py that cleans the JSON before it gets stored or formatted.
+
+This new function will perform two tasks:
+
+Recursively loop through the entire JSON object from the LLM.
+For every string value, it will fix common formatting errors.
+New Sanitization Function in asc606_analyzer.py:
+
+# In asc606_analyzer.py, add this new helper function inside the class
+
+def _sanitize_llm_json(self, data: Any) -> Any:
+    """
+    Recursively traverses a JSON object from the LLM and cleans up
+    common string formatting issues like character splitting.
+    """
+    if isinstance(data, dict):
+        return {key: self._sanitize_llm_json(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [self._sanitize_llm_json(item) for item in data]
+    elif isinstance(data, str):
+        # 1. Fix the "s p a c e d o u t" text issue
+        # This regex finds single characters separated by one or more spaces
+        # and joins them back together.
+        sanitized_str = re.sub(r'\b(\w)\s(?=\w\b)', r'\1', data)
+
+        # 2. Collapse multiple spaces into a single space
+        sanitized_str = re.sub(r'\s+', ' ', sanitized_str).strip()
+
+        return sanitized_str
+    else:
+        return data
+
+# Then, use this function immediately after receiving the JSON response:
+
+# In the `for step_num in range(1, 6):` loop in `analyze_contract`:
+
+try:
+    step_response = make_llm_call(...)
+    step_analysis_raw = json.loads(step_response)
+
+    # --- THIS IS THE NEW SANITIZATION STEP ---
+    step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+
+    step_results[f"step_{step_num}"] = step_analysis_sanitized
+    self.logger.info(...)
+except (...):
+    # ...
+
+This creates a defensive layer. The simpler prompt (Prong 1) will prevent most errors, and this sanitization function (Prong 2) will catch and fix any that still occur.
+
+Finally, we need to update the format_step_detail_as_markdown function in step_prompts.py to handle the new, simpler list-of-strings format.
+
+Revised format_step_detail_as_markdown in step_prompts.py:
+
+# In step_prompts.py
+
+@staticmethod
+def format_step_detail_as_markdown(step_data: dict, step_num: int, step_name: str) -> str:
+    # ... (header and detailed_analysis parts are fine) ...
+
+    # Supporting contract evidence (now parsing the simple string list)
+    if step_data.get('supporting_contract_evidence'):
+        parts.append("\n**Supporting Contract Evidence:**")
+        for evidence_str in step_data.get('supporting_contract_evidence', []):
+            evidence_parts = evidence_str.split('|', 1) # Split only once
+            quote = evidence_parts[0].strip()
+            analysis = evidence_parts[1].strip() if len(evidence_parts) > 1 else ""
+            if quote:
+                parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+            if analysis:
+                parts.append(f"> **Analysis:** {analysis}")
+
+    # ASC 606 Citations (now parsing the simple string list)
+    if step_data.get('asc_606_citations'):
+        parts.append("\n**Authoritative Guidance:**")
+        for citation_str in step_data.get('asc_606_citations', []):
+            citation_parts = citation_str.split('|', 2) # Split max twice
+            paragraph = citation_parts[0].strip()
+            full_text = citation_parts[1].strip() if len(citation_parts) > 1 else ""
+            relevance = citation_parts[2].strip() if len(citation_parts) > 2 else ""
+            if paragraph and full_text:
+                parts.append(f"- **[CITATION]{paragraph}:** *{full_text}*")
+            if relevance:
+                 parts.append(f"  - **Relevance:** {relevance}")
+
+    # ... (and so on for other list-based fields) ...
+
+    return "\n".join(parts)
+
+Summary of Feedback for Your Developer
+"You've correctly diagnosed that the formatting issues originate from the LLM's step-analysis responses, not the Python assembly code. This is a common challenge with complex JSON generation.
+
+To solve this permanently, let's implement a robust, two-pronged strategy:
+
+Proactive Fix (Simplify the Prompt): Let's refactor the JSON structure in the get_step_specific_analysis_prompt in step_prompts.py. Instead of asking for nested dictionaries for citations and evidence, let's have it return simple lists of strings, with fields separated by a pipe | character. This reduces the cognitive load on the AI and makes errors less likely.
+
+Reactive Fix (Add a Sanitization Layer): In asc606_analyzer.py, let's create a new _sanitize_llm_json helper function. This function will recursively traverse the JSON response from the LLM and use regex to clean up any common formatting errors, like the character-splitting issue. We will call this function immediately after json.loads() for each step.
+
+Finally, we'll need to update the format_step_detail_as_markdown function to parse the new, simpler list[str] format instead of the old list[dict] format.
+
+This multi-layered approach will prevent the majority of formatting errors at the source and automatically correct any that still slip through, making our entire pipeline much more resilient."▌
