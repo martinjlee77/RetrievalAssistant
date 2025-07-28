@@ -356,6 +356,34 @@ Write 1-2 paragraphs covering:
 Keep this section factual and concise."""
 
     @staticmethod
+    def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """CRITICAL: Check for contradictions and inconsistencies across all 5 steps."""
+        step_conclusions = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            conclusion = step.get('executive_conclusion', 'N/A')
+            step_conclusions.append(f"Step {i}: {conclusion}")
+        
+        return f"""You are a senior accounting partner reviewing ASC 606 analysis for consistency.
+
+INDIVIDUAL STEP CONCLUSIONS:
+{chr(10).join(step_conclusions)}
+
+CRITICAL TASK: Identify any contradictions or inconsistencies between these 5 steps.
+
+Check for these common issues:
+- Step 1 says "single contract" but Step 2 identifies multiple unrelated obligations
+- Step 2 identifies distinct services but Step 4 allocates to combined obligation  
+- Step 3 determines fixed price but Step 5 recognizes over variable timeline
+- Transaction price in Step 3 doesn't match allocation in Step 4
+- Recognition timing in Step 5 conflicts with obligation identification in Step 2
+
+RESPONSE FORMAT:
+If inconsistencies found: List each contradiction clearly with recommended resolution
+If consistent: State "ANALYSIS CONSISTENT - All steps align logically"
+
+Be thorough - audit-quality analysis depends on step consistency."""
+
+    @staticmethod
     def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
         """Generates focused prompt for key judgments section only."""
         judgments = []

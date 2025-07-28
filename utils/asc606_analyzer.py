@@ -182,6 +182,22 @@ class ASC606Analyzer:
             # Get step results for easy reference
             s1, s2, s3, s4, s5 = [step_results.get(f"step_{i}", {}) for i in range(1, 6)]
             
+            # 0. CRITICAL: Consistency Check (GEMINI'S NEW REQUIREMENT)
+            self.logger.info("Performing consistency check across all 5 steps...")
+            consistency_prompt = StepAnalysisPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
+            consistency_result = make_llm_call(
+                self.client, consistency_prompt,
+                model='gpt-4o', max_tokens=1000, temperature=0.1  # Use best model with low temp for accuracy
+            )
+            
+            # Check if analysis is inconsistent and halt if needed
+            if "ANALYSIS CONSISTENT" not in consistency_result:
+                import streamlit as st
+                st.error(f"❌ **Analysis Consistency Issue Detected**\n\n{consistency_result}\n\nPlease review the contract and try again.")
+                raise Exception(f"Analysis consistency check failed: {consistency_result[:200]}...")
+            
+            self.logger.info("✅ Consistency check passed - all steps align")
+            
             # 1. Generate Executive Summary (focused LLM call)
             summary_prompt = StepAnalysisPrompts.get_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data)
             executive_summary = make_llm_call(
