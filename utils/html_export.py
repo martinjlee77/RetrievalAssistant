@@ -157,28 +157,28 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             text-align: justify;
         }}
         
-        /* Citation and quote styling */
+        /* Citation and quote styling - PROFESSIONAL MEMO STANDARDS */
         blockquote {{
-            font-family: 'Courier New', monospace; /* Use a monospace font to clearly separate it from narrative text */
-            font-style: normal;
-            font-size: 11pt;
-            color: #2d3748; /* A professional dark grey/blue */
-            background-color: #f7fafc; /* A very light, cool grey */
-            border: 1px solid #e2e8f0; /* Thin, subtle border */
-            border-left: 4px solid #4299e1; /* A friendly, professional blue accent */
-            border-radius: 5px; /* Soft rounded corners */
-            padding: 16pt;
-            margin: 20pt 0; /* Generous spacing to let it breathe */
+            font-family: '{style_config['font_family']}', serif; /* Same as body font for consistency */
+            font-style: italic;
+            font-size: {style_config['font_size']}; /* Same size as body text */
+            color: #333333; /* Professional dark grey */
+            background-color: #f8f9fa; /* Very subtle light background */
+            border: 1px solid #dee2e6; /* Light professional border */
+            /* Removed left border line as requested */
+            border-radius: 3px; /* Minimal rounded corners */
+            padding: 12pt;
+            margin: 16pt 0;
         }}
         
         .citation {{
             font-weight: bold;
             font-style: normal;
-            color: #555555; /* Not black, to reduce harshness */
-            background-color: #edf2f7; /* A very subtle highlight color */
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.9em; /* Slightly smaller */
+            color: #2c5aa0; /* Professional navy blue - formal and readable */
+            background-color: #f0f4f8; /* Very subtle blue-grey background */
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 1em; /* Same size as body text */
         }}
         
         /* Table styling */
@@ -231,6 +231,25 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-size: 10pt;
             color: {style_config['secondary_color']};
             text-align: center;
+        }}
+        
+        /* Prevent nested styling issues */
+        blockquote blockquote {{
+            border: none;
+            background: none;
+            padding: 8pt;
+            margin: 8pt 0;
+            font-style: normal;
+        }}
+        
+        /* Ensure conclusion section appears as regular text, not boxed */
+        h2:contains("CONCLUSION") + p,
+        h2:contains("Conclusion") + p {{
+            background: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 12pt 0 !important;
+            font-style: normal !important;
         }}
         
         /* Print styles */
