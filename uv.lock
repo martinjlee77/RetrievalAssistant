@@ -969,6 +969,15 @@ wheels = [
 ]
 
 [[package]]
+name = "markdown2"
+version = "2.5.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/42/f8/b2ae8bf5f28f9b510ae097415e6e4cb63226bb28d7ee01aec03a755ba03b/markdown2-2.5.4.tar.gz", hash = "sha256:a09873f0b3c23dbfae589b0080587df52ad75bb09a5fa6559147554736676889", size = 145652 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/06/2697b5043c3ecb720ce0d243fc7cf5024c0b5b1e450506e9b21939019963/markdown2-2.5.4-py3-none-any.whl", hash = "sha256:3c4b2934e677be7fec0e6f2de4410e116681f4ad50ec8e5ba7557be506d3f439", size = 49954 },
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2099,6 +2108,7 @@ dependencies = [
     { name = "docx" },
     { name = "faiss-cpu" },
     { name = "fpdf2" },
+    { name = "markdown2" },
     { name = "numpy" },
     { name = "openai" },
     { name = "pandas" },
@@ -2122,6 +2132,7 @@ requires-dist = [
     { name = "docx", specifier = ">=0.2.4" },
     { name = "faiss-cpu", specifier = ">=1.11.0" },
     { name = "fpdf2", specifier = ">=2.8.3" },
+    { name = "markdown2", specifier = ">=2.5.4" },
     { name = "numpy", specifier = ">=2.3.1" },
     { name = "openai", specifier = ">=1.95.0" },
     { name = "pandas", specifier = ">=2.3.1" },

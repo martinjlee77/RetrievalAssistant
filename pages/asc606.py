@@ -506,18 +506,21 @@ else:
     st.subheader("📋 Professional Accounting Memo")
     memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
+        # Import HTML export functions
+        from utils.html_export import enhance_markdown_for_display, convert_memo_to_html
+        
         with st.container(border=True):
-            # Display memo with enhanced formatting
-            memo_html = memo.replace('*', '').replace('**', '').replace('[QUOTE]', '').replace('[/QUOTE]', '').replace('[CITATION]', '').replace('[/CITATION]', '')
-            st.markdown(memo_html)
+            # Enhanced markdown display with better formatting
+            enhanced_memo = enhance_markdown_for_display(memo)
+            st.markdown(enhanced_memo)
             
             # Create columns for the download buttons
-            dl_col1, dl_col2 = st.columns(2)
+            dl_col1, dl_col2, dl_col3 = st.columns(3)
 
             with dl_col1:
                 analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
                 st.download_button(
-                    label="📄 Download as .docx",
+                    label="📄 Download DOCX",
                     data=create_docx_from_text(memo, contract_data=contract_data),
                     file_name=
                     f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
@@ -526,9 +529,21 @@ else:
                     use_container_width=True)
 
             with dl_col2:
+                # HTML Download with professional styling
+                html_content = convert_memo_to_html(memo, contract_data.__dict__ if contract_data else None)
+                st.download_button(
+                    label="🌐 Download HTML", 
+                    data=html_content.encode('utf-8'),
+                    file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
+                    mime="text/html",
+                    use_container_width=True,
+                    help="Professional HTML version - opens perfectly in any browser"
+                )
+                
+            with dl_col3:
                 # PDF Download - TEMPORARILY DISABLED due to Unicode issues
-                st.info("📋 PDF Download - Coming Soon")
-                st.caption("(Temporarily disabled - use DOCX format)")
+                st.button("📋 PDF (Coming Soon)", disabled=True, use_container_width=True)
+                st.caption("Use HTML version for best formatting")
     else:
         st.info("No memo generated for this analysis.")
 
