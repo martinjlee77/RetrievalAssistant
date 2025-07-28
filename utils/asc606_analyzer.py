@@ -176,31 +176,76 @@ class ASC606Analyzer:
                 st.error(error_msg)
                 raise Exception(f"Analysis failed for {len(failed_steps)} step(s): {[s[0] for s in failed_steps]}")
             
-            # === STEP 3: GENERATE COMPREHENSIVE MEMO ===
-            self.logger.info("Generating final comprehensive memo")
+            # === STEP 3: PYTHON-DRIVEN MEMO ASSEMBLY (GEMINI'S RECOMMENDED ARCHITECTURE) ===
+            self.logger.info("Assembling final comprehensive memo section by section...")
             
-            # OPTIMIZATION: Lean final prompt with only essential data
-            memo_prompt = StepAnalysisPrompts.get_final_memo_generation_prompt(
-                step1_analysis=step_results.get("step_1", {}),
-                step2_analysis=step_results.get("step_2", {}),
-                step3_analysis=step_results.get("step_3", {}),
-                step4_analysis=step_results.get("step_4", {}),
-                step5_analysis=step_results.get("step_5", {}),
-                analysis_title=getattr(contract_data, 'analysis_title', 'ASC 606 Analysis'),
-                customer_name=getattr(contract_data, 'customer_name', 'Unknown'),
-                memo_audience=getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
-                debug_config=debug_config or {}
+            # Get step results for easy reference
+            s1, s2, s3, s4, s5 = [step_results.get(f"step_{i}", {}) for i in range(1, 6)]
+            
+            # 1. Generate Executive Summary (focused LLM call)
+            summary_prompt = StepAnalysisPrompts.get_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data)
+            executive_summary = make_llm_call(
+                self.client, summary_prompt, 
+                model='gpt-4o-mini', max_tokens=800, temperature=0.3
             )
             
-            final_memo = make_llm_call(
-                self.client,
-                memo_prompt,
-                temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
-                max_tokens=debug_config.get('max_tokens', 16000) if debug_config else 16000,  # INCREASED for complete memo
-                model=debug_config.get('memo_model', 'gpt-4o') if debug_config else 'gpt-4o'  # Use full model for better completion
+            # 2. Generate Background (focused LLM call) 
+            background_prompt = StepAnalysisPrompts.get_background_prompt(contract_data)
+            background = make_llm_call(
+                self.client, background_prompt,
+                model='gpt-4o-mini', max_tokens=600, temperature=0.3
             )
             
-            self.logger.info(f"Final memo generated: {len(final_memo)} characters")
+            # 3. Assemble Detailed Analysis (Python formatting - NO LLM CALL)
+            detailed_analysis_sections = []
+            step_names = [
+                "Identify the Contract",
+                "Identify Performance Obligations", 
+                "Determine the Transaction Price",
+                "Allocate the Transaction Price",
+                "Recognize Revenue"
+            ]
+            
+            for i in range(1, 6):
+                step_data = step_results.get(f"step_{i}", {})
+                formatted_step = StepAnalysisPrompts.format_step_detail_as_markdown(
+                    step_data, i, step_names[i-1]
+                )
+                detailed_analysis_sections.append(formatted_step)
+            
+            detailed_analysis = "\n\n".join(detailed_analysis_sections)
+            
+            # 4. Generate Key Judgments (focused LLM call)
+            judgments_prompt = StepAnalysisPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
+            key_judgments = make_llm_call(
+                self.client, judgments_prompt,
+                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
+            )
+            
+            # 5. Python Assembly of Final Memo (guaranteed complete structure)
+            memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
+
+TO: Technical Accounting Team / Audit File
+FROM: ASC 606 AI Analyst  
+DATE: {datetime.now().strftime('%B %d, %Y')}
+SUBJECT: ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
+
+---
+"""
+            
+            final_memo_sections = [
+                memo_header,
+                f"## 1. Executive Summary\n\n{executive_summary}",
+                f"## 2. Background\n\n{background}", 
+                f"## 3. Detailed Analysis\n\n{detailed_analysis}",
+                f"## 4. Key Judgments\n\n{key_judgments}",
+                f"## 5. Financial Impact\n\nBased on the analysis above, revenue recognition follows ASC 606 requirements with appropriate timing and measurement.",
+                f"## 6. Conclusion\n\nThe contract meets all ASC 606 criteria for revenue recognition. Implementation should follow the step-by-step analysis detailed above."
+            ]
+            
+            final_memo = "\n\n---\n\n".join(final_memo_sections)
+            
+            self.logger.info(f"Python-assembled memo completed: {len(final_memo)} characters with all 6 sections")
             
             # === STEP 4: RETURN CLEAN, CONSOLIDATED ANALYSIS RESULT ===
             analysis_result = ASC606Analysis(

@@ -260,19 +260,123 @@ This section must contain the comprehensive 5-step ASC 606 framework:
 - Use ** for bold text and standard bullet points (-)
 - Preserve all analytical depth - this should be a substantial, impressive memo
 
-**CRITICAL REQUIREMENTS:**
-- YOU MUST INCLUDE ALL 5 STEPS IN SECTION 3. DO NOT STOP AT STEP 2.
-- Step 3: Determine the Transaction Price
-- Step 4: Allocate the Transaction Price  
-- Step 5: Recognize Revenue
-- Each step must have the same comprehensive treatment as Steps 1 and 2
+        """
+    
+    @staticmethod
+    def format_step_detail_as_markdown(step_data: dict, step_num: int, step_name: str) -> str:
+        """Formats the rich JSON of a single step into professional markdown prose."""
+        if not step_data or step_data.get('error'):
+            return f"### Step {step_num}: {step_name}\n**Error:** Analysis failed for this step.\n"
+        
+        parts = []
+        parts.append(f"### Step {step_num}: {step_name}")
+        
+        # Executive conclusion
+        if step_data.get('executive_conclusion'):
+            parts.append(f"**Conclusion:** {step_data.get('executive_conclusion')}")
+        
+        # Detailed analysis
+        parts.append("\n**Detailed Analysis & Reasoning:**")
+        parts.append(step_data.get('detailed_analysis', 'N/A'))
 
-**QUALITY TARGETS:**
-- Minimum 3,000 words showing comprehensive analysis for all 5 steps
-- Extensive use of authoritative citations throughout all steps
-- Professional tone demonstrating Big 4 expertise
-- Clear demonstration of analytical rigor and professional judgment
-"""
+        # Supporting contract evidence
+        if step_data.get('supporting_contract_evidence'):
+            parts.append("\n**Supporting Contract Evidence:**")
+            for evidence in step_data.get('supporting_contract_evidence', []):
+                quote = evidence.get('quote', '') if isinstance(evidence, dict) else str(evidence)
+                analysis = evidence.get('analysis', '') if isinstance(evidence, dict) else ''
+                if quote:
+                    parts.append(f"> [QUOTE]{quote}[/QUOTE]")
+                if analysis:
+                    parts.append(f"> **Analysis:** {analysis}")
+
+        # ASC 606 Citations
+        if step_data.get('asc_606_citations'):
+            parts.append("\n**Authoritative Guidance:**")
+            for citation in step_data.get('asc_606_citations', []):
+                if isinstance(citation, dict):
+                    paragraph = citation.get('paragraph', '')
+                    full_text = citation.get('full_text', '')
+                    if paragraph and full_text:
+                        parts.append(f"- **[CITATION]{paragraph}:** *{full_text}*")
+                else:
+                    parts.append(f"- {str(citation)}")
+
+        # Professional judgments
+        if step_data.get('professional_judgments'):
+            parts.append("\n**Key Professional Judgments:**")
+            for judgment in step_data.get('professional_judgments', []):
+                judgment_text = judgment if isinstance(judgment, str) else str(judgment)
+                parts.append(f"- {judgment_text}")
+
+        return "\n".join(parts)
+
+    @staticmethod
+    def get_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, contract_data) -> str:
+        """Generates focused prompt for executive summary only."""
+        conclusions = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            conclusion = step.get('executive_conclusion', 'N/A')
+            conclusions.append(f"Step {i}: {conclusion}")
+        
+        return f"""Write a professional executive summary for an ASC 606 technical accounting memo.
+
+CONTRACT CONTEXT:
+- Customer: {getattr(contract_data, 'customer_name', 'Unknown')}
+- Analysis: {getattr(contract_data, 'analysis_title', 'ASC 606 Analysis')}
+
+STEP CONCLUSIONS:
+{chr(10).join(conclusions)}
+
+Write 2-3 paragraphs synthesizing these conclusions into a cohesive executive summary that:
+- States the overall ASC 606 compliance conclusion
+- Highlights key judgments and financial impacts
+- Provides clear guidance for decision makers
+
+Use professional accounting language appropriate for technical staff."""
+
+    @staticmethod 
+    def get_background_prompt(contract_data) -> str:
+        """Generates focused prompt for background section only."""
+        return f"""Write a professional background section for an ASC 606 technical accounting memo.
+
+CONTRACT INFORMATION:
+- Customer: {getattr(contract_data, 'customer_name', 'Unknown')}
+- Analysis Title: {getattr(contract_data, 'analysis_title', 'ASC 606 Analysis')}
+- Contract Start: {getattr(contract_data, 'contract_start_date', 'Not specified')}
+- Contract End: {getattr(contract_data, 'contract_end_date', 'Not specified')}
+- Modification: {getattr(contract_data, 'is_modification', False)}
+
+Write 1-2 paragraphs covering:
+- Contract parties and key dates
+- Nature of the arrangement and services
+- Scope and objectives of this ASC 606 analysis
+- Any unique circumstances requiring special consideration
+
+Keep this section factual and concise."""
+
+    @staticmethod
+    def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Generates focused prompt for key judgments section only."""
+        judgments = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            step_judgments = step.get('professional_judgments', [])
+            for judgment in step_judgments:
+                judgment_text = judgment if isinstance(judgment, str) else str(judgment)
+                judgments.append(f"Step {i}: {judgment_text}")
+        
+        return f"""Write a professional key judgments section for an ASC 606 technical accounting memo.
+
+PROFESSIONAL JUDGMENTS FROM ANALYSIS:
+{chr(10).join(judgments)}
+
+Transform these into 3-4 well-structured judgment statements that:
+- State each critical accounting position clearly
+- Provide rationale for the judgment
+- Reference relevant ASC 606 guidance
+- Address potential alternative treatments considered
+
+Use bullet points and maintain professional accounting tone."""
 
     @staticmethod
     def get_step_guidance_mapping() -> Dict[int, Dict[str, str]]:
