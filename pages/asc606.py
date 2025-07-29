@@ -10,6 +10,7 @@ from pydantic import ValidationError
 # Import core components
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
@@ -89,7 +90,8 @@ if st.session_state.analysis_results is None:
         with col3:
             contract_types = st.multiselect(
                 "Contract Document Types Included *", [
-                    "Master Agreement", "Master Services Agreement (MSA)",
+                    "Online Terms and Conditions",
+                    "Master Services Agreement (MSA)",
                     "Statement of Work (SOW)",
                     "Software as a Service (SaaS) Agreement",
                     "Software License Agreement",
@@ -385,8 +387,9 @@ if st.session_state.analysis_results is None:
 
                     # Check for failures and decide whether to continue or stop
                     if failed_files:
-                        successful_files = len(uploaded_files) - len(failed_files)
-                        
+                        successful_files = len(uploaded_files) - len(
+                            failed_files)
+
                         if successful_files == 0:
                             # All files failed - stop the analysis
                             error_message = (
@@ -507,27 +510,39 @@ else:
                 "This percentage reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
             )
         with metrics_col2:
-            complexity = getattr(analysis_results, 'analysis_complexity', 'Unknown')
-            st.metric("Complexity", complexity,
-                help="Analysis complexity based on contract features: modifications, variable consideration, financing components, etc.")
+            complexity = getattr(analysis_results, 'analysis_complexity',
+                                 'Unknown')
+            st.metric(
+                "Complexity",
+                complexity,
+                help=
+                "Analysis complexity based on contract features: modifications, variable consideration, financing components, etc."
+            )
         with metrics_col3:
-            duration = getattr(analysis_results, 'analysis_duration_seconds', 0)
+            duration = getattr(analysis_results, 'analysis_duration_seconds',
+                               0)
             duration_display = f"{duration//60}m {duration%60}s" if duration >= 60 else f"{duration}s"
-            st.metric("Generation Time", duration_display,
-                help="Total time required to complete the comprehensive analysis")
+            st.metric(
+                "Generation Time",
+                duration_display,
+                help=
+                "Total time required to complete the comprehensive analysis")
 
     # Professional memo with enhanced display
     st.markdown("---")
     st.subheader("📋 ASC 606 Accounting Memo")
-    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
+    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(
+        analysis_results, 'professional_memo', None)
     if memo:
         # Import HTML export functions
         from utils.html_export import enhance_markdown_for_display, convert_memo_to_html, create_pdf_from_html
-        
+
         with st.container(border=True):
             st.markdown("**📋 Memo Downloads**")
-            st.write("Your ASC 606 revenue contract review is complete. Download in your preferred format:")
-            
+            st.write(
+                "Your ASC 606 revenue contract review is complete. Download in your preferred format:"
+            )
+
             # Create columns for the download buttons
             dl_col1, dl_col2, dl_col3 = st.columns(3)
 
@@ -535,7 +550,8 @@ else:
                 analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
                 st.download_button(
                     label="📄 Download DOCX",
-                    data=create_docx_from_text(memo, contract_data=contract_data),
+                    data=create_docx_from_text(memo,
+                                               contract_data=contract_data),
                     file_name=
                     f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
                     mime=
@@ -544,16 +560,17 @@ else:
 
             with dl_col2:
                 # HTML Download with professional styling
-                html_content = convert_memo_to_html(memo, contract_data.__dict__ if contract_data else None)
+                html_content = convert_memo_to_html(
+                    memo, contract_data.__dict__ if contract_data else None)
                 st.download_button(
-                    label="🌐 Download HTML", 
+                    label="🌐 Download HTML",
                     data=html_content.encode('utf-8'),
-                    file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
+                    file_name=
+                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
                     mime="text/html",
                     use_container_width=True,
-                    help="HTML version - opens perfectly in any browser"
-                )
-                
+                    help="HTML version - opens perfectly in any browser")
+
             with dl_col3:
                 # PDF Download with WeasyPrint)
                 try:
@@ -561,13 +578,17 @@ else:
                     st.download_button(
                         label="📋 Download PDF",
                         data=pdf_bytes,
-                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
+                        file_name=
+                        f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
                         mime="application/pdf",
                         use_container_width=True,
-                        help="High-quality PDF generated from HTML - perfect formatting"
+                        help=
+                        "High-quality PDF generated from HTML - perfect formatting"
                     )
                 except Exception as e:
-                    st.button("📋 PDF Error", disabled=True, use_container_width=True)
+                    st.button("📋 PDF Error",
+                              disabled=True,
+                              use_container_width=True)
                     st.caption(f"PDF generation failed: {str(e)[:50]}...")
     else:
         st.info("No memo generated for this analysis.")
