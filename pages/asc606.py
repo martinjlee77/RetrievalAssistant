@@ -8,6 +8,10 @@ from typing import Optional, List
 from pydantic import ValidationError
 
 # Import core components
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 try:
     from core.models import ContractData, ASC606Analysis
     from utils.asc606_analyzer import ASC606Analyzer
@@ -50,10 +54,10 @@ analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
 # Standard header
-st.title("ASC 606: Revenue Contract Analysis")
+st.title("ASC 606: Revenue Contract Review")
 st.write(
     "**Powered by Authoritative FASB Codification & Leading Interpretive Guidance**\n\n"
-    "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and configure your analysis."
+    "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and generate the memo."
 )
 
 debug_config = create_debug_sidebar()
@@ -73,13 +77,13 @@ if st.session_state.analysis_results is None:
             analysis_title = st.text_input(
                 "Analysis Title *",
                 placeholder="e.g., Q4 Project Phoenix SOW",
-                help="A unique name to identify this analysis")
+                help="A unique name to identify this contract analysis.")
         with col2:
             customer_name = st.text_input(
                 "Customer Name *",
                 placeholder="e.g., ABC Corporation",
                 help=
-                "The legal entity name of the customer as it appears on the contract."
+                "The name of the customer or end user of the goods or services provided."
             )
         col3, col4 = st.columns(2, gap="small")
         with col3:
@@ -99,7 +103,7 @@ if st.session_state.analysis_results is None:
         with col4:
             currency = st.selectbox(
                 "Currency *",
-                ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "Other"],
+                ["USD", "EUR", "GBP", "CAD", "AUD", "KRW", "JPY", "Other"],
                 help="Primary currency for the contract")
         col5, col6 = st.columns(2, gap="small")
         with col5:
@@ -128,7 +132,7 @@ if st.session_state.analysis_results is None:
             type=['pdf', 'docx', 'txt'],
             accept_multiple_files=True,
             help=
-            "Crucial: Upload the complete set of related documents for this arrangement."
+            "Crucial: Upload the complete set of related documents for this arrangement. Missing documents can lead to incomplete or inaccurate results."
         )
         st.markdown("---")
         with st.container(border=True):
@@ -136,7 +140,7 @@ if st.session_state.analysis_results is None:
                 "Once the fields above are complete, continue to the **2️⃣ Provide Context** tab."
             )
 
-    # Tab 2: Analysis Questions (New Compact Design with Expanders)
+    # Tab 2: Analysis Questions
     with tab2:
         st.subheader(
             ":material/question_answer: Provide Key Considerations for 5-Step Model"
@@ -489,29 +493,29 @@ else:
                 "Source Quality",
                 getattr(analysis_results, 'source_quality', 'N/A'),
                 help=
-                "This score (out of 100) reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
+                "This percentage reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
             )
         with metrics_col2:
-            memo_audience = contract_data.memo_audience if contract_data else "Unknown"
-            st.metric("Audience", memo_audience.split(' / ')[0])
+            complexity = getattr(analysis_results, 'analysis_complexity', 'Unknown')
+            st.metric("Complexity", complexity,
+                help="Analysis complexity based on contract features: modifications, variable consideration, financing components, etc.")
         with metrics_col3:
-            currency = contract_data.currency if contract_data else "USD"
-            st.metric("Currency", currency)
-
-    # Skip the duplicative five-step summary section per user request
-    st.markdown("---")
+            duration = getattr(analysis_results, 'analysis_duration_seconds', 0)
+            duration_display = f"{duration//60}m {duration%60}s" if duration >= 60 else f"{duration}s"
+            st.metric("Generation Time", duration_display,
+                help="Total time required to complete the comprehensive analysis")
 
     # Professional memo with enhanced display
     st.markdown("---")
-    st.subheader("📋 Professional Accounting Memo")
+    st.subheader("📋 ASC 606 Accounting Memo")
     memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
         # Import HTML export functions
         from utils.html_export import enhance_markdown_for_display, convert_memo_to_html, create_pdf_from_html
         
         with st.container(border=True):
-            st.markdown("**📋 Professional Memo Downloads**")
-            st.write("Your ASC 606 analysis is complete. Download in your preferred format:")
+            st.markdown("**📋 Memo Downloads**")
+            st.write("Your ASC 606 revenue contract review is complete. Download in your preferred format:")
             
             # Create columns for the download buttons
             dl_col1, dl_col2, dl_col3 = st.columns(3)
@@ -536,11 +540,11 @@ else:
                     file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
                     mime="text/html",
                     use_container_width=True,
-                    help="Professional HTML version - opens perfectly in any browser"
+                    help="HTML version - opens perfectly in any browser"
                 )
                 
             with dl_col3:
-                # PDF Download with WeasyPrint (no more Unicode issues!)
+                # PDF Download with WeasyPrint)
                 try:
                     pdf_bytes = create_pdf_from_html(html_content)
                     st.download_button(

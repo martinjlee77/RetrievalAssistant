@@ -64,6 +64,8 @@ class ASC606Analysis(BaseModel):
     # Analysis metadata
     source_quality: str = "General Knowledge"
     relevant_chunks: int = 0
+    analysis_complexity: str = "Simple"  # Simple, Medium, Complex
+    analysis_duration_seconds: int = 0
     analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     
     # Analysis overview

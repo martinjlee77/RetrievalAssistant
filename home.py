@@ -71,7 +71,7 @@ st.logo("assets/images/logo.png")
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
     st.Page("pages/asc606.py",
-            title="ASC 606 Analyzer",
+            title="ASC 606 Contract Review",
             icon=":material/arrow_forward:"),
     st.Page("pages/asc842.py",
             title="ASC 842 Analyzer",

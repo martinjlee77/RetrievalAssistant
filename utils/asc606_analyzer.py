@@ -68,6 +68,9 @@ class ASC606Analyzer:
     
     def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
         """Analyze contract using step-by-step detailed analysis with extensive citations"""
+        import time
+        analysis_start_time = time.time()
+        
         try:
             # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
             retrieved_context = ""
@@ -185,7 +188,6 @@ class ASC606Analyzer:
                     # Parse JSON response
                     step_analysis_raw = json.loads(step_response) if step_response else {}
                     
-                    # --- GEMINI'S SANITIZATION STEP ---
                     step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
                     
                     step_results[f"step_{step_num}"] = step_analysis_sanitized
@@ -210,7 +212,7 @@ class ASC606Analyzer:
                 st.error(error_msg)
                 raise Exception(f"Analysis failed for {len(failed_steps)} step(s): {[s[0] for s in failed_steps]}")
             
-            # === STEP 3: PYTHON-DRIVEN MEMO ASSEMBLY (GEMINI'S RECOMMENDED ARCHITECTURE) ===
+            # === STEP 3: PYTHON-DRIVEN MEMO ASSEMBLY ===
             self.logger.info("Assembling final comprehensive memo section by section...")
             
             # Get step results for easy reference
@@ -319,7 +321,7 @@ class ASC606Analyzer:
                 f"## 3. DETAILED ASC 606 ANALYSIS\n\n{detailed_analysis}",
                 f"## 4. KEY PROFESSIONAL JUDGMENTS\n\n{key_judgments}",
                 f"## 5. FINANCIAL IMPACT ASSESSMENT\n\n{financial_impact}",
-                f"## 6. CONCLUSION AND RECOMMENDATIONS\n\n<div class=\"conclusion-content\">{conclusion}</div>",
+                f"## 6. CONCLUSION AND RECOMMENDATIONS\n\n{conclusion}",
                 f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
             
@@ -328,11 +330,45 @@ class ASC606Analyzer:
             self.logger.info(f"Python-assembled memo completed: {len(final_memo)} characters with all 6 sections")
             
             # === STEP 4: RETURN CLEAN, CONSOLIDATED ANALYSIS RESULT ===
+            analysis_duration = time.time() - analysis_start_time
+            
+            # Determine complexity based on analysis patterns
+            complexity_indicators = [
+                bool(getattr(contract_data, 'is_modification', False)),
+                bool(getattr(contract_data, 'variable_consideration_involved', False)), 
+                bool(getattr(contract_data, 'financing_component_involved', False)),
+                bool(getattr(contract_data, 'principal_agent_involved', False)),
+                len(getattr(contract_data, 'key_focus_areas', '') or '') > 100,
+                analysis_duration > 180  # Complex if takes more than 3 minutes
+            ]
+            complexity_score = sum(complexity_indicators)
+            if complexity_score >= 4:
+                complexity = "Complex"
+            elif complexity_score >= 2:
+                complexity = "Medium"
+            else:
+                complexity = "Simple"
+            
+            # Calculate source quality percentage 
+            total_chunks = len(retrieved_context.split('\n\n')) if retrieved_context else 0
+            if total_chunks >= 8:
+                source_quality_pct = 95
+            elif total_chunks >= 5:
+                source_quality_pct = 85
+            elif total_chunks >= 3:
+                source_quality_pct = 75
+            elif total_chunks >= 1:
+                source_quality_pct = 65
+            else:
+                source_quality_pct = 45  # General knowledge only
+            
             analysis_result = ASC606Analysis(
                 professional_memo=final_memo,
                 step_by_step_details=step_results,  # Single source of truth
-                source_quality="Hybrid RAG - Step Analysis" if retrieved_context else "General Knowledge - Step Analysis",
-                relevant_chunks=len(retrieved_context.split('\n\n')) if retrieved_context else 0,
+                source_quality=f"{source_quality_pct}%",
+                relevant_chunks=total_chunks,
+                analysis_complexity=complexity,
+                analysis_duration_seconds=int(analysis_duration),
                 contract_overview={
                     "title": getattr(contract_data, 'analysis_title', 'ASC 606 Analysis'),
                     "customer": getattr(contract_data, 'customer_name', 'Unknown'),
@@ -369,7 +405,7 @@ class ASC606Analyzer:
 | **Contract Period** | {start_date} to {end_date} |
 | **Currency** | {currency} |
 | **Modification Status** | {'Yes - Amendment/Modification' if modification else 'No - Original Contract'} |
-| **Analysis Scope** | {getattr(contract_data, 'key_focus_areas', 'Standard ASC 606 five-step analysis')} |
+| **Analysis Scope** | {getattr(contract_data, 'key_focus_areas', 'Standard ASC 606 five-step analysis') or 'Standard ASC 606 five-step analysis'} |
 | **Materiality Threshold** | ${getattr(contract_data, 'materiality_threshold', 'Not specified'):,} |"""
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:

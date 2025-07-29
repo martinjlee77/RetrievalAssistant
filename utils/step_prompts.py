@@ -131,7 +131,7 @@ Return your response as a single, valid JSON object with this structure:
   ],
   
   "supporting_contract_evidence": [
-    "Direct quote from contract | Detailed explanation of what this contract language means for this ASC 606 step"
+    "Direct quote from contract (cite source file and section if available) | Detailed explanation of what this contract language means for this ASC 606 step"
   ],
   
   "professional_judgments": [
