@@ -1,7 +1,7 @@
 [project]
-name = "repl-nix-workspace"
+name = "asc-analyzer"
 version = "0.1.0"
-description = "Add your description here"
+description = "Multi-standard accounting analysis platform with ASC 606, 842, 815, and 326 support"
 requires-python = ">=3.11"
 dependencies = [
     "camelot-py>=1.0.0",

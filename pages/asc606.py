@@ -6,24 +6,20 @@ import time
 from datetime import date
 from typing import Optional, List
 from pydantic import ValidationError
-
-# Import core components
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 try:
     from core.models import ContractData, ASC606Analysis
     from utils.asc606_analyzer import ASC606Analyzer
     from utils.document_extractor import DocumentExtractor
     from utils.llm import create_debug_sidebar, create_docx_from_text
 except ImportError:
-    # Handle missing imports gracefully
-    st.error(
-        "Core components not found. Please ensure all required modules are available."
-    )
-    st.stop()
+    # Fallback to path-based imports for Replit compatibility
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from core.models import ContractData, ASC606Analysis
+    from utils.asc606_analyzer import ASC606Analyzer
+    from utils.document_extractor import DocumentExtractor
+    from utils.llm import create_debug_sidebar, create_docx_from_text
 
 
 def format_dict_as_markdown(data: dict) -> str:
