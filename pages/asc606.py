@@ -111,7 +111,6 @@ def render_tab1_contract_details() -> dict:
 def render_tab2_asc606_assessment() -> dict:
     """Render Tab 2: ASC 606 specific assessment questions"""
     st.subheader(":material/question_answer: Provide Key Considerations for 5-Step Model")
-    st.write("Your answers address key areas of judgment and provide crucial context for the AI.")
 
     # Initialize all optional detail variables to None to prevent errors
     original_contract_uploaded = None
@@ -131,7 +130,7 @@ def render_tab2_asc606_assessment() -> dict:
             is_modification = st.toggle(
                 "This is a contract modification *",
                 value=False,
-                help="Select if this is an amendment, addendum, or change order that modifies an existing contract.")
+                help="Select if this modifies an existing contract. This tells the AI to apply specific modification accounting rules (ASC 606-10-25-10 to 13) instead of treating it as a new contract.")
         with col2:
             is_combined_contract = st.toggle(
                 "Evaluate docs as one contract? *",
@@ -146,7 +145,7 @@ def render_tab2_asc606_assessment() -> dict:
         st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
         principal_agent_involved = st.toggle(
             "Is a third party involved in providing goods or services?",
-            help="Select if another party is involved in providing the goods or services to your end customer (e.g., you are reselling another company's product).")
+            help="Select if a third party is involved. This directs the AI to perform a principal vs. agent analysis (ASC 606-10-55-36) to determine if revenue should be recognized gross or net.")
         if principal_agent_involved:
             principal_agent_details = st.text_area(
                 "Describe the arrangement and specify who controls the good/service:",
@@ -158,7 +157,7 @@ def render_tab2_asc606_assessment() -> dict:
         with col3:
             variable_consideration_involved = st.toggle(
                 "Is there variable consideration?",
-                help="Variable consideration includes bonuses, penalties, discounts, rebates, refunds, credits, incentives, performance bonuses, or other similar items.")
+                help="Select if the price includes items like bonuses, penalties, discounts, rebates, refunds, credits, incentives, performance bonuses, or other similar items. This prompts the AI to assess whether the variable amount should be estimated and included in the transaction price.")
             financing_component_involved = st.toggle(
                 "Is there a significant financing component?",
                 help="This occurs when the timing of payments provides the customer or the entity with a significant benefit of financing.")
@@ -246,8 +245,7 @@ def render_tab3_analysis_config() -> dict:
     """
 
     st.subheader(":material/grading: Set Analysis Focus & Audience")
-    st.write("Finalize your analysis by providing optional focus areas and audience preferences before generating the memo.")
-
+    
     # Key Focus Areas - The most important steering input
     key_focus_areas = st.text_area(
         "Key Focus Areas / Specific Questions (Optional)",
@@ -331,7 +329,7 @@ analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
 # Standard header
-st.title("ASC 606: Revenue Contract Review Memo Generator")
+st.title("ASC 606: Contract Review Memo Generator")
 st.info(
     """
     **How to achieve the best results:**
@@ -377,13 +375,15 @@ if st.session_state.analysis_results is None:
                 st.stop()
 
             # Continue with analysis workflow (this would connect to the existing analysis logic)
-            with st.status("🔍 Analyzing contract...", expanded=True) as status:
+            # Use a generic, static label for the status box itself. This will be small.
+            with st.status("Analysis in Progress...", expanded=True) as status:
                 try:
                     # Merge all form data for processing  
                     all_form_data = {**tab1_data, **tab2_data, **tab3_data}
                     
                     # Enhanced text extraction with fail-safe policy
-                    st.write("📄 Verifying and extracting text from documents...")
+                    # Use st.write for all our dynamic steps so they have a consistent, larger font.
+                    st.write("➡️ **Verifying and extracting text from documents...**")
                     all_extracted_text = []
                     failed_files = []
 
@@ -454,10 +454,15 @@ if st.session_state.analysis_results is None:
                         revenue_recognition_timing_details=all_form_data.get("revenue_recognition_timing_details", "")
                     )
 
-                    st.write("⚡ Running AI analysis...")
+                    st.write("➡️ **Processing your answers and guidance...**")
+                    # Contract data object creation happens here (already done above)
+                    
+                    st.write("➡️ **Running AI analysis... This may take a moment.**")
                     analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
                     st.session_state.analysis_results = analysis_results
                     st.session_state.contract_data = contract_data
+                    
+                    # The label here updates the small text at the top of the box.
                     status.update(label="✅ Analysis complete!", state="complete")
                     time.sleep(1)
                     st.rerun()
