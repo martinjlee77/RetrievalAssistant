@@ -496,69 +496,60 @@ else:
         st.markdown("**✅ Analysis Complete**")
         st.write("Professional ASC 606 memo generated using hybrid RAG system with authoritative sources.")
 
-    # Professional memo with enhanced display
-    st.markdown("---")
     st.subheader("📋 ASC 606 Accounting Memo")
-    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
+    
+    memo = getattr(analysis_results, 'professional_memo', None)
+    
     if memo:
-        # Import HTML export functions
-        from utils.html_export import enhance_markdown_for_display, convert_memo_to_html, create_pdf_from_html
-
+        # --- 1. MEMO ACTIONS (Buttons First) ---
         with st.container(border=True):
-            st.markdown("**📋 Memo Downloads**")
-            st.write("Your ASC 606 revenue contract review is complete. Download in your preferred format:")
+            st.markdown("**Memo Actions**")
+            st.write("Your analysis is complete. Choose an option below to view or download the memo.")
 
-            # Create columns for the download buttons
-            col1, col2, col3 = st.columns(3, gap="small")
+            dl_col1, dl_col2 = st.columns(2)
+
+            # Generate the HTML content once to be used for both the link and the preview
+            from utils.html_export import convert_memo_to_html, create_html_download_link
+            from utils.llm import create_docx_from_text
             
-            with col1:
-                # DOCX Export
+            html_content = convert_memo_to_html(memo, contract_data)
+            analysis_title = contract_data.analysis_title if contract_data and contract_data.analysis_title else "ASC606_Analysis"
+
+            # Column 1: The primary working file (DOCX Download)
+            with dl_col1:
                 try:
-                    docx_content = create_docx_from_text(memo)
-                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.docx" if contract_data and contract_data.analysis_title else "ASC606_Analysis.docx"
+                    docx_content = create_docx_from_text(memo, contract_data)
                     st.download_button(
                         label="📄 Download DOCX",
                         data=docx_content,
-                        file_name=file_name,
+                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        use_container_width=True
+                        use_container_width=True,
+                        help="Download the memo as an editable Word document."
                     )
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            with col2:
-                # HTML Export
+            # Column 2: The primary viewing file (HTML View)
+            with dl_col2:
                 try:
-                    html_content = convert_memo_to_html(memo, contract_data)
-                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.html" if contract_data and contract_data.analysis_title else "ASC606_Analysis.html"
-                    st.download_button(
-                        label="🌐 Download HTML",
-                        data=html_content,
-                        file_name=file_name,
-                        mime="text/html",
-                        use_container_width=True
+                    data_url = create_html_download_link(html_content)
+                    st.link_button(
+                        label="🌐 View in Browser",
+                        url=data_url,
+                        use_container_width=True,
+                        help="Opens the fully-styled memo in a new tab for easy viewing or printing to PDF."
                     )
                 except Exception as e:
-                    st.error(f"Error generating HTML: {str(e)}")
+                    st.error(f"Error generating HTML view: {str(e)}")
 
-            with col3:
-                # PDF Export
-                try:
-                    html_content = convert_memo_to_html(memo, contract_data)
-                    pdf_content = create_pdf_from_html(html_content)
-                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.pdf" if contract_data and contract_data.analysis_title else "ASC606_Analysis.pdf"
-                    st.download_button(
-                        label="📋 Download PDF",
-                        data=pdf_content,
-                        file_name=file_name,
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
-                except Exception as e:
-                    st.error(f"Error generating PDF: {str(e)}")
+        # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
+        st.markdown("---")  # Visual separator
+        with st.expander("📄 Show Memo Preview", expanded=False):
+            import streamlit.components.v1 as components
 
-        # Display enhanced memo
-        enhanced_memo = enhance_markdown_for_display(memo)
-        st.markdown(enhanced_memo, unsafe_allow_html=True)
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
+
     else:
-        st.error("No memo content available to display.")
+        st.info("No memo was generated for this analysis.")

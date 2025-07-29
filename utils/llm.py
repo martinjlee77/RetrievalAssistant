@@ -163,10 +163,10 @@ def create_debug_sidebar():
         
         max_tokens = st.slider(
             "Max Tokens",
-            min_value=100,
-            max_value=4000,
-            value=2000,
-            step=100,
+            min_value=1000,
+            max_value=8192,
+            value=4096,
+            step=256,
             help="Maximum response length"
         )
         
