@@ -167,8 +167,8 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             border: 1px solid #dee2e6; /* Light professional border */
             /* Removed left border line as requested */
             border-radius: 3px; /* Minimal rounded corners */
-            padding: 8pt 12pt; /* Tighter top/bottom padding, keep left/right */
-            margin: 12pt 0; /* Reduced margin for tighter appearance */
+            padding: 4pt 8pt; /* Much tighter padding - reduced from 8pt 12pt */
+            margin: 8pt 0; /* Reduced margin for tighter appearance */
         }}
         
         .citation {{
