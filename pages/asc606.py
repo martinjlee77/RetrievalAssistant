@@ -32,6 +32,280 @@ def format_dict_as_markdown(data: dict) -> str:
     return markdown_str
 
 
+def render_tab1_contract_details() -> dict:
+    """Render Tab 1: Contract details and document upload"""
+    st.subheader(":material/contract: Enter Key Contract Details")
+    
+    col1, col2 = st.columns(2, gap="small")
+    with col1:
+        analysis_title = st.text_input(
+            "Analysis Title *",
+            placeholder="e.g., Q4 Project Phoenix SOW",
+            help="A unique name to identify this contract analysis.")
+    with col2:
+        customer_name = st.text_input(
+            "Customer Name *",
+            placeholder="e.g., ABC Corporation",
+            help="The name of the customer or end user of the goods or services provided.")
+    
+    col3, col4 = st.columns(2, gap="small")
+    with col3:
+        contract_types = st.multiselect(
+            "Contract Document Types Included *", [
+                "Online Terms and Conditions",
+                "Master Services Agreement (MSA)",
+                "Statement of Work (SOW)",
+                "Software as a Service (SaaS) Agreement",
+                "Software License Agreement",
+                "Professional Services Agreement",
+                "Sales Order / Order Form", "Purchase Order (PO)",
+                "Contract Amendment / Addendum", "Change Order",
+                "Reseller / Partner Agreement", "Invoice", "Other"
+            ],
+            help="Select all document types that are part of this analysis.")
+    with col4:
+        currency = st.selectbox(
+            "Currency *",
+            ["USD", "EUR", "GBP", "CAD", "AUD", "KRW", "JPY", "Other"],
+            help="Primary currency for the contract")
+    
+    col5, col6 = st.columns(2, gap="small")
+    with col5:
+        contract_start = st.date_input(
+            "Contract Start Date *",
+            help="The effective start date of the contractual period being analyzed.")
+    with col6:
+        contract_end = st.date_input(
+            "Contract End Date *",
+            help="The effective end date of the contractual period being analyzed.")
+    
+    arrangement_description = st.text_area(
+        "Overall Arrangement Summary (Optional)",
+        placeholder='e.g., "New 3-year SaaS license with one-time setup fee."',
+        height=100,
+        help="Provide a one-sentence summary of the deal. This gives the AI crucial high-level context before it analyzes the details.")
+    
+    st.subheader(":material/upload_file: Upload Documents")
+    uploaded_files = st.file_uploader(
+        "Upload All Related Contract Documents *",
+        type=['pdf', 'docx', 'txt'],
+        accept_multiple_files=True,
+        help="Crucial: Upload the complete set of related documents for this arrangement. Missing documents can lead to incomplete or inaccurate results.")
+    
+    st.markdown("---")
+    with st.container(border=True):
+        st.info("Once the fields above are complete, continue to the **2️⃣ Provide Context** tab.")
+    
+    return {
+        "analysis_title": analysis_title,
+        "customer_name": customer_name,
+        "contract_types": contract_types,
+        "currency": currency,
+        "contract_start": contract_start,
+        "contract_end": contract_end,
+        "arrangement_description": arrangement_description,
+        "uploaded_files": uploaded_files
+    }
+
+
+def render_tab2_asc606_assessment() -> dict:
+    """Render Tab 2: ASC 606 specific assessment questions"""
+    st.subheader(":material/question_answer: Provide Key Considerations for 5-Step Model")
+    st.write("Your answers address key areas of judgment and provide crucial context for the AI.")
+
+    # Initialize all optional detail variables to None to prevent errors
+    original_contract_uploaded = None
+    principal_agent_details = None
+    variable_consideration_details = None
+    financing_component_details = None
+    noncash_consideration_details = None
+    consideration_payable_details = None
+
+    with st.expander("**Step 1: Identify the Contract (required)**", expanded=True):
+        col1, col2 = st.columns(2, gap="medium")
+        with col1:
+            collectibility = st.toggle(
+                "Collectibility is probable *",
+                value=True,
+                help="A contract does not exist under ASC 606 if collection is not probable.")
+            is_modification = st.toggle(
+                "This is a contract modification *",
+                value=False,
+                help="Select if this is an amendment, addendum, or change order that modifies an existing contract.")
+        with col2:
+            is_combined_contract = st.toggle(
+                "Evaluate docs as one contract? *",
+                value=True,
+                help="Per ASC 606-10-25-9, contracts entered into at or near the same time with the same customer should be combined if certain criteria are met. Select if these documents should be treated as a single accounting contract.")
+            original_contract_uploaded = st.toggle(
+                "Is the original contract uploaded? *",
+                value=False,
+                disabled=not is_modification)
+
+    with st.expander("**Step 2: Identify Performance Obligations (optional)**"):
+        st.info("The AI will analyze the contract(s) to identify distinct goods or services.", icon="🤖")
+        principal_agent_involved = st.toggle(
+            "Is a third party involved in providing goods or services?",
+            help="Select if another party is involved in providing the goods or services to your end customer (e.g., you are reselling another company's product).")
+        if principal_agent_involved:
+            principal_agent_details = st.text_area(
+                "Describe the arrangement and specify who controls the good/service:",
+                placeholder="e.g., We are an agent for Party X's software...",
+                label_visibility="collapsed")
+
+    with st.expander("**Step 3: Determine the Transaction Price (optional)**"):
+        col3, col4 = st.columns(2, gap="medium")
+        with col3:
+            variable_consideration_involved = st.toggle(
+                "Is there variable consideration?",
+                help="Variable consideration includes bonuses, penalties, discounts, rebates, refunds, credits, incentives, performance bonuses, or other similar items.")
+            financing_component_involved = st.toggle(
+                "Is there a significant financing component?",
+                help="This occurs when the timing of payments provides the customer or the entity with a significant benefit of financing.")
+        with col4:
+            noncash_consideration_involved = st.toggle(
+                "Is there noncash consideration?",
+                help="Noncash consideration includes goods, services, or other noncash items that a customer contributes.")
+            consideration_payable_involved = st.toggle(
+                "Is consideration payable to customer?",
+                help="This includes payments to the customer (or parties that purchase from the customer) such as coupons, vouchers, or credits.")
+
+        # Conditional text areas for Step 3
+        if variable_consideration_involved:
+            variable_consideration_details = st.text_area(
+                "Details on variable consideration:",
+                placeholder="e.g., 20% performance bonus if project completed early.",
+                label_visibility="collapsed")
+        if financing_component_involved:
+            financing_component_details = st.text_area(
+                "Details on financing component:",
+                placeholder="e.g., Customer pays upfront for a 3-year service.",
+                label_visibility="collapsed")
+        if noncash_consideration_involved:
+            noncash_consideration_details = st.text_area(
+                "Details on noncash consideration:",
+                placeholder="e.g., Customer provides equipment valued at $50K.",
+                label_visibility="collapsed")
+        if consideration_payable_involved:
+            consideration_payable_details = st.text_area(
+                "Details on consideration payable:",
+                placeholder="e.g., Customer receives a $5,000 credit for marketing.",
+                label_visibility="collapsed")
+
+    with st.expander("**Step 4: Allocate the Transaction Price**"):
+        ssp_represents_contract_price = st.toggle(
+            "Do contract prices represent Standalone Selling Price (SSP)?",
+            value=True,
+            help="SSP is the price at which you would sell a good or service separately.")
+
+    with st.expander("**Step 5: Recognize Revenue**"):
+        revenue_recognition_timing_details = st.text_area(
+            "Describe when control transfers for each major performance obligation:",
+            placeholder="e.g., Software license delivered upfront; support services provided evenly over 12 months.")
+
+    st.markdown("---")
+    st.info("Continue to the **3️⃣ Generate the Memo** tab.")
+
+    return {
+        "collectibility": collectibility,
+        "is_combined_contract": is_combined_contract,
+        "is_modification": is_modification,
+        "original_contract_uploaded": original_contract_uploaded,
+        "principal_agent_involved": principal_agent_involved,
+        "principal_agent_details": principal_agent_details,
+        "variable_consideration_involved": variable_consideration_involved,
+        "variable_consideration_details": variable_consideration_details,
+        "financing_component_involved": financing_component_involved,
+        "financing_component_details": financing_component_details,
+        "noncash_consideration_involved": noncash_consideration_involved,
+        "noncash_consideration_details": noncash_consideration_details,
+        "consideration_payable_involved": consideration_payable_involved,
+        "consideration_payable_details": consideration_payable_details,
+        "ssp_represents_contract_price": ssp_represents_contract_price,
+        "revenue_recognition_timing_details": revenue_recognition_timing_details
+    }
+
+
+def render_tab3_analysis_config() -> dict:
+    """Render Tab 3: Analysis focus and audience configuration"""
+    # Define the detailed help text as a constant for clarity
+    AUDIENCE_HELP_TEXT = """
+    Select the primary audience for the final memo. This adjusts the tone, focus, and level of technical detail. The underlying five-step analysis remains comprehensive for all options.
+
+    • **Technical Accounting Team / Audit File (Default):**
+      - **Focus:** Deep technical compliance and audit readiness.
+      - **Content:** Assumes expert knowledge. Includes detailed step-by-step reasoning, direct quotations from ASC 606, and precise citations (e.g., ASC 606-10-55-34). This is the most detailed and formal output, suitable for internal accounting records and external auditors.
+
+    • **Management Review:**
+      - **Focus:** Key judgments, financial impact, and business implications.
+      - **Content:** Summarizes critical conclusions upfront. Uses less technical jargon and focuses on the "so what" for decision-makers like the CFO or Controller. It answers questions like, "How does this contract affect our revenue forecast?"
+
+    • **Deal Desk / Sales Team:**
+      - **Focus:** Explaining the revenue recognition impact of specific contract terms.
+      - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
+    """
+
+    st.subheader(":material/grading: Set Analysis Focus & Audience")
+    st.write("Finalize your analysis by providing optional focus areas and audience preferences before generating the memo.")
+
+    # Key Focus Areas - The most important steering input
+    key_focus_areas = st.text_area(
+        "Key Focus Areas / Specific Questions (Optional)",
+        placeholder=("Example: 'The main uncertainty is whether the implementation services are distinct from the "
+                     "SaaS license. Please analyze this thoroughly, referencing the criteria in ASC 606-10-25-21.'"),
+        height=100,
+        help="Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis.")
+
+    col1, col2 = st.columns(2, gap="small")
+    with col1:
+        memo_audience = st.selectbox(
+            "Tailor Memo for Audience (Optional)",
+            ["Technical Accounting Team / Audit File", "Management Review", "Deal Desk / Sales Team"],
+            index=0,  # Default to the most comprehensive option
+            help=AUDIENCE_HELP_TEXT)
+
+    with col2:
+        # Materiality Threshold for financial significance
+        materiality_threshold = st.number_input(
+            "Materiality Threshold (Optional)",
+            min_value=0,
+            value=1000,
+            step=1000,
+            help="The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly.")
+
+    return {
+        "key_focus_areas": key_focus_areas,
+        "memo_audience": memo_audience,
+        "materiality_threshold": materiality_threshold
+    }
+
+
+def validate_form_data(tab1_data: dict, tab2_data: dict) -> list:
+    """Validate required fields from all tabs"""
+    errors = []
+    
+    # Tab 1 validations
+    if not tab1_data["analysis_title"]:
+        errors.append("Analysis Title is required (Tab 1).")
+    if not tab1_data["customer_name"]:
+        errors.append("Customer Name is required (Tab 1).")
+    if not tab1_data["contract_types"]:
+        errors.append("At least one Document Type must be selected (Tab 1).")
+    if not tab1_data["currency"]:
+        errors.append("Currency is required (Tab 1).")
+    if tab1_data["contract_start"] and tab1_data["contract_end"]:
+        if tab1_data["contract_end"] < tab1_data["contract_start"]:
+            errors.append("Contract End Date cannot be before the Contract Start Date (Tab 1).")
+    if not tab1_data["uploaded_files"]:
+        errors.append("At least one document must be uploaded (Tab 1).")
+
+    # Tab 2 validations
+    if tab2_data["is_modification"] and tab2_data["original_contract_uploaded"] is None:
+        errors.append("When 'This is a contract modification' is on, you must also specify if the original contract is uploaded (Tab 2).")
+
+    return errors
+
+
 # Initialize session state
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
@@ -59,7 +333,7 @@ st.write(
 
 debug_config = create_debug_sidebar()
 
-# Main application logic
+# Main application logic - refactored with dedicated tab functions
 if st.session_state.analysis_results is None:
 
     tab1, tab2, tab3 = st.tabs([
@@ -67,327 +341,52 @@ if st.session_state.analysis_results is None:
         "**3️⃣ Generate the Memo**"
     ])
 
+    # Render each tab using dedicated functions for cleaner architecture
     with tab1:
-        st.subheader(":material/contract: Enter Key Contract Details")
-        col1, col2 = st.columns(2, gap="small")
-        with col1:
-            analysis_title = st.text_input(
-                "Analysis Title *",
-                placeholder="e.g., Q4 Project Phoenix SOW",
-                help="A unique name to identify this contract analysis.")
-        with col2:
-            customer_name = st.text_input(
-                "Customer Name *",
-                placeholder="e.g., ABC Corporation",
-                help=
-                "The name of the customer or end user of the goods or services provided."
-            )
-        col3, col4 = st.columns(2, gap="small")
-        with col3:
-            contract_types = st.multiselect(
-                "Contract Document Types Included *", [
-                    "Online Terms and Conditions",
-                    "Master Services Agreement (MSA)",
-                    "Statement of Work (SOW)",
-                    "Software as a Service (SaaS) Agreement",
-                    "Software License Agreement",
-                    "Professional Services Agreement",
-                    "Sales Order / Order Form", "Purchase Order (PO)",
-                    "Contract Amendment / Addendum", "Change Order",
-                    "Reseller / Partner Agreement", "Invoice", "Other"
-                ],
-                help="Select all document types that are part of this analysis."
-            )
-        with col4:
-            currency = st.selectbox(
-                "Currency *",
-                ["USD", "EUR", "GBP", "CAD", "AUD", "KRW", "JPY", "Other"],
-                help="Primary currency for the contract")
-        col5, col6 = st.columns(2, gap="small")
-        with col5:
-            contract_start = st.date_input(
-                "Contract Start Date *",
-                help=
-                "The effective start date of the contractual period being analyzed."
-            )
-        with col6:
-            contract_end = st.date_input(
-                "Contract End Date *",
-                help=
-                "The effective end date of the contractual period being analyzed."
-            )
-        arrangement_description = st.text_area(
-            "Overall Arrangement Summary (Optional)",
-            placeholder=
-            'e.g., "New 3-year SaaS license with one-time setup fee."',
-            height=100,
-            help=
-            "Provide a one-sentence summary of the deal. This gives the AI crucial high-level context before it analyzes the details."
-        )
-        st.subheader(":material/upload_file: Upload Documents")
-        uploaded_files = st.file_uploader(
-            "Upload All Related Contract Documents *",
-            type=['pdf', 'docx', 'txt'],
-            accept_multiple_files=True,
-            help=
-            "Crucial: Upload the complete set of related documents for this arrangement. Missing documents can lead to incomplete or inaccurate results."
-        )
-        st.markdown("---")
-        with st.container(border=True):
-            st.info(
-                "Once the fields above are complete, continue to the **2️⃣ Provide Context** tab."
-            )
+        tab1_data = render_tab1_contract_details()
 
-    # Tab 2: Analysis Questions
     with tab2:
-        st.subheader(
-            ":material/question_answer: Provide Key Considerations for 5-Step Model"
-        )
-        st.write(
-            "Your answers address key areas of judgment and provide crucial context for the AI."
-        )
+        tab2_data = render_tab2_asc606_assessment()
 
-        # Initialize all optional detail variables to None to prevent errors
-        original_contract_uploaded = None
-        principal_agent_details = None
-        variable_consideration_details = None
-        financing_component_details = None
-        noncash_consideration_details = None
-        consideration_payable_details = None
-
-        with st.expander("**Step 1: Identify the Contract (required)**",
-                         expanded=True):
-            col1, col2 = st.columns(2, gap="medium")
-            with col1:
-                collectibility = st.toggle(
-                    "Collectibility is probable *",
-                    value=True,
-                    help=
-                    "A contract does not exist under ASC 606 if collection is not probable."
-                )
-                is_modification = st.toggle(
-                    "This is a contract modification *",
-                    value=False,
-                    help=
-                    "Select if this is an amendment, addendum, or change order that modifies an existing contract."
-                )
-            with col2:
-                is_combined_contract = st.toggle(
-                    "Evaluate docs as one contract? *",
-                    value=True,
-                    help=
-                    "Per ASC 606-10-25-9, contracts entered into at or near the same time with the same customer should be combined if certain criteria are met. Select if these documents should be treated as a single accounting contract."
-                )
-                original_contract_uploaded = st.toggle(
-                    "Is the original contract uploaded? *",
-                    value=False,
-                    disabled=not is_modification)
-
-        with st.expander(
-                "**Step 2: Identify Performance Obligations (optional)**"):
-            st.info(
-                "The AI will analyze the contract(s) to identify distinct goods or services.",
-                icon="🤖")
-            principal_agent_involved = st.toggle(
-                "Is a third party involved in providing goods or services?",
-                help=
-                "Select if another party is involved in providing the goods or services to your end customer (e.g., you are reselling another company's product)."
-            )
-            if principal_agent_involved:
-                principal_agent_details = st.text_area(
-                    "Describe the arrangement and specify who controls the good/service:",
-                    placeholder=
-                    "e.g., We are an agent for Party X's software...",
-                    label_visibility="collapsed")
-
-        with st.expander(
-                "**Step 3: Determine the Transaction Price (optional)**"):
-            col3, col4 = st.columns(2, gap="medium")
-            with col3:
-                variable_consideration_involved = st.toggle(
-                    "Includes variable consideration?")
-                noncash_consideration_involved = st.toggle(
-                    "Includes noncash consideration?")
-            with col4:
-                financing_component_involved = st.toggle(
-                    "Includes significant financing?")
-                consideration_payable_involved = st.toggle(
-                    "Includes consideration payable?")
-
-            if variable_consideration_involved:
-                variable_consideration_details = st.text_area(
-                    "Details on variable consideration:",
-                    placeholder="e.g., A $10,000 bonus is 90% probable.",
-                    label_visibility="collapsed")
-            if financing_component_involved:
-                financing_component_details = st.text_area(
-                    "Details on financing component:",
-                    placeholder=
-                    "e.g., Customer pays upfront for a 3-year service.",
-                    label_visibility="collapsed")
-            if noncash_consideration_involved:
-                noncash_consideration_details = st.text_area(
-                    "Details on noncash consideration:",
-                    placeholder=
-                    "e.g., Customer provides equipment valued at $50K.",
-                    label_visibility="collapsed")
-            if consideration_payable_involved:
-                consideration_payable_details = st.text_area(
-                    "Details on consideration payable:",
-                    placeholder=
-                    "e.g., Customer receives a $5,000 credit for marketing.",
-                    label_visibility="collapsed")
-
-        with st.expander("**Step 4: Allocate the Transaction Price**"):
-            ssp_represents_contract_price = st.toggle(
-                "Do contract prices represent Standalone Selling Price (SSP)?",
-                value=True,
-                help=
-                "SSP is the price at which you would sell a good or service separately."
-            )
-
-        with st.expander("**Step 5: Recognize Revenue**"):
-            revenue_recognition_timing_details = st.text_area(
-                "Describe when control transfers for each major performance obligation:",
-                placeholder=
-                "e.g., Software license delivered upfront; support services provided evenly over 12 months."
-            )
-
-        st.markdown("---")
-        st.info("Continue to the **3️⃣ Generate the Memo** tab.")
-
-    # Tab 3: Analysis Configuration and Execution
     with tab3:
-        # Define the detailed help text as a constant for clarity
-        AUDIENCE_HELP_TEXT = """
-        Select the primary audience for the final memo. This adjusts the tone, focus, and level of technical detail. The underlying five-step analysis remains comprehensive for all options.
+        tab3_data = render_tab3_analysis_config()
 
-        • **Technical Accounting Team / Audit File (Default):**
-          - **Focus:** Deep technical compliance and audit readiness.
-          - **Content:** Assumes expert knowledge. Includes detailed step-by-step reasoning, direct quotations from ASC 606, and precise citations (e.g., ASC 606-10-55-34). This is the most detailed and formal output, suitable for internal accounting records and external auditors.
-
-        • **Management Review:**
-          - **Focus:** Key judgments, financial impact, and business implications.
-          - **Content:** Summarizes critical conclusions upfront. Uses less technical jargon and focuses on the "so what" for decision-makers like the CFO or Controller. It answers questions like, "How does this contract affect our revenue forecast?"
-
-        • **Deal Desk / Sales Team:**
-          - **Focus:** Explaining the revenue recognition impact of specific contract terms.
-          - **Content:** Translates complex accounting rules into practical guidance for teams structuring deals. It helps them understand how different clauses (e.g., acceptance terms, payment timing) can accelerate or defer revenue, enabling them to negotiate more effectively.
-        """
-
-        st.subheader(":material/grading: Set Analysis Focus & Audience")
-        st.write(
-            "Finalize your analysis by providing optional focus areas and audience preferences before generating the memo."
-        )
-
-        # Key Focus Areas - The most important steering input
-        key_focus_areas = st.text_area(
-            "Key Focus Areas / Specific Questions (Optional)",
-            placeholder=
-            ("Example: 'The main uncertainty is whether the implementation services are distinct from the "
-             "SaaS license. Please analyze this thoroughly, referencing the criteria in ASC 606-10-25-21.'"
-             ),
-            height=100,
-            help=
-            "Direct the AI to analyze specific clauses, risks, or uncertainties you have identified. This is the most effective way to improve the analysis."
-        )
-
-        col1, col2 = st.columns(2, gap="small")
-        with col1:
-            memo_audience = st.selectbox(
-                "Tailor Memo for Audience (Optional)",
-                [
-                    "Technical Accounting Team / Audit File",
-                    "Management Review", "Deal Desk / Sales Team"
-                ],
-                index=0,  # Default to the most comprehensive option
-                help=AUDIENCE_HELP_TEXT)
-
-        with col2:
-            # Materiality Threshold for financial significance
-            materiality_threshold = st.number_input(
-                "Materiality Threshold (Optional)",
-                min_value=0,
-                value=1000,
-                step=1000,
-                help=
-                "The AI will use this to assess the financial significance of contract elements like bonuses, penalties, or discounts, and focus its commentary accordingly."
-            )
-
-        def validate_form():
-            """Validate required fields from Tab 1"""
-            errors = []
-            if not analysis_title:
-                errors.append("Analysis Title is required (Tab 1).")
-            if not customer_name:
-                errors.append("Customer Name is required (Tab 1).")
-            if not contract_types:
-                errors.append(
-                    "At least one Document Type must be selected (Tab 1).")
-            if not currency: errors.append("Currency is required (Tab 1).")
-            # Contract dates are now optional
-            # if not contract_start:
-            #     errors.append("Contract Start Date is required (Tab 1).")
-            # if not contract_end:
-            #     errors.append("Contract End Date is required (Tab 1).")
-            if contract_start and contract_end:
-                if contract_end < contract_start:
-                    errors.append(
-                        "Contract End Date cannot be before the Contract Start Date (Tab 1)."
-                    )
-            if not uploaded_files:
-                errors.append(
-                    "At least one document must be uploaded (Tab 1).")
-
-            # Tab 2 fields are now optional - only validate if modification requires original contract
-            if is_modification and original_contract_uploaded is None:
-                errors.append(
-                    "When 'This is a contract modification' is on, you must also specify if the original contract is uploaded (Tab 2)."
-                )
-
-            return errors
-
+        # Validate form data using the new validation function
+        validation_errors = validate_form_data(tab1_data, tab2_data)
+        
         st.markdown("---")
 
-        if st.button("📝 Generate the Memo",
-                     use_container_width=True,
-                     type="primary"):
-            validation_errors = validate_form()
+        if st.button("📝 Generate the Memo", use_container_width=True, type="primary"):
             if validation_errors:
                 st.error("Please fix the following issues before submitting:")
                 [st.warning(f"• {e}") for e in validation_errors]
                 st.stop()
 
+            # Continue with analysis workflow (this would connect to the existing analysis logic)
             with st.status("🔍 Analyzing contract...", expanded=True) as status:
                 try:
+                    # Merge all form data for processing  
+                    all_form_data = {**tab1_data, **tab2_data, **tab3_data}
+                    
                     # Enhanced text extraction with fail-safe policy
-                    st.write(
-                        "📄 Verifying and extracting text from documents...")
+                    st.write("📄 Verifying and extracting text from documents...")
                     all_extracted_text = []
                     failed_files = []
 
-                    for f in uploaded_files:
+                    for f in all_form_data["uploaded_files"]:
                         try:
                             extraction_result = extractor.extract_text(f)
-                            # Check if the extraction returned a valid result with actual text
-                            if extraction_result and extraction_result.get(
-                                    'text'):
-                                all_extracted_text.append(
-                                    extraction_result['text'])
+                            if extraction_result and extraction_result.get('text'):
+                                all_extracted_text.append(extraction_result['text'])
                             else:
-                                # The file was processed but no text was found (e.g., a scanned image PDF)
                                 failed_files.append(f.name)
                         except Exception:
-                            # The extractor itself threw an error (e.g., corrupted or password-protected file)
                             failed_files.append(f.name)
 
                     # Check for failures and decide whether to continue or stop
                     if failed_files:
-                        successful_files = len(uploaded_files) - len(
-                            failed_files)
-
+                        successful_files = len(all_form_data["uploaded_files"]) - len(failed_files)
                         if successful_files == 0:
-                            # All files failed - stop the analysis
                             error_message = (
                                 f"**Text extraction failed for all uploaded file(s):**\n"
                                 f"- `{'`, `'.join(failed_files)}`\n\n"
@@ -397,9 +396,8 @@ if st.session_state.analysis_results is None:
                                 "- The file is corrupted or in an unsupported format."
                             )
                             st.error(error_message, icon="🚨")
-                            st.stop()  # Immediately halt the analysis
+                            st.stop()
                         else:
-                            # Some files worked - show warning but continue
                             warning_message = (
                                 f"⚠️ **Warning:** Text extraction failed for {len(failed_files)} file(s): `{'`, `'.join(failed_files)}`\n\n"
                                 f"**Continuing analysis with {successful_files} successful file(s).** "
@@ -407,80 +405,60 @@ if st.session_state.analysis_results is None:
                             )
                             st.warning(warning_message, icon="⚠️")
 
-                    # This part only runs if all files were successful
-                    combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(
-                        all_extracted_text)
+                    combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
 
-                    st.write("🧠 Processing your answers and guidance...")
-
-                    # Create the ContractData object with the new steering fields
+                    # Create ContractData object from all form data
                     contract_data = ContractData(
-                        analysis_title=analysis_title,
-                        customer_name=customer_name,
-                        arrangement_description=arrangement_description,
-                        contract_start=contract_start,
-                        contract_end=contract_end,
-                        currency=currency or "USD",
-                        uploaded_file_name=", ".join(
-                            [f.name for f in uploaded_files]),
-                        contract_types=contract_types or [],
+                        analysis_title=all_form_data.get("analysis_title", ""),
+                        customer_name=all_form_data.get("customer_name", ""),
+                        arrangement_description=all_form_data.get("arrangement_description", ""),
+                        contract_start=all_form_data.get("contract_start"),
+                        contract_end=all_form_data.get("contract_end"),
+                        currency=all_form_data.get("currency", "USD"),
+                        uploaded_file_name=", ".join([f.name for f in all_form_data["uploaded_files"]]),
+                        contract_types=all_form_data.get("contract_types", []),
                         # New steering fields from Tab 3
-                        key_focus_areas=key_focus_areas,
-                        memo_audience=memo_audience,
-                        materiality_threshold=materiality_threshold,
+                        key_focus_areas=all_form_data.get("key_focus_areas", ""),
+                        memo_audience=all_form_data.get("memo_audience", "Technical Accounting Team / Audit File"),
+                        materiality_threshold=all_form_data.get("materiality_threshold", 1000),
                         # All data from Tab 2
-                        collectibility=collectibility,
-                        is_combined_contract=is_combined_contract,
-                        is_modification=is_modification,
-                        original_contract_uploaded=original_contract_uploaded,
-                        principal_agent_involved=principal_agent_involved,
-                        principal_agent_details=principal_agent_details,
-                        variable_consideration_involved=
-                        variable_consideration_involved,
-                        variable_consideration_details=
-                        variable_consideration_details,
-                        financing_component_involved=
-                        financing_component_involved,
-                        financing_component_details=financing_component_details,
-                        noncash_consideration_involved=
-                        noncash_consideration_involved,
-                        noncash_consideration_details=
-                        noncash_consideration_details,
-                        consideration_payable_involved=
-                        consideration_payable_involved,
-                        consideration_payable_details=
-                        consideration_payable_details,
-                        ssp_represents_contract_price=
-                        ssp_represents_contract_price,
-                        revenue_recognition_timing_details=
-                        revenue_recognition_timing_details)
+                        collectibility=all_form_data.get("collectibility", True),
+                        is_combined_contract=all_form_data.get("is_combined_contract", True),
+                        is_modification=all_form_data.get("is_modification", False),
+                        original_contract_uploaded=all_form_data.get("original_contract_uploaded"),
+                        principal_agent_involved=all_form_data.get("principal_agent_involved", False),
+                        principal_agent_details=all_form_data.get("principal_agent_details"),
+                        variable_consideration_involved=all_form_data.get("variable_consideration_involved", False),
+                        variable_consideration_details=all_form_data.get("variable_consideration_details"),
+                        financing_component_involved=all_form_data.get("financing_component_involved", False),
+                        financing_component_details=all_form_data.get("financing_component_details"),
+                        noncash_consideration_involved=all_form_data.get("noncash_consideration_involved", False),
+                        noncash_consideration_details=all_form_data.get("noncash_consideration_details"),
+                        consideration_payable_involved=all_form_data.get("consideration_payable_involved", False),
+                        consideration_payable_details=all_form_data.get("consideration_payable_details"),
+                        ssp_represents_contract_price=all_form_data.get("ssp_represents_contract_price", True),
+                        revenue_recognition_timing_details=all_form_data.get("revenue_recognition_timing_details", "")
+                    )
 
                     st.write("⚡ Running AI analysis...")
-                    analysis_results = analyzer.analyze_contract(
-                        combined_text,
-                        contract_data,
-                        debug_config=debug_config)
+                    analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
                     st.session_state.analysis_results = analysis_results
                     st.session_state.contract_data = contract_data
-                    status.update(label="✅ Analysis complete!",
-                                  state="complete")
+                    status.update(label="✅ Analysis complete!", state="complete")
                     time.sleep(1)
                     st.rerun()
 
                 except Exception as e:
-                    st.error(
-                        "An unexpected error occurred during the analysis. Please try again. "
-                        "If the problem persists, please contact support.")
-
+                    st.error("An unexpected error occurred during the analysis. Please try again. "
+                            "If the problem persists, please contact support.")
                     # Only show the full technical error if debug mode is on
                     if debug_config.get("show_raw_response", False):
                         st.subheader("🔧 Technical Error Details")
                         st.exception(e)
-                    # Always stop after an error, regardless of debug mode
                     st.stop()
 
 else:
-    # Display results
+    # Display results (existing results display code would go here)
     analysis_results = st.session_state.analysis_results
     contract_data = st.session_state.contract_data
 
@@ -502,93 +480,63 @@ else:
     # Professional memo with enhanced display
     st.markdown("---")
     st.subheader("📋 ASC 606 Accounting Memo")
-    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(
-        analysis_results, 'professional_memo', None)
+    memo = getattr(analysis_results, 'five_step_analysis', None) or getattr(analysis_results, 'professional_memo', None)
     if memo:
         # Import HTML export functions
         from utils.html_export import enhance_markdown_for_display, convert_memo_to_html, create_pdf_from_html
 
         with st.container(border=True):
             st.markdown("**📋 Memo Downloads**")
-            st.write(
-                "Your ASC 606 revenue contract review is complete. Download in your preferred format:"
-            )
+            st.write("Your ASC 606 revenue contract review is complete. Download in your preferred format:")
 
             # Create columns for the download buttons
-            dl_col1, dl_col2, dl_col3 = st.columns(3)
-
-            with dl_col1:
-                analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
-                st.download_button(
-                    label="📄 Download DOCX",
-                    data=create_docx_from_text(memo,
-                                               contract_data=contract_data),
-                    file_name=
-                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
-                    mime=
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True)
-
-            with dl_col2:
-                # HTML Download with professional styling
-                html_content = convert_memo_to_html(
-                    memo, contract_data.__dict__ if contract_data else None)
-                st.download_button(
-                    label="🌐 Download HTML",
-                    data=html_content.encode('utf-8'),
-                    file_name=
-                    f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
-                    mime="text/html",
-                    use_container_width=True,
-                    help="HTML version - opens perfectly in any browser")
-
-            with dl_col3:
-                # PDF Download with WeasyPrint)
+            col1, col2, col3 = st.columns(3, gap="small")
+            
+            with col1:
+                # DOCX Export
                 try:
-                    pdf_bytes = create_pdf_from_html(html_content)
+                    docx_content = create_docx_from_text(memo)
                     st.download_button(
-                        label="📋 Download PDF",
-                        data=pdf_bytes,
-                        file_name=
-                        f"{analysis_title.replace(' ', '_')}_ASC606_Memo.pdf",
-                        mime="application/pdf",
-                        use_container_width=True,
-                        help=
-                        "High-quality PDF generated from HTML - perfect formatting"
+                        label="📄 Download DOCX",
+                        data=docx_content,
+                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True
                     )
                 except Exception as e:
-                    st.button("📋 PDF Error",
-                              disabled=True,
-                              use_container_width=True)
-                    st.caption(f"PDF generation failed: {str(e)[:50]}...")
+                    st.error(f"Error generating DOCX: {str(e)}")
+
+            with col2:
+                # HTML Export
+                try:
+                    html_content = convert_memo_to_html(memo, contract_data)
+                    st.download_button(
+                        label="🌐 Download HTML",
+                        data=html_content,
+                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.html",
+                        mime="text/html",
+                        use_container_width=True
+                    )
+                except Exception as e:
+                    st.error(f"Error generating HTML: {str(e)}")
+
+            with col3:
+                # PDF Export
+                try:
+                    html_content = convert_memo_to_html(memo, contract_data)
+                    pdf_content = create_pdf_from_html(html_content)
+                    st.download_button(
+                        label="📋 Download PDF",
+                        data=pdf_content,
+                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.pdf",
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                except Exception as e:
+                    st.error(f"Error generating PDF: {str(e)}")
+
+        # Display enhanced memo
+        enhanced_memo = enhance_markdown_for_display(memo)
+        st.markdown(enhanced_memo, unsafe_allow_html=True)
     else:
-        st.info("No memo generated for this analysis.")
-
-    # Additional sections for comprehensive results
-    if debug_config.get("show_raw_response", False):
-        st.markdown("---")
-        st.subheader("🔧 Debug Information")
-        st.json(analysis_results.__dict__ if hasattr(
-            analysis_results, '__dict__') else str(analysis_results))
-
-    # Citations and guidance
-    if hasattr(analysis_results, 'citations') and analysis_results.citations:
-        st.markdown("---")
-        st.subheader("📚 Citations")
-        for citation in analysis_results.citations:
-            st.write(f"• {citation}")
-
-    if hasattr(analysis_results, 'implementation_guidance'
-               ) and analysis_results.implementation_guidance:
-        st.markdown("---")
-        st.subheader("💡 Implementation Guidance")
-        for guidance in analysis_results.implementation_guidance:
-            st.write(f"• {guidance}")
-
-    if hasattr(
-            analysis_results,
-            'not_applicable_items') and analysis_results.not_applicable_items:
-        st.markdown("---")
-        st.subheader("❌ Not Applicable Items")
-        for item in analysis_results.not_applicable_items:
-            st.write(f"• {item}")
+        st.error("No memo content available to display.")
