@@ -56,15 +56,15 @@ def get_style_config() -> Dict[str, str]:
     """
     return {
         'font_family': 'Times New Roman',
-        'font_size': '12pt',
+        'font_size': '11pt',
         'page_width': '8.5in',
         'margins': '1in',
         'primary_color': '#000000',
         'secondary_color': '#666666',
         'border_color': '#000000',
         'line_height': '1.6',
-        'header_size': '16pt',
-        'subheader_size': '14pt'
+        'header_size': '14pt',
+        'subheader_size': '12pt'
     }
 
 def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = None) -> str:

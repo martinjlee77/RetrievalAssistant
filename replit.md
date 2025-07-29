@@ -97,6 +97,11 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Professional Typography**: Custom heading styles with Times New Roman, proper spacing, and Big 4 color scheme
 - ✅ **Contract Table Support**: Automatic detection and formatting of contract overview tables
 - ✅ **HTML Parity**: DOCX output now closely matches the professional structure and formatting of HTML version
+- ✅ **CRITICAL MEMO FORMATTING FIXES**: Addressed all four user-identified issues for production quality
+- ✅ **Documents Reviewed List**: Added automatic listing of uploaded documents on first page of memo
+- ✅ **Enhanced Citation Sources**: Citations now include document names and section references for audit trail
+- ✅ **PDF Font Size Correction**: Reduced PDF font sizes to match HTML version (11pt body, 14pt headers)
+- ✅ **Improved Source Quality Calculation**: Now based only on authoritative sources (FASB + EY guidance), not general knowledge
 - ✅ **COMPREHENSIVE DATA FLOW AUDIT & FIXES**: Conducted systematic review and resolved all sloppy implementation issues
 - ✅ **Fixed RAG Context Injection**: RAG results now inject properly BEFORE guidance section, not after prompt
 - ✅ **Enhanced EY Citation System**: Added source categorization to distinguish ASC 606 vs EY interpretative guidance

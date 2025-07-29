@@ -78,12 +78,12 @@ You are a senior technical accountant from a Big 4 firm performing detailed ASC 
 3. **EXTENSIVE ASC 606 CITATION REQUIREMENT:**
    - You MUST cite and quote the full text of relevant ASC 606 paragraphs
    - Do not just reference paragraph numbers - include the actual standard language
-   - Use [CITATION]ASC 606-XX-XX-X: "Full text of the standard..."[/CITATION] format
+   - Use [CITATION]ASC 606-XX-XX-X: "Full text of the standard..." - Source: ASC 606 Standard, Section XX[/CITATION] format
 
 4. **EXTENSIVE EY GUIDANCE CITATION REQUIREMENT:**
    - You MUST cite and quote relevant EY interpretative guidance when available
    - Include specific EY publication references and full text quotes
-   - Use [CITATION]EY Guidance: "Full text from EY publication..."[/CITATION] format
+   - Use [CITATION]EY Guidance: "Full text from EY publication..." - Source: EY FRDBB3043, Section X.X[/CITATION] format
 
 5. **MANDATORY CONTRACT EVIDENCE:**
    - You MUST extract and analyze specific contract language relevant to this step

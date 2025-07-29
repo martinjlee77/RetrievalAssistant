@@ -349,18 +349,28 @@ class ASC606Analyzer:
             else:
                 complexity = "Simple"
             
-            # Calculate source quality percentage 
-            total_chunks = len(retrieved_context.split('\n\n')) if retrieved_context else 0
-            if total_chunks >= 8:
-                source_quality_pct = 95
-            elif total_chunks >= 5:
-                source_quality_pct = 85
-            elif total_chunks >= 3:
-                source_quality_pct = 75
-            elif total_chunks >= 1:
-                source_quality_pct = 65
+            # Calculate source quality percentage - count FASB and interpretative guidance chunks
+            # Only general knowledge should decrease quality, authoritative sources increase it
+            if retrieved_context:
+                total_chunks = len(retrieved_context.split('\n\n'))
+                # Count authoritative chunks (FASB ASC 606 and EY interpretative guidance)
+                authoritative_chunks = len([chunk for chunk in retrieved_context.split('\n\n') 
+                                          if 'ASC 606' in chunk or 'EY' in chunk or 'FASB' in chunk])
+                general_knowledge_chunks = total_chunks - authoritative_chunks
+                
+                # Quality based on authoritative source usage
+                if authoritative_chunks >= 8:
+                    source_quality_pct = 95
+                elif authoritative_chunks >= 5:
+                    source_quality_pct = 85
+                elif authoritative_chunks >= 3:
+                    source_quality_pct = 75
+                elif authoritative_chunks >= 1:
+                    source_quality_pct = 65
+                else:
+                    source_quality_pct = 45  # Only general knowledge used
             else:
-                source_quality_pct = 45  # General knowledge only
+                source_quality_pct = 45  # No RAG context
             
             analysis_result = ASC606Analysis(
                 professional_memo=final_memo,
@@ -397,6 +407,9 @@ class ASC606Analyzer:
         currency = getattr(contract_data, 'currency', 'USD')
         modification = getattr(contract_data, 'is_modification', False)
         
+        # Add documents reviewed list
+        documents_list = self._format_documents_list()
+        
         return f"""**CONTRACT DATA SUMMARY**
 
 | **Element** | **Details** |
@@ -406,7 +419,34 @@ class ASC606Analyzer:
 | **Currency** | {currency} |
 | **Modification Status** | {'Yes - Amendment/Modification' if modification else 'No - Original Contract'} |
 | **Analysis Scope** | {getattr(contract_data, 'key_focus_areas', 'Standard ASC 606 five-step analysis') or 'Standard ASC 606 five-step analysis'} |
-| **Materiality Threshold** | ${getattr(contract_data, 'materiality_threshold', 'Not specified'):,} |"""
+| **Materiality Threshold** | ${getattr(contract_data, 'materiality_threshold', 'Not specified'):,} |
+
+**DOCUMENTS REVIEWED**
+
+{documents_list}"""
+
+    def _format_documents_list(self) -> str:
+        """Format the list of documents reviewed for the analysis."""
+        import streamlit as st
+        
+        try:
+            # Get uploaded files from session state
+            documents = []
+            if hasattr(st, 'session_state') and hasattr(st.session_state, 'uploaded_files'):
+                uploaded_files = st.session_state.uploaded_files
+                if uploaded_files:
+                    for file in uploaded_files:
+                        file_name = getattr(file, 'name', str(file))
+                        documents.append(f"• {file_name}")
+            
+            if not documents:
+                documents = ["• Contract document (uploaded file)"]
+                
+            return "\n".join(documents)
+            
+        except Exception as e:
+            self.logger.warning(f"Could not retrieve document list: {e}")
+            return "• Contract document (uploaded file)"
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """Get knowledge base statistics for debugging purposes"""
