@@ -16,7 +16,7 @@ from utils.llm import make_llm_call, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
 from utils.step_prompts import StepAnalysisPrompts
-import streamlit as st
+# Note: streamlit imported dynamically where needed to avoid import errors
 
 
 class ASC606Analyzer:
@@ -378,6 +378,12 @@ class ASC606Analyzer:
                 source_quality_pct = 65  # Default fallback
                 total_chunks = 0
             
+            # Ensure all variables are properly defined
+            if 'total_chunks' not in locals():
+                total_chunks = 0
+            if 'source_quality_pct' not in locals():
+                source_quality_pct = 65
+                
             analysis_result = ASC606Analysis(
                 professional_memo=final_memo,
                 step_by_step_details=step_results,  # Single source of truth
