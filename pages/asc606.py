@@ -383,19 +383,30 @@ if st.session_state.analysis_results is None:
                             # The extractor itself threw an error (e.g., corrupted or password-protected file)
                             failed_files.append(f.name)
 
-                    # Check for failures and stop the process if any exist
+                    # Check for failures and decide whether to continue or stop
                     if failed_files:
-                        # Construct a helpful, multi-line error message
-                        error_message = (
-                            f"**Text extraction failed for the following file(s):**\n"
-                            f"- `{'`, `'.join(failed_files)}`\n\n"
-                            "**Please check the file(s) and try again. Common reasons for failure include:**\n"
-                            "- The file is password-protected.\n"
-                            "- The PDF is an image-only scan with no machine-readable text.\n"
-                            "- The file is corrupted or in an unsupported format."
-                        )
-                        st.error(error_message, icon="🚨")
-                        st.stop()  # Immediately halt the analysis
+                        successful_files = len(uploaded_files) - len(failed_files)
+                        
+                        if successful_files == 0:
+                            # All files failed - stop the analysis
+                            error_message = (
+                                f"**Text extraction failed for all uploaded file(s):**\n"
+                                f"- `{'`, `'.join(failed_files)}`\n\n"
+                                "**Please check the file(s) and try again. Common reasons for failure include:**\n"
+                                "- The file is password-protected.\n"
+                                "- The PDF is an image-only scan with no machine-readable text.\n"
+                                "- The file is corrupted or in an unsupported format."
+                            )
+                            st.error(error_message, icon="🚨")
+                            st.stop()  # Immediately halt the analysis
+                        else:
+                            # Some files worked - show warning but continue
+                            warning_message = (
+                                f"⚠️ **Warning:** Text extraction failed for {len(failed_files)} file(s): `{'`, `'.join(failed_files)}`\n\n"
+                                f"**Continuing analysis with {successful_files} successful file(s).** "
+                                "The failed files may be corrupted, password-protected, or image-only scans."
+                            )
+                            st.warning(warning_message, icon="⚠️")
 
                     # This part only runs if all files were successful
                     combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(

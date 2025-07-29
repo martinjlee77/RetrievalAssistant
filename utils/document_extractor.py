@@ -31,12 +31,26 @@ class DocumentExtractor:
         file_extension = uploaded_file.name.lower().split('.')[-1]
         
         try:
+            # Check file size first - reject empty files
+            uploaded_file.seek(0)  # Reset file pointer
+            file_content = uploaded_file.read()
+            if len(file_content) < 100:  # Less than 100 bytes is likely empty/corrupted
+                raise ValueError(f"File appears to be empty or corrupted (size: {len(file_content)} bytes)")
+            
+            # Reset file pointer for actual extraction
+            uploaded_file.seek(0)
+            
             if file_extension == 'pdf':
                 extraction_result = self._extract_pdf_text(uploaded_file)
             elif file_extension in ['docx']:
                 extraction_result = self._extract_word_text(uploaded_file)
             else:
                 raise ValueError(f"Unsupported file type: {file_extension}")
+
+            # Check if extraction yielded meaningful text
+            extracted_text = extraction_result.get('text', '').strip()
+            if len(extracted_text) < 50:  # Less than 50 characters is likely failed extraction
+                raise ValueError("File processed but no meaningful text extracted (may be image-only PDF or corrupted)")
 
             # --- NEW: Call the validation method here ---
             validation = self.validate_extraction(extraction_result)
