@@ -351,6 +351,7 @@ class ASC606Analyzer:
             
             # Calculate source quality percentage - count FASB and interpretative guidance chunks
             # Only general knowledge should decrease quality, authoritative sources increase it
+            total_chunks = 0  # Initialize total_chunks
             try:
                 if retrieved_context:
                     total_chunks = len(retrieved_context.split('\n\n'))
@@ -371,9 +372,11 @@ class ASC606Analyzer:
                         source_quality_pct = 45  # Only general knowledge used
                 else:
                     source_quality_pct = 45  # No RAG context
+                    total_chunks = 0
             except Exception as e:
                 self.logger.warning(f"Error calculating source quality: {e}")
                 source_quality_pct = 65  # Default fallback
+                total_chunks = 0
             
             analysis_result = ASC606Analysis(
                 professional_memo=final_memo,
@@ -390,11 +393,16 @@ class ASC606Analyzer:
             )
             
             # Store debug information if enabled
-            if debug_config and debug_config.get("show_raw_response"):
-                st.session_state.raw_response = final_memo
-                
-            if debug_config and debug_config.get("show_prompts"):
-                st.session_state.enhanced_prompt = f"Step-by-step analysis with {len(step_results)} detailed steps"
+            try:
+                import streamlit as st
+                if debug_config and debug_config.get("show_raw_response"):
+                    st.session_state.raw_response = final_memo
+                    
+                if debug_config and debug_config.get("show_prompts"):
+                    st.session_state.enhanced_prompt = f"Step-by-step analysis with {len(step_results)} detailed steps"
+            except ImportError:
+                # Streamlit not available, skip debug storage
+                pass
                 
             return analysis_result
             
