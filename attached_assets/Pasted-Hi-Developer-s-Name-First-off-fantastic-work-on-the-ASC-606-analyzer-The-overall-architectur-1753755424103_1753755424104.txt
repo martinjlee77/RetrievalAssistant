@@ -1,0 +1,75 @@
+Hi [Developer's Name],
+
+First off, fantastic work on the ASC 606 analyzer. The overall architecture is robust, and the recent implementation of the professional DOCX export is especially impressive. The template you've built with the custom headers, footers, and formal styling in create_docx_from_text is exactly the kind of high-quality output we want to provide.
+
+I'm writing today with a request to enhance this feature to bring the formatting of the main content up to the same high standard as the rest of the template.
+
+The Goal:
+
+Currently, the main body of the memo (the part generated from the text_content variable) is rendered as a single block of plain text, which causes us to lose all the valuable Markdown formatting like headings and lists.
+
+The goal is to modify the function so that it correctly parses this Markdown, making the final DOCX much more structured, readable, and professional—closely matching the structural quality of the HTML version.
+
+The Plan:
+
+The good news is that we don't need a complex new library or a full rewrite. We can achieve this by replacing the "simplified" Phase 2 parser in the existing create_docx_from_text function with a slightly more intelligent one. The rest of the function (Phase 1 for the template, Phase 3 for metadata) is perfect and should remain as is.
+
+Requested Change:
+
+Could you please replace the existing "Phase 2" section of the create_docx_from_text function in utils/llm.py with the following logic?
+
+This new parser handles the most important Markdown elements we use: headings (#, ##, ###), bullet points (* or -), and bold text (**).
+
+# === PHASE 2: CONTENT PARSING AND FORMATTING (ENHANCED) ===
+# This new parser understands Markdown headings, bold, and lists,
+# and applies the document's pre-defined styles.
+
+# Split the entire text_content into individual lines for processing
+lines = text_content.split('\n')
+
+for line in lines:
+    stripped_line = line.strip()
+    if not stripped_line:
+        continue  # Skip empty lines to avoid extra paragraphs
+
+    # Handle headings by checking the start of the line
+    if stripped_line.startswith('# '):
+        # Use Word's built-in 'Heading 1' style
+        document.add_paragraph(stripped_line.lstrip('# ').strip(), style='Heading 1')
+    elif stripped_line.startswith('## '):
+        # Use Word's built-in 'Heading 2' style
+        document.add_paragraph(stripped_line.lstrip('## ').strip(), style='Heading 2')
+    elif stripped_line.startswith('### '):
+        # Use Word's built-in 'Heading 3' style
+        document.add_paragraph(stripped_line.lstrip('### ').strip(), style='Heading 3')
+
+    # Handle bullet points
+    elif stripped_line.startswith('* ') or stripped_line.startswith('- '):
+        # Use Word's built-in 'List Bullet' style
+        text = stripped_line[2:].strip()
+        document.add_paragraph(text, style='List Bullet')
+
+    # Handle normal paragraphs, including those with bold text
+    else:
+        p = document.add_paragraph()
+        # Split the line by the bold delimiter '**'
+        parts = stripped_line.split('**')
+        for i, part in enumerate(parts):
+            if not part:
+                continue # Skip empty strings that can result from splitting
+
+            # Text between the delimiters (at odd indices) should be bold
+            if i % 2 == 1:
+                p.add_run(part).bold = True
+            else:
+                p.add_run(part)
+
+Why This Approach is a Good One:
+
+Leverages Your Existing Work: It builds directly on the excellent template you've already created.
+High Impact, Low Effort: This is a small, targeted change that will dramatically improve the quality of our most popular download format.
+No External Dependencies: It uses the python-docx library we already have in place.
+Delivers on User Expectations: This will produce the clean, structured, and editable Word document our users are looking for.
+This change will make the DOCX output a truly premium feature. Please let me know if you have any questions or foresee any issues with this approach.
+
+Thanks again for all your great work on this project!
