@@ -349,15 +349,12 @@ class ASC606Analyzer:
             else:
                 complexity = "Simple"
             
-            # Simplified metrics to prevent errors
-            source_quality_pct = 85  # Fixed value - hybrid RAG system
-            total_chunks = 5  # Fixed value representing RAG usage
-                
+            # Metrics disabled to prevent errors
             analysis_result = ASC606Analysis(
                 professional_memo=final_memo,
                 step_by_step_details=step_results,  # Single source of truth
-                source_quality=f"{source_quality_pct}%",
-                relevant_chunks=total_chunks,
+                source_quality="RAG Enabled",
+                relevant_chunks=0,
                 analysis_complexity=complexity,
                 analysis_duration_seconds=int(analysis_duration),
                 contract_overview={

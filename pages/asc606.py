@@ -498,35 +498,10 @@ else:
                 del st.session_state[key]
             st.rerun()
 
-    # Analysis metrics
+    # Analysis status - metrics disabled
     with st.container(border=True):
-        st.markdown("**📊 Analysis Overview**")
-        metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
-        with metrics_col1:
-            st.metric(
-                "Source Quality",
-                getattr(analysis_results, 'source_quality', 'N/A'),
-                help=
-                "This percentage reflects the quality and authority of the sources used for the analysis. Higher scores indicate reliance on direct FASB guidance, while lower scores may indicate reliance on interpretive or general knowledge."
-            )
-        with metrics_col2:
-            complexity = getattr(analysis_results, 'analysis_complexity',
-                                 'Unknown')
-            st.metric(
-                "Complexity",
-                complexity,
-                help=
-                "Analysis complexity based on contract features: modifications, variable consideration, financing components, etc."
-            )
-        with metrics_col3:
-            duration = getattr(analysis_results, 'analysis_duration_seconds',
-                               0)
-            duration_display = f"{duration//60}m {duration%60}s" if duration >= 60 else f"{duration}s"
-            st.metric(
-                "Generation Time",
-                duration_display,
-                help=
-                "Total time required to complete the comprehensive analysis")
+        st.markdown("**✅ Analysis Complete**")
+        st.write("Professional ASC 606 memo generated using hybrid RAG system with authoritative sources.")
 
     # Professional memo with enhanced display
     st.markdown("---")
