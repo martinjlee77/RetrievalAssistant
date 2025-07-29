@@ -62,12 +62,12 @@ def render_tab1_contract_details() -> dict:
                 "Contract Amendment / Addendum", "Change Order",
                 "Reseller / Partner Agreement", "Invoice", "Other"
             ],
-            help="Select all document types that are part of this analysis.")
+            help="Select all applicable document types. This helps the AI understand the relationship between the files (e.g., that an SOW is governed by an MSA).")
     with col4:
         currency = st.selectbox(
             "Currency *",
             ["USD", "EUR", "GBP", "CAD", "AUD", "KRW", "JPY", "Other"],
-            help="Primary currency for the contract")
+            help="Select the contract's primary currency. This provides context for the AI and is used in relation to the Materiality Threshold set in Tab 3.")
     
     col5, col6 = st.columns(2, gap="small")
     with col5:
@@ -293,6 +293,12 @@ def validate_form_data(tab1_data: dict, tab2_data: dict) -> list:
         errors.append("At least one Document Type must be selected (Tab 1).")
     if not tab1_data["currency"]:
         errors.append("Currency is required (Tab 1).")
+    if not tab1_data["contract_start"]:
+        errors.append("Contract Start Date is required (Tab 1).")
+    if not tab1_data["contract_end"]:
+        errors.append("Contract End Date is required (Tab 1).")
+    
+    # This check can remain, but it should be separate
     if tab1_data["contract_start"] and tab1_data["contract_end"]:
         if tab1_data["contract_end"] < tab1_data["contract_start"]:
             errors.append("Contract End Date cannot be before the Contract Start Date (Tab 1).")
@@ -325,11 +331,19 @@ analyzer = get_cached_analyzer()
 extractor = DocumentExtractor()
 
 # Standard header
-st.title("ASC 606: Revenue Contract Review")
-st.write(
-    "**Powered by Authoritative FASB Codification & Leading Interpretive Guidance**\n\n"
-    "An intelligent platform to generate comprehensive ASC 606 memos. Follow the numbered tabs to input contract details, provide context, and generate the memo."
-)
+st.title("ASC 606: Revenue Contract Review Memo Generator")
+st.info(
+    """
+    **How to achieve the best results:**
+
+    This tool combines AI analysis with your professional expertise. The AI drafts the memo based on authoritative guidance, but **your input is essential** for a precise and relevant analysis.
+
+    - **Provide Complete Documents:** Upload all related contracts, SOWs, and amendments.
+    - **Add Crucial Context:** Use the fields in **Tab 2** and **Tab 3** to highlight key judgments, uncertainties, and specific terms you want the AI to focus on.
+
+    The more context you provide, the more tailored and accurate your final memo will be.
+    """,
+    icon="💡")
 
 debug_config = create_debug_sidebar()
 
@@ -496,10 +510,11 @@ else:
                 # DOCX Export
                 try:
                     docx_content = create_docx_from_text(memo)
+                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.docx" if contract_data and contract_data.analysis_title else "ASC606_Analysis.docx"
                     st.download_button(
                         label="📄 Download DOCX",
                         data=docx_content,
-                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.docx",
+                        file_name=file_name,
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         use_container_width=True
                     )
@@ -510,10 +525,11 @@ else:
                 # HTML Export
                 try:
                     html_content = convert_memo_to_html(memo, contract_data)
+                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.html" if contract_data and contract_data.analysis_title else "ASC606_Analysis.html"
                     st.download_button(
                         label="🌐 Download HTML",
                         data=html_content,
-                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.html",
+                        file_name=file_name,
                         mime="text/html",
                         use_container_width=True
                     )
@@ -525,10 +541,11 @@ else:
                 try:
                     html_content = convert_memo_to_html(memo, contract_data)
                     pdf_content = create_pdf_from_html(html_content)
+                    file_name = f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.pdf" if contract_data and contract_data.analysis_title else "ASC606_Analysis.pdf"
                     st.download_button(
                         label="📋 Download PDF",
                         data=pdf_content,
-                        file_name=f"{contract_data.analysis_title.replace(' ', '_')}_ASC606_Analysis.pdf",
+                        file_name=file_name,
                         mime="application/pdf",
                         use_container_width=True
                     )
