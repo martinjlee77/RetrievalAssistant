@@ -359,15 +359,210 @@ def create_docx_from_text(text_content, contract_data=None):
     
     document.add_paragraph()  # Spacing after header
     
-    # === PHASE 2: CONTENT PARSING AND FORMATTING ===
+    # === PHASE 2: CONTENT PARSING AND FORMATTING (ENHANCED) ===
+    # This enhanced parser understands Markdown headings, bold, tables, and lists,
+    # and applies the document's pre-defined styles to match HTML output quality.
     
-    # Parse and format the memo content - simplified approach
-    # Split content into paragraphs and add them to document
-    paragraphs = text_content.split('\n\n')
-    for paragraph in paragraphs:
-        if paragraph.strip():
-            p = document.add_paragraph(paragraph.strip())
-            p.style = document.styles['Normal']
+    # Enhanced styles for better formatting
+    def configure_heading_styles():
+        """Configure custom heading styles to match HTML output"""
+        try:
+            # Heading 1 - Main sections (matches HTML h2)
+            heading1_style = document.styles.add_style('Custom Heading 1', 1)
+            heading1_style.font.name = 'Times New Roman'
+            heading1_style.font.size = Pt(14)
+            heading1_style.font.bold = True
+            heading1_style.font.color.rgb = RGBColor(0, 51, 102)
+            heading1_style.paragraph_format.space_before = Pt(12)
+            heading1_style.paragraph_format.space_after = Pt(6)
+        except:
+            # Style already exists, get it
+            heading1_style = document.styles['Heading 1']
+            
+        try:
+            # Heading 2 - Subsections (matches HTML h3)
+            heading2_style = document.styles.add_style('Custom Heading 2', 1)
+            heading2_style.font.name = 'Times New Roman'
+            heading2_style.font.size = Pt(13)
+            heading2_style.font.bold = True
+            heading2_style.font.color.rgb = RGBColor(51, 51, 51)
+            heading2_style.paragraph_format.space_before = Pt(8)
+            heading2_style.paragraph_format.space_after = Pt(4)
+        except:
+            heading2_style = document.styles['Heading 2']
+            
+        try:
+            # Heading 3 - Sub-subsections
+            heading3_style = document.styles.add_style('Custom Heading 3', 1)
+            heading3_style.font.name = 'Times New Roman'
+            heading3_style.font.size = Pt(12)
+            heading3_style.font.bold = True
+            heading3_style.paragraph_format.space_before = Pt(6)
+            heading3_style.paragraph_format.space_after = Pt(3)
+        except:
+            heading3_style = document.styles['Heading 3']
+    
+    configure_heading_styles()
+    
+    # Preprocess content to handle HTML-like formatting and tables
+    def preprocess_content(content):
+        """Preprocess content to extract tables and clean formatting"""
+        # Extract and store contract overview tables
+        table_pattern = r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\n(?:\|.*?\|\s*\n)*'
+        tables = re.findall(table_pattern, content, re.MULTILINE | re.DOTALL)
+        
+        # Remove tables from content for now, we'll add them back specially
+        for table in tables:
+            content = content.replace(table, '\n[TABLE_PLACEHOLDER]\n')
+        
+        return content, tables
+    
+    processed_content, extracted_tables = preprocess_content(text_content)
+    
+    # Split the entire text_content into individual lines for processing
+    lines = processed_content.split('\n')
+    table_index = 0
+    
+    # Define helper functions before the main loop
+    def _parse_text_formatting(paragraph, text):
+        """Parse bold text and other formatting within a paragraph"""
+        # Split the line by the bold delimiter '**'
+        parts = text.split('**')
+        for i, part in enumerate(parts):
+            if not part:
+                continue # Skip empty strings that can result from splitting
+                
+            # Text between the delimiters (at odd indices) should be bold
+            if i % 2 == 1:
+                paragraph.add_run(part).bold = True
+            else:
+                paragraph.add_run(part)
+    
+    def _add_contract_table(doc, table_markdown):
+        """Add a professional contract overview table to match HTML styling"""
+        lines = table_markdown.strip().split('\n')
+        if len(lines) < 2:
+            return
+            
+        # Parse table headers and rows
+        headers = [cell.strip().strip('|').strip('*').strip() for cell in lines[0].split('|') if cell.strip()]
+        
+        # Skip separator line, get data rows
+        data_rows = []
+        for line in lines[2:]:
+            if '|' in line:
+                row_data = [cell.strip().strip('|').strip('*').strip() for cell in line.split('|') if cell.strip()]
+                if row_data:
+                    data_rows.append(row_data)
+        
+        if not headers or not data_rows:
+            return
+            
+        # Create table
+        table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
+        table.style = 'Table Grid'
+        
+        # Set column widths
+        if len(headers) == 2:
+            table.columns[0].width = Inches(2.5)
+            table.columns[1].width = Inches(4.5)
+        
+        # Add headers
+        header_row = table.rows[0]
+        for i, header in enumerate(headers):
+            if i < len(header_row.cells):
+                cell = header_row.cells[i]
+                cell.text = header
+                # Format header
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+                        run.font.name = 'Times New Roman'
+                        run.font.size = Pt(11)
+        
+        # Add data rows
+        for row_idx, row_data in enumerate(data_rows):
+            table_row = table.rows[row_idx + 1]
+            for col_idx, cell_data in enumerate(row_data):
+                if col_idx < len(table_row.cells):
+                    cell = table_row.cells[col_idx]
+                    cell.text = cell_data
+                    # Format data
+                    for paragraph in cell.paragraphs:
+                        for run in paragraph.runs:
+                            run.font.name = 'Times New Roman'
+                            run.font.size = Pt(10)
+        
+        doc.add_paragraph()  # Add spacing after table
+
+    for line in lines:
+        stripped_line = line.strip()
+        if not stripped_line:
+            continue  # Skip empty lines to avoid extra paragraphs
+            
+        # Handle table placeholders
+        if stripped_line == '[TABLE_PLACEHOLDER]' and table_index < len(extracted_tables):
+            _add_contract_table(document, extracted_tables[table_index])
+            table_index += 1
+            continue
+        
+        # Handle headings by checking the start of the line
+        if stripped_line.startswith('# '):
+            # Use custom 'Heading 1' style for main sections
+            try:
+                document.add_paragraph(stripped_line.lstrip('# ').strip(), style='Custom Heading 1')
+            except:
+                document.add_paragraph(stripped_line.lstrip('# ').strip(), style='Heading 1')
+        elif stripped_line.startswith('## '):
+            # Use custom 'Heading 2' style for subsections
+            try:
+                document.add_paragraph(stripped_line.lstrip('## ').strip(), style='Custom Heading 2')
+            except:
+                document.add_paragraph(stripped_line.lstrip('## ').strip(), style='Heading 2')
+        elif stripped_line.startswith('### '):
+            # Use custom 'Heading 3' style
+            try:
+                document.add_paragraph(stripped_line.lstrip('### ').strip(), style='Custom Heading 3')
+            except:
+                document.add_paragraph(stripped_line.lstrip('### ').strip(), style='Heading 3')
+                
+        # Handle bullet points
+        elif stripped_line.startswith('* ') or stripped_line.startswith('- '):
+            # Use Word's built-in 'List Bullet' style
+            text = stripped_line[2:].strip()
+            bullet_para = document.add_paragraph()
+            _parse_text_formatting(bullet_para, text)
+            bullet_para.style = 'List Bullet'
+            
+        # Handle numbered lists
+        elif re.match(r'^\d+\.\s', stripped_line):
+            # Use Word's built-in 'List Number' style
+            text = re.sub(r'^\d+\.\s', '', stripped_line)
+            num_para = document.add_paragraph()
+            _parse_text_formatting(num_para, text)
+            num_para.style = 'List Number'
+            
+        # Handle blockquotes (contract evidence boxes)
+        elif stripped_line.startswith('>'):
+            quote_text = stripped_line.lstrip('> ').strip()
+            quote_para = document.add_paragraph()
+            _parse_text_formatting(quote_para, quote_text)
+            # Style as a quote with indentation
+            quote_para.paragraph_format.left_indent = Inches(0.5)
+            quote_para.paragraph_format.right_indent = Inches(0.5)
+            for run in quote_para.runs:
+                run.font.italic = True
+                run.font.color.rgb = RGBColor(70, 70, 70)
+                
+        # Handle horizontal rules (section separators)
+        elif stripped_line.startswith('---'):
+            # Add a line break for section separation
+            document.add_paragraph()
+            
+        # Handle normal paragraphs, including those with bold text
+        else:
+            p = document.add_paragraph()
+            _parse_text_formatting(p, stripped_line)
     
     # === PHASE 3: AUDIT-READY FEATURES ===
     
@@ -438,6 +633,3 @@ def create_docx_from_text(text_content, contract_data=None):
 
 # Legacy PDF generation removed - replaced with WeasyPrint HTML-to-PDF approach
 # See utils/html_export.py create_pdf_from_html() for new implementation
-
-    
-    pdf.set_text_color(0, 0, 0)
