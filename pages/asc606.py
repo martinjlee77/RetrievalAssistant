@@ -332,12 +332,11 @@ extractor = DocumentExtractor()
 st.title("ASC 606: Contract Review Memo Generator")
 st.info(
     """
-    **How to achieve the best results:**
-
-    This tool combines AI analysis with your professional expertise. The AI drafts the memo based on authoritative guidance, but **your input is essential** for a precise and relevant analysis.
-
-    - **Provide Complete Documents:** Upload all related contracts, SOWs, and amendments.
-    - **Add Crucial Context:** Use the fields in **Tab 2** and **Tab 3** to highlight key judgments, uncertainties, and specific terms you want the AI to focus on.
+    This tool analyzes your contract documents to generate a comprehensive, professional ASC 606 memo.
+    
+    **For the best results:**
+    - **Upload Complete Documents:** Include all related contracts, SOWs, and amendments.
+    - **Add Crucial Context:** Use the tabs below to guide the AI on key terms, judgments, and focus areas.
 
     The more context you provide, the more tailored and accurate your final memo will be.
     """,
