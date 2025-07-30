@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**Date: 2025-07-30**
+- 🚨 **CRITICAL SYSTEM REPAIR**: Discovered and fixed knowledge base being completely empty (0 documents)
+- ✅ **RAG System Was Broken**: Memos were generated using only GPT-4o general knowledge, not authoritative sources
+- ✅ **Knowledge Base Populated**: Seeded ChromaDB with 1,894 authoritative documents (476 ASC 606 + 1,418 EY guidance chunks)  
+- ✅ **Map-Reduce Contract Extraction**: Fixed 3000-character truncation, now analyzes full documents with overlapping chunks
+- ✅ **Enhanced Error Detection**: Added comprehensive logging to detect RAG failures and silent system degradation
+- ✅ **Configurable RAG Constants**: GENERAL_RAG_RESULTS_COUNT = 8, STEP_SPECIFIC_RAG_RESULTS_COUNT = 5 for easy tuning
+- ✅ **Robust Source Categorization**: Enhanced keyword matching for Big 4 firms (EY, Ernst, PwC, Deloitte, KPMG)
+- ✅ **System Integrity Verification**: Added seeding script and validation tools to prevent future silent failures
+
 **Date: 2025-07-29**
 - ✅ **STREAMLINED MEMO RESULTS PAGE**: Implemented professional actions-first layout per user feedback
 - ✅ Simplified to two core actions: Download DOCX (editable) and View in Browser (styled HTML)
@@ -406,11 +416,14 @@ Preferred communication style: Simple, everyday language.
 
 ### Core Components
 - **Hybrid RAG System**: Combines metadata filtering with semantic search for precise results
+- **Knowledge Base**: 1,894 authoritative documents (ASC 606 official guidance + EY interpretative literature)
 - **Two-Stage Citation Process**: Stage 1 (extract verbatim quotes), Stage 2 (assemble analysis)
-- **ChromaDB Vector Database**: Stores ASC 606 paragraphs with metadata for semantic search
+- **ChromaDB Vector Database**: Stores ASC 606 paragraphs with rich metadata for semantic search
+- **Map-Reduce Contract Processing**: Full document analysis with overlapping chunks (no truncation)
 - **Multi-document Processing**: Handles up to 5 files (contracts, invoices, amendments)
 - **Professional Memo Generation**: Creates Big 4 quality accounting memos with auditable citations
 - **Source Transparency**: Tracks hybrid RAG chunks used and relevance scores
+- **System Integrity Monitoring**: Comprehensive logging and validation to detect silent failures
 - **Performance Optimization**: Cached analyzer and persistent vector database
 
 ### Final Clean File Structure
