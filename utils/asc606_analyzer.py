@@ -97,7 +97,7 @@ class ASC606Analyzer:
                     
                     if rag_results:
                         # Categorize results by source type with robust industry keyword matching
-                        INDUSTRY_KEYWORDS = ['ey', 'ernst', 'frdbb', 'pwc', 'deloitte', 'kpmg']
+                        INDUSTRY_KEYWORDS = ['ey', 'ernst', 'pwc', 'deloitte', 'kpmg']
                         asc_results = []
                         ey_results = []
                         
