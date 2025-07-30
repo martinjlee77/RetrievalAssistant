@@ -178,7 +178,7 @@ def create_debug_sidebar():
 
 def extract_contract_terms(client, contract_text: str, step_context: str = "comprehensive_analysis") -> List[str]:
     """
-    Extract key contract terms using map-reduce approach for full document coverage
+    Extract key contract terms for enhanced RAG search
     
     Args:
         client: OpenAI client
@@ -189,136 +189,42 @@ def extract_contract_terms(client, contract_text: str, step_context: str = "comp
         List of extracted contract terms for semantic search
     """
     try:
-        # For shorter contracts, use simple approach
-        if len(contract_text) <= 4000:
-            return _extract_terms_simple(client, contract_text)
+        prompt = f"""
+        Extract 5-7 key terms and phrases from this contract that would be most relevant for ASC 606 revenue recognition analysis:
         
-        # For longer contracts, use map-reduce approach
-        return _extract_terms_map_reduce(client, contract_text)
+        CONTRACT TEXT:
+        {contract_text[:3000]}...
+        
+        Focus on:
+        - Service/product descriptions (e.g., SaaS license, implementation)
+        - Performance obligations
+        - Payment terms (e.g., Net 30, upfront payment)
+        - Contract timing/duration
+        - Acceptance clauses, warranties, or return rights
+        - Discounts, rebates, penalties, or other variable consideration
+        - Customer responsibilities
+        
+        Return only the key terms, one per line, no explanations.
+        """
+        
+        response = make_llm_call(
+            client=client,
+            prompt=prompt,
+            model="gpt-4o-mini",
+            max_tokens=200,
+            temperature=0.3
+        )
+        
+        if response:
+            # Split response into individual terms
+            terms = [term.strip() for term in response.split('\n') if term.strip()]
+            return terms[:7]  # Limit to 7 terms
+        
+        return []
         
     except Exception as e:
         st.warning(f"Contract term extraction failed: {e}")
         return []
-
-def _extract_terms_simple(client, contract_text: str) -> List[str]:
-    """Simple extraction for shorter contracts"""
-    prompt = f"""
-    Extract 5-7 key terms and phrases from this contract that would be most relevant for ASC 606 revenue recognition analysis:
-    
-    CONTRACT TEXT:
-    {contract_text}
-    
-    Focus on:
-    - Service/product descriptions (e.g., SaaS license, implementation)
-    - Performance obligations
-    - Payment terms (e.g., Net 30, upfront payment)
-    - Contract timing/duration
-    - Acceptance clauses, warranties, or return rights
-    - Discounts, rebates, penalties, or other variable consideration
-    - Customer responsibilities
-    
-    Return only the key terms, one per line, no explanations.
-    """
-    
-    response = make_llm_call(
-        client=client,
-        prompt=prompt,
-        model="gpt-4o-mini",
-        max_tokens=200,
-        temperature=0.3
-    )
-    
-    if response:
-        terms = [term.strip() for term in response.split('\n') if term.strip()]
-        return terms[:7]
-    return []
-
-def _extract_terms_map_reduce(client, contract_text: str) -> List[str]:
-    """
-    Map-reduce extraction for longer contracts to ensure full document coverage
-    
-    Map Step: Extract terms from each chunk
-    Reduce Step: Combine and prioritize the most important terms
-    """
-    # MAP STEP: Break contract into overlapping chunks
-    chunk_size = 4000
-    overlap = 200
-    chunks = []
-    
-    for i in range(0, len(contract_text), chunk_size - overlap):
-        chunk = contract_text[i:i + chunk_size]
-        if chunk.strip():  # Only add non-empty chunks
-            chunks.append(chunk)
-    
-    # Extract terms from each chunk
-    all_terms = []
-    chunk_prompt_template = """
-    Extract 3-5 key terms from this contract section that would be most relevant for ASC 606 revenue recognition analysis:
-    
-    CONTRACT SECTION:
-    {chunk}
-    
-    Focus on:
-    - Service/product descriptions
-    - Performance obligations
-    - Payment terms
-    - Contract timing/duration
-    - Acceptance clauses, warranties, return rights
-    - Variable consideration elements
-    - Customer responsibilities
-    
-    Return only the key terms, one per line, no explanations.
-    """
-    
-    for i, chunk in enumerate(chunks):
-        if i >= 8:  # Limit to prevent excessive API calls
-            break
-            
-        chunk_response = make_llm_call(
-            client=client,
-            prompt=chunk_prompt_template.format(chunk=chunk),
-            model="gpt-4o-mini",
-            max_tokens=150,
-            temperature=0.3
-        )
-        
-        if chunk_response:
-            chunk_terms = [term.strip() for term in chunk_response.split('\n') if term.strip()]
-            all_terms.extend(chunk_terms)
-    
-    if not all_terms:
-        return []
-    
-    # REDUCE STEP: Prioritize and deduplicate terms
-    reduce_prompt = f"""
-    From this list of contract terms extracted from different sections, select the 7 most unique and important terms for ASC 606 revenue recognition analysis:
-    
-    EXTRACTED TERMS:
-    {chr(10).join(all_terms)}
-    
-    Prioritize terms that are:
-    - Most specific to this contract (not generic)
-    - Most relevant to ASC 606 analysis
-    - Unique/non-overlapping with each other
-    
-    Return exactly 7 terms, one per line, no explanations or numbering.
-    """
-    
-    final_response = make_llm_call(
-        client=client,
-        prompt=reduce_prompt,
-        model="gpt-4o-mini",
-        max_tokens=200,
-        temperature=0.3
-    )
-    
-    if final_response:
-        final_terms = [term.strip() for term in final_response.split('\n') if term.strip()]
-        return final_terms[:7]
-    
-    # Fallback: return deduplicated terms from map step
-    unique_terms = list(dict.fromkeys(all_terms))  # Preserve order while removing duplicates
-    return unique_terms[:7]
 
 def validate_api_key() -> bool:
     """Validate OpenAI API key is properly configured"""

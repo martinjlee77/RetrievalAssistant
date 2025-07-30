@@ -87,6 +87,8 @@ class ASC606Analyzer:
                 )
                 
                 if contract_terms:
+                    self.logger.info(f"Extracted contract terms: {contract_terms}")
+                    
                     # Query knowledge base with extracted terms using improved manager
                     rag_results = self.kb_manager.search_relevant_guidance(
                         standard="ASC 606",
@@ -94,6 +96,12 @@ class ASC606Analyzer:
                         step_context="comprehensive_analysis",
                         n_results=self.GENERAL_RAG_RESULTS_COUNT
                     )
+                    
+                    self.logger.info(f"RAG search returned {len(rag_results) if rag_results else 0} results")
+                else:
+                    self.logger.warning("No contract terms extracted - falling back to general knowledge")
+            else:
+                self.logger.error("Knowledge base manager not initialized - using general knowledge only")
                     
                     if rag_results:
                         # Categorize results by source type with robust industry keyword matching
