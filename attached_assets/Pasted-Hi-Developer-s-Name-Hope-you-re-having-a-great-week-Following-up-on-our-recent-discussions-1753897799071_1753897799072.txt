@@ -1,0 +1,21 @@
+Hi [Developer's Name],
+
+Hope you're having a great week.
+
+Following up on our recent discussions about improving the app's analysis, I've been looking into a high-impact enhancement for our RAG system: implementing metadata filtering in our knowledge base searches.
+
+The Goal: Currently, when we analyze a specific step of the 5-step model, we add keywords to the search query. A more precise and efficient method would be to use the database's built-in filtering capabilities. For example, when analyzing Step 2, we could tell ChromaDB to "search for these contract terms, but only within documents that are tagged as relevant to Step 2." This should significantly improve the relevance of our retrieved context and reduce noise from other sections of the standard.
+
+Proposed Plan (2-Part Change):
+
+Part 1: Add Metadata During Ingestion
+
+We'll need to modify our data ingestion/seeding script. As the script processes each chunk of the ASC 606 standard (and other guidance), it should also assign a step_context metadata tag (e.g., step_1_contract, step_2_obligations, step_3_price, etc.).
+I understand this will require us to clear the existing ChromaDB collection and re-process/re-ingest the entire knowledge base with this new metadata. This seems like a necessary one-time step to enable this new functionality.
+Part 2: Enable Filtering in search_relevant_guidance
+
+In the KnowledgeBaseManager class, specifically in the search_relevant_guidance method, we need to uncomment and enable the where clause functionality.
+The function should be updated to build a where_clause dictionary based on the step_context argument passed in from the analyzer. This clause will then be used in the collection.query() call.
+This change seems to be the logical next step to make our step-specific RAG process more targeted and effective, directly leading to better-quality analysis in the final memo.
+
+Could you please take a look at this and let me know your thoughts on the feasibility and effort involved?
