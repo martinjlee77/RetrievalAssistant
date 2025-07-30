@@ -22,6 +22,10 @@ from utils.step_prompts import StepAnalysisPrompts
 class ASC606Analyzer:
     """ASC 606 analyzer using hybrid RAG with ChromaDB knowledge base"""
     
+    # Configurable constants for RAG tuning
+    GENERAL_RAG_RESULTS_COUNT = 8
+    STEP_SPECIFIC_RAG_RESULTS_COUNT = 5
+    
     def __init__(self):
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.logger = logging.getLogger(__name__)
@@ -41,7 +45,6 @@ class ASC606Analyzer:
         """
         Recursively traverses a JSON object from the LLM and cleans up
         common string formatting issues like character splitting.
-        GEMINI'S PRONG 2: REACTIVE FIX
         """
         if isinstance(data, dict):
             return {key: self._sanitize_llm_json(value) for key, value in data.items()}
@@ -55,7 +58,7 @@ class ASC606Analyzer:
 
             # 2. Preserve proper spacing around currency symbols and punctuation
             # Ensure space before currency symbols like $, €, £
-            sanitized_str = re.sub(r'(\w)(\$)', r'\1 \2', sanitized_str)
+            sanitized_str = re.sub(r'(\w)(\$€£¥)', r'\1 \2', sanitized_str)
             # Ensure space after currency amounts
             sanitized_str = re.sub(r'(\$\d+\.?\d*),(\w)', r'\1, \2', sanitized_str)
 
@@ -89,17 +92,18 @@ class ASC606Analyzer:
                         standard="ASC 606",
                         query_texts=contract_terms,  # Pass as list for better search
                         step_context="comprehensive_analysis",
-                        n_results=8
+                        n_results=self.GENERAL_RAG_RESULTS_COUNT
                     )
                     
                     if rag_results:
-                        # Categorize results by source type
+                        # Categorize results by source type with robust industry keyword matching
+                        INDUSTRY_KEYWORDS = ['ey', 'ernst', 'frdbb', 'pwc', 'deloitte', 'kpmg']
                         asc_results = []
                         ey_results = []
                         
                         for result in rag_results:
                             source = result.get('source', '').lower()
-                            if 'ey' in source or 'ernst' in source or 'frdbb' in source:
+                            if any(keyword in source for keyword in INDUSTRY_KEYWORDS):
                                 ey_results.append(result)
                             else:
                                 asc_results.append(result)
@@ -154,7 +158,7 @@ class ASC606Analyzer:
                         standard="ASC 606",
                         query_texts=enhanced_terms,
                         step_context=f"step_{step_num}",
-                        n_results=5  # Focused results per step
+                        n_results=self.STEP_SPECIFIC_RAG_RESULTS_COUNT  # Focused results per step
                     )
                     
                     if step_rag_results:
