@@ -1,0 +1,68 @@
+I have reviewed the updated analyzer code and have one critical correction and one minor suggestion.
+
+1. CRITICAL CORRECTION: Indentation/Syntax Error
+There appears to be a copy-paste or indentation error in the code you've provided. The if rag_results: block is in the wrong place.
+
+Incorrect Code:
+
+else:
+                self.logger.error("Knowledge base manager not initialized - using general knowledge only")
+
+                    if rag_results:  # <-- This is incorrectly indented under the else block
+                        # Categorize results by source type...
+                        # ...
+
+This code would only try to categorize results if the knowledge base failed to initialize, which is the opposite of what's intended and would cause an error because rag_results would not exist.
+
+Corrected Code: The if rag_results: block needs to be moved up and indented to be part of the successful RAG workflow.
+
+# ... inside analyze_contract method ...
+        if self.kb_manager:
+            # Extract contract-specific terms for better RAG results
+            contract_terms = extract_contract_terms(
+                client=self.client,
+                contract_text=contract_text,
+                step_context="comprehensive_analysis"
+            )
+
+            rag_results = [] # Initialize rag_results as an empty list
+            if contract_terms:
+                self.logger.info(f"Extracted contract terms: {contract_terms}")
+
+                # Query knowledge base with extracted terms
+                rag_results = self.kb_manager.search_relevant_guidance(
+                    standard="ASC 606",
+                    query_texts=contract_terms,
+                    step_context="comprehensive_analysis",
+                    n_results=self.GENERAL_RAG_RESULTS_COUNT
+                )
+
+                self.logger.info(f"RAG search returned {len(rag_results) if rag_results else 0} results")
+            else:
+                self.logger.warning("No contract terms extracted - RAG search will be skipped.")
+
+            # THIS IS THE CORRECTED PLACEMENT
+            if rag_results:
+                # Categorize results by source type with robust industry keyword matching
+                INDUSTRY_KEYWORDS = ['ey', 'ernst', 'pwc', 'deloitte', 'kpmg']
+                asc_results = []
+                # ... rest of the categorization and context building logic ...
+                # ...
+                retrieved_context += "\n---\n"
+        else:
+            self.logger.error("Knowledge base manager not initialized - using general knowledge only")
+
+Please ask your developer to verify this indentation. It is crucial for the RAG system to function correctly.
+
+2. Minor Improvement: More Insightful Logging
+The log for the search results is good, but it can be even better.
+
+Current Log: self.logger.info(f"RAG search returned {len(rag_results) if rag_results else 0} results")
+Suggested Improvement:
+if rag_results:
+    max_relevance = max(r['relevance_score'] for r in rag_results)
+    self.logger.info(f"RAG search returned {len(rag_results)} results with max relevance of {max_relevance:.2f}")
+else:
+    self.logger.info("RAG search returned 0 results.")
+
+Why: This tells you not just how many results you got, but also how good the best result was. A high relevance score (e.g., > 0.5) gives you confidence that the search found something very similar to your query.

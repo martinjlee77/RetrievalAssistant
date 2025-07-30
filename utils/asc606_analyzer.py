@@ -86,6 +86,7 @@ class ASC606Analyzer:
                     step_context="comprehensive_analysis"
                 )
                 
+                rag_results = []  # Initialize rag_results as empty list
                 if contract_terms:
                     self.logger.info(f"Extracted contract terms: {contract_terms}")
                     
@@ -97,43 +98,47 @@ class ASC606Analyzer:
                         n_results=self.GENERAL_RAG_RESULTS_COUNT
                     )
                     
-                    self.logger.info(f"RAG search returned {len(rag_results) if rag_results else 0} results")
+                    # Enhanced logging with relevance insights
+                    if rag_results:
+                        max_relevance = max(r['relevance_score'] for r in rag_results)
+                        self.logger.info(f"RAG search returned {len(rag_results)} results with max relevance of {max_relevance:.2f}")
+                    else:
+                        self.logger.info("RAG search returned 0 results.")
                 else:
-                    self.logger.warning("No contract terms extracted - falling back to general knowledge")
+                    self.logger.warning("No contract terms extracted - RAG search will be skipped.")
+                
+                # CORRECTED PLACEMENT: Process RAG results if they exist
+                if rag_results:
+                    # Categorize results by source type with robust industry keyword matching
+                    INDUSTRY_KEYWORDS = ['ey', 'ernst', 'pwc', 'deloitte', 'kpmg']
+                    asc_results = []
+                    ey_results = []
+                    
+                    for result in rag_results:
+                        source = result.get('source', '').lower()
+                        if any(keyword in source for keyword in INDUSTRY_KEYWORDS):
+                            ey_results.append(result)
+                        else:
+                            asc_results.append(result)
+                    
+                    # Format retrieved context with clear categorization
+                    if asc_results:
+                        retrieved_context += "\n\n**RETRIEVED ASC 606 AUTHORITATIVE GUIDANCE:**\n"
+                        retrieved_context += "Use these sources for 'Relevant ASC 606 citations' in your analysis:\n"
+                        for result in asc_results:
+                            retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                            retrieved_context += f"{result['content']}\n"
+                    
+                    if ey_results:
+                        retrieved_context += "\n\n**RETRIEVED INDUSTRY INTERPRETATIONS:**\n"
+                        retrieved_context += "Use these EY professional guidance sources for 'Relevant industry interpretations' in your analysis:\n"  
+                        for result in ey_results:
+                            retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
+                            retrieved_context += f"{result['content']}\n"
+                    
+                    retrieved_context += "\n---\n"
             else:
                 self.logger.error("Knowledge base manager not initialized - using general knowledge only")
-                    
-                    if rag_results:
-                        # Categorize results by source type with robust industry keyword matching
-                        INDUSTRY_KEYWORDS = ['ey', 'ernst', 'pwc', 'deloitte', 'kpmg']
-                        asc_results = []
-                        ey_results = []
-                        
-                        for result in rag_results:
-                            source = result.get('source', '').lower()
-                            if any(keyword in source for keyword in INDUSTRY_KEYWORDS):
-                                ey_results.append(result)
-                            else:
-                                asc_results.append(result)
-                        
-                        # Format retrieved context with clear categorization
-                        retrieved_context = ""
-                        
-                        if asc_results:
-                            retrieved_context += "\n\n**RETRIEVED ASC 606 AUTHORITATIVE GUIDANCE:**\n"
-                            retrieved_context += "Use these sources for 'Relevant ASC 606 citations' in your analysis:\n"
-                            for result in asc_results:
-                                retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
-                                retrieved_context += f"{result['content']}\n"
-                        
-                        if ey_results:
-                            retrieved_context += "\n\n**RETRIEVED INDUSTRY INTERPRETATIONS:**\n"
-                            retrieved_context += "Use these EY professional guidance sources for 'Relevant industry interpretations' in your analysis:\n"  
-                            for result in ey_results:
-                                retrieved_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
-                                retrieved_context += f"{result['content']}\n"
-                        
-                        retrieved_context += "\n---\n"
             
             # === STEP 2: STEP-BY-STEP DETAILED ANALYSIS ===
             step_results = {}
