@@ -281,7 +281,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     
     # Generate complete HTML document
     current_date = datetime.now().strftime("%B %d, %Y")
-    customer_name = contract_data.get('customer_name', 'Contract Analysis') if contract_data else 'Contract Analysis'
+    customer_name = getattr(contract_data, 'customer_name', 'Contract Analysis') if contract_data else 'Contract Analysis'
     
     html_document = f"""<!DOCTYPE html>
 <html lang="en">

@@ -251,6 +251,7 @@ def create_docx_from_text(text_content, contract_data=None):
     from docx.oxml.ns import qn
     from datetime import datetime
     import re
+    import logging
     
     document = Document()
     
@@ -377,9 +378,10 @@ def create_docx_from_text(text_content, contract_data=None):
             heading1_style.font.color.rgb = RGBColor(0, 51, 102)
             heading1_style.paragraph_format.space_before = Pt(12)
             heading1_style.paragraph_format.space_after = Pt(6)
-        except:
-            # Style already exists, get it
-            heading1_style = document.styles['Heading 1']
+        except Exception as e:
+            # Style already exists or other error, use default
+            logging.warning(f"Could not create Custom Heading 1 style: {e}")
+            heading1_style = document.styles.get('Heading 1', document.styles['Normal'])
             
         try:
             # Heading 2 - Subsections (matches HTML h3)
@@ -390,8 +392,9 @@ def create_docx_from_text(text_content, contract_data=None):
             heading2_style.font.color.rgb = RGBColor(51, 51, 51)
             heading2_style.paragraph_format.space_before = Pt(8)
             heading2_style.paragraph_format.space_after = Pt(4)
-        except:
-            heading2_style = document.styles['Heading 2']
+        except Exception as e:
+            logging.warning(f"Could not create Custom Heading 2 style: {e}")
+            heading2_style = document.styles.get('Heading 2', document.styles['Normal'])
             
         try:
             # Heading 3 - Sub-subsections
@@ -401,8 +404,9 @@ def create_docx_from_text(text_content, contract_data=None):
             heading3_style.font.bold = True
             heading3_style.paragraph_format.space_before = Pt(6)
             heading3_style.paragraph_format.space_after = Pt(3)
-        except:
-            heading3_style = document.styles['Heading 3']
+        except Exception as e:
+            logging.warning(f"Could not create Custom Heading 3 style: {e}")
+            heading3_style = document.styles.get('Heading 3', document.styles['Normal'])
     
     configure_heading_styles()
     
@@ -513,19 +517,22 @@ def create_docx_from_text(text_content, contract_data=None):
             # Use custom 'Heading 1' style for main sections
             try:
                 document.add_paragraph(stripped_line.lstrip('# ').strip(), style='Custom Heading 1')
-            except:
+            except Exception as e:
+                logging.warning(f"Could not apply Custom Heading 1 style: {e}")
                 document.add_paragraph(stripped_line.lstrip('# ').strip(), style='Heading 1')
         elif stripped_line.startswith('## '):
             # Use custom 'Heading 2' style for subsections
             try:
                 document.add_paragraph(stripped_line.lstrip('## ').strip(), style='Custom Heading 2')
-            except:
+            except Exception as e:
+                logging.warning(f"Could not apply Custom Heading 2 style: {e}")
                 document.add_paragraph(stripped_line.lstrip('## ').strip(), style='Heading 2')
         elif stripped_line.startswith('### '):
             # Use custom 'Heading 3' style
             try:
                 document.add_paragraph(stripped_line.lstrip('### ').strip(), style='Custom Heading 3')
-            except:
+            except Exception as e:
+                logging.warning(f"Could not apply Custom Heading 3 style: {e}")
                 document.add_paragraph(stripped_line.lstrip('### ').strip(), style='Heading 3')
                 
         # Handle bullet points
