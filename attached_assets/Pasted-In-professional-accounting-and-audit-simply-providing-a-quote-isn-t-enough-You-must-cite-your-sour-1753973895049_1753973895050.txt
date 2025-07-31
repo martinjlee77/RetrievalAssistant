@@ -1,0 +1,83 @@
+In professional accounting and audit, simply providing a quote isn't enough. You must cite your source. Knowing whether a quote came from the "Master Services Agreement" versus an "Invoice" versus a "Statement of Work" provides critical context.
+
+The current output is good, but adding the document source would elevate it to "audit-ready."
+
+Here’s how you and your developer can implement this. It involves a two-part change: modifying the prompt and ensuring the necessary information is available to the prompt.
+
+1. The Information Challenge: Making the Source Known
+The first challenge is ensuring the AI knows the source of each piece of text. Right now, your code combines all the text from the uploaded documents into one giant string:
+
+# From your streamlit page logic
+combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
+
+The AI sees one long text block. It can't reliably know where one document ends and the next begins.
+
+Solution (Developer to implement):
+
+The best practice is to preface each document's text with its filename before combining them.
+
+In your Streamlit page logic (likely in the if st.button("📝 Generate the Memo"...) block), modify the text combination step:
+
+Current Code:
+
+all_extracted_text = []
+for f in all_form_data["uploaded_files"]:
+    # ... extraction logic ...
+    all_extracted_text.append(extraction_result['text'])
+
+combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
+
+Improved Code:
+
+all_extracted_text_with_sources = []
+for f in all_form_data["uploaded_files"]:
+    # ... extraction logic ...
+    if extraction_result and extraction_result.get('text'):
+        # Prepend the document name as a clear header
+        document_header = f"--- START OF DOCUMENT: {f.name} ---\n\n"
+        full_text = document_header + extraction_result['text']
+        all_extracted_text_with_sources.append(full_text)
+
+# The new combined_text now contains source information
+combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text_with_sources)
+
+This simple change structures the input text so the AI can easily identify the source file for any given quote.
+
+2. The Prompt Enhancement
+Now that the AI has the necessary information, you need to update the prompt to explicitly ask for the citation.
+
+Location: StepPrompts.get_step_specific_analysis_prompt
+
+Current Prompt Instruction:
+
+# ...
+3. **Contract Evidence**: Specific quotes from the contract that support your conclusion
+# ...
+
+Improved Prompt Instruction (Developer to implement):
+
+# ...
+3. **Contract Evidence**: Provide specific, direct quotes from the contract that support your conclusion. **For each quote, you MUST cite the source document name (e.g., "Master Services Agreement.docx", "SOW_Project_Phoenix.pdf") where the quote was found.** Format it as: `Quote text (Source: [Document Name])`
+# ...
+
+This revised prompt is much more explicit. It:
+
+Tells the AI what to do (cite the source).
+Tells it how to format the citation.
+Uses strong language ("MUST cite") to ensure compliance.
+Expected Outcome
+With these two changes, your Contract Evidence section should transform into something much more professional and useful:
+
+Before:
+
+The contract states: 'Your Netflix membership will continue and automatically renew until terminated...'
+
+After (Ideal Output):
+
+'Your Netflix membership will continue and automatically renew until terminated.' (Source: Netflix_Terms_of_Use.pdf)
+
+'The subscription fee for the Netflix service... will be charged to your Payment Method...' (Source: Netflix_Terms_of_Use.pdf)
+
+'Invoice # E355F-92FF9-F6069-07497' (Source: Invoice_Dec2023.pdf)
+
+This is a high-value change that directly improves the quality and audit-readiness of the final memo. I would classify this as highly important.

@@ -7,20 +7,15 @@ import time
 from datetime import date
 from typing import Optional, List
 from pydantic import ValidationError
-try:
-    from core.models import ContractData, ASC606Analysis
-    from utils.asc606_analyzer import ASC606Analyzer
-    from utils.document_extractor import DocumentExtractor
-    from utils.llm import create_debug_sidebar, create_docx_from_text
-except ImportError:
-    # Fallback to path-based imports for Replit compatibility
-    import sys
-    import os
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from core.models import ContractData, ASC606Analysis
-    from utils.asc606_analyzer import ASC606Analyzer
-    from utils.document_extractor import DocumentExtractor
-    from utils.llm import create_debug_sidebar, create_docx_from_text
+# Add root directory to path for imports
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.models import ContractData, ASC606Analysis
+from utils.asc606_analyzer import ASC606Analyzer
+from utils.document_extractor import DocumentExtractor
+from utils.llm import create_debug_sidebar, create_docx_from_text
 
 
 def format_dict_as_markdown(data: dict) -> str:
@@ -384,14 +379,17 @@ if st.session_state.analysis_results is None:
                     # Enhanced text extraction with fail-safe policy
                     # Use st.write for all our dynamic steps so they have a consistent, larger font.
                     st.write("➡️ **Verifying documents and extracting texts...**")
-                    all_extracted_text = []
+                    all_extracted_text_with_sources = []
                     failed_files = []
 
                     for f in all_form_data["uploaded_files"]:
                         try:
                             extraction_result = extractor.extract_text(f)
                             if extraction_result and extraction_result.get('text'):
-                                all_extracted_text.append(extraction_result['text'])
+                                # Prepend the document name as a clear header for source identification
+                                document_header = f"--- START OF DOCUMENT: {f.name} ---\n\n"
+                                full_text = document_header + extraction_result['text']
+                                all_extracted_text_with_sources.append(full_text)
                             else:
                                 failed_files.append(f.name)
                         except Exception:
@@ -419,7 +417,8 @@ if st.session_state.analysis_results is None:
                             )
                             st.warning(warning_message, icon="⚠️")
 
-                    combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text)
+                    # The new combined_text now contains source information for each document
+                    combined_text = "\n\n--- END OF DOCUMENT ---\n\n".join(all_extracted_text_with_sources)
 
                     # Create ContractData object from all form data
                     contract_data = ContractData(

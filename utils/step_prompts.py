@@ -214,8 +214,8 @@ Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 comp
 
 Provide a detailed analysis including:
 1. **Executive Conclusion**: Clear determination for this step
-2. **Supporting Analysis**: Detailed reasoning with ASC 606 citations
-3. **Contract Evidence**: Specific quotes from the contract that support your conclusion
+2. **Supporting Analysis**: Detailed reasoning with ASC 606 citations. Where significant judgment is required, also reference relevant industry interpretations from the context provided.
+3. **Contract Evidence**: Provide specific, direct quotes from the contract that support your conclusion. **For each quote, you MUST cite the source document name (e.g., "Master Services Agreement.docx", "SOW_Project_Phoenix.pdf") where the quote was found.** Format it as: `Quote text (Source: [Document Name])`
 4. **Key Considerations**: Any complexities or judgment areas
 
 Return your response as a JSON object with the keys: executive_conclusion, supporting_analysis, contract_evidence, key_considerations."""
@@ -304,13 +304,13 @@ If no significant judgments are required, state that the contract follows standa
         
         return f"""## Step {step_number}: {step_name}
 
-**Executive Conclusion:**
+**Conclusion:**
 {conclusion}
 
 **Supporting Analysis:**
 {analysis}
 
-**Contract Evidence:**
+**Contract Evidence:** (Include source document names for each quote)
 {evidence}
 
 **Key Considerations:**
