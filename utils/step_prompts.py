@@ -524,7 +524,7 @@ Your reputation for precision is on the line. Do not overstate the complexity of
         price_details = "Not specified"
         recognition_summary = "Not specified"
         
-        # 1. Prioritize structured data from Step 4 (Allocation)
+        # ENHANCED: Prioritize structured data from Step 4 allocation
         if s4_allocation := s4.get('allocation_details'):
             import json
             try:
@@ -534,14 +534,13 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                     price_details = str(s4_allocation)
             except (TypeError, ValueError):
                 price_details = str(s4_allocation)
-        
-        # 2. Fallback to regex on Step 3 conclusion if no structured data
+        # Fallback to regex extraction from Step 3
         elif s3_conclusion := s3.get('executive_conclusion', ''):
             import re
             if price_match := re.search(r'\$[\d,]+\.?\d*', s3_conclusion):
                 price_details = f"Total Transaction Price: {price_match.group()}"
         
-        # Extract revenue recognition summary from Step 5
+        # Get recognition summary from Step 5
         recognition_summary = s5.get('executive_conclusion', 'Not specified')
 
         # NEW: Logic to determine transaction complexity
