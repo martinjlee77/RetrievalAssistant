@@ -191,15 +191,48 @@ Create an executive summary using this professional structure:
 Keep this professional, concise, and focused on executive-level insights."""
 
     @staticmethod
+    def get_step1_schema() -> str:
+        """Returns Step 1 specific JSON schema for contract criteria assessment."""
+        return '"contract_criteria_assessment": [\n    {\n      "criterion": "Approval and Commitment",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(a)..."\n    },\n    {\n      "criterion": "Identification of Rights",\n      "status": "Met/Not Met", \n      "justification": "Analysis based on ASC 606-10-25-1(b)..."\n    },\n    {\n      "criterion": "Identification of Payment Terms",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(c)..."\n    },\n    {\n      "criterion": "Commercial Substance", \n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(d)..."\n    },\n    {\n      "criterion": "Collectibility",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(e)..."\n    }\n  ],\n  '
+
+    @staticmethod
+    def get_step2_schema() -> str:
+        """Returns Step 2 specific JSON schema for performance obligations assessment."""
+        return '"performance_obligations": [\n    {\n      "po_description": "Description of the performance obligation",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Justification based on ASC 606-10-25-19: (a) capable of being distinct and (b) separately identifiable in the contract context."\n    }\n  ],\n  '
+
+    @staticmethod  
+    def get_step3_schema() -> str:
+        """Returns Step 3 specific JSON schema for transaction price components."""
+        return '"transaction_price_components": {\n    "fixed_consideration": "Amount and description",\n    "variable_consideration": [\n      {\n        "type": "e.g., Performance Bonus, Sales-Based Royalty, Discount",\n        "estimated_amount": "Amount or \'Not applicable\'",\n        "estimation_method": "Expected Value / Most Likely Amount / Not applicable",\n        "constraint_analysis": "Analysis of variable consideration constraint per ASC 606-10-32-11."\n      }\n    ],\n    "financing_component_analysis": "Analysis of any significant financing component per ASC 606-10-32-15.",\n    "total_transaction_price": "Total estimated transaction price."\n  },\n  '
+
+    @staticmethod
+    def get_step4_schema() -> str:
+        """Returns Step 4 specific JSON schema for allocation details."""
+        return '"allocation_details": {\n    "total_transaction_price": "The total amount from Step 3",\n    "allocations": [\n      {\n        "performance_obligation": "Description of the performance obligation from Step 2",\n        "standalone_selling_price": "SSP amount and estimation method",\n        "allocated_amount": "Amount allocated to this performance obligation"\n      }\n    ]\n  },\n  '
+
+    @staticmethod
+    def get_step5_schema() -> str:
+        """Returns Step 5 specific JSON schema for revenue recognition plan."""
+        return '"revenue_recognition_plan": [\n    {\n      "performance_obligation": "Name of the PO from Step 2",\n      "recognition_method": "Over Time / Point in Time",\n      "justification": "If \'Over Time\', state which of the three criteria in ASC 606-10-25-27 is met. If \'Point in Time\', discuss transfer of control indicators per ASC 606-10-25-30.",\n      "measure_of_progress": "If \'Over Time\', describe the method (e.g., straight-line, input/output method). If \'Point in Time\', state timing of control transfer."\n    }\n  ],\n  '
+
+    @staticmethod
     def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
                                         contract_text: str, rag_context: str, 
                                         contract_data=None, debug_config=None) -> str:
         """Generate step-specific analysis prompt that requests narrative, thematically-grouped JSON output."""
         
-        # Add step-specific instructions for Step 4 (allocation details) - APPROVED ENHANCEMENT
+        # Get step-specific schema
         step_specific_json_field = ""
-        if step_number == 4:
-            step_specific_json_field = '"allocation_details": {\n    "total_transaction_price": "The total amount from Step 3",\n    "allocations": [\n      {\n        "performance_obligation": "Description of the first performance obligation",\n        "allocated_amount": "Amount allocated to this performance obligation"\n      }\n    ]\n  },\n  '
+        if step_number == 1:
+            step_specific_json_field = StepPrompts.get_step1_schema()
+        elif step_number == 2:
+            step_specific_json_field = StepPrompts.get_step2_schema()
+        elif step_number == 3:
+            step_specific_json_field = StepPrompts.get_step3_schema()
+        elif step_number == 4:
+            step_specific_json_field = StepPrompts.get_step4_schema()
+        elif step_number == 5:
+            step_specific_json_field = StepPrompts.get_step5_schema()
         
         return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
 
@@ -216,12 +249,12 @@ Customer: {getattr(contract_data, 'customer_name', 'N/A') if contract_data else 
 Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance') if contract_data else 'General ASC 606 compliance'}
 
 *** YOUR CRITICAL TASK ***
-Analyze the contract and structure your findings thematically. For each distinct topic or issue you identify for this step, provide your analysis, the supporting ASC 606 rule, and the direct contract evidence.
+Analyze the contract and provide both structured step-specific assessment AND thematic narrative analysis. 
 
 You MUST return your response as a single, well-formed JSON object with the following exact structure:
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-{step_specific_json_field}  "analysis_points": [
+  {step_specific_json_field}"analysis_points": [
     {{
       "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
       "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
@@ -240,10 +273,12 @@ You MUST return your response as a single, well-formed JSON object with the foll
   ]
 }}
 
-Guidelines:
+CRITICAL INSTRUCTIONS:
+- Fill out the step-specific structured assessment thoroughly and precisely
+- Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
+- Ensure structured assessment connects logically to your narrative analysis points
 - Aim for 2-4 analysis points per step (avoid single mega-topics or excessive fragmentation)
 - Every quote MUST include source document name
-- Integrate key considerations and judgment areas directly into the relevant topic analysis
 - Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
 - Make analysis flow naturally, building from one point to the next"""
 
