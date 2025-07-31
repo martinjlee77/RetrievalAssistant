@@ -189,3 +189,127 @@ Create an executive summary using this professional structure:
 • Implementation Requirements: [Key operational changes needed]
 
 Keep this professional, concise, and focused on executive-level insights."""
+
+    @staticmethod
+    def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
+                                        contract_text: str, rag_context: str, 
+                                        contract_terms: list, guidance_context: str) -> str:
+        """Generate step-specific analysis prompt."""
+        return f"""You are an expert in ASC 606 revenue recognition. Analyze this contract for Step {step_number}: {step_title}.
+
+PRIMARY GUIDANCE: {step_guidance}
+
+AUTHORITATIVE GUIDANCE CONTEXT:
+{rag_context}
+
+ADDITIONAL GUIDANCE:
+{guidance_context}
+
+CONTRACT TEXT TO ANALYZE:
+{contract_text}
+
+EXTRACTED CONTRACT TERMS:
+{', '.join(contract_terms) if contract_terms else 'None identified'}
+
+Provide a detailed analysis including:
+1. **Executive Conclusion**: Clear determination for this step
+2. **Supporting Analysis**: Detailed reasoning with ASC 606 citations
+3. **Contract Evidence**: Specific quotes from the contract that support your conclusion
+4. **Key Considerations**: Any complexities or judgment areas
+
+Return your response as a JSON object with the keys: executive_conclusion, supporting_analysis, contract_evidence, key_considerations."""
+
+    @staticmethod
+    def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Generate consistency check prompt for all 5 steps."""
+        return f"""Review the consistency of this ASC 606 analysis across all 5 steps:
+
+STEP 1 - CONTRACT IDENTIFICATION:
+{s1.get('executive_conclusion', 'N/A')}
+
+STEP 2 - PERFORMANCE OBLIGATIONS:
+{s2.get('executive_conclusion', 'N/A')}
+
+STEP 3 - TRANSACTION PRICE:
+{s3.get('executive_conclusion', 'N/A')}
+
+STEP 4 - ALLOCATION:
+{s4.get('executive_conclusion', 'N/A')}
+
+STEP 5 - RECOGNITION:
+{s5.get('executive_conclusion', 'N/A')}
+
+Check for logical consistency between steps. Do the conclusions align? Are there any contradictions or gaps?
+
+Provide brief feedback on any inconsistencies found, or confirm the analysis is consistent."""
+
+    @staticmethod
+    def get_background_prompt(contract_data) -> str:
+        """Generate background section prompt."""
+        return f"""Write a professional background section for an ASC 606 memo.
+
+CONTRACT DETAILS:
+- Customer: {getattr(contract_data, 'customer_name', 'N/A')}
+- Contract Date: {getattr(contract_data, 'contract_date', 'N/A')}
+- Services/Products: {getattr(contract_data, 'arrangement_description', 'N/A')}
+- Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance')}
+
+Create a background section that includes:
+1. Contract parties and key dates
+2. Nature of the arrangement
+3. Scope of this analysis
+4. Key terms relevant to revenue recognition
+
+Keep it professional and concise."""
+
+    @staticmethod
+    def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Generate key judgments prompt."""
+        judgments = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            considerations = step.get('key_considerations', '')
+            if considerations and 'judgment' in considerations.lower():
+                judgments.append(f"Step {i}: {considerations}")
+        
+        judgment_text = '\n'.join(judgments) if judgments else "No significant professional judgments identified in the analysis."
+        
+        return f"""Identify and explain the key professional judgments in this ASC 606 analysis:
+
+POTENTIAL JUDGMENT AREAS:
+{judgment_text}
+
+For each significant judgment area:
+1. **What**: Describe the judgment made
+2. **Why**: Explain the rationale and ASC 606 guidance applied
+3. **Alternatives**: Note any alternative treatments considered
+4. **Impact**: Assess the materiality of the judgment
+
+If no significant judgments are required, state that the contract follows standard ASC 606 treatments."""
+
+    @staticmethod
+    def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
+        """Format step analysis as markdown."""
+        if not step_data:
+            return f"## Step {step_number}: {step_name}\n\nNo analysis available.\n"
+        
+        conclusion = step_data.get('executive_conclusion', 'N/A')
+        analysis = step_data.get('supporting_analysis', 'N/A')
+        evidence = step_data.get('contract_evidence', 'N/A')
+        considerations = step_data.get('key_considerations', 'N/A')
+        
+        return f"""## Step {step_number}: {step_name}
+
+**Executive Conclusion:**
+{conclusion}
+
+**Supporting Analysis:**
+{analysis}
+
+**Contract Evidence:**
+{evidence}
+
+**Key Considerations:**
+{considerations}
+
+---
+"""

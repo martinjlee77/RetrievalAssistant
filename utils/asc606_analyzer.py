@@ -17,7 +17,7 @@ from core.models import ASC606Analysis
 from utils.llm import make_llm_call, make_llm_call_async, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
-from utils.step_prompts import StepAnalysisPrompts
+from utils.step_prompts import StepPrompts
 # Note: streamlit imported dynamically where needed to avoid import errors
 
 
@@ -144,7 +144,7 @@ class ASC606Analyzer:
             
             # === STEP 2: CONCURRENT STEP-BY-STEP ANALYSIS ===
             # 🚀 GEMINI PERFORMANCE IMPROVEMENT: Execute all 5 steps concurrently
-            step_mapping = StepAnalysisPrompts.get_step_guidance_mapping()
+            step_mapping = StepPrompts.get_step_info()
             
             # Phase 1: Prepare all prompts and tasks
             tasks = []
@@ -186,7 +186,7 @@ class ASC606Analyzer:
                             step_specific_context += f"{result['content']}\n"
                 
                 # Generate focused prompt for this specific step
-                step_prompt = StepAnalysisPrompts.get_step_specific_analysis_prompt(
+                step_prompt = StepPrompts.get_step_specific_analysis_prompt(
                     step_number=step_num,
                     step_title=step_info['title'],
                     step_guidance=step_info['primary_guidance'],
@@ -273,7 +273,7 @@ class ASC606Analyzer:
             
             # 0. CRITICAL: Consistency Check
             self.logger.info("Performing consistency check across all 5 steps...")
-            consistency_prompt = StepAnalysisPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
+            consistency_prompt = StepPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
             consistency_result = make_llm_call(
                 self.client, consistency_prompt,
                 model='gpt-4o', max_tokens=1000, temperature=0.1  # Use best model with low temp for accuracy
@@ -295,28 +295,28 @@ class ASC606Analyzer:
             memo_tasks = []
             
             # Task 1: Executive Summary 
-            summary_prompt = StepAnalysisPrompts.get_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data)
+            summary_prompt = StepPrompts.get_enhanced_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data.analysis_title, contract_data.customer_name)
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, summary_prompt, 
                 model='gpt-4o-mini', max_tokens=800, temperature=0.3
             )))
             
             # Task 2: Background
-            background_prompt = StepAnalysisPrompts.get_background_prompt(contract_data)
+            background_prompt = StepPrompts.get_background_prompt(contract_data)
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, background_prompt,
                 model='gpt-4o-mini', max_tokens=600, temperature=0.3
             )))
             
             # Task 3: Key Judgments
-            judgments_prompt = StepAnalysisPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
+            judgments_prompt = StepPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, judgments_prompt,
                 model='gpt-4o-mini', max_tokens=1000, temperature=0.3
             )))
             
             # Task 4: Financial Impact
-            financial_prompt = StepAnalysisPrompts.get_financial_impact_prompt(
+            financial_prompt = StepPrompts.get_financial_impact_prompt(
                 s1, s2, s3, s4, s5, 
                 getattr(contract_data, 'customer_name', 'Customer'),
                 getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
@@ -327,7 +327,7 @@ class ASC606Analyzer:
             )))
             
             # Task 5: Conclusion
-            conclusion_prompt = StepAnalysisPrompts.get_conclusion_prompt(
+            conclusion_prompt = StepPrompts.get_conclusion_prompt(
                 s1, s2, s3, s4, s5,
                 getattr(contract_data, 'customer_name', 'Customer'),
                 getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
@@ -366,7 +366,7 @@ class ASC606Analyzer:
             
             for i in range(1, 6):
                 step_data = step_results.get(f"step_{i}", {})
-                formatted_step = StepAnalysisPrompts.format_step_detail_as_markdown(
+                formatted_step = StepPrompts.format_step_detail_as_markdown(
                     step_data, i, step_names[i-1]
                 )
                 detailed_analysis_sections.append(formatted_step)
