@@ -361,42 +361,58 @@ This section must contain the comprehensive 5-step ASC 606 framework:
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
             conclusion = step.get('executive_conclusion', 'N/A')
             conclusions.append(f"Step {i}: {conclusion}")
+
+        audience = getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')
         
-        return f"""Write a professional executive summary for an ASC 606 technical accounting memo.
+        return f"""You are a senior accounting manager tasked with writing a world-class executive summary for a technical accounting memo on ASC 606. The summary must be concise, authoritative, and immediately useful to a senior reader.
 
 CONTRACT CONTEXT:
 - Customer: {getattr(contract_data, 'customer_name', 'Unknown')}
 - Analysis: {getattr(contract_data, 'analysis_title', 'ASC 606 Analysis')}
+- Primary Audience: {audience}
 
-STEP CONCLUSIONS:
+CONCLUSIONS FROM THE 5-STEP ANALYSIS:
 {chr(10).join(conclusions)}
 
-Write 2-3 paragraphs synthesizing these conclusions into a cohesive executive summary that:
-- States the overall ASC 606 compliance conclusion
-- Highlights key judgments and financial impacts
-- Provides clear guidance for decision makers
+YOUR TASK:
+Synthesize the provided conclusions into a single, dense, and highly professional paragraph. The summary MUST follow this specific structure:
 
-Use professional accounting language appropriate for technical staff."""
+1.  **Opening Statement:** Start by confirming that a valid contract exists under ASC 606.
+2.  **Performance Obligations (POs):** State the exact number of distinct performance obligations identified in Step 2.
+3.  **Transaction Price:** State the total transaction price determined in Step 3.
+4.  **Allocation & Recognition Summary:** Briefly summarize how the transaction price will be allocated across the POs and the timing of revenue recognition for the major components (e.g., "the license revenue will be recognized upfront, while support services will be recognized ratably over the term").
+5.  **Key Judgment (Conditional):** If a significant judgment was required (e.g., regarding the distinctness of POs, variable consideration, or a financing component), conclude by highlighting this single most critical judgment. If the contract is straightforward, omit this part.
 
+The tone should be formal and appropriate for the specified audience. Do not write more than one paragraph unless the complexity of the conclusions absolutely requires a second. Do not include recommendations or guidance for future actions.
+
+Begin writing the executive summary.
+"""
+        
     @staticmethod 
     def get_background_prompt(contract_data) -> str:
-        """Generates focused prompt for background section only."""
-        return f"""Write a professional background section for an ASC 606 technical accounting memo.
+        """Generates a focused and non-repetitive background section."""
+     
+        key_focus = getattr(contract_data, 'key_focus_areas', '')
+        
+        return f"""You are writing the 'Background' section of a formal ASC 606 accounting memo. A summary data table will appear just before your text, so DO NOT repeat basic information like party names or contract dates.
 
-CONTRACT INFORMATION:
-- Customer: {getattr(contract_data, 'customer_name', 'Unknown')}
-- Analysis Title: {getattr(contract_data, 'analysis_title', 'ASC 606 Analysis')}
-- Contract Start: {getattr(contract_data, 'contract_start_date', 'Not specified')}
-- Contract End: {getattr(contract_data, 'contract_end_date', 'Not specified')}
-- Modification: {getattr(contract_data, 'is_modification', False)}
+YOUR TASK:
+Write a single, concise paragraph that provides context for the analysis. Your paragraph should cover:
+1.  **Nature of the Arrangement:** Briefly describe the business purpose of the contract based on the summary provided below.
+2.  **Scope of this Memo:** State that the objective of this memorandum is to document the Company's accounting analysis and conclusions under ASC 606.
+3.  **Specific Areas of Judgment (if provided):** If the user provided specific 'Key Focus Areas', incorporate them into the scope. This is the most important part.
 
-Write 1-2 paragraphs covering:
-- Contract parties and key dates
-- Nature of the arrangement and services
-- Scope and objectives of this ASC 606 analysis
-- Any unique circumstances requiring special consideration
+CONTEXT:
+- Arrangement Summary: "{getattr(contract_data, 'arrangement_description', 'A standard sales arrangement.')}"
+- Key Focus Areas provided by user: "{key_focus if key_focus else 'None'}"
 
-Keep this section factual and concise."""
+Example if focus areas ARE provided:
+"The objective of this memorandum is to document the accounting analysis for this arrangement under ASC 606, with a specific focus on evaluating whether the implementation services are distinct from the SaaS license, per the criteria in ASC 606-10-25-21."
+
+Example if no focus areas are provided:
+"The objective of this memorandum is to document the Company's accounting analysis and conclusions for the transaction with the customer under the five-step model of ASC 606."
+
+"""
 
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
@@ -406,19 +422,21 @@ Keep this section factual and concise."""
             conclusion = step.get('executive_conclusion', 'N/A')
             step_conclusions.append(f"Step {i}: {conclusion}")
         
-        return f"""You are a senior accounting partner reviewing ASC 606 analysis for consistency.
+        return f"""You are a meticulous senior accounting partner reviewing a draft ASC 606 analysis for internal consistency before it goes to the audit committee.
 
-INDIVIDUAL STEP CONCLUSIONS:
+Here are the summary conclusions from each of the five steps:
 {chr(10).join(step_conclusions)}
 
-CRITICAL TASK: Identify any contradictions or inconsistencies between these 5 steps.
+CRITICAL TASK: Scrutinize these conclusions and identify any logical or mathematical contradictions between the steps. Your reputation for quality depends on this review.
 
 Check for these common issues:
 - Step 1 says "single contract" but Step 2 identifies multiple unrelated obligations
 - Step 2 identifies distinct services but Step 4 allocates to combined obligation  
-- Step 3 determines fixed price but Step 5 recognizes over variable timeline
-- Transaction price in Step 3 doesn't match allocation in Step 4
-- Recognition timing in Step 5 conflicts with obligation identification in Step 2
+- Step 3 determines fixed price but in Step 5 a variable amount is recognized over the contract period
+- Transaction price in Step 3 doesn't match the total amount allocated in Step 4
+- Recognition timing in Step 5 conflicts with the nature of the performance obligation identified in Step 2
+- If the user indicated a third party is involved (Tab 2 input), does the analysis in Step 2 (identifying P.O.s) and Step 3 (determining transaction price) correctly reflect a principal (gross revenue) or agent (net revenue) conclusion?
+- If the user flagged this as a contract modification (Tab 2 input), does the analysis in Step 1 and Step 2 properly consider whether it should be treated as a separate contract or a cumulative catch-up adjustment, as required by modification guidance?
 
 RESPONSE FORMAT:
 If inconsistencies found: List each contradiction clearly with recommended resolution

@@ -29,6 +29,7 @@ class ContractData(BaseModel):
     contract_end: Optional[date] = None
     currency: str = "USD"
     uploaded_file_name: str = ""
+    document_names: List[str] = Field(default_factory=list)  # List of uploaded document filenames
     contract_types: List[str] = Field(default_factory=list)
     
     # New steering fields from Tab 3

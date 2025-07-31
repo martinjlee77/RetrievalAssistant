@@ -1,0 +1,59 @@
+Fixing the "Documents Reviewed" List
+You are right to want the individual filenames listed. The fact that it only shows "• Contract document (uploaded file)" points to a problem in how the file list is being accessed.
+
+The code for this resides in _format_documents_list() within asc606_analyzer.py.
+
+Let's look at the logic:
+
+# From asc606_analyzer.py
+def _format_documents_list(self) -> str:
+    import streamlit as st
+    try:
+        documents = []
+        if hasattr(st, 'session_state') and hasattr(st.session_state, 'uploaded_files'):
+            uploaded_files = st.session_state.uploaded_files
+            if uploaded_files:
+                # ... loop to get names ...
+    except Exception as e:
+        # ...
+
+This function tries to get the file list from st.session_state.uploaded_files. This is likely failing because by the time the memo is being assembled, the uploaded_files object from the original file uploader widget might no longer be in the session state, or it might be in a different format.
+
+A much more robust solution is to pass the filenames into the analyzer as part of the contract_data object, just like the customer name and dates.
+
+The Fix (A 2-Part Plan for your Developer):
+
+In the Streamlit Page (pages/ASC_606_Memo_Generator.py): When building the ContractData object, extract the filenames from the uploaded_files list and store them in a new field.
+
+# In the "Generate Memo" button logic
+all_form_data = {**tab1_data, **tab2_data, **tab3_data}
+file_names = [f.name for f in all_form_data["uploaded_files"]]
+
+contract_data = ContractData(
+    # ... other fields ...
+    document_names=file_names, # Add this new field
+    # ...
+)
+
+(Note: You will also need to add document_names: List[str] to the ContractData model definition in core/models.py)
+
+In asc606_analyzer.py: Modify _format_documents_list to read from this reliable contract_data object instead of trying to access Streamlit's session state.
+
+# Change _format_documents_list to accept contract_data
+def _create_contract_data_table(self, contract_data) -> str:
+    # ...
+    documents_list = self._format_documents_list(contract_data)
+    # ...
+
+def _format_documents_list(self, contract_data) -> str:
+    try:
+        documents = getattr(contract_data, 'document_names', [])
+        if not documents:
+            return "• No documents specified."
+
+        return "\n".join([f"• {name}" for name in documents])
+    except Exception as e:
+        self.logger.warning(f"Could not retrieve document list: {e}")
+        return "• Error retrieving document list."
+
+This change makes the analyzer more self-contained and removes the fragile dependency on st.session_state, ensuring the correct filenames are always available for the memo.

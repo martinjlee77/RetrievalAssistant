@@ -470,8 +470,8 @@ class ASC606Analyzer:
         currency = getattr(contract_data, 'currency', 'USD')
         modification = getattr(contract_data, 'is_modification', False)
         
-        # Add documents reviewed list
-        documents_list = self._format_documents_list()
+        # Add documents reviewed list using robust approach
+        documents_list = self._format_documents_list(contract_data)
         
         return f"""**CONTRACT DATA SUMMARY**
 
@@ -488,24 +488,15 @@ class ASC606Analyzer:
 
 {documents_list}"""
 
-    def _format_documents_list(self) -> str:
-        """Format the list of documents reviewed for the analysis."""
-        import streamlit as st
-        
+    def _format_documents_list(self, contract_data) -> str:
+        """Format the list of documents reviewed for the analysis using robust contract_data approach."""
         try:
-            # Get uploaded files from session state
-            documents = []
-            if hasattr(st, 'session_state') and hasattr(st.session_state, 'uploaded_files'):
-                uploaded_files = st.session_state.uploaded_files
-                if uploaded_files:
-                    for file in uploaded_files:
-                        file_name = getattr(file, 'name', str(file))
-                        documents.append(f"• {file_name}")
-            
+            # Get document names from contract_data (robust approach)
+            documents = getattr(contract_data, 'document_names', [])
             if not documents:
-                documents = ["• Contract document (uploaded file)"]
-                
-            return "\n".join(documents)
+                return "• No documents specified."
+
+            return "\n".join([f"• {name}" for name in documents])
             
         except Exception as e:
             self.logger.warning(f"Could not retrieve document list: {e}")

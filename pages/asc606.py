@@ -430,6 +430,7 @@ if st.session_state.analysis_results is None:
                         contract_end=all_form_data.get("contract_end"),
                         currency=all_form_data.get("currency", "USD"),
                         uploaded_file_name=", ".join([f.name for f in all_form_data["uploaded_files"]]),
+                        document_names=[f.name for f in all_form_data["uploaded_files"]],  # Individual filenames for memo
                         contract_types=all_form_data.get("contract_types", []),
                         # New steering fields from Tab 3
                         key_focus_areas=all_form_data.get("key_focus_areas", ""),
