@@ -1,0 +1,109 @@
+The reason you are clicking the button and "nothing happens" is because the developer's implementation is being silently blocked by your web browser's built-in pop-up blocker.
+
+This is a subtle but critical bug related to how Streamlit and web browsers interact. The previous "fix" was logically correct but architecturally flawed for a web environment.
+
+Technical Explanation: Why the Button Fails
+Here is the exact execution flow that causes the failure:
+
+You Click the Button: You perform a click event in the browser.
+Streamlit Reruns Python: The click triggers a full rerun of the Python script on the server. The if st.button(...) block now evaluates to True.
+JavaScript is Injected: The server-side Python code executes and sends a new piece of HTML to your browser: a <script> tag containing the window.open() command.
+Browser Security Kicks In: Your browser sees a script that was not part of the original page load suddenly trying to open a new window. It does not associate this script's action with your initial button click because of the server round-trip delay.
+Pop-up is Blocked: From the browser's perspective, this is an unsolicited, programmatic attempt to open a pop-up, which is a classic behavior of malicious ads. It therefore blocks the action, and since it's a common security feature, it does so without showing an error message.
+The result is that from your perspective, you click the button and nothing happens.
+
+The Correct Implementation: A Custom HTML Component
+To fix this permanently, the click event and the window.open action must be directly linked on the client side, with no server round-trip in between. We must create a custom button entirely in HTML with an onclick JavaScript handler.
+
+The developer must replace the render_view_in_browser_button function with the following production-ready version. This new function does not use st.button at all; it constructs a self-contained HTML component that is guaranteed to work.
+
+Production-Ready Code
+This new function should replace the old one in utils/html_export.py.
+
+# In utils/html_export.py
+
+import streamlit as st
+import streamlit.components.v1 as components
+import json
+
+def render_view_in_browser_button(html_content: str):
+    """
+    Renders a custom HTML button that uses a direct onclick JavaScript handler
+    to open a new tab and write the HTML content to it. This is the correct
+    method to bypass browser pop-up blockers and URL length limits.
+    """
+    # 1. Safely embed the large HTML string into a JavaScript-readable format.
+    # json.dumps handles quotes, newlines, and other special characters correctly.
+    safe_html_content = json.dumps(html_content)
+
+    # 2. Construct a self-contained HTML component.
+    # This includes CSS for styling, a JavaScript function, and the button itself.
+    html_with_js = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            /* Basic styling to make our button look like a real button */
+            .custom-button {{
+                border: 1px solid rgba(49, 51, 63, 0.2);
+                border-radius: 0.5rem;
+                padding: 0.5em 1em;
+                background-color: #FFFFFF;
+                color: #31333F;
+                font-size: 14px;
+                font-weight: 400;
+                cursor: pointer;
+                text-align: center;
+                display: inline-block;
+                width: 100%;
+                box-sizing: border-box; /* Ensures padding doesn't affect width */
+            }}
+            .custom-button:hover {{
+                border-color: #FF4B4B;
+                color: #FF4B4B;
+            }}
+            .custom-button:active {{
+                background-color: #F0F2F6;
+            }}
+        </style>
+    </head>
+    <body>
+        <script>
+            // This JavaScript function will be called directly by the button's onclick event.
+            function openHtmlInNewTab() {{
+                // Get the HTML content that was safely embedded from Python.
+                const htmlContent = {safe_html_content};
+
+                // Open a new, blank tab. This is allowed because it's a direct result of a user click.
+                const newWindow = window.open("", "_blank");
+
+                // Write the full HTML content into the new tab.
+                newWindow.document.open();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+            }}
+        </script>
+
+        <!-- The button element with the direct onclick handler. -->
+        <button class="custom-button" onclick="openHtmlInNewTab()">
+            🌐 View in Browser
+        </button>
+    </body>
+    </html>
+    """
+
+    # 3. Render the custom component in Streamlit.
+    components.html(html_with_js, height=50)
+
+Action Items for the Developer
+Delete the old render_view_in_browser_button function from its utility file (e.g., utils/html_export.py).
+Add the new, corrected version of the function provided above into the same file.
+Confirm the call remains correct. The call to this function in asc_606_page.py does not need to change.
+# In asc_606_page.py (this part is correct and does not need to change)
+# ...
+# Column 2: View in Browser (Correct JavaScript Approach)
+with dl_col2:
+    render_view_in_browser_button(html_content)
+# ...
+
+This implementation is the industry-standard solution for this problem. It is robust, reliable, and will not be blocked by browser security features. It permanently resolves the issue.

@@ -378,44 +378,75 @@ def create_html_download_link(html_content: str, filename: str = "asc606_memo.ht
 
 def render_view_in_browser_button(html_content: str):
     """
-    Renders a button that, when clicked, uses JavaScript to open a new tab
-    and write the provided HTML content to it. This bypasses URL length limits.
-    
-    Args:
-        html_content: The complete HTML document to display
+    Renders a custom HTML button that uses a direct onclick JavaScript handler
+    to open a new tab and write the HTML content to it. This is the correct
+    method to bypass browser pop-up blockers and URL length limits.
     """
-    import streamlit as st
     import streamlit.components.v1 as components
     import json
     
-    # Use a unique key for the button to maintain state
-    button_key = "view_in_browser_button"
+    # 1. Safely embed the large HTML string into a JavaScript-readable format.
+    # json.dumps handles quotes, newlines, and other special characters correctly.
+    safe_html_content = json.dumps(html_content)
 
-    if st.button("🌐 View in Browser", use_container_width=True, key=button_key, help="Opens the styled memo in a new browser tab."):
-        # Safely embed the Python string into the JavaScript block
-        # using json.dumps() to handle quotes, newlines, and other special characters.
-        safe_html_content = json.dumps(html_content)
-
-        # The JavaScript code to be executed
-        js_code = f"""
-            <script>
-            // This function runs when the component is rendered
-            (function() {{
-                // 1. Open a new, blank browser tab.
-                const newWindow = window.open("", "_blank");
-
-                // 2. Get the HTML content passed from Python.
+    # 2. Construct a self-contained HTML component.
+    # This includes CSS for styling, a JavaScript function, and the button itself.
+    html_with_js = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            /* Basic styling to make our button look like a real button */
+            .custom-button {{
+                border: 1px solid rgba(49, 51, 63, 0.2);
+                border-radius: 0.5rem;
+                padding: 0.5em 1em;
+                background-color: #FFFFFF;
+                color: #31333F;
+                font-size: 14px;
+                font-weight: 400;
+                cursor: pointer;
+                text-align: center;
+                display: inline-block;
+                width: 100%;
+                box-sizing: border-box; /* Ensures padding doesn't affect width */
+            }}
+            .custom-button:hover {{
+                border-color: #FF4B4B;
+                color: #FF4B4B;
+            }}
+            .custom-button:active {{
+                background-color: #F0F2F6;
+            }}
+        </style>
+    </head>
+    <body>
+        <script>
+            // This JavaScript function will be called directly by the button's onclick event.
+            function openHtmlInNewTab() {{
+                // Get the HTML content that was safely embedded from Python.
                 const htmlContent = {safe_html_content};
 
-                // 3. Write the content to the new tab's document.
+                // Open a new, blank tab. This is allowed because it's a direct result of a user click.
+                const newWindow = window.open("", "_blank");
+
+                // Write the full HTML content into the new tab.
                 newWindow.document.open();
                 newWindow.document.write(htmlContent);
                 newWindow.document.close();
-            }})();
-            </script>
-        """
-        # Render the HTML component with the script. The script runs automatically.
-        components.html(js_code, height=0, width=0)
+            }}
+        </script>
+
+        <!-- The button element with the direct onclick handler. -->
+        <button class="custom-button" onclick="openHtmlInNewTab()">
+            🌐 View in Browser
+        </button>
+    </body>
+    </html>
+    """
+
+    # 3. Render the custom component in Streamlit.
+    components.html(html_with_js, height=50)
 
 def enhance_markdown_for_display(memo_markdown: str) -> str:
     """
