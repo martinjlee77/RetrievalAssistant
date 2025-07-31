@@ -3,10 +3,12 @@ ASC 606 Analyzer - Hybrid RAG System with Authoritative Sources
 Implements full Retrieval-Augmented Generation workflow
 """
 
+import asyncio
 import json
 import logging
 import os
 import re
+import time
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 from openai import OpenAI
@@ -193,6 +195,9 @@ class ASC606Analyzer:
                 
                 # Get detailed analysis for this step
                 try:
+                    # GEMINI IMPROVEMENT: Add step timing for performance diagnostics
+                    step_start_time = time.time()
+                    
                     step_response = make_llm_call(
                         self.client,
                         step_prompt,
@@ -208,7 +213,10 @@ class ASC606Analyzer:
                     step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
                     
                     step_results[f"step_{step_num}"] = step_analysis_sanitized
-                    self.logger.info(f"Step {step_num} analysis completed: {len(step_response) if step_response else 0} characters")
+                    
+                    # GEMINI IMPROVEMENT: Log timing and performance diagnostics
+                    step_duration = time.time() - step_start_time
+                    self.logger.info(f"Step {step_num} analysis completed in {step_duration:.2f}s: {len(step_response) if step_response else 0} characters")
                     
                 except (json.JSONDecodeError, Exception) as e:
                     self.logger.error(f"Step {step_num} failed: {e}")

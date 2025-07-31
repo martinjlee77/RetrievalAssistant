@@ -22,6 +22,42 @@ def get_openai_client():
         st.stop()
     return OpenAI(api_key=api_key)
 
+async def make_llm_call_async(
+    client,
+    prompt: str,
+    temperature: float = 0.3,
+    max_tokens: Optional[int] = None,
+    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    response_format: Optional[Dict[str, Any]] = None
+) -> Optional[str]:
+    """
+    Asynchronous version of make_llm_call for concurrent execution
+    """
+    try:
+        # Prepare messages format
+        messages = [{"role": "user", "content": prompt}]
+        
+        # Prepare request parameters
+        request_params = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature
+        }
+        
+        if max_tokens:
+            request_params["max_tokens"] = max_tokens
+        if response_format:
+            request_params["response_format"] = response_format
+        
+        # Make async API call
+        response = await client.chat.completions.create(**request_params)
+        return response.choices[0].message.content
+        
+    except Exception as e:
+        import streamlit as st
+        st.error(f"LLM API call failed: {str(e)}")
+        return None
+
 def make_llm_call(
     client,
     prompt: str,
