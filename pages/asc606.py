@@ -21,10 +21,7 @@ from utils.llm import create_debug_sidebar, create_docx_from_text
 def format_dict_as_markdown(data: dict) -> str:
     """Converts a dictionary to a readable Markdown bulleted list."""
     markdown_str = ""
-    for key, value in data.items():
-        # Format the key (e.g., 'is_enforceable' -> 'Is Enforceable')
-        formatted_key = key.replace('_', ' ').replace('-', ' ').title()
-        markdown_str += f"- **{formatted_key}:** {value}\n"
+    for key, value in data.items():0e}\n"
     return markdown_str
 
 
