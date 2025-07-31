@@ -1,0 +1,46 @@
+To the developer: "The consistency check is a great idea, but I noticed it hasn't been updated yet to use the new structured JSON data from each step. Let's make it more powerful and reliable by having it use this new data. Also, could we have it return a JSON object so we can programmatically check the result instead of searching for keywords?"
+
+Here is a revised version that implements these improvements:
+
+# PROPOSED REVISION
+@staticmethod
+def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+    """Generate consistency check prompt using structured data from all 5 steps."""
+    import json
+
+    # Use the rich, structured data, not just the text conclusion
+    step_data = {
+        "step_1_assessment": s1.get('contract_criteria_assessment', {}),
+        "step_2_obligations": s2.get('performance_obligations', []),
+        "step_3_price": s3.get('transaction_price_components', {}),
+        "step_4_allocation": s4.get('allocation_details', {}),
+        "step_5_recognition": s5.get('revenue_recognition_plan', [])
+    }
+
+    return f"""You are an expert accounting review bot. Your task is to perform a logical consistency check on the following ASC 606 analysis data.
+
+ANALYSIS DATA:
+{json.dumps(step_data, indent=2)}
+
+CRITICAL REVIEW TASK:
+Analyze the data above and perform these specific checks:
+1.  **PO Count Mismatch:** Does the number of distinct performance obligations in `step_2_obligations` match the number of allocations in `step_4_allocation`?
+2.  **Price Mismatch:** Does the `total_transaction_price` in `step_3_price` appear to equal the sum of the `allocated_amount` fields in `step_4_allocation`? (You may need to parse numbers from strings).
+3.  **Recognition Mismatch:** Does every performance obligation listed in `step_2_obligations` have a corresponding entry in the `step_5_recognition` plan?
+4.  **Contract Validity:** If any criterion in `step_1_assessment` is "Not Met", does the rest of the analysis correctly reflect that no revenue should be recognized yet?
+
+You MUST return your response as a single JSON object with the following exact structure:
+{{
+  "is_consistent": true/false,
+  "issues_found": [
+    {{
+      "issue_code": "PO_COUNT_MISMATCH",
+      "description": "A brief explanation of the inconsistency found."
+    }}
+  ]
+}}
+
+If the analysis is fully consistent, return `{{"is_consistent": true, "issues_found": []}}`. If you find multiple issues, add multiple objects to the 'issues_found' list.
+"""
+
+This revised prompt is vastly superior. It's more precise, less prone to error, and gives a machine-readable output that the application can reliably act upon. It's the most important change to make for this function.

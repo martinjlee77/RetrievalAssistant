@@ -383,31 +383,42 @@ CRITICAL INSTRUCTIONS:
 
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
-        """Generate consistency check prompt for all 5 steps."""
-        return f"""Review the logical consistency of this ASC 606 analysis across all 5 steps:
+        """Generate consistency check prompt using structured data from all 5 steps."""
+        import json
 
-STEP 1 - CONTRACT IDENTIFICATION:
-{s1.get('executive_conclusion', 'N/A')}
+        # Use the rich, structured data, not just the text conclusion
+        step_data = {
+            "step_1_assessment": s1.get('contract_criteria_assessment', {}),
+            "step_2_obligations": s2.get('performance_obligations', []),
+            "step_3_price": s3.get('transaction_price_components', {}),
+            "step_4_allocation": s4.get('allocation_details', {}),
+            "step_5_recognition": s5.get('revenue_recognition_plan', [])
+        }
 
-STEP 2 - PERFORMANCE OBLIGATIONS:
-{s2.get('executive_conclusion', 'N/A')}
+        return f"""You are an expert accounting review bot. Your task is to perform a logical consistency check on the following ASC 606 analysis data.
 
-STEP 3 - TRANSACTION PRICE:
-{s3.get('executive_conclusion', 'N/A')}
-
-STEP 4 - ALLOCATION:
-{s4.get('executive_conclusion', 'N/A')}
-
-STEP 5 - RECOGNITION:
-{s5.get('executive_conclusion', 'N/A')}
+ANALYSIS DATA:
+{json.dumps(step_data, indent=2)}
 
 CRITICAL REVIEW TASK:
-1. Check if the number of performance obligations in Step 2 matches the allocation approach in Step 4
-2. Verify that the transaction price in Step 3 aligns with the allocation amounts in Step 4
-3. Ensure the recognition timing in Step 5 matches the nature of obligations identified in Step 2
-4. Look for any logical contradictions between steps
+Analyze the data above and perform these specific checks:
+1.  **PO Count Mismatch:** Does the number of distinct performance obligations in `step_2_obligations` match the number of allocations in `step_4_allocation`?
+2.  **Price Mismatch:** Does the `total_transaction_price` in `step_3_price` appear to equal the sum of the `allocated_amount` fields in `step_4_allocation`? (You may need to parse numbers from strings).
+3.  **Recognition Mismatch:** Does every performance obligation listed in `step_2_obligations` have a corresponding entry in the `step_5_recognition` plan?
+4.  **Contract Validity:** If any criterion in `step_1_assessment` is "Not Met", does the rest of the analysis correctly reflect that no revenue should be recognized yet?
 
-Provide brief feedback on any inconsistencies found, or confirm the analysis is consistent."""
+You MUST return your response as a single JSON object with the following exact structure:
+{{
+  "is_consistent": true/false,
+  "issues_found": [
+    {{
+      "issue_code": "PO_COUNT_MISMATCH",
+      "description": "A brief explanation of the inconsistency found."
+    }}
+  ]
+}}
+
+If the analysis is fully consistent, return {{"is_consistent": true, "issues_found": []}}. If you find multiple issues, add multiple objects to the 'issues_found' list."""
 
     @staticmethod
     def get_background_prompt(contract_data) -> str:
