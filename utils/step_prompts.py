@@ -520,10 +520,11 @@ Your reputation for precision is on the line. Do not overstate the complexity of
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
         """Generates proportional financial impact prompt based on transaction complexity."""
         
-        # Extract transaction price and timing details
+        # Robust data extraction logic remains the same
         price_details = "Not specified"
         recognition_summary = "Not specified"
         
+        # Extract price and recognition summary
         if s3.get('executive_conclusion'):
             conclusion = s3.get('executive_conclusion', '')
             # Try to extract price information
@@ -534,13 +535,14 @@ Your reputation for precision is on the line. Do not overstate the complexity of
         
         if s5.get('executive_conclusion'):
             recognition_summary = s5.get('executive_conclusion', '')
-        
-        # Logic to determine transaction complexity
-        # We can infer complexity from the analysis conclusions
+
+        # NEW: Logic to determine transaction complexity
+        # We can infer complexity from the analysis conclusions.
+        # For example, if variable consideration or multiple POs exist.
         is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
                      "variable consideration" in s3.get('executive_conclusion', '').lower() or \
                      "financing component" in s3.get('executive_conclusion', '').lower()
-        
+
         return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
 
 CONTEXT FROM ANALYSIS:
@@ -580,7 +582,8 @@ The $XX.XX fee will be recorded as a deferred revenue liability upon receipt and
 
 ---
 
-Begin writing the financial impact section, strictly adhering to the proportionality rule."""
+Begin writing the financial impact section, strictly adhering to the proportionality rule.
+"""
 
     @staticmethod
     def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:

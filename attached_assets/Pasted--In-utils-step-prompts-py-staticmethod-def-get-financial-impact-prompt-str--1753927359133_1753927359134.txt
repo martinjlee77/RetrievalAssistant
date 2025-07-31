@@ -1,0 +1,55 @@
+# In utils/step_prompts.py
+@staticmethod
+def get_financial_impact_prompt(...) -> str:
+    # --- (Robust data extraction logic remains the same) ---
+    price_details = "Not specified"
+    # ... logic to get price and recognition summary ...
+
+    # --- NEW: Logic to determine transaction complexity ---
+    # We can infer complexity from the analysis conclusions.
+    # For example, if variable consideration or multiple POs exist.
+    is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
+                 "variable consideration" in s3.get('executive_conclusion', '').lower() or \
+                 "financing component" in s3.get('executive_conclusion', '').lower()
+
+    return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
+
+CONTEXT FROM ANALYSIS:
+- Price & Allocation Details: {price_details}
+- Revenue Recognition Summary: {recognition_summary}
+- Is the transaction complex (e.g., multiple POs, variable consideration)? {"Yes" if is_complex else "No"}
+
+YOUR TASK:
+Write a concise financial impact analysis.
+
+**CRITICAL RULE: Be Proportional.**
+- **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
+- **For COMPLEX transactions:** Provide a more detailed analysis, including separate sections for Financial Statement Impact and Illustrative Journal Entries as described below.
+
+---
+**IF THE TRANSACTION IS COMPLEX, follow this structure:**
+
+1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or multiple deferred revenue liabilities).
+
+2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Use standard account names.
+
+    | Date       | Account                          | Debit     | Credit    |
+    |------------|----------------------------------|-----------|-----------|
+    | ...        | ...                              | ...       | ...       |
+
+---
+**IF THE TRANSACTION IS SIMPLE, follow this structure:**
+
+The $XX.XX fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
+
+**Illustrative Journal Entry:**
+| Account                      | Debit     | Credit    |
+|------------------------------|-----------|-----------|
+| Cash / Accounts Receivable   | $XX.XX    |           |
+| Deferred Revenue             |           | $XX.XX    |
+| *To record contract inception* | | |
+
+---
+
+Begin writing the financial impact section, strictly adhering to the proportionality rule.
+"""
