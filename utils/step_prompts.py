@@ -135,8 +135,7 @@ Return your response as a single, valid JSON object with this structure:
   ],
   
   "professional_judgments": [
-    "A string explaining a single professional judgment.",
-    "Another string for a second judgment."
+    "ONLY populate this field if the analysis required a significant estimation (e.g., variable consideration amount) or a choice between multiple viable accounting treatments (e.g., whether a service is distinct). The standard application of a rule to a simple fact pattern is NOT a key judgment. If no such judgment exists for this step, you must return an empty list [] for this field."
   ],
   
   "potential_issues_addressed": "Discussion of potential complications, edge cases, or areas requiring additional consideration"
@@ -446,26 +445,37 @@ Be thorough - audit-quality analysis depends on step consistency."""
 
     @staticmethod
     def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
-        """Generates focused prompt for key judgments section only."""
-        judgments = []
+        """Generates a highly discerning prompt for the Key Professional Judgments section."""
+
+        all_judgments = []
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
-            step_judgments = step.get('professional_judgments', [])
-            for judgment in step_judgments:
-                judgment_text = judgment if isinstance(judgment, str) else str(judgment)
-                judgments.append(f"Step {i}: {judgment_text}")
-        
-        return f"""Write a professional key judgments section for an ASC 606 technical accounting memo.
+            judgments = step.get('professional_judgments', [])
+            if judgments:
+                all_judgments.extend(judgments)
 
-PROFESSIONAL JUDGMENTS FROM ANALYSIS:
-{chr(10).join(judgments)}
+        # If, after stricter identification, no judgments were passed up, provide a standard statement.
+        if not all_judgments:
+            return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-Transform these into 3-4 well-structured judgment statements that:
-- State each critical accounting position clearly
-- Provide rationale for the judgment
-- Reference relevant ASC 606 guidance
-- Address potential alternative treatments considered
+        # If judgments were flagged, this prompt will act as a final quality filter.
+        return f"""You are an accounting director writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
 
-Use numbered paragraphs (not bullets) and maintain professional accounting tone."""
+CONTEXT FROM ANALYSIS:
+The following potential judgments were flagged during the five-step analysis:
+{chr(10).join(all_judgments)}
+
+YOUR TASK:
+Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
+
+- **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. In this case, your entire output must be only the following single sentence:
+"The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+
+- If there are genuine judgments, present each one as a separate bullet point following this precise structure:
+  - **Judgment:** State the judgment clearly.
+  - **Analysis:** Explain the issue and the rationale for the conclusion.
+  - **Authoritative Guidance:** Cite the specific ASC 606 guidance that supports the judgment.
+
+Your reputation for precision is on the line. Do not overstate the complexity of a simple contract."""
 
     @staticmethod
     def get_step_guidance_mapping() -> Dict[int, Dict[str, str]]:
