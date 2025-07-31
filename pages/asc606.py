@@ -376,7 +376,7 @@ if st.session_state.analysis_results is None:
 
             # Continue with analysis workflow (this would connect to the existing analysis logic)
             # Use a generic, static label for the status box itself. This will be small.
-            with st.status("Analysis in Progress...", expanded=True) as status:
+            with st.status("Analysis in progress, please be patient...", expanded=True) as status:
                 try:
                     # Merge all form data for processing  
                     all_form_data = {**tab1_data, **tab2_data, **tab3_data}
@@ -458,7 +458,7 @@ if st.session_state.analysis_results is None:
                     st.write("➡️ **Processing your inputs...**")
                     # Contract data object creation happens here (already done above)
                     
-                    st.write("➡️ **Running AI analysis. This may take a moment.**")
+                    st.write("➡️ **Running AI analysis...**")
                     # Use asyncio.run to execute the async analyzer method
                     analysis_results = asyncio.run(analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config))
                     st.session_state.analysis_results = analysis_results
@@ -535,38 +535,50 @@ else:
             # Column 2: The primary viewing file (HTML View)
             with dl_col2:
                 try:
-                    # Create a data URL for viewing in browser
-                    data_url = create_html_download_link(html_content)
+                    # Debug: Check HTML content
+                    html_size = len(html_content)
                     
-                    # Check if data URL is too large for some browsers (>2MB limit)
-                    if len(data_url) > 2000000:  # 2MB limit
-                        st.warning("⚠️ Memo is large - using download instead of direct view")
-                        st.download_button(
-                            label="📄 Download HTML",
-                            data=html_content,
-                            file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
-                            mime="text/html",
-                            use_container_width=True,
-                            help="Download the memo as an HTML file to open in your browser."
-                        )
-                    else:
-                        st.link_button(
-                            label="🌐 View in Browser",
-                            url=data_url,
-                            use_container_width=True,
-                            help="Opens the fully-styled memo in a new tab for easy viewing or printing to PDF."
-                        )
-                except Exception as e:
-                    st.error(f"Error generating HTML view: {str(e)}")
-                    # Fallback to download button
+                    # Try both approaches - data URL and download
+                    data_url = create_html_download_link(html_content)
+                    data_url_size = len(data_url)
+                    
+                    # Try JavaScript approach for better data URL handling
+                    import streamlit.components.v1 as components
+                    
+                    # Create a custom button that opens data URL with JavaScript
+                    button_html = f"""
+                    <script>
+                    function openMemoInBrowser() {{
+                        const dataUrl = {repr(data_url)};
+                        const newWindow = window.open();
+                        if (newWindow) {{
+                            newWindow.document.write(atob(dataUrl.split(',')[1]));
+                            newWindow.document.close();
+                        }} else {{
+                            alert('Please allow pop-ups to view the memo in a new tab');
+                        }}
+                    }}
+                    </script>
+                    <button onclick="openMemoInBrowser()" 
+                            style="width: 100%; padding: 10px; background-color: #ff4b4b; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        🌐 View in Browser
+                    </button>
+                    """
+                    
+                    components.html(button_html, height=60)
+                    
+                    # Fallback download option
                     st.download_button(
-                        label="📄 Download HTML",
+                        label="📥 Download HTML",
                         data=html_content,
                         file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
                         mime="text/html",
                         use_container_width=True,
-                        help="Download the memo as an HTML file to open in your browser."
+                        help="Download HTML file as backup option."
                     )
+                    
+                except Exception as e:
+                    st.error(f"Error generating HTML view: {str(e)}")
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator
