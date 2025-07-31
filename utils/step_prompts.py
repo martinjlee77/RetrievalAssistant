@@ -198,21 +198,9 @@ Keep this professional, concise, and focused on executive-level insights."""
         
         # Add step-specific instructions for Step 4 (allocation details)
         step_specific_instructions = ""
+        step_specific_json_field = ""
         if step_number == 4:
-            step_specific_instructions = """  "allocation_details": {
-    "total_transaction_price": "The total amount from Step 3",
-    "allocations": [
-      {
-        "performance_obligation": "Description of the first performance obligation",
-        "allocated_amount": "Amount allocated to this performance obligation"
-      },
-      {
-        "performance_obligation": "Description of the second performance obligation", 
-        "allocated_amount": "Amount allocated to this performance obligation"
-      }
-    ]
-  },
-"""
+            step_specific_json_field = '"allocation_details": {\n    "total_transaction_price": "The total amount from Step 3",\n    "allocations": [\n      {\n        "performance_obligation": "Description of the first performance obligation",\n        "allocated_amount": "Amount allocated to this performance obligation"\n      }\n    ]\n  },\n  '
         
         return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
 
@@ -234,7 +222,7 @@ Analyze the contract and structure your findings thematically. For each distinct
 You MUST return your response as a single, well-formed JSON object with the following exact structure:
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-{step_specific_instructions}  "analysis_points": [
+{step_specific_json_field}  "analysis_points": [
     {{
       "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
       "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
