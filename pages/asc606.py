@@ -531,36 +531,32 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: View in Browser (File-based approach)
+            # Column 2: View in Browser (Fixed Data URL Approach)
             with dl_col2:
                 try:
-                    # Write HTML to a temporary file and provide download link
-                    import tempfile
-                    import os
-                    
-                    # Create a temporary HTML file
-                    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8') as f:
-                        f.write(html_content)
-                        temp_html_path = f.name
-                    
-                    # Read the file back as bytes for download
-                    with open(temp_html_path, 'rb') as f:
-                        html_bytes = f.read()
-                    
-                    # Clean up the temp file
-                    os.unlink(temp_html_path)
-                    
-                    st.download_button(
-                        label="🌐 Download HTML",
-                        data=html_bytes,
-                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
-                        mime="text/html",
-                        use_container_width=True,
-                        help="Download the memo as an HTML file to view in your browser."
-                    )
+                    # Debug: Check HTML content first
+                    if not html_content or len(html_content.strip()) < 100:
+                        st.error("HTML content appears to be empty or too short")
+                    else:
+                        # Ensure HTML is properly encoded
+                        import base64
+                        import urllib.parse
+                        
+                        # Clean HTML content of any problematic characters
+                        clean_html = html_content.replace('"', '&quot;').replace("'", "&#39;")
+                        
+                        # Create data URL with proper encoding
+                        encoded_html = urllib.parse.quote(clean_html)
+                        data_url = f"data:text/html;charset=utf-8,{encoded_html}"
+                        
+                        st.link_button(
+                            label="🌐 View in Browser",
+                            url=data_url,
+                            use_container_width=True,
+                            help="Opens the styled memo in a new browser tab."
+                        )
                 except Exception as e:
-                    st.error(f"Error generating HTML download: {str(e)}")
-                    # Fallback to download
+                    st.error(f"Error generating HTML view: {str(e)}")
                     st.download_button(
                         label="📄 Download HTML",
                         data=html_content,
