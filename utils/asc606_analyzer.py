@@ -43,6 +43,19 @@ class ASC606Analyzer:
             self.logger.error(f"Knowledge base manager initialization failed: {e}")
             self.kb_manager = None
 
+    def _clean_memo_section(self, text: str) -> str:
+        """Removes common unwanted markdown artifacts from LLM-generated text."""
+        if not isinstance(text, str):
+            return text  # Return as-is if it's an error message or not a string
+        
+        # Remove leading blockquote characters from each line
+        cleaned_text = '\n'.join(line.lstrip('> ') for line in text.split('\n'))
+        
+        # Future-proof: Add any other cleaning rules here as needed
+        # Example: Remove excessive whitespace, fix common formatting issues, etc.
+        
+        return cleaned_text.strip()
+
     def _sanitize_llm_json(self, data: Any) -> Any:
         """
         Recursively traverses a JSON object from the LLM and cleans up
@@ -352,7 +365,7 @@ class ASC606Analyzer:
                 if isinstance(response, Exception):
                     self.logger.error(f"Memo section '{section_names[i]}' failed: {response}")
                     # Use fallback content
-                    memo_responses[i] = f"[{section_names[i]} generation failed - please regenerate memo]"
+                    memo_responses[i] = f"[{section_names[i]} generation failed - please regenerate the memo]"
             
             # Generate Detailed Analysis (Python-only, no LLM call needed)
             detailed_analysis_sections = []
@@ -373,13 +386,15 @@ class ASC606Analyzer:
             
             detailed_analysis = "\n\n".join(detailed_analysis_sections)
             
-            # Ensure we have the final values
+            # Ensure we have the final values and apply consistent cleaning
             executive_summary, background, key_judgments, financial_impact, conclusion = memo_responses
             
-            # Clean any blockquote formatting that might create boxes
-            if conclusion and isinstance(conclusion, str):
-                # Remove any leading > characters that create blockquotes
-                conclusion = '\n'.join(line.lstrip('> ') for line in conclusion.split('\n'))
+            # Apply generalized cleaning to all AI-generated memo sections
+            executive_summary = self._clean_memo_section(executive_summary)
+            background = self._clean_memo_section(background)
+            key_judgments = self._clean_memo_section(key_judgments)
+            financial_impact = self._clean_memo_section(financial_impact)
+            conclusion = self._clean_memo_section(conclusion)
             
             # 7. Python Assembly of Final Memo with Professional Formatting
             contract_data_table = self._create_contract_data_table(contract_data)
