@@ -347,6 +347,9 @@ def create_pdf_from_html(html_content: str, filename: str = "asc606_memo.pdf") -
             optimize_size=('fonts', 'images')
         )
         
+        if pdf_bytes is None:
+            raise ValueError("PDF generation returned None")
+        
         return pdf_bytes
         
     except ImportError:
@@ -372,6 +375,47 @@ def create_html_download_link(html_content: str, filename: str = "asc606_memo.ht
     # Create download URL
     download_url = f"data:text/html;base64,{b64_html}"
     return download_url
+
+def render_view_in_browser_button(html_content: str):
+    """
+    Renders a button that, when clicked, uses JavaScript to open a new tab
+    and write the provided HTML content to it. This bypasses URL length limits.
+    
+    Args:
+        html_content: The complete HTML document to display
+    """
+    import streamlit as st
+    import streamlit.components.v1 as components
+    import json
+    
+    # Use a unique key for the button to maintain state
+    button_key = "view_in_browser_button"
+
+    if st.button("🌐 View in Browser", use_container_width=True, key=button_key, help="Opens the styled memo in a new browser tab."):
+        # Safely embed the Python string into the JavaScript block
+        # using json.dumps() to handle quotes, newlines, and other special characters.
+        safe_html_content = json.dumps(html_content)
+
+        # The JavaScript code to be executed
+        js_code = f"""
+            <script>
+            // This function runs when the component is rendered
+            (function() {{
+                // 1. Open a new, blank browser tab.
+                const newWindow = window.open("", "_blank");
+
+                // 2. Get the HTML content passed from Python.
+                const htmlContent = {safe_html_content};
+
+                // 3. Write the content to the new tab's document.
+                newWindow.document.open();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+            }})();
+            </script>
+        """
+        # Render the HTML component with the script. The script runs automatically.
+        components.html(js_code, height=0, width=0)
 
 def enhance_markdown_for_display(memo_markdown: str) -> str:
     """

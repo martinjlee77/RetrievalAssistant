@@ -510,7 +510,7 @@ else:
             dl_col1, dl_col2 = st.columns(2)
 
             # Generate the HTML content once to be used for both the link and the preview
-            from utils.html_export import convert_memo_to_html, create_html_download_link
+            from utils.html_export import convert_memo_to_html, render_view_in_browser_button
             from utils.llm import create_docx_from_text
             
             html_content = convert_memo_to_html(memo, contract_data)
@@ -531,40 +531,9 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: View in Browser (Fixed Data URL Approach)
+            # Column 2: View in Browser (Correct JavaScript Approach)
             with dl_col2:
-                try:
-                    # Debug: Check HTML content first
-                    if not html_content or len(html_content.strip()) < 100:
-                        st.error("HTML content appears to be empty or too short")
-                    else:
-                        # Ensure HTML is properly encoded
-                        import base64
-                        import urllib.parse
-                        
-                        # Clean HTML content of any problematic characters
-                        clean_html = html_content.replace('"', '&quot;').replace("'", "&#39;")
-                        
-                        # Create data URL with proper encoding
-                        encoded_html = urllib.parse.quote(clean_html)
-                        data_url = f"data:text/html;charset=utf-8,{encoded_html}"
-                        
-                        st.link_button(
-                            label="🌐 View in Browser",
-                            url=data_url,
-                            use_container_width=True,
-                            help="Opens the styled memo in a new browser tab."
-                        )
-                except Exception as e:
-                    st.error(f"Error generating HTML view: {str(e)}")
-                    st.download_button(
-                        label="📄 Download HTML",
-                        data=html_content,
-                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
-                        mime="text/html",
-                        use_container_width=True,
-                        help="Download HTML file to open in browser."
-                    )
+                render_view_in_browser_button(html_content)
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator

@@ -1,0 +1,86 @@
+This is a technical review of the recent fix for the "View in Browser" functionality.
+
+The current implementation using a st.link_button with a Data URL is not a viable production solution and needs to be replaced. While adding URL encoding via urllib.parse.quote() correctly solves for special characters, it does not address the primary point of failure: the browser's maximum URL length limitation.
+
+The Core Technical Issue: File Size vs. URL Length
+You mentioned the memo's HTML size might be an issue. That is correct. A memo size of under 1 MB is the direct cause of this problem when using a Data URL.
+
+Here is the technical breakdown:
+
+Browser URL Limits: All browsers impose a hard limit on the maximum number of characters a URL can contain. For modern browsers like Chrome and Firefox, this limit is around 2 megabytes. While 1 MB seems less than 2 MB, it is dangerously close to this limit and will fail in many common enterprise environments.
+Environmental Constraints: The 2 MB limit is not guaranteed. Network proxies, firewalls, and security gateways often enforce much smaller URL limits (e.g., 64KB - 256KB) and will truncate the request, leading to a blank page.
+URL Encoding Increases Size: The urllib.parse.quote() function, while necessary for encoding special characters, increases the total character count. For example, a single space character ( ) becomes three characters (%20). A 1 MB raw HTML file can easily become 1.2 MB or more after encoding, pushing it over the browser limit.
+Conclusion: The Data URL approach is fundamentally flawed for this use case because our generated memos are too large. It is not a scalable or reliable method.
+
+The Required Production-Ready Solution
+The correct and standard industry practice is to use JavaScript to dynamically write the HTML content into a new tab. This method completely bypasses the URL length limitation because the content is not passed via the URL itself.
+
+The implementation must be changed as follows:
+
+Use a standard st.button instead of st.link_button.
+When the button is clicked, render a small HTML component containing a <script> tag.
+This script will programmatically open a new tab and write the memo's HTML content into it.
+Here is a function that provides this functionality. It should be added to utils/html_export.py or a similar utility file and called from the main page.
+
+# In a utility file like utils/html_export.py or similar
+
+import streamlit as st
+import streamlit.components.v1 as components
+import json
+
+def render_view_in_browser_button(html_content: str):
+    """
+    Renders a button that, when clicked, uses JavaScript to open a new tab
+    and write the provided HTML content to it. This bypasses URL length limits.
+    """
+    # Use a unique key for the button to maintain state
+    button_key = "view_in_browser_button"
+
+    if st.button("🌐 View in Browser", use_container_width=True, key=button_key, help="Opens the styled memo in a new browser tab."):
+        # Safely embed the Python string into the JavaScript block
+        # using json.dumps() to handle quotes, newlines, and other special characters.
+        safe_html_content = json.dumps(html_content)
+
+        # The JavaScript code to be executed
+        js_code = f"""
+            <script>
+            // This function runs when the component is rendered
+            (function() {{
+                // 1. Open a new, blank browser tab.
+                const newWindow = window.open("", "_blank");
+
+                // 2. Get the HTML content passed from Python.
+                const htmlContent = {safe_html_content};
+
+                // 3. Write the content to the new tab's document.
+                newWindow.document.open();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+            }})();
+            </script>
+        """
+        # Render the HTML component with the script. The script runs automatically.
+        components.html(js_code, height=0, width=0)
+
+Action Items
+Remove the entire try/except block for the st.link_button in the asc_606_page.py file.
+Implement the new solution. Import and call the render_view_in_browser_button function from the appropriate utility file, passing the html_content to it.
+Example Implementation in asc_606_page.py:
+
+# In asc_606_page.py
+
+# ... import the new function
+from utils.html_export import render_view_in_browser_button, convert_memo_to_html # Assuming it's in html_export.py
+
+# ... inside the "else" block where results are displayed
+# ...
+
+# Column 2: View in Browser (Correct JavaScript Approach)
+with dl_col2:
+    render_view_in_browser_button(html_content)
+
+# ...
+
+This change is not a suggestion; it is the required implementation to ensure this feature works reliably for all users and all memo sizes.
+
+Please implement this fix and test it with a large contract analysis to confirm it resolves the blank page issue permanently.
