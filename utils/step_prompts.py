@@ -520,7 +520,7 @@ Your reputation for precision is on the line. Do not overstate the complexity of
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
         """Generates proportional financial impact prompt based on transaction complexity."""
         
-        # Enhanced data extraction logic - prioritize structured data
+        # Robust data extraction logic remains the same
         price_details = "Not specified"
         recognition_summary = "Not specified"
         
