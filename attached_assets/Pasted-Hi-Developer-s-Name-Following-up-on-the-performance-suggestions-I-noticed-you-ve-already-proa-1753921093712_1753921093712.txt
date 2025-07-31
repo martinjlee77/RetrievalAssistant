@@ -1,0 +1,93 @@
+Hi [Developer's Name],
+
+Following up on the performance suggestions, I noticed you've already proactively created an async version of our LLM call function (make_llm_call_async) in llm.py. This is excellent and gets us more than halfway to a huge performance win!
+
+The goal now is to wire this up in the ASC606Analyzer to run the five step-by-step analysis calls concurrently. This should dramatically reduce the user's total wait time.
+
+Here’s a proposed plan to refactor the analysis loop:
+
+Step 1: Modify analyze_contract to be Asynchronous
+
+In asc606_analyzer.py, change the main method signature from def to async def:
+# From:
+def analyze_contract(self, ...) -> ASC606Analysis:
+
+# To:
+async def analyze_contract(self, ...) -> ASC606Analysis:
+
+Step 2: Refactor the Step-Analysis Loop
+
+Inside analyze_contract, we'll change the loop to prepare all five analysis calls first, and then run them all at once.
+We'll need to import make_llm_call_async and asyncio.
+# --- Current Synchronous Loop ---
+# for step_num in range(1, 6):
+#     # ... prepares prompt
+#     step_response = make_llm_call(...)
+#     # ... processes response
+
+
+# --- Proposed Asynchronous Refactor ---
+# Import make_llm_call_async at the top of the file
+# from utils.llm import make_llm_call_async
+
+# ... inside async def analyze_contract ...
+
+tasks = []
+prompt_details = {} # To hold details for processing later
+
+# 1. Prepare all tasks
+for step_num in range(1, 6):
+    step_info = step_mapping[step_num]
+    # ... code to prepare step_specific_context and step_prompt ...
+
+    # Store details needed to process the response
+    prompt_details[step_num] = {
+        "step_info": step_info
+    }
+
+    # Create an async task for the LLM call, but don't run it yet
+    task = asyncio.create_task(make_llm_call_async(
+        self.client,
+        step_prompt,
+        # ... other params: temperature, max_tokens, etc. ...
+        response_format={"type": "json_object"}
+    ))
+    tasks.append(task)
+
+# 2. Run all tasks concurrently
+self.logger.info(f"Executing {len(tasks)} step-analysis tasks concurrently...")
+step_responses = await asyncio.gather(*tasks, return_exceptions=True)
+self.logger.info("All step-analysis tasks completed.")
+
+# 3. Process the results
+for i, response in enumerate(step_responses):
+    step_num = i + 1
+    step_info = prompt_details[step_num]["step_info"]
+
+    if isinstance(response, Exception):
+        # Handle exceptions from asyncio.gather
+        self.logger.error(f"Step {step_num} failed with exception: {response}")
+        failed_steps.append((step_num, step_info['title'], str(response)))
+        step_results[f"step_{step_num}"] = {"error": str(response)}
+    else:
+        # Process the successful response
+        step_analysis_raw = json.loads(response) if response else {}
+        step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+        step_results[f"step_{step_num}"] = step_analysis_sanitized
+        self.logger.info(f"Step {step_num} result processed successfully.")
+
+Step 3: Modify the Top-Level Call in the Streamlit Page
+
+Since Streamlit runs in a synchronous environment, we'll need to use asyncio.run() to execute our new async method from the main Streamlit script (e.g., app.py or wherever the "Generate Memo" button is).
+# In the "Generate Memo" button logic:
+# Instead of:
+# analysis_results = analyzer.analyze_contract(...)
+
+# We would use:
+analysis_results = asyncio.run(analyzer.analyze_contract(...))
+
+This refactoring is a significant change, but it directly targets the biggest performance bottleneck in the application and should make the analysis feel much faster for the user.
+
+Let me know your thoughts on the feasibility of this approach.
+
+Thanks,

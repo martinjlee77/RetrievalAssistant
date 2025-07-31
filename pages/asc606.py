@@ -1,6 +1,7 @@
 """
 ASC 606 Revenue Recognition Analysis Page
 """
+import asyncio
 import streamlit as st
 import time
 from datetime import date
@@ -457,7 +458,8 @@ if st.session_state.analysis_results is None:
                     # Contract data object creation happens here (already done above)
                     
                     st.write("➡️ **Running AI analysis... This may take a moment.**")
-                    analysis_results = analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config)
+                    # Use asyncio.run to execute the async analyzer method
+                    analysis_results = asyncio.run(analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config))
                     st.session_state.analysis_results = analysis_results
                     st.session_state.contract_data = contract_data
                     

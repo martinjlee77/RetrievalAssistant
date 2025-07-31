@@ -14,7 +14,7 @@ from typing import Dict, List, Any, Optional
 from openai import OpenAI
 
 from core.models import ASC606Analysis
-from utils.llm import make_llm_call, extract_contract_terms
+from utils.llm import make_llm_call, make_llm_call_async, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
 from utils.prompt import ASC606PromptTemplates
 from utils.step_prompts import StepAnalysisPrompts
@@ -71,7 +71,7 @@ class ASC606Analyzer:
         else:
             return data
     
-    def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
+    async def analyze_contract(self, contract_text: str, contract_data: Any, debug_config: Optional[Dict] = None) -> ASC606Analysis:
         """Analyze contract using step-by-step detailed analysis with extensive citations"""
         import time
         analysis_start_time = time.time()
@@ -142,22 +142,26 @@ class ASC606Analyzer:
             else:
                 self.logger.error("Knowledge base manager not initialized - using general knowledge only")
             
-            # === STEP 2: STEP-BY-STEP DETAILED ANALYSIS ===
-            step_results = {}
+            # === STEP 2: CONCURRENT STEP-BY-STEP ANALYSIS ===
+            # 🚀 GEMINI PERFORMANCE IMPROVEMENT: Execute all 5 steps concurrently
             step_mapping = StepAnalysisPrompts.get_step_guidance_mapping()
             
-            # Perform focused analysis for each ASC 606 step with step-specific RAG
-            failed_steps = []
+            # Phase 1: Prepare all prompts and tasks
+            tasks = []
+            prompt_details = {}
+            step_start_times = {}
+            
+            self.logger.info("🚀 PERFORMANCE BOOST: Preparing all 5 ASC 606 steps for concurrent execution...")
             
             for step_num in range(1, 6):
                 step_info = step_mapping[step_num]
+                step_start_times[step_num] = time.time()
                 
-                self.logger.info(f"Analyzing Step {step_num}: {step_info['title']}")
+                self.logger.info(f"Preparing Step {step_num}: {step_info['title']}")
                 
-                # CRITICAL IMPROVEMENT: Step-specific RAG query
+                # Step-specific RAG query
                 step_specific_context = ""
                 if self.kb_manager and contract_terms:
-                    # Define step-specific search terms for targeted RAG
                     step_search_terms = {
                         1: ["contract approval", "enforceable rights", "commercial substance", "collectibility"],
                         2: ["distinct", "performance obligations", "series", "separately identifiable", "capable of being distinct"],
@@ -166,14 +170,13 @@ class ASC606Analyzer:
                         5: ["over time", "point in time", "control transfer", "progress measurement"]
                     }
                     
-                    # Enhanced search with step-specific terms
                     enhanced_terms = contract_terms + step_search_terms.get(step_num, [])
                     
                     step_rag_results = self.kb_manager.search_relevant_guidance(
                         standard="ASC 606",
                         query_texts=enhanced_terms,
                         step_context=f"step_{step_num}",
-                        n_results=self.STEP_SPECIFIC_RAG_RESULTS_COUNT  # Focused results per step
+                        n_results=self.STEP_SPECIFIC_RAG_RESULTS_COUNT
                     )
                     
                     if step_rag_results:
@@ -188,44 +191,69 @@ class ASC606Analyzer:
                     step_title=step_info['title'],
                     step_guidance=step_info['primary_guidance'],
                     contract_text=contract_text,
-                    rag_context=retrieved_context + step_specific_context,  # Combined general + step-specific
+                    rag_context=retrieved_context + step_specific_context,
                     contract_data=contract_data,
                     debug_config=debug_config or {}
                 )
                 
-                # Get detailed analysis for this step
-                try:
-                    # GEMINI IMPROVEMENT: Add step timing for performance diagnostics
-                    step_start_time = time.time()
-                    
-                    step_response = make_llm_call(
-                        self.client,
-                        step_prompt,
-                        temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
-                        max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
-                        model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
-                        response_format={"type": "json_object"}
-                    )
-                    
-                    # Parse JSON response
-                    step_analysis_raw = json.loads(step_response) if step_response else {}
-                    
-                    step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
-                    
-                    step_results[f"step_{step_num}"] = step_analysis_sanitized
-                    
-                    # GEMINI IMPROVEMENT: Log timing and performance diagnostics
-                    step_duration = time.time() - step_start_time
-                    self.logger.info(f"Step {step_num} analysis completed in {step_duration:.2f}s: {len(step_response) if step_response else 0} characters")
-                    
-                except (json.JSONDecodeError, Exception) as e:
-                    self.logger.error(f"Step {step_num} failed: {e}")
-                    failed_steps.append((step_num, step_info['title'], str(e)))
+                # Store details for processing responses later
+                prompt_details[step_num] = {"step_info": step_info}
+                
+                # Create async task for concurrent execution
+                task = asyncio.create_task(make_llm_call_async(
+                    self.client,
+                    step_prompt,
+                    temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
+                    max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
+                    model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
+                    response_format={"type": "json_object"}
+                ))
+                tasks.append(task)
+            
+            # Phase 2: Execute all 5 steps concurrently 
+            concurrent_start_time = time.time()
+            self.logger.info(f"🎯 Executing {len(tasks)} step-analysis tasks concurrently...")
+            
+            step_responses = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            concurrent_duration = time.time() - concurrent_start_time
+            self.logger.info(f"⚡ All 5 steps completed concurrently in {concurrent_duration:.2f}s (vs ~150s sequential)")
+            
+            # Phase 3: Process concurrent results
+            step_results = {}
+            failed_steps = []
+            
+            for i, response in enumerate(step_responses):
+                step_num = i + 1
+                step_info = prompt_details[step_num]["step_info"]
+                
+                if isinstance(response, Exception):
+                    self.logger.error(f"Step {step_num} failed with exception: {response}")
+                    failed_steps.append((step_num, step_info['title'], str(response)))
                     step_results[f"step_{step_num}"] = {
                         "step_name": step_info['title'],
                         "detailed_analysis": "Analysis failed - see error details",
-                        "error": str(e)
+                        "error": str(response)
                     }
+                else:
+                    try:
+                        # Process successful response
+                        step_analysis_raw = json.loads(response) if response else {}
+                        step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+                        step_results[f"step_{step_num}"] = step_analysis_sanitized
+                        
+                        # Performance diagnostics
+                        step_duration = time.time() - step_start_times[step_num]
+                        self.logger.info(f"Step {step_num} result processed in {step_duration:.2f}s: {len(response) if response else 0} characters")
+                        
+                    except (json.JSONDecodeError, Exception) as e:
+                        self.logger.error(f"Step {step_num} parsing failed: {e}")
+                        failed_steps.append((step_num, step_info['title'], str(e)))
+                        step_results[f"step_{step_num}"] = {
+                            "step_name": step_info['title'],
+                            "detailed_analysis": "Analysis parsing failed",
+                            "error": str(e)
+                        }
             
             # CRITICAL UX IMPROVEMENT: Check for failures and halt if any occurred
             if failed_steps:
