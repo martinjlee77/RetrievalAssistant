@@ -532,53 +532,20 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: The primary viewing file (HTML View)
+            # Column 2: View in Browser (Simple Download Approach)
             with dl_col2:
                 try:
-                    # Debug: Check HTML content
-                    html_size = len(html_content)
-                    
-                    # Try both approaches - data URL and download
-                    data_url = create_html_download_link(html_content)
-                    data_url_size = len(data_url)
-                    
-                    # Try JavaScript approach for better data URL handling
-                    import streamlit.components.v1 as components
-                    
-                    # Create a custom button that opens data URL with JavaScript
-                    button_html = f"""
-                    <script>
-                    function openMemoInBrowser() {{
-                        const dataUrl = {repr(data_url)};
-                        const newWindow = window.open();
-                        if (newWindow) {{
-                            newWindow.document.write(atob(dataUrl.split(',')[1]));
-                            newWindow.document.close();
-                        }} else {{
-                            alert('Please allow pop-ups to view the memo in a new tab');
-                        }}
-                    }}
-                    </script>
-                    <button onclick="openMemoInBrowser()" 
-                            style="width: 100%; padding: 10px; background-color: #ff4b4b; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                        🌐 View in Browser
-                    </button>
-                    """
-                    
-                    components.html(button_html, height=60)
-                    
-                    # Fallback download option
+                    # Simple download approach - user downloads HTML and opens it
                     st.download_button(
-                        label="📥 Download HTML",
+                        label="🌐 View in Browser",
                         data=html_content,
                         file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
                         mime="text/html",
                         use_container_width=True,
-                        help="Download HTML file as backup option."
+                        help="Download the styled memo to open in your browser."
                     )
-                    
                 except Exception as e:
-                    st.error(f"Error generating HTML view: {str(e)}")
+                    st.error(f"Error generating HTML file: {str(e)}")
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator

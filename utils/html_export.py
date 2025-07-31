@@ -199,14 +199,22 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-weight: bold;
         }}
         
-        /* List styling */
-        ul, ol {{
+        /* List styling - Fix bullet icons */
+        ul {{
             margin: 12pt 0;
             padding-left: 24pt;
+            list-style-type: disc; /* Ensure bullets appear */
+        }}
+        
+        ol {{
+            margin: 12pt 0;
+            padding-left: 24pt;
+            list-style-type: decimal; /* Ensure numbers appear */
         }}
         
         li {{
             margin-bottom: 6pt;
+            display: list-item; /* Ensure list item display */
         }}
         
         /* Memo header */
