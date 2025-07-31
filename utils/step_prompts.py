@@ -520,21 +520,29 @@ Your reputation for precision is on the line. Do not overstate the complexity of
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
         """Generates proportional financial impact prompt based on transaction complexity."""
         
-        # Robust data extraction logic remains the same
+        # Enhanced data extraction logic - prioritize structured data
         price_details = "Not specified"
         recognition_summary = "Not specified"
         
-        # Extract price and recognition summary
-        if s3.get('executive_conclusion'):
-            conclusion = s3.get('executive_conclusion', '')
-            # Try to extract price information
-            import re
-            price_match = re.search(r'\$[\d,]+\.?\d*', conclusion)
-            if price_match:
-                price_details = price_match.group()
+        # 1. Prioritize structured data from Step 4 (Allocation)
+        if s4_allocation := s4.get('allocation_details'):
+            import json
+            try:
+                if isinstance(s4_allocation, dict):
+                    price_details = json.dumps(s4_allocation, indent=2)
+                else:
+                    price_details = str(s4_allocation)
+            except (TypeError, ValueError):
+                price_details = str(s4_allocation)
         
-        if s5.get('executive_conclusion'):
-            recognition_summary = s5.get('executive_conclusion', '')
+        # 2. Fallback to regex on Step 3 conclusion if no structured data
+        elif s3_conclusion := s3.get('executive_conclusion', ''):
+            import re
+            if price_match := re.search(r'\$[\d,]+\.?\d*', s3_conclusion):
+                price_details = f"Total Transaction Price: {price_match.group()}"
+        
+        # Extract revenue recognition summary from Step 5
+        recognition_summary = s5.get('executive_conclusion', 'Not specified')
 
         # NEW: Logic to determine transaction complexity
         # We can infer complexity from the analysis conclusions.
@@ -567,6 +575,8 @@ Write a concise financial impact analysis.
     | Date       | Account                          | Debit     | Credit    |
     |------------|----------------------------------|-----------|-----------|
     | ...        | ...                              | ...       | ...       |
+
+3.  **Internal Control & Process Considerations:** Briefly mention any operational considerations required for accurate accounting (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
 
 ---
 **IF THE TRANSACTION IS SIMPLE, follow this structure:**

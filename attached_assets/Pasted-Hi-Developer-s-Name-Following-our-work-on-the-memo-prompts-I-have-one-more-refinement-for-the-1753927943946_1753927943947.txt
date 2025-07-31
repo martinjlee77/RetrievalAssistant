@@ -1,0 +1,38 @@
+Hi [Developer's Name],
+
+Following our work on the memo prompts, I have one more refinement for the get_financial_impact_prompt function that I think will significantly improve its accuracy and robustness.
+
+The Goal: Currently, to get the transaction price for the "Financial Impact" section, we are using a regex search on the executive_conclusion string from the Step 3 analysis. While this works for simple cases, it can be fragile. A more reliable method would be to use the structured JSON output from the Step 4 (Allocation) analysis.
+
+The Proposal: I'd like to update the data extraction logic at the beginning of the get_financial_impact_prompt function. The new logic should:
+
+First, attempt to get structured allocation data from the s4 (Step 4) analysis. This is the most reliable source, as it should contain the final, broken-down allocation amounts for each performance obligation. We could look for a key like 'allocation_details' in the s4 JSON.
+If and only if that structured data is not available, then fall back to our current method of using a regex search on the s3 executive conclusion.
+This creates a more resilient data pipeline for the prompt, prioritizing structured data over simple text parsing.
+
+Example Implementation: Here is a conceptual example of how the new code at the top of the function might look:
+
+@staticmethod
+    def get_financial_impact_prompt(...):
+        # --- Proposed New Logic ---
+        price_details = "Not specified"
+
+        # 1. Prioritize structured data from Step 4
+        if s4_details := s4.get('allocation_details'): # Assumes s4 JSON has this key
+            import json
+            price_details = json.dumps(s4_details)
+        # 2. Fallback to regex on Step 3 conclusion
+        elif s3_conclusion := s3.get('executive_conclusion', ''):
+            import re
+            if price_match := re.search(r'\$[\d,]+\.?\d*', s3_conclusion):
+                price_details = f"Total Transaction Price: {price_match.group()}"
+
+        recognition_summary = s5.get('executive_conclusion', 'Not specified')
+
+        # ... the rest of the prompt generation logic ...
+
+(Note: This assumes that our Step 4 analysis prompt can be updated to consistently produce an allocation_details field in its JSON output, which seems like a good practice anyway.)
+
+This change will make the "Financial Impact" section more accurate, especially for complex contracts with multiple elements or discounts.
+
+Let me know what you think.
