@@ -291,10 +291,15 @@ class ASC606Analyzer:
             
             while consistency_retry_count <= max_consistency_retries:
                 consistency_prompt = StepPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
-                consistency_result = make_llm_call(
-                    self.client, consistency_prompt,
-                    model='gpt-4o', max_tokens=1000, temperature=0.1
-                )
+                try:
+                    consistency_result = make_llm_call(
+                        self.client, consistency_prompt,
+                        model='gpt-4o', max_tokens=1000, temperature=0.1
+                    )
+                except Exception as e:
+                    self.logger.warning(f"Consistency check failed due to API error: {e}")
+                    # Continue without consistency check if rate limited
+                    break
                 
                 # Internal quality assessment
                 if consistency_result:

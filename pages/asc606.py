@@ -535,15 +535,38 @@ else:
             # Column 2: The primary viewing file (HTML View)
             with dl_col2:
                 try:
+                    # Create a data URL for viewing in browser
                     data_url = create_html_download_link(html_content)
-                    st.link_button(
-                        label="🌐 View in Browser",
-                        url=data_url,
-                        use_container_width=True,
-                        help="Opens the fully-styled memo in a new tab for easy viewing or printing to PDF."
-                    )
+                    
+                    # Check if data URL is too large for some browsers (>2MB limit)
+                    if len(data_url) > 2000000:  # 2MB limit
+                        st.warning("⚠️ Memo is large - using download instead of direct view")
+                        st.download_button(
+                            label="📄 Download HTML",
+                            data=html_content,
+                            file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
+                            mime="text/html",
+                            use_container_width=True,
+                            help="Download the memo as an HTML file to open in your browser."
+                        )
+                    else:
+                        st.link_button(
+                            label="🌐 View in Browser",
+                            url=data_url,
+                            use_container_width=True,
+                            help="Opens the fully-styled memo in a new tab for easy viewing or printing to PDF."
+                        )
                 except Exception as e:
                     st.error(f"Error generating HTML view: {str(e)}")
+                    # Fallback to download button
+                    st.download_button(
+                        label="📄 Download HTML",
+                        data=html_content,
+                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
+                        mime="text/html",
+                        use_container_width=True,
+                        help="Download the memo as an HTML file to open in your browser."
+                    )
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator
