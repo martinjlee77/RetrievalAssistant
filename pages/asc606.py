@@ -531,20 +531,27 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: View in Browser (Simple Download Approach)
+            # Column 2: View in Browser (Data URL Approach)
             with dl_col2:
                 try:
-                    # Simple download approach - user downloads HTML and opens it
-                    st.download_button(
+                    data_url = create_html_download_link(html_content)
+                    st.link_button(
                         label="🌐 View in Browser",
+                        url=data_url,
+                        use_container_width=True,
+                        help="Opens the styled memo in a new browser tab."
+                    )
+                except Exception as e:
+                    st.error(f"Error generating HTML view: {str(e)}")
+                    # Fallback to download
+                    st.download_button(
+                        label="📄 Download HTML",
                         data=html_content,
                         file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
                         mime="text/html",
                         use_container_width=True,
-                        help="Download the styled memo to open in your browser."
+                        help="Download HTML file to open in browser."
                     )
-                except Exception as e:
-                    st.error(f"Error generating HTML file: {str(e)}")
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator

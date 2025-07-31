@@ -104,7 +104,8 @@ def handle_llm_error(error: Exception):
     error_message = str(error).lower()
     
     if "rate limit" in error_message:
-        st.error("⏱️ API rate limit reached. Please wait a moment and try again.")
+        # Rate limit handled internally with retries - no user notification needed
+        pass
     elif "quota" in error_message or "billing" in error_message:
         st.error("💳 API quota exceeded. Please check your OpenAI billing settings.")
     elif "invalid api key" in error_message or "unauthorized" in error_message:
