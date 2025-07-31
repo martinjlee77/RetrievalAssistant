@@ -58,8 +58,9 @@ async def make_llm_call_async(
         return response.choices[0].message.content
         
     except Exception as e:
-        import streamlit as st
-        st.error(f"LLM API call failed: {str(e)}")
+        # Log error internally without displaying technical details to users
+        import logging
+        logging.error(f"Async LLM API call failed: {str(e)}")
         return None
 
 def make_llm_call(
@@ -100,24 +101,22 @@ def make_llm_call(
         return None
 
 def handle_llm_error(error: Exception):
-    """Handle LLM API errors with user-friendly messages"""
+    """Handle LLM API errors with internal logging only - no user-facing technical details"""
+    import logging
     error_message = str(error).lower()
     
-    if "rate limit" in error_message:
-        # Rate limit handled internally with retries - no user notification needed
-        pass
-    elif "quota" in error_message or "billing" in error_message:
+    # Log all errors internally for debugging
+    logging.error(f"LLM API error: {str(error)}")
+    
+    # Only display user-facing errors for configuration issues, not temporary API problems
+    if "quota" in error_message or "billing" in error_message:
         st.error("💳 API quota exceeded. Please check your OpenAI billing settings.")
     elif "invalid api key" in error_message or "unauthorized" in error_message:
         st.error("🔑 Invalid API key. Please check your OpenAI API key configuration.")
     elif "context length" in error_message or "token" in error_message:
         st.error("📄 Content too long. Please try with a shorter document or input.")
-    else:
-        st.error(f"🚫 AI service error: {str(error)}")
-    
-    # Log error for debugging (in production, send to logging service)
-    if st.session_state.get("debug_mode", False):
-        st.write(f"Debug info: {error}")
+    # Rate limits, server errors, and other temporary issues are handled silently
+    # The system has retry logic and graceful degradation
 
 @st.cache_data(ttl=3600)  # Cache for 1 hour
 def cached_llm_call(

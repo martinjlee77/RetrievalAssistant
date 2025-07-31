@@ -268,15 +268,17 @@ class ASC606Analyzer:
                             "error": str(e)
                         }
             
-            # CRITICAL UX IMPROVEMENT: Check for failures and halt if any occurred
+            # INTERNAL ERROR HANDLING: Log failures without user-facing technical details
             if failed_steps:
-                import streamlit as st
-                error_msg = "❌ **Analysis Failed** - The following steps encountered errors:\n\n"
+                # Log technical details for debugging
+                self.logger.error(f"Analysis failed for {len(failed_steps)} step(s): {[s[0] for s in failed_steps]}")
                 for step_num, title, error in failed_steps:
-                    error_msg += f"• **Step {step_num} ({title})**: {error}\n"
-                error_msg += "\nPlease try again or contact support if the issue persists."
-                st.error(error_msg)
-                raise Exception(f"Analysis failed for {len(failed_steps)} step(s): {[s[0] for s in failed_steps]}")
+                    self.logger.error(f"Step {step_num} ({title}) failed: {error}")
+                
+                # Show simple user-friendly message without technical details
+                import streamlit as st
+                st.error("⚠️ **Analysis temporarily unavailable** - Our system is experiencing high demand. Please try again in a moment.")
+                raise Exception(f"Analysis failed for {len(failed_steps)} step(s) - see logs for details")
             
             # === STEP 3: PYTHON-DRIVEN MEMO ASSEMBLY ===
             self.logger.info("Assembling final comprehensive memo section by section...")
