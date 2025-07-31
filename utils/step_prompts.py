@@ -300,50 +300,68 @@ Provide brief feedback on any inconsistencies found, or confirm the analysis is 
 
     @staticmethod
     def get_background_prompt(contract_data) -> str:
-        """Generate background section prompt."""
-        return f"""Write a professional background section for an ASC 606 memo.
+                """Generates a focused and non-repetitive background section."""
 
-CONTRACT DETAILS:
-- Customer: {getattr(contract_data, 'customer_name', 'N/A')}
-- Contract Date: {getattr(contract_data, 'contract_date', 'N/A')}
-- Services/Products: {getattr(contract_data, 'arrangement_description', 'N/A')}
-- Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance')}
+                key_focus = getattr(contract_data, 'key_focus_areas', '')
 
-Create a background section that includes:
-1. Contract parties and key dates
-2. Nature of the arrangement
-3. Scope of this analysis
-4. Key terms relevant to revenue recognition
+                return f"""You are writing the 'Background' section of a formal ASC 606 accounting memo. A summary data table will appear just before your text, so DO NOT repeat basic information like party names or contract dates.
 
-Keep it professional and concise."""
+        YOUR TASK:
+        Write a single, concise paragraph that provides context for the analysis. Your paragraph should cover:
+        1.  **Nature of the Arrangement:** Briefly describe the business purpose of the contract based on the summary provided below.
+        2.  **Scope of this Memo:** State that the objective of this memorandum is to document the Company's accounting analysis and conclusions under ASC 606.
+        3.  **Specific Areas of Judgment (if provided):** If the user provided specific 'Key Focus Areas', incorporate them into the scope. This is the most important part.
+
+        CONTEXT:
+        - Arrangement Summary: "{getattr(contract_data, 'arrangement_description', 'A standard sales arrangement.')}"
+        - Key Focus Areas provided by user: "{key_focus if key_focus else 'None'}"
+
+        Example if focus areas ARE provided:
+        "The objective of this memorandum is to document the accounting analysis for this arrangement under ASC 606, with a specific focus on evaluating whether the implementation services are distinct from the SaaS license, per the criteria in ASC 606-10-25-21."
+
+        Example if no focus areas are provided:
+        "The objective of this memorandum is to document the Company's accounting analysis and conclusions for the transaction with the customer under the five-step model of ASC 606."
+        
+        Write only the paragraph, no additional formatting or labels."""
 
     @staticmethod
     def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
-        """Generate key judgments prompt."""
-        judgments = []
-        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
-            # Search within the new narrative structure
-            analysis_points = step.get('analysis_points', [])
-            for point in analysis_points:
-                analysis_text = point.get('analysis_text', '')
-                # Use a more robust check for judgment-related keywords
-                if any(keyword in analysis_text.lower() for keyword in ['judgment', 'significant estimate', 'alternative treatment', 'professional judgment', 'estimate', 'assumption']):
-                    judgments.append(f"Step {i} - {point.get('topic_title', 'Analysis')}: {analysis_text}")
-        
-        judgment_text = '\n\n'.join(judgments) if judgments else "No significant professional judgments identified in the analysis."
-        
-        return f"""Identify and explain the key professional judgments in this ASC 606 analysis:
+                """Generates a highly discerning prompt for the Key Professional Judgments section."""
 
-POTENTIAL JUDGMENT AREAS:
-{judgment_text}
+                all_judgments = []
+                for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+                    judgments = step.get('professional_judgments', [])
+                    if judgments:
+                        all_judgments.extend(judgments)
 
-For each significant judgment area:
-1. **What**: Describe the judgment made
-2. **Why**: Explain the rationale and ASC 606 guidance applied
-3. **Alternatives**: Note any alternative treatments considered
-4. **Impact**: Assess the materiality of the judgment
+                # If, after stricter identification, no judgments were passed up, provide a standard statement.
+                if not all_judgments:
+                    return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-If no significant judgments are required, state that the contract follows standard ASC 606 treatments."""
+                # If judgments were flagged, this prompt will act as a final quality filter.
+                return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
+
+        CONTEXT FROM ANALYSIS:
+        The following key judgments were identified during the five-step analysis:
+        {chr(10).join(all_judgments)}
+
+        YOUR TASK:
+        Transform the list of judgments above into a formal, well-articulated narrative. For each key judgment, present it as a separate bullet point following this precise structure:
+        - **Judgment:** State the judgment clearly and concisely (e.g., "Conclusion on the Distinctness of Implementation Services").
+        - **Analysis:** Briefly explain the issue and the rationale for the conclusion, referencing the relevant facts from the contract.
+        - **Authoritative Guidance:** Explicitly cite the primary ASC 606 guidance that supports the judgment (e.g., "This conclusion is based on the criteria outlined in ASC 606-10-25-21.").
+
+        Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
+
+        - **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. In this case, your entire output must be only the following single sentence:
+        "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+
+        - If there are genuine judgments, present each one as a separate bullet point following this precise structure:
+          - **Judgment:** State the judgment clearly.
+          - **Analysis:** Explain the issue and the rationale for the conclusion.
+          - **Authoritative Guidance:** Cite the specific ASC 606 guidance that supports the judgment.
+
+        Your reputation for precision is on the line. Do not overstate the complexity of a simple contract."""
 
     @staticmethod
     def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
