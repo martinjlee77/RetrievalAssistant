@@ -531,18 +531,35 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: View in Browser (Data URL Approach)
+            # Column 2: View in Browser (File-based approach)
             with dl_col2:
                 try:
-                    data_url = create_html_download_link(html_content)
-                    st.link_button(
-                        label="🌐 View in Browser",
-                        url=data_url,
+                    # Write HTML to a temporary file and provide download link
+                    import tempfile
+                    import os
+                    
+                    # Create a temporary HTML file
+                    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8') as f:
+                        f.write(html_content)
+                        temp_html_path = f.name
+                    
+                    # Read the file back as bytes for download
+                    with open(temp_html_path, 'rb') as f:
+                        html_bytes = f.read()
+                    
+                    # Clean up the temp file
+                    os.unlink(temp_html_path)
+                    
+                    st.download_button(
+                        label="🌐 Download HTML",
+                        data=html_bytes,
+                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.html",
+                        mime="text/html",
                         use_container_width=True,
-                        help="Opens the styled memo in a new browser tab."
+                        help="Download the memo as an HTML file to view in your browser."
                     )
                 except Exception as e:
-                    st.error(f"Error generating HTML view: {str(e)}")
+                    st.error(f"Error generating HTML download: {str(e)}")
                     # Fallback to download
                     st.download_button(
                         label="📄 Download HTML",
