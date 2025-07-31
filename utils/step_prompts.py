@@ -246,3 +246,139 @@ Guidelines:
 - Integrate key considerations and judgment areas directly into the relevant topic analysis
 - Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
 - Make analysis flow naturally, building from one point to the next"""
+
+    @staticmethod
+    def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Generate consistency check prompt for all 5 steps."""
+        return f"""Review the logical consistency of this ASC 606 analysis across all 5 steps:
+
+STEP 1 - CONTRACT IDENTIFICATION:
+{s1.get('executive_conclusion', 'N/A')}
+
+STEP 2 - PERFORMANCE OBLIGATIONS:
+{s2.get('executive_conclusion', 'N/A')}
+
+STEP 3 - TRANSACTION PRICE:
+{s3.get('executive_conclusion', 'N/A')}
+
+STEP 4 - ALLOCATION:
+{s4.get('executive_conclusion', 'N/A')}
+
+STEP 5 - RECOGNITION:
+{s5.get('executive_conclusion', 'N/A')}
+
+CRITICAL REVIEW TASK:
+1. Check if the number of performance obligations in Step 2 matches the allocation approach in Step 4
+2. Verify that the transaction price in Step 3 aligns with the allocation amounts in Step 4
+3. Ensure the recognition timing in Step 5 matches the nature of obligations identified in Step 2
+4. Look for any logical contradictions between steps
+
+Provide brief feedback on any inconsistencies found, or confirm the analysis is consistent."""
+
+    @staticmethod
+    def get_background_prompt(contract_data) -> str:
+        """Generates a focused and non-repetitive background section."""
+        key_focus = getattr(contract_data, 'key_focus_areas', '')
+        
+        return f"""You are writing the 'Background' section of a formal ASC 606 accounting memo. A summary data table will appear just before your text, so DO NOT repeat basic information like party names or contract dates.
+
+YOUR TASK:
+Write a single, concise paragraph that provides context for the analysis. Your paragraph should cover:
+1. **Nature of the Arrangement:** Briefly describe the business purpose of the contract based on the summary provided below.
+2. **Scope of this Memo:** State that the objective of this memorandum is to document the Company's accounting analysis and conclusions under ASC 606.
+3. **Specific Areas of Judgment (if provided):** If the user provided specific 'Key Focus Areas', incorporate them into the scope. This is the most important part.
+
+CONTEXT:
+- Arrangement Summary: "{getattr(contract_data, 'arrangement_description', 'A standard sales arrangement.')}"
+- Key Focus Areas provided by user: "{key_focus if key_focus else 'None'}"
+
+Example if focus areas ARE provided:
+"The objective of this memorandum is to document the accounting analysis for this arrangement under ASC 606, with a specific focus on evaluating whether the implementation services are distinct from the SaaS license, per the criteria in ASC 606-10-25-21."
+
+Example if no focus areas are provided:
+"The objective of this memorandum is to document the Company's accounting analysis and conclusions for the transaction with the customer under the five-step model of ASC 606."
+
+Write only the paragraph, no additional formatting or labels."""
+
+    @staticmethod
+    def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Generates a highly discerning prompt for the Key Professional Judgments section."""
+        all_judgments = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            judgments = step.get('professional_judgments', [])
+            if judgments:
+                all_judgments.extend(judgments)
+
+        # If, after stricter identification, no judgments were passed up, provide a standard statement.
+        if not all_judgments:
+            return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+
+        # If judgments were flagged, this prompt will act as a final quality filter.
+        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
+
+CONTEXT FROM ANALYSIS:
+The following key judgments were identified during the five-step analysis:
+{chr(10).join(all_judgments)}
+
+YOUR TASK:
+Transform the list of judgments above into a formal, well-articulated narrative. For each key judgment, present it as a separate bullet point following this precise structure:
+- **Judgment:** State the judgment clearly and concisely (e.g., "Conclusion on the Distinctness of Implementation Services").
+- **Analysis:** Briefly explain the issue and the rationale for the conclusion, referencing the relevant facts from the contract.
+- **Authoritative Guidance:** Explicitly cite the primary ASC 606 guidance that supports the judgment (e.g., "This conclusion is based on the criteria outlined in ASC 606-10-25-21.").
+
+Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
+
+- **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. In this case, your entire output must be only the following single sentence:
+"The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+
+- If there are genuine judgments, present each one as a separate bullet point following this precise structure:
+  - **Judgment:** State the judgment clearly.
+  - **Analysis:** Explain the issue and the rationale for the conclusion.
+  - **Authoritative Guidance:** Cite the specific ASC 606 guidance that supports the judgment.
+
+Your reputation for precision is on the line. Do not overstate the complexity of a simple contract."""
+
+    @staticmethod
+    def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
+        """Format step analysis from narrative JSON structure into professional markdown."""
+        if not step_data or not isinstance(step_data, dict):
+            return f"### Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
+
+        conclusion = step_data.get('executive_conclusion', 'No conclusion was provided.')
+        analysis_points = step_data.get('analysis_points', [])
+
+        # Start with the main heading and the upfront conclusion
+        markdown_sections = [
+            f"### Step {step_number}: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "\n---\n",  # Visual separator
+            "**Detailed Analysis:**\n"
+        ]
+
+        if not analysis_points:
+            markdown_sections.append("No detailed analysis points were provided.")
+        else:
+            # Loop through each thematically-grouped analysis point
+            for i, point in enumerate(analysis_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
+
+                # Add the topic as a sub-heading
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
+
+                # Add the evidence quotes for that topic
+                # Add type check to prevent errors if the LLM returns a string instead of list
+                if evidence_quotes and isinstance(evidence_quotes, list):
+                    for quote in evidence_quotes:
+                        if isinstance(quote, str):  # Ensure the item in the list is a string
+                            markdown_sections.append(f"> {quote}")
+                elif isinstance(evidence_quotes, str):
+                    # Handle case where LLM returns a single string instead of list
+                    markdown_sections.append(f"> {evidence_quotes}")
+
+                markdown_sections.append("")  # Add a blank line for spacing before the next point
+
+        markdown_sections.append("---\n")  # Final separator
+        return "\n".join(markdown_sections)
