@@ -1,0 +1,78 @@
+Proposed Improvement: Step-Tailored JSON Schemas
+Instead of just one special case, we can define a unique, ideal JSON output for each of the five steps.
+
+Step 1: Identify the Contract
+
+Problem: The current prompt might miss one of the five core criteria of a valid contract.
+
+Solution: Force the AI to evaluate all five criteria from ASC 606-10-25-1.
+
+Suggested JSON for Step 1:
+
+"contract_criteria_assessment": [
+  {"criterion": "Approval and Commitment", "status": "Met/Not Met", "justification": "Analysis..."},
+  {"criterion": "Identification of Rights", "status": "Met/Not Met", "justification": "Analysis..."},
+  {"criterion": "Identification of Payment Terms", "status": "Met/Not Met", "justification": "Analysis..."},
+  {"criterion": "Commercial Substance", "status": "Met/Not Met", "justification": "Analysis..."},
+  {"criterion": "Collectibility", "status": "Met/Not Met", "justification": "Analysis..."}
+]
+
+Step 2: Identify Performance Obligations (POs)
+
+Problem: The current prompt might not clearly explain why something is a distinct PO.
+
+Solution: Force the AI to list the POs and, for each one, explicitly justify its "distinct" status based on the two sub-criteria.
+
+Suggested JSON for Step 2:
+
+"performance_obligations": [
+  {
+    "po_description": "e.g., Software License",
+    "is_distinct": "Yes/No",
+    "distinct_analysis": "Justification based on the two criteria: 'capable of being distinct' and 'separately identifiable' in the contract's context."
+  },
+  {
+    "po_description": "e.g., Professional Services",
+    "is_distinct": "Yes/No",
+    "distinct_analysis": "Justification..."
+  }
+]
+
+Step 3: Determine the Transaction Price
+
+Problem: The analysis of fixed vs. variable consideration might be jumbled.
+
+Solution: Force the AI to break down the price into its core components.
+
+Suggested JSON for Step 3:
+
+"transaction_price_components": {
+  "fixed_consideration": "Amount",
+  "variable_consideration": [
+    {
+      "type": "e.g., Performance Bonus, Sales-Based Royalty",
+      "estimated_amount": "Amount",
+      "estimation_method": "e.g., Expected Value / Most Likely Amount",
+      "constraint_analysis": "Analysis of the variable consideration constraint."
+    }
+  ],
+  "financing_component_analysis": "Analysis of any significant financing component.",
+  "total_transaction_price": "Total estimated price."
+}
+
+Step 5: Recognize Revenue
+
+Problem: The AI might say "over time" without justifying which of the three criteria is met.
+
+Solution: Force the AI to state the recognition method and provide a specific justification tied to the ASC 606 criteria.
+
+Suggested JSON for Step 5:
+
+"revenue_recognition_plan": [
+    {
+      "performance_obligation": "Name of the PO from Step 2",
+      "recognition_method": "Over Time / Point in Time",
+      "justification": "If 'Over Time', state which of the three criteria in ASC 606-10-25-27 is met. If 'Point in Time', discuss the transfer of control indicators.",
+      "measure_of_progress": "If 'Over Time', describe the method (e.g., straight-line, usage-based)."
+    }
+]
