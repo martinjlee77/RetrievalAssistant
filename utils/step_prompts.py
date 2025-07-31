@@ -193,7 +193,7 @@ Keep this professional, concise, and focused on executive-level insights."""
     @staticmethod
     def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
                                         contract_text: str, rag_context: str, 
-                                        contract_terms: list, guidance_context: str) -> str:
+                                        contract_data=None, debug_config=None) -> str:
         """Generate step-specific analysis prompt."""
         return f"""You are an expert in ASC 606 revenue recognition. Analyze this contract for Step {step_number}: {step_title}.
 
@@ -203,13 +203,14 @@ AUTHORITATIVE GUIDANCE CONTEXT:
 {rag_context}
 
 ADDITIONAL GUIDANCE:
-{guidance_context}
+(Available in RAG context above)
 
 CONTRACT TEXT TO ANALYZE:
 {contract_text}
 
-EXTRACTED CONTRACT TERMS:
-{', '.join(contract_terms) if contract_terms else 'None identified'}
+CONTRACT DATA:
+Customer: {getattr(contract_data, 'customer_name', 'N/A') if contract_data else 'N/A'}
+Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance') if contract_data else 'General ASC 606 compliance'}
 
 Provide a detailed analysis including:
 1. **Executive Conclusion**: Clear determination for this step
