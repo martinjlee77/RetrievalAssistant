@@ -300,8 +300,21 @@ class ASC606Analyzer:
                 if consistency_result:
                     consistency_text = str(consistency_result).lower()
                     
-                    # Check for clear inconsistency flags
-                    if "inconsistency detected:" in consistency_text:
+                    # Check for inconsistency indicators with your original prompt format
+                    negative_indicators = [
+                        "inconsistent", "contradiction", "contradicts", "gap", "error", 
+                        "issue", "problem", "conflicts", "mismatch", "does not align", "do not align"
+                    ]
+                    positive_indicators = [
+                        "consistent", "align properly", "aligns", "no inconsistencies", 
+                        "no contradictions", "logically sound", "analysis is consistent"
+                    ]
+                    
+                    has_negative = any(indicator in consistency_text for indicator in negative_indicators)
+                    has_positive = any(indicator in consistency_text for indicator in positive_indicators)
+                    
+                    # Only retry if we have clear negative indicators without positive confirmation
+                    if has_negative and not has_positive:
                         consistency_retry_count += 1
                         self.logger.warning(f"Internal consistency check failed (attempt {consistency_retry_count}/{max_consistency_retries + 1})")
                         
@@ -421,10 +434,7 @@ class ASC606Analyzer:
             # 7. Python Assembly of Final Memo with Professional Formatting
             contract_data_table = self._create_contract_data_table(contract_data)
             
-            # Add quality control note if needed
-            quality_note = ""
-            if consistency_retry_count > 0:
-                quality_note = "\n**QUALITY CONTROL NOTE:** This analysis underwent additional internal validation to ensure consistency across all five ASC 606 steps.\n"
+            # Remove quality control note - internal processes don't belong in professional memos
             
             memo_header = f"""#TECHNICAL ACCOUNTING MEMORANDUM
 
@@ -433,7 +443,7 @@ class ASC606Analyzer:
 **DATE:** {datetime.now().strftime('%B %d, %Y')}  
 **RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}
 **DOCUMENT CLASSIFICATION:** Internal Use Only  
-**REVIEW STATUS:** Preliminary Analysis{quality_note} \n\n\n
+**REVIEW STATUS:** Preliminary Analysis \n\n\n
 """
             
             final_memo_sections = [
