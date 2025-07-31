@@ -458,13 +458,18 @@ Be thorough - audit-quality analysis depends on step consistency."""
             return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
         # If judgments were flagged, this prompt will act as a final quality filter.
-        return f"""You are an accounting director writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
+        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
 
 CONTEXT FROM ANALYSIS:
-The following potential judgments were flagged during the five-step analysis:
+The following key judgments were identified during the five-step analysis:
 {chr(10).join(all_judgments)}
 
 YOUR TASK:
+Transform the list of judgments above into a formal, well-articulated narrative. For each key judgment, present it as a separate bullet point following this precise structure:
+- **Judgment:** State the judgment clearly and concisely (e.g., "Conclusion on the Distinctness of Implementation Services").
+- **Analysis:** Briefly explain the issue and the rationale for the conclusion, referencing the relevant facts from the contract.
+- **Authoritative Guidance:** Explicitly cite the primary ASC 606 guidance that supports the judgment (e.g., "This conclusion is based on the criteria outlined in ASC 606-10-25-21.").
+
 Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
 
 - **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. In this case, your entire output must be only the following single sentence:
@@ -510,13 +515,14 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             }
         }
 
+    
     @staticmethod
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
-        """Generates focused prompt for financial impact section with suggested journal entries."""
+        """Generates proportional financial impact prompt based on transaction complexity."""
         
         # Extract transaction price and timing details
-        transaction_price = "Not specified"
-        revenue_timing = "Not specified"
+        price_details = "Not specified"
+        recognition_summary = "Not specified"
         
         if s3.get('executive_conclusion'):
             conclusion = s3.get('executive_conclusion', '')
@@ -524,33 +530,57 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             import re
             price_match = re.search(r'\$[\d,]+\.?\d*', conclusion)
             if price_match:
-                transaction_price = price_match.group()
+                price_details = price_match.group()
         
         if s5.get('executive_conclusion'):
-            revenue_timing = s5.get('executive_conclusion', '')
+            recognition_summary = s5.get('executive_conclusion', '')
         
-        return f"""Write a meaningful financial impact section for an ASC 606 technical accounting memo.
+        # Logic to determine transaction complexity
+        # We can infer complexity from the analysis conclusions
+        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
+                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
+                     "financing component" in s3.get('executive_conclusion', '').lower()
+        
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
 
-TRANSACTION DETAILS:
-- Customer: {customer_name}
-- Transaction Price: {transaction_price}
-- Revenue Recognition: {revenue_timing}
+CONTEXT FROM ANALYSIS:
+- Price & Allocation Details: {price_details}
+- Revenue Recognition Summary: {recognition_summary}
+- Is the transaction complex (e.g., multiple POs, variable consideration)? {"Yes" if is_complex else "No"}
 
-Create a comprehensive financial impact analysis that includes:
+YOUR TASK:
+Write a concise financial impact analysis.
 
-**Revenue Recognition Impact:**
-Total contract value and timing of recognition, impact on financial statement presentation, any deferred revenue or contract asset implications.
+**CRITICAL RULE: Be Proportional.**
+- **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
+- **For COMPLEX transactions:** Provide a more detailed analysis, including separate sections for Financial Statement Impact and Illustrative Journal Entries as described below.
 
-**Suggested Journal Entries:**
-Provide specific journal entries with realistic account names and amounts:
-- Contract inception entries (if applicable)
-- Revenue recognition entries
-- Any performance obligation and contract asset/liability entries
+---
+**IF THE TRANSACTION IS COMPLEX, follow this structure:**
 
-**Key Financial Statement Effects:**
-Income statement impact (revenue, timing), balance sheet impact (contract assets, deferred revenue), cash flow statement considerations.
+1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or multiple deferred revenue liabilities).
 
-Use clear paragraphs (not bullets) and professional accounting language suitable for {memo_audience.lower()}."""
+2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Use standard account names.
+
+    | Date       | Account                          | Debit     | Credit    |
+    |------------|----------------------------------|-----------|-----------|
+    | ...        | ...                              | ...       | ...       |
+
+---
+**IF THE TRANSACTION IS SIMPLE, follow this structure:**
+
+The $XX.XX fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
+
+**Illustrative Journal Entry:**
+| Account                      | Debit     | Credit    |
+|------------------------------|-----------|-----------|
+| Cash / Accounts Receivable   | $XX.XX    |           |
+| Deferred Revenue             |           | $XX.XX    |
+| *To record contract inception* | | |
+
+---
+
+Begin writing the financial impact section, strictly adhering to the proportionality rule."""
 
     @staticmethod
     def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
