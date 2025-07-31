@@ -271,7 +271,7 @@ class ASC606Analyzer:
             # Get step results for easy reference
             s1, s2, s3, s4, s5 = [step_results.get(f"step_{i}", {}) for i in range(1, 6)]
             
-            # 0. CRITICAL: Consistency Check (GEMINI'S NEW REQUIREMENT)
+            # 0. CRITICAL: Consistency Check
             self.logger.info("Performing consistency check across all 5 steps...")
             consistency_prompt = StepAnalysisPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
             consistency_result = make_llm_call(
@@ -287,21 +287,74 @@ class ASC606Analyzer:
             
             self.logger.info("✅ Consistency check passed - all steps align")
             
-            # 1. Generate Executive Summary (focused LLM call)
+            # === CONCURRENT MEMO ASSEMBLY ===
+            # 🚀 REVIEWER SUGGESTION: Run memo sections concurrently for 5-10s speedup
+            self.logger.info("🚀 MEMO PERFORMANCE: Generating all memo sections concurrently...")
+            
+            # Prepare all memo section tasks for concurrent execution
+            memo_tasks = []
+            
+            # Task 1: Executive Summary 
             summary_prompt = StepAnalysisPrompts.get_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data)
-            executive_summary = make_llm_call(
+            memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, summary_prompt, 
                 model='gpt-4o-mini', max_tokens=800, temperature=0.3
-            )
+            )))
             
-            # 2. Generate Background (focused LLM call) 
+            # Task 2: Background
             background_prompt = StepAnalysisPrompts.get_background_prompt(contract_data)
-            background = make_llm_call(
+            memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, background_prompt,
                 model='gpt-4o-mini', max_tokens=600, temperature=0.3
-            )
+            )))
             
-            # 3. Assemble Detailed Analysis (Python formatting - NO LLM CALL)
+            # Task 3: Key Judgments
+            judgments_prompt = StepAnalysisPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
+            memo_tasks.append(asyncio.create_task(make_llm_call_async(
+                self.client, judgments_prompt,
+                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
+            )))
+            
+            # Task 4: Financial Impact
+            financial_prompt = StepAnalysisPrompts.get_financial_impact_prompt(
+                s1, s2, s3, s4, s5, 
+                getattr(contract_data, 'customer_name', 'Customer'),
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+            )
+            memo_tasks.append(asyncio.create_task(make_llm_call_async(
+                self.client, financial_prompt,
+                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
+            )))
+            
+            # Task 5: Conclusion
+            conclusion_prompt = StepAnalysisPrompts.get_conclusion_prompt(
+                s1, s2, s3, s4, s5,
+                getattr(contract_data, 'customer_name', 'Customer'),
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+            )
+            memo_tasks.append(asyncio.create_task(make_llm_call_async(
+                self.client, conclusion_prompt,
+                model='gpt-4o-mini', max_tokens=800, temperature=0.3
+            )))
+            
+            # Execute all memo sections concurrently
+            memo_start_time = time.time()
+            memo_responses = await asyncio.gather(*memo_tasks, return_exceptions=True)
+            memo_duration = time.time() - memo_start_time
+            self.logger.info(f"⚡ All 5 memo sections completed concurrently in {memo_duration:.2f}s")
+            
+            # Unpack concurrent results
+            executive_summary, background, key_judgments, financial_impact, conclusion = memo_responses
+            
+            # Handle any exceptions in memo generation
+            for i, response in enumerate(memo_responses):
+                section_names = ["Executive Summary", "Background", "Key Judgments", "Financial Impact", "Conclusion"]
+                if isinstance(response, Exception):
+                    self.logger.error(f"Memo section '{section_names[i]}' failed: {response}")
+                    # Use fallback content
+                    memo_responses[i] = f"[{section_names[i]} generation failed - please regenerate memo]"
+            
+            # Generate Detailed Analysis (Python-only, no LLM call needed)
             detailed_analysis_sections = []
             step_names = [
                 "Identify the Contract",
@@ -320,34 +373,8 @@ class ASC606Analyzer:
             
             detailed_analysis = "\n\n".join(detailed_analysis_sections)
             
-            # 4. Generate Key Judgments (focused LLM call)
-            judgments_prompt = StepAnalysisPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
-            key_judgments = make_llm_call(
-                self.client, judgments_prompt,
-                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
-            )
-            
-            # 5. Generate Financial Impact (focused LLM call)
-            financial_prompt = StepAnalysisPrompts.get_financial_impact_prompt(
-                s1, s2, s3, s4, s5, 
-                getattr(contract_data, 'customer_name', 'Customer'),
-                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
-            )
-            financial_impact = make_llm_call(
-                self.client, financial_prompt,
-                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
-            )
-            
-            # 6. Generate Conclusion (focused LLM call)
-            conclusion_prompt = StepAnalysisPrompts.get_conclusion_prompt(
-                s1, s2, s3, s4, s5,
-                getattr(contract_data, 'customer_name', 'Customer'),
-                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
-            )
-            conclusion = make_llm_call(
-                self.client, conclusion_prompt,
-                model='gpt-4o-mini', max_tokens=800, temperature=0.3
-            )
+            # Ensure we have the final values
+            executive_summary, background, key_judgments, financial_impact, conclusion = memo_responses
             
             # Clean any blockquote formatting that might create boxes
             if conclusion and isinstance(conclusion, str):
