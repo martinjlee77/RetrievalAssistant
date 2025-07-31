@@ -4,7 +4,7 @@ Handles OpenAI API calls, error handling, caching, and file conversion utilities
 """
 import os
 import streamlit as st
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 from typing import Dict, List, Any, Optional, Union, cast
 import json
 import time
@@ -34,6 +34,10 @@ async def make_llm_call_async(
     Asynchronous version of make_llm_call for concurrent execution
     """
     try:
+        # Create async client for this call
+        api_key = os.environ.get("OPENAI_API_KEY")
+        async_client = AsyncOpenAI(api_key=api_key)
+        
         # Prepare messages format
         messages = [{"role": "user", "content": prompt}]
         
@@ -50,7 +54,7 @@ async def make_llm_call_async(
             request_params["response_format"] = response_format
         
         # Make async API call
-        response = await client.chat.completions.create(**request_params)
+        response = await async_client.chat.completions.create(**request_params)
         return response.choices[0].message.content
         
     except Exception as e:
