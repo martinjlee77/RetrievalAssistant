@@ -194,16 +194,13 @@ Keep this professional, concise, and focused on executive-level insights."""
     def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
                                         contract_text: str, rag_context: str, 
                                         contract_data=None, debug_config=None) -> str:
-        """Generate step-specific analysis prompt."""
-        return f"""You are an expert in ASC 606 revenue recognition. Analyze this contract for Step {step_number}: {step_title}.
+        """Generate step-specific analysis prompt that requests narrative, thematically-grouped JSON output."""
+        return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
 
-PRIMARY GUIDANCE: {step_guidance}
+PRIMARY GUIDANCE FOR THIS STEP: {step_guidance}
 
-AUTHORITATIVE GUIDANCE CONTEXT:
+AUTHORITATIVE & INDUSTRY GUIDANCE CONTEXT:
 {rag_context}
-
-ADDITIONAL GUIDANCE:
-(Available in RAG context above)
 
 CONTRACT TEXT TO ANALYZE:
 {contract_text}
@@ -212,13 +209,59 @@ CONTRACT DATA:
 Customer: {getattr(contract_data, 'customer_name', 'N/A') if contract_data else 'N/A'}
 Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance') if contract_data else 'General ASC 606 compliance'}
 
-Provide a detailed analysis including:
-1. **Executive Conclusion**: Clear determination for this step
-2. **Supporting Analysis**: Detailed reasoning with ASC 606 citations. Where significant judgment is required, also reference relevant industry interpretations from the context provided.
-3. **Contract Evidence**: Provide specific, direct quotes from the contract that support your conclusion. **For each quote, you MUST cite the source document name (e.g., "Master Services Agreement.docx", "SOW_Project_Phoenix.pdf") where the quote was found.** Format it as: `Quote text (Source: [Document Name])`
-4. **Key Considerations**: Any complexities or judgment areas
+*** YOUR CRITICAL TASK ***
+Analyze the contract and structure your findings thematically. For each distinct topic or issue you identify for this step, provide your analysis, the supporting ASC 606 rule, and the direct contract evidence.
 
-Return your response as a JSON object with the keys: executive_conclusion, supporting_analysis, contract_evidence, key_considerations."""
+You MUST return your response as a single, well-formed JSON object with the following exact structure:
+{{
+  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
+  "analysis_points": [
+    {{
+      "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
+      "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
+      "evidence_quotes": [
+        "A specific, direct quote from the contract that supports the analysis for this topic. You MUST include the source document name, formatted as: 'Quote text... (Source: [Document Name])'",
+        "Another supporting quote, if applicable."
+      ]
+    }},
+    {{
+      "topic_title": "The name of the second major theme or issue (e.g., 'Assessment of Variable Consideration').",
+      "analysis_text": "Your detailed analysis for this second topic...",
+      "evidence_quotes": [
+        "A quote supporting the second topic... (Source: [Document Name])"
+      ]
+    }}
+  ]
+}}
+
+EXAMPLE FORMAT:
+{{
+  "executive_conclusion": "The contract qualifies as a valid contract under ASC 606-10-25-1, with clearly identifiable parties, commercial substance, and enforceable rights and obligations.",
+  "analysis_points": [
+    {{
+      "topic_title": "Contract Validity Assessment",
+      "analysis_text": "The arrangement meets all five criteria under ASC 606-10-25-1 for contract identification. The parties are clearly identified with legal capacity to enter agreements. Commercial substance exists as both parties' cash flows are expected to change as a result of the contract per ASC 606-10-25-1(e).",
+      "evidence_quotes": [
+        "This Agreement is entered into between Netflix Inc. and Customer effective January 1, 2024 (Source: Netflix_Service_Agreement.pdf)",
+        "Customer agrees to pay monthly subscription fees in consideration for streaming services (Source: Netflix_Service_Agreement.pdf)"
+      ]
+    }},
+    {{
+      "topic_title": "Enforceability Analysis", 
+      "analysis_text": "The contract demonstrates clear enforceability through defined payment terms, service delivery obligations, and dispute resolution mechanisms. The presence of termination clauses and remedy provisions supports the conclusion that rights and obligations are legally enforceable under ASC 606-10-25-1(d).",
+      "evidence_quotes": [
+        "Either party may terminate this agreement with 30 days written notice (Source: Netflix_Service_Agreement.pdf)"
+      ]
+    }}
+  ]
+}}
+
+Guidelines:
+- Aim for 2-4 analysis points per step (avoid single mega-topics or excessive fragmentation)
+- Every quote MUST include source document name
+- Integrate key considerations and judgment areas directly into the relevant topic analysis
+- Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
+- Make analysis flow naturally, building from one point to the next"""
 
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
@@ -293,28 +336,41 @@ If no significant judgments are required, state that the contract follows standa
 
     @staticmethod
     def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
-        """Format step analysis as markdown."""
-        if not step_data:
-            return f"## Step {step_number}: {step_name}\n\nNo analysis available.\n"
-        
-        conclusion = step_data.get('executive_conclusion', 'N/A')
-        analysis = step_data.get('supporting_analysis', 'N/A')
-        evidence = step_data.get('contract_evidence', 'N/A')
-        considerations = step_data.get('key_considerations', 'N/A')
-        
-        return f"""## Step {step_number}: {step_name}
+        """Format step analysis from narrative JSON structure into professional markdown."""
+        if not step_data or not isinstance(step_data, dict):
+            return f"## Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
 
-**Conclusion:**
-{conclusion}
+        conclusion = step_data.get('executive_conclusion', 'No conclusion was provided.')
+        analysis_points = step_data.get('analysis_points', [])
 
-**Supporting Analysis:**
-{analysis}
+        # Start with the main heading and the upfront conclusion
+        markdown_sections = [
+            f"## Step {step_number}: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "\n---\n",  # Visual separator
+            "**Detailed Analysis:**\n"
+        ]
 
-**Contract Evidence:** (Include source document names for each quote)
-{evidence}
+        if not analysis_points:
+            markdown_sections.append("No detailed analysis points were provided.")
+        else:
+            # Loop through each thematically-grouped analysis point
+            for i, point in enumerate(analysis_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
 
-**Key Considerations:**
-{considerations}
+                # Add the topic as a sub-heading
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
 
----
-"""
+                # Add the evidence quotes for that topic
+                if evidence_quotes:
+                    for quote in evidence_quotes:
+                        # Format as a markdown blockquote for emphasis
+                        markdown_sections.append(f"> {quote}")
+
+                markdown_sections.append("")  # Add a blank line for spacing before the next point
+
+        markdown_sections.append("---\n")  # Final separator
+        return "\n".join(markdown_sections)
