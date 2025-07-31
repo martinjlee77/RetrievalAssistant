@@ -73,7 +73,7 @@ class KnowledgeBaseManager:
                     collection = self.client.get_or_create_collection(
                         name=collection_name,
                         metadata={"standard": standard},
-                        embedding_function=self.embedding_function  # Use dependency injection
+                        embedding_function=self.embedding_function
                     )
                     self.collections[collection_name] = collection
                     self.logger.info(f"Collection '{collection_name}' ready for {standard}")
