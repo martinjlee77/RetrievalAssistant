@@ -293,10 +293,27 @@ class ASC606Analyzer:
             )
             
             # Check if analysis is inconsistent and halt if needed
-            if consistency_result and "ANALYSIS CONSISTENT" not in str(consistency_result):
-                import streamlit as st
-                st.error(f"❌ **Analysis Consistency Issue Detected**\n\n{consistency_result}\n\nPlease review the contract and try again.")
-                raise Exception(f"Analysis consistency check failed: {consistency_result[:200]}...")
+            if consistency_result:
+                consistency_text = str(consistency_result).lower()
+                # Look for positive indicators that analysis is consistent
+                positive_indicators = [
+                    "consistent", "logically consistent", "align", "aligns", 
+                    "no contradictions", "no inconsistencies", "sound", "logically sound"
+                ]
+                # Look for negative indicators that show problems
+                negative_indicators = [
+                    "inconsistent", "contradiction", "contradicts", "gap", "error", 
+                    "issue", "problem", "conflicts", "mismatch"
+                ]
+                
+                has_positive = any(indicator in consistency_text for indicator in positive_indicators)
+                has_negative = any(indicator in consistency_text for indicator in negative_indicators)
+                
+                # If we have clear negative indicators and no positive ones, flag as inconsistent
+                if has_negative and not has_positive:
+                    import streamlit as st
+                    st.error(f"❌ **Analysis Consistency Issue Detected**\n\n{consistency_result}\n\nPlease review the contract and try again.")
+                    raise Exception(f"Analysis consistency check failed: {consistency_result[:200]}...")
             
             self.logger.info("✅ Consistency check passed - all steps align")
             

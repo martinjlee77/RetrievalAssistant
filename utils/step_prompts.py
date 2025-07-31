@@ -223,7 +223,7 @@ Return your response as a JSON object with the keys: executive_conclusion, suppo
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
         """Generate consistency check prompt for all 5 steps."""
-        return f"""Review the consistency of this ASC 606 analysis across all 5 steps:
+        return f"""Review the logical consistency of this ASC 606 analysis across all 5 steps:
 
 STEP 1 - CONTRACT IDENTIFICATION:
 {s1.get('executive_conclusion', 'N/A')}
@@ -240,9 +240,16 @@ STEP 4 - ALLOCATION:
 STEP 5 - RECOGNITION:
 {s5.get('executive_conclusion', 'N/A')}
 
-Check for logical consistency between steps. Do the conclusions align? Are there any contradictions or gaps?
+CRITICAL REVIEW TASK:
+1. Check if the number of performance obligations in Step 2 matches the allocation approach in Step 4
+2. Verify that the transaction price in Step 3 aligns with the allocation amounts in Step 4
+3. Ensure the recognition timing in Step 5 matches the nature of obligations identified in Step 2
+4. Look for any logical contradictions between steps
 
-Provide brief feedback on any inconsistencies found, or confirm the analysis is consistent."""
+RESPONSE FORMAT:
+If you find ANY inconsistencies, contradictions, or logical gaps, start your response with "INCONSISTENCY DETECTED:" and explain the specific issues.
+
+If the analysis is logically consistent across all steps, provide a brief confirmation that the steps align properly."""
 
     @staticmethod
     def get_background_prompt(contract_data) -> str:

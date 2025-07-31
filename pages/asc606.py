@@ -383,7 +383,7 @@ if st.session_state.analysis_results is None:
                     
                     # Enhanced text extraction with fail-safe policy
                     # Use st.write for all our dynamic steps so they have a consistent, larger font.
-                    st.write("➡️ **Verifying and extracting text from documents...**")
+                    st.write("➡️ **Verifying documents and extracting texts...**")
                     all_extracted_text = []
                     failed_files = []
 
@@ -455,10 +455,10 @@ if st.session_state.analysis_results is None:
                         revenue_recognition_timing_details=all_form_data.get("revenue_recognition_timing_details", "")
                     )
 
-                    st.write("➡️ **Processing your answers and guidance...**")
+                    st.write("➡️ **Processing your inputs...**")
                     # Contract data object creation happens here (already done above)
                     
-                    st.write("➡️ **Running AI analysis... This may take a moment.**")
+                    st.write("➡️ **Running AI analysis. This may take a moment.**")
                     # Use asyncio.run to execute the async analyzer method
                     analysis_results = asyncio.run(analyzer.analyze_contract(combined_text, contract_data, debug_config=debug_config))
                     st.session_state.analysis_results = analysis_results
