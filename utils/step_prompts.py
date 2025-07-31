@@ -246,10 +246,7 @@ CRITICAL REVIEW TASK:
 3. Ensure the recognition timing in Step 5 matches the nature of obligations identified in Step 2
 4. Look for any logical contradictions between steps
 
-RESPONSE FORMAT:
-If you find ANY inconsistencies, contradictions, or logical gaps, start your response with "INCONSISTENCY DETECTED:" and explain the specific issues.
-
-If the analysis is logically consistent across all steps, provide a brief confirmation that the steps align properly."""
+Provide brief feedback on any inconsistencies found, or confirm the analysis is consistent."""
 
     @staticmethod
     def get_background_prompt(contract_data) -> str:
