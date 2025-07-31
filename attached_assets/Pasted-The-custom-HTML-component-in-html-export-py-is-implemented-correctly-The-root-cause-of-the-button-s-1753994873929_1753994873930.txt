@@ -1,0 +1,63 @@
+The custom HTML component in html_export.py is implemented correctly. The root cause of the button's failure is not in that file.
+
+The problem is a race condition in asc_606_page.py caused by placing the custom HTML component inside an st.columns layout with another interactive element (st.download_button). Actions in one column are causing the component in the other column to re-render, which interrupts the JavaScript onclick event and prevents the new tab from opening.
+
+To fix this permanently, we must isolate the custom component from the st.columns layout.
+
+Required Action
+In asc_606_page.py, modify the "MEMO ACTIONS" section as follows:
+
+Keep the st.download_button inside the st.columns layout.
+Move the render_view_in_browser_button call to its own line, outside and below the columns. This will ensure its rendering lifecycle is independent and cannot be interrupted by other buttons.
+Here is the exact code to implement:
+
+File: asc_606_page.py
+
+# --- Find this section in asc_606_page.py ---
+# ... inside the "else:" block that displays results
+
+# --- 1. MEMO ACTIONS (Buttons First) ---
+with st.container(border=True):
+    st.markdown("**Memo Actions**")
+    st.write("Your analysis is complete. Choose an option below to view or download the memo.")
+
+    # --- THIS IS THE INCORRECT CODE ---
+    # dl_col1, dl_col2 = st.columns(2)
+    # with dl_col1:
+    #     st.download_button(...)
+    # with dl_col2:
+    #     render_view_in_browser_button(html_content)
+
+
+    # --- REPLACE IT WITH THIS CORRECTED CODE ---
+
+    # Keep the download buttons in columns for alignment
+    dl_col1, dl_col2 = st.columns(2)
+    with dl_col1:
+        try:
+            docx_content = create_docx_from_text(memo, contract_data)
+            st.download_button(
+                label="📄 Download DOCX",
+                data=docx_content,
+                file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True,
+                help="Download the memo as an editable Word document."
+            )
+        except Exception as e:
+            st.error(f"Error generating DOCX: {str(e)}")
+
+    # The other column can remain empty or contain another download link if needed.
+    with dl_col2:
+        # We can put a placeholder or another button here if we want.
+        # For now, leaving it empty is fine.
+        pass
+
+    # **CRITICAL FIX:** Render the custom JavaScript button OUTSIDE the columns.
+    # This gives it its own container and isolates it from other widget interactions.
+    st.write("") # Adds a little vertical space
+    render_view_in_browser_button(html_content)
+
+This structural change isolates the custom component, guarantees that its JavaScript event will not be interrupted, and permanently solves the issue.
+
+Please implement this layout change. No modifications are needed in html_export.py. This is the final step to make this feature production-ready.

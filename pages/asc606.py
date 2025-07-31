@@ -507,8 +507,6 @@ else:
             st.markdown("**Memo Actions**")
             st.write("Your analysis is complete. Choose an option below to view or download the memo.")
 
-            dl_col1, dl_col2 = st.columns(2)
-
             # Generate the HTML content once to be used for both the link and the preview
             from utils.html_export import convert_memo_to_html, render_view_in_browser_button
             from utils.llm import create_docx_from_text
@@ -516,7 +514,8 @@ else:
             html_content = convert_memo_to_html(memo, contract_data)
             analysis_title = contract_data.analysis_title if contract_data and contract_data.analysis_title else "ASC606_Analysis"
 
-            # Column 1: The primary working file (DOCX Download)
+            # Keep the download buttons in columns for alignment
+            dl_col1, dl_col2 = st.columns(2)
             with dl_col1:
                 try:
                     docx_content = create_docx_from_text(memo, contract_data)
@@ -531,9 +530,16 @@ else:
                 except Exception as e:
                     st.error(f"Error generating DOCX: {str(e)}")
 
-            # Column 2: View in Browser (Correct JavaScript Approach)
+            # The other column can remain empty or contain another download link if needed.
             with dl_col2:
-                render_view_in_browser_button(html_content)
+                # We can put a placeholder or another button here if we want.
+                # For now, leaving it empty is fine.
+                pass
+
+            # **CRITICAL FIX:** Render the custom JavaScript button OUTSIDE the columns.
+            # This gives it its own container and isolates it from other widget interactions.
+            st.write("") # Adds a little vertical space
+            render_view_in_browser_button(html_content)
 
         # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
         st.markdown("---")  # Visual separator
