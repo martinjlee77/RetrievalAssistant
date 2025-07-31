@@ -1,0 +1,91 @@
+Hi [Developer's Name],
+
+I've identified the root cause for the "View in Browser" button failure. The custom component code in html_export.py is logically correct. The failure is due to a security feature in the Streamlit framework.
+
+The function st.components.html renders the button inside a sandboxed <iframe> that, by default, is forbidden from opening new windows. This is a security policy that silently blocks the window.open() command.
+
+The fix is to switch from st.components.html to st.markdown(..., unsafe_allow_html=True), which injects the component directly into the main page and bypasses the <iframe> sandbox.
+
+Required Action
+In html_export.py, make the following two changes to the render_view_in_browser_button function:
+
+Add import streamlit as st at the top of the file.
+Change the final line of the function from components.html(...) to st.markdown(...).
+Here is the final, production-ready code for the entire function.
+
+File to Edit: utils/html_export.py
+
+# In utils/html_export.py
+
+# Add this import at the top of the file
+import streamlit as st
+# ... other imports like markdown2, json, etc.
+
+# Replace the entire existing function with this corrected version
+def render_view_in_browser_button(html_content: str):
+    """
+    Renders a custom HTML button that uses a direct onclick JavaScript handler
+    to open a new tab and write the HTML content to it. This is the correct
+    method to bypass browser pop-up blockers and URL length limits.
+    """
+    import json
+    # No need to re-import components if it's not used
+
+    # 1. Safely serialize the Python string into a valid JavaScript string.
+    safe_html_content = json.dumps(html_content)
+
+    # 2. Construct the self-contained HTML component string (this part is correct and remains unchanged).
+    html_with_js = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            /* Your button CSS remains the same */
+            .custom-button {{
+                border: 1px solid rgba(49, 51, 63, 0.2);
+                border-radius: 0.5rem;
+                padding: 0.5em 1em;
+                background-color: #FFFFFF;
+                color: #31333F;
+                font-size: 14px;
+                font-weight: 400;
+                cursor: pointer;
+                text-align: center;
+                display: inline-block;
+                width: 100%;
+                box-sizing: border-box;
+            }}
+            .custom-button:hover {{
+                border-color: #FF4B4B;
+                color: #FF4B4B;
+            }}
+            .custom-button:active {{
+                background-color: #F0F2F6;
+            }}
+        </style>
+    </head>
+    <body>
+        <script>
+            // This JavaScript function remains the same.
+            function openHtmlInNewTab() {{
+                const htmlContent = {safe_html_content};
+                const newWindow = window.open("", "_blank");
+                newWindow.document.open();
+                newWindow.document.write(htmlContent);
+                newWindow.document.close();
+            }}
+        </script>
+        <!-- The button element also remains the same. -->
+        <button class="custom-button" onclick="openHtmlInNewTab()">
+            🌐 View in Browser
+        </button>
+    </body>
+    </html>
+    """
+
+    # 3. CRITICAL CHANGE: Render the component using st.markdown, not st.components.html.
+    st.markdown(html_with_js, unsafe_allow_html=True)
+
+This is the standard and correct way to implement this functionality in Streamlit. It permanently resolves the issue by avoiding the iframe sandbox entirely.
+
+Please apply this final change. No other modifications are needed.

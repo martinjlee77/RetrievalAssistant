@@ -382,21 +382,19 @@ def render_view_in_browser_button(html_content: str):
     to open a new tab and write the HTML content to it. This is the correct
     method to bypass browser pop-up blockers and URL length limits.
     """
-    import streamlit.components.v1 as components
+    import streamlit as st
     import json
     
-    # 1. Safely embed the large HTML string into a JavaScript-readable format.
-    # json.dumps handles quotes, newlines, and other special characters correctly.
+    # 1. Safely serialize the Python string into a valid JavaScript string.
     safe_html_content = json.dumps(html_content)
 
-    # 2. Construct a self-contained HTML component.
-    # This includes CSS for styling, a JavaScript function, and the button itself.
+    # 2. Construct the self-contained HTML component string.
     html_with_js = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <style>
-            /* Basic styling to make our button look like a real button */
+            /* Your button CSS remains the same */
             .custom-button {{
                 border: 1px solid rgba(49, 51, 63, 0.2);
                 border-radius: 0.5rem;
@@ -409,7 +407,7 @@ def render_view_in_browser_button(html_content: str):
                 text-align: center;
                 display: inline-block;
                 width: 100%;
-                box-sizing: border-box; /* Ensures padding doesn't affect width */
+                box-sizing: border-box;
             }}
             .custom-button:hover {{
                 border-color: #FF4B4B;
@@ -422,22 +420,16 @@ def render_view_in_browser_button(html_content: str):
     </head>
     <body>
         <script>
-            // This JavaScript function will be called directly by the button's onclick event.
+            // This JavaScript function remains the same.
             function openHtmlInNewTab() {{
-                // Get the HTML content that was safely embedded from Python.
                 const htmlContent = {safe_html_content};
-
-                // Open a new, blank tab. This is allowed because it's a direct result of a user click.
                 const newWindow = window.open("", "_blank");
-
-                // Write the full HTML content into the new tab.
                 newWindow.document.open();
                 newWindow.document.write(htmlContent);
                 newWindow.document.close();
             }}
         </script>
-
-        <!-- The button element with the direct onclick handler. -->
+        <!-- The button element also remains the same. -->
         <button class="custom-button" onclick="openHtmlInNewTab()">
             🌐 View in Browser
         </button>
@@ -445,8 +437,8 @@ def render_view_in_browser_button(html_content: str):
     </html>
     """
 
-    # 3. Render the custom component in Streamlit.
-    components.html(html_with_js, height=50)
+    # 3. CRITICAL CHANGE: Render the component using st.markdown, not st.components.html.
+    st.markdown(html_with_js, unsafe_allow_html=True)
 
 def enhance_markdown_for_display(memo_markdown: str) -> str:
     """
