@@ -38,42 +38,63 @@ class StepPrompts:
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
-        """Generates proportional financial impact prompt based on transaction complexity."""
+        """Generates proportional financial impact prompt based on structured data analysis."""
+        import json
         
-        # Robust data extraction logic
-        price_details = "Not specified"
-        recognition_summary = "Not specified"
+        # Extract structured data from each step
         
-        # ENHANCED: Prioritize structured data from Step 4 allocation
-        if s4_allocation := s4.get('allocation_details'):
-            import json
-            try:
-                if isinstance(s4_allocation, dict):
-                    price_details = json.dumps(s4_allocation, indent=2)
-                else:
-                    price_details = str(s4_allocation)
-            except (TypeError, ValueError):
-                price_details = str(s4_allocation)
-        # Fallback to regex extraction from Step 3
-        elif s3_conclusion := s3.get('executive_conclusion', ''):
-            import re
-            if price_match := re.search(r'\$[\d,]+\.?\d*', s3_conclusion):
-                price_details = f"Total Transaction Price: {price_match.group()}"
+        # Step 1: Contract validity
+        contract_valid = "Valid"
+        if s1_criteria := s1.get('contract_criteria_assessment'):
+            failed_criteria = [c for c in s1_criteria if c.get('status') == 'Not Met']
+            if failed_criteria:
+                contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
         
-        # Get recognition summary from Step 5
-        recognition_summary = s5.get('executive_conclusion', 'Not specified')
+        # Step 2: Performance obligations
+        performance_obligations = []
+        if s2_pos := s2.get('performance_obligations'):
+            performance_obligations = [po.get('po_description', 'Unknown PO') for po in s2_pos if po.get('is_distinct') == 'Yes']
+        po_summary = f"{len(performance_obligations)} distinct performance obligations: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
+        
+        # Step 3: Transaction price components
+        transaction_price_data = {}
+        if s3_price := s3.get('transaction_price_components'):
+            transaction_price_data = {
+                'total_price': s3_price.get('total_transaction_price', 'Not specified'),
+                'fixed_consideration': s3_price.get('fixed_consideration', 'Not specified'),
+                'variable_consideration': s3_price.get('variable_consideration', []),
+                'financing_component': s3_price.get('financing_component_analysis', 'None identified')
+            }
+        
+        # Step 4: Allocation details  
+        allocation_data = s4.get('allocation_details', {})
+        
+        # Step 5: Revenue recognition plan
+        recognition_methods = []
+        if s5_plan := s5.get('revenue_recognition_plan'):
+            recognition_methods = [(po.get('performance_obligation', 'Unknown'), 
+                                  po.get('recognition_method', 'Unknown'),
+                                  po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
 
-        # Logic to determine transaction complexity
-        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
-                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
-                     "financing component" in s3.get('executive_conclusion', '').lower()
+        # Enhanced logic to determine transaction complexity using structured data
+        is_complex = (
+            len(performance_obligations) > 1 or  # Multiple POs
+            (transaction_price_data.get('variable_consideration') and 
+             len(transaction_price_data.get('variable_consideration', [])) > 0) or  # Variable consideration exists
+            'significant financing component' in transaction_price_data.get('financing_component', '').lower() or  # Financing component
+            any('Over Time' in method[1] for method in recognition_methods)  # Over time recognition
+        )
 
         return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
 
-CONTEXT FROM ANALYSIS:
-- Price & Allocation Details: {price_details}
-- Revenue Recognition Summary: {recognition_summary}
-- Is the transaction complex (e.g., multiple POs, variable consideration)? {"Yes" if is_complex else "No"}
+STRUCTURED ANALYSIS DATA:
+- Contract Status: {contract_valid}
+- Performance Obligations: {po_summary}
+- Transaction Price: {transaction_price_data.get('total_price', 'Not specified')}
+- Variable Consideration: {json.dumps(transaction_price_data.get('variable_consideration', []), indent=2) if transaction_price_data.get('variable_consideration') else 'None'}
+- Allocation Details: {json.dumps(allocation_data, indent=2) if allocation_data else 'Not specified'}
+- Revenue Recognition Methods: {recognition_methods}
+- Is transaction complex? {"Yes" if is_complex else "No"}
 
 YOUR TASK:
 Write a concise financial impact analysis.
@@ -114,17 +135,48 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
     @staticmethod
     def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
-        """Generates a proportional and meaningful conclusion prompt."""
+        """Generates a proportional and meaningful conclusion prompt using structured data."""
 
-        # Logic to determine transaction complexity
-        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
-                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
-                     "financing component" in s3.get('executive_conclusion', '').lower()
+        # Extract structured data for conclusion
+        
+        # Performance obligations count
+        po_count = 0
+        if s2_pos := s2.get('performance_obligations'):
+            po_count = len([po for po in s2_pos if po.get('is_distinct') == 'Yes'])
+        
+        # Variable consideration check
+        has_variable_consideration = False
+        if s3_price := s3.get('transaction_price_components'):
+            has_variable_consideration = bool(s3_price.get('variable_consideration') and 
+                                            len(s3_price.get('variable_consideration', [])) > 0)
+        
+        # Financing component check
+        has_financing_component = False
+        if s3_price := s3.get('transaction_price_components'):
+            financing_analysis = s3_price.get('financing_component_analysis', '').lower()
+            has_financing_component = 'significant financing component' in financing_analysis
+        
+        # Over time recognition check
+        has_over_time_recognition = False
+        if s5_plan := s5.get('revenue_recognition_plan'):
+            has_over_time_recognition = any('Over Time' in po.get('recognition_method', '') for po in s5_plan)
+
+        # Enhanced logic using structured data
+        is_complex = (
+            po_count > 1 or
+            has_variable_consideration or
+            has_financing_component or
+            has_over_time_recognition
+        )
 
         return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
 
-CONTEXT FROM ANALYSIS:
-- Is the transaction complex? {"Yes" if is_complex else "No"}
+STRUCTURED ANALYSIS DATA:
+- Performance Obligations Count: {po_count}
+- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+- Has Financing Component: {"Yes" if has_financing_component else "No"}
+- Has Over Time Recognition: {"Yes" if has_over_time_recognition else "No"}
+- Transaction Complexity: {"Complex" if is_complex else "Simple"}
 
 YOUR TASK:
 Write a final concluding section for the memo, strictly adhering to the proportionality rule below.
@@ -158,35 +210,82 @@ Begin writing the "Conclusion and Recommendations" section. Do not add any other
 
     @staticmethod 
     def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:
-        """Generates enhanced executive summary with professional dashboard format."""
+        """Generates enhanced executive summary using structured data from all steps."""
+        import json
         
-        conclusions = []
-        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
-            conclusion = step.get('executive_conclusion', 'N/A')
-            conclusions.append(f"Step {i}: {conclusion}")
+        # Extract structured data for executive summary
+        
+        # Step 1: Contract validity
+        contract_status = "Valid"
+        failed_criteria = []
+        if s1_criteria := s1.get('contract_criteria_assessment'):
+            failed_criteria = [c.get('criterion', 'Unknown') for c in s1_criteria if c.get('status') == 'Not Met']
+            if failed_criteria:
+                contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
+        
+        # Step 2: Performance obligations summary
+        po_count = 0
+        po_descriptions = []
+        if s2_pos := s2.get('performance_obligations'):
+            distinct_pos = [po for po in s2_pos if po.get('is_distinct') == 'Yes']
+            po_count = len(distinct_pos)
+            po_descriptions = [po.get('po_description', 'Unnamed PO') for po in distinct_pos]
+        
+        # Step 3: Transaction price details
+        total_price = "Not specified"
+        has_variable_consideration = False
+        if s3_price := s3.get('transaction_price_components'):
+            total_price = s3_price.get('total_transaction_price', 'Not specified')
+            has_variable_consideration = bool(s3_price.get('variable_consideration') and 
+                                            len(s3_price.get('variable_consideration', [])) > 0)
+        
+        # Step 5: Revenue recognition methods
+        recognition_summary = []
+        critical_judgments = []
+        if s5_plan := s5.get('revenue_recognition_plan'):
+            for po_plan in s5_plan:
+                method = po_plan.get('recognition_method', 'Unknown')
+                po_name = po_plan.get('performance_obligation', 'Unknown PO')
+                recognition_summary.append(f"{po_name}: {method}")
+                
+                # Extract critical judgments
+                if 'Over Time' in method and po_plan.get('justification'):
+                    critical_judgments.append(f"Over time recognition criteria for {po_name}")
+        
+        # Identify key judgments
+        if has_variable_consideration:
+            critical_judgments.append("Variable consideration estimation and constraint analysis")
+        if po_count > 1:
+            critical_judgments.append("Distinct performance obligation assessment")
         
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
-ANALYSIS RESULTS:
+STRUCTURED ANALYSIS DATA:
 - Analysis: {analysis_title}
 - Customer: {customer_name}
-- Step Conclusions: {chr(10).join(conclusions)}
+- Contract Status: {contract_status}
+- Performance Obligations Count: {po_count}
+- Performance Obligations: {po_descriptions}
+- Total Transaction Price: {total_price}
+- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+- Revenue Recognition Methods: {recognition_summary}
+- Key Judgment Areas: {critical_judgments}
 
 Create an executive summary using this professional structure:
 
 **OVERALL CONCLUSION**
-[Single paragraph stating overall ASC 606 compliance and revenue recognition approach]
+[Single paragraph stating overall ASC 606 compliance and revenue recognition approach based on the structured data above]
 
 **KEY FINDINGS**
-• Contract Status: [Valid/Invalid under ASC 606-10-25-1]
-• Performance Obligations: [Number and nature of distinct obligations]
-• Transaction Price: [Amount and any variable consideration]
-• Revenue Recognition: [Over time/Point in time with timing]
-• Critical Judgments: [1-2 most significant accounting decisions]
+• Contract Status: {contract_status}
+• Performance Obligations: {po_count} distinct obligations - {', '.join(po_descriptions[:3])}{'...' if len(po_descriptions) > 3 else ''}
+• Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+• Revenue Recognition: {', '.join(recognition_summary[:2])}{'...' if len(recognition_summary) > 2 else ''}
+• Critical Judgments: {', '.join(critical_judgments[:2])}{'...' if len(critical_judgments) > 2 else ''}
 
 **FINANCIAL IMPACT SUMMARY**
-• Expected Revenue: [Amount and timing]
-• Implementation Requirements: [Key operational changes needed]
+• Expected Revenue: [Derive from transaction price and recognition timing]
+• Implementation Requirements: [Base on complexity - simple vs multi-PO arrangements]
 
 Keep this professional, concise, and focused on executive-level insights."""
 
