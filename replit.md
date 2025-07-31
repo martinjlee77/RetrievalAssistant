@@ -13,10 +13,11 @@ Preferred communication style: Simple, everyday language.
 **Date: 2025-07-31**
 - ✅ **NARRATIVE-DRIVEN ANALYSIS FORMAT**: Upgraded from sectioned data-dump to professional narrative presentation per user proposal
 - ✅ **Enhanced Prompt Engineering**: Implemented thematic JSON structure with analysis_points array and concrete examples
-- ✅ **Production-Ready Fixes**: Resolved 3 critical issues identified in technical review:
+- ✅ **Production-Ready Fixes**: Resolved 4 critical issues identified in technical review:
   - Fixed broken Key Judgments dependency by searching within analysis_text of narrative structure
   - Added defensive parsing with type checking for evidence_quotes (list vs string handling)
   - Corrected markdown heading hierarchy from ## to ### for proper document structure
+  - Restored allocation_details field for Step 4 to preserve Financial Impact section data quality
 - ✅ **Document Source Citations**: Implemented audit-ready citations with "Quote text (Source: [Document Name])" format
 - ✅ **ASYNC API COMPATIBILITY FIXES**: Resolved "ChatCompletion can't be used in 'await' expression" errors by implementing proper AsyncOpenAI client
 - ✅ **METHOD SIGNATURE REPAIRS**: Fixed StepPrompts class method mismatches ensuring all analyzer calls work properly after file recreation
