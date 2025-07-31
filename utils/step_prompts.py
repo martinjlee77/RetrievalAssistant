@@ -315,11 +315,15 @@ Keep it professional and concise."""
         """Generate key judgments prompt."""
         judgments = []
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
-            considerations = step.get('key_considerations', '')
-            if considerations and 'judgment' in considerations.lower():
-                judgments.append(f"Step {i}: {considerations}")
+            # Search within the new narrative structure
+            analysis_points = step.get('analysis_points', [])
+            for point in analysis_points:
+                analysis_text = point.get('analysis_text', '')
+                # Use a more robust check for judgment-related keywords
+                if any(keyword in analysis_text.lower() for keyword in ['judgment', 'significant estimate', 'alternative treatment', 'professional judgment', 'estimate', 'assumption']):
+                    judgments.append(f"Step {i} - {point.get('topic_title', 'Analysis')}: {analysis_text}")
         
-        judgment_text = '\n'.join(judgments) if judgments else "No significant professional judgments identified in the analysis."
+        judgment_text = '\n\n'.join(judgments) if judgments else "No significant professional judgments identified in the analysis."
         
         return f"""Identify and explain the key professional judgments in this ASC 606 analysis:
 
@@ -338,14 +342,14 @@ If no significant judgments are required, state that the contract follows standa
     def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
         """Format step analysis from narrative JSON structure into professional markdown."""
         if not step_data or not isinstance(step_data, dict):
-            return f"## Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
+            return f"### Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
 
         conclusion = step_data.get('executive_conclusion', 'No conclusion was provided.')
         analysis_points = step_data.get('analysis_points', [])
 
         # Start with the main heading and the upfront conclusion
         markdown_sections = [
-            f"## Step {step_number}: {step_name}",
+            f"### Step {step_number}: {step_name}",
             f"**Conclusion:**\n{conclusion}",
             "\n---\n",  # Visual separator
             "**Detailed Analysis:**\n"
@@ -365,10 +369,14 @@ If no significant judgments are required, state that the contract follows standa
                 markdown_sections.append(analysis_text)
 
                 # Add the evidence quotes for that topic
-                if evidence_quotes:
+                # Add type check to prevent errors if the LLM returns a string instead of list
+                if evidence_quotes and isinstance(evidence_quotes, list):
                     for quote in evidence_quotes:
-                        # Format as a markdown blockquote for emphasis
-                        markdown_sections.append(f"> {quote}")
+                        if isinstance(quote, str):  # Ensure the item in the list is a string
+                            markdown_sections.append(f"> {quote}")
+                elif isinstance(evidence_quotes, str):
+                    # Handle case where LLM returns a single string instead of list
+                    markdown_sections.append(f"> {evidence_quotes}")
 
                 markdown_sections.append("")  # Add a blank line for spacing before the next point
 

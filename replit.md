@@ -11,11 +11,18 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 **Date: 2025-07-31**
+- ✅ **NARRATIVE-DRIVEN ANALYSIS FORMAT**: Upgraded from sectioned data-dump to professional narrative presentation per user proposal
+- ✅ **Enhanced Prompt Engineering**: Implemented thematic JSON structure with analysis_points array and concrete examples
+- ✅ **Production-Ready Fixes**: Resolved 3 critical issues identified in technical review:
+  - Fixed broken Key Judgments dependency by searching within analysis_text of narrative structure
+  - Added defensive parsing with type checking for evidence_quotes (list vs string handling)
+  - Corrected markdown heading hierarchy from ## to ### for proper document structure
+- ✅ **Document Source Citations**: Implemented audit-ready citations with "Quote text (Source: [Document Name])" format
 - ✅ **ASYNC API COMPATIBILITY FIXES**: Resolved "ChatCompletion can't be used in 'await' expression" errors by implementing proper AsyncOpenAI client
 - ✅ **METHOD SIGNATURE REPAIRS**: Fixed StepPrompts class method mismatches ensuring all analyzer calls work properly after file recreation
 - ✅ **CONSISTENCY CHECK ENHANCEMENT**: Transformed user-facing errors into internal quality control with auto-retry system (up to 2 attempts)
 - ✅ **GRACEFUL RATE LIMIT HANDLING**: Added proper error handling for OpenAI API rate limits during consistency checks and memo generation
-- ✅ **BROWSER VIEW SIMPLIFICATION**: Replaced problematic custom JavaScript with simple HTML file download approach per user preference
+- ✅ **BROWSER VIEW RESTORATION**: Fixed View in Browser button to open new tab using st.link_button with data URL instead of downloading
 - ✅ **CSS LIST STYLING FIX**: Enhanced bullet point and numbered list display with proper CSS formatting (disc bullets, decimal numbers)
 - ✅ **USER EXPERIENCE IMPROVEMENTS**: Removed technical error messages from user interface, implementing seamless quality control
 
