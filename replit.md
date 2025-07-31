@@ -6,6 +6,8 @@ This project is a multi-standard accounting analysis platform that generates com
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+**CRITICAL DEVELOPMENT RULE**: Never modify prompt text content without explicit user approval. The user has spent significant time fine-tuning prompt templates in utils/step_prompts.py and other files. Always ask permission before changing any prompt text or templates.
+
 ## System Architecture
 
 ### Multi-Standard Platform Architecture
