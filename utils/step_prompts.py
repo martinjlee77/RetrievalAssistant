@@ -589,48 +589,32 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
     @staticmethod
     def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
-        """Generates a proportional and meaningful conclusion prompt."""
+        """Generates focused prompt for meaningful conclusion section."""
+        
+        # Extract key conclusions from each step
+        key_points = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            conclusion = step.get('executive_conclusion', '')
+            if conclusion:
+                key_points.append(f"Step {i}: {conclusion}")
+        
+        return f"""Write a meaningful conclusion section for an ASC 606 technical accounting memo.
 
-        # Logic to determine transaction complexity
-        # (This can be the same logic used in the financial impact prompt)
-        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
-                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
-                     "financing component" in s3.get('executive_conclusion', '').lower()
+KEY CONCLUSIONS FROM ANALYSIS:
+{chr(10).join(key_points)}
 
-        return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+Create a comprehensive conclusion that:
 
-CONTEXT FROM ANALYSIS:
-- Is the transaction complex? {"Yes" if is_complex else "No"}
+**Overall Compliance Assessment:**
+Summarize whether the contract complies with ASC 606 and any areas of concern or complexity.
 
-YOUR TASK:
-Write a final concluding section for the memo, strictly adhering to the proportionality rule below.
+**Key Takeaways for {memo_audience}:**
+Highlight the most important implications for the intended audience, focusing on actionable insights.
 
-**CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
+**Implementation Considerations:**
+Any practical next steps, documentation requirements, or monitoring needed.
 
----
-**IF THE TRANSACTION IS COMPLEX, follow this structure:**
-
-### Conclusion
-In a single paragraph, state that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606. Briefly reiterate the core revenue recognition conclusion.
-
-### Recommendations
-Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Focus on items like:
-- "The process for estimating the variable consideration for [specific bonus] must be documented and reviewed quarterly."
-- "The ERP system must be configured to handle the allocation of the transaction price to the three distinct performance obligations."
-
----
-**IF THE TRANSACTION IS SIMPLE, your ENTIRE output must be the following two paragraphs ONLY:**
-
-### Conclusion
-The accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.
-
-### Recommendations
-It is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis.
-
----
-
-Begin writing the "Conclusion and Recommendations" section. Do not add any other text, summaries, or boilerplate language.
-"""
+Use clear, decisive language that provides closure and actionable guidance. Avoid simply repeating earlier analysis."""
 
     @staticmethod 
     def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:
