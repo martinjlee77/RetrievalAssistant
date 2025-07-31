@@ -6,7 +6,21 @@ This project is a multi-standard accounting analysis platform that generates com
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-**CRITICAL DEVELOPMENT RULE**: Never modify prompt text content without explicit user approval. The user has spent significant time fine-tuning prompt templates in utils/step_prompts.py and other files. Always ask permission before changing any prompt text or templates.
+**CRITICAL DEVELOPMENT RULES - PROMPT PROTECTION**:
+1. **NEVER modify prompt text content without explicit user approval** - The user has spent significant time fine-tuning prompt templates in utils/step_prompts.py and other files
+2. **ALWAYS ask permission before changing any prompt text or templates**
+3. **Protected files requiring user approval for content changes**:
+   - utils/step_prompts.py (all prompt methods)
+   - utils/prompt.py (all template content)
+   - pages/asc606.py (form labels, help text, user-facing content)
+   - Any file containing user-facing text or analysis instructions
+4. **Safe technical changes (no approval needed)**:
+   - Bug fixes to code logic/structure
+   - Adding missing methods/functions
+   - Performance improvements
+   - Import statements and technical infrastructure
+5. **When in doubt**: Always ask the user before making ANY content changes
+6. **Violation consequences**: User has to re-review entire codebase, causing significant frustration and lost work
 
 ## System Architecture
 
