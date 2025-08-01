@@ -54,49 +54,54 @@ class StepPrompts:
 
         # Extract structured data from each step
 
-        # Step 1: Contract validity
+        # Step 1: Contract validity - FIXED to access nested structure
         contract_valid = "Valid"
-        if s1_criteria := s1.get('contract_criteria_assessment'):
-            failed_criteria = [
-                c for c in s1_criteria if c.get('status') == 'Not Met'
-            ]
-            if failed_criteria:
-                contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
+        if s1_analysis := s1.get('step1_analysis'):
+            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+                failed_criteria = [
+                    c for c in s1_criteria if c.get('status') == 'Not Met'
+                ]
+                if failed_criteria:
+                    contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
 
-        # Step 2: Performance obligations - FIXED for financial impact consistency
+        # Step 2: Performance obligations - FIXED to access nested structure
         performance_obligations = []
-        if s2_pos := s2.get('performance_obligations'):
-            # Count all performance obligations found, not just distinct ones
-            performance_obligations = [
-                po.get('po_description', 'Unknown PO') for po in s2_pos
-            ]
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                performance_obligations = [
+                    po.get('po_description', 'Unknown PO') for po in s2_pos
+                ]
         po_summary = f"{len(performance_obligations)} distinct performance obligation{'s' if len(performance_obligations) != 1 else ''}: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
 
-        # Step 3: Transaction price components
+        # Step 3: Transaction price components - FIXED to access nested structure
         transaction_price_data = {}
-        if s3_price := s3.get('transaction_price_components'):
-            transaction_price_data = {
-                'total_price':
-                s3_price.get('total_transaction_price', 'Not specified'),
-                'fixed_consideration':
-                s3_price.get('fixed_consideration', 'Not specified'),
-                'variable_consideration':
-                s3_price.get('variable_consideration', []),
-                'financing_component':
-                s3_price.get('financing_component_analysis', 'None identified')
-            }
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                transaction_price_data = {
+                    'total_price':
+                    s3_price.get('total_transaction_price', 'Not specified'),
+                    'fixed_consideration':
+                    s3_price.get('fixed_consideration', 'Not specified'),
+                    'variable_consideration':
+                    s3_price.get('variable_consideration', []),
+                    'financing_component':
+                    s3_price.get('financing_component_analysis', 'None identified')
+                }
 
-        # Step 4: Allocation details
-        allocation_data = s4.get('allocation_details', {})
+        # Step 4: Allocation details - FIXED to access nested structure
+        allocation_data = {}
+        if s4_analysis := s4.get('step4_analysis'):
+            allocation_data = s4_analysis.get('allocation_details', {})
 
-        # Step 5: Revenue recognition plan
+        # Step 5: Revenue recognition plan - FIXED to access nested structure
         recognition_methods = []
-        if s5_plan := s5.get('revenue_recognition_plan'):
-            recognition_methods = [(po.get('performance_obligation',
-                                           'Unknown'),
-                                    po.get('recognition_method', 'Unknown'),
-                                    po.get('measure_of_progress', 'Unknown'))
-                                   for po in s5_plan]
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                recognition_methods = [(po.get('performance_obligation',
+                                               'Unknown'),
+                                        po.get('recognition_method', 'Unknown'),
+                                        po.get('measure_of_progress', 'Unknown'))
+                                       for po in s5_plan]
 
         # --- Enhanced Complexity Scoring System ---
         complexity_score = 0
@@ -223,30 +228,32 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
         # Extract structured data for conclusion
 
-        # Performance obligations and recognition methods - FIXED for consistency
+        # Performance obligations and recognition methods - FIXED to access nested structure
         performance_obligations = []
         recognition_methods = []
-        if s2_pos := s2.get('performance_obligations'):
-            # Count all performance obligations found, not just distinct ones
-            performance_obligations = [
-                po.get('po_description', 'Unknown PO') for po in s2_pos
-            ]
-        if s5_plan := s5.get('revenue_recognition_plan'):
-            recognition_methods = [(po.get('performance_obligation',
-                                           'Unknown'),
-                                    po.get('recognition_method', 'Unknown'),
-                                    po.get('measure_of_progress', 'Unknown'))
-                                   for po in s5_plan]
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                performance_obligations = [
+                    po.get('po_description', 'Unknown PO') for po in s2_pos
+                ]
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                recognition_methods = [(po.get('performance_obligation',
+                                               'Unknown'),
+                                        po.get('recognition_method', 'Unknown'),
+                                        po.get('measure_of_progress', 'Unknown'))
+                                       for po in s5_plan]
 
-        # Transaction price components
+        # Transaction price components - FIXED to access nested structure
         transaction_price_data = {}
-        if s3_price := s3.get('transaction_price_components'):
-            transaction_price_data = {
-                'variable_consideration':
-                s3_price.get('variable_consideration', []),
-                'financing_component':
-                s3_price.get('financing_component_analysis', 'None identified')
-            }
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                transaction_price_data = {
+                    'variable_consideration':
+                    s3_price.get('variable_consideration', []),
+                    'financing_component':
+                    s3_price.get('financing_component_analysis', 'None identified')
+                }
 
         # --- Enhanced Complexity Scoring System (Same as Financial Impact) ---
         complexity_score = 0
@@ -377,57 +384,63 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
 
         # Extract structured data for executive summary
 
-        # Step 1: Contract validity
+        # Step 1: Contract validity - FIXED to access nested structure
         contract_status = "Valid"
         failed_criteria = []
-        if s1_criteria := s1.get('contract_criteria_assessment'):
-            failed_criteria = [
-                c.get('criterion', 'Unknown') for c in s1_criteria
-                if c.get('status') == 'Not Met'
-            ]
-            if failed_criteria:
-                contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
+        if s1_analysis := s1.get('step1_analysis'):
+            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+                failed_criteria = [
+                    c.get('criterion', 'Unknown') for c in s1_criteria
+                    if c.get('status') == 'Not Met'
+                ]
+                if failed_criteria:
+                    contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
 
-        # Step 2: Performance obligations summary - FIXED to count all POs found
+        # Step 2: Performance obligations summary - FIXED to access nested structure
         po_count = 0
         po_descriptions = []
-        if s2_pos := s2.get('performance_obligations'):
-            # Count all performance obligations found, regardless of distinct status
-            po_count = len(s2_pos) if s2_pos else 0
-            po_descriptions = [
-                po.get('po_description', 'Unnamed PO') for po in s2_pos
-            ]
+        # First, get the nested analysis dictionary
+        if s2_analysis := s2.get('step2_analysis'):
+            # Then, get the performance obligations from inside it
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                po_count = len(s2_pos) if s2_pos else 0
+                po_descriptions = [
+                    po.get('po_description', 'Unnamed PO') for po in s2_pos
+                ]
 
-        # Step 3: Transaction price details
+        # Step 3: Transaction price details - FIXED to access nested structure
         total_price = "Not specified"
         has_variable_consideration = False
-        if s3_price := s3.get('transaction_price_components'):
-            total_price = s3_price.get('total_transaction_price',
-                                       'Not specified')
-            has_variable_consideration = bool(
-                s3_price.get('variable_consideration')
-                and len(s3_price.get('variable_consideration', [])) > 0)
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                total_price = s3_price.get('total_transaction_price',
+                                           'Not specified')
+                has_variable_consideration = bool(
+                    s3_price.get('variable_consideration')
+                    and len(s3_price.get('variable_consideration', [])) > 0)
 
-        # Step 4: Allocation summary
+        # Step 4: Allocation summary - FIXED to access nested structure
         allocation_summary = "Not applicable (single performance obligation)."
-        if s4_details := s4.get('allocation_details'):
-            if allocations := s4_details.get('allocations'):
-                if len(allocations) > 1:
-                    allocation_summary = f"Price allocated across {len(allocations)} POs based on standalone selling prices."
+        if s4_analysis := s4.get('step4_analysis'):
+            if s4_details := s4_analysis.get('allocation_details'):
+                if allocations := s4_details.get('allocations'):
+                    if len(allocations) > 1:
+                        allocation_summary = f"Price allocated across {len(allocations)} POs based on standalone selling prices."
 
-        # Step 5: Revenue recognition methods
+        # Step 5: Revenue recognition methods - FIXED to access nested structure
         recognition_summary = []
         critical_judgments = []
-        if s5_plan := s5.get('revenue_recognition_plan'):
-            for po_plan in s5_plan:
-                method = po_plan.get('recognition_method', 'Unknown')
-                po_name = po_plan.get('performance_obligation', 'Unknown PO')
-                recognition_summary.append(f"{po_name}: {method}")
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                for po_plan in s5_plan:
+                    method = po_plan.get('recognition_method', 'Unknown')
+                    po_name = po_plan.get('performance_obligation', 'Unknown PO')
+                    recognition_summary.append(f"{po_name}: {method}")
 
-                # Extract critical judgments
-                if 'Over Time' in method and po_plan.get('justification'):
-                    critical_judgments.append(
-                        f"Over time recognition criteria for {po_name}")
+                    # Extract critical judgments
+                    if 'Over Time' in method and po_plan.get('justification'):
+                        critical_judgments.append(
+                            f"Over time recognition criteria for {po_name}")
 
         # Identify key judgments
         if has_variable_consideration:
