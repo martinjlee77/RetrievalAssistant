@@ -70,7 +70,7 @@ class StepPrompts:
             performance_obligations = [
                 po.get('po_description', 'Unknown PO') for po in s2_pos
             ]
-        po_summary = f"{len(performance_obligations)} distinct performance obligations: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
+        po_summary = f"{len(performance_obligations)} distinct performance obligation{'s' if len(performance_obligations) != 1 else ''}: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
 
         # Step 3: Transaction price components
         transaction_price_data = {}
@@ -196,13 +196,13 @@ Write a concise financial impact analysis.
 ---
 **IF THE TRANSACTION IS SIMPLE, follow this structure:**
 
-The ${transaction_price_data.get('total_price', 'XX.XX')} fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
+The {transaction_price_data.get('total_price', '$XX.XX')} fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
 
 **Illustrative Journal Entry:**
 | Account                      | Debit     | Credit    |
 |------------------------------|-----------|-----------|
-| Cash / Accounts Receivable   | ${transaction_price_data.get('total_price', 'XX.XX')}    |           |
-| Deferred Revenue             |           | ${transaction_price_data.get('total_price', 'XX.XX')}    |
+| Cash / Accounts Receivable   | {transaction_price_data.get('total_price', '$XX.XX')}    |           |
+| Deferred Revenue             |           | {transaction_price_data.get('total_price', '$XX.XX')}    |
 | *To record contract inception* | | |
 
 ---
@@ -458,7 +458,7 @@ Create an executive summary using this professional structure:
 
 **KEY FINDINGS**
 • Contract Status: {contract_status}
-• Performance Obligations: {po_count} distinct obligations{(' - ' + ', '.join(po_descriptions[:3])) if po_descriptions else ''}{'...' if len(po_descriptions) > 3 else ''}
+• Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:3])) if po_descriptions else ''}{'...' if len(po_descriptions) > 3 else ''}
 • Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 • Allocation: {allocation_summary}
 • Revenue Recognition: {', '.join(recognition_summary[:2]) if recognition_summary else 'No revenue recognition methods applicable due to lack of performance obligations'}{'...' if len(recognition_summary) > 2 else ''}
