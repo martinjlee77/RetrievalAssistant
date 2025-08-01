@@ -277,7 +277,7 @@ def render_analysis_metrics(analysis_results: Any):
         st.metric("Memo Length", f"{memo_length:,}", "Characters")
 
 def render_step_analysis(step_name: str, step_data: Dict[str, Any]):
-    """Render individual step analysis in a card format"""
+    """Render individual step analysis in a card format using new structured JSON data"""
     with st.container():
         st.markdown(f"""
         <div class="step-card">
@@ -286,26 +286,73 @@ def render_step_analysis(step_name: str, step_data: Dict[str, Any]):
         """, unsafe_allow_html=True)
         
         if isinstance(step_data, dict):
-            # Extract conclusion
-            conclusion = step_data.get('conclusion', 'No conclusion provided')
+            # Extract executive conclusion (updated from 'conclusion')
+            conclusion = step_data.get('executive_conclusion', 'No conclusion provided')
             st.write(f"**Conclusion:** {conclusion}")
             
-            # Extract key findings
-            if 'key_findings' in step_data:
-                with st.expander("Key Findings"):
-                    for finding in step_data['key_findings']:
-                        st.write(f"• {finding}")
+            # Extract structured data specific to each step
+            if 'contract_criteria_assessment' in step_data:
+                with st.expander("Contract Criteria Assessment"):
+                    for criterion in step_data['contract_criteria_assessment']:
+                        status = criterion.get('status', 'Unknown')
+                        criterion_name = criterion.get('criterion', 'Unknown Criterion')
+                        st.write(f"• **{criterion_name}:** {status}")
             
-            # Extract rationale
-            if 'rationale' in step_data:
-                with st.expander("Rationale"):
-                    st.write(step_data['rationale'])
+            if 'performance_obligations' in step_data:
+                with st.expander("Performance Obligations"):
+                    for po in step_data['performance_obligations']:
+                        po_desc = po.get('po_description', 'Unknown PO')
+                        is_distinct = po.get('is_distinct', 'Unknown')
+                        st.write(f"• **{po_desc}:** {'✅ Distinct' if is_distinct == 'Yes' else '❌ Not Distinct'}")
             
-            # Extract supporting evidence
-            if 'supporting_evidence' in step_data:
-                with st.expander("Supporting Evidence"):
-                    for evidence in step_data['supporting_evidence']:
-                        st.write(f"• {evidence}")
+            if 'transaction_price_components' in step_data:
+                with st.expander("Transaction Price Components"):
+                    price_data = step_data['transaction_price_components']
+                    st.write(f"• **Total Price:** {price_data.get('total_transaction_price', 'Not specified')}")
+                    st.write(f"• **Fixed Consideration:** {price_data.get('fixed_consideration', 'Not specified')}")
+                    if price_data.get('variable_consideration'):
+                        st.write("• **Variable Consideration:** Present")
+            
+            if 'allocation_details' in step_data:
+                with st.expander("Allocation Details"):
+                    allocation_data = step_data['allocation_details']
+                    if allocation_data.get('allocations'):
+                        for allocation in allocation_data['allocations']:
+                            po_name = allocation.get('performance_obligation', 'Unknown PO')
+                            amount = allocation.get('allocated_amount', 'Unknown amount')
+                            st.write(f"• **{po_name}:** {amount}")
+            
+            if 'revenue_recognition_plan' in step_data:
+                with st.expander("Revenue Recognition Plan"):
+                    for plan in step_data['revenue_recognition_plan']:
+                        po_name = plan.get('performance_obligation', 'Unknown PO')
+                        method = plan.get('recognition_method', 'Unknown method')
+                        st.write(f"• **{po_name}:** {method}")
+            
+            # Extract analysis points (updated from 'rationale')
+            analysis_points = step_data.get('analysis_points', [])
+            if analysis_points:
+                with st.expander("Detailed Analysis"):
+                    for i, point in enumerate(analysis_points, 1):
+                        topic_title = point.get('topic_title', f'Analysis Point {i}')
+                        analysis_text = point.get('analysis_text', 'No analysis provided')
+                        evidence_quotes = point.get('evidence_quotes', [])
+                        
+                        st.write(f"**{i}. {topic_title}**")
+                        st.write(analysis_text)
+                        
+                        # Display evidence quotes (updated from 'supporting_evidence')
+                        if evidence_quotes and isinstance(evidence_quotes, list):
+                            st.write("*Supporting Evidence:*")
+                            for quote in evidence_quotes:
+                                if isinstance(quote, str):
+                                    st.write(f"> {quote}")
+                        elif isinstance(evidence_quotes, str):
+                            st.write("*Supporting Evidence:*")
+                            st.write(f"> {evidence_quotes}")
+                        
+                        if i < len(analysis_points):  # Add separator between points
+                            st.write("---")
         else:
             st.write(str(step_data))
 
