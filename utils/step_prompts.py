@@ -119,9 +119,15 @@ class StepPrompts:
             )
 
         # Criterion 2: Variable Consideration (high-judgment area)
-        has_variable_consideration = (
-            transaction_price_data.get('variable_consideration') and len(
-                transaction_price_data.get('variable_consideration', [])) > 0)
+        var_consideration = transaction_price_data.get("variable_consideration")
+        has_variable_consideration = False
+        if var_consideration:
+            var_str = str(var_consideration).strip().lower()
+            has_variable_consideration = (
+                var_str not in ["n/a", "not applicable", "none", "none identified", ""]
+                and len(var_str) > 10
+                and "variable" in var_str
+            )
         if has_variable_consideration:
             complexity_score += 2
             complexity_reasons.append("Contains variable consideration")
@@ -269,16 +275,16 @@ Begin writing the financial impact section, strictly adhering to the proportiona
         if len(po_methods) > 2:
             complexity_score += 1
             complexity_reasons.append("More than two performance obligations")
-        if len(set(po_methods)) > 1:
-            complexity_score += 1
-            complexity_reasons.append(
-                "Mixed revenue recognition timing (Over Time and Point in Time)"
-            )
-
         # Criterion 2: Variable Consideration (high-judgment area)
-        has_variable_consideration = (
-            transaction_price_data.get('variable_consideration') and len(
-                transaction_price_data.get('variable_consideration', [])) > 0)
+        var_consideration = transaction_price_data.get("variable_consideration")
+        has_variable_consideration = False
+        if var_consideration:
+            var_str = str(var_consideration).strip().lower()
+            has_variable_consideration = (
+                var_str not in ["n/a", "not applicable", "none", "none identified", ""]
+                and len(var_str) > 10
+                and "variable" in var_str
+            )
         if has_variable_consideration:
             complexity_score += 2
             complexity_reasons.append("Contains variable consideration")
