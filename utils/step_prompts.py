@@ -278,12 +278,10 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 In a single paragraph, state that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606. Briefly reiterate the core revenue recognition conclusion.
 
 ### Recommendations
-Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Focus on items like:
-- "The process for estimating the variable consideration for [specific bonus] must be documented and reviewed quarterly."
-- "The ERP system must be configured to handle the allocation of the transaction price to the three distinct performance obligations."
+Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Important: For straightforward contracts, focus only on the accounting conclusion without generic recommendations.
 
 ---
-**IF THE TRANSACTION IS SIMPLE, your ENTIRE output must be the following two paragraphs ONLY:**
+**IF THE TRANSACTION or CONTRACT IS SIMPLE, your ENTIRE output must be the following two paragraphs ONLY:**
 
 ### Conclusion
 The accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.
@@ -474,6 +472,7 @@ CRITICAL INSTRUCTIONS:
 - Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
 - Ensure structured assessment connects logically to your narrative analysis points
 - Aim for 2-4 analysis points per step (avoid single mega-topics or excessive fragmentation)
+- For single performance obligation contracts: Keep allocation analysis concise - simply state "Entire transaction price allocated to single performance obligation" with minimal elaboration
 - Every quote MUST include source document name
 - Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
 - Make analysis flow naturally, building from one point to the next"""
@@ -577,7 +576,8 @@ Write only the paragraph, no additional formatting or labels."""
 
         # If, after stricter identification, no judgments were passed up, provide a standard statement.
         if not all_judgments:
-            return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+            # Return the standard statement directly as a string, not as a prompt
+            return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
         # If judgments were flagged, this prompt will act as a final quality filter.
         return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.

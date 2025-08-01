@@ -367,10 +367,17 @@ class ASC606Analyzer:
             
             # Task 3: Key Judgments
             judgments_prompt = StepPrompts.get_key_judgments_prompt(s1, s2, s3, s4, s5)
-            memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                self.client, judgments_prompt,
-                model='gpt-4o-mini', max_tokens=1000, temperature=0.3
-            )))
+            # Check if this returns direct text (no LLM call needed)
+            if judgments_prompt.startswith("RETURN_DIRECT_TEXT: "):
+                direct_judgments_text = judgments_prompt.replace("RETURN_DIRECT_TEXT: ", "")
+                async def return_direct_text():
+                    return direct_judgments_text
+                memo_tasks.append(asyncio.create_task(return_direct_text()))
+            else:
+                memo_tasks.append(asyncio.create_task(make_llm_call_async(
+                    self.client, judgments_prompt,
+                    model='gpt-4o-mini', max_tokens=1000, temperature=0.3
+                )))
             
             # Task 4: Financial Impact
             financial_prompt = StepPrompts.get_financial_impact_prompt(
