@@ -1,44 +1,167 @@
 """
-Enhanced step-by-step prompt templates for ASC 606 analysis.
+Refactored ASC 606 prompt templates using System/User architecture for improved LLM adherence.
+This approach separates the AI's core instructions (System Prompt) from the
+dynamic task-specific instructions (User Prompt).
 """
+
+import json
+from typing import Dict, List, Any, Optional
 
 
 class StepPrompts:
-    """Enhanced prompts with proportional complexity handling."""
+    """
+    Refactored prompts using a modular, System/User architecture to improve LLM adherence.
+    This approach separates the AI's core instructions (System Prompt) from the
+    dynamic task-specific instructions (User Prompt).
+    """
 
     @staticmethod
     def get_step_info() -> dict:
-        """Returns information about each ASC 606 step."""
+        """Returns information about each ASC 606 step. (No changes needed here)"""
         return {
-            1: {
-                "title": "Identify the Contract",
-                "primary_guidance": "ASC 606-10-25-1 through 25-8",
-                "description":
-                "Contract identification and combination criteria"
-            },
-            2: {
-                "title": "Identify Performance Obligations",
-                "primary_guidance": "ASC 606-10-25-14 through 25-22",
-                "description": "Distinct goods or services identification"
-            },
-            3: {
-                "title": "Determine the Transaction Price",
-                "primary_guidance": "ASC 606-10-32-2 through 32-27",
-                "description": "Fixed and variable consideration determination"
-            },
-            4: {
-                "title": "Allocate the Transaction Price",
-                "primary_guidance": "ASC 606-10-32-28 through 32-41",
-                "description":
-                "Standalone selling prices and allocation methods"
-            },
-            5: {
-                "title": "Recognize Revenue",
-                "primary_guidance": "ASC 606-10-25-23 through 25-37",
-                "description":
-                "Over time vs point in time recognition criteria"
-            }
+            1: {"title": "Identify the Contract", "primary_guidance": "ASC 606-10-25-1 through 25-8"},
+            2: {"title": "Identify Performance Obligations", "primary_guidance": "ASC 606-10-25-14 through 25-22"},
+            3: {"title": "Determine the Transaction Price", "primary_guidance": "ASC 606-10-32-2 through 32-27"},
+            4: {"title": "Allocate the Transaction Price", "primary_guidance": "ASC 606-10-32-28 through 32-41"},
+            5: {"title": "Recognize Revenue", "primary_guidance": "ASC 606-10-25-23 through 25-37"}
         }
+
+    # --- NEW: Core Prompt Architecture ---
+
+    @staticmethod
+    def get_system_prompt() -> str:
+        """
+        Defines the AI's core persona, universal rules, and mandatory output format.
+        This is static and sent with every step-analysis call.
+        """
+        return """You are an expert technical accountant specializing in ASC 606. Your analysis must be audit-ready, precise, and objective. You must follow all instructions and formatting rules precisely.
+
+<OUTPUT_FORMAT_RULE>
+You MUST return your response as a single, well-formed JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object. Your entire response must be only the JSON.
+
+The JSON object MUST contain these top-level keys: "executive_conclusion", the relevant "step_X_analysis" block, "professional_judgments", and "analysis_points".
+</OUTPUT_FORMAT_RULE>
+
+<EVIDENCE_RULE>
+Every quote from the contract provided in the `evidence_quotes` array MUST include the source document name, formatted exactly as: 'Quote text... (Source: [Document Name])'.
+</EVIDENCE_RULE>
+
+<ANALYSIS_RULE>
+Your analysis must be thorough. Weave in specific ASC 606 citations (e.g., ASC 606-10-25-1) to support your conclusions.
+</ANALYSIS_RULE>
+"""
+
+    @staticmethod
+    def get_user_prompt_for_step(step_number: int, contract_text: str, rag_context: str, contract_data=None, debug_config=None) -> str:
+        """
+        Builds the dynamic, task-specific user prompt for a single step analysis.
+        This is the new replacement for the old get_step_specific_analysis_prompt.
+        """
+        step_info = StepPrompts.get_step_info()[step_number]
+        step_schema_name = f"step{step_number}_analysis"
+        step_schema_definition = StepPrompts._get_schema_for_step(step_number)
+        critical_rules = StepPrompts._get_critical_rules_for_step(step_number, contract_text)
+
+        # Assemble the concise user prompt
+        prompt_parts = [
+            f"Your task is to analyze a contract for Step {step_number}: {step_info['title']}.",
+            f"PRIMARY GUIDANCE FOR THIS STEP: {step_info['primary_guidance']}",
+            f"<AUTHORITATIVE_CONTEXT>\n{rag_context}\n</AUTHORITATIVE_CONTEXT>",
+            f"<CONTRACT_TEXT>\n{contract_text}\n</CONTRACT_TEXT>",
+            f"<CONTRACT_DATA>\nCustomer: {getattr(contract_data, 'customer_name', 'N/A')}\nAnalysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance')}\n</CONTRACT_DATA>",
+            "---",
+            "CRITICAL TASK: Analyze the contract based on the context provided. Populate the JSON structure below with your complete analysis. Adhere to all rules.",
+            "```json",
+            "{",
+            f'  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the \'bottom line\'.",',
+            f'  "{step_schema_name}": {step_schema_definition},',
+            '  "professional_judgments": [ "A list of strings describing conclusions that required significant professional judgment for this step. If none, return an empty list []." ],',
+            '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
+            "}",
+            "```",
+            critical_rules
+        ]
+        return "\n\n".join(prompt_parts)
+
+    # --- NEW: Modular Helper Functions ---
+
+    @staticmethod
+    def _get_schema_for_step(step_number: int) -> str:
+        """Helper to route to the correct, existing schema definition."""
+        if step_number == 1: return StepPrompts.get_step1_schema()
+        if step_number == 2: return StepPrompts.get_step2_schema()
+        if step_number == 3: return StepPrompts.get_step3_schema()
+        if step_number == 4: return StepPrompts.get_step4_schema()
+        if step_number == 5: return StepPrompts.get_step5_schema()
+        return "{}"
+
+    @staticmethod
+    def _get_critical_rules_for_step(step_number: int, contract_text: str) -> str:
+        """Returns a concise block of the most critical, non-negotiable rules for a given step."""
+        rules = {
+            1: """<CRITICAL_INSTRUCTION>
+- You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e) within the `contract_criteria_assessment` array. No shortcuts.
+- You MUST create a corresponding `analysis_points` entry for each of the five criteria.
+</CRITICAL_INSTRUCTION>""",
+            2: """<CRITICAL_INSTRUCTION>
+- If no distinct performance obligations are found, `performance_obligations` MUST be an empty list `[]`, and you must explain why in the `analysis_points`.
+- For simple contracts with one obvious obligation, keep the analysis concise but complete.
+- Focus on the "separately identifiable" criterion, as it is often the most decisive factor.
+</CRITICAL_INSTRUCTION>""",
+            3: """<CRITICAL_INSTRUCTION>
+- Your primary analysis MUST occur within the `transaction_price_components` JSON structure.
+- Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.
+</CRITICAL_INSTRUCTION>""",
+            4: """<CRITICAL_INSTRUCTION>
+- If there is only one performance obligation identified in Step 2, the `analysis_points` array MUST be empty `[]`. The `step4_overall_conclusion` is sufficient.
+- Do NOT re-identify or re-analyze performance obligations or the transaction price in this step. Simply reference the POs from Step 2.
+</CRITICAL_INSTRUCTION>""",
+            5: """<CRITICAL_INSTRUCTION>
+- You MUST provide detailed analysis in both the `revenue_recognition_plan` and `analysis_points`. Do not use shortcuts like "No additional analysis required".
+- The `revenue_recognition_plan` must include a specific `recognition_justification` for each PO, citing which ASC 606-10-25-27 criterion is met for 'Over Time' recognition.
+- You must include a `measure_of_progress_analysis` explaining the method used (e.g., straight-line, input/output).
+</CRITICAL_INSTRUCTION>"""
+        }
+
+        # Special logic for Step 3 to prevent hallucination
+        if step_number == 3:
+            contract_lower = contract_text.lower()
+            is_simple_contract = "subscription" in contract_lower or "fixed fee" in contract_lower
+            is_complex_contract = "bonus" in contract_lower or "royalty" in contract_lower or "variable" in contract_lower
+
+            if is_simple_contract and not is_complex_contract:
+                return rules[3] + """
+<CRITICAL_OVERRIDE>
+This appears to be a simple, fixed-price contract. You MUST follow these rules:
+- In the `transaction_price_components` JSON, set `variable_consideration` to "N/A".
+- The `professional_judgments` array MUST be an empty list `[]`.
+- Do NOT invent complexity where none exists.
+</CRITICAL_OVERRIDE>"""
+
+        return rules.get(step_number, "")
+
+    # --- LEGACY COMPATIBILITY FUNCTION ---
+    
+    @staticmethod
+    def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
+                                        contract_text: str, rag_context: str, contract_data=None, 
+                                        debug_config=None) -> str:
+        """
+        LEGACY COMPATIBILITY: This function is deprecated but maintained for backward compatibility.
+        NEW CODE SHOULD USE: get_system_prompt() + get_user_prompt_for_step() 
+        """
+        # For backwards compatibility, return a single prompt combining system + user
+        system_prompt = StepPrompts.get_system_prompt()
+        user_prompt = StepPrompts.get_user_prompt_for_step(
+            step_number=step_number,
+            contract_text=contract_text,
+            rag_context=rag_context,
+            contract_data=contract_data,
+            debug_config=debug_config
+        )
+        return f"{system_prompt}\n\n{user_prompt}"
+
+    # --- EXISTING FUNCTIONS (Preserved for Compatibility) ---
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict,

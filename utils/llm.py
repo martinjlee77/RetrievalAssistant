@@ -24,7 +24,7 @@ def get_openai_client():
 
 async def make_llm_call_async(
     client,
-    prompt: str,
+    messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
     model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -38,13 +38,10 @@ async def make_llm_call_async(
         api_key = os.environ.get("OPENAI_API_KEY")
         async_client = AsyncOpenAI(api_key=api_key)
         
-        # Prepare messages format
-        messages = [{"role": "user", "content": prompt}]
-        
         # Prepare request parameters
         request_params = {
             "model": model,
-            "messages": messages,
+            "messages": messages,  # This now uses the passed-in messages list
             "temperature": temperature
         }
         
@@ -65,7 +62,7 @@ async def make_llm_call_async(
 
 def make_llm_call(
     client,
-    prompt: str,
+    messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
     model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -77,8 +74,7 @@ def make_llm_call(
     """
     try:
         with st.spinner("Analyzing with AI..."):
-            # Prepare messages format
-            messages = [{"role": "user", "content": prompt}]
+            # Messages are now passed in directly
             
             # Prepare request parameters
             request_params = {

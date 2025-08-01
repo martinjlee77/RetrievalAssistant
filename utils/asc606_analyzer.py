@@ -220,16 +220,20 @@ class ASC606Analyzer:
                             step_specific_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
                             step_specific_context += f"{result['content']}\n"
                 
-                # Generate focused prompt for this specific step
-                step_prompt = StepPrompts.get_step_specific_analysis_prompt(
+                # NEW: Prepare the messages list using the new architecture
+                system_prompt = StepPrompts.get_system_prompt()
+                user_prompt = StepPrompts.get_user_prompt_for_step(
                     step_number=step_num,
-                    step_title=step_info['title'],
-                    step_guidance=step_info['primary_guidance'],
                     contract_text=contract_text,
                     rag_context=retrieved_context + step_specific_context,
                     contract_data=contract_data,
                     debug_config=debug_config or {}
                 )
+
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
                 
                 # Store details for processing responses later
                 prompt_details[step_num] = {"step_info": step_info}
@@ -237,7 +241,7 @@ class ASC606Analyzer:
                 # Create async task for concurrent execution
                 task = asyncio.create_task(make_llm_call_async(
                     self.client,
-                    step_prompt,
+                    messages,  # PASS the messages list here
                     temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
                     max_tokens=debug_config.get('max_tokens', 4000 if step_num == 2 else 3000) if debug_config else (4000 if step_num == 2 else 3000),
                     model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
@@ -322,8 +326,9 @@ class ASC606Analyzer:
             while consistency_retry_count <= max_consistency_retries:
                 consistency_prompt = StepPrompts.get_consistency_check_prompt(s1, s2, s3, s4, s5)
                 try:
+                    consistency_messages = [{"role": "user", "content": consistency_prompt}]
                     consistency_result = make_llm_call(
-                        self.client, consistency_prompt,
+                        self.client, consistency_messages,
                         model='gpt-4o', max_tokens=1000, temperature=0.1
                     )
                 except Exception as e:
@@ -379,15 +384,17 @@ class ASC606Analyzer:
             
             # Task 1: Executive Summary 
             summary_prompt = StepPrompts.get_enhanced_executive_summary_prompt(s1, s2, s3, s4, s5, contract_data.analysis_title, contract_data.customer_name)
+            summary_messages = [{"role": "user", "content": summary_prompt}]
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                self.client, summary_prompt, 
+                self.client, summary_messages, 
                 model='gpt-4o-mini', max_tokens=800, temperature=0.3
             )))
             
             # Task 2: Background
             background_prompt = StepPrompts.get_background_prompt(contract_data)
+            background_messages = [{"role": "user", "content": background_prompt}]
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                self.client, background_prompt,
+                self.client, background_messages,
                 model='gpt-4o-mini', max_tokens=600, temperature=0.3
             )))
             
@@ -400,8 +407,9 @@ class ASC606Analyzer:
                     return direct_judgments_text
                 memo_tasks.append(asyncio.create_task(return_direct_judgments()))
             else:
+                judgments_messages = [{"role": "user", "content": judgments_prompt}]
                 memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                    self.client, judgments_prompt,
+                    self.client, judgments_messages,
                     model='gpt-4o-mini', max_tokens=1000, temperature=0.3
                 )))
             
@@ -412,8 +420,9 @@ class ASC606Analyzer:
                 getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
                 contract_data
             )
+            financial_messages = [{"role": "user", "content": financial_prompt}]
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                self.client, financial_prompt,
+                self.client, financial_messages,
                 model='gpt-4o-mini', max_tokens=1000, temperature=0.3
             )))
             
@@ -431,8 +440,9 @@ class ASC606Analyzer:
                     return direct_conclusion_text
                 memo_tasks.append(asyncio.create_task(return_direct_conclusion()))
             else:
+                conclusion_messages = [{"role": "user", "content": conclusion_prompt}]
                 memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                    self.client, conclusion_prompt,
+                    self.client, conclusion_messages,
                     model='gpt-4o-mini', max_tokens=800, temperature=0.3
                 )))
             
