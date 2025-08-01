@@ -238,6 +238,13 @@ Begin writing the "Conclusion and Recommendations" section. Do not add any other
             total_price = s3_price.get('total_transaction_price', 'Not specified')
             has_variable_consideration = bool(s3_price.get('variable_consideration') and 
                                             len(s3_price.get('variable_consideration', [])) > 0)
+
+        # Step 4: Allocation summary
+        allocation_summary = "Not applicable (single performance obligation)."
+        if s4_details := s4.get('allocation_details'):
+            if allocations := s4_details.get('allocations'):
+                if len(allocations) > 1:
+                    allocation_summary = f"Price allocated across {len(allocations)} POs based on standalone selling prices."
         
         # Step 5: Revenue recognition methods
         recognition_summary = []
@@ -268,24 +275,22 @@ STRUCTURED ANALYSIS DATA:
 - Performance Obligations: {po_descriptions}
 - Total Transaction Price: {total_price}
 - Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+- Allocation Method: {allocation_summary}
 - Revenue Recognition Methods: {recognition_summary}
 - Key Judgment Areas: {critical_judgments}
 
 Create an executive summary using this professional structure:
 
 **OVERALL CONCLUSION**
-[Single paragraph stating overall ASC 606 compliance and revenue recognition approach based on the structured data above]
+[Single paragraph stating the **concluded accounting treatment** for the contract under ASC 606, including the overall revenue recognition approach, based on the structured data above.]
 
 **KEY FINDINGS**
 • Contract Status: {contract_status}
 • Performance Obligations: {po_count} distinct obligations - {', '.join(po_descriptions[:3])}{'...' if len(po_descriptions) > 3 else ''}
 • Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+• Allocation: {allocation_summary}
 • Revenue Recognition: {', '.join(recognition_summary[:2])}{'...' if len(recognition_summary) > 2 else ''}
 • Critical Judgments: {', '.join(critical_judgments[:2])}{'...' if len(critical_judgments) > 2 else ''}
-
-**FINANCIAL IMPACT SUMMARY**
-• Expected Revenue: [Derive from transaction price and recognition timing]
-• Implementation Requirements: [Base on complexity - simple vs multi-PO arrangements]
 
 Keep this professional, concise, and focused on executive-level insights."""
 
@@ -406,6 +411,8 @@ Analyze the data above and perform these specific checks:
 2.  **Price Mismatch:** Does the `total_transaction_price` in `step_3_price` appear to equal the sum of the `allocated_amount` fields in `step_4_allocation`? (You may need to parse numbers from strings).
 3.  **Recognition Mismatch:** Does every performance obligation listed in `step_2_obligations` have a corresponding entry in the `step_5_recognition` plan?
 4.  **Contract Validity:** If any criterion in `step_1_assessment` is "Not Met", does the rest of the analysis correctly reflect that no revenue should be recognized yet?
+5.  **Semantic Mismatch:** For each performance obligation, does the `recognition_method` in `step_5_recognition` make logical sense given the `po_description` in `step_2_obligations`? (e.g., A one-time 'Setup Fee' should generally not be recognized 'Over Time'; a '12-month Support Service' should generally not be recognized at a 'Point in Time').
+
 
 You MUST return your response as a single JSON object with the following exact structure:
 {{
