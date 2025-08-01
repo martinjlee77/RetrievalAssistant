@@ -243,9 +243,11 @@ def extract_contract_terms(client, contract_text: str, step_context: str = "comp
         Return only the key terms, one per line, no explanations.
         """
         
+        # NEW: Wrap prompt in messages list structure
+        messages = [{"role": "user", "content": prompt}]
         response = make_llm_call(
             client=client,
-            prompt=prompt,
+            messages=messages,  # Pass the new messages list
             model="gpt-4o-mini",
             max_tokens=200,
             temperature=0.3
