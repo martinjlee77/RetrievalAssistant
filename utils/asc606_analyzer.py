@@ -239,7 +239,7 @@ class ASC606Analyzer:
                     self.client,
                     step_prompt,
                     temperature=debug_config.get('temperature', 0.3) if debug_config else 0.3,
-                    max_tokens=debug_config.get('max_tokens', 3000) if debug_config else 3000,
+                    max_tokens=debug_config.get('max_tokens', 4000 if step_num == 2 else 3000) if debug_config else (4000 if step_num == 2 else 3000),
                     model=debug_config.get('model', 'gpt-4o') if debug_config else 'gpt-4o',
                     response_format={"type": "json_object"}
                 ))
@@ -275,13 +275,17 @@ class ASC606Analyzer:
                 else:
                     try:
                         # Process successful response
-                        step_analysis_raw = json.loads(response) if response else {}
-                        step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
-                        step_results[f"step_{step_num}"] = step_analysis_sanitized
-                        
-                        # Performance diagnostics
-                        step_duration = time.time() - step_start_times[step_num]
-                        self.logger.info(f"Step {step_num} result processed in {step_duration:.2f}s: {len(response) if response else 0} characters")
+                        # Ensure response is a string before processing
+                        if isinstance(response, str):
+                            step_analysis_raw = json.loads(response) if response else {}
+                            step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+                            step_results[f"step_{step_num}"] = step_analysis_sanitized
+                            
+                            # Performance diagnostics
+                            step_duration = time.time() - step_start_times[step_num]
+                            self.logger.info(f"Step {step_num} result processed in {step_duration:.2f}s: {len(response)} characters")
+                        else:
+                            raise ValueError(f"Expected string response, got {type(response)}")
                         
                     except (json.JSONDecodeError, Exception) as e:
                         self.logger.error(f"Step {step_num} parsing failed: {e}")
@@ -472,11 +476,12 @@ class ASC606Analyzer:
             executive_summary, background, key_judgments, financial_impact, conclusion = memo_responses
             
             # Apply generalized cleaning to all AI-generated memo sections
-            executive_summary = self._clean_memo_section(executive_summary)
-            background = self._clean_memo_section(background)
-            key_judgments = self._clean_memo_section(key_judgments)
-            financial_impact = self._clean_memo_section(financial_impact)
-            conclusion = self._clean_memo_section(conclusion)
+            # Ensure all responses are strings before cleaning
+            executive_summary = self._clean_memo_section(executive_summary) if isinstance(executive_summary, str) else str(executive_summary)
+            background = self._clean_memo_section(background) if isinstance(background, str) else str(background)
+            key_judgments = self._clean_memo_section(key_judgments) if isinstance(key_judgments, str) else str(key_judgments)
+            financial_impact = self._clean_memo_section(financial_impact) if isinstance(financial_impact, str) else str(financial_impact)
+            conclusion = self._clean_memo_section(conclusion) if isinstance(conclusion, str) else str(conclusion)
             
             # 7. Python Assembly of Final Memo with Professional Formatting
             contract_data_table = self._create_contract_data_table(contract_data)

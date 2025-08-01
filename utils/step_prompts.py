@@ -404,7 +404,7 @@ Keep this professional, concise, and focused on executive-level insights."""
     @staticmethod
     def get_step2_schema() -> str:
         """Returns Step 2 specific JSON schema for performance obligations assessment."""
-        return '"performance_obligations": [\n    {\n      "po_description": "Description of the performance obligation",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Justification based on ASC 606-10-25-19: (a) capable of being distinct and (b) separately identifiable in the contract context."\n    }\n  ],\n  '
+        return '"performance_obligations": [\n    {\n      "po_description": "Brief description of the first performance obligation identified",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion."\n    }\n  ],\n  '
 
     @staticmethod  
     def get_step3_schema() -> str:
@@ -461,7 +461,8 @@ You MUST return your response as a single, well-formed JSON object with the foll
 
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-  {step_specific_json_field}"professional_judgments": [
+  {step_specific_json_field}
+  "professional_judgments": [
     "A list of strings. For this step only, describe any conclusions that required significant professional judgment (e.g., 'Estimation of SSP for the license using the residual approach', 'Conclusion that implementation services are not distinct from the SaaS platform'). If no significant judgments were made in this step, return an empty list []."
   ],
   "analysis_points": [
@@ -492,7 +493,11 @@ CRITICAL INSTRUCTIONS:
 - Every quote MUST include source document name
 - Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
 - Make analysis flow naturally, building from one point to the next
-- **CRITICAL FOR STEP 2:** If no distinct performance obligations are found, set "performance_obligations": [] and explain in analysis_points why no obligations were identified.
+- **CRITICAL FOR STEP 2:** 
+  * If no distinct performance obligations are found, set "performance_obligations": [] and explain in analysis_points why no obligations were identified
+  * For simple contracts with obvious single obligations (e.g., "product sale"), keep analysis concise but complete
+  * Always include at least one performance obligation unless truly none exist (very rare)
+  * Focus on the "separately identifiable" criterion which is typically the decisive factor
 """
 
     @staticmethod
