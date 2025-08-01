@@ -79,6 +79,17 @@ Your analysis must be thorough. Weave in specific ASC 606 citations (e.g., ASC 6
             '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
             "}",
             "```",
+            """<ANALYSIS_STRUCTURE_RULE>
+For every `analysis_point` you generate, your `analysis_text` MUST be a flowing narrative that tells the story of your analysis. While maintaining the three core elements (assessment, guidance application, conclusion), write them as a seamless narrative rather than separate subsections:
+
+- Start by stating the facts from the contract and your assessment
+- Flow naturally into explaining how ASC 606 guidance applies, citing specific paragraphs. Do the same if the industry interpretation (e.g., EY guide) is used.
+- Conclude with your determination, all within a single flowing paragraph
+
+Example: "The contract specifies a fixed monthly fee of $15.49 with no performance-based adjustments or penalties. Under ASC 606-10-32-2, this represents fixed consideration as the amount does not vary based on future events or customer actions. Therefore, no variable consideration is present in this arrangement."
+
+Even for simple topics, provide this detailed reasoning narrative to ensure the memo is audit-ready.
+</ANALYSIS_STRUCTURE_RULE>""",
             critical_rules
         ]
         return "\n\n".join(prompt_parts)
@@ -189,6 +200,21 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
                     'financing_component':
                     s3_price.get('financing_component_analysis', 'None identified')
                 }
+
+        # Extract tax amount from Step 3 analysis for journal entries
+        tax_amount_str = "Not specified"
+        if s3_analysis := s3.get('step3_analysis'):
+            # Search in other_considerations_analysis or similar fields
+            other_considerations = s3_analysis.get('other_considerations_analysis', '')
+            # Also search in the analysis_points of step 3
+            for point in s3.get('analysis_points', []):
+                if 'tax' in point.get('topic_title', '').lower():
+                    # Find a dollar amount in the analysis text
+                    import re
+                    match = re.search(r'\$?(\d+\.\d{2})', point.get('analysis_text', ''))
+                    if match:
+                        tax_amount_str = f"${match.group(1)}"
+                        break
 
         # Step 4: Allocation details - FIXED to access nested structure
         allocation_data = {}
@@ -307,7 +333,10 @@ Write a concise financial impact analysis.
 
     | Date       | Account                          | Debit     | Credit    |
     |------------|----------------------------------|-----------|-----------|
-    | ...        | ...                              | ...       | ...       |
+    | 2024-09-26 | Cash / Accounts Receivable       | $16.52    |           |
+    |            |   Deferred Revenue               |           | $15.49    |
+    |            |   Sales Tax Payable              |           | $1.03     |
+    |            | *To record contract inception*   |           |           |
 
 3.  **Internal Control & Process Considerations:** Briefly mention any internal controls over financial reportin (ICFR) considerations required for accurate accounting and effective control environment (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
 
@@ -321,6 +350,7 @@ The {transaction_price_data.get('total_price', '$XX.XX')} fee will be recorded a
 |------------------------------|-----------|-----------|
 | Cash / Accounts Receivable   | {transaction_price_data.get('total_price', '$XX.XX')}    |           |
 | Deferred Revenue             |           | {transaction_price_data.get('total_price', '$XX.XX')}    |
+| Sales Tax Payable            |           | {tax_amount_str} |
 | *To record contract inception* | | |
 
 ---
@@ -496,7 +526,7 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 Write a comprehensive conclusion paragraph that:
 1. States that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606
 2. Summarizes the key revenue recognition approach
-3. Only mention significant judgments if actual professional judgments were identified in the analysis: {all_judgments}
+3. Based on the provided list of judgments, {json.dumps(all_judgments)}, summarize the key judgments. If the list is empty, you MUST state that 'no significant professional judgments were required'.
 4. Only mention ongoing monitoring if the contract has variable elements or complex terms that require it
 ---
 
@@ -612,7 +642,7 @@ Create an executive summary using this professional structure:
 • Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 • Allocation: {allocation_summary}
 • Revenue Recognition: {', '.join(recognition_summary[:2]) if recognition_summary else 'No revenue recognition methods applicable due to lack of performance obligations'}{'...' if len(recognition_summary) > 2 else ''}
-• Critical Judgments: {', '.join(critical_judgments[:2]) if critical_judgments else 'None identified at this time'}{'...' if len(critical_judgments) > 2 else ''}
+• Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
 
 Keep this professional, concise, and focused on executive-level insights."""
 
@@ -1072,47 +1102,7 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             "**Detailed Analysis:**\n"
         ]
     
-        # NEW: Special formatting logic for Step 5
-        if step_number == 5:
-            plan_formatted = False
-            if step5_analysis := step_data.get('step5_analysis'):
-                if plan := step5_analysis.get('revenue_recognition_plan'):
-                    for po_plan in plan:
-                        po_name = po_plan.get('performance_obligation', 'Unknown PO')
-                        method = po_plan.get('recognition_method', 'N/A')
-                        justification = po_plan.get('recognition_justification', 'No justification provided.')
-    
-                        markdown_sections.append(f"• **{po_name} (Method: {method})**")
-                        markdown_sections.append(f"  - **Justification:** {justification}")
-                        plan_formatted = True
-    
-            if not plan_formatted:
-                markdown_sections.append("No detailed revenue recognition plan was provided.")
-    
-            # Add analysis_points if they exist for Step 5
-            if analysis_points:
-                markdown_sections.append("\n**Additional Analysis Points:**\n")
-                for i, point in enumerate(analysis_points):
-                    topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                    analysis_text = point.get('analysis_text', 'No analysis text provided.')
-                    evidence_quotes = point.get('evidence_quotes', [])
-    
-                    markdown_sections.append(f"**{i+1}. {topic_title}**")
-                    markdown_sections.append(analysis_text)
-    
-                    if evidence_quotes and isinstance(evidence_quotes, list):
-                        for quote in evidence_quotes:
-                            if isinstance(quote, str):
-                                markdown_sections.append(f"> {quote}")
-                    elif isinstance(evidence_quotes, str):
-                        markdown_sections.append(f"> {evidence_quotes}")
-    
-                    markdown_sections.append("")  # Add spacing
-    
-            markdown_sections.append("---\n")
-            return "\n".join(markdown_sections)
-    
-        # Existing logic for filtering analysis_points for Steps 1 and 4
+        # Existing logic for filtering analysis_points for Steps 1, 4, and 5
         ignore_phrases = {'n/a', 'not applicable'}
         filtered_points = []
         for point in analysis_points:
