@@ -446,10 +446,7 @@ Analyze the contract and provide both structured step-specific assessment AND th
 You MUST return your response as a single, well-formed JSON object with the following exact structure:
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-  {step_specific_json_field}"professional_judgments": [
-    "A list of strings. For this step only, describe any conclusions that required significant professional judgment (e.g., 'Estimation of SSP for the license using the residual approach', 'Conclusion that implementation services are not distinct from the SaaS platform'). If no significant judgments were made in this step, return an empty list []."
-  ],
-  "analysis_points": [
+  {step_specific_json_field}"analysis_points": [
     {{
       "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
       "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
@@ -571,7 +568,7 @@ Transform the list of judgments above into a formal, well-articulated narrative.
 
 Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
 
-- **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. In this case, your entire output must be only the following single sentence:
+- **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. **Only focus on items that involve significant estimation or a choice between viable accounting alternatives.** Examples of genuine judgments include: "Estimating the standalone selling price of the license using a residual approach" or "Concluding that the performance bonus is not constrained and should be included in the transaction price." In this case (i.e., no genuine judgments), your entire output must be only the following single sentence:
 "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
 - If there are genuine judgments, present each one as a separate bullet point following this precise structure:
