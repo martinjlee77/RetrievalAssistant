@@ -177,6 +177,11 @@ STRUCTURED ANALYSIS DATA:
 YOUR TASK:
 Write a concise financial impact analysis.
 
+**CRITICAL TAX RULE: Any sales tax collected from the customer is NOT revenue or deferred revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). The journal entry should show a credit to Deferred Revenue for the pre-tax amount and a separate credit to Sales Tax Payable.
+
+**CRITICAL RULE: Be Proportional.**
+#... rest of the prompt
+
 **CRITICAL RULE: Be Proportional.**
 - **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
 - **For COMPLEX transactions:** Provide a more detailed analysis, including separate sections for Financial Statement Impact and Illustrative Journal Entries as described below.
@@ -314,30 +319,38 @@ Begin writing the financial impact section, strictly adhering to the proportiona
         if complexity_reasons:
             complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
 
-        # Simple contract detection logic
+        # Simple contract detection logic - FIXED to use nested data paths
         is_simple_contract = True
-        # Check for complexity indicators
-        po_count = len(s2.get('performance_obligations',
-                              [])) if s2.get('performance_obligations') else 0
-        has_variable_consideration = bool(
-            s3.get('transaction_price_components',
-                   {}).get('variable_consideration'))
-        has_financing_component = bool(
-            s3.get('transaction_price_components',
-                   {}).get('financing_component_analysis', '').strip())
-        # Professional judgments from all steps
+
+        # Correctly get PO count from nested structure
+        po_count = 0
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                po_count = len(s2_pos) if s2_pos else 0
+
+        # Correctly check for variable consideration and financing from nested structure
+        has_variable_consideration = False
+        has_financing_component = False
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                has_variable_consideration = bool(s3_price.get('variable_consideration'))
+                financing_analysis = s3_price.get('financing_component_analysis', '')
+                has_financing_component = 'significant financing component' in str(financing_analysis).lower()
+
+        # Professional judgments from all steps (this part was already correct)
         all_judgments = []
         for step in [s1, s2, s3, s4, s5]:
             judgments = step.get('professional_judgments', [])
             if judgments:
                 all_judgments.extend(judgments)
+
         # Mark as complex if any complexity indicators present
-        if po_count > 1 or has_variable_consideration or has_financing_component or len(
-                all_judgments) > 0:
+        if po_count > 1 or has_variable_consideration or has_financing_component or len(all_judgments) > 0:
             is_simple_contract = False
+
         # For simple contracts, return standard conclusion directly
         if is_simple_contract:
-            return "RETURN_DIRECT_TEXT: ### Conclusion\nThe accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above."
+            return "RETURN_DIRECT_TEXT: The accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above."
 
         # --- End Enhanced Complexity Logic ---
 
@@ -663,6 +676,7 @@ You MUST return your response as a single, well-formed JSON object with the foll
 }}
 
 CRITICAL INSTRUCTIONS:
+- **You MUST analyze and populate every single field in the step-specific JSON schema.** Do not skip any fields; use "N/A" only if truly not applicable.
 - Fill out the step-specific structured assessment thoroughly and precisely
 - Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
 - Ensure structured assessment connects logically to your narrative analysis points
@@ -676,6 +690,15 @@ CRITICAL INSTRUCTIONS:
   * For simple contracts with obvious single obligations (e.g., "product sale"), keep analysis concise but complete
   * Always include at least one performance obligation unless truly none exist (very rare)
   * Focus on the "separately identifiable" criterion which is typically the decisive factor
+**- CRITICAL FOR STEP 3:**
+  * **The primary analysis MUST occur within the `transaction_price_components` JSON structure.**
+  * **Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.**
+  * For simple fixed-price contracts, `variable_consideration` MUST be "N/A" and `professional_judgments` MUST be an empty list []. Do not invent judgments.
+**- CRITICAL FOR STEP 4:**
+  * **If there is only one performance obligation, `analysis_points` should be an empty list []. The `step4_overall_conclusion` is sufficient.**
+  * **Do NOT re-analyze the transaction price in Step 4.**
+**- CRITICAL FOR STEP 5:**
+
 """
 
     @staticmethod
@@ -1009,36 +1032,48 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                                             conclusion: str,
                                             analysis_points: list,
                                             step_number: int) -> str:
-        """Apply the Auditor's Method to Steps 1, 4, and 5: Filter out N/A components."""
+        """Apply the Auditor's Method to Steps 1, 4, and 5: Filter out N/A components and format structured data."""
         markdown_sections = [
             f"### Step {step_number}: {step_name}",
             f"**Conclusion:**\n{conclusion}", "\n---\n",
             "**Detailed Analysis:**\n"
         ]
-
-        # Filter analysis points to remove N/A topics
+    
+        # NEW: Special formatting logic for Step 5
+        if step_number == 5:
+            plan_formatted = False
+            if step5_analysis := step_data.get('step5_analysis'):
+                if plan := step5_analysis.get('revenue_recognition_plan'):
+                    for po_plan in plan:
+                        po_name = po_plan.get('performance_obligation', 'Unknown PO')
+                        method = po_plan.get('recognition_method', 'N/A')
+                        justification = po_plan.get('recognition_justification', 'No justification provided.')
+    
+                        markdown_sections.append(f"• **{po_name} (Method: {method})**")
+                        markdown_sections.append(f"  - **Justification:** {justification}")
+                        plan_formatted = True
+    
+            if not plan_formatted:
+                 markdown_sections.append("No detailed revenue recognition plan was provided.")
+    
+            markdown_sections.append("---\n")
+            return "\n".join(markdown_sections)
+    
+        # Existing logic for filtering analysis_points for Steps 1 and 4
         ignore_phrases = {'n/a', 'not applicable'}
         filtered_points = []
-
         for point in analysis_points:
             topic_title = point.get('topic_title', '')
             analysis_text = point.get('analysis_text', '')
-
-            # Check if the analysis text indicates N/A
+    
             analysis_text_str = str(analysis_text or '').strip().lower()
             is_not_applicable = False
-
-            if not analysis_text_str:
+            if not analysis_text_str or analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
                 is_not_applicable = True
-            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith(
-                    'n/a'):
-                is_not_applicable = True
-
-            # Only include if not N/A
+    
             if not is_not_applicable:
                 filtered_points.append(point)
-
-        # Use filtered points for display
+    
         if not filtered_points:
             markdown_sections.append(
                 "No additional analysis was required for this step.")
@@ -1048,18 +1083,18 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 analysis_text = point.get('analysis_text',
                                           'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
-
+    
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
                 markdown_sections.append(analysis_text)
-
+    
                 if evidence_quotes and isinstance(evidence_quotes, list):
                     for quote in evidence_quotes:
                         if isinstance(quote, str):
                             markdown_sections.append(f"> {quote}")
                 elif isinstance(evidence_quotes, str):
                     markdown_sections.append(f"> {evidence_quotes}")
-
+    
                 markdown_sections.append("")  # Add spacing
-
+    
         markdown_sections.append("---\n")
         return "\n".join(markdown_sections)
