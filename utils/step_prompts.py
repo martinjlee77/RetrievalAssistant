@@ -357,7 +357,11 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 **IF THE TRANSACTION or Contract IS COMPLEX, follow this structure:**
 
 ### Conclusion
-In a single paragraph, state that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606. Briefly reiterate the core revenue recognition conclusion.
+Write a comprehensive conclusion paragraph that:
+1. States that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606
+2. Summarizes the key revenue recognition approach
+3. Highlights any significant judgments or estimates that were required, if any. Don't mention anything if no significant judgments were made.
+4. Notes any ongoing monitoring requirements if the contract has variable elements or complex terms, if any. Don't mention anything if there are no such requirements.
 ---
 
 Begin writing the "Conclusion" section. Do not add any other text, summaries, or boilerplate language.
