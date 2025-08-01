@@ -1,0 +1,155 @@
+TECHNICAL ACCOUNTING MEMORANDUM
+TO: Technical Accounting Team / Audit File
+FROM: ASC 606 AI Analyst
+DATE: August 01, 2025
+RE: ASC 606 Revenue Recognition Analysis - Netflix01
+DOCUMENT CLASSIFICATION: Internal Use Only
+REVIEW STATUS: Preliminary Analysis
+
+1. EXECUTIVE SUMMARY
+OVERALL CONCLUSION
+The concluded accounting treatment for the contract with Martin Lee under ASC 606 is to recognize revenue over time for the provision of streaming services. Given the single performance obligation associated with the contract, the total transaction price of $15.49 will be recognized as revenue in alignment with the subscription period from September 26, 2024, to October 25, 2024. The presence of variable consideration does not impact the allocation method, as there is only one performance obligation.
+
+KEY FINDINGS
+• Contract Status: Valid
+• Performance Obligations: 1 distinct obligation - Provision of streaming services for the period 9/26/24—10/25/24.
+• Transaction Price: $15.49 (includes variable consideration)
+• Allocation: Not applicable (single performance obligation).
+• Revenue Recognition: Streaming Service Subscription: Over Time
+• Critical Judgments: None identified at this time
+
+2. CONTRACT OVERVIEW
+CONTRACT DATA SUMMARY
+
+Element	Details
+Customer	Martin Lee
+Contract Period	2024-09-26 to 2024-10-26
+Currency	USD
+Modification Status	No - Original Contract
+Analysis Scope	Standard ASC 606 five-step analysis
+Materiality Threshold	$10
+DOCUMENTS REVIEWED
+
+• invoice.pdf
+• Netflix.pdf
+• pricing.pdf
+• terms.pdf
+
+The arrangement involves a monthly subscription to a Netflix streaming service, which provides customers with access to a library of films and television shows. The objective of this memorandum is to document the Company's accounting analysis and conclusions for the transaction with the customer under the five-step model of ASC 606.
+
+3. DETAILED ASC 606 ANALYSIS
+Step 1: Identify the Contract
+Conclusion:
+The contract with Netflix for streaming services meets all criteria under ASC 606-10-25-1, establishing a valid contract for revenue recognition purposes.
+
+Detailed Analysis:
+
+1. Identification of Contractual Rights and Obligations
+The contract clearly identifies the rights and obligations of both Netflix and the customer. Netflix provides streaming services, and the customer pays a monthly fee. This aligns with ASC 606-10-25-1(b), which requires clear identification of rights and obligations.
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content... (Source: terms.pdf)
+Your membership has ended... Membership for 9/26/2024-10/25/2024 (Source: Netflix.pdf)
+
+2. Assessment of Payment Terms
+The payment terms are explicitly stated, with a monthly billing cycle and specified amounts. This satisfies ASC 606-10-25-1(c), ensuring that payment terms are clearly defined.
+
+The subscription fee for the Netflix service... will be charged to your Payment Method on the specific payment date... (Source: terms.pdf)
+Date Description Service Period Amount Tax Total 9/26/24 Streaming Service 9/26/24—10/25/24 $15.49 $1.03 $16.52 (Source: invoice.pdf)
+
+Step 2: Identify Performance Obligations
+Conclusion:
+The contract involves a single performance obligation related to the provision of streaming services, which is distinct and separately identifiable. There are no additional customer options or principal-agent considerations applicable.
+
+Detailed Analysis:
+
+1. Identification of Performance Obligation
+
+The primary performance obligation in the contract is the provision of streaming services for a specified period. According to ASC 606-10-25-19, a good or service is distinct if it is both capable of being distinct and separately identifiable. The streaming service is capable of being distinct as it provides standalone functionality, allowing the customer to access content independently. It is also separately identifiable as it does not significantly integrate with other potential services, fulfilling the criteria under ASC 606-10-25-19.
+
+Supporting Contract Evidence:
+
+Membership for 9/26/2024-10/25/2024 (Source: Netflix.pdf)
+
+Unlimited ad-free movies, TV shows, and mobile games (Source: pricing.pdf)
+
+2. Assessment of Customer Options
+
+The contract does not provide any customer options for additional goods or services that would constitute a material right under ASC 606-10-55-41. The membership is straightforward with no embedded options for future discounts or renewals beyond the standard subscription terms.
+
+Supporting Contract Evidence:
+
+You can easily change your plan or cancel at any time. (Source: pricing.pdf)
+
+Step 3: Determine the Transaction Price
+Conclusion:
+The transaction price for the Netflix subscription contract is a fixed amount of $15.49, with no variable consideration or other complex components involved.
+
+Transaction Price Analysis:
+
+Only basic fixed consideration was identified in this contract.
+
+Additional Analysis:
+
+1. Identification of Fixed Consideration
+
+The fixed consideration for the Netflix subscription contract is clearly defined as $15.49 per month. According to ASC 606-10-32-2, the transaction price is the amount of consideration to which an entity expects to be entitled in exchange for transferring promised goods or services to a customer. In this case, the service is the streaming access provided by Netflix, and the fixed monthly fee is the consideration for this service.
+
+Supporting Contract Evidence:
+
+Date Description Service Period Amount Tax Total 9/26/24 Streaming Service 9/26/24—10/25/24 $15.49 $1.03 $16.52 (Source: invoice.pdf)
+
+2. Assessment of Variable Consideration
+
+There is no variable consideration in the Netflix subscription contract. The contract specifies a fixed monthly fee, and there are no indications of bonuses, royalties, or other forms of variable payments. According to ASC 606-10-32-6, variable consideration is only applicable if the amount of consideration is contingent on future events, which is not the case here.
+
+Supporting Contract Evidence:
+
+Membership for 9/26/2024-10/25/2024 $15.49 (+$1.03 tax) (Source: Netflix.pdf)
+
+Step 4: Allocate the Transaction Price
+Conclusion:
+The entire transaction price is allocated to a single performance obligation, which is the provision of the streaming service for the specified period.
+
+Detailed Analysis:
+
+No additional analysis was required for this step.
+Step 5: Recognize Revenue
+Conclusion:
+The Netflix subscription service revenue is recognized over time as the service is provided continuously throughout the subscription period.
+
+Detailed Analysis:
+
+• Streaming Service Subscription (Method: Over Time)
+
+- Justification: The recognition is over time because the customer simultaneously receives and consumes the benefits provided by Netflix's performance as it occurs, meeting the criteria in ASC 606-10-25-27(a).
+4. KEY PROFESSIONAL JUDGMENTS
+The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model.
+
+5. FINANCIAL IMPACT ASSESSMENT
+Financial Statement Impact
+The transaction involves a single performance obligation for streaming services, with a total transaction price of $15.49. Upon contract inception, this amount will be recorded as deferred revenue on the balance sheet. Revenue will be recognized over the service period from September 26, 2024, to October 25, 2024, reflecting the delivery of the service over time. There are no variable considerations impacting the transaction price, and no sales tax is applicable.
+
+Illustrative Journal Entries
+Date	Account	Debit	Credit
+09/26/2024	Cash / Accounts Receivable	$15.49	
+Deferred Revenue		$15.49
+To record contract inception			
+10/25/2024	Deferred Revenue	$15.49	
+Revenue		$15.49
+To recognize revenue over time			
+Internal Control & Process Considerations
+It is essential to implement internal controls to ensure accurate tracking of the service delivery period and the recognition of revenue in accordance with ASC 606. Regular monitoring of performance obligations will be necessary to maintain compliance and ensure timely revenue recognition.
+
+6. CONCLUSION AND RECOMMENDATIONS
+Conclusion
+The accounting treatment outlined in this memo is appropriate and in accordance with ASC 606, given the complexities associated with the contract. The key revenue recognition approach involves recognizing revenue over time as the streaming services are provided from September 26, 2024, to October 25, 2024. Significant judgments were made regarding the estimation of variable consideration, which is influenced by factors such as user engagement and subscription levels. Ongoing monitoring of these variable elements will be essential to ensure that revenue is recognized accurately throughout the contract term, reflecting any changes in the underlying assumptions that could impact the estimated variable consideration.
+
+CONFIDENTIAL: This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.
+
+PREPARED BY: ASC 606 AI Analyst
+REVIEWED BY: [To be completed]
+APPROVED BY: [To be completed]
+
+Generated by Controller.cpa ASC 606 Analysis Platform | August 01, 2025
+
+This document is optimized for printing and professional review.
