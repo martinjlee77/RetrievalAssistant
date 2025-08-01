@@ -449,7 +449,10 @@ TEST
 
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-  {step_specific_json_field}"analysis_points": [
+  {step_specific_json_field}"professional_judgments": [
+    "A list of strings. For this step only, describe any conclusions that required significant professional judgment (e.g., 'Estimation of SSP for the license using the residual approach', 'Conclusion that implementation services are not distinct from the SaaS platform'). If no significant judgments were made in this step, return an empty list []."
+  ],
+  "analysis_points": [
     {{
       "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
       "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
