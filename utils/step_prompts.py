@@ -455,13 +455,15 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
                         critical_judgments.append(
                             f"Over time recognition criteria for {po_name}")
 
-        # Identify key judgments
-        if has_variable_consideration:
-            critical_judgments.append(
-                "Variable consideration estimation and constraint analysis")
-        if po_count > 1:
-            critical_judgments.append(
-                "Distinct performance obligation assessment")
+        # Extract actual critical judgments from step analyses (no defaults)  
+        all_step_judgments = []
+        for step_result in [s1, s2, s3, s4, s5]:
+            if step_analysis := step_result.get(f'step{[s1, s2, s3, s4, s5].index(step_result) + 1}_analysis'):
+                if judgments := step_result.get('professional_judgments'):
+                    all_step_judgments.extend(judgments)
+        
+        # Only use actual judgments found in the analysis, not defaults
+        critical_judgments = all_step_judgments[:3]  # Limit to top 3 to avoid overwhelming
 
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
@@ -631,8 +633,29 @@ Keep this professional, concise, and focused on executive-level insights."""
         elif step_number == 5:
             step_specific_json_field = StepPrompts.get_step5_schema()
 
-        return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
+        # Add critical override for Step 3 to prevent variable consideration hallucination
+        step3_override = ""
+        if step_number == 3:
+            # Check if this is a simple contract (basic heuristics)
+            contract_lower = contract_text.lower()
+            simple_indicators = ["monthly subscription", "fixed fee", "streaming service", "$"]
+            complex_indicators = ["bonus", "royalty", "percentage", "variable", "contingent"]
+            
+            simple_score = sum(1 for indicator in simple_indicators if indicator in contract_lower)
+            complex_score = sum(1 for indicator in complex_indicators if indicator in contract_lower)
+            
+            if simple_score > complex_score:
+                step3_override = """
+**🚨 CRITICAL OVERRIDE: This appears to be a simple, fixed-price contract. You MUST follow these rules:**
+- Set `variable_consideration` to "N/A" (not a detailed analysis of why there isn't any)
+- Set `professional_judgments` to an empty list []
+- Do NOT invent complexity where none exists
+- Focus only on the fixed consideration amount
 
+"""
+
+        return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
+{step3_override}
 PRIMARY GUIDANCE FOR THIS STEP: {step_guidance}
 
 AUTHORITATIVE & INDUSTRY GUIDANCE CONTEXT:
@@ -676,7 +699,8 @@ You MUST return your response as a single, well-formed JSON object with the foll
 }}
 
 CRITICAL INSTRUCTIONS:
-- **You MUST analyze and populate every single field in the step-specific JSON schema.** Do not skip any fields; use "N/A" only if truly not applicable.
+- **🚨 MANDATORY: You MUST analyze and populate every single field in the step-specific JSON schema.** Do not skip any fields; use "N/A" only if truly not applicable.
+- **FOR STEP 1: You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e). No shortcuts or summary assessments allowed.**
 - Fill out the step-specific structured assessment thoroughly and precisely
 - Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
 - Ensure structured assessment connects logically to your narrative analysis points
@@ -698,6 +722,9 @@ CRITICAL INSTRUCTIONS:
   * **If there is only one performance obligation, `analysis_points` should be an empty list []. The `step4_overall_conclusion` is sufficient.**
   * **Do NOT re-analyze the transaction price in Step 4.**
 **- CRITICAL FOR STEP 5:**
+  * **You MUST provide detailed analysis in both the JSON schema AND analysis_points. Do not use shortcuts like "No additional analysis required".**
+  * **The `revenue_recognition_plan` must include specific recognition_justification for each performance obligation.**
+  * **Include measure_of_progress_analysis explaining the method used (straight-line, input/output method, etc.).**
 
 """
 
