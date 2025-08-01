@@ -120,7 +120,13 @@ Even for simple topics, provide this detailed reasoning narrative to ensure the 
 - If no distinct performance obligations are found, `performance_obligations` MUST be an empty list `[]`, and you must explain why in the `analysis_points`.
 - For simple contracts with one obvious obligation, keep the analysis concise but complete.
 - Focus on the "separately identifiable" criterion, as it is often the most decisive factor.
-</CRITICAL_INSTRUCTION>""",
+</CRITICAL_INSTRUCTION>
+<CRITICAL_OVERRIDE>
+This is a simple subscription-based contract (e.g., SaaS, streaming). Such contracts almost always contain a SINGLE, distinct performance obligation: the service access itself.
+- You MUST identify this as one distinct performance obligation.
+- Do NOT misinterpret "integrated service" to mean "not distinct". The service itself is the distinct promise.
+- Conclude that there is one distinct performance obligation.
+</CRITICAL_OVERRIDE>""",
             3: """<CRITICAL_INSTRUCTION>
 - Your primary analysis MUST occur within the `transaction_price_components` JSON structure.
 - Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.
@@ -596,7 +602,6 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
 
         # Step 5: Revenue recognition methods - FIXED to access nested structure
         recognition_summary = []
-        critical_judgments = []
         if s5_analysis := s5.get('step5_analysis'):
             if s5_plan := s5_analysis.get('revenue_recognition_plan'):
                 for po_plan in s5_plan:
@@ -604,20 +609,14 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
                     po_name = po_plan.get('performance_obligation', 'Unknown PO')
                     recognition_summary.append(f"{po_name}: {method}")
 
-                    # Extract critical judgments
-                    if 'Over Time' in method and po_plan.get('justification'):
-                        critical_judgments.append(
-                            f"Over time recognition criteria for {po_name}")
-
         # Extract actual critical judgments from step analyses (no defaults)  
         all_step_judgments = []
         for step_result in [s1, s2, s3, s4, s5]:
-            if step_analysis := step_result.get(f'step{[s1, s2, s3, s4, s5].index(step_result) + 1}_analysis'):
-                if judgments := step_result.get('professional_judgments'):
-                    all_step_judgments.extend(judgments)
+            if judgments := step_result.get('professional_judgments'):
+                all_step_judgments.extend(judgments)
         
         # Only use actual judgments found in the analysis, not defaults
-        critical_judgments = all_step_judgments[:3]  # Limit to top 3 to avoid overwhelming
+        critical_judgments = all_step_judgments
 
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
