@@ -334,7 +334,7 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
         # --- End Enhanced Complexity Logic ---
 
-        return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+        return f"""You are an accounting manager writing the final "Conclusion" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
 
 **CRITICAL CONTRACT CLASSIFICATION:**
 This contract has been classified as: {"SIMPLE" if is_simple_contract else "COMPLEX"}
@@ -354,17 +354,13 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 **CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
 
 ---
-**IF THE TRANSACTION IS COMPLEX, follow this structure:**
+**IF THE TRANSACTION or Contract IS COMPLEX, follow this structure:**
 
 ### Conclusion
 In a single paragraph, state that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606. Briefly reiterate the core revenue recognition conclusion.
-
-### Recommendations
-Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Important: For straightforward contracts, focus only on the accounting conclusion without generic recommendations.
-
 ---
 
-Begin writing the "Conclusion and Recommendations" section. Do not add any other text, summaries, or boilerplate language.
+Begin writing the "Conclusion" section. Do not add any other text, summaries, or boilerplate language.
 """
 
     @staticmethod
