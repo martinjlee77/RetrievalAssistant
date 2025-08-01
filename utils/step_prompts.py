@@ -149,15 +149,19 @@ Write a concise financial impact analysis.
 ---
 **IF THE TRANSACTION IS COMPLEX, follow this structure:**
 
-1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or multiple deferred revenue liabilities).
+1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or deferred revenue liabilities).
 
 2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Use standard account names.
+**Focus on the most critical events, such as:**
+- **The journal entry upon contract signing/initial invoicing.**
+- **The journal entry to recognize the first period of revenue for 'Over Time' obligations.**
+- **The journal entry to recognize revenue for a 'Point in Time' obligation.**
 
     | Date       | Account                          | Debit     | Credit    |
     |------------|----------------------------------|-----------|-----------|
     | ...        | ...                              | ...       | ...       |
 
-3.  **Internal Control & Process Considerations:** Briefly mention any operational considerations required for accurate accounting (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
+3.  **Internal Control & Process Considerations:** Briefly mention any internal controls over financial reportin (ICFR) considerations required for accurate accounting and effective control environment (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
 
 ---
 **IF THE TRANSACTION IS SIMPLE, follow this structure:**
@@ -442,7 +446,10 @@ Analyze the contract and provide both structured step-specific assessment AND th
 You MUST return your response as a single, well-formed JSON object with the following exact structure:
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-  {step_specific_json_field}"analysis_points": [
+  {step_specific_json_field}"professional_judgments": [
+    "A list of strings. For this step only, describe any conclusions that required significant professional judgment (e.g., 'Estimation of SSP for the license using the residual approach', 'Conclusion that implementation services are not distinct from the SaaS platform'). If no significant judgments were made in this step, return an empty list []."
+  ],
+  "analysis_points": [
     {{
       "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
       "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",

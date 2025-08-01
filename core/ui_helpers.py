@@ -329,6 +329,13 @@ def render_step_analysis(step_name: str, step_data: Dict[str, Any]):
                         method = plan.get('recognition_method', 'Unknown method')
                         st.write(f"• **{po_name}:** {method}")
             
+            # Extract professional judgments (new field)
+            professional_judgments = step_data.get('professional_judgments', [])
+            if professional_judgments:
+                with st.expander("Professional Judgments"):
+                    for judgment in professional_judgments:
+                        st.write(f"⚖️ {judgment}")
+            
             # Extract analysis points (updated from 'rationale')
             analysis_points = step_data.get('analysis_points', [])
             if analysis_points:
