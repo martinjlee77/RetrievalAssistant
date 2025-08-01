@@ -388,7 +388,7 @@ Begin writing the "Conclusion and Recommendations" section. Do not add any other
             if failed_criteria:
                 contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
 
-        # Step 2: Performance obligations summary - FIXED to count all POs, not just distinct ones
+        # Step 2: Performance obligations summary - FIXED to count all POs found
         po_count = 0
         po_descriptions = []
         if s2_pos := s2.get('performance_obligations'):
@@ -811,11 +811,13 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             "**Detailed Analysis:**\n"
         ]
 
-        # AUDITOR'S METHOD: Special handling for Steps 2 and 3 to filter out N/A items
+        # AUDITOR'S METHOD: Special handling for Steps 2, 3, and ALL steps to filter out N/A items
         if step_number == 2:
             return StepPrompts._format_step2_with_filtering(step_data, step_name, conclusion, analysis_points)
         elif step_number == 3:
             return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
+        elif step_number in [1, 4, 5]:
+            return StepPrompts._format_general_step_with_filtering(step_data, step_name, conclusion, analysis_points, step_number)
 
         # Continue with normal processing for other steps
 
@@ -866,25 +868,17 @@ Your reputation for precision is on the line. Do not overstate the complexity of
         transaction_components = step_data.get('transaction_price_components',
                                                {})
 
-        # Filter out N/A items using the Auditor's Method - Refined and Safer Version
+        # Filter out N/A items using the Auditor's Method
         relevant_components = []
-        ignore_phrases = {'n/a', 'not applicable'}
-        
         for key, analysis_text in transaction_components.items():
-            # Normalize the AI's text once
-            analysis_text_str = str(analysis_text or '').strip().lower()
-            
-            # Perform the checks
-            is_not_applicable = False
-            if not analysis_text_str:  # Catches None and empty strings ''
-                is_not_applicable = True
-            else:
-                # Check if the entire string is one of our ignore phrases
-                if analysis_text_str in ignore_phrases:
-                    is_not_applicable = True
-                # Or if it starts with one of them (e.g., "N/A - no variable consideration")
-                elif analysis_text_str.startswith('n/a'):
-                    is_not_applicable = True
+            # Define what "not applicable" means
+            is_not_applicable = (
+                analysis_text is None
+                or str(analysis_text).strip().lower() == 'n/a'
+                or str(analysis_text).strip().lower() == 'not applicable'
+                or str(analysis_text).strip().lower().startswith('n/a')
+                or str(analysis_text).strip() == ''
+                or len(str(analysis_text).strip()) < 3)
 
             # If the AI's analysis for this component is NOT "N/A", include it in the memo
             if not is_not_applicable:
@@ -987,3 +981,58 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                         markdown_sections.append(f"> {quote}")
 
         return "\n\n".join(markdown_sections)
+
+    @staticmethod
+    def _format_general_step_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list, step_number: int) -> str:
+        """Apply the Auditor's Method to Steps 1, 4, and 5: Filter out N/A components."""
+        markdown_sections = [
+            f"### Step {step_number}: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "\n---\n",
+            "**Detailed Analysis:**\n"
+        ]
+        
+        # Filter analysis points to remove N/A topics
+        ignore_phrases = {'n/a', 'not applicable'}
+        filtered_points = []
+        
+        for point in analysis_points:
+            topic_title = point.get('topic_title', '')
+            analysis_text = point.get('analysis_text', '')
+            
+            # Check if the analysis text indicates N/A
+            analysis_text_str = str(analysis_text or '').strip().lower()
+            is_not_applicable = False
+            
+            if not analysis_text_str:
+                is_not_applicable = True
+            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
+                is_not_applicable = True
+            
+            # Only include if not N/A
+            if not is_not_applicable:
+                filtered_points.append(point)
+        
+        # Use filtered points for display
+        if not filtered_points:
+            markdown_sections.append("No additional analysis was required for this step.")
+        else:
+            for i, point in enumerate(filtered_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
+
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
+
+                if evidence_quotes and isinstance(evidence_quotes, list):
+                    for quote in evidence_quotes:
+                        if isinstance(quote, str):
+                            markdown_sections.append(f"> {quote}")
+                elif isinstance(evidence_quotes, str):
+                    markdown_sections.append(f"> {evidence_quotes}")
+
+                markdown_sections.append("")  # Add spacing
+
+        markdown_sections.append("---\n")
+        return "\n".join(markdown_sections)
