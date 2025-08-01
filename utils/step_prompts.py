@@ -409,16 +409,17 @@ Keep this professional, concise, and focused on executive-level insights."""
     @staticmethod
     def get_step3_schema() -> str:
         """Returns a comprehensive, structured JSON schema for all Step 3 components."""
-        return '''"transaction_price_components": {
-        "fixed_consideration": "Amount and description of fixed consideration, or 'N/A' if not applicable.",
-        "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or 'N/A' if not applicable.",
-        "financing_component_analysis": "Analysis of any significant financing component, or 'N/A' if not applicable.",
-        "noncash_consideration_analysis": "Analysis of any noncash consideration, or 'N/A' if not applicable.",
-        "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or 'N/A' if not applicable.",
-        "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, nonrefundable upfront fees or changes in the transaction price, or 'N/A' if not applicable.",
-        "total_transaction_price": "The final, total estimated transaction price."
-      },
-      '''
+        # Note: Formatted with \n newlines for consistency with existing file style.
+        return '"transaction_price_components": {\n' \
+               '    "fixed_consideration": "Amount and description of fixed consideration, or \'N/A\' if not applicable.",\n' \
+               '    "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or \'N/A\' if not applicable.",\n' \
+               '    "financing_component_analysis": "Analysis of any significant financing component, or \'N/A\' if not applicable.",\n' \
+               '    "noncash_consideration_analysis": "Analysis of any noncash consideration, or \'N/A\' if not applicable.",\n' \
+               '    "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or \'N/A\' if not applicable.",\n' \
+               '    "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, nonrefundable upfront fees or changes in the transaction price, or \'N/A\' if not applicable.",\n' \
+               '    "total_transaction_price": "The final, total estimated transaction price."\n' \
+               '  },\n' \
+               '  '
     
     @staticmethod
     def get_step4_schema() -> str:
@@ -703,18 +704,25 @@ Your reputation for precision is on the line. Do not overstate the complexity of
         # Get the transaction price components from the AI analysis
         transaction_components = step_data.get('transaction_price_components', {})
         
-        # Filter out N/A items using the Auditor's Method
+        # Filter out N/A items using the Auditor's Method - Refined and Safer Version
         relevant_components = []
+        ignore_phrases = {'n/a', 'not applicable'}
+        
         for key, analysis_text in transaction_components.items():
-            # Define what "not applicable" means
-            is_not_applicable = (
-                analysis_text is None or
-                str(analysis_text).strip().lower() == 'n/a' or
-                str(analysis_text).strip().lower() == 'not applicable' or
-                str(analysis_text).strip().lower().startswith('n/a') or
-                str(analysis_text).strip() == '' or
-                len(str(analysis_text).strip()) < 3
-            )
+            # Normalize the AI's text once
+            analysis_text_str = str(analysis_text or '').strip().lower()
+            
+            # Perform the checks
+            is_not_applicable = False
+            if not analysis_text_str:  # Catches None and empty strings ''
+                is_not_applicable = True
+            else:
+                # Check if the entire string is one of our ignore phrases
+                if analysis_text_str in ignore_phrases:
+                    is_not_applicable = True
+                # Or if it starts with one of them (e.g., "N/A - no variable consideration")
+                elif analysis_text_str.startswith('n/a'):
+                    is_not_applicable = True
             
             # If the AI's analysis for this component is NOT "N/A", include it in the memo
             if not is_not_applicable:
