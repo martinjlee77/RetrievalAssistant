@@ -63,12 +63,12 @@ class StepPrompts:
             if failed_criteria:
                 contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
 
-        # Step 2: Performance obligations
+        # Step 2: Performance obligations - FIXED for financial impact consistency
         performance_obligations = []
         if s2_pos := s2.get('performance_obligations'):
+            # Count all performance obligations found, not just distinct ones
             performance_obligations = [
                 po.get('po_description', 'Unknown PO') for po in s2_pos
-                if po.get('is_distinct') == 'Yes'
             ]
         po_summary = f"{len(performance_obligations)} distinct performance obligations: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
 
@@ -196,13 +196,13 @@ Write a concise financial impact analysis.
 ---
 **IF THE TRANSACTION IS SIMPLE, follow this structure:**
 
-The $XX.XX fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
+The ${transaction_price_data.get('total_price', 'XX.XX')} fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
 
 **Illustrative Journal Entry:**
 | Account                      | Debit     | Credit    |
 |------------------------------|-----------|-----------|
-| Cash / Accounts Receivable   | $XX.XX    |           |
-| Deferred Revenue             |           | $XX.XX    |
+| Cash / Accounts Receivable   | ${transaction_price_data.get('total_price', 'XX.XX')}    |           |
+| Deferred Revenue             |           | ${transaction_price_data.get('total_price', 'XX.XX')}    |
 | *To record contract inception* | | |
 
 ---
@@ -223,13 +223,13 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
         # Extract structured data for conclusion
 
-        # Performance obligations and recognition methods
+        # Performance obligations and recognition methods - FIXED for consistency
         performance_obligations = []
         recognition_methods = []
         if s2_pos := s2.get('performance_obligations'):
+            # Count all performance obligations found, not just distinct ones
             performance_obligations = [
                 po.get('po_description', 'Unknown PO') for po in s2_pos
-                if po.get('is_distinct') == 'Yes'
             ]
         if s5_plan := s5.get('revenue_recognition_plan'):
             recognition_methods = [(po.get('performance_obligation',
@@ -330,7 +330,7 @@ Begin writing the financial impact section, strictly adhering to the proportiona
             is_simple_contract = False
         # For simple contracts, return standard conclusion directly
         if is_simple_contract:
-            return "RETURN_DIRECT_TEXT: ### Conclusion\nThe accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.\n\n### Recommendations\nIt is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis."
+            return "RETURN_DIRECT_TEXT: ### Conclusion\nThe accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above."
 
         # --- End Enhanced Complexity Logic ---
 
@@ -458,11 +458,11 @@ Create an executive summary using this professional structure:
 
 **KEY FINDINGS**
 • Contract Status: {contract_status}
-• Performance Obligations: {po_count} distinct obligations - {', '.join(po_descriptions[:3])}{'...' if len(po_descriptions) > 3 else ''}
+• Performance Obligations: {po_count} distinct obligations{(' - ' + ', '.join(po_descriptions[:3])) if po_descriptions else ''}{'...' if len(po_descriptions) > 3 else ''}
 • Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 • Allocation: {allocation_summary}
-• Revenue Recognition: {', '.join(recognition_summary[:2])}{'...' if len(recognition_summary) > 2 else ''}
-• Critical Judgments: {', '.join(critical_judgments[:2])}{'...' if len(critical_judgments) > 2 else ''}
+• Revenue Recognition: {', '.join(recognition_summary[:2]) if recognition_summary else 'No revenue recognition methods applicable due to lack of performance obligations'}{'...' if len(recognition_summary) > 2 else ''}
+• Critical Judgments: {', '.join(critical_judgments[:2]) if critical_judgments else 'None identified at this time'}{'...' if len(critical_judgments) > 2 else ''}
 
 Keep this professional, concise, and focused on executive-level insights."""
 
@@ -547,6 +547,7 @@ Keep this professional, concise, and focused on executive-level insights."""
                '      "total_transaction_price": "The total amount from Step 3",\n' \
                '      "allocations": [\n' \
                '        {\n' \
+               '          "performance_obligation": "Reference the PO from Step 2 (do NOT re-identify or re-describe performance obligations here)",\n' \
                '          "ssp_determination": "Describe how the Standalone Selling Price (SSP) was determined, following the hierarchy in ASC 606-10-32-33 (observable price, or estimation method like adjusted market, cost-plus-margin, or residual).",\n' \
                '          "allocated_amount": "Amount of the transaction price allocated to this performance obligation."\n' \
                '        }\n' \
@@ -765,7 +766,7 @@ Write only the paragraph, no additional formatting or labels."""
 
         # If, after stricter identification, no judgments were passed up, provide a standard statement.
         if not all_judgments:
-            return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+            return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
         # If judgments were flagged, this prompt will act as a final quality filter.
         return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
@@ -813,11 +814,14 @@ Your reputation for precision is on the line. Do not overstate the complexity of
 
         # AUDITOR'S METHOD: Special handling for Steps 2, 3, and ALL steps to filter out N/A items
         if step_number == 2:
-            return StepPrompts._format_step2_with_filtering(step_data, step_name, conclusion, analysis_points)
+            return StepPrompts._format_step2_with_filtering(
+                step_data, step_name, conclusion, analysis_points)
         elif step_number == 3:
-            return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
+            return StepPrompts._format_step3_with_filtering(
+                step_data, step_name, conclusion, analysis_points)
         elif step_number in [1, 4, 5]:
-            return StepPrompts._format_general_step_with_filtering(step_data, step_name, conclusion, analysis_points, step_number)
+            return StepPrompts._format_general_step_with_filtering(
+                step_data, step_name, conclusion, analysis_points, step_number)
 
         # Continue with normal processing for other steps
 
@@ -933,93 +937,103 @@ Your reputation for precision is on the line. Do not overstate the complexity of
         return "\n\n".join(markdown_sections)
 
     @staticmethod
-    def _format_step2_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list) -> str:
+    def _format_step2_with_filtering(step_data: dict, step_name: str,
+                                     conclusion: str,
+                                     analysis_points: list) -> str:
         """Apply the Auditor's Method to Step 2: Filter out N/A components."""
         markdown_sections = [
-            f"### Step 2: {step_name}",
-            f"**Conclusion:**\n{conclusion}",
-            "\n---\n",
-            "**Detailed Analysis:**\n"
+            f"### Step 2: {step_name}", f"**Conclusion:**\n{conclusion}",
+            "\n---\n", "**Detailed Analysis:**\n"
         ]
-        
+
         # Filter analysis points to remove N/A topics
         ignore_phrases = {'n/a', 'not applicable'}
         filtered_points = []
-        
+
         for point in analysis_points:
             topic_title = point.get('topic_title', '')
             analysis_text = point.get('analysis_text', '')
-            
+
             # Check if the analysis text indicates N/A
             analysis_text_str = str(analysis_text or '').strip().lower()
             is_not_applicable = False
-            
+
             if not analysis_text_str:
                 is_not_applicable = True
-            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
+            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith(
+                    'n/a'):
                 is_not_applicable = True
-            
+
             # Only include if not N/A
             if not is_not_applicable:
                 filtered_points.append(point)
-        
+
         # Use filtered points for display
         if not filtered_points:
-            markdown_sections.append("The contract contains a straightforward single performance obligation.")
+            markdown_sections.append(
+                "The contract contains a straightforward single performance obligation."
+            )
         else:
             for i, point in enumerate(filtered_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                analysis_text = point.get('analysis_text',
+                                          'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
 
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
                 markdown_sections.append(analysis_text)
 
                 if evidence_quotes and isinstance(evidence_quotes, list):
-                    markdown_sections.append("**Supporting Contract Evidence:**")
+                    markdown_sections.append(
+                        "**Supporting Contract Evidence:**")
                     for quote in evidence_quotes:
                         markdown_sections.append(f"> {quote}")
 
         return "\n\n".join(markdown_sections)
 
     @staticmethod
-    def _format_general_step_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list, step_number: int) -> str:
+    def _format_general_step_with_filtering(step_data: dict, step_name: str,
+                                            conclusion: str,
+                                            analysis_points: list,
+                                            step_number: int) -> str:
         """Apply the Auditor's Method to Steps 1, 4, and 5: Filter out N/A components."""
         markdown_sections = [
             f"### Step {step_number}: {step_name}",
-            f"**Conclusion:**\n{conclusion}",
-            "\n---\n",
+            f"**Conclusion:**\n{conclusion}", "\n---\n",
             "**Detailed Analysis:**\n"
         ]
-        
+
         # Filter analysis points to remove N/A topics
         ignore_phrases = {'n/a', 'not applicable'}
         filtered_points = []
-        
+
         for point in analysis_points:
             topic_title = point.get('topic_title', '')
             analysis_text = point.get('analysis_text', '')
-            
+
             # Check if the analysis text indicates N/A
             analysis_text_str = str(analysis_text or '').strip().lower()
             is_not_applicable = False
-            
+
             if not analysis_text_str:
                 is_not_applicable = True
-            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
+            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith(
+                    'n/a'):
                 is_not_applicable = True
-            
+
             # Only include if not N/A
             if not is_not_applicable:
                 filtered_points.append(point)
-        
+
         # Use filtered points for display
         if not filtered_points:
-            markdown_sections.append("No additional analysis was required for this step.")
+            markdown_sections.append(
+                "No additional analysis was required for this step.")
         else:
             for i, point in enumerate(filtered_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                analysis_text = point.get('analysis_text',
+                                          'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
 
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
