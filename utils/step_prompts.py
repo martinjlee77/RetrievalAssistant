@@ -333,7 +333,15 @@ Begin writing the financial impact section, strictly adhering to the proportiona
         has_financing_component = False
         if s3_analysis := s3.get('step3_analysis'):
             if s3_price := s3_analysis.get('transaction_price_components'):
-                has_variable_consideration = bool(s3_price.get('variable_consideration'))
+                var_consideration = s3_price.get('variable_consideration')
+                if var_consideration:
+                    var_str = str(var_consideration).strip().lower()
+                    # Only treat as variable consideration if it's substantial and not N/A
+                    has_variable_consideration = (
+                        var_str not in ['n/a', 'not applicable', 'none', 'none identified', '']
+                        and len(var_str) > 10
+                        and 'variable' in var_str
+                    )
                 financing_analysis = s3_price.get('financing_component_analysis', '')
                 has_financing_component = 'significant financing component' in str(financing_analysis).lower()
 
@@ -380,8 +388,8 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 Write a comprehensive conclusion paragraph that:
 1. States that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606
 2. Summarizes the key revenue recognition approach
-3. Highlights any significant judgments or estimates that were required, if any. Don't mention anything if no significant judgments were made.
-4. Notes any ongoing monitoring requirements if the contract has variable elements or complex terms, if any. Don't mention anything if there are no such requirements.
+3. Only mention significant judgments if actual professional judgments were identified in the analysis: {all_judgments}
+4. Only mention ongoing monitoring if the contract has variable elements or complex terms that require it
 ---
 
 Begin writing the "Conclusion" section. Do not add any other text, summaries, or boilerplate language.
@@ -428,9 +436,15 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
             if s3_price := s3_analysis.get('transaction_price_components'):
                 total_price = s3_price.get('total_transaction_price',
                                            'Not specified')
-                has_variable_consideration = bool(
-                    s3_price.get('variable_consideration')
-                    and len(s3_price.get('variable_consideration', [])) > 0)
+                var_consideration = s3_price.get('variable_consideration')
+                if var_consideration:
+                    var_str = str(var_consideration).strip().lower()
+                    # Only treat as variable consideration if it's substantial and not N/A
+                    has_variable_consideration = (
+                        var_str not in ['n/a', 'not applicable', 'none', 'none identified', '']
+                        and len(var_str) > 10
+                        and 'variable' in var_str
+                    )
 
         # Step 4: Allocation summary - FIXED to access nested structure
         allocation_summary = "Not applicable (single performance obligation)."
@@ -700,7 +714,7 @@ You MUST return your response as a single, well-formed JSON object with the foll
 
 CRITICAL INSTRUCTIONS:
 - **🚨 MANDATORY: You MUST analyze and populate every single field in the step-specific JSON schema.** Do not skip any fields; use "N/A" only if truly not applicable.
-- **FOR STEP 1: You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e). No shortcuts or summary assessments allowed.**
+- **FOR STEP 1: You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e). No shortcuts or summary assessments allowed. Your response MUST include exactly 5 criteria assessments AND 5 analysis_points covering each criterion separately.**
 - Fill out the step-specific structured assessment thoroughly and precisely
 - Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
 - Ensure structured assessment connects logically to your narrative analysis points
@@ -1081,7 +1095,27 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                         plan_formatted = True
     
             if not plan_formatted:
-                 markdown_sections.append("No detailed revenue recognition plan was provided.")
+                markdown_sections.append("No detailed revenue recognition plan was provided.")
+    
+            # Add analysis_points if they exist for Step 5
+            if analysis_points:
+                markdown_sections.append("\n**Additional Analysis Points:**\n")
+                for i, point in enumerate(analysis_points):
+                    topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                    analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                    evidence_quotes = point.get('evidence_quotes', [])
+    
+                    markdown_sections.append(f"**{i+1}. {topic_title}**")
+                    markdown_sections.append(analysis_text)
+    
+                    if evidence_quotes and isinstance(evidence_quotes, list):
+                        for quote in evidence_quotes:
+                            if isinstance(quote, str):
+                                markdown_sections.append(f"> {quote}")
+                    elif isinstance(evidence_quotes, str):
+                        markdown_sections.append(f"> {evidence_quotes}")
+    
+                    markdown_sections.append("")  # Add spacing
     
             markdown_sections.append("---\n")
             return "\n".join(markdown_sections)
