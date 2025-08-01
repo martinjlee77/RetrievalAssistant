@@ -254,9 +254,34 @@ Begin writing the financial impact section, strictly adhering to the proportiona
         complexity_summary = f"Score: {complexity_score}/10 ({'Complex' if is_complex else 'Simple'})"
         if complexity_reasons:
             complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
+        
+        # Simple contract detection logic
+        is_simple_contract = True
+        # Check for complexity indicators
+        po_count = len(s2.get('performance_obligations', [])) if s2.get('performance_obligations') else 0
+        has_variable_consideration = bool(s3.get('transaction_price_components', {}).get('variable_consideration'))
+        has_financing_component = bool(s3.get('transaction_price_components', {}).get('financing_component_analysis', '').strip())
+        # Professional judgments from all steps
+        all_judgments = []
+        for step in [s1, s2, s3, s4, s5]:
+            judgments = step.get('professional_judgments', [])
+            if judgments:
+                all_judgments.extend(judgments)
+        # Mark as complex if any complexity indicators present
+        if po_count > 1 or has_variable_consideration or has_financing_component or len(all_judgments) > 0:
+            is_simple_contract = False
+        # For simple contracts, return standard conclusion directly
+        if is_simple_contract:
+            return "RETURN_DIRECT_TEXT: ### Conclusion\nThe accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.\n\n### Recommendations\nIt is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis."
+
+        
         # --- End Enhanced Complexity Logic ---
 
         return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+
+**CRITICAL CONTRACT CLASSIFICATION:**
+This contract has been classified as: {"SIMPLE" if is_simple_contract else "COMPLEX"}
+
 
 STRUCTURED ANALYSIS DATA:
 - Performance Obligations Count: {len(performance_obligations)}
@@ -279,15 +304,6 @@ In a single paragraph, state that the accounting treatment outlined in the memo 
 
 ### Recommendations
 Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Important: For straightforward contracts, focus only on the accounting conclusion without generic recommendations.
-
----
-**IF THE TRANSACTION or CONTRACT IS SIMPLE, your ENTIRE output must be the following two paragraphs ONLY:**
-
-### Conclusion
-The accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.
-
-### Recommendations
-It is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis.
 
 ---
 
@@ -475,7 +491,9 @@ CRITICAL INSTRUCTIONS:
 - For single performance obligation contracts: Keep allocation analysis concise - simply state "Entire transaction price allocated to single performance obligation" with minimal elaboration
 - Every quote MUST include source document name
 - Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
-- Make analysis flow naturally, building from one point to the next"""
+- Make analysis flow naturally, building from one point to the next
+- **CRITICAL FOR STEP 2:** If no distinct performance obligations are found, set "performance_obligations": [] and explain in analysis_points why no obligations were identified.
+"""
 
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
@@ -576,8 +594,7 @@ Write only the paragraph, no additional formatting or labels."""
 
         # If, after stricter identification, no judgments were passed up, provide a standard statement.
         if not all_judgments:
-            # Return the standard statement directly as a string, not as a prompt
-            return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+            return "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
         # If judgments were flagged, this prompt will act as a final quality filter.
         return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.

@@ -51,8 +51,30 @@ class ASC606Analyzer:
         # Remove leading blockquote characters from each line
         cleaned_text = '\n'.join(line.lstrip('> ') for line in text.split('\n'))
         
-        # Future-proof: Add any other cleaning rules here as needed
-        # Example: Remove excessive whitespace, fix common formatting issues, etc.
+        # Remove duplicate section headers that LLM sometimes adds
+        # This fixes the "EXECUTIVE SUMMARY" duplication issue
+        unwanted_headers = [
+            "# EXECUTIVE SUMMARY",
+            "## EXECUTIVE SUMMARY", 
+            "### EXECUTIVE SUMMARY",
+            "**EXECUTIVE SUMMARY**",
+            "EXECUTIVE SUMMARY",
+            "# KEY PROFESSIONAL JUDGMENTS",
+            "## KEY PROFESSIONAL JUDGMENTS",
+            "# CONCLUSION AND RECOMMENDATIONS", 
+            "## CONCLUSION AND RECOMMENDATIONS"
+        ]
+        
+        lines = cleaned_text.split('\n')
+        filtered_lines = []
+        for line in lines:
+            line_stripped = line.strip()
+            if not any(header in line_stripped.upper() for header in [h.upper() for h in unwanted_headers]):
+                filtered_lines.append(line)
+        
+        cleaned_text = '\n'.join(filtered_lines)
+        
+        return cleaned_text
         
         return cleaned_text.strip()
 
@@ -370,9 +392,9 @@ class ASC606Analyzer:
             # Check if this returns direct text (no LLM call needed)
             if judgments_prompt.startswith("RETURN_DIRECT_TEXT: "):
                 direct_judgments_text = judgments_prompt.replace("RETURN_DIRECT_TEXT: ", "")
-                async def return_direct_text():
+                async def return_direct_judgments():
                     return direct_judgments_text
-                memo_tasks.append(asyncio.create_task(return_direct_text()))
+                memo_tasks.append(asyncio.create_task(return_direct_judgments()))
             else:
                 memo_tasks.append(asyncio.create_task(make_llm_call_async(
                     self.client, judgments_prompt,
@@ -398,10 +420,17 @@ class ASC606Analyzer:
                 getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
                 contract_data
             )
-            memo_tasks.append(asyncio.create_task(make_llm_call_async(
-                self.client, conclusion_prompt,
-                model='gpt-4o-mini', max_tokens=800, temperature=0.3
-            )))
+            # Handle direct text for simple contracts
+            if conclusion_prompt.startswith("RETURN_DIRECT_TEXT: "):
+                direct_conclusion_text = conclusion_prompt.replace("RETURN_DIRECT_TEXT: ", "")
+                async def return_direct_conclusion():
+                    return direct_conclusion_text
+                memo_tasks.append(asyncio.create_task(return_direct_conclusion()))
+            else:
+                memo_tasks.append(asyncio.create_task(make_llm_call_async(
+                    self.client, conclusion_prompt,
+                    model='gpt-4o-mini', max_tokens=800, temperature=0.3
+                )))
             
             # Execute all memo sections concurrently
             memo_start_time = time.time()
