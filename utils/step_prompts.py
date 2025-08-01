@@ -37,7 +37,7 @@ class StepPrompts:
         }
 
     @staticmethod
-    def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
+    def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
         """Generates proportional financial impact prompt based on structured data analysis."""
         import json
         
@@ -76,14 +76,57 @@ class StepPrompts:
                                   po.get('recognition_method', 'Unknown'),
                                   po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
 
-        # Enhanced logic to determine transaction complexity using structured data
-        is_complex = (
-            len(performance_obligations) > 1 or  # Multiple POs
-            (transaction_price_data.get('variable_consideration') and 
-             len(transaction_price_data.get('variable_consideration', [])) > 0) or  # Variable consideration exists
-            'significant financing component' in transaction_price_data.get('financing_component', '').lower() or  # Financing component
-            any('Over Time' in method[1] for method in recognition_methods)  # Over time recognition
-        )
+        # --- Enhanced Complexity Scoring System ---
+        complexity_score = 0
+        complexity_reasons = []
+
+        # Criterion 1: Multiple POs with different timing
+        po_methods = [method[1] for method in recognition_methods]
+        if len(po_methods) > 2:
+            complexity_score += 1
+            complexity_reasons.append("More than two performance obligations")
+        if len(set(po_methods)) > 1:
+            complexity_score += 1
+            complexity_reasons.append("Mixed revenue recognition timing (Over Time and Point in Time)")
+
+        # Criterion 2: Variable Consideration (high-judgment area)
+        has_variable_consideration = (transaction_price_data.get('variable_consideration') and 
+                                    len(transaction_price_data.get('variable_consideration', [])) > 0)
+        if has_variable_consideration:
+            complexity_score += 2
+            complexity_reasons.append("Contains variable consideration")
+
+        # Criterion 3: Significant Financing Component (high-judgment area)
+        financing_analysis = transaction_price_data.get('financing_component', '')
+        if 'significant financing component' in financing_analysis.lower():
+            complexity_score += 2
+            complexity_reasons.append("Contains a significant financing component")
+
+        # Criterion 4: Complex Allocation (requires SSP estimation)
+        if s4_details := s4.get('allocation_details'):
+            if allocations := s4_details.get('allocations'):
+                for alloc in allocations:
+                    ssp_info = alloc.get('standalone_selling_price', '').lower()
+                    if "method" in ssp_info and "observable" not in ssp_info:
+                        complexity_score += 1
+                        complexity_reasons.append("Requires estimation of Standalone Selling Price")
+                        break
+
+        # Criterion 5: Other High-Judgment Factors (from contract data)
+        if contract_data:
+            if getattr(contract_data, 'is_modification', False):
+                complexity_score += 2
+                complexity_reasons.append("Is a contract modification")
+            if getattr(contract_data, 'principal_agent_involved', False):
+                complexity_score += 2
+                complexity_reasons.append("Involves Principal vs. Agent analysis")
+
+        # Final determination: Score of 2 or more is complex
+        is_complex = complexity_score >= 2
+        complexity_summary = f"Score: {complexity_score}/10 ({'Complex' if is_complex else 'Simple'})"
+        if complexity_reasons:
+            complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
+        # --- End Enhanced Complexity Logic ---
 
         return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
 
@@ -94,7 +137,7 @@ STRUCTURED ANALYSIS DATA:
 - Variable Consideration: {json.dumps(transaction_price_data.get('variable_consideration', []), indent=2) if transaction_price_data.get('variable_consideration') else 'None'}
 - Allocation Details: {json.dumps(allocation_data, indent=2) if allocation_data else 'Not specified'}
 - Revenue Recognition Methods: {recognition_methods}
-- Is transaction complex? {"Yes" if is_complex else "No"}
+- Transaction Complexity: {complexity_summary}
 
 YOUR TASK:
 Write a concise financial impact analysis.
@@ -134,49 +177,90 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 """
 
     @staticmethod
-    def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str) -> str:
+    def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
         """Generates a proportional and meaningful conclusion prompt using structured data."""
 
         # Extract structured data for conclusion
         
-        # Performance obligations count
-        po_count = 0
+        # Performance obligations and recognition methods
+        performance_obligations = []
+        recognition_methods = []
         if s2_pos := s2.get('performance_obligations'):
-            po_count = len([po for po in s2_pos if po.get('is_distinct') == 'Yes'])
-        
-        # Variable consideration check
-        has_variable_consideration = False
-        if s3_price := s3.get('transaction_price_components'):
-            has_variable_consideration = bool(s3_price.get('variable_consideration') and 
-                                            len(s3_price.get('variable_consideration', [])) > 0)
-        
-        # Financing component check
-        has_financing_component = False
-        if s3_price := s3.get('transaction_price_components'):
-            financing_analysis = s3_price.get('financing_component_analysis', '').lower()
-            has_financing_component = 'significant financing component' in financing_analysis
-        
-        # Over time recognition check
-        has_over_time_recognition = False
+            performance_obligations = [po.get('po_description', 'Unknown PO') for po in s2_pos if po.get('is_distinct') == 'Yes']
         if s5_plan := s5.get('revenue_recognition_plan'):
-            has_over_time_recognition = any('Over Time' in po.get('recognition_method', '') for po in s5_plan)
+            recognition_methods = [(po.get('performance_obligation', 'Unknown'), 
+                                  po.get('recognition_method', 'Unknown'),
+                                  po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
+        
+        # Transaction price components
+        transaction_price_data = {}
+        if s3_price := s3.get('transaction_price_components'):
+            transaction_price_data = {
+                'variable_consideration': s3_price.get('variable_consideration', []),
+                'financing_component': s3_price.get('financing_component_analysis', 'None identified')
+            }
 
-        # Enhanced logic using structured data
-        is_complex = (
-            po_count > 1 or
-            has_variable_consideration or
-            has_financing_component or
-            has_over_time_recognition
-        )
+        # --- Enhanced Complexity Scoring System (Same as Financial Impact) ---
+        complexity_score = 0
+        complexity_reasons = []
+
+        # Criterion 1: Multiple POs with different timing
+        po_methods = [method[1] for method in recognition_methods]
+        if len(po_methods) > 2:
+            complexity_score += 1
+            complexity_reasons.append("More than two performance obligations")
+        if len(set(po_methods)) > 1:
+            complexity_score += 1
+            complexity_reasons.append("Mixed revenue recognition timing (Over Time and Point in Time)")
+
+        # Criterion 2: Variable Consideration (high-judgment area)
+        has_variable_consideration = (transaction_price_data.get('variable_consideration') and 
+                                    len(transaction_price_data.get('variable_consideration', [])) > 0)
+        if has_variable_consideration:
+            complexity_score += 2
+            complexity_reasons.append("Contains variable consideration")
+
+        # Criterion 3: Significant Financing Component (high-judgment area)
+        financing_analysis = transaction_price_data.get('financing_component', '')
+        if 'significant financing component' in financing_analysis.lower():
+            complexity_score += 2
+            complexity_reasons.append("Contains a significant financing component")
+
+        # Criterion 4: Complex Allocation (requires SSP estimation)
+        if s4_details := s4.get('allocation_details'):
+            if allocations := s4_details.get('allocations'):
+                for alloc in allocations:
+                    ssp_info = alloc.get('standalone_selling_price', '').lower()
+                    if "method" in ssp_info and "observable" not in ssp_info:
+                        complexity_score += 1
+                        complexity_reasons.append("Requires estimation of Standalone Selling Price")
+                        break
+
+        # Criterion 5: Other High-Judgment Factors (from contract data)
+        if contract_data:
+            if getattr(contract_data, 'is_modification', False):
+                complexity_score += 2
+                complexity_reasons.append("Is a contract modification")
+            if getattr(contract_data, 'principal_agent_involved', False):
+                complexity_score += 2
+                complexity_reasons.append("Involves Principal vs. Agent analysis")
+
+        # Final determination: Score of 2 or more is complex
+        is_complex = complexity_score >= 2
+        complexity_summary = f"Score: {complexity_score}/10 ({'Complex' if is_complex else 'Simple'})"
+        if complexity_reasons:
+            complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
+        # --- End Enhanced Complexity Logic ---
 
         return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
 
 STRUCTURED ANALYSIS DATA:
-- Performance Obligations Count: {po_count}
+- Performance Obligations Count: {len(performance_obligations)}
+- Performance Obligations: {', '.join(performance_obligations) if performance_obligations else 'None identified'}
 - Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
-- Has Financing Component: {"Yes" if has_financing_component else "No"}
-- Has Over Time Recognition: {"Yes" if has_over_time_recognition else "No"}
-- Transaction Complexity: {"Complex" if is_complex else "Simple"}
+- Has Financing Component: {"Yes" if 'significant financing component' in financing_analysis.lower() else "No"}
+- Recognition Methods: {[method[1] for method in recognition_methods]}
+- Transaction Complexity: {complexity_summary}
 
 YOUR TASK:
 Write a final concluding section for the memo, strictly adhering to the proportionality rule below.

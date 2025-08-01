@@ -374,7 +374,8 @@ class ASC606Analyzer:
             financial_prompt = StepPrompts.get_financial_impact_prompt(
                 s1, s2, s3, s4, s5, 
                 getattr(contract_data, 'customer_name', 'Customer'),
-                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
+                contract_data
             )
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, financial_prompt,
@@ -385,7 +386,8 @@ class ASC606Analyzer:
             conclusion_prompt = StepPrompts.get_conclusion_prompt(
                 s1, s2, s3, s4, s5,
                 getattr(contract_data, 'customer_name', 'Customer'),
-                getattr(contract_data, 'memo_audience', 'Technical Accounting Team')
+                getattr(contract_data, 'memo_audience', 'Technical Accounting Team'),
+                contract_data
             )
             memo_tasks.append(asyncio.create_task(make_llm_call_async(
                 self.client, conclusion_prompt,

@@ -1,0 +1,49 @@
+nstead of a simple True/False, a more robust approach is a scoring system. This gives you more flexibility.
+
+# In the Python part of the function
+
+# --- Start of New Complexity Logic ---
+complexity_score = 0
+complexity_reasons = []
+
+# Criterion 1: Multiple POs with different timing
+po_methods = [method[1] for method in recognition_methods]
+if len(po_methods) > 2:
+    complexity_score += 1
+    complexity_reasons.append("More than two performance obligations")
+if len(set(po_methods)) > 1:
+    complexity_score += 1
+    complexity_reasons.append("Mixed revenue recognition timing (Over Time and Point in Time)")
+
+# Criterion 2: Variable Consideration
+if has_variable_consideration:
+    complexity_score += 2 # This is a high-judgment area
+    complexity_reasons.append("Contains variable consideration")
+
+# Criterion 3: Significant Financing Component
+if 'significant financing component' in financing_analysis.lower():
+    complexity_score += 2 # Also a high-judgment area
+    complexity_reasons.append("Contains a significant financing component")
+
+# Criterion 4: Complex Allocation
+if s4_details := s4.get('allocation_details'):
+    if allocations := s4_details.get('allocations'):
+        for alloc in allocations:
+            # Assumes 'standalone_selling_price' is a string like "1000 (Method: Adjusted Market Assessment)"
+            if "method" in alloc.get('standalone_selling_price', '').lower() and "observable" not in alloc.get('standalone_selling_price', '').lower():
+                complexity_score += 1
+                complexity_reasons.append("Requires estimation of Standalone Selling Price")
+                break # Only need to find one
+
+# Criterion 5: Other High-Judgment Factors (from UI)
+# This requires that contract_data is passed into the function
+if getattr(contract_data, 'is_modification', False):
+    complexity_score += 2
+    complexity_reasons.append("Is a contract modification")
+if getattr(contract_data, 'principal_agent_involved', False):
+    complexity_score += 2
+    complexity_reasons.append("Involves Principal vs. Agent analysis")
+
+# Final determination
+is_complex = complexity_score >= 2 # Set a threshold
+# --- End of New Complexity Logic ---
