@@ -483,6 +483,28 @@ CRITICAL INSTRUCTIONS:
         """Generate consistency check prompt using structured data from all 5 steps."""
         import json
 
+        # Check for missing step data and flag it
+        missing_steps = []
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            if not step or not isinstance(step, dict) or len(step) < 2:
+                missing_steps.append(i)
+        
+        if missing_steps:
+            return f"""You are an expert accounting review bot. CRITICAL ISSUE DETECTED:
+Step(s) {missing_steps} returned insufficient data (likely due to API failures or parsing errors).
+This prevents meaningful consistency checking.
+
+You MUST return the following JSON structure indicating the analysis is incomplete:
+{{
+  "is_consistent": false,
+  "issues_found": [
+    {{
+      "issue_code": "MISSING_STEP_DATA",
+      "description": "Step(s) {missing_steps} failed to return complete analysis data, preventing consistency validation."
+    }}
+  ]
+}}"""
+
         # Use the rich, structured data, not just the text conclusion
         step_data = {
             "step_1_assessment": s1.get('contract_criteria_assessment', {}),

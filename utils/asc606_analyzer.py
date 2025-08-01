@@ -243,11 +243,13 @@ class ASC606Analyzer:
                 if isinstance(response, Exception):
                     self.logger.error(f"Step {step_num} failed with exception: {response}")
                     failed_steps.append((step_num, step_info['title'], str(response)))
-                    step_results[f"step_{step_num}"] = {
-                        "step_name": step_info['title'],
-                        "detailed_analysis": "Analysis failed - see error details",
-                        "error": str(response)
+                    # Create fallback empty step data to prevent cascading failures
+                    step_results[step_num] = {
+                        'executive_conclusion': f'Step {step_num} analysis failed due to API error: {str(response)[:100]}...',
+                        'analysis_points': [],
+                        'professional_judgments': []
                     }
+                    continue
                 else:
                     try:
                         # Process successful response
