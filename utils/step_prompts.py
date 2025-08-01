@@ -444,6 +444,9 @@ Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 comp
 Analyze the contract and provide both structured step-specific assessment AND thematic narrative analysis. 
 
 You MUST return your response as a single, well-formed JSON object with the following exact structure:
+
+TEST
+
 {{
   "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
   {step_specific_json_field}"analysis_points": [
