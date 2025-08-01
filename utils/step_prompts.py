@@ -406,11 +406,6 @@ Keep this professional, concise, and focused on executive-level insights."""
         """Returns Step 2 specific JSON schema for performance obligations assessment."""
         return '"performance_obligations": [\n    {\n      "po_description": "Brief description of the performance obligation identified",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion."\n    }\n  ],\n  '
 
-    @staticmethod  
-    def get_step3_schema() -> str:
-        """Returns a comprehensive, structured JSON schema for all Step 3 components using the Auditor's Method."""
-        return '"transaction_price_components": {\n    "fixed_consideration": "Amount and description of fixed consideration, or \'N/A\' if not applicable.",\n    "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties, discounts), or \'N/A\' if not applicable.",\n    "financing_component_analysis": "Analysis of any significant financing component per ASC 606-10-32-15, or \'N/A\' if not applicable.",\n    "noncash_consideration_analysis": "Analysis of any noncash consideration per ASC 606-10-32-21, or \'N/A\' if not applicable.",\n    "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons) per ASC 606-10-32-25, or \'N/A\' if not applicable.",\n    "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, or nonrefundable upfront fees, or \'N/A\' if not applicable.",\n    "total_transaction_price": "The final, total estimated transaction price."\n  },\n  '
-
     @staticmethod
     def get_step3_schema() -> str:
         """Returns a comprehensive, structured JSON schema for all Step 3 components."""
