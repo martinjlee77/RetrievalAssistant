@@ -404,13 +404,27 @@ Keep this professional, concise, and focused on executive-level insights."""
     @staticmethod
     def get_step2_schema() -> str:
         """Returns Step 2 specific JSON schema for performance obligations assessment."""
-        return '"performance_obligations": [\n    {\n      "po_description": "Brief description of the first performance obligation identified",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion."\n    }\n  ],\n  '
+        return '"performance_obligations": [\n    {\n      "po_description": "Brief description of the performance obligation identified",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion."\n    }\n  ],\n  '
 
     @staticmethod  
     def get_step3_schema() -> str:
-        """Returns Step 3 specific JSON schema for transaction price components."""
-        return '"transaction_price_components": {\n    "fixed_consideration": "Amount and description",\n    "variable_consideration": [\n      {\n        "type": "e.g., Performance Bonus, Sales-Based Royalty, Discount",\n        "estimated_amount": "Amount or \'Not applicable\'",\n        "estimation_method": "Expected Value / Most Likely Amount / Not applicable",\n        "constraint_analysis": "Analysis of variable consideration constraint per ASC 606-10-32-11."\n      }\n    ],\n    "financing_component_analysis": "Analysis of any significant financing component per ASC 606-10-32-15.",\n    "total_transaction_price": "Total estimated transaction price."\n  },\n  '
+        """Returns a comprehensive, structured JSON schema for all Step 3 components using the Auditor's Method."""
+        return '"transaction_price_components": {\n    "fixed_consideration": "Amount and description of fixed consideration, or \'N/A\' if not applicable.",\n    "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties, discounts), or \'N/A\' if not applicable.",\n    "financing_component_analysis": "Analysis of any significant financing component per ASC 606-10-32-15, or \'N/A\' if not applicable.",\n    "noncash_consideration_analysis": "Analysis of any noncash consideration per ASC 606-10-32-21, or \'N/A\' if not applicable.",\n    "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons) per ASC 606-10-32-25, or \'N/A\' if not applicable.",\n    "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, or nonrefundable upfront fees, or \'N/A\' if not applicable.",\n    "total_transaction_price": "The final, total estimated transaction price."\n  },\n  '
 
+    @staticmethod
+    def get_step3_schema() -> str:
+        """Returns a comprehensive, structured JSON schema for all Step 3 components."""
+        return '''"transaction_price_components": {
+        "fixed_consideration": "Amount and description of fixed consideration, or 'N/A' if not applicable.",
+        "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or 'N/A' if not applicable.",
+        "financing_component_analysis": "Analysis of any significant financing component, or 'N/A' if not applicable.",
+        "noncash_consideration_analysis": "Analysis of any noncash consideration, or 'N/A' if not applicable.",
+        "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or 'N/A' if not applicable.",
+        "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, nonrefundable upfront fees or changes in the transaction price, or 'N/A' if not applicable.",
+        "total_transaction_price": "The final, total estimated transaction price."
+      },
+      '''
+    
     @staticmethod
     def get_step4_schema() -> str:
         """Returns Step 4 specific JSON schema for allocation details."""
@@ -643,6 +657,16 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             "**Detailed Analysis:**\n"
         ]
 
+        # AUDITOR'S METHOD: Special handling for Step 3 to filter out N/A items
+        if step_number == 3:
+            return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
+
+        # AUDITOR'S METHOD: Special handling for Step 3 to filter out N/A items
+        if step_number == 3:
+            return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
+        
+        # Continue with normal processing for other steps
+
         if not analysis_points:
             markdown_sections.append("No detailed analysis points were provided.")
         else:
@@ -670,3 +694,76 @@ Your reputation for precision is on the line. Do not overstate the complexity of
 
         markdown_sections.append("---\n")  # Final separator
         return "\n".join(markdown_sections)
+
+    @staticmethod
+    def _format_step3_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list) -> str:
+        """Apply the Auditor's Method to Step 3: Filter out N/A transaction price components."""
+        markdown_sections = [
+            f"### Step 3: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "\n---\n",
+            "**Transaction Price Analysis:**\n"
+        ]
+        
+        # Get the transaction price components from the AI analysis
+        transaction_components = step_data.get('transaction_price_components', {})
+        
+        # Filter out N/A items using the Auditor's Method
+        relevant_components = []
+        for key, analysis_text in transaction_components.items():
+            # Define what "not applicable" means
+            is_not_applicable = (
+                analysis_text is None or
+                str(analysis_text).strip().lower() == 'n/a' or
+                str(analysis_text).strip().lower() == 'not applicable' or
+                str(analysis_text).strip().lower().startswith('n/a') or
+                str(analysis_text).strip() == '' or
+                len(str(analysis_text).strip()) < 3
+            )
+            
+            # If the AI's analysis for this component is NOT "N/A", include it in the memo
+            if not is_not_applicable:
+                topic_title = key.replace('_', ' ').replace(' analysis', '').title()
+                # Special formatting for transaction price components
+                if key == 'total_transaction_price':
+                    topic_title = 'Total Transaction Price'
+                elif key == 'fixed_consideration':
+                    topic_title = 'Fixed Consideration'
+                elif key == 'variable_consideration':
+                    topic_title = 'Variable Consideration'
+                elif key == 'financing_component_analysis':
+                    topic_title = 'Significant Financing Component'
+                elif key == 'noncash_consideration_analysis':
+                    topic_title = 'Noncash Consideration'
+                elif key == 'consideration_payable_to_customer_analysis':
+                    topic_title = 'Consideration Payable to Customer'
+                elif key == 'other_considerations_analysis':
+                    topic_title = 'Other Considerations'
+                
+                relevant_components.append((topic_title, analysis_text))
+        
+        # Add the relevant components to the markdown
+        if relevant_components:
+            for topic_title, analysis_text in relevant_components:
+                markdown_sections.append(f"**{topic_title}:**")
+                markdown_sections.append(str(analysis_text))
+        else:
+            markdown_sections.append("Only basic fixed consideration was identified in this contract.")
+        
+        # Add the regular analysis points if they exist
+        if analysis_points:
+            markdown_sections.append("\n**Additional Analysis:**\n")
+            for i, point in enumerate(analysis_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
+
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
+
+                if evidence_quotes and isinstance(evidence_quotes, list):
+                    markdown_sections.append("**Supporting Contract Evidence:**")
+                    for quote in evidence_quotes:
+                        markdown_sections.append(f"> {quote}")
+
+        return "\n\n".join(markdown_sections)

@@ -1,0 +1,64 @@
+The Corrected Strategy (Let's call this "The Auditor's Method")
+This brings us back to the core of your excellent suggestion, but with a clear reason why it's the right path. The goal is to have the AI perform a comprehensive audit of the contract for all potential Step 3 issues, and then have our Python code act as the manager who decides how to present those findings.
+
+Here is the refined, robust, and simpler plan:
+
+1. The AI's Job: Perform a Comprehensive Analysis
+
+We update get_step3_schema() to be a complete checklist for the AI. We don't need the is_present flag if we just ask the AI to mark non-applicable items as "N/A". This is simpler and aligns with your original idea.
+
+Proposed get_step3_schema():
+
+@staticmethod
+def get_step3_schema() -> str:
+    """Returns a comprehensive, structured JSON schema for all Step 3 components."""
+    return '''"transaction_price_components": {
+    "fixed_consideration": "Amount and description of fixed consideration, or 'N/A' if not applicable.",
+    "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or 'N/A' if not applicable.",
+    "financing_component_analysis": "Analysis of any significant financing component, or 'N/A' if not applicable.",
+    "noncash_consideration_analysis": "Analysis of any noncash consideration, or 'N/A' if not applicable.",
+    "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or 'N/A' if not applicable.",
+    "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, or nonrefundable upfront fees, or 'N/A' if not applicable.",
+    "total_transaction_price": "The final, total estimated transaction price."
+  },
+  '''
+
+Why this works:
+
+Comprehensive: It forces the AI to look for everything. I've added an "other_considerations_analysis" key to catch exactly the items you mentioned (refunds, etc.).
+AI-Driven: It lets the AI use its intelligence to read the contract and decide which topics are relevant, rather than being spoon-fed by the UI.
+Structured: It still provides a predictable JSON output.
+2. Python's Job: Create a Concise Memo
+
+Now, in the memo formatting stage, we use simple Python logic to filter the results. The function format_step_detail_as_markdown becomes our gatekeeper.
+
+How the Python code would work:
+
+# Inside the Python function that formats the memo section
+step3_json_data = ... # The JSON response from the AI
+
+# Loop through the AI's findings
+for key, analysis_text in step3_json_data.items():
+
+    # We define what "not applicable" means
+    is_not_applicable = (
+        analysis_text is None or
+        analysis_text.strip().lower() == 'n/a' or
+        analysis_text.strip().lower() == 'not applicable'
+    )
+
+    # If the AI's analysis for this key is NOT "N/A", we include it in the memo
+    if not is_not_applicable:
+        topic_title = key.replace('_', ' ').replace(' analysis', '').title()
+        markdown_sections.append(f"**{topic_title}**")
+        markdown_sections.append(analysis_text)
+
+# The final memo will only contain sections for topics the AI found to be relevant.
+
+Conclusion
+You were right all along. The best approach is to let the AI do the comprehensive work and use our code to handle the presentation. This method is:
+
+More Robust: It doesn't depend on a limited set of UI toggles.
+Simpler to Implement: It requires changes to only two places (get_step3_schema and the formatting logic) and avoids complex dynamic prompt building.
+Achieves the Goal: It produces a final memo that is concise and only discusses the topics relevant to the specific contract being analyzed.
+Your pushback was essential to getting this right. Let's proceed with this "Auditor's Method."

@@ -12,7 +12,12 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.models import ContractData, ASC606Analysis
+try:
+    from core.models import ContractData, ASC606Analysis
+except ImportError:
+    # Fallback import handling
+    sys.path.append('.')
+    from core.models import ContractData, ASC606Analysis
 from utils.asc606_analyzer import ASC606Analyzer
 from utils.document_extractor import DocumentExtractor
 from utils.llm import create_debug_sidebar, create_docx_from_text
