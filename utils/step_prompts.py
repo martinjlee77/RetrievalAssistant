@@ -88,6 +88,8 @@ For every `analysis_point` you generate, your `analysis_text` MUST be a flowing 
 
 Example: "The contract specifies a fixed monthly fee of $15.49 with no performance-based adjustments or penalties. Under ASC 606-10-32-2, this represents fixed consideration as the amount does not vary based on future events or customer actions. Therefore, no variable consideration is present in this arrangement."
 
+**For Steps 2 and 5 in particular**, which involve more judgment, enhance your analysis by also briefly discussing *why an alternative accounting treatment was rejected*. For example, when concluding a service is a single performance obligation in Step 2, briefly explain why the components are not distinct. When concluding revenue is recognized 'Over Time' in Step 5, briefly explain why 'Point in Time' is inappropriate.
+
 Even for simple topics, provide this detailed reasoning narrative to ensure the memo is audit-ready.
 </ANALYSIS_STRUCTURE_RULE>""",
             critical_rules
@@ -961,79 +963,66 @@ Your reputation for precision is on the line. Do not overstate the complexity of
     def _format_step3_with_filtering(step_data: dict, step_name: str,
                                      conclusion: str,
                                      analysis_points: list) -> str:
-        """Apply the Auditor's Method to Step 3: Filter out N/A transaction price components."""
+        """
+        Apply the Auditor's Method to Step 3: Merge structured components and
+        analysis points into a single, consistently formatted list.
+        """
         markdown_sections = [
             f"### Step 3: {step_name}", f"**Conclusion:**\n{conclusion}",
-            "\n---\n", "**Transaction Price Analysis:**\n"
+            "\n---\n", "**Detailed Analysis:**\n"
         ]
 
-        # Get the transaction price components from the AI analysis
-        transaction_components = step_data.get('transaction_price_components',
-                                               {})
+        all_points = []
 
-        # Filter out N/A items using the Auditor's Method
-        relevant_components = []
+        # 1. Process structured transaction_price_components
+        transaction_components = step_data.get('step3_analysis', {}).get('transaction_price_components', {})
+
+        # Define a mapping for better titles
+        title_map = {
+            'total_transaction_price': 'Total Transaction Price',
+            'fixed_consideration': 'Fixed Consideration',
+            'variable_consideration': 'Variable Consideration',
+            'financing_component_analysis': 'Significant Financing Component',
+            'noncash_consideration_analysis': 'Noncash Consideration',
+            'consideration_payable_to_customer_analysis': 'Consideration Payable to Customer',
+            'other_considerations_analysis': 'Other Considerations'
+        }
+
         for key, analysis_text in transaction_components.items():
-            # Define what "not applicable" means
             is_not_applicable = (
-                analysis_text is None
-                or str(analysis_text).strip().lower() == 'n/a'
-                or str(analysis_text).strip().lower() == 'not applicable'
-                or str(analysis_text).strip().lower().startswith('n/a')
-                or str(analysis_text).strip() == ''
-                or len(str(analysis_text).strip()) < 3)
-
-            # If the AI's analysis for this component is NOT "N/A", include it in the memo
-            if not is_not_applicable:
-                topic_title = key.replace('_', ' ').replace(' analysis',
-                                                            '').title()
-                # Special formatting for transaction price components
-                if key == 'total_transaction_price':
-                    topic_title = 'Total Transaction Price'
-                elif key == 'fixed_consideration':
-                    topic_title = 'Fixed Consideration'
-                elif key == 'variable_consideration':
-                    topic_title = 'Variable Consideration'
-                elif key == 'financing_component_analysis':
-                    topic_title = 'Significant Financing Component'
-                elif key == 'noncash_consideration_analysis':
-                    topic_title = 'Noncash Consideration'
-                elif key == 'consideration_payable_to_customer_analysis':
-                    topic_title = 'Consideration Payable to Customer'
-                elif key == 'other_considerations_analysis':
-                    topic_title = 'Other Considerations'
-
-                relevant_components.append((topic_title, analysis_text))
-
-        # Add the relevant components to the markdown
-        if relevant_components:
-            for topic_title, analysis_text in relevant_components:
-                markdown_sections.append(f"**{topic_title}:**")
-                markdown_sections.append(str(analysis_text))
-        else:
-            markdown_sections.append(
-                "Only basic fixed consideration was identified in this contract."
+                analysis_text is None or
+                str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
+                str(analysis_text).strip().lower().startswith('n/a') or
+                len(str(analysis_text).strip()) < 3
             )
 
-        # Add the regular analysis points if they exist
+            if not is_not_applicable:
+                topic_title = title_map.get(key, key.replace('_', ' ').title())
+                all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
+
+        # 2. Add the regular analysis_points (these already have quotes)
         if analysis_points:
-            markdown_sections.append("\n**Additional Analysis:**\n")
-            for i, point in enumerate(analysis_points):
+            all_points.extend(analysis_points)
+
+        # 3. Format the combined list
+        if not all_points:
+            markdown_sections.append("Only basic fixed consideration was identified in this contract.")
+        else:
+            for i, point in enumerate(all_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text',
-                                          'No analysis text provided.')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
 
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
-                markdown_sections.append(analysis_text)
+                markdown_sections.append(str(analysis_text))
 
                 if evidence_quotes and isinstance(evidence_quotes, list):
-                    markdown_sections.append(
-                        "**Supporting Contract Evidence:**")
+                    markdown_sections.append("\n**Supporting Contract Evidence:**")
                     for quote in evidence_quotes:
                         markdown_sections.append(f"> {quote}")
+                markdown_sections.append("") # Spacing
 
-        return "\n\n".join(markdown_sections)
+        return "\n".join(markdown_sections)
 
     @staticmethod
     def _format_step2_with_filtering(step_data: dict, step_name: str,
