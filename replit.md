@@ -21,6 +21,7 @@ Preferred communication style: Simple, everyday language.
    - Import statements and technical infrastructure
 5. **When in doubt**: Always ask the user before making ANY content changes
 6. **Violation consequences**: User has to re-review entire codebase, causing significant frustration and lost work
+7. **MANDATORY ALERT PROTOCOL**: If the AI agent cannot make a necessary change due to these prompt protection rules, it MUST explicitly alert the user with: "⚠️ PROMPT PROTECTION ALERT: I cannot modify [specific file/content] due to the prompt protection rules in replit.md. You will need to make this change manually. Here's exactly what needs to be changed: [specific instructions]"
 
 ## System Architecture
 
