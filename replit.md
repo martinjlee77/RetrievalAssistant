@@ -6,6 +6,24 @@ This project is a multi-standard accounting analysis platform that generates com
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (January 2025)
+
+### Major Architectural Refactor - System/User Prompt Architecture
+**Date**: January 31, 2025
+**Status**: COMPLETED
+
+- **IMPLEMENTED**: Complete System/User prompt architecture replacing monolithic prompts with modular design
+- **NEW PROMPT SYSTEM**: Separated core AI instructions (system prompts) from task-specific context (user prompts) for each of the 5 ASC 606 steps
+- **LLM INTEGRATION UPDATED**: Modified both sync/async LLM functions to handle message arrays instead of single prompt strings
+- **ENHANCED STEP-SPECIFIC RULES**: Each step now has focused, critical rules preventing hallucination (especially Step 3 variable consideration)
+- **CODE CLEANUP COMPLETED**: Removed ALL legacy get_step_specific_analysis_prompt functions (both wrapper and monolithic versions)
+- **FINAL STATE**: Only get_system_prompt() and get_user_prompt_for_step() functions remain for core analysis
+- **EXPECTED IMPROVEMENTS**: 
+  - Better LLM instruction adherence (system/user separation)
+  - Reduced token usage and improved performance
+  - More accurate variable consideration detection
+  - Cleaner Step 5 formatting and professional presentation
+
 **CRITICAL DEVELOPMENT RULES - PROMPT PROTECTION**:
 1. **NEVER modify prompt text content without explicit user approval** - The user has spent significant time fine-tuning prompt templates in utils/step_prompts.py and other files
 2. **ALWAYS ask permission before changing any prompt text or templates**

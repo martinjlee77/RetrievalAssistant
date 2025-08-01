@@ -140,28 +140,7 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
 
         return rules.get(step_number, "")
 
-    # --- LEGACY COMPATIBILITY FUNCTION ---
-    
-    @staticmethod
-    def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
-                                        contract_text: str, rag_context: str, contract_data=None, 
-                                        debug_config=None) -> str:
-        """
-        LEGACY COMPATIBILITY: This function is deprecated but maintained for backward compatibility.
-        NEW CODE SHOULD USE: get_system_prompt() + get_user_prompt_for_step() 
-        """
-        # For backwards compatibility, return a single prompt combining system + user
-        system_prompt = StepPrompts.get_system_prompt()
-        user_prompt = StepPrompts.get_user_prompt_for_step(
-            step_number=step_number,
-            contract_text=contract_text,
-            rag_context=rag_context,
-            contract_data=contract_data,
-            debug_config=debug_config
-        )
-        return f"{system_prompt}\n\n{user_prompt}"
-
-    # --- EXISTING FUNCTIONS (Preserved for Compatibility) ---
+    # --- EXISTING FUNCTIONS ---
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict,
@@ -753,123 +732,7 @@ Keep this professional, concise, and focused on executive-level insights."""
                '    "step5_overall_conclusion": "Provide a single, definitive summary statement for all of Step 5."\n' \
                '  }\n'
 
-    @staticmethod
-    def get_step_specific_analysis_prompt(step_number: int,
-                                          step_title: str,
-                                          step_guidance: str,
-                                          contract_text: str,
-                                          rag_context: str,
-                                          contract_data=None,
-                                          debug_config=None) -> str:
-        """Generate step-specific analysis prompt that requests narrative, thematically-grouped JSON output."""
 
-        # Get step-specific schema
-        step_specific_json_field = ""
-        if step_number == 1:
-            step_specific_json_field = StepPrompts.get_step1_schema()
-        elif step_number == 2:
-            step_specific_json_field = StepPrompts.get_step2_schema()
-        elif step_number == 3:
-            step_specific_json_field = StepPrompts.get_step3_schema()
-        elif step_number == 4:
-            step_specific_json_field = StepPrompts.get_step4_schema()
-        elif step_number == 5:
-            step_specific_json_field = StepPrompts.get_step5_schema()
-
-        # Add critical override for Step 3 to prevent variable consideration hallucination
-        step3_override = ""
-        if step_number == 3:
-            # Check if this is a simple contract (basic heuristics)
-            contract_lower = contract_text.lower()
-            simple_indicators = ["monthly subscription", "fixed fee", "streaming service", "$"]
-            complex_indicators = ["bonus", "royalty", "percentage", "variable", "contingent"]
-            
-            simple_score = sum(1 for indicator in simple_indicators if indicator in contract_lower)
-            complex_score = sum(1 for indicator in complex_indicators if indicator in contract_lower)
-            
-            if simple_score > complex_score:
-                step3_override = """
-**🚨 CRITICAL OVERRIDE: This appears to be a simple, fixed-price contract. You MUST follow these rules:**
-- Set `variable_consideration` to "N/A" (not a detailed analysis of why there isn't any)
-- Set `professional_judgments` to an empty list []
-- Do NOT invent complexity where none exists
-- Focus only on the fixed consideration amount
-
-"""
-
-        return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
-{step3_override}
-PRIMARY GUIDANCE FOR THIS STEP: {step_guidance}
-
-AUTHORITATIVE & INDUSTRY GUIDANCE CONTEXT:
-{rag_context}
-
-CONTRACT TEXT TO ANALYZE:
-{contract_text}
-
-CONTRACT DATA:
-Customer: {getattr(contract_data, 'customer_name', 'N/A') if contract_data else 'N/A'}
-Analysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance') if contract_data else 'General ASC 606 compliance'}
-
-*** YOUR CRITICAL TASK ***
-Analyze the contract and provide both structured step-specific assessment AND thematic narrative analysis. 
-
-You MUST return your response as a single, well-formed JSON object with the following exact structure:
-
-{{
-  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the 'bottom line'.",
-  {step_specific_json_field}
-  "professional_judgments": [
-    "A list of strings. For this step only, describe any conclusions that required significant professional judgment (e.g., 'Estimation of SSP for the license using the residual approach', 'Conclusion that implementation services are not distinct from the SaaS platform'). If no significant judgments were made in this step, return an empty list []."
-  ],
-  "analysis_points": [
-    {{
-      "topic_title": "The name of the first major theme or issue you analyzed (e.g., 'Identification of Fixed Consideration').",
-      "analysis_text": "Your detailed analysis for THIS TOPIC ONLY. Explain the issue, apply the ASC 606 guidance (citing specific paragraphs like ASC 606-10-XX-XX), and introduce the contract evidence. Weave in any key considerations or judgment areas for this topic.",
-      "evidence_quotes": [
-        "A specific, direct quote from the contract that supports the analysis for this topic. You MUST include the source document name, formatted as: 'Quote text... (Source: [Document Name])'",
-        "Another supporting quote, if applicable."
-      ]
-    }},
-    {{
-      "topic_title": "The name of the second major theme or issue (e.g., 'Assessment of Variable Consideration').",
-      "analysis_text": "Your detailed analysis for this second topic...",
-      "evidence_quotes": [
-        "A quote supporting the second topic... (Source: [Document Name])"
-      ]
-    }}
-  ]
-}}
-
-CRITICAL INSTRUCTIONS:
-- **🚨 MANDATORY: You MUST analyze and populate every single field in the step-specific JSON schema.** Do not skip any fields; use "N/A" only if truly not applicable.
-- **FOR STEP 1: You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e). No shortcuts or summary assessments allowed. Your response MUST include exactly 5 criteria assessments AND 5 analysis_points covering each criterion separately.**
-- Fill out the step-specific structured assessment thoroughly and precisely
-- Complete the structured assessment by citing relevant ASC 606 paragraphs for each element
-- Ensure structured assessment connects logically to your narrative analysis points
-- Aim for 2-4 analysis points per step (avoid single mega-topics or excessive fragmentation)
-- For single performance obligation contracts: Keep allocation analysis concise - simply state "Entire transaction price allocated to single performance obligation" with minimal elaboration
-- Every quote MUST include source document name
-- Use specific ASC 606 paragraph citations (e.g., ASC 606-10-25-1)
-- Make analysis flow naturally, building from one point to the next
-- **CRITICAL FOR STEP 2:** 
-  * If no distinct performance obligations are found, set "performance_obligations": [] and explain in analysis_points why no obligations were identified
-  * For simple contracts with obvious single obligations (e.g., "product sale"), keep analysis concise but complete
-  * Always include at least one performance obligation unless truly none exist (very rare)
-  * Focus on the "separately identifiable" criterion which is typically the decisive factor
-**- CRITICAL FOR STEP 3:**
-  * **The primary analysis MUST occur within the `transaction_price_components` JSON structure.**
-  * **Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.**
-  * For simple fixed-price contracts, `variable_consideration` MUST be "N/A" and `professional_judgments` MUST be an empty list []. Do not invent judgments.
-**- CRITICAL FOR STEP 4:**
-  * **If there is only one performance obligation, `analysis_points` should be an empty list []. The `step4_overall_conclusion` is sufficient.**
-  * **Do NOT re-analyze the transaction price in Step 4.**
-**- CRITICAL FOR STEP 5:**
-  * **You MUST provide detailed analysis in both the JSON schema AND analysis_points. Do not use shortcuts like "No additional analysis required".**
-  * **The `revenue_recognition_plan` must include specific recognition_justification for each performance obligation.**
-  * **Include measure_of_progress_analysis explaining the method used (straight-line, input/output method, etc.).**
-
-"""
 
     @staticmethod
     def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict,
