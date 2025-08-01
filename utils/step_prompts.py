@@ -2,9 +2,10 @@
 Enhanced step-by-step prompt templates for ASC 606 analysis.
 """
 
+
 class StepPrompts:
     """Enhanced prompts with proportional complexity handling."""
-    
+
     @staticmethod
     def get_step_info() -> dict:
         """Returns information about each ASC 606 step."""
@@ -12,7 +13,8 @@ class StepPrompts:
             1: {
                 "title": "Identify the Contract",
                 "primary_guidance": "ASC 606-10-25-1 through 25-8",
-                "description": "Contract identification and combination criteria"
+                "description":
+                "Contract identification and combination criteria"
             },
             2: {
                 "title": "Identify Performance Obligations",
@@ -27,54 +29,74 @@ class StepPrompts:
             4: {
                 "title": "Allocate the Transaction Price",
                 "primary_guidance": "ASC 606-10-32-28 through 32-41",
-                "description": "Standalone selling prices and allocation methods"
+                "description":
+                "Standalone selling prices and allocation methods"
             },
             5: {
                 "title": "Recognize Revenue",
                 "primary_guidance": "ASC 606-10-25-23 through 25-37",
-                "description": "Over time vs point in time recognition criteria"
+                "description":
+                "Over time vs point in time recognition criteria"
             }
         }
 
     @staticmethod
-    def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
+    def get_financial_impact_prompt(s1: dict,
+                                    s2: dict,
+                                    s3: dict,
+                                    s4: dict,
+                                    s5: dict,
+                                    customer_name: str,
+                                    memo_audience: str,
+                                    contract_data=None) -> str:
         """Generates proportional financial impact prompt based on structured data analysis."""
         import json
-        
+
         # Extract structured data from each step
-        
+
         # Step 1: Contract validity
         contract_valid = "Valid"
         if s1_criteria := s1.get('contract_criteria_assessment'):
-            failed_criteria = [c for c in s1_criteria if c.get('status') == 'Not Met']
+            failed_criteria = [
+                c for c in s1_criteria if c.get('status') == 'Not Met'
+            ]
             if failed_criteria:
                 contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
-        
+
         # Step 2: Performance obligations
         performance_obligations = []
         if s2_pos := s2.get('performance_obligations'):
-            performance_obligations = [po.get('po_description', 'Unknown PO') for po in s2_pos if po.get('is_distinct') == 'Yes']
+            performance_obligations = [
+                po.get('po_description', 'Unknown PO') for po in s2_pos
+                if po.get('is_distinct') == 'Yes'
+            ]
         po_summary = f"{len(performance_obligations)} distinct performance obligations: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
-        
+
         # Step 3: Transaction price components
         transaction_price_data = {}
         if s3_price := s3.get('transaction_price_components'):
             transaction_price_data = {
-                'total_price': s3_price.get('total_transaction_price', 'Not specified'),
-                'fixed_consideration': s3_price.get('fixed_consideration', 'Not specified'),
-                'variable_consideration': s3_price.get('variable_consideration', []),
-                'financing_component': s3_price.get('financing_component_analysis', 'None identified')
+                'total_price':
+                s3_price.get('total_transaction_price', 'Not specified'),
+                'fixed_consideration':
+                s3_price.get('fixed_consideration', 'Not specified'),
+                'variable_consideration':
+                s3_price.get('variable_consideration', []),
+                'financing_component':
+                s3_price.get('financing_component_analysis', 'None identified')
             }
-        
-        # Step 4: Allocation details  
+
+        # Step 4: Allocation details
         allocation_data = s4.get('allocation_details', {})
-        
+
         # Step 5: Revenue recognition plan
         recognition_methods = []
         if s5_plan := s5.get('revenue_recognition_plan'):
-            recognition_methods = [(po.get('performance_obligation', 'Unknown'), 
-                                  po.get('recognition_method', 'Unknown'),
-                                  po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
+            recognition_methods = [(po.get('performance_obligation',
+                                           'Unknown'),
+                                    po.get('recognition_method', 'Unknown'),
+                                    po.get('measure_of_progress', 'Unknown'))
+                                   for po in s5_plan]
 
         # --- Enhanced Complexity Scoring System ---
         complexity_score = 0
@@ -87,29 +109,36 @@ class StepPrompts:
             complexity_reasons.append("More than two performance obligations")
         if len(set(po_methods)) > 1:
             complexity_score += 1
-            complexity_reasons.append("Mixed revenue recognition timing (Over Time and Point in Time)")
+            complexity_reasons.append(
+                "Mixed revenue recognition timing (Over Time and Point in Time)"
+            )
 
         # Criterion 2: Variable Consideration (high-judgment area)
-        has_variable_consideration = (transaction_price_data.get('variable_consideration') and 
-                                    len(transaction_price_data.get('variable_consideration', [])) > 0)
+        has_variable_consideration = (
+            transaction_price_data.get('variable_consideration') and len(
+                transaction_price_data.get('variable_consideration', [])) > 0)
         if has_variable_consideration:
             complexity_score += 2
             complexity_reasons.append("Contains variable consideration")
 
         # Criterion 3: Significant Financing Component (high-judgment area)
-        financing_analysis = transaction_price_data.get('financing_component', '')
+        financing_analysis = transaction_price_data.get(
+            'financing_component', '')
         if 'significant financing component' in financing_analysis.lower():
             complexity_score += 2
-            complexity_reasons.append("Contains a significant financing component")
+            complexity_reasons.append(
+                "Contains a significant financing component")
 
         # Criterion 4: Complex Allocation (requires SSP estimation)
         if s4_details := s4.get('allocation_details'):
             if allocations := s4_details.get('allocations'):
                 for alloc in allocations:
-                    ssp_info = alloc.get('standalone_selling_price', '').lower()
+                    ssp_info = alloc.get('standalone_selling_price',
+                                         '').lower()
                     if "method" in ssp_info and "observable" not in ssp_info:
                         complexity_score += 1
-                        complexity_reasons.append("Requires estimation of Standalone Selling Price")
+                        complexity_reasons.append(
+                            "Requires estimation of Standalone Selling Price")
                         break
 
         # Criterion 5: Other High-Judgment Factors (from contract data)
@@ -119,7 +148,8 @@ class StepPrompts:
                 complexity_reasons.append("Is a contract modification")
             if getattr(contract_data, 'principal_agent_involved', False):
                 complexity_score += 2
-                complexity_reasons.append("Involves Principal vs. Agent analysis")
+                complexity_reasons.append(
+                    "Involves Principal vs. Agent analysis")
 
         # Final determination: Score of 2 or more is complex
         is_complex = complexity_score >= 2
@@ -181,27 +211,41 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 """
 
     @staticmethod
-    def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
+    def get_conclusion_prompt(s1: dict,
+                              s2: dict,
+                              s3: dict,
+                              s4: dict,
+                              s5: dict,
+                              customer_name: str,
+                              memo_audience: str,
+                              contract_data=None) -> str:
         """Generates a proportional and meaningful conclusion prompt using structured data."""
 
         # Extract structured data for conclusion
-        
+
         # Performance obligations and recognition methods
         performance_obligations = []
         recognition_methods = []
         if s2_pos := s2.get('performance_obligations'):
-            performance_obligations = [po.get('po_description', 'Unknown PO') for po in s2_pos if po.get('is_distinct') == 'Yes']
+            performance_obligations = [
+                po.get('po_description', 'Unknown PO') for po in s2_pos
+                if po.get('is_distinct') == 'Yes'
+            ]
         if s5_plan := s5.get('revenue_recognition_plan'):
-            recognition_methods = [(po.get('performance_obligation', 'Unknown'), 
-                                  po.get('recognition_method', 'Unknown'),
-                                  po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
-        
+            recognition_methods = [(po.get('performance_obligation',
+                                           'Unknown'),
+                                    po.get('recognition_method', 'Unknown'),
+                                    po.get('measure_of_progress', 'Unknown'))
+                                   for po in s5_plan]
+
         # Transaction price components
         transaction_price_data = {}
         if s3_price := s3.get('transaction_price_components'):
             transaction_price_data = {
-                'variable_consideration': s3_price.get('variable_consideration', []),
-                'financing_component': s3_price.get('financing_component_analysis', 'None identified')
+                'variable_consideration':
+                s3_price.get('variable_consideration', []),
+                'financing_component':
+                s3_price.get('financing_component_analysis', 'None identified')
             }
 
         # --- Enhanced Complexity Scoring System (Same as Financial Impact) ---
@@ -215,29 +259,36 @@ Begin writing the financial impact section, strictly adhering to the proportiona
             complexity_reasons.append("More than two performance obligations")
         if len(set(po_methods)) > 1:
             complexity_score += 1
-            complexity_reasons.append("Mixed revenue recognition timing (Over Time and Point in Time)")
+            complexity_reasons.append(
+                "Mixed revenue recognition timing (Over Time and Point in Time)"
+            )
 
         # Criterion 2: Variable Consideration (high-judgment area)
-        has_variable_consideration = (transaction_price_data.get('variable_consideration') and 
-                                    len(transaction_price_data.get('variable_consideration', [])) > 0)
+        has_variable_consideration = (
+            transaction_price_data.get('variable_consideration') and len(
+                transaction_price_data.get('variable_consideration', [])) > 0)
         if has_variable_consideration:
             complexity_score += 2
             complexity_reasons.append("Contains variable consideration")
 
         # Criterion 3: Significant Financing Component (high-judgment area)
-        financing_analysis = transaction_price_data.get('financing_component', '')
+        financing_analysis = transaction_price_data.get(
+            'financing_component', '')
         if 'significant financing component' in financing_analysis.lower():
             complexity_score += 2
-            complexity_reasons.append("Contains a significant financing component")
+            complexity_reasons.append(
+                "Contains a significant financing component")
 
         # Criterion 4: Complex Allocation (requires SSP estimation)
         if s4_details := s4.get('allocation_details'):
             if allocations := s4_details.get('allocations'):
                 for alloc in allocations:
-                    ssp_info = alloc.get('standalone_selling_price', '').lower()
+                    ssp_info = alloc.get('standalone_selling_price',
+                                         '').lower()
                     if "method" in ssp_info and "observable" not in ssp_info:
                         complexity_score += 1
-                        complexity_reasons.append("Requires estimation of Standalone Selling Price")
+                        complexity_reasons.append(
+                            "Requires estimation of Standalone Selling Price")
                         break
 
         # Criterion 5: Other High-Judgment Factors (from contract data)
@@ -247,20 +298,26 @@ Begin writing the financial impact section, strictly adhering to the proportiona
                 complexity_reasons.append("Is a contract modification")
             if getattr(contract_data, 'principal_agent_involved', False):
                 complexity_score += 2
-                complexity_reasons.append("Involves Principal vs. Agent analysis")
+                complexity_reasons.append(
+                    "Involves Principal vs. Agent analysis")
 
         # Final determination: Score of 2 or more is complex
         is_complex = complexity_score >= 2
         complexity_summary = f"Score: {complexity_score}/10 ({'Complex' if is_complex else 'Simple'})"
         if complexity_reasons:
             complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
-        
+
         # Simple contract detection logic
         is_simple_contract = True
         # Check for complexity indicators
-        po_count = len(s2.get('performance_obligations', [])) if s2.get('performance_obligations') else 0
-        has_variable_consideration = bool(s3.get('transaction_price_components', {}).get('variable_consideration'))
-        has_financing_component = bool(s3.get('transaction_price_components', {}).get('financing_component_analysis', '').strip())
+        po_count = len(s2.get('performance_obligations',
+                              [])) if s2.get('performance_obligations') else 0
+        has_variable_consideration = bool(
+            s3.get('transaction_price_components',
+                   {}).get('variable_consideration'))
+        has_financing_component = bool(
+            s3.get('transaction_price_components',
+                   {}).get('financing_component_analysis', '').strip())
         # Professional judgments from all steps
         all_judgments = []
         for step in [s1, s2, s3, s4, s5]:
@@ -268,13 +325,13 @@ Begin writing the financial impact section, strictly adhering to the proportiona
             if judgments:
                 all_judgments.extend(judgments)
         # Mark as complex if any complexity indicators present
-        if po_count > 1 or has_variable_consideration or has_financing_component or len(all_judgments) > 0:
+        if po_count > 1 or has_variable_consideration or has_financing_component or len(
+                all_judgments) > 0:
             is_simple_contract = False
         # For simple contracts, return standard conclusion directly
         if is_simple_contract:
             return "RETURN_DIRECT_TEXT: ### Conclusion\nThe accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.\n\n### Recommendations\nIt is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis."
 
-        
         # --- End Enhanced Complexity Logic ---
 
         return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
@@ -310,36 +367,46 @@ Based on the analysis, provide a bulleted list of specific, practical next steps
 Begin writing the "Conclusion and Recommendations" section. Do not add any other text, summaries, or boilerplate language.
 """
 
-    @staticmethod 
-    def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, analysis_title: str, customer_name: str) -> str:
+    @staticmethod
+    def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict,
+                                              s4: dict, s5: dict,
+                                              analysis_title: str,
+                                              customer_name: str) -> str:
         """Generates enhanced executive summary using structured data from all steps."""
         import json
-        
+
         # Extract structured data for executive summary
-        
+
         # Step 1: Contract validity
         contract_status = "Valid"
         failed_criteria = []
         if s1_criteria := s1.get('contract_criteria_assessment'):
-            failed_criteria = [c.get('criterion', 'Unknown') for c in s1_criteria if c.get('status') == 'Not Met']
+            failed_criteria = [
+                c.get('criterion', 'Unknown') for c in s1_criteria
+                if c.get('status') == 'Not Met'
+            ]
             if failed_criteria:
                 contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
-        
-        # Step 2: Performance obligations summary
+
+        # Step 2: Performance obligations summary - FIXED to count all POs, not just distinct ones
         po_count = 0
         po_descriptions = []
         if s2_pos := s2.get('performance_obligations'):
-            distinct_pos = [po for po in s2_pos if po.get('is_distinct') == 'Yes']
-            po_count = len(distinct_pos)
-            po_descriptions = [po.get('po_description', 'Unnamed PO') for po in distinct_pos]
-        
+            # Count all performance obligations found, regardless of distinct status
+            po_count = len(s2_pos) if s2_pos else 0
+            po_descriptions = [
+                po.get('po_description', 'Unnamed PO') for po in s2_pos
+            ]
+
         # Step 3: Transaction price details
         total_price = "Not specified"
         has_variable_consideration = False
         if s3_price := s3.get('transaction_price_components'):
-            total_price = s3_price.get('total_transaction_price', 'Not specified')
-            has_variable_consideration = bool(s3_price.get('variable_consideration') and 
-                                            len(s3_price.get('variable_consideration', [])) > 0)
+            total_price = s3_price.get('total_transaction_price',
+                                       'Not specified')
+            has_variable_consideration = bool(
+                s3_price.get('variable_consideration')
+                and len(s3_price.get('variable_consideration', [])) > 0)
 
         # Step 4: Allocation summary
         allocation_summary = "Not applicable (single performance obligation)."
@@ -347,7 +414,7 @@ Begin writing the "Conclusion and Recommendations" section. Do not add any other
             if allocations := s4_details.get('allocations'):
                 if len(allocations) > 1:
                     allocation_summary = f"Price allocated across {len(allocations)} POs based on standalone selling prices."
-        
+
         # Step 5: Revenue recognition methods
         recognition_summary = []
         critical_judgments = []
@@ -356,17 +423,20 @@ Begin writing the "Conclusion and Recommendations" section. Do not add any other
                 method = po_plan.get('recognition_method', 'Unknown')
                 po_name = po_plan.get('performance_obligation', 'Unknown PO')
                 recognition_summary.append(f"{po_name}: {method}")
-                
+
                 # Extract critical judgments
                 if 'Over Time' in method and po_plan.get('justification'):
-                    critical_judgments.append(f"Over time recognition criteria for {po_name}")
-        
+                    critical_judgments.append(
+                        f"Over time recognition criteria for {po_name}")
+
         # Identify key judgments
         if has_variable_consideration:
-            critical_judgments.append("Variable consideration estimation and constraint analysis")
+            critical_judgments.append(
+                "Variable consideration estimation and constraint analysis")
         if po_count > 1:
-            critical_judgments.append("Distinct performance obligation assessment")
-        
+            critical_judgments.append(
+                "Distinct performance obligation assessment")
+
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
 STRUCTURED ANALYSIS DATA:
@@ -398,45 +468,129 @@ Keep this professional, concise, and focused on executive-level insights."""
 
     @staticmethod
     def get_step1_schema() -> str:
-        """Returns Step 1 specific JSON schema for contract criteria assessment."""
-        return '"contract_criteria_assessment": [\n    {\n      "criterion": "Approval and Commitment",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(a)..."\n    },\n    {\n      "criterion": "Identification of Rights",\n      "status": "Met/Not Met", \n      "justification": "Analysis based on ASC 606-10-25-1(b)..."\n    },\n    {\n      "criterion": "Identification of Payment Terms",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(c)..."\n    },\n    {\n      "criterion": "Commercial Substance", \n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(d)..."\n    },\n    {\n      "criterion": "Collectibility",\n      "status": "Met/Not Met",\n      "justification": "Analysis based on ASC 606-10-25-1(e)..."\n    }\n  ],\n  '
+        """Returns a comprehensive, structured JSON schema for the entirety of Step 1 analysis."""
+        # Note: Formatted with \n newlines for consistency with existing file style.
+        return '"step1_analysis": {\n' \
+               '    "contract_criteria_assessment": [\n' \
+               '      {\n' \
+               '        "criterion": "Approval and Commitment",\n' \
+               '        "status": "Met/Not Met",\n' \
+               '        "justification": "Analysis based on ASC 606-10-25-1(a)..."\n' \
+               '      },\n' \
+               '      {\n' \
+               '        "criterion": "Identification of Rights",\n' \
+               '        "status": "Met/Not Met",\n' \
+               '        "justification": "Analysis based on ASC 606-10-25-1(b)..."\n' \
+               '      },\n' \
+               '      {\n' \
+               '        "criterion": "Identification of Payment Terms",\n' \
+               '        "status": "Met/Not Met",\n' \
+               '        "justification": "Analysis based on ASC 606-10-25-1(c)..."\n' \
+               '      },\n' \
+               '      {\n' \
+               '        "criterion": "Commercial Substance",\n' \
+               '        "status": "Met/Not Met",\n' \
+               '        "justification": "Analysis based on ASC 606-10-25-1(d)..."\n' \
+               '      },\n' \
+               '      {\n' \
+               '        "criterion": "Collectibility",\n' \
+               '        "status": "Met/Not Met",\n' \
+               '        "justification": "Analysis based on ASC 606-10-25-1(e)..."\n' \
+               '      }\n' \
+               '    ],\n' \
+               '    "contract_combination_analysis": "Based on ASC 606-10-25-9, analyze if multiple contracts should be combined into a single accounting contract. Conclude with a clear Yes or No and justification, or state \'N/A\' if only one document was provided.",\n' \
+               '    "contract_modification_analysis": "Analyze if the arrangement represents a modification of a pre-existing contract. If so, analyze if it should be accounted for as a separate contract or as a change to the original. State \'N/A\' if this is a new contract arrangement.",\n' \
+               '    "step1_overall_conclusion": "Provide a single, definitive summary statement for all of Step 1."\n' \
+               '  }\n'
 
     @staticmethod
     def get_step2_schema() -> str:
-        """Returns Step 2 specific JSON schema for performance obligations assessment."""
-        return '"performance_obligations": [\n    {\n      "po_description": "Brief description of the performance obligation identified",\n      "is_distinct": "Yes/No",\n      "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion."\n    }\n  ],\n  '
+        """Returns a comprehensive, structured JSON schema for the entirety of Step 2 analysis."""
+        # Note: Formatted with \n newlines for consistency with existing file style.
+        return '"step2_analysis": {\n' \
+               '    "performance_obligations": [\n' \
+               '      {\n' \
+               '        "po_description": "Brief description of the promised good or service. If immaterial, note that here.",\n' \
+               '        "is_distinct": "Yes/No",\n' \
+               '        "distinct_analysis": "Concise justification citing ASC 606-10-25-19 criteria: (a) capable of being distinct AND (b) separately identifiable. Focus on the key factors that drive the conclusion.",\n' \
+               '        "series_analysis": "Analyze if this PO is part of a series of distinct goods or services under ASC 606-10-25-14. State Yes or No and provide justification, or \'N/A\'."\n' \
+               '      }\n' \
+               '    ],\n' \
+               '    "principal_vs_agent_analysis": "Analyze whether the company is acting as a principal or an agent for any promises, per ASC 606-10-55-36 through 55-40. Conclude for each relevant promise. State \'N/A\' if not applicable.",\n' \
+               '    "customer_options_analysis": "Analyze if the contract provides any customer options for additional goods or services (e.g., discounts, renewals). If so, assess if they provide a material right under ASC 606-10-55-41 and should be a separate performance obligation. State \'N/A\' if not applicable.",\n' \
+               '    "step2_overall_conclusion": "Provide a single, definitive summary statement for all of Step 2."\n' \
+               '  }\n'
 
     @staticmethod
     def get_step3_schema() -> str:
         """Returns a comprehensive, structured JSON schema for all Step 3 components."""
         # Note: Formatted with \n newlines for consistency with existing file style.
-        return '"transaction_price_components": {\n' \
-               '    "fixed_consideration": "Amount and description of fixed consideration, or \'N/A\' if not applicable.",\n' \
-               '    "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or \'N/A\' if not applicable.",\n' \
-               '    "financing_component_analysis": "Analysis of any significant financing component, or \'N/A\' if not applicable.",\n' \
-               '    "noncash_consideration_analysis": "Analysis of any noncash consideration, or \'N/A\' if not applicable.",\n' \
-               '    "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or \'N/A\' if not applicable.",\n' \
-               '    "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, nonrefundable upfront fees or changes in the transaction price, or \'N/A\' if not applicable.",\n' \
-               '    "total_transaction_price": "The final, total estimated transaction price."\n' \
-               '  },\n' \
-               '  '
-    
+        return '"step3_analysis": {\n' \
+               '    "transaction_price_components": {\n' \
+               '      "fixed_consideration": "Amount and description of fixed consideration, or \'N/A\' if not applicable.",\n' \
+               '      "variable_consideration": "Detailed analysis of any variable consideration (e.g., bonuses, royalties), or \'N/A\' if not applicable.",\n' \
+               '      "financing_component_analysis": "Analysis of any significant financing component, or \'N/A\' if not applicable.",\n' \
+               '      "noncash_consideration_analysis": "Analysis of any noncash consideration, or \'N/A\' if not applicable.",\n' \
+               '      "consideration_payable_to_customer_analysis": "Analysis of any consideration payable to the customer (e.g., credits, coupons), or \'N/A\' if not applicable.",\n' \
+               '      "other_considerations_analysis": "Analysis of any other relevant considerations affecting the transaction price, such as refund liabilities, rights of return, nonrefundable upfront fees or changes in the transaction price, or \'N/A\' if not applicable.",\n' \
+               '      "total_transaction_price": "The final, total estimated transaction price."\n' \
+               '    },\n' \
+               '    "step3_overall_conclusion": "Provide a single, definitive summary statement for all of Step 3."\n' \
+               '  }\n'
+
     @staticmethod
     def get_step4_schema() -> str:
-        """Returns Step 4 specific JSON schema for allocation details."""
-        return '"allocation_details": {\n    "total_transaction_price": "The total amount from Step 3",\n    "allocations": [\n      {\n        "performance_obligation": "Description of the performance obligation from Step 2",\n        "standalone_selling_price": "SSP amount and estimation method",\n        "allocated_amount": "Amount allocated to this performance obligation"\n      }\n    ]\n  },\n  '
+        """Returns a comprehensive, structured JSON schema for the entirety of Step 4 analysis."""
+        # Note: Formatted with \n newlines for consistency with existing file style.
+        return '"step4_analysis": {\n' \
+               '    "allocation_details": {\n' \
+               '      "total_transaction_price": "The total amount from Step 3",\n' \
+               '      "allocations": [\n' \
+               '        {\n' \
+               '          "ssp_determination": "Describe how the Standalone Selling Price (SSP) was determined, following the hierarchy in ASC 606-10-32-33 (observable price, or estimation method like adjusted market, cost-plus-margin, or residual).",\n' \
+               '          "allocated_amount": "Amount of the transaction price allocated to this performance obligation."\n' \
+               '        }\n' \
+               '      ]\n' \
+               '    },\n' \
+               '    "variable_consideration_allocation_analysis": "Analyze if any variable consideration should be allocated to a specific performance obligation per ASC 606-10-32-39, rather than proportionally. State \'N/A\' if no variable consideration exists or if it relates to the entire contract.",\n' \
+               '    "discount_allocation_analysis": "Analyze if any discount should be allocated to one or more (but not all) performance obligations per ASC 606-10-32-37. State \'N/A\' if no discount exists or if it applies to all POs.",\n' \
+               '    "changes_in_price_analysis": "Briefly describe how a change in the transaction price after contract inception would be allocated based on the guidance in ASC 606-10-32-42. State \'N/A\' if not relevant.",\n' \
+               '    "step4_overall_conclusion": "Provide a single, definitive summary statement for all of Step 4."\n' \
+               '  }\n'
 
     @staticmethod
     def get_step5_schema() -> str:
-        """Returns Step 5 specific JSON schema for revenue recognition plan."""
-        return '"revenue_recognition_plan": [\n    {\n      "performance_obligation": "Name of the PO from Step 2",\n      "recognition_method": "Over Time / Point in Time",\n      "justification": "If \'Over Time\', state which of the three criteria in ASC 606-10-25-27 is met. If \'Point in Time\', discuss transfer of control indicators per ASC 606-10-25-30.",\n      "measure_of_progress": "If \'Over Time\', describe the method (e.g., straight-line, input/output method). If \'Point in Time\', state timing of control transfer."\n    }\n  ],\n  '
+        """Returns a comprehensive, structured JSON schema for the entirety of Step 5 analysis."""
+        # Note: Formatted with \n newlines for consistency with existing file style.
+        return '"step5_analysis": {\n' \
+               '    "revenue_recognition_plan": [\n' \
+               '      {\n' \
+               '        "performance_obligation": "Name of the PO from Step 2",\n' \
+               '        "recognition_method": "Over Time / Point in Time",\n' \
+               '        "recognition_justification": "If \'Over Time\', state which of the three criteria in ASC 606-10-25-27 is met. If \'Point in Time\', discuss the transfer of control indicators per ASC 606-10-25-30.",\n' \
+               '        "measure_of_progress_analysis": "If \'Over Time\', describe the method (e.g., straight-line, input/output method) and justify why it best depicts the transfer of control. If \'Point in Time\', state the specific timing of control transfer."\n' \
+               '      }\n' \
+               '    ],\n' \
+               '    "special_arrangements_analysis": {\n' \
+               '      "licenses_of_ip": "Analyze if any POs are licenses of intellectual property and determine if they represent a right to use (point in time) or a right to access (over time) per ASC 606-10-55-58. State \'N/A\' if not applicable.",\n' \
+               '      "repurchase_agreements": "Analyze for any repurchase agreements (forwards, calls, puts) and their accounting impact (lease, financing, or sale with a right of return) per ASC 606-10-55-66. State \'N/A\' if not applicable.",\n' \
+               '      "bill_and_hold": "Analyze if any bill-and-hold arrangements exist and if they meet all the criteria in ASC 606-10-55-83 to recognize revenue. State \'N/A\' if not applicable.",\n' \
+               '      "consignment_arrangements": "Analyze if any consignment arrangements exist where the entity controls the product before it is sold to an end customer. State \'N/A\' if not applicable.",\n' \
+               '      "breakage": "Analyze for any expected breakage on non-refundable upfront fees or other prepayments. State \'N/A\' if not applicable."\n' \
+               '    },\n' \
+               '    "step5_overall_conclusion": "Provide a single, definitive summary statement for all of Step 5."\n' \
+               '  }\n'
 
     @staticmethod
-    def get_step_specific_analysis_prompt(step_number: int, step_title: str, step_guidance: str, 
-                                        contract_text: str, rag_context: str, 
-                                        contract_data=None, debug_config=None) -> str:
+    def get_step_specific_analysis_prompt(step_number: int,
+                                          step_title: str,
+                                          step_guidance: str,
+                                          contract_text: str,
+                                          rag_context: str,
+                                          contract_data=None,
+                                          debug_config=None) -> str:
         """Generate step-specific analysis prompt that requests narrative, thematically-grouped JSON output."""
-        
+
         # Get step-specific schema
         step_specific_json_field = ""
         if step_number == 1:
@@ -449,7 +603,7 @@ Keep this professional, concise, and focused on executive-level insights."""
             step_specific_json_field = StepPrompts.get_step4_schema()
         elif step_number == 5:
             step_specific_json_field = StepPrompts.get_step5_schema()
-        
+
         return f"""You are an expert technical accountant specializing in ASC 606. Your task is to analyze a contract for Step {step_number}: {step_title}.
 
 PRIMARY GUIDANCE FOR THIS STEP: {step_guidance}
@@ -511,7 +665,8 @@ CRITICAL INSTRUCTIONS:
 """
 
     @staticmethod
-    def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+    def get_consistency_check_prompt(s1: dict, s2: dict, s3: dict, s4: dict,
+                                     s5: dict) -> str:
         """Generate consistency check prompt using structured data from all 5 steps."""
         import json
 
@@ -520,7 +675,7 @@ CRITICAL INSTRUCTIONS:
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
             if not step or not isinstance(step, dict) or len(step) < 2:
                 missing_steps.append(i)
-        
+
         if missing_steps:
             return f"""You are an expert accounting review bot. CRITICAL ISSUE DETECTED:
 Step(s) {missing_steps} returned insufficient data (likely due to API failures or parsing errors).
@@ -577,7 +732,7 @@ If the analysis is fully consistent, return {{"is_consistent": true, "issues_fou
     def get_background_prompt(contract_data) -> str:
         """Generates a focused and non-repetitive background section."""
         key_focus = getattr(contract_data, 'key_focus_areas', '')
-        
+
         return f"""You are writing the 'Background' section of a formal ASC 606 accounting memo. A summary data table will appear just before your text, so DO NOT repeat basic information like party names or contract dates.
 
 YOUR TASK:
@@ -599,7 +754,8 @@ Example if no focus areas are provided:
 Write only the paragraph, no additional formatting or labels."""
 
     @staticmethod
-    def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+    def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict,
+                                 s5: dict) -> str:
         """Generates a highly discerning prompt for the Key Professional Judgments section."""
         all_judgments = []
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
@@ -637,12 +793,14 @@ Review the list above. Write a formal summary of ONLY the items that represent a
 Your reputation for precision is on the line. Do not overstate the complexity of a simple contract."""
 
     @staticmethod
-    def format_step_detail_as_markdown(step_data: dict, step_number: int, step_name: str) -> str:
+    def format_step_detail_as_markdown(step_data: dict, step_number: int,
+                                       step_name: str) -> str:
         """Format step analysis from narrative JSON structure into professional markdown."""
         if not step_data or not isinstance(step_data, dict):
             return f"### Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
 
-        conclusion = step_data.get('executive_conclusion', 'No conclusion was provided.')
+        conclusion = step_data.get('executive_conclusion',
+                                   'No conclusion was provided.')
         analysis_points = step_data.get('analysis_points', [])
 
         # Start with the main heading and the upfront conclusion
@@ -653,23 +811,23 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             "**Detailed Analysis:**\n"
         ]
 
-        # AUDITOR'S METHOD: Special handling for Step 3 to filter out N/A items
-        if step_number == 3:
+        # AUDITOR'S METHOD: Special handling for Steps 2 and 3 to filter out N/A items
+        if step_number == 2:
+            return StepPrompts._format_step2_with_filtering(step_data, step_name, conclusion, analysis_points)
+        elif step_number == 3:
             return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
 
-        # AUDITOR'S METHOD: Special handling for Step 3 to filter out N/A items
-        if step_number == 3:
-            return StepPrompts._format_step3_with_filtering(step_data, step_name, conclusion, analysis_points)
-        
         # Continue with normal processing for other steps
 
         if not analysis_points:
-            markdown_sections.append("No detailed analysis points were provided.")
+            markdown_sections.append(
+                "No detailed analysis points were provided.")
         else:
             # Loop through each thematically-grouped analysis point
             for i, point in enumerate(analysis_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                analysis_text = point.get('analysis_text',
+                                          'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
 
                 # Add the topic as a sub-heading
@@ -680,30 +838,34 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 # Add type check to prevent errors if the LLM returns a string instead of list
                 if evidence_quotes and isinstance(evidence_quotes, list):
                     for quote in evidence_quotes:
-                        if isinstance(quote, str):  # Ensure the item in the list is a string
+                        if isinstance(
+                                quote, str
+                        ):  # Ensure the item in the list is a string
                             markdown_sections.append(f"> {quote}")
                 elif isinstance(evidence_quotes, str):
                     # Handle case where LLM returns a single string instead of list
                     markdown_sections.append(f"> {evidence_quotes}")
 
-                markdown_sections.append("")  # Add a blank line for spacing before the next point
+                markdown_sections.append(
+                    "")  # Add a blank line for spacing before the next point
 
         markdown_sections.append("---\n")  # Final separator
         return "\n".join(markdown_sections)
 
     @staticmethod
-    def _format_step3_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list) -> str:
+    def _format_step3_with_filtering(step_data: dict, step_name: str,
+                                     conclusion: str,
+                                     analysis_points: list) -> str:
         """Apply the Auditor's Method to Step 3: Filter out N/A transaction price components."""
         markdown_sections = [
-            f"### Step 3: {step_name}",
-            f"**Conclusion:**\n{conclusion}",
-            "\n---\n",
-            "**Transaction Price Analysis:**\n"
+            f"### Step 3: {step_name}", f"**Conclusion:**\n{conclusion}",
+            "\n---\n", "**Transaction Price Analysis:**\n"
         ]
-        
+
         # Get the transaction price components from the AI analysis
-        transaction_components = step_data.get('transaction_price_components', {})
-        
+        transaction_components = step_data.get('transaction_price_components',
+                                               {})
+
         # Filter out N/A items using the Auditor's Method - Refined and Safer Version
         relevant_components = []
         ignore_phrases = {'n/a', 'not applicable'}
@@ -723,10 +885,11 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 # Or if it starts with one of them (e.g., "N/A - no variable consideration")
                 elif analysis_text_str.startswith('n/a'):
                     is_not_applicable = True
-            
+
             # If the AI's analysis for this component is NOT "N/A", include it in the memo
             if not is_not_applicable:
-                topic_title = key.replace('_', ' ').replace(' analysis', '').title()
+                topic_title = key.replace('_', ' ').replace(' analysis',
+                                                            '').title()
                 # Special formatting for transaction price components
                 if key == 'total_transaction_price':
                     topic_title = 'Total Transaction Price'
@@ -742,21 +905,75 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                     topic_title = 'Consideration Payable to Customer'
                 elif key == 'other_considerations_analysis':
                     topic_title = 'Other Considerations'
-                
+
                 relevant_components.append((topic_title, analysis_text))
-        
+
         # Add the relevant components to the markdown
         if relevant_components:
             for topic_title, analysis_text in relevant_components:
                 markdown_sections.append(f"**{topic_title}:**")
                 markdown_sections.append(str(analysis_text))
         else:
-            markdown_sections.append("Only basic fixed consideration was identified in this contract.")
-        
+            markdown_sections.append(
+                "Only basic fixed consideration was identified in this contract."
+            )
+
         # Add the regular analysis points if they exist
         if analysis_points:
             markdown_sections.append("\n**Additional Analysis:**\n")
             for i, point in enumerate(analysis_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text',
+                                          'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
+
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
+
+                if evidence_quotes and isinstance(evidence_quotes, list):
+                    markdown_sections.append(
+                        "**Supporting Contract Evidence:**")
+                    for quote in evidence_quotes:
+                        markdown_sections.append(f"> {quote}")
+
+        return "\n\n".join(markdown_sections)
+
+    @staticmethod
+    def _format_step2_with_filtering(step_data: dict, step_name: str, conclusion: str, analysis_points: list) -> str:
+        """Apply the Auditor's Method to Step 2: Filter out N/A components."""
+        markdown_sections = [
+            f"### Step 2: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "\n---\n",
+            "**Detailed Analysis:**\n"
+        ]
+        
+        # Filter analysis points to remove N/A topics
+        ignore_phrases = {'n/a', 'not applicable'}
+        filtered_points = []
+        
+        for point in analysis_points:
+            topic_title = point.get('topic_title', '')
+            analysis_text = point.get('analysis_text', '')
+            
+            # Check if the analysis text indicates N/A
+            analysis_text_str = str(analysis_text or '').strip().lower()
+            is_not_applicable = False
+            
+            if not analysis_text_str:
+                is_not_applicable = True
+            elif analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
+                is_not_applicable = True
+            
+            # Only include if not N/A
+            if not is_not_applicable:
+                filtered_points.append(point)
+        
+        # Use filtered points for display
+        if not filtered_points:
+            markdown_sections.append("The contract contains a straightforward single performance obligation.")
+        else:
+            for i, point in enumerate(filtered_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
                 analysis_text = point.get('analysis_text', 'No analysis text provided.')
                 evidence_quotes = point.get('evidence_quotes', [])
