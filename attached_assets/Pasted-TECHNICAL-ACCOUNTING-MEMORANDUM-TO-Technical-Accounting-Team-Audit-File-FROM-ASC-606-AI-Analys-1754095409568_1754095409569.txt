@@ -1,0 +1,158 @@
+TECHNICAL ACCOUNTING MEMORANDUM
+TO: Technical Accounting Team / Audit File
+FROM: ASC 606 AI Analyst
+DATE: August 02, 2025
+RE: ASC 606 Revenue Recognition Analysis - Netflix01
+DOCUMENT CLASSIFICATION: Internal Use Only
+REVIEW STATUS: Preliminary Analysis
+
+1. EXECUTIVE SUMMARY
+OVERALL CONCLUSION
+The concluded accounting treatment for the contract with Martin Lee under ASC 606 is that the revenue from the Monthly Netflix streaming service subscription will be recognized over time. This approach is based on the identification of a single performance obligation, reflecting the continuous nature of the service provided, with a total transaction price of $15.49 per month, excluding tax.
+
+KEY FINDINGS
+• Contract Status: Valid
+• Performance Obligations: 1 distinct obligation - Monthly Netflix streaming service subscription.
+• Transaction Price: $15.49 per month, excluding tax.
+• Allocation: Not applicable (single performance obligation).
+• Revenue Recognition: Netflix Streaming Service Subscription: Over Time
+• Critical Judgments:
+
+Determining that the Netflix subscription service is a single performance obligation required significant judgment due to the continuous nature of the service and lack of distinct separable components.
+Assessing the subscription service as a single performance obligation recognized over time necessitated judgment regarding the ongoing delivery of the service.
+2. CONTRACT OVERVIEW
+CONTRACT DATA SUMMARY
+
+Element	Details
+Customer	Martin Lee
+Contract Period	2024-09-26 to 2024-10-26
+Currency	USD
+Modification Status	No - Original Contract
+Analysis Scope	Standard ASC 606 five-step analysis
+Materiality Threshold	$10
+DOCUMENTS REVIEWED
+
+• invoice.pdf
+• Netflix.pdf
+• pricing.pdf
+• terms.pdf
+
+The arrangement involves a monthly streaming service provided by Netflix, which allows subscribers to access a library of films and television shows. The objective of this memorandum is to document the Company's accounting analysis and conclusions for the transaction with the customer under the five-step model of ASC 606.
+
+3. DETAILED ASC 606 ANALYSIS
+Step 1: Identify the Contract
+Conclusion:
+The contract with Netflix, Inc. meets all the criteria under ASC 606-10-25-1 for identifying a contract with a customer, confirming it is a valid contract for revenue recognition purposes.
+
+Detailed Analysis:
+
+1. Approval and Commitment
+The contract between Netflix and Martin Lee is deemed approved and both parties are committed, as evidenced by the acceptance of Netflix's Terms of Use and the payment made by Martin Lee. This aligns with ASC 606-10-25-1(a), which requires that the parties to the contract have approved the contract and are committed to perform their respective obligations. The payment and the active subscription indicate that both parties have agreed to the terms and are committed to fulfilling their contractual obligations.
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content... (Source: terms.pdf)
+Your membership has ended... Membership for 9/26/2024-10/25/2024... (Source: Netflix.pdf)
+
+2. Identification of Rights
+The contract clearly identifies the rights of both parties, with Netflix providing streaming services and Martin Lee having the right to access Netflix content. According to ASC 606-10-25-1(b), a contract must identify the rights of the parties regarding the goods or services to be transferred. The Terms of Use specify that Martin Lee has access to Netflix's streaming service, which includes a variety of movies and TV shows, thereby fulfilling this criterion.
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content... (Source: terms.pdf)
+
+3. Identification of Payment Terms
+The payment terms are clearly identified in the contract, with a monthly fee of $15.49 specified in the invoice and Terms of Use. ASC 606-10-25-1(c) requires that a contract must have payment terms that are identifiable. The invoice and payment history document the monthly charge, ensuring that both parties understand the payment obligations.
+
+Date Description Service Period Amount Tax Total 9/26/24 Streaming Service 9/26/24—10/25/24 $15.49 $1.03 $16.52 (Source: invoice.pdf)
+
+4. Commercial Substance
+The contract has commercial substance as it results in a change in the cash flows of Martin Lee, who pays for the streaming service provided by Netflix. Under ASC 606-10-25-1(d), a contract must have commercial substance. The exchange of cash for access to Netflix's content library demonstrates a clear economic impact on both parties, satisfying this requirement.
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content... (Source: terms.pdf)
+
+5. Collectibility
+Collectibility is probable as evidenced by the payment made by Martin Lee for the service period. ASC 606-10-25-1(e) requires that it be probable the entity will collect the consideration to which it will be entitled. The payment history confirms that Martin Lee has the ability and intention to pay for the services, meeting this criterion.
+
+Payment History 9/26/2024 $16.52 $15.49 (+$1.03 tax) Membership for 9/26/2024-10/25/2024 (Source: Netflix.pdf)
+
+Step 2: Identify Performance Obligations
+Conclusion:
+The analysis concludes that the Netflix subscription service constitutes a single performance obligation, as it provides a continuous service without distinct separable components.
+
+Detailed Analysis:
+
+1. Performance Obligation Analysis
+
+The Netflix subscription service, as described in the contract, involves providing continuous access to streaming content for a monthly fee. According to ASC 606-10-25-19, a good or service is distinct if it is both capable of being distinct and separately identifiable. In this case, the streaming service is not capable of being distinct because it does not provide individual components that can be separately used by the customer. Furthermore, the service is not separately identifiable as it is a continuous service that is substantially the same throughout the subscription period. Therefore, the Netflix subscription service is considered a single performance obligation. This conclusion is supported by the nature of the service, which provides a series of substantially the same services over time, aligning with ASC 606-10-25-14.
+
+Supporting Contract Evidence:
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content ('Netflix content') over the Internet on certain Internet-connected TV's, computers and other devices ('Netflix ready devices')... (Source: terms.pdf)
+
+The subscription fee for the Netflix service and any other charges you may incur in connection with your use of the service, such as taxes and possible transaction fees, will be charged to your Payment Method on the specific payment date indicated on the 'Account' page... (Source: terms.pdf)
+
+Step 3: Determine the Transaction Price
+Conclusion:
+The transaction price for the Netflix subscription is determined to be a fixed monthly fee of $15.49, with no variable considerations or significant financing components involved.
+
+Detailed Analysis:
+
+1. Fixed Consideration
+The fixed consideration is $15.49 per month as specified in the invoice and pricing documents.
+
+2. Other Considerations
+The transaction price includes a tax component of $1.03, making the total monthly payment $16.52. There are no refund liabilities or nonrefundable upfront fees affecting the transaction price.
+
+3. Total Transaction Price
+$15.49 per month, excluding tax.
+
+4. Fixed Consideration Analysis
+The contract specifies a fixed monthly fee of $15.49 for the Netflix subscription service, as outlined in the invoice and pricing documents. According to ASC 606-10-32-2, fixed consideration is the portion of the transaction price that is not subject to variability. Since the monthly fee does not vary based on future events or customer actions, it represents fixed consideration. Therefore, the transaction price is straightforward and does not involve any variable considerations.
+
+Supporting Contract Evidence:
+
+Date Description Service Period Amount Tax Total 9/26/24 Streaming Service 9/26/24—10/25/24 $15.49 $1.03 $16.52 (Source: invoice.pdf)
+Netflix offers a variety of plans to meet your entertainment needs. As a Netflix member, you are charged monthly on the date you signed up. (Source: pricing.pdf)
+
+Step 4: Allocate the Transaction Price
+Conclusion:
+The transaction price is allocated entirely to the single performance obligation identified in Step 2, as there are no variable considerations or discounts applicable.
+
+Detailed Analysis:
+
+No additional analysis was required for this step.
+Step 5: Recognize Revenue
+Conclusion:
+Revenue for the Netflix subscription service is recognized over time as the service is delivered continuously throughout the subscription period, meeting the criteria for 'Over Time' recognition under ASC 606.
+
+Detailed Analysis:
+
+1. Revenue Recognition for Subscription Services
+The contract specifies a monthly subscription fee of $15.49 for access to Netflix's streaming service, which is billed on a monthly basis. According to ASC 606-10-25-23, revenue is recognized when control of the promised goods or services is transferred to the customer. In this case, the service is delivered continuously over the subscription period, as the customer has access to the streaming service at any time during the month. This aligns with ASC 606-10-25-27(a), which states that revenue should be recognized over time if the customer simultaneously receives and consumes the benefits as the entity performs. The straight-line method is appropriate here as it reflects the uniform delivery of service throughout the month. An alternative treatment of recognizing revenue at a point in time was rejected because the service is not delivered at a single point but rather continuously over the month.
+
+Netflix provides a personalized subscription service that allows our members to access entertainment content... (Source: terms.pdf)
+As a Netflix member, you are charged monthly on the date you signed up. (Source: pricing.pdf)
+
+4. KEY PROFESSIONAL JUDGMENTS
+"The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+
+5. FINANCIAL IMPACT ASSESSMENT
+The $15.49 per month fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue over time as the streaming service is provided.
+
+Illustrative Journal Entry:
+
+Account	Debit	Credit
+Cash / Accounts Receivable	$15.49	
+Deferred Revenue		$15.49
+Sales Tax Payable		Not specified
+To record contract inception		
+6. CONCLUSION AND RECOMMENDATIONS
+Conclusion
+The accounting treatment outlined in this memo is appropriate and in accordance with ASC 606. The key revenue recognition approach involves recognizing the revenue from the monthly Netflix streaming service subscription over time, reflecting the continuous nature of the service provided to customers. Significant judgment was required in determining that the Netflix subscription service constitutes a single performance obligation due to its continuous nature and the absence of distinct separable components. Additionally, the assessment that this performance obligation is recognized over time necessitated careful consideration of the ongoing service delivery. Given the straightforward nature of this contract and the absence of variable consideration or complex terms, no ongoing monitoring is required.
+
+CONFIDENTIAL: This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.
+
+PREPARED BY: ASC 606 AI Analyst
+REVIEWED BY: [To be completed]
+APPROVED BY: [To be completed]
+
+Generated by Controller.cpa ASC 606 Analysis Platform | August 02, 2025
+
+This document is optimized for printing and professional review.

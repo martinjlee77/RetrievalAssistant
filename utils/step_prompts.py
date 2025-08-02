@@ -491,12 +491,25 @@ Begin writing the financial impact section, strictly adhering to the proportiona
                 financing_analysis = s3_price.get('financing_component_analysis', '')
                 has_financing_component = 'significant financing component' in str(financing_analysis).lower()
 
-        # Professional judgments from all steps (this part was already correct)
+        # Professional judgments from all steps - apply consistent filtering
         all_judgments = []
         for step in [s1, s2, s3, s4, s5]:
             judgments = step.get('professional_judgments', [])
             if judgments:
-                all_judgments.extend(judgments)
+                # Apply the same filtering logic as get_key_judgments_prompt
+                for judgment in judgments:
+                    judgment_lower = judgment.lower()
+                    # Filter out standard ASC 606 application
+                    is_standard_application = (
+                        "single performance obligation" in judgment_lower or
+                        "over time" in judgment_lower or 
+                        "point in time" in judgment_lower or
+                        "distinct" in judgment_lower or
+                        "revenue is recognized" in judgment_lower or
+                        "subscription service" in judgment_lower
+                    )
+                    if not is_standard_application:
+                        all_judgments.append(judgment)
 
         # Mark as complex if any complexity indicators present
         if po_count > 1 or has_variable_consideration or has_financing_component or len(all_judgments) > 0:
@@ -615,8 +628,24 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
             if judgments := step_result.get('professional_judgments'):
                 all_step_judgments.extend(judgments)
         
-        # Only use actual judgments found in the analysis, not defaults
-        critical_judgments = all_step_judgments
+        # Apply the same filtering logic as get_key_judgments_prompt
+        filtered_judgments = []
+        for judgment in all_step_judgments:
+            judgment_lower = judgment.lower()
+            # Filter out standard ASC 606 application (same logic as get_key_judgments_prompt)
+            is_standard_application = (
+                "single performance obligation" in judgment_lower or
+                "over time" in judgment_lower or 
+                "point in time" in judgment_lower or
+                "distinct" in judgment_lower or
+                "revenue is recognized" in judgment_lower or
+                "subscription service" in judgment_lower
+            )
+            if not is_standard_application:
+                filtered_judgments.append(judgment)
+        
+        # Only use filtered judgments to ensure consistency
+        critical_judgments = filtered_judgments
 
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
@@ -862,9 +891,22 @@ Write only the paragraph, no additional formatting or labels."""
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
             judgments = step.get('professional_judgments', [])
             if judgments:
-                all_judgments.extend(judgments)
+                # Apply the same filtering logic as other functions
+                for judgment in judgments:
+                    judgment_lower = judgment.lower()
+                    # Filter out standard ASC 606 application
+                    is_standard_application = (
+                        "single performance obligation" in judgment_lower or
+                        "over time" in judgment_lower or 
+                        "point in time" in judgment_lower or
+                        "distinct" in judgment_lower or
+                        "revenue is recognized" in judgment_lower or
+                        "subscription service" in judgment_lower
+                    )
+                    if not is_standard_application:
+                        all_judgments.append(judgment)
 
-        # If, after stricter identification, no judgments were passed up, provide a standard statement.
+        # If, after filtering, no genuine judgments remain, provide a standard statement.
         if not all_judgments:
             return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 

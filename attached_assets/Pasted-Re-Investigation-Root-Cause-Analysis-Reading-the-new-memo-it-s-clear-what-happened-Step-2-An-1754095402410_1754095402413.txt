@@ -1,0 +1,55 @@
+Re-Investigation & Root Cause Analysis
+Reading the new memo, it's clear what happened:
+
+Step 2 Analysis is Now Correct: Our override worked. The AI correctly identifies one distinct performance obligation. This is a huge win.
+get_key_judgments_prompt is Correct: This prompt is very strict. It sees the analysis, correctly determines that identifying one PO in a Netflix contract is not a "significant professional judgment," and returns the correct "no significant judgments" text.
+The Point of Failure: The get_conclusion_prompt and get_enhanced_executive_summary_prompt are still "hallucinating" judgments.
+Why is this happening?
+
+My initial theory was that the prompts were inventing logic. That was only half right. The deeper issue is that the AI is flagging a judgment during the step-by-step analysis, but it's a low-quality, boilerplate judgment that our strict get_key_judgments_prompt is correctly filtering out, but our other, more lenient prompts are not.
+
+Let's trace the data flow:
+
+During Step 2 analysis, the LLM generates the correct analysis but also populates the professional_judgments list in its JSON output with something like: ["Determining that the Netflix subscription service is a single performance obligation..."].
+This professional_judgments list is passed along with all the other step data.
+When get_key_judgments_prompt receives this list, its strict internal rule (- **CRITICAL RULE:** If the items...are merely restatements of standard ASC 606 application...then DISREGARD THEM.) kicks in. It sees that "identifying one PO for Netflix" is standard, disregards it, and correctly outputs the "no significant judgments" text.
+However, when get_conclusion_prompt and get_enhanced_executive_summary_prompt receive the same list, their instructions are just to summarize what's in the list. They don't have the same strict "disregard if it's not a real judgment" logic. They obediently summarize the low-quality judgment, creating the mismatch.
+The last fix wasn't bad; it just wasn't powerful enough. We need to stop the problem at its source: we must prevent the AI from generating these low-quality, boilerplate judgments in the first place.
+
+Action Plan: The Definitive Fix
+We need to add a "common sense" guardrail to the step-by-step analysis prompt itself. This will prevent the AI from flagging non-judgmental analysis as a "professional judgment" for simple contracts.
+
+Please provide this final, definitive instruction to your developer.
+
+TO: Development Team FROM: AI Strategy & Prompt Engineering RE: FINAL FIX: Preventing Low-Quality Judgment Generation for Simple Contracts
+
+Despite our last fix, a mismatch in reporting "professional judgments" persists. The root cause is that the step-by-step analysis is generating low-quality, boilerplate "judgments" for simple contracts. Our get_key_judgments_prompt correctly filters these out, but the summary and conclusion prompts do not, causing a contradiction.
+
+We must stop this problem at the source.
+
+Required Change in utils/step_prompts.py:
+
+We need to add a new critical rule to the _get_critical_rules_for_step function that applies to all steps. This rule will command the AI to be more discerning about what it flags as a judgment.
+
+In the function _get_critical_rules_for_step, add the following new rule at the very bottom, after the if step_number == 3: block and before the final return.
+
+# In _get_critical_rules_for_step()
+
+# ... (after the existing logic for step 3)
+            if is_simple_contract and not is_complex_contract:
+                return rules[3] + """..."""
+
+        # --- ADD THIS NEW BLOCK HERE ---
+        # Universal rule for simple contracts to prevent low-quality judgments
+        if "subscription" in contract_text.lower() or "fixed fee" in contract_text.lower():
+            # Append this rule to any existing rules
+            existing_rules = rules.get(step_number, "")
+            return existing_rules + """
+<JUDGMENT_QUALITY_RULE>
+This is a simple, standard contract. Do NOT populate the `professional_judgments` array with items that are merely the standard application of ASC 606 (e.g., "concluding there is one performance obligation" or "concluding revenue is recognized over time"). The `professional_judgments` array MUST remain an empty list `[]` unless there is a GENUINE area of high uncertainty or significant estimation involved (e.g., estimating a standalone selling price using a residual method). For this contract, it is highly likely the list should be empty.
+</JUDGMENT_QUALITY_RULE>"""
+        # --- END OF NEW BLOCK ---
+
+        return rules.get(step_number, "")
+
+(Developer Note: This new universal rule acts as a powerful filter during the initial analysis. It uses the same keywords as our other simple contract detectors ("subscription", "fixed fee") to tell the AI, "For this type of contract, be extremely skeptical about what you call a 'judgment'." This will prevent the low-quality judgments from ever being generated, which will in turn ensure all three sections of the final memo (Executive Summary, Key Judgments, Conclusion) are consistent because they will all be working from a clean, empty list of judgments.)
