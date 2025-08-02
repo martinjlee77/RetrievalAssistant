@@ -980,7 +980,7 @@ Your reputation for precision is on the line. Do not overstate the complexity of
 
         all_points = []
 
-        # 1. Process structured transaction_price_components
+        # 1. Process structured transaction_price_components intelligently
         transaction_components = step_data.get('step3_analysis', {}).get('transaction_price_components', {})
 
         # Define a mapping for better titles
@@ -994,6 +994,9 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             'other_considerations_analysis': 'Other Considerations'
         }
 
+        # Smart filtering: avoid redundant price entries
+        processed_values = set()
+        
         for key, analysis_text in transaction_components.items():
             is_not_applicable = (
                 analysis_text is None or
@@ -1003,6 +1006,19 @@ Your reputation for precision is on the line. Do not overstate the complexity of
             )
 
             if not is_not_applicable:
+                text_str = str(analysis_text).strip()
+                
+                # Skip if this is a redundant price amount we've already seen
+                if key in ['fixed_consideration', 'total_transaction_price']:
+                    if text_str in processed_values:
+                        continue  # Skip duplicate price entries
+                    processed_values.add(text_str)
+                
+                # Only include substantive analysis, not just price amounts
+                if key in ['fixed_consideration', 'total_transaction_price'] and len(text_str) < 30:
+                    # This is likely just a price amount, skip it if we have analysis_points with more detail
+                    continue
+                
                 topic_title = title_map.get(key, key.replace('_', ' ').title())
                 all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
 
