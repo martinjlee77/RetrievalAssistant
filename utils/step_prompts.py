@@ -99,6 +99,31 @@ Even for simple topics, provide this detailed reasoning narrative to ensure the 
     # --- NEW: Modular Helper Functions ---
 
     @staticmethod
+    def _filter_genuine_judgments(judgments: list) -> list:
+        """
+        Applies consistent filtering logic to remove standard ASC 606 application 
+        that doesn't represent genuine professional judgment.
+        
+        Returns only judgments that involve significant estimation, choice between 
+        viable alternatives, or genuine uncertainty.
+        """
+        filtered_judgments = []
+        for judgment in judgments:
+            judgment_lower = judgment.lower()
+            # Filter out standard ASC 606 application
+            is_standard_application = (
+                "single performance obligation" in judgment_lower or
+                "over time" in judgment_lower or 
+                "point in time" in judgment_lower or
+                "distinct" in judgment_lower or
+                "revenue is recognized" in judgment_lower or
+                "subscription service" in judgment_lower
+            )
+            if not is_standard_application:
+                filtered_judgments.append(judgment)
+        return filtered_judgments
+
+    @staticmethod
     def _get_schema_for_step(step_number: int) -> str:
         """Helper to route to the correct, existing schema definition."""
         if step_number == 1: return StepPrompts.get_step1_schema()
@@ -496,20 +521,9 @@ Begin writing the financial impact section, strictly adhering to the proportiona
         for step in [s1, s2, s3, s4, s5]:
             judgments = step.get('professional_judgments', [])
             if judgments:
-                # Apply the same filtering logic as get_key_judgments_prompt
-                for judgment in judgments:
-                    judgment_lower = judgment.lower()
-                    # Filter out standard ASC 606 application
-                    is_standard_application = (
-                        "single performance obligation" in judgment_lower or
-                        "over time" in judgment_lower or 
-                        "point in time" in judgment_lower or
-                        "distinct" in judgment_lower or
-                        "revenue is recognized" in judgment_lower or
-                        "subscription service" in judgment_lower
-                    )
-                    if not is_standard_application:
-                        all_judgments.append(judgment)
+                # Apply consistent filtering using shared function
+                filtered = StepPrompts._filter_genuine_judgments(judgments)
+                all_judgments.extend(filtered)
 
         # Mark as complex if any complexity indicators present
         if po_count > 1 or has_variable_consideration or has_financing_component or len(all_judgments) > 0:
@@ -628,24 +642,8 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
             if judgments := step_result.get('professional_judgments'):
                 all_step_judgments.extend(judgments)
         
-        # Apply the same filtering logic as get_key_judgments_prompt
-        filtered_judgments = []
-        for judgment in all_step_judgments:
-            judgment_lower = judgment.lower()
-            # Filter out standard ASC 606 application (same logic as get_key_judgments_prompt)
-            is_standard_application = (
-                "single performance obligation" in judgment_lower or
-                "over time" in judgment_lower or 
-                "point in time" in judgment_lower or
-                "distinct" in judgment_lower or
-                "revenue is recognized" in judgment_lower or
-                "subscription service" in judgment_lower
-            )
-            if not is_standard_application:
-                filtered_judgments.append(judgment)
-        
-        # Only use filtered judgments to ensure consistency
-        critical_judgments = filtered_judgments
+        # Apply consistent filtering using shared function
+        critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
 
         return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
 
@@ -891,20 +889,9 @@ Write only the paragraph, no additional formatting or labels."""
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
             judgments = step.get('professional_judgments', [])
             if judgments:
-                # Apply the same filtering logic as other functions
-                for judgment in judgments:
-                    judgment_lower = judgment.lower()
-                    # Filter out standard ASC 606 application
-                    is_standard_application = (
-                        "single performance obligation" in judgment_lower or
-                        "over time" in judgment_lower or 
-                        "point in time" in judgment_lower or
-                        "distinct" in judgment_lower or
-                        "revenue is recognized" in judgment_lower or
-                        "subscription service" in judgment_lower
-                    )
-                    if not is_standard_application:
-                        all_judgments.append(judgment)
+                # Apply consistent filtering using shared function
+                filtered = StepPrompts._filter_genuine_judgments(judgments)
+                all_judgments.extend(filtered)
 
         # If, after filtering, no genuine judgments remain, provide a standard statement.
         if not all_judgments:
