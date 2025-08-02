@@ -6,7 +6,19 @@ This project is a multi-standard accounting analysis platform that generates com
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (January 2025)
+## Recent Changes (January/February 2025)
+
+### Critical Judgment Consistency Fix - Unified Filtering Architecture
+**Date**: February 1, 2025
+**Status**: COMPLETED
+
+- **ROOT CAUSE IDENTIFIED**: Executive Summary and Conclusion prompts reported different judgment status than Key Professional Judgments section
+- **SOLUTION IMPLEMENTED**: Created shared `_filter_genuine_judgments()` function with consistent filtering logic across all three judgment-reporting sections
+- **ARCHITECTURE IMPROVED**: Replaced duplicated filtering code with single source of truth approach
+- **FILTERING LOGIC**: Removes standard ASC 606 application (e.g., "single performance obligation", "over time recognition") while preserving genuine judgments requiring estimation or choice between alternatives
+- **FUNCTIONS UPDATED**: get_key_judgments_prompt, get_enhanced_executive_summary_prompt, get_conclusion_prompt now use identical filtering
+- **NETFLIX MISMATCH RESOLVED**: All three sections now consistently report "no significant judgments" for simple subscription contracts
+- **DESIGN PRINCIPLE**: Maintained sophisticated filtering without over-engineering or preventing legitimate judgment detection in complex contracts
 
 ### Major Architectural Refactor - System/User Prompt Architecture
 **Date**: January 31, 2025
