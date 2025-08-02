@@ -34,7 +34,7 @@ class StepPrompts:
         Defines the AI's core persona, universal rules, and mandatory output format.
         This is static and sent with every step-analysis call.
         """
-        return """You are an expert technical accountant specializing in ASC 606. Your analysis must be audit-ready, precise, and objective. You must follow all instructions and formatting rules precisely.
+        return """You are an expert technical accountant specializing in ASC 606. Your analysis must be audit-ready, understandable, precise, and objective. You must follow all instructions and formatting rules precisely.
 
 <OUTPUT_FORMAT_RULE>
 You MUST return your response as a single, well-formed JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object. Your entire response must be only the JSON.
@@ -47,10 +47,12 @@ Every quote from the contract provided in the `evidence_quotes` array MUST inclu
 </EVIDENCE_RULE>
 
 <ANALYSIS_RULE>
-Your analysis must be thorough. Weave in specific ASC 606 citations (e.g., ASC 606-10-25-1) to support your conclusions.
+Your analysis must be thorough. Weave in specific citations to support your conclusions.
+- When citing the official standard, reference its **authoritative** source (e.g., ASC 606-10-25-1).
+- Where helpful, you may also cite **interpretative** guidance (e.g., from an EY source) to add practical context.
 </ANALYSIS_RULE>
 """
-
+   
     @staticmethod
     def get_user_prompt_for_step(step_number: int, contract_text: str, rag_context: str, contract_data=None, debug_config=None) -> str:
         """
@@ -80,22 +82,22 @@ Your analysis must be thorough. Weave in specific ASC 606 citations (e.g., ASC 6
             "}",
             "```",
             """<ANALYSIS_STRUCTURE_RULE>
-For every `analysis_point` you generate, your `analysis_text` MUST be a flowing narrative that tells the story of your analysis. While maintaining the three core elements (assessment, guidance application, conclusion), write them as a seamless narrative rather than separate subsections:
+For each `analysis_point`, your `analysis_text` MUST be a professional, narrative paragraph that follows this 3-part "IAC" structure:
+1.  **Issue:** Clearly state the accounting question being addressed (e.g., "Is the contract enforceable?", "Are the services distinct?").
+2.  **Analysis:** Present the relevant facts from the contract, cite the applicable guidance, both authoritative and interpretative (e.g., ASC 606, EY Guidance), and explain how the guidance applies to the facts.
+3.  **Conclusion:** Provide a definitive answer to the issue.
 
-- Start by stating the facts from the contract and your assessment
-- Flow naturally into explaining how ASC 606 guidance applies, citing specific paragraphs. Do the same if the industry interpretation (e.g., EY guide) is used.
-- Conclude with your determination, all within a single flowing paragraph
+Weave these three parts into a seamless, easy-to-understand narrative.
 
-Example: "The contract specifies a fixed monthly fee of $15.49 with no performance-based adjustments or penalties. Under ASC 606-10-32-2, this represents fixed consideration as the amount does not vary based on future events or customer actions. Therefore, no variable consideration is present in this arrangement."
+**META-EXAMPLE OF STRUCTURE (Do NOT copy the content, only the pattern):**
+"The primary question is [state the issue] (Issue). The contract specifies that [key term or fact], and ASC 606-10-XX-X requires [paraphrase guidance]. Applying this, the facts indicate that [explain application] (Analysis). Therefore, we conclude that [state the conclusion] (Conclusion)."
 
-**For Steps 2 and 5 in particular**, which involve more judgment, enhance your analysis by also briefly discussing *why an alternative accounting treatment was rejected*. For example, when concluding a service is a single performance obligation in Step 2, briefly explain why the components are not distinct. When concluding revenue is recognized 'Over Time' in Step 5, briefly explain why 'Point in Time' is inappropriate.
-
-Even for simple topics, provide this detailed reasoning narrative to ensure the memo is audit-ready.
+**For Steps 2 & 5:** Your analysis should also briefly explain *why an alternative accounting treatment, if any, was rejected*.
 </ANALYSIS_STRUCTURE_RULE>""",
             critical_rules
         ]
         return "\n\n".join(prompt_parts)
-
+      
     # --- NEW: Modular Helper Functions ---
 
     @staticmethod
@@ -142,16 +144,11 @@ Even for simple topics, provide this detailed reasoning narrative to ensure the 
 - You MUST create a corresponding `analysis_points` entry for each of the five criteria.
 </CRITICAL_INSTRUCTION>""",
             2: """<CRITICAL_INSTRUCTION>
-- If no distinct performance obligations are found, `performance_obligations` MUST be an empty list `[]`, and you must explain why in the `analysis_points`.
-- For simple contracts with one obvious obligation, keep the analysis concise but complete.
-- Focus on the "separately identifiable" criterion, as it is often the most decisive factor.
+- If no distinct performance obligations are found, `performance_obligations` MUST be an empty list `[]`, and you must explain why in the `analysis_points`. But an genuine ASC 606 contract should have at least one performance obligation.
+- For simple contracts with one obvious performance obligation, keep the analysis concise but complete.
+- Focus on the "separately identifiable" (also called "distinct within the context of the contract") criterion, as it is often the most decisive factor.
 </CRITICAL_INSTRUCTION>
-<CRITICAL_OVERRIDE>
-This is a simple subscription-based contract (e.g., SaaS, streaming). Such contracts almost always contain a SINGLE, distinct performance obligation: the service access itself.
-- You MUST identify this as one distinct performance obligation.
-- Do NOT misinterpret "integrated service" to mean "not distinct". The service itself is the distinct promise.
-- Conclude that there is one distinct performance obligation.
-</CRITICAL_OVERRIDE>""",
+""",
             3: """<CRITICAL_INSTRUCTION>
 - Your primary analysis MUST occur within the `transaction_price_components` JSON structure.
 - Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.
@@ -344,17 +341,11 @@ STRUCTURED ANALYSIS DATA:
 YOUR TASK:
 Write a concise financial impact analysis.
 
-**CRITICAL TAX RULE: Any sales tax collected from the customer is NOT revenue or deferred revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). The journal entry should show a credit to Deferred Revenue for the pre-tax amount and a separate credit to Sales Tax Payable.
-
-**CRITICAL RULE: Be Proportional.**
-#... rest of the prompt
+**CRITICAL TAX RULE: Any sales tax collected from the customer generally is NOT revenue or deferred revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). The journal entry should show a debit to Cash or Accounts Receivable for the sales tax amount and a separate credit to Sales Tax Payable.
 
 **CRITICAL RULE: Be Proportional.**
 - **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
-- **For COMPLEX transactions:** Provide a more detailed analysis, including separate sections for Financial Statement Impact and Illustrative Journal Entries as described below.
-
----
-**IF THE TRANSACTION IS COMPLEX, follow this structure:**
+- ** For COMPLEX transactions**, follow this structure:**
 
 1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or deferred revenue liabilities).
 
@@ -366,25 +357,12 @@ Write a concise financial impact analysis.
 
     | Date       | Account                          | Debit     | Credit    |
     |------------|----------------------------------|-----------|-----------|
-    | 2024-09-26 | Cash / Accounts Receivable       | $16.52    |           |
-    |            |   Deferred Revenue               |           | $15.49    |
-    |            |   Sales Tax Payable              |           | $1.03     |
-    |            | *To record contract inception*   |           |           |
+    | [date]     | [asset] or [liability]           | $[amount] |           |
+    |            |   [liability] or [revenue]       |           | $[amount] |
+    |            | *To record [include the purpose] |           |           |
+
 
 3.  **Internal Control & Process Considerations:** Briefly mention any internal controls over financial reportin (ICFR) considerations required for accurate accounting and effective control environment (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
-
----
-**IF THE TRANSACTION IS SIMPLE, follow this structure:**
-
-The {transaction_price_data.get('total_price', '$XX.XX')} fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
-
-**Illustrative Journal Entry:**
-| Account                      | Debit     | Credit    |
-|------------------------------|-----------|-----------|
-| Cash / Accounts Receivable   | {transaction_price_data.get('total_price', '$XX.XX')}    |           |
-| Deferred Revenue             |           | {transaction_price_data.get('total_price', '$XX.XX')}    |
-| Sales Tax Payable            |           | {tax_amount_str} |
-| *To record contract inception* | | |
 
 ---
 
@@ -535,7 +513,7 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
         # --- End Enhanced Complexity Logic ---
 
-        return f"""You are an accounting manager writing the final "Conclusion" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+        return f"""You are an accounting senior manager writing the final "Conclusion" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
 
 **CRITICAL CONTRACT CLASSIFICATION:**
 This contract has been classified as: {"SIMPLE" if is_simple_contract else "COMPLEX"}
@@ -558,7 +536,7 @@ Write a final concluding section for the memo, strictly adhering to the proporti
 **IF THE TRANSACTION or Contract IS COMPLEX, follow this structure:**
 
 ### Conclusion
-Write a comprehensive conclusion paragraph that:
+Write one comprehensive conclusion paragraph that:
 1. States that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606
 2. Summarizes the key revenue recognition approach
 3. Based on the provided list of judgments, {json.dumps(all_judgments)}, summarize the key judgments. If the list is empty, you MUST state that 'no significant professional judgments were required'.
@@ -1044,11 +1022,14 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
                 markdown_sections.append(str(analysis_text))
 
+                # Integrate evidence directly below the analysis text it supports
                 if evidence_quotes and isinstance(evidence_quotes, list):
-                    markdown_sections.append("\n**Supporting Contract Evidence:**")
                     for quote in evidence_quotes:
-                        markdown_sections.append(f"> {quote}")
-                markdown_sections.append("") # Spacing
+                        # Add a blockquote for each piece of evidence
+                        if isinstance(quote, str) and quote:
+                            markdown_sections.append(f"> {quote}")
+
+                markdown_sections.append("") # Add spacing before next point
 
         return "\n".join(markdown_sections)
 
@@ -1138,8 +1119,7 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 filtered_points.append(point)
     
         if not filtered_points:
-            markdown_sections.append(
-                "No additional analysis was required for this step.")
+            markdown_sections.append("No additional analysis was required for this step.")
         else:
             for i, point in enumerate(filtered_points):
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
