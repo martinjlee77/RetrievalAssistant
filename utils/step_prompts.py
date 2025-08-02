@@ -1099,13 +1099,16 @@ Your reputation for precision is on the line. Do not overstate the complexity of
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
                 markdown_sections.append(analysis_text)
 
+                # NEW: Integrate evidence directly below the analysis text it supports
                 if evidence_quotes and isinstance(evidence_quotes, list):
-                    markdown_sections.append(
-                        "**Supporting Contract Evidence:**")
                     for quote in evidence_quotes:
-                        markdown_sections.append(f"> {quote}")
+                        # Add a blockquote for each piece of evidence
+                        if isinstance(quote, str) and quote:
+                            markdown_sections.append(f"> {quote}")
 
-        return "\n\n".join(markdown_sections)
+                markdown_sections.append("") # Add spacing before next point
+
+        return "\n".join(markdown_sections)
 
     @staticmethod
     def _format_general_step_with_filtering(step_data: dict, step_name: str,

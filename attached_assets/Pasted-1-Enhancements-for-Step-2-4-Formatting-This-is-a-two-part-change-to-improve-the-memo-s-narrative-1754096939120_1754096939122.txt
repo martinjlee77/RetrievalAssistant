@@ -1,0 +1,241 @@
+1. Enhancements for Step 2 & 4 Formatting
+This is a two-part change to improve the memo's narrative flow and professionalism.
+
+Part A: Improve Step 4 "No Analysis" Output
+
+This change ensures that when a contract has only one performance obligation, the memo provides a clear, audit-ready explanation for Step 4 instead of a generic "no analysis" message.
+
+File to Edit: asc_606_analyzer.py
+Function to Modify: analyze_contract
+Locate the following block of code (around line 430):
+
+# Generate Detailed Analysis (Python-only, no LLM call needed)
+            detailed_analysis_sections = []
+            step_names = [
+                "Identify the Contract",
+                "Identify Performance Obligations", 
+                "Determine the Transaction Price",
+                "Allocate the Transaction Price",
+                "Recognize Revenue"
+            ]
+
+            for i in range(1, 6):
+                step_data = step_results.get(f"step_{i}", {})
+                formatted_step = StepPrompts.format_step_detail_as_markdown(
+                    step_data, i, step_names[i-1]
+                )
+                detailed_analysis_sections.append(formatted_step)
+
+Replace that entire block with this new, more intelligent logic:
+
+# Generate Detailed Analysis (Python-only, no LLM call needed)
+            detailed_analysis_sections = []
+            step_names = [
+                "Identify the Contract", "Identify Performance Obligations",
+                "Determine the Transaction Price", "Allocate the Transaction Price",
+                "Recognize Revenue"
+            ]
+
+            for i in range(1, 6):
+                step_number = i
+                step_data = step_results.get(f"step_{step_number}", {})
+
+                # --- NEW LOGIC FOR STEP 4 ---
+                # If Step 4 analysis is empty and Step 2 confirmed only one PO, use the enhanced text.
+                if step_number == 4:
+                    s2_data = step_results.get("step_2", {})
+                    # Safely access nested performance obligations
+                    s2_pos = s2_data.get('step2_analysis', {}).get('performance_obligations', [])
+                    s4_analysis_points = step_data.get('analysis_points', [])
+
+                    if not s4_analysis_points and isinstance(s2_pos, list) and len(s2_pos) == 1:
+                        # Create the improved, audit-ready markdown for Step 4 manually
+                        conclusion_text = step_data.get('executive_conclusion', "The entire transaction price is allocated to the single performance obligation.")
+                        formatted_step = (
+                            f"### Step 4: Allocate the Transaction Price\n\n"
+                            f"**Conclusion:**\n{conclusion_text}\n\n---\n\n"
+                            f"**Detailed Analysis:**\nAs only one distinct performance obligation was identified in Step 2, "
+                            f"the entire transaction price is allocated to that single obligation. No further allocation is necessary."
+                        )
+                        detailed_analysis_sections.append(formatted_step)
+                        continue # Skip to the next iteration of the loop
+
+                # Fallback to the standard formatting logic for all other cases
+                formatted_step = StepPrompts.format_step_detail_as_markdown(
+                    step_data, step_number, step_names[step_number - 1]
+                )
+                detailed_analysis_sections.append(formatted_step)
+
+Part B: Improve Step 2 Evidence Formatting
+
+This change will make the supporting quotes in Step 2 appear more integrated with the analysis they support.
+
+File to Edit: step_prompts.py
+Function to Replace: _format_step2_with_filtering
+# Replace the existing _format_step2_with_filtering function with this new version
+
+    @staticmethod
+    def _format_step2_with_filtering(step_data: dict, step_name: str,
+                                     conclusion: str,
+                                     analysis_points: list) -> str:
+        """Apply the Auditor's Method to Step 2: Filter out N/A components and improve evidence formatting."""
+        markdown_sections = [
+            f"### Step 2: {step_name}", f"**Conclusion:**\n{conclusion}",
+            "\n---\n", "**Detailed Analysis:**\n"
+        ]
+
+        # Filter analysis points to remove N/A topics
+        ignore_phrases = {'n/a', 'not applicable'}
+        filtered_points = []
+
+        for point in analysis_points:
+            analysis_text = point.get('analysis_text', '')
+            analysis_text_str = str(analysis_text or '').strip().lower()
+            is_not_applicable = False
+
+            if not analysis_text_str or analysis_text_str in ignore_phrases or analysis_text_str.startswith('n/a'):
+                is_not_applicable = True
+
+            # Only include if not N/A
+            if not is_not_applicable:
+                filtered_points.append(point)
+
+        if not filtered_points:
+            markdown_sections.append(
+                "The contract contains a straightforward single performance obligation."
+            )
+        else:
+            for i, point in enumerate(filtered_points):
+                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
+                evidence_quotes = point.get('evidence_quotes', [])
+
+                markdown_sections.append(f"**{i+1}. {topic_title}**")
+                markdown_sections.append(analysis_text)
+
+                # NEW: Integrate evidence directly below the analysis text it supports
+                if evidence_quotes and isinstance(evidence_quotes, list):
+                    for quote in evidence_quotes:
+                        # Add a blockquote for each piece of evidence
+                        if isinstance(quote, str) and quote:
+                            markdown_sections.append(f"> {quote}")
+
+                markdown_sections.append("") # Add spacing before next point
+
+        return "\n".join(markdown_sections)
+
+2. Critical Fix for Financial Impact Accuracy
+This is the most important change. It replaces the existing prompt logic with a much more robust version that correctly parses sales tax and ensures the journal entry is always balanced and accurate.
+
+File to Edit: step_prompts.py
+Function to Replace: get_financial_impact_prompt
+# Replace the entire existing get_financial_impact_prompt function with this new, more robust version.
+
+    @staticmethod
+    def get_financial_impact_prompt(s1: dict,
+                                    s2: dict,
+                                    s3: dict,
+                                    s4: dict,
+                                    s5: dict,
+                                    customer_name: str,
+                                    memo_audience: str,
+                                    contract_data=None) -> str:
+        """Generates proportional financial impact prompt based on structured data analysis."""
+        import json
+        import re
+
+        # --- Extract structured data from each step (using existing safe access logic) ---
+        contract_valid = "Valid"
+        if s1_analysis := s1.get('step1_analysis'):
+            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+                failed_criteria = [c for c in s1_criteria if c.get('status') == 'Not Met']
+                if failed_criteria:
+                    contract_valid = f"Invalid - Failed: {', '.join([c.get('criterion', 'Unknown') for c in failed_criteria])}"
+
+        # --- NEW: More robust extraction for Step 3, including Sales Tax ---
+        total_price_str = "Not specified"
+        pre_tax_price_str = "Not specified"
+        tax_amount_str = "0.00" # Default to 0.00
+        total_receivable_str = "Not specified"
+        has_variable_consideration = False
+
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                total_price_str = s3_price.get('total_transaction_price', 'Not specified')
+                pre_tax_price_str = total_price_str # Assume pre-tax is total unless tax found
+
+                var_consideration = s3_price.get('variable_consideration')
+                if var_consideration:
+                    var_str = str(var_consideration).strip().lower()
+                    has_variable_consideration = (var_str not in ['n/a', 'not applicable', 'none', 'none identified', ''] and len(var_str) > 10)
+
+                # Robustly find tax amount. Search multiple places.
+                search_text = json.dumps(s3) # Search the entire step 3 output for context
+                # Regex to find tax amount like "$1.03" or "1.03" near the word "tax"
+                tax_match = re.search(r'tax.*?\$?(\d+\.\d{2})', search_text, re.IGNORECASE)
+
+                if tax_match:
+                    tax_amount_str = tax_match.group(1)
+                    # Attempt to calculate total receivable amount
+                    try:
+                        # Find the pre-tax amount again for calculation
+                        pre_tax_val_match = re.search(r'\$?(\d+\.\d{2})', pre_tax_price_str)
+                        if pre_tax_val_match:
+                            pre_tax_val = float(pre_tax_val_match.group(1))
+                            tax_val = float(tax_amount_str)
+                            total_receivable_str = f"${pre_tax_val + tax_val:.2f}"
+                        else:
+                            total_receivable_str = "[Total Price + Tax]" # Fallback
+                    except (IndexError, ValueError, TypeError):
+                        total_receivable_str = "[Total Price + Tax]" # Fallback
+                else:
+                    tax_amount_str = "0.00"
+                    total_receivable_str = pre_tax_price_str
+
+        # --- Generate the rest of the prompt using these robust variables ---
+        # The logic for complexity scoring can remain as is.
+        # ... (Keep the existing complexity scoring logic) ...
+        # (The following is the new prompt text to be returned)
+
+        # Simplified complexity check for this prompt
+        is_simple_contract = not has_variable_consideration and contract_valid == "Valid"
+
+        prompt_template = f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise, financially accurate, and proportional to the complexity of the transaction.
+
+STRUCTURED ANALYSIS DATA:
+- Total Transaction Price (pre-tax revenue): {pre_tax_price_str}
+- Sales Tax Collected: ${tax_amount_str}
+- Total Receivable (Price + Tax): {total_receivable_str}
+
+YOUR TASK: Write a concise financial impact analysis.
+
+**CRITICAL JOURNAL ENTRY RULE:** You MUST create a complete and balanced journal entry.
+- The 'Cash / Accounts Receivable' debit **MUST** equal the sum of the credits ({total_receivable_str}).
+- The 'Deferred Revenue' credit **MUST** be for the pre-tax transaction price ({pre_tax_price_str}).
+- The 'Sales Tax Payable' credit **MUST** be for the sales tax amount (${tax_amount_str}). If the tax is $0.00, this line must be omitted.
+- Your entire journal entry must balance (Debits = Credits).
+
+**CRITICAL PROPORTIONALITY RULE:**
+- **For SIMPLE transactions** (like this one): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry.
+- **For COMPLEX transactions:** Provide a more detailed narrative, multiple journal entries, and ICFR considerations.
+
+---
+**IF THE TRANSACTION IS SIMPLE (Use this format):**
+
+The transaction price of {pre_tax_price_str} will be initially recorded as a deferred revenue liability. This amount will be recognized as revenue on a straight-line basis over the service period. The sales tax of ${tax_amount_str} collected from the customer is recorded as a separate liability.
+
+**Illustrative Journal Entry:**
+| Account                      | Debit     | Credit    |
+|------------------------------|-----------|-----------|
+| Cash / Accounts Receivable   | {total_receivable_str}    |           |
+|   Deferred Revenue           |           | {pre_tax_price_str}    |
+|   Sales Tax Payable          |           | ${tax_amount_str}    |
+| *To record initial invoicing*|           |           |
+
+---
+
+Begin writing the financial impact section, strictly adhering to all rules. If tax is $0.00, OMIT the 'Sales Tax Payable' line from the journal entry.
+"""
+        return prompt_template
+
+After applying these changes, your application will produce memos that are more professional, accurate, and robust against common edge cases found in simple contracts.
