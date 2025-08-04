@@ -55,7 +55,7 @@ def get_style_config() -> Dict[str, str]:
         Dictionary containing all styling parameters
     """
     return {
-        'font_family': 'Times New Roman',
+        'font_family': 'Lato',
         'font_size': '12pt',
         'page_width': '8.5in',
         'margins': '1in',
@@ -110,7 +110,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     # Generate professional CSS with configuration
     professional_css = f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;400italic;700italic&display=swap');
         
         body {{
             font-family: '{style_config['font_family']}', serif;

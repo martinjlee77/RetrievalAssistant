@@ -58,7 +58,7 @@ class ASC606PromptTemplates:
         3. Detailed Analysis (comprehensive 5-step ASC 606 framework)
         4. Key Judgments (critical accounting positions with rationale)
         5. Financial Impact (revenue amounts, timing, P&L effects)
-        6. Conclusion (final recommendations and next steps)
+        6. Conclusion (final conclusion)
         
         Use technical accounting language suitable for:
         - Audit committee presentations
