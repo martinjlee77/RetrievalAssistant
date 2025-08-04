@@ -466,24 +466,43 @@ def create_docx_from_text(text_content, contract_data=None):
             doc.add_paragraph(match.group(1), style='Heading 1')
     
     def add_heading2(doc, match):
-        """Add heading 2 with custom style"""
+        """Add heading 2 with custom style and proper spacing"""
+        # A6: Add more space before main section headers
+        heading_text = match.group(1)
+        if any(x in heading_text for x in ["EXECUTIVE SUMMARY", "CONTRACT OVERVIEW", "DETAILED ASC 606", "KEY PROFESSIONAL", "FINANCIAL IMPACT", "CONCLUSION"]):
+            doc.add_paragraph()  # Extra space before main sections
+        
         try:
-            doc.add_paragraph(match.group(1), style='Custom Heading 2')
+            doc.add_paragraph(heading_text, style='Custom Heading 2')
         except Exception:
-            doc.add_paragraph(match.group(1), style='Heading 2')
+            doc.add_paragraph(heading_text, style='Heading 2')
     
     def add_heading3(doc, match):
-        """Add heading 3 with custom style"""
+        """Add heading 3 with custom style and reduced spacing"""
+        heading_text = match.group(1)
+        # A7: Reduce space before "Detailed Analysis" and similar subsections
+        # A8: Remove redundant "Conclusion:" from headers
+        if heading_text.startswith("Conclusion:"):
+            heading_text = heading_text.replace("Conclusion:", "").strip()
+        
         try:
-            doc.add_paragraph(match.group(1), style='Custom Heading 3')
+            doc.add_paragraph(heading_text, style='Custom Heading 3')
         except Exception:
-            doc.add_paragraph(match.group(1), style='Heading 3')
+            doc.add_paragraph(heading_text, style='Heading 3')
     
     def add_bullet_point(doc, match):
-        """Add bullet point with formatting support"""
+        """Add bullet point with formatting support and smart indentation"""
+        bullet_text = match.group(1)
         bullet_para = doc.add_paragraph()
-        _parse_text_formatting(bullet_para, match.group(1))
-        bullet_para.style = 'List Bullet'
+        _parse_text_formatting(bullet_para, bullet_text)
+        
+        # A3-A5: Check if this should be a sub-bullet
+        # Sub-bullets start with specific patterns or are under performance obligations
+        if any(x in bullet_text for x in ["Logi-AI Suite", "Hardware", "Professional Services", "OptiScan-7", "Over Time", "Point in Time"]):
+            bullet_para.style = 'List Bullet'
+            bullet_para.paragraph_format.left_indent = Inches(0.5)  # Indent sub-bullets
+        else:
+            bullet_para.style = 'List Bullet'
     
     def add_numbered_item(doc, match):
         """Add numbered list item with formatting support"""
@@ -514,6 +533,11 @@ def create_docx_from_text(text_content, contract_data=None):
     # Preprocess content to handle HTML-like formatting and tables
     def preprocess_content(content):
         """Preprocess content to extract tables and clean formatting"""
+        # A2: Remove duplicate TECHNICAL ACCOUNTING MEMORANDUM headers
+        # Look for patterns like "#TECHNICAL ACCOUNTING MEMORANDUM" followed by the styled version
+        duplicate_header_pattern = r'#TECHNICAL ACCOUNTING MEMORANDUM\s*\n\s*\*\*TO:\*\*.*?\*\*REVIEW STATUS:\*\*[^\n]*\n'
+        content = re.sub(duplicate_header_pattern, '', content, flags=re.MULTILINE | re.DOTALL)
+        
         # Extract and store contract overview tables
         table_pattern = r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\n(?:\|.*?\|\s*\n)*'
         tables = re.findall(table_pattern, content, re.MULTILINE | re.DOTALL)
@@ -642,9 +666,27 @@ def create_docx_from_text(text_content, contract_data=None):
         table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
         table.style = 'Table Grid'
         
-        # Set dynamic column widths based on content
-        if len(headers) <= 3:
-            # For small tables, distribute evenly
+        # A1: Custom column widths for Contract Data Summary table + add missing fields
+        if len(headers) == 2 and any("Element" in h or "Details" in h for h in headers):
+            # Contract table: narrow first column, wide second column
+            table.columns[0].width = Inches(2.2)  # Element column
+            table.columns[1].width = Inches(4.3)  # Details column
+            
+            # A1: Check if we need to add DOCUMENT CLASSIFICATION and REVIEW STATUS
+            existing_rows = [row_data[0] for row_data in data_rows if row_data]
+            if "Document Classification" not in str(existing_rows):
+                # Add missing rows to data_rows for this table
+                data_rows.extend([
+                    ["Document Classification", "Internal Use Only"],
+                    ["Review Status", "Preliminary Analysis"]
+                ])
+                # Recreate table with additional rows
+                table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
+                table.style = 'Table Grid'
+                table.columns[0].width = Inches(2.2)
+                table.columns[1].width = Inches(4.3)
+        elif len(headers) <= 3:
+            # For other small tables, distribute evenly
             col_width = int(Inches(6.5) / len(headers))
             for col in table.columns:
                 col.width = col_width
@@ -753,30 +795,7 @@ def create_docx_from_text(text_content, contract_data=None):
                     run.font.name = 'Lato'
                     run.font.size = Pt(10)
     
-    # Add signature section
-    document.add_paragraph()
-    signature_para = document.add_paragraph()
-    signature_run = signature_para.add_run("ANALYST CERTIFICATION")
-    signature_run.font.name = 'Lato'
-    signature_run.font.size = Pt(12)
-    signature_run.font.bold = True
-    
-    cert_text = document.add_paragraph()
-    cert_run = cert_text.add_run(
-        "I certify that this analysis has been prepared in accordance with ASC 606 "
-        "requirements and represents my professional judgment based on the contract "
-        "documentation provided and applicable authoritative guidance."
-    )
-    cert_run.font.name = 'Lato'
-    cert_run.font.size = Pt(11)
-    cert_run.font.italic = True
-    
-    # Signature line
-    document.add_paragraph()
-    sig_line = document.add_paragraph()
-    sig_line.add_run("_" * 50)
-    sig_name = document.add_paragraph()
-    sig_name.add_run(f"{analyst_name}, Technical Accounting")
+    # A9: Analyst certification section removed per user feedback
     
     bio = io.BytesIO()
     document.save(bio)

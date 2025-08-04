@@ -507,17 +507,24 @@ else:
     memo = getattr(analysis_results, 'professional_memo', None)
     
     if memo:
-        # --- STREAMLINED TWO-OPTION MODEL ---
+        # Generate content once for both preview and download
+        from utils.html_export import convert_memo_to_html
+        from utils.llm import create_docx_from_text
+        
+        html_content = convert_memo_to_html(memo, contract_data)
+        analysis_title = contract_data.analysis_title if contract_data and contract_data.analysis_title else "ASC606_Analysis"
+
+        # --- PREVIEW FIRST (Front and Center) ---
+        with st.expander("📄 Memo Preview", expanded=True):
+            import streamlit.components.v1 as components
+            
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
+
+        # --- DOWNLOAD ACTION (Below Preview) ---
         with st.container(border=True):
             st.markdown("**Export Memo**")
-            st.write("Your analysis is complete. Download the memo as an editable Word document for review and filing.")
-
-            # Generate content
-            from utils.html_export import convert_memo_to_html
-            from utils.llm import create_docx_from_text
-            
-            html_content = convert_memo_to_html(memo, contract_data)
-            analysis_title = contract_data.analysis_title if contract_data and contract_data.analysis_title else "ASC606_Analysis"
+            st.write("Download the memo as an editable Word document for review and filing.")
 
             # Single primary action - Download DOCX
             try:
@@ -533,14 +540,6 @@ else:
                 )
             except Exception as e:
                 st.error(f"Error generating DOCX: {str(e)}")
-
-        # --- IMMEDIATE PREVIEW (Expanded by Default) ---
-        st.markdown("---")
-        with st.expander("📄 Memo Preview", expanded=True):
-            import streamlit.components.v1 as components
-            
-            # Display the styled HTML in a scrollable container
-            components.html(html_content, height=800, scrolling=True)
 
     else:
         st.info("No memo was generated for this analysis.")

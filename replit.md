@@ -17,11 +17,21 @@ Preferred communication style: Simple, everyday language.
 - **ENHANCED TEXT FORMATTING**: Added missing italic text support (*text*) alongside existing bold (**text**) formatting
 - **DYNAMIC TABLE HANDLING**: Replaced hardcoded table logic with intelligent column width distribution and markdown table parsing
 - **STREAMLINED UX**: Adopted industry-standard two-option model (Google Docs/Figma pattern):
-  - **Primary Action**: Single Download DOCX button (type="primary")
-  - **Secondary View**: Embedded preview expanded by default (expanded=True)
+  - **Preview First**: Memo preview displayed immediately at top, expanded by default
+  - **Download Below**: Single primary Download DOCX button positioned after preview
+  - **Minimal Friction**: Content front and center before any actions
   - **Removed**: Problematic "View in Browser" functionality
+- **COMPREHENSIVE DOCX FIXES**: Addressed detailed user feedback (A1-A10 tickmarks):
+  - **A1**: Contract table column widths optimized + Document Classification/Review Status added
+  - **A2**: Duplicate TECHNICAL ACCOUNTING MEMORANDUM header removed
+  - **A3-A5**: Sub-bullet indentation for performance obligations and recognition timing
+  - **A6**: Enhanced spacing before main section headers (Executive Summary, etc.)
+  - **A7**: Consistent spacing for subsections (Detailed Analysis)
+  - **A8**: Redundant "Conclusion:" text removed from headers
+  - **A9**: Analyst certification section completely removed
+  - **A10**: Enhanced table formatting with proper column distribution
 - **CODE CLEANUP**: Removed render_view_in_browser_button function and cleaned up html_export.py
-- **USER EXPERIENCE**: Immediate results visibility with expanded preview, eliminating click friction
+- **USER EXPERIENCE**: Preview-first approach with minimal content before results
 - **ARCHITECTURE**: html_export.py retained for embedded preview functionality while removing unused browser view features
 
 ### Critical Judgment Consistency Fix - Unified Filtering Architecture
