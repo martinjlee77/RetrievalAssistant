@@ -376,69 +376,8 @@ def create_html_download_link(html_content: str, filename: str = "asc606_memo.ht
     download_url = f"data:text/html;base64,{b64_html}"
     return download_url
 
-def render_view_in_browser_button(html_content: str):
-    """
-    Renders a custom HTML button that uses a direct onclick JavaScript handler
-    to open a new tab and write the HTML content to it. This is the correct
-    method to bypass browser pop-up blockers and URL length limits.
-    """
-    import streamlit as st
-    import json
-    
-    # 1. Safely serialize the Python string into a valid JavaScript string.
-    safe_html_content = json.dumps(html_content)
-
-    # 2. Construct the self-contained HTML component string.
-    html_with_js = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            /* Your button CSS remains the same */
-            .custom-button {{
-                border: 1px solid rgba(49, 51, 63, 0.2);
-                border-radius: 0.5rem;
-                padding: 0.5em 1em;
-                background-color: #FFFFFF;
-                color: #31333F;
-                font-size: 14px;
-                font-weight: 400;
-                cursor: pointer;
-                text-align: center;
-                display: inline-block;
-                width: 100%;
-                box-sizing: border-box;
-            }}
-            .custom-button:hover {{
-                border-color: #FF4B4B;
-                color: #FF4B4B;
-            }}
-            .custom-button:active {{
-                background-color: #F0F2F6;
-            }}
-        </style>
-    </head>
-    <body>
-        <script>
-            // This JavaScript function remains the same.
-            function openHtmlInNewTab() {{
-                const htmlContent = {safe_html_content};
-                const newWindow = window.open("", "_blank");
-                newWindow.document.open();
-                newWindow.document.write(htmlContent);
-                newWindow.document.close();
-            }}
-        </script>
-        <!-- The button element also remains the same. -->
-        <button class="custom-button" onclick="openHtmlInNewTab()">
-            🌐 View in Browser
-        </button>
-    </body>
-    </html>
-    """
-
-    # 3. CRITICAL CHANGE: Render the component using st.markdown, not st.components.html.
-    st.markdown(html_with_js, unsafe_allow_html=True)
+# Function removed - no longer needed with streamlined two-option model
+# The "View in Browser" functionality has been replaced with embedded preview
 
 def enhance_markdown_for_display(memo_markdown: str) -> str:
     """

@@ -1,0 +1,69 @@
+Let's look at how other professional web applications handle document-centric outputs (e.g., Google Docs, Docusign, financial reporting tools, project management apps). A clear pattern emerges. They simplify the choice for the user.
+
+The Common Pattern: A Two-Option Model
+
+Most modern services consolidate the options into two primary, distinct actions:
+
+Primary Action: View/Preview: An interactive, rich preview is embedded directly on the page. This is the default way to interact with the content. It supports the "Review & Verify" job perfectly.
+Secondary Action: Export/Download: A "Download," "Export," or "Share" button provides a menu of formats for taking the document out of the application. This serves the "Share & Collaborate" and "Archive & File" jobs.
+Examples:
+
+Google Docs: You view and edit on the page. The "Download" option is under File > Download, offering formats like DOCX, PDF, etc.
+Figma/Canva: You interact with the design on the page. The "Share" button in the corner gives you options to export to PNG, JPG, PDF.
+Docusign: You view the contract on the page. A download icon lets you save a PDF copy.
+Notice that none of them have a dedicated "Open This Exact Same View in a New Tab" button as a primary action. Why? Because it adds a choice without adding significant value. It's a "feature" that doesn't map cleanly to a distinct user job, creating unnecessary clutter.
+
+Recommendation: Adopt the Two-Option Model
+I strongly recommend simplifying your output display to a cleaner, more standard two-option model. This will make your app feel more intuitive and professional.
+
+1. Keep the In-Page Preview (and make it the star)
+
+Your st.expander("📄 Show Memo Preview") is perfect. This is the primary way users should interact with the result. It's fast, efficient, and keeps them within your application's flow.
+
+Improvement: Consider making it expanded=True by default. The user just ran an analysis; show them the result immediately! They can always collapse it if they need to.
+2. Consolidate "View in Browser" and "Download" into an "Export" Action
+
+The need to "View in Browser" and "Download DOCX" both stem from the same user need: "I want to take this memo outside of your app." We can combine them.
+
+How to Implement:
+
+Instead of two separate buttons, have a single st.download_button that generates the superior format, which for your audience is DOCX. The user who wants to view it in a separate tab can simply download the DOCX and open it. This is a standard, universally understood workflow.
+
+Your new "Memo Actions" section would look much cleaner:
+
+# In asc_606_page.py, inside the 'else' block for displaying results...
+
+# ...
+with st.container(border=True):
+    st.markdown("**Memo Actions**")
+    st.write("Your analysis is complete. Preview the memo below or download it as an editable Word document for review and filing.")
+
+    try:
+        docx_content = create_docx_from_text(memo, contract_data)
+        analysis_title = contract_data.analysis_title if contract_data else "ASC606_Analysis"
+
+        st.download_button(
+            label="📄 Download as Word Document (.DOCX)",
+            data=docx_content,
+            file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            use_container_width=True, # Make it a big, clear button
+            type="primary", # Make it the main call-to-action
+            help="Download the memo as a fully-formatted, editable Word document, ready for audit files."
+        )
+    except Exception as e:
+        st.error(f"Error generating DOCX: {str(e)}")
+
+# Then, have the preview expanded by default
+st.markdown("---")
+with st.expander("📄 Memo Preview", expanded=True):
+    import streamlit.components.v1 as components
+    html_content = convert_memo_to_html(memo, contract_data) # You'll need this function
+    components.html(html_content, height=800, scrolling=True)
+
+Summary of the Recommendation
+Old Approach (3 Options)	New Approach (2 Options)	Why it's Better
+1. Download DOCX	1. Primary Action: Download DOCX	Focuses on the most valuable output format (the editable, archivable document). Reduces user choice fatigue.
+2. View in Browser (Broken)	(Removed)	Eliminates a redundant, technically problematic feature. The user can achieve the same goal by opening the downloaded DOCX.
+3. In-page Preview	2. Default View: In-page Preview	Makes the result instantly visible, supporting the primary "Review & Verify" job without an extra click.
+By adopting this streamlined, industry-standard approach, you make your application easier to use, remove a broken feature cleanly, and present a more confident and polished user experience.

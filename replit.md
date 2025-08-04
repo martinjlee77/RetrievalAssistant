@@ -8,6 +8,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (January/February 2025)
 
+### Enhanced DOCX Generation & Streamlined UX - Industry Standards Adoption
+**Date**: February 4, 2025  
+**Status**: COMPLETED
+
+- **FONT MODERNIZATION**: Updated both DOCX and HTML exports from Times New Roman to Lato for modern, professional appearance
+- **RULE-BASED PARSING**: Implemented robust, extensible parsing system replacing brittle if/elif chains with regex-based rules
+- **ENHANCED TEXT FORMATTING**: Added missing italic text support (*text*) alongside existing bold (**text**) formatting
+- **DYNAMIC TABLE HANDLING**: Replaced hardcoded table logic with intelligent column width distribution and markdown table parsing
+- **STREAMLINED UX**: Adopted industry-standard two-option model (Google Docs/Figma pattern):
+  - **Primary Action**: Single Download DOCX button (type="primary")
+  - **Secondary View**: Embedded preview expanded by default (expanded=True)
+  - **Removed**: Problematic "View in Browser" functionality
+- **CODE CLEANUP**: Removed render_view_in_browser_button function and cleaned up html_export.py
+- **USER EXPERIENCE**: Immediate results visibility with expanded preview, eliminating click friction
+- **ARCHITECTURE**: html_export.py retained for embedded preview functionality while removing unused browser view features
+
 ### Critical Judgment Consistency Fix - Unified Filtering Architecture
 **Date**: February 1, 2025
 **Status**: COMPLETED

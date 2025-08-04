@@ -507,50 +507,38 @@ else:
     memo = getattr(analysis_results, 'professional_memo', None)
     
     if memo:
-        # --- 1. MEMO ACTIONS (Buttons First) ---
+        # --- STREAMLINED TWO-OPTION MODEL ---
         with st.container(border=True):
-            st.markdown("**Memo Actions**")
-            st.write("Your analysis is complete. Choose an option below to view or download the memo.")
+            st.markdown("**Export Memo**")
+            st.write("Your analysis is complete. Download the memo as an editable Word document for review and filing.")
 
-            # Generate the HTML content once to be used for both the link and the preview
-            from utils.html_export import convert_memo_to_html, render_view_in_browser_button
+            # Generate content
+            from utils.html_export import convert_memo_to_html
             from utils.llm import create_docx_from_text
             
             html_content = convert_memo_to_html(memo, contract_data)
             analysis_title = contract_data.analysis_title if contract_data and contract_data.analysis_title else "ASC606_Analysis"
 
-            # Keep the download buttons in columns for alignment
-            dl_col1, dl_col2 = st.columns(2)
-            with dl_col1:
-                try:
-                    docx_content = create_docx_from_text(memo, contract_data)
-                    st.download_button(
-                        label="📄 Download DOCX",
-                        data=docx_content,
-                        file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        use_container_width=True,
-                        help="Download the memo as an editable Word document."
-                    )
-                except Exception as e:
-                    st.error(f"Error generating DOCX: {str(e)}")
+            # Single primary action - Download DOCX
+            try:
+                docx_content = create_docx_from_text(memo, contract_data)
+                st.download_button(
+                    label="📄 Download as Word Document (.DOCX)",
+                    data=docx_content,
+                    file_name=f"{analysis_title.replace(' ', '_')}_ASC606_Memo.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True,
+                    type="primary",
+                    help="Download the memo as a fully-formatted, editable Word document, ready for audit files."
+                )
+            except Exception as e:
+                st.error(f"Error generating DOCX: {str(e)}")
 
-            # The other column can remain empty or contain another download link if needed.
-            with dl_col2:
-                # We can put a placeholder or another button here if we want.
-                # For now, leaving it empty is fine.
-                pass
-
-            # **CRITICAL FIX:** Render the custom JavaScript button OUTSIDE the columns.
-            # This gives it its own container and isolates it from other widget interactions.
-            st.write("") # Adds a little vertical space
-            render_view_in_browser_button(html_content)
-
-        # --- 2. OPTIONAL MEMO PREVIEW (Below the buttons) ---
-        st.markdown("---")  # Visual separator
-        with st.expander("📄 Show Memo Preview", expanded=False):
+        # --- IMMEDIATE PREVIEW (Expanded by Default) ---
+        st.markdown("---")
+        with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
-
+            
             # Display the styled HTML in a scrollable container
             components.html(html_content, height=800, scrolling=True)
 
