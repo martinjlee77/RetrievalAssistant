@@ -89,6 +89,19 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     # Pre-process the markdown to handle our custom tags FIRST
     preprocessed_markdown = _preprocess_markdown_for_html(memo_markdown)
     
+    # Add subsection header styling for common patterns
+    subsection_patterns = [
+        "OVERALL CONCLUSION", "KEY FINDINGS", "CONTRACT DATA SUMMARY", 
+        "DOCUMENTS REVIEWED", "DETAILED ANALYSIS", "CONCLUSION"
+    ]
+    
+    for pattern in subsection_patterns:
+        if pattern in preprocessed_markdown:
+            preprocessed_markdown = preprocessed_markdown.replace(
+                pattern, 
+                f'<div class="subsection-header">{pattern}</div>'
+            )
+    
     # Convert the PREPROCESSED markdown to HTML with error handling
     try:
         html_content = markdown2.markdown(
@@ -137,10 +150,10 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         h2 {{
             font-size: {style_config['subheader_size']};
             font-weight: bold;
-            margin-top: 18pt;
+            margin-top: 24pt;
             margin-bottom: 12pt;
-            border-bottom: 1px solid {style_config['primary_color']};
-            padding-bottom: 3pt;
+            border-bottom: 2px solid {style_config['primary_color']};
+            padding-bottom: 6pt;
             color: {style_config['primary_color']};
         }}
         
@@ -149,6 +162,18 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-weight: bold;
             margin-top: 12pt;
             margin-bottom: 6pt;
+            color: #555555;
+        }}
+        
+        /* Enhanced subsection headers */
+        .subsection-header {{
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: {style_config['primary_color']};
+            margin-top: 16pt;
+            margin-bottom: 8pt;
+            letter-spacing: 0.5px;
         }}
         
         /* Paragraph and text styling */
@@ -190,13 +215,24 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         
         th, td {{
             border: 1px solid {style_config['border_color']};
-            padding: 8pt;
+            padding: 10pt;
             text-align: left;
         }}
         
         th {{
-            background-color: #f0f0f0;
+            background-color: #003366;
+            color: white;
             font-weight: bold;
+            text-align: center;
+        }}
+        
+        /* Alternating row colors */
+        tr:nth-child(even) {{
+            background-color: #f8f9fa;
+        }}
+        
+        tr:nth-child(odd) {{
+            background-color: white;
         }}
         
         /* List styling - Fix bullet icons */

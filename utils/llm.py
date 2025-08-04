@@ -408,7 +408,7 @@ def create_docx_from_text(text_content, contract_data=None):
     # Implement robust, maintainable parsing using regex rules
     
     def configure_heading_styles():
-        """Configure custom heading styles with Lato font"""
+        """Configure custom heading styles with enhanced professional formatting"""
         try:
             # Heading 1 - Main sections (matches HTML h2)
             heading1_style = document.styles.add_style('Custom Heading 1', 1)
@@ -416,12 +416,11 @@ def create_docx_from_text(text_content, contract_data=None):
             heading1_style.font.size = Pt(14)
             heading1_style.font.bold = True
             heading1_style.font.color.rgb = RGBColor(0, 51, 102)
-            heading1_style.paragraph_format.space_before = Pt(12)
-            heading1_style.paragraph_format.space_after = Pt(6)
+            heading1_style.paragraph_format.space_before = Pt(18)  # Increased spacing
+            heading1_style.paragraph_format.space_after = Pt(8)
+            heading1_style.paragraph_format.keep_with_next = True  # Avoid page breaks after headings
         except Exception as e:
-            # Style already exists or other error, use default
             logging.warning(f"Could not create Custom Heading 1 style: {e}")
-            heading1_style = document.styles.get('Heading 1', document.styles['Normal'])
             
         try:
             # Heading 2 - Subsections (matches HTML h3)
@@ -430,28 +429,42 @@ def create_docx_from_text(text_content, contract_data=None):
             heading2_style.font.size = Pt(13)
             heading2_style.font.bold = True
             heading2_style.font.color.rgb = RGBColor(51, 51, 51)
-            heading2_style.paragraph_format.space_before = Pt(8)
-            heading2_style.paragraph_format.space_after = Pt(4)
+            heading2_style.paragraph_format.space_before = Pt(12)
+            heading2_style.paragraph_format.space_after = Pt(6)
+            heading2_style.paragraph_format.keep_with_next = True
         except Exception as e:
             logging.warning(f"Could not create Custom Heading 2 style: {e}")
-            heading2_style = document.styles.get('Heading 2', document.styles['Normal'])
             
         try:
-            # Heading 3 - Sub-subsections
+            # Heading 3 - Sub-subsections  
             heading3_style = document.styles.add_style('Custom Heading 3', 1)
             heading3_style.font.name = 'Lato'
             heading3_style.font.size = Pt(12)
             heading3_style.font.bold = True
-            heading3_style.paragraph_format.space_before = Pt(6)
-            heading3_style.paragraph_format.space_after = Pt(3)
+            heading3_style.font.color.rgb = RGBColor(85, 85, 85)  # Softer color
+            heading3_style.paragraph_format.space_before = Pt(8)
+            heading3_style.paragraph_format.space_after = Pt(4)
         except Exception as e:
             logging.warning(f"Could not create Custom Heading 3 style: {e}")
-            heading3_style = document.styles.get('Heading 3', document.styles['Normal'])
+            
+        try:
+            # NEW: Subsection Header Style for OVERALL CONCLUSION, KEY FINDINGS, etc.
+            subsection_style = document.styles.add_style('Subsection Header', 1)
+            subsection_style.font.name = 'Lato'
+            subsection_style.font.size = Pt(11)
+            subsection_style.font.bold = True
+            subsection_style.font.color.rgb = RGBColor(0, 51, 102)
+            subsection_style.font.all_caps = True  # UPPERCASE styling
+            subsection_style.paragraph_format.space_before = Pt(12)
+            subsection_style.paragraph_format.space_after = Pt(6)
+        except Exception as e:
+            logging.warning(f"Could not create Subsection Header style: {e}")
     
     # Compile regex patterns once for performance
     HEADING1_PATTERN = re.compile(r'^#\s+(.*?)$')
     HEADING2_PATTERN = re.compile(r'^##\s+(.*?)$') 
     HEADING3_PATTERN = re.compile(r'^###\s+(.*?)$')
+    SUBSECTION_PATTERN = re.compile(r'^(OVERALL CONCLUSION|KEY FINDINGS|CONTRACT DATA SUMMARY|DOCUMENTS REVIEWED|DETAILED ANALYSIS|CONCLUSION)$')
     BULLET_PATTERN = re.compile(r'^[\*\-]\s+(.*?)$')
     NUMBERED_PATTERN = re.compile(r'^\d+\.\s+(.*?)$')
     BLOCKQUOTE_PATTERN = re.compile(r'^>\s*(.*?)$')
@@ -510,15 +523,42 @@ def create_docx_from_text(text_content, contract_data=None):
         _parse_text_formatting(num_para, match.group(1))
         num_para.style = 'List Number'
     
+    def add_subsection_header(doc, match):
+        """Add professional subsection header (OVERALL CONCLUSION, KEY FINDINGS, etc.)"""
+        try:
+            doc.add_paragraph(match.group(1), style='Subsection Header')
+        except Exception:
+            # Fallback to manual formatting
+            para = doc.add_paragraph()
+            run = para.add_run(match.group(1))
+            run.font.name = 'Lato'
+            run.font.size = Pt(11)
+            run.font.bold = True
+            run.font.color.rgb = RGBColor(0, 51, 102)
+            para.paragraph_format.space_before = Pt(12)
+            para.paragraph_format.space_after = Pt(6)
+    
     def add_blockquote(doc, match):
-        """Add blockquote with professional styling"""
+        """Add enhanced blockquote with professional contract citation styling"""
         quote_para = doc.add_paragraph()
         _parse_text_formatting(quote_para, match.group(1))
+        # Enhanced professional styling for contract excerpts
         quote_para.paragraph_format.left_indent = Inches(0.5)
         quote_para.paragraph_format.right_indent = Inches(0.5)
+        quote_para.paragraph_format.space_before = Pt(6)
+        quote_para.paragraph_format.space_after = Pt(6)
+        # Add subtle border effect through shading
+        try:
+            from docx.oxml.shared import qn
+            from docx.oxml import parse_xml
+            shading_elm = parse_xml(r'<w:shd {} w:fill="F8F9FA"/>'.format(qn('w:val')))
+            quote_para._element.get_or_add_pPr().append(shading_elm)
+        except Exception:
+            pass  # Graceful fallback if shading fails
+        
         for run in quote_para.runs:
             run.font.italic = True
-            run.font.color.rgb = RGBColor(70, 70, 70)
+            run.font.color.rgb = RGBColor(85, 85, 85)
     
     def add_horizontal_rule(doc, match):
         """Add section separator"""
@@ -559,6 +599,7 @@ def create_docx_from_text(text_content, contract_data=None):
         (HEADING1_PATTERN, add_heading1),
         (HEADING2_PATTERN, add_heading2), 
         (HEADING3_PATTERN, add_heading3),
+        (SUBSECTION_PATTERN, add_subsection_header),  # NEW: Handle subsection headers
         (BULLET_PATTERN, add_bullet_point),
         (NUMBERED_PATTERN, add_numbered_item),
         (BLOCKQUOTE_PATTERN, add_blockquote),
@@ -700,13 +741,22 @@ def create_docx_from_text(text_content, contract_data=None):
             if i < len(header_row.cells):
                 cell = header_row.cells[i]
                 cell.text = header
-                # Enhanced header formatting
+                # Enhanced header formatting with better styling
                 for paragraph in cell.paragraphs:
+                    paragraph.alignment = 1  # Center alignment for headers
                     for run in paragraph.runs:
                         run.font.bold = True
                         run.font.name = 'Lato'
                         run.font.size = Pt(11)
-                        run.font.color.rgb = RGBColor(0, 51, 102)
+                        run.font.color.rgb = RGBColor(255, 255, 255)  # White text
+                # Add header background color
+                try:
+                    from docx.oxml.shared import qn
+                    from docx.oxml import parse_xml
+                    shading_elm = parse_xml(r'<w:shd {} w:fill="003366"/>'.format(qn('w:val')))
+                    cell._element.get_or_add_tcPr().append(shading_elm)
+                except Exception:
+                    pass  # Graceful fallback
         
         # Add and format data rows
         for row_idx, row_data in enumerate(data_rows):
@@ -719,12 +769,23 @@ def create_docx_from_text(text_content, contract_data=None):
                     cell_paragraph.clear()  # Clear default content
                     _parse_text_formatting(cell_paragraph, cell_data)
                     
-                    # Ensure proper font for data cells
+                    # Enhanced data cell formatting
                     for paragraph in cell.paragraphs:
+                        paragraph.paragraph_format.space_after = Pt(0)  # Tighter spacing
                         for run in paragraph.runs:
                             if not run.font.name:  # Only set if not already set by formatter
                                 run.font.name = 'Lato'
                                 run.font.size = Pt(10)
+                    
+                    # Add subtle alternating row colors for better readability
+                    if row_idx % 2 == 1:  # Odd rows (0-indexed, so this is actually even visual rows)
+                        try:
+                            from docx.oxml.shared import qn
+                            from docx.oxml import parse_xml
+                            shading_elm = parse_xml(r'<w:shd {} w:fill="F8F9FA"/>'.format(qn('w:val')))
+                            cell._element.get_or_add_tcPr().append(shading_elm)
+                        except Exception:
+                            pass
         
         doc.add_paragraph()  # Add spacing after table
 
@@ -758,29 +819,34 @@ def create_docx_from_text(text_content, contract_data=None):
             p = document.add_paragraph()
             _parse_text_formatting(p, stripped_line)
     
-    # === PHASE 3: AUDIT-READY FEATURES ===
+    # === PHASE 3: ENHANCED DOCUMENT FEATURES ===
     
-    # Add document metadata section
+    # Add professional page break with document metadata
     document.add_page_break()
     
+    # Enhanced metadata section with professional styling
     metadata_heading = document.add_paragraph()
+    metadata_heading.alignment = 1  # Center alignment
     metadata_run = metadata_heading.add_run("DOCUMENT METADATA")
     metadata_run.font.name = 'Lato'
     metadata_run.font.size = Pt(14)
     metadata_run.font.bold = True
     metadata_run.font.color.rgb = RGBColor(0, 51, 102)
+    metadata_heading.paragraph_format.space_after = Pt(12)
     
-    metadata_table = document.add_table(rows=5, cols=2)
+    # Enhanced metadata table with better styling
+    metadata_table = document.add_table(rows=6, cols=2)  # Added one more row
     metadata_table.style = 'Table Grid'
-    metadata_table.columns[0].width = Inches(2)
-    metadata_table.columns[1].width = Inches(5)
+    metadata_table.columns[0].width = Inches(2.5)
+    metadata_table.columns[1].width = Inches(4.5)
     
     metadata_info = [
         ("Document Version:", "Final"),
         ("Analysis Date:", current_date),
         ("Analyst:", analyst_name),
         ("Review Status:", "Pending Management Review"),
-        ("File Classification:", "Internal Accounting Analysis")
+        ("File Classification:", "Internal Accounting Analysis"),
+        ("Page Count:", f"{len(document.paragraphs)} sections")  # Dynamic page info
     ]
     
     for i, (label, content) in enumerate(metadata_info):
@@ -788,12 +854,16 @@ def create_docx_from_text(text_content, contract_data=None):
         row.cells[0].text = label
         row.cells[1].text = content
         
-        # Format cells
-        for cell in row.cells:
+        # Enhanced cell formatting
+        for j, cell in enumerate(row.cells):
             for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.space_after = Pt(0)
                 for run in paragraph.runs:
                     run.font.name = 'Lato'
                     run.font.size = Pt(10)
+                    if j == 0:  # Label column
+                        run.font.bold = True
+                        run.font.color.rgb = RGBColor(0, 51, 102)
     
     # A9: Analyst certification section removed per user feedback
     
