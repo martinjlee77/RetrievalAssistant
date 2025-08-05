@@ -654,14 +654,14 @@ def create_docx_from_text(text_content, contract_data=None):
             if not content:
                 continue
             run = paragraph.add_run(content)
-            run.font.name = 'Lato'  # Ensure consistent font
+            run.font.name = 'Calibri'  # Ensure consistent font
             if format_type == 'bold':
                 run.bold = True
             elif format_type == 'italic':
                 run.italic = True
     
     def _add_contract_table(doc, table_markdown):
-        """Enhanced table parser supporting any markdown table with dynamic column widths"""
+        """Enhanced table parser with special handling for journal entries in DOCX"""
         if not table_markdown or not table_markdown.strip():
             return
             
@@ -681,6 +681,14 @@ def create_docx_from_text(text_content, contract_data=None):
                 headers.append(cleaned_cell)
         
         if not headers:
+            return
+        
+        # Check if this is a journal entry table (has accounting columns)
+        is_journal_entry = any(keyword in ''.join(headers).lower() for keyword in 
+                              ['date', 'account', 'debit', 'credit', 'journal', 'entry'])
+        
+        if is_journal_entry:
+            _add_journal_entry_list(doc, table_markdown)
             return
         
         # Find separator line (|---|---|) and data rows
@@ -737,6 +745,81 @@ def create_docx_from_text(text_content, contract_data=None):
                         table_row.cells[col_idx].text = str(cell_data)
         
         doc.add_paragraph()  # Add spacing after table
+    
+    def _add_journal_entry_list(doc, table_markdown):
+        """Convert journal entry table to professional list format for DOCX"""
+        lines = [line.strip() for line in table_markdown.strip().split('\n') if line.strip()]
+        if len(lines) < 3:  # Need header, separator, and at least one data row
+            return
+        
+        # Parse the table structure
+        header_line = lines[0]
+        headers = [cell.strip().strip('*').strip() for cell in header_line.split('|') if cell.strip().strip('*').strip()]
+        
+        # Find data rows (skip separator line)
+        data_rows = []
+        separator_found = False
+        
+        for line in lines[1:]:
+            if not separator_found and re.match(r'^[\|\-\s:]+$', line):
+                separator_found = True
+                continue
+            
+            if '|' in line and separator_found:
+                row_data = [cell.strip() for cell in line.split('|') if cell.strip()]
+                if len(row_data) >= len(headers):
+                    data_rows.append(row_data[:len(headers)])
+        
+        if not data_rows:
+            return
+        
+        # Group entries by transaction (assuming first column is date or transaction identifier)
+        current_transaction = None
+        
+        for row in data_rows:
+            if len(row) < 4:  # Need at least Date, Account, Debit, Credit
+                continue
+                
+            date_val = row[0] if row[0] and row[0] != current_transaction else ""
+            account = row[1] if len(row) > 1 else ""
+            debit = row[2] if len(row) > 2 else ""
+            credit = row[3] if len(row) > 3 else ""
+            description = row[4] if len(row) > 4 else ""
+            
+            # Start new transaction entry
+            if date_val and date_val != current_transaction:
+                if current_transaction:  # Add spacing between transactions
+                    doc.add_paragraph()
+                
+                current_transaction = date_val
+                # Transaction header
+                header_para = doc.add_paragraph()
+                header_run = header_para.add_run(f"Journal Entry - {date_val}:")
+                header_run.font.name = 'Calibri'
+                header_run.font.bold = True
+                header_run.font.size = Pt(12)
+            
+            # Format the journal entry line
+            entry_para = doc.add_paragraph()
+            entry_para.paragraph_format.left_indent = Inches(0.25)
+            
+            # Build the entry line with proper accounting format
+            if debit and debit.strip() and debit.strip() != "$0" and debit.strip() != "-":
+                # Debit entry
+                entry_text = f"Dr. {account:<30} {debit:>12}"
+            elif credit and credit.strip() and credit.strip() != "$0" and credit.strip() != "-":
+                # Credit entry (indented)
+                entry_text = f"     Cr. {account:<26} {credit:>12}"
+            else:
+                # Description or other line
+                entry_text = f"   *{account}*" if account else ""
+            
+            if entry_text:
+                entry_run = entry_para.add_run(entry_text)
+                entry_run.font.name = 'Courier New'  # Monospace for alignment
+                entry_run.font.size = Pt(11)
+        
+        doc.add_paragraph()  # Add spacing after journal entries
 
     # === ENHANCED RULE-BASED PARSING LOOP ===
     for line in lines:
@@ -779,9 +862,9 @@ def create_docx_from_text(text_content, contract_data=None):
     
     metadata_para = document.add_paragraph()
     metadata_run = metadata_para.add_run(f"Analysis Date: {current_date} | Review Status: Preliminary Analysis | Internal Use")
-    metadata_run.font.name = 'Lato'
+    metadata_run.font.name = 'Calibri'
     metadata_run.font.size = Pt(9)
-    metadata_run.font.color.rgb = RGBColor(102, 102, 102)
+    metadata_run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
     metadata_para.alignment = 1  # Center alignment
     
     bio = io.BytesIO()
