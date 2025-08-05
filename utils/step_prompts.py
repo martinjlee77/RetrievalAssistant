@@ -643,12 +643,12 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
 **KEY FINDINGS** (Scannable dashboard format)
-- ASC 606 Contract Exists: {contract_exists}
-- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
-- Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
-- Allocation: {allocation_method}
-- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
-- Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+- **ASC 606 Contract Exists:** {contract_exists}
+- **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- **Allocation:** {allocation_method}
+- **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
@@ -1018,14 +1018,7 @@ Begin your work. Your precision is critical to producing an audit-ready memo.
                                    'No conclusion was provided.')
         analysis_points = step_data.get('analysis_points', [])
 
-        # Start with the main heading and the upfront conclusion
-        markdown_sections = [
-            f"### Step {step_number}: {step_name}",
-            f"**Conclusion:**\n{conclusion}",
-            "\n---ailed Analysis:**\n"
-        ]
-
-        # AUDITOR'S METHOD: Special handling for Steps 2, 3, and ALL steps to filter out N/A items
+        # Route to the correct helper function based on step number
         if step_number == 2:
             return StepPrompts._format_step2_with_filtering(
                 step_data, step_name, conclusion, analysis_points)
@@ -1036,35 +1029,19 @@ Begin your work. Your precision is critical to producing an audit-ready memo.
             return StepPrompts._format_general_step_with_filtering(
                 step_data, step_name, conclusion, analysis_points, step_number)
 
-        # Continue with normal processing for other steps
-
-        if not analysis_points:
-            markdown_sections.append(
-                "No detailed analysis points were provided.")
-        else:
-            # Loop through each thematically-grouped analysis point
+        # Fallback for any unhandled steps (should not be reached)
+        markdown_sections = [
+            f"### Step {step_number}: {step_name}",
+            f"**Conclusion:**\n{conclusion}",
+            "**Detailed Analysis:**\n"
+        ]
+        if analysis_points:
             for i, point in enumerate(analysis_points):
+                # Simplified fallback logic
                 topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text',
-                                          'No analysis text provided.')
-                evidence_quotes = point.get('evidence_quotes', [])
-
-                # Add the topic as a sub-heading
+                analysis_text = point.get('analysis_text', 'No analysis text provided.')
                 markdown_sections.append(f"**{i+1}. {topic_title}**")
                 markdown_sections.append(analysis_text)
-
-                # Add the evidence quotes for that topic
-                # Add type check to prevent errors if the LLM returns a string instead of list
-                if evidence_quotes and isinstance(evidence_quotes, list):
-                    for quote in evidence_quotes:
-                        if isinstance(
-                                quote, str
-                        ):  # Ensure the item in the list is a string
-                            markdown_sections.append(f"> {quote}")
-                elif isinstance(evidence_quotes, str):
-                    # Handle case where LLM returns a single string instead of list
-                    markdown_sections.append(f"> {evidence_quotes}")
-
 
         final_content = [section for section in markdown_sections if str(section).strip()]
         return "\n\n".join(final_content)
@@ -1083,72 +1060,41 @@ Begin your work. Your precision is critical to producing an audit-ready memo.
         ]
 
         all_points = []
-
-        # 1. Process structured transaction_price_components intelligently
         transaction_components = step_data.get('step3_analysis', {}).get('transaction_price_components', {})
-
-        # Define a mapping for better titles
         title_map = {
-            'total_transaction_price': 'Total Transaction Price',
-            'fixed_consideration': 'Fixed Consideration',
-            'variable_consideration': 'Variable Consideration',
-            'financing_component_analysis': 'Significant Financing Component',
-            'noncash_consideration_analysis': 'Noncash Consideration',
-            'consideration_payable_to_customer_analysis': 'Consideration Payable to Customer',
+            'total_transaction_price': 'Total Transaction Price', 'fixed_consideration': 'Fixed Consideration',
+            'variable_consideration': 'Variable Consideration', 'financing_component_analysis': 'Significant Financing Component',
+            'noncash_consideration_analysis': 'Noncash Consideration', 'consideration_payable_to_customer_analysis': 'Consideration Payable to Customer',
             'other_considerations_analysis': 'Other Considerations'
         }
-
-        # Smart filtering: avoid redundant price entries
         processed_values = set()
 
         for key, analysis_text in transaction_components.items():
-            is_not_applicable = (
-                analysis_text is None or
-                str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
-                str(analysis_text).strip().lower().startswith('n/a') or
-                len(str(analysis_text).strip()) < 3
-            )
-
+            is_not_applicable = (not analysis_text or str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
+                               str(analysis_text).strip().lower().startswith('n/a') or len(str(analysis_text).strip()) < 3)
             if not is_not_applicable:
                 text_str = str(analysis_text).strip()
-
-                # Skip if this is a redundant price amount we've already seen
                 if key in ['fixed_consideration', 'total_transaction_price']:
-                    if text_str in processed_values:
-                        continue  # Skip duplicate price entries
+                    if text_str in processed_values: continue
                     processed_values.add(text_str)
-
-                # Only include substantive analysis, not just price amounts
-                if key in ['fixed_consideration', 'total_transaction_price'] and len(text_str) < 30:
-                    # This is likely just a price amount, skip it if we have analysis_points with more detail
-                    continue
-
+                    if len(text_str) < 30: continue
                 topic_title = title_map.get(key, key.replace('_', ' ').title())
                 all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
 
-        # 2. Add the regular analysis_points (these already have quotes)
         if analysis_points:
             all_points.extend(analysis_points)
 
-        # 3. Format the combined list
         if not all_points:
             markdown_sections.append("Only basic fixed consideration was identified in this contract.")
         else:
             for i, point in enumerate(all_points):
-                topic_title = point.get('topic_title', f'Analysis Point {i+1}')
-                analysis_text = point.get('analysis_text', 'No analysis text provided.')
-                evidence_quotes = point.get('evidence_quotes', [])
-
-                markdown_sections.append(f"**{i+1}. {topic_title}**")
-                markdown_sections.append(str(analysis_text))
-
-                # Integrate evidence directly below the analysis text it supports
-                if evidence_quotes and isinstance(evidence_quotes, list):
-                    for quote in evidence_quotes:
-                        # Add a blockquote for each piece of evidence
-                        if isinstance(quote, str) and quote:
-                            markdown_sections.append(f"> {quote}")
-
+                markdown_sections.append(f"**{i+1}. {point.get('topic_title', 'Analysis Point')}**")
+                markdown_sections.append(str(point.get('analysis_text', 'No analysis text provided.')))
+                if evidence_quotes := point.get('evidence_quotes', []):
+                    if isinstance(evidence_quotes, list):
+                        for quote in evidence_quotes:
+                            if isinstance(quote, str) and quote:
+                                markdown_sections.append(f"> {quote}")
 
         final_content = [section for section in markdown_sections if str(section).strip()]
         return "\n\n".join(final_content)
