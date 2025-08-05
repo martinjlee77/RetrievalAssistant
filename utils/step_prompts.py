@@ -1,5 +1,5 @@
 """
-Refactored ASC 606 prompt templates using System/User architecture for improved LLM adherence.
+Enhanced step-by-step prompt templates for ASC 606 analysis using System/User architecture.
 This approach separates the AI's core instructions (System Prompt) from the
 dynamic task-specific instructions (User Prompt).
 """
@@ -9,21 +9,37 @@ from typing import Dict, List, Any, Optional
 
 
 class StepPrompts:
-    """
-    Refactored prompts using a modular, System/User architecture to improve LLM adherence.
-    This approach separates the AI's core instructions (System Prompt) from the
-    dynamic task-specific instructions (User Prompt).
-    """
-
+    """Enhanced prompts using a modular, System/User architecture to improve LLM adherence."""
+    
     @staticmethod
     def get_step_info() -> dict:
-        """Returns information about each ASC 606 step. (No changes needed here)"""
+        """Returns information about each ASC 606 step."""
         return {
-            1: {"title": "Identify the Contract", "primary_guidance": "ASC 606-10-25-1 through 25-8"},
-            2: {"title": "Identify Performance Obligations", "primary_guidance": "ASC 606-10-25-14 through 25-22"},
-            3: {"title": "Determine the Transaction Price", "primary_guidance": "ASC 606-10-32-2 through 32-27"},
-            4: {"title": "Allocate the Transaction Price", "primary_guidance": "ASC 606-10-32-28 through 32-41"},
-            5: {"title": "Recognize Revenue", "primary_guidance": "ASC 606-10-25-23 through 25-37"}
+            1: {
+                "title": "Identify the Contract",
+                "primary_guidance": "ASC 606-10-25-1 through 25-8",
+                "description": "Contract identification and combination criteria"
+            },
+            2: {
+                "title": "Identify Performance Obligations",
+                "primary_guidance": "ASC 606-10-25-14 through 25-22",
+                "description": "Distinct goods or services identification"
+            },
+            3: {
+                "title": "Determine the Transaction Price", 
+                "primary_guidance": "ASC 606-10-32-2 through 32-27",
+                "description": "Fixed and variable consideration determination"
+            },
+            4: {
+                "title": "Allocate the Transaction Price",
+                "primary_guidance": "ASC 606-10-32-28 through 32-41",
+                "description": "Standalone selling prices and allocation methods"
+            },
+            5: {
+                "title": "Recognize Revenue",
+                "primary_guidance": "ASC 606-10-25-23 through 25-37",
+                "description": "Over time vs point in time recognition criteria"
+            }
         }
 
     # --- NEW: Core Prompt Architecture ---
@@ -191,144 +207,199 @@ Create a professional background section that provides essential context includi
 Keep this section concise (2-3 paragraphs) and focus on information that directly supports the ASC 606 analysis that follows."""
 
     @staticmethod
+    def _filter_genuine_judgments(judgments: List[str]) -> List[str]:
+        """Shared function to filter for genuine professional judgments with significant complexity."""
+        
+        # Define indicators of genuine complexity
+        complexity_indicators = [
+            'estimate', 'judgment', 'assumption', 'uncertain', 'complex', 'significant', 
+            'material', 'substantial', 'residual', 'variable', 'constraint', 'probability'
+        ]
+        
+        # Define routine analysis indicators (these are NOT judgments)
+        routine_indicators = [
+            'standard', 'straightforward', 'clear', 'obvious', 'routine', 'typical',
+            'normal', 'common', 'simple', 'basic', 'usual'
+        ]
+        
+        genuine_judgments = []
+        
+        for judgment in judgments:
+            judgment_lower = judgment.lower()
+            
+            # Skip if it contains routine indicators
+            if any(routine in judgment_lower for routine in routine_indicators):
+                continue
+                
+            # Include if it contains complexity indicators
+            if any(indicator in judgment_lower for indicator in complexity_indicators):
+                genuine_judgments.append(judgment)
+            # Also include if it mentions specific accounting estimates or alternatives
+            elif any(term in judgment_lower for term in ['ssp', 'standalone selling price', 'allocation', 'modification', 'contract asset']):
+                genuine_judgments.append(judgment)
+        
+        return genuine_judgments
+
+    @staticmethod
     def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
-        """Enhanced key judgments prompt with filtering logic"""
+        """Enhanced key judgments prompt with shared filtering logic"""
         
-        # Extract all professional judgments from steps
         all_judgments = []
-        for step_data in [s1, s2, s3, s4, s5]:
-            if judgments := step_data.get('professional_judgments', []):
-                all_judgments.extend(judgments)
-        
-        # If no significant judgments found, return simple statement
-        if not all_judgments or len(all_judgments) == 0:
-            return "RETURN_DIRECT_TEXT: No significant professional judgments were required for this straightforward ASC 606 analysis. The contract terms were clear and the application of the standard was routine."
-        
-        # Filter for genuine complexity indicators
-        complexity_indicators = ['estimate', 'judgment', 'assumption', 'uncertain', 'complex', 'significant', 'material', 'substantial']
-        genuine_judgments = [j for j in all_judgments if any(indicator in j.lower() for indicator in complexity_indicators)]
-        
-        if not genuine_judgments:
-            return "RETURN_DIRECT_TEXT: While the analysis involved various considerations, no significant professional judgments requiring substantial estimation or complex interpretation were identified. The accounting treatment follows established guidance in a straightforward manner."
+        for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            # The 'professional_judgments' key comes from the initial 5-step analysis
+            judgments = step.get('professional_judgments', [])
+            if judgments and isinstance(judgments, list):
+                # Apply consistent filtering using the shared utility function
+                filtered = StepPrompts._filter_genuine_judgments(judgments)
+                all_judgments.extend(filtered)
 
-        return f"""You are writing the "Key Professional Judgments" section of an ASC 606 memo. Focus only on judgments that involved significant estimation, complex interpretation, or material assumptions.
+        # If, after filtering, no genuine judgments remain, provide a standard statement.
+        if not all_judgments:
+            return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-**JUDGMENTS IDENTIFIED:**
-{chr(10).join(f"• {judgment}" for judgment in genuine_judgments)}
+        # If judgments were flagged, this prompt acts as a final, expert-level quality filter.
+        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. Your role is to be a highly discerning final quality filter.
 
-For each genuine judgment above:
-1. Describe the accounting issue requiring judgment
-2. Explain the factors considered and rationale applied
-3. State the conclusion reached and its impact
+CONTEXT: The initial analysis flagged these potential judgment areas:
+{json.dumps(all_judgments, indent=2)}
 
-**Important:** If after review you determine that none of these represent genuine professional judgments requiring significant estimation or interpretation, your entire response MUST be only: "No significant professional judgments were required for this ASC 606 analysis."
+YOUR TASK:
+1.  **Review the Context:** Scrutinize the list above. Your primary task is to distinguish between genuine professional judgments and standard contract analysis.
+2.  **Identify Genuine Judgments:** A **genuine judgment** involves significant estimation, a choice between viable accounting alternatives, or a "gray area" in the guidance.
+    - **Examples of Genuine Judgments:** "Estimating the standalone selling price (SSP) of a license using a residual approach," "Concluding that a performance bonus is not constrained," "Assessing whether a contract modification is a separate contract."
+    - **Standard analysis is NOT a judgment.** Do not include items like: "Concluding a SaaS service is a single performance obligation," or "Recognizing subscription revenue over time."
+3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a single, well-written paragraph called 'Rationale' that seamlessly combines the issue, analysis, and authoritative guidance.
+4.  **Provide a "No Judgments" Conclusion if Necessary:** If your review finds that none of the items in the context are genuine judgments, your entire response MUST be only the following sentence:
+    "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-Write in professional accounting language suitable for audit documentation."""
+---
+### EXAMPLE OF DESIRED OUTPUT:
+
+- **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
+  **Rationale:** The contract does not include a standalone price for the on-premise license, and an observable price is not available as the license is not sold separately. Therefore, a significant judgment was required to estimate the SSP. Per the hierarchy in ASC 606-10-32-33, we used the residual approach. This was deemed appropriate because the SSP for the professional services and support obligations were readily observable and stable. The total transaction price less the observable SSPs of the other obligations resulted in an estimated SSP for the license.
+
+---
+Begin your work. Your precision is critical to producing an audit-ready memo.
+"""
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
-        """Financial impact assessment prompt"""
+        """Generates proportional financial impact prompt based on transaction complexity."""
         
-        # Extract revenue amounts and timing from analysis
-        transaction_price = 'Not specified'
-        if s3_analysis := s3.get('step3_analysis'):
-            if s3_price := s3_analysis.get('transaction_price_components'):
-                transaction_price = s3_price.get('fixed_consideration', 'Not specified')
+        # Robust data extraction logic
+        price_details = "Not specified"
+        recognition_summary = "Not specified"
         
-        recognition_methods = []
-        if s5_analysis := s5.get('step5_analysis'):
-            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
-                recognition_methods = [(po.get('performance_obligation', 'Unknown'),
-                                      po.get('recognition_method', 'Unknown')) for po in s5_plan]
+        # ENHANCED: Prioritize structured data from Step 4 allocation
+        if s4_allocation := s4.get('allocation_details'):
+            try:
+                if isinstance(s4_allocation, dict):
+                    price_details = json.dumps(s4_allocation, indent=2)
+                else:
+                    price_details = str(s4_allocation)
+            except (TypeError, ValueError):
+                price_details = str(s4_allocation)
+        # Fallback to regex extraction from Step 3
+        elif s3_conclusion := s3.get('executive_conclusion', ''):
+            import re
+            if price_match := re.search(r'\$[\d,]+\.?\d*', s3_conclusion):
+                price_details = f"Total Transaction Price: {price_match.group()}"
+        
+        # Get recognition summary from Step 5
+        recognition_summary = s5.get('executive_conclusion', 'Not specified')
 
-        return f"""You are writing the "Financial Impact Assessment" section of an ASC 606 memo for {memo_audience}.
+        # Logic to determine transaction complexity
+        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
+                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
+                     "financing component" in s3.get('executive_conclusion', '').lower()
 
-**TRANSACTION DATA:**
-- Transaction Price: {transaction_price}
-- Recognition Methods: {recognition_methods}
-- Customer: {customer_name}
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
 
-Create a comprehensive financial impact assessment covering:
+CONTEXT FROM ANALYSIS:
+- Price & Allocation Details: {price_details}
+- Revenue Recognition Summary: {recognition_summary}
+- Is the transaction complex (e.g., multiple POs, variable consideration)? {"Yes" if is_complex else "No"}
 
-1. **Revenue Recognition Timing:** Describe when and how revenue will be recognized
-2. **P&L Impact:** Explain the income statement effects and timing
-3. **Balance Sheet Considerations:** Note any contract assets/liabilities
-4. **Comparison to Previous Treatment:** If applicable, note changes from prior accounting
-5. **Material Considerations:** Highlight any significant financial implications
+YOUR TASK:
+Write a concise financial impact analysis.
 
-Focus on practical business implications and be specific about amounts and timing where possible."""
+**CRITICAL RULE: Be Proportional.**
+- **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
+- **For COMPLEX transactions:** Provide a more detailed analysis, including separate sections for Financial Statement Impact and Illustrative Journal Entries as described below.
+
+---
+**IF THE TRANSACTION IS COMPLEX, follow this structure:**
+
+1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or multiple deferred revenue liabilities).
+
+2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Use standard account names.
+
+    | Date       | Account                          | Debit     | Credit    |
+    |------------|----------------------------------|-----------|-----------|
+    | ...        | ...                              | ...       | ...       |
+
+3.  **Internal Control & Process Considerations:** Briefly mention any operational considerations required for accurate accounting (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).
+
+---
+**IF THE TRANSACTION IS SIMPLE, follow this structure:**
+
+The $XX.XX fee will be recorded as a deferred revenue liability upon receipt and recognized as revenue on a straight-line basis over the service period.
+
+**Illustrative Journal Entry:**
+| Account                      | Debit     | Credit    |
+|------------------------------|-----------|-----------|
+| Cash / Accounts Receivable   | $XX.XX    |           |
+| Deferred Revenue             |           | $XX.XX    |
+| *To record contract inception* | | |
+
+---
+
+Begin writing the financial impact section, strictly adhering to the proportionality rule.
+"""
 
     @staticmethod
     def get_conclusion_prompt(s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, customer_name: str, memo_audience: str, contract_data=None) -> str:
-        """Generates a proportional and meaningful conclusion prompt using structured data."""
+        """Generates a proportional and meaningful conclusion prompt."""
 
-        # Extract structured data for conclusion
-        performance_obligations = []
-        recognition_methods = []
-        if s2_analysis := s2.get('step2_analysis'):
-            if s2_pos := s2_analysis.get('performance_obligations'):
-                performance_obligations = [po.get('po_description', 'Unknown PO') for po in s2_pos]
-        if s5_analysis := s5.get('step5_analysis'):
-            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
-                recognition_methods = [(po.get('performance_obligation', 'Unknown'),
-                                      po.get('recognition_method', 'Unknown'),
-                                      po.get('measure_of_progress', 'Unknown')) for po in s5_plan]
+        # Logic to determine transaction complexity
+        is_complex = "multiple performance obligations" in s2.get('executive_conclusion', '').lower() or \
+                     "variable consideration" in s3.get('executive_conclusion', '').lower() or \
+                     "financing component" in s3.get('executive_conclusion', '').lower()
 
-        # Transaction price data
-        transaction_price_data = {}
-        if s3_analysis := s3.get('step3_analysis'):
-            if s3_price := s3_analysis.get('transaction_price_components'):
-                transaction_price_data = {
-                    'variable_consideration': s3_price.get('variable_consideration', []),
-                    'financing_component': s3_price.get('financing_component_analysis', 'None identified')
-                }
+        return f"""You are an accounting manager writing the final "Conclusion and Recommendations" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
 
-        # Enhanced complexity scoring system
-        complexity_score = 0
-        complexity_reasons = []
+CONTEXT FROM ANALYSIS:
+- Is the transaction complex? {"Yes" if is_complex else "No"}
 
-        # Multiple POs with different timing
-        po_methods = [method[1] for method in recognition_methods]
-        if len(po_methods) > 2:
-            complexity_score += 1
-            complexity_reasons.append("More than two performance obligations")
-        
-        # Variable consideration
-        var_consideration = transaction_price_data.get("variable_consideration")
-        has_variable_consideration = (isinstance(var_consideration, list) and len(var_consideration) > 0) or \
-                                   (isinstance(var_consideration, str) and var_consideration.lower() not in ['none', 'n/a', ''])
-        if has_variable_consideration:
-            complexity_score += 1
-            complexity_reasons.append("Variable consideration components")
+YOUR TASK:
+Write a final concluding section for the memo, strictly adhering to the proportionality rule below.
 
-        # Mixed recognition methods
-        unique_methods = set(po_methods)
-        if len(unique_methods) > 1 and 'Unknown' not in unique_methods:
-            complexity_score += 1
-            complexity_reasons.append("Mixed revenue recognition methods")
+**CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
 
-        # For simple contracts, return standard conclusion directly
-        if complexity_score == 0:
-            return f"RETURN_DIRECT_TEXT: Based on our comprehensive ASC 606 analysis, the contract with {customer_name} represents a straightforward revenue arrangement. The accounting treatment follows established guidance without significant complexity or unusual judgments. Revenue recognition will proceed in accordance with the five-step model as detailed in the analysis above, providing clear and appropriate financial reporting for this transaction."
+---
+**IF THE TRANSACTION IS COMPLEX, follow this structure:**
 
-        return f"""You are an accounting senior manager writing the final "Conclusion" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+### Conclusion
+In a single paragraph, state that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606. Briefly reiterate the core revenue recognition conclusion.
 
-**TRANSACTION COMPLEXITY INDICATORS:**
-- Performance Obligations: {len(performance_obligations)}
-- Recognition Methods: {list(set(po_methods))}
-- Variable Consideration: {'Yes' if has_variable_consideration else 'No'}
-- Complexity Factors: {complexity_reasons if complexity_reasons else ['Standard transaction']}
+### Recommendations
+Based on the analysis, provide a bulleted list of specific, practical next steps derived directly from the complexities of this contract. Focus on items like:
+- "The process for estimating the variable consideration for [specific bonus] must be documented and reviewed quarterly."
+- "The ERP system must be configured to handle the allocation of the transaction price to the three distinct performance obligations."
 
-**RECOGNITION PLAN:**
-{chr(10).join(f"• {method[0]}: {method[1]} ({method[2] if method[1] == 'Over Time' else 'N/A'})" for method in recognition_methods)}
+---
+**IF THE TRANSACTION IS SIMPLE, your ENTIRE output must be the following two paragraphs ONLY:**
 
-Write one comprehensive conclusion paragraph that:
-1. Reaffirms the appropriateness of the ASC 606 analysis
-2. Summarizes the key accounting treatment decisions
-3. Notes any ongoing monitoring or implementation considerations
-4. Provides final assurance on the accounting approach
+### Conclusion
+The accounting treatment for this straightforward arrangement is appropriate and in accordance with ASC 606. Revenue will be recognized as described in the analysis above.
 
-Begin writing the "Conclusion" section. Do not add any other text, summaries, or boilerplate language."""
+### Recommendations
+It is recommended that this memorandum and the supporting contract documentation be retained as audit evidence for the transaction. No other specific actions are required as a result of this analysis.
+
+---
+
+Begin writing the "Conclusion and Recommendations" section. Do not add any other text, summaries, or boilerplate language.
+"""
 
     @staticmethod
     def format_step_detail_as_markdown(step_data: Dict[str, Any], step_number: int, step_name: str) -> str:
