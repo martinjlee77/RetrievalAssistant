@@ -655,7 +655,7 @@ class ASC606Analyzer:
                 f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}",
                 f"## 4. KEY PROFESSIONAL JUDGMENTS\n{key_judgments}",
                 f"## 5. FINANCIAL IMPACT ASSESSMENT\n{financial_impact}",
-                f"## 6. CONCLUSION AND RECOMMENDATIONS\n{conclusion}",
+                f"## 6. CONCLUSION\n{conclusion}",
                 f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
 
