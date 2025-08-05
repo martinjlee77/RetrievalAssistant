@@ -643,12 +643,12 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
 **KEY FINDINGS** (Scannable dashboard format)
-- ASC 606 Contract Exists: {contract_exists}
-- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
-- Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
-- Allocation: {allocation_method}
-- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
-- Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+- ASC 60**6 Contract Exists: {cont**ract_exists}
+- Perfor**mance Obligations: {po_c**ount} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- Transa**ction Price: {tota**l_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- Alloca**tion: {allo**cation_method}
+- Revenu**e Recognition: {', '**.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- Critic**al Judgments: {', '**.join(critical_judgments) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
@@ -1022,8 +1022,7 @@ Begin your work. Your precision is critical to producing an audit-ready memo.
         markdown_sections = [
             f"### Step {step_number}: {step_name}",
             f"**Conclusion:**\n{conclusion}",
-            "\n---\n",  # Visual separator
-            "**Detailed Analysis:**\n"
+            "\n---ailed Analysis:**\n"
         ]
 
         # AUDITOR'S METHOD: Special handling for Steps 2, 3, and ALL steps to filter out N/A items

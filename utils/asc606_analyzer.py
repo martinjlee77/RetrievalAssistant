@@ -88,7 +88,7 @@ class ASC606Analyzer:
                     fixed_lines.append('    • ' + stripped.lstrip('•- ').strip())
                 # Sub-bullets (specific details under main bullets)
                 elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining']) and not line.startswith('    '):
-                    fixed_lines.append('        ◦ ' + stripped.lstrip('•- ').strip())
+                    fixed_lines.append('        ◦ ' + stripped.lstrip('•- ◦*').strip())
                 else:
                     fixed_lines.append(line)
             else:
@@ -121,8 +121,16 @@ class ASC606Analyzer:
             line = line.lstrip('> ')
             line_stripped = line.strip()
             
-            # Filter out unwanted duplicate headers
-            if not any(header in line_stripped.upper() for header in [h.upper() for h in unwanted_headers]):
+            # FIXED: Only filter exact header matches, not content containing those words
+            # Check if the line is EXACTLY a header (not content that contains header words)
+            is_duplicate_header = any(
+                line_stripped.upper() == header.upper() or  # Exact match
+                line_stripped.upper().startswith(header.upper() + '\n') or  # Header followed by newline
+                (header.startswith('#') and line_stripped.upper() == header.upper().lstrip('#').strip())  # Markdown header match
+                for header in unwanted_headers
+            )
+            
+            if not is_duplicate_header:
                 filtered_lines.append(line)
         
         cleaned_text = '\n'.join(filtered_lines)
@@ -716,7 +724,7 @@ class ASC606Analyzer:
             # Remove quality control note - internal processes don't belong in professional memos
 
             # FIXED: Remove # from title and format properly
-            memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
+            memo_header = f"""# TECHNICAL ACCOUNTING MEMORANDUM
 
 **TO:** {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}  
 **FROM:** ASC 606 AI Analyst
@@ -724,13 +732,22 @@ class ASC606Analyzer:
 **RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}\n\n\n
 """
 
+            separator = "\n\n---\n\n"
+
             final_memo_sections = [
-                memo_header, f"## 1. EXECUTIVE SUMMARY\n{executive_summary}",
+                memo_header,
+                f"## 1. EXECUTIVE SUMMARY\n{executive_summary}",
+                separator,
                 f"## 2. CONTRACT OVERVIEW\n\n{contract_data_table}\n\n{background}",
+                separator,
                 f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}",
+                separator,
                 f"## 4. KEY PROFESSIONAL JUDGMENTS\n{key_judgments}",
+                separator,
                 f"## 5. FINANCIAL IMPACT ASSESSMENT\n{financial_impact}",
+                separator,
                 f"## 6. CONCLUSION\n{conclusion}",
+                separator,
                 f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
 

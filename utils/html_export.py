@@ -28,8 +28,8 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
 
     # === CRITICAL HTML FORMATTING FIXES ===
     
-    # 1. DOCUMENT TITLE FIX - Remove # from beginning and fix formatting
-    processed_text = re.sub(r'^#\s*TECHNICAL ACCOUNTING MEMORANDUM', 'TECHNICAL ACCOUNTING MEMORANDUM', processed_text, flags=re.MULTILINE)
+    # 1. DOCUMENT TITLE
+    processed_text = re.sub(r'^(#\s*)?TECHNICAL ACCOUNTING MEMORANDUM', '# TECHNICAL ACCOUNTING MEMORANDUM', processed_text, flags=re.MULTILINE)
     
     # 2. EXECUTIVE SUMMARY NUMBERING FIX - Remove "1." and "2." before subsections
     processed_text = re.sub(r'^1\.\s*EXECUTIVE SUMMARY', 'EXECUTIVE SUMMARY', processed_text, flags=re.MULTILINE)
@@ -57,7 +57,7 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
             if any(keyword in stripped for keyword in ['ASC 606 Contract Exists:', 'Performance Obligations:', 'Transaction Price:', 'Allocation:', 'Revenue Recognition:', 'Critical Judgments:']):
                 fixed_lines.append('* ' + stripped.lstrip('•*- ').strip())
             elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining']) and not line.startswith('    '):
-                fixed_lines.append('    * ' + stripped.lstrip('•*- ').strip())
+                fixed_lines.append('    * ' + stripped.lstrip('•*- ◦').strip())
             else:
                 fixed_lines.append(line)
         else:
@@ -140,19 +140,6 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     
     # Pre-process the markdown to handle our custom tags FIRST
     preprocessed_markdown = _preprocess_markdown_for_html(memo_markdown)
-    
-    # Add subsection header styling for common patterns
-    subsection_patterns = [
-        "OVERALL CONCLUSION", "KEY FINDINGS", "CONTRACT DATA SUMMARY", 
-        "DOCUMENTS REVIEWED", "DETAILED ANALYSIS", "CONCLUSION"
-    ]
-    
-    for pattern in subsection_patterns:
-        if pattern in preprocessed_markdown:
-            preprocessed_markdown = preprocessed_markdown.replace(
-                pattern, 
-                f'<div class="subsection-header">{pattern}</div>'
-            )
     
     # Convert the PREPROCESSED markdown to HTML with error handling
     try:
