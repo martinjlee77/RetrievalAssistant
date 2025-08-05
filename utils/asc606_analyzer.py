@@ -54,14 +54,17 @@ class ASC606Analyzer:
             line.lstrip('> ') for line in text.split('\n'))
 
         # Remove duplicate section headers that LLM sometimes adds
-        # This fixes the "EXECUTIVE SUMMARY" duplication issue
+        # This fixes header duplication issues across all sections
         unwanted_headers = [
             "# EXECUTIVE SUMMARY", "## EXECUTIVE SUMMARY",
             "### EXECUTIVE SUMMARY", "**EXECUTIVE SUMMARY**",
             "EXECUTIVE SUMMARY", "# KEY PROFESSIONAL JUDGMENTS",
-            "## KEY PROFESSIONAL JUDGMENTS",
-            "# CONCLUSION AND RECOMMENDATIONS",
-            "## CONCLUSION AND RECOMMENDATIONS"
+            "## KEY PROFESSIONAL JUDGMENTS", "### KEY PROFESSIONAL JUDGMENTS",
+            "# CONCLUSION AND RECOMMENDATIONS", "## CONCLUSION AND RECOMMENDATIONS",
+            "### CONCLUSION AND RECOMMENDATIONS", "# CONCLUSION", "## CONCLUSION", 
+            "### CONCLUSION", "**CONCLUSION**", "CONCLUSION",
+            "# FINANCIAL IMPACT", "## FINANCIAL IMPACT", "### FINANCIAL IMPACT",
+            "**FINANCIAL IMPACT**", "FINANCIAL IMPACT"
         ]
 
         lines = cleaned_text.split('\n')
@@ -73,8 +76,6 @@ class ASC606Analyzer:
                 filtered_lines.append(line)
 
         cleaned_text = '\n'.join(filtered_lines)
-
-        return cleaned_text
 
         return cleaned_text.strip()
 

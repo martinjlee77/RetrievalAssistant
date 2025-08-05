@@ -87,7 +87,7 @@ For each `analysis_point`, your `analysis_text` MUST be a professional, narrativ
 2.  **Analysis:** This is the most critical part. Your analysis must be robust.
     - First, identify and quote the most relevant terms or clauses from the provided contract evidence.
     - Next, cite the specific, applicable guidance (e.g., ASC 606-10-25-21).
-    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** Explain *how* the specific words in the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them.
+    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** Explain *how* the specific words in the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them. One or two sentences are not enough; you must provide a thorough explanation and support for the conclusion.
 3.  **Conclusion:** Provide a definitive answer to the issue raised.
 
 Weave these three parts into a seamless, easy-to-understand narrative. Follow the depth and pattern of the example below.
@@ -636,13 +636,13 @@ STRUCTURED DATA FROM 5-STEP ANALYSIS:
 
 SECTION STRUCTURE & REQUIREMENTS:
 
-**1. OVERALL CONCLUSION** (2-3 sentences maximum)
+**OVERALL CONCLUSION** (2-3 sentences maximum)
 - Provide the strategic, bottom-line accounting determination
 - State the total transaction price and high-level revenue recognition approach
 - Confirm ASC 606 compliance
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
-**2. KEY FINDINGS** (Scannable dashboard format)
+**KEY FINDINGS** (Scannable dashboard format)
 - ASC 606 Contract Exists: {contract_exists}
 - Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
 - Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}

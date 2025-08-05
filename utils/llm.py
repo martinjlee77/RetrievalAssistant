@@ -295,10 +295,10 @@ def create_docx_from_text(text_content, contract_data=None):
     
     # === PHASE 1: PROFESSIONAL DOCUMENT STRUCTURE ===
     
-    # Set default font to Lato 12pt (modern professional standard)
+    # Set default font to standard system font for consistency
     style = document.styles['Normal']
     font = style.font
-    font.name = 'Lato'
+    font.name = 'Calibri'  # Standard professional font
     font.size = Pt(12)
     
     # Configure paragraph spacing (6pt after paragraphs)
@@ -314,22 +314,22 @@ def create_docx_from_text(text_content, contract_data=None):
         section.left_margin = Inches(1)
         section.right_margin = Inches(1)
     
-    # Add header with VeritasLogic.ai branding
+    # Add header with Controller.cpa branding
     header = document.sections[0].header
     header_para = header.paragraphs[0]
-    header_para.text = "VeritasLogic.ai"
+    header_para.text = "Controller.cpa"
     header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     header_run = header_para.runs[0]
-    header_run.font.name = 'Lato'
+    header_run.font.name = 'Calibri'
     header_run.font.size = Pt(10)
-    header_run.font.color.rgb = RGBColor(70, 70, 70)
+    header_run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
     
     # Add footer with page numbers
     footer = document.sections[0].footer
     footer_para = footer.paragraphs[0]
     footer_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     footer_run = footer_para.runs[0] if footer_para.runs else footer_para.add_run()
-    footer_run.font.name = 'Lato'
+    footer_run.font.name = 'Calibri'
     footer_run.font.size = Pt(10)
     # Add page number field
     fldChar1 = OxmlElement('w:fldChar')
@@ -356,9 +356,10 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 1 - Main sections (matches HTML h2)
             heading1_style = document.styles.add_style('Custom Heading 1', 1)
-            heading1_style.font.name = 'Lato'
+            heading1_style.font.name = 'Calibri'
             heading1_style.font.size = Pt(14)
             heading1_style.font.bold = True
+            heading1_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
             heading1_style.paragraph_format.space_before = Pt(18)
             heading1_style.paragraph_format.space_after = Pt(8)
             heading1_style.paragraph_format.keep_with_next = True
@@ -368,9 +369,10 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 2 - Subsections (matches HTML h3)
             heading2_style = document.styles.add_style('Custom Heading 2', 1)
-            heading2_style.font.name = 'Lato'
+            heading2_style.font.name = 'Calibri'
             heading2_style.font.size = Pt(13)
             heading2_style.font.bold = True
+            heading2_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
             heading2_style.paragraph_format.space_before = Pt(12)
             heading2_style.paragraph_format.space_after = Pt(6)
             heading2_style.paragraph_format.keep_with_next = True
@@ -380,10 +382,10 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 3 - Sub-subsections  
             heading3_style = document.styles.add_style('Custom Heading 3', 1)
-            heading3_style.font.name = 'Lato'
+            heading3_style.font.name = 'Calibri'
             heading3_style.font.size = Pt(12)
             heading3_style.font.bold = True
-            heading3_style.font.color.rgb = RGBColor(0, 51, 102)
+            heading3_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
             heading3_style.paragraph_format.space_before = Pt(8)
             heading3_style.paragraph_format.space_after = Pt(4)
         except Exception as e:
@@ -392,7 +394,7 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # NEW: Subsection Header Style for OVERALL CONCLUSION, KEY FINDINGS, etc.
             subsection_style = document.styles.add_style('Subsection Header', 1)
-            subsection_style.font.name = 'Lato'
+            subsection_style.font.name = 'Calibri'
             subsection_style.font.size = Pt(11)
             subsection_style.font.bold = True
             subsection_style.font.color.rgb = RGBColor(0, 0, 0)
@@ -503,10 +505,10 @@ def create_docx_from_text(text_content, contract_data=None):
             # Fallback to manual formatting
             para = doc.add_paragraph()
             run = para.add_run(match.group(1))
-            run.font.name = 'Lato'
+            run.font.name = 'Calibri'
             run.font.size = Pt(11)
             run.font.bold = True
-            run.font.color.rgb = RGBColor(0, 51, 102)
+            run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
             para.paragraph_format.space_before = Pt(12)
             para.paragraph_format.space_after = Pt(6)
     

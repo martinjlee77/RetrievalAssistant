@@ -55,12 +55,12 @@ def get_style_config() -> Dict[str, str]:
         Dictionary containing all styling parameters
     """
     return {
-        'font_family': 'Lato',
+        'font_family': 'system-ui, -apple-system, sans-serif',  # Default system fonts
         'font_size': '12pt',
         'page_width': '8.5in',
         'margins': '1in',
-        'primary_color': '#000000',
-        'secondary_color': '#666666',
+        'primary_color': '#000000',  # Black for all headers and text
+        'secondary_color': '#000000',  # Black for consistency
         'border_color': '#000000',
         'line_height': '1.6',
         'header_size': '16pt',
@@ -123,10 +123,8 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
     # Generate professional CSS with configuration
     professional_css = f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;400italic;700italic&display=swap');
-        
         body {{
-            font-family: '{style_config['font_family']}', 'Arial', 'Helvetica', sans-serif;
+            font-family: {style_config['font_family']};
             font-size: {style_config['font_size']};
             line-height: {style_config['line_height']};
             max-width: {style_config['page_width']};
@@ -136,15 +134,13 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             color: #000;
         }}
         
-        /* Header styling */
+        /* Header styling - all black, no colors */
         h1 {{
             font-size: {style_config['header_size']};
             font-weight: bold;
             text-align: center;
             margin-bottom: 24pt;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: {style_config['primary_color']};
+            color: #000000;
         }}
         
         h2 {{
@@ -152,9 +148,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-weight: bold;
             margin-top: 24pt;
             margin-bottom: 12pt;
-            border-bottom: 2px solid {style_config['primary_color']};
-            padding-bottom: 6pt;
-            color: {style_config['primary_color']};
+            color: #000000;
         }}
         
         h3 {{
@@ -162,15 +156,15 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             font-weight: bold;
             margin-top: 12pt;
             margin-bottom: 6pt;
-            color: #555555;
+            color: #000000;
         }}
         
-        /* Enhanced subsection headers */
+        /* Enhanced subsection headers - all black */
         .subsection-header {{
             font-size: 11pt;
             font-weight: bold;
             text-transform: uppercase;
-            color: {style_config['primary_color']};
+            color: #000000;
             margin-top: 16pt;
             margin-bottom: 8pt;
             letter-spacing: 0.5px;
@@ -184,26 +178,25 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         
         /* Citation and quote styling - PROFESSIONAL MEMO STANDARDS */
         blockquote {{
-            font-family: '{style_config['font_family']}', 'Arial', 'Helvetica', sans-serif; /* Same as body font for consistency */
+            font-family: {style_config['font_family']};
             font-style: italic;
-            font-size: {style_config['font_size']}; /* Same size as body text */
-            color: #333333; /* Professional dark grey */
-            background-color: #f8f9fa; /* Very subtle light background */
-            border: 1px solid #dee2e6; /* Light professional border */
-            /* Removed left border line as requested */
-            border-radius: 3px; /* Minimal rounded corners */
-            padding: 4pt 8pt; /* Much tighter padding - reduced from 8pt 12pt */
-            margin: 8pt 0; /* Reduced margin for tighter appearance */
+            font-size: {style_config['font_size']};
+            color: #000000;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 4pt 8pt;
+            margin: 8pt 0;
         }}
         
         .citation {{
             font-weight: bold;
             font-style: normal;
-            color: #000000; /* Black font as requested */
-            background-color: #f0f4f8; /* Keep the highlight background */
+            color: #000000;
+            background-color: #f0f4f8;
             padding: 1px 4px;
             border-radius: 2px;
-            font-size: 1em; /* Same size as body text */
+            font-size: 1em;
         }}
         
         /* Table styling */
@@ -235,27 +228,39 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
             background-color: white;
         }}
         
-        /* List styling - Fix bullet icons */
+        /* List styling - Fix bullet icons and sub-bullets */
         ul {{
             margin: 12pt 0;
             padding-left: 24pt;
-            list-style-type: disc; /* Ensure bullets appear */
+            list-style-type: disc;
+        }}
+        
+        /* Sub-bullet indentation */
+        ul ul {{
+            margin: 6pt 0;
+            padding-left: 20pt;
+            list-style-type: circle;
+        }}
+        
+        /* Third level bullets */
+        ul ul ul {{
+            padding-left: 20pt;
+            list-style-type: square;
         }}
         
         ol {{
             margin: 12pt 0;
             padding-left: 24pt;
-            list-style-type: decimal; /* Ensure numbers appear */
+            list-style-type: decimal;
         }}
         
         li {{
             margin-bottom: 6pt;
-            display: list-item; /* Ensure list item display */
+            display: list-item;
         }}
         
-        /* Memo header */
+        /* Memo header - remove color borders */
         .memo-header {{
-            border-bottom: 2px solid {style_config['primary_color']};
             padding-bottom: 12pt;
             margin-bottom: 24pt;
         }}
@@ -271,10 +276,16 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         .memo-footer {{
             margin-top: 36pt;
             padding-top: 12pt;
-            border-top: 1px solid {style_config['border_color']};
             font-size: 10pt;
-            color: {style_config['secondary_color']};
+            color: #000000;
             text-align: center;
+        }}
+        
+        /* Horizontal line consistency - add after each section */
+        hr {{
+            border: none;
+            border-top: 1px solid #dee2e6;
+            margin: 24pt 0;
         }}
         
         /* Prevent nested styling issues */
