@@ -875,9 +875,10 @@ Write only the paragraph, no additional formatting or labels."""
         """Generates a highly discerning prompt for the Key Professional Judgments section."""
         all_judgments = []
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
+            # The 'professional_judgments' key comes from the initial 5-step analysis
             judgments = step.get('professional_judgments', [])
-            if judgments:
-                # Apply consistent filtering using shared function
+            if judgments and isinstance(judgments, list):
+                # Apply consistent filtering using the shared utility function
                 filtered = StepPrompts._filter_genuine_judgments(judgments)
                 all_judgments.extend(filtered)
 
@@ -885,30 +886,30 @@ Write only the paragraph, no additional formatting or labels."""
         if not all_judgments:
             return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-        # If judgments were flagged, this prompt will act as a final quality filter.
-        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. You must be highly discerning. Do not mistake standard analysis for a key judgment.
+        # If judgments were flagged, this prompt acts as a final, expert-level quality filter.
+        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. Your role is to be a highly discerning final quality filter.
 
-CONTEXT FROM ANALYSIS:
-The following key judgments were identified during the five-step analysis:
-{chr(10).join(all_judgments)}
+CONTEXT: The initial analysis flagged these potential judgment areas:
+{json.dumps(all_judgments, indent=2)}
 
 YOUR TASK:
-Transform the list of judgments above into a formal, well-articulated narrative. For each key judgment, present it as a separate bullet point following this precise structure:
-- **Judgment:** State the judgment clearly and concisely (e.g., "Conclusion on the Distinctness of Implementation Services").
-- **Analysis:** Briefly explain the issue and the rationale for the conclusion, referencing the relevant facts from the contract.
-- **Authoritative Guidance:** Explicitly cite the primary ASC 606 guidance that supports the judgment (e.g., "This conclusion is based on the criteria outlined in ASC 606-10-25-21.").
+1.  **Review the Context:** Scrutinize the list above. Your primary task is to distinguish between genuine professional judgments and standard contract analysis.
+2.  **Identify Genuine Judgments:** A **genuine judgment** involves significant estimation, a choice between viable accounting alternatives, or a "gray area" in the guidance.
+    - **Examples of Genuine Judgments:** "Estimating the standalone selling price (SSP) of a license using a residual approach," "Concluding that a performance bonus is not constrained," "Assessing whether a contract modification is a separate contract."
+    - **Standard analysis is NOT a judgment.** Do not include items like: "Concluding a SaaS service is a single performance obligation," or "Recognizing subscription revenue over time."
+3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a single, well-written paragraph called 'Rationale' that seamlessly combines the issue, analysis, and authoritative guidance.
+4.  **Provide a "No Judgments" Conclusion if Necessary:** If your review finds that none of the items in the context are genuine judgments, your entire response MUST be only the following sentence:
+    "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-Review the list above. Write a formal summary of ONLY the items that represent a genuine professional judgment (i.e., a "gray area" requiring significant estimation or a choice between viable alternatives).
+---
+### EXAMPLE OF DESIRED OUTPUT:
 
-- **CRITICAL RULE:** If the items in the list above are merely restatements of standard ASC 606 application (e.g., "the service is distinct," "revenue is recognized over time for a subscription"), then DISREGARD THEM. **Only focus on items that involve significant estimation or a choice between viable accounting alternatives.** Examples of genuine judgments include: "Estimating the standalone selling price of the license using a residual approach" or "Concluding that the performance bonus is not constrained and should be included in the transaction price." In this case (i.e., no genuine judgments), your entire output must be only the following single sentence:
-"The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+- **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
+  **Rationale:** The contract does not include a standalone price for the on-premise license, and an observable price is not available as the license is not sold separately. Therefore, a significant judgment was required to estimate the SSP. Per the hierarchy in ASC 606-10-32-33, we used the residual approach. This was deemed appropriate because the SSP for the professional services and support obligations were readily observable and stable. The total transaction price less the observable SSPs equals $450,000, representing the estimated fair value for the license component.
 
-- If there are genuine judgments, present each one as a separate bullet point following this precise structure:
-  - **Judgment:** State the judgment clearly.
-  - **Analysis:** Explain the issue and the rationale for the conclusion.
-  - **Authoritative Guidance:** Cite the specific ASC 606 guidance that supports the judgment.
-
-Your reputation for precision is on the line. Do not overstate the complexity of a simple contract."""
+---
+Begin your work. Your precision is critical to producing an audit-ready memo.
+"""
 
     @staticmethod
     def format_step_detail_as_markdown(step_data: dict, step_number: int,
