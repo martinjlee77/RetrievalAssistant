@@ -314,10 +314,10 @@ def create_docx_from_text(text_content, contract_data=None):
         section.left_margin = Inches(1)
         section.right_margin = Inches(1)
     
-    # Add header with Controller.cpa branding
+    # Add header with VeritasLogic.ai branding
     header = document.sections[0].header
     header_para = header.paragraphs[0]
-    header_para.text = "Controller.cpa"
+    header_para.text = "VeritasLogic.ai"
     header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     header_run = header_para.runs[0]
     header_run.font.name = 'Lato'
@@ -356,13 +356,14 @@ def create_docx_from_text(text_content, contract_data=None):
     document.add_paragraph()  # Spacing
     
     # Professional memo header table
-    header_table = document.add_table(rows=4, cols=2)
+    header_table = document.add_table(rows=5, cols=2)
     header_table.alignment = WD_TABLE_ALIGNMENT.LEFT
     header_table.style = 'Table Grid'
     
     # Configure table width
-    header_table.columns[0].width = Inches(1.2)
-    header_table.columns[1].width = Inches(5.8)
+    header_table.autofit = False
+    header_table.columns[0].width = Inches(2)
+    header_table.columns[1].width = Inches(4.5)
     
     # Header content
     current_date = datetime.now().strftime("%B %d, %Y")
@@ -372,7 +373,8 @@ def create_docx_from_text(text_content, contract_data=None):
         ("TO:", "Technical Accounting Team / Management"),
         ("FROM:", analyst_name),
         ("DATE:", current_date),
-        ("SUBJECT:", f"ASC 606 Revenue Recognition Analysis")
+        ("SUBJECT:", f"ASC 606 Revenue Recognition Analysis"),
+        ("REVIEW STATUS:", "Preliminary Analysis")
     ]
     
     if contract_data:
@@ -415,10 +417,9 @@ def create_docx_from_text(text_content, contract_data=None):
             heading1_style.font.name = 'Lato'
             heading1_style.font.size = Pt(14)
             heading1_style.font.bold = True
-            heading1_style.font.color.rgb = RGBColor(0, 51, 102)
-            heading1_style.paragraph_format.space_before = Pt(18)  # Increased spacing
+            heading1_style.paragraph_format.space_before = Pt(18)
             heading1_style.paragraph_format.space_after = Pt(8)
-            heading1_style.paragraph_format.keep_with_next = True  # Avoid page breaks after headings
+            heading1_style.paragraph_format.keep_with_next = True
         except Exception as e:
             logging.warning(f"Could not create Custom Heading 1 style: {e}")
             
@@ -428,7 +429,6 @@ def create_docx_from_text(text_content, contract_data=None):
             heading2_style.font.name = 'Lato'
             heading2_style.font.size = Pt(13)
             heading2_style.font.bold = True
-            heading2_style.font.color.rgb = RGBColor(51, 51, 51)
             heading2_style.paragraph_format.space_before = Pt(12)
             heading2_style.paragraph_format.space_after = Pt(6)
             heading2_style.paragraph_format.keep_with_next = True
@@ -441,7 +441,7 @@ def create_docx_from_text(text_content, contract_data=None):
             heading3_style.font.name = 'Lato'
             heading3_style.font.size = Pt(12)
             heading3_style.font.bold = True
-            heading3_style.font.color.rgb = RGBColor(85, 85, 85)  # Softer color
+            heading3_style.font.color.rgb = RGBColor(0, 51, 102)
             heading3_style.paragraph_format.space_before = Pt(8)
             heading3_style.paragraph_format.space_after = Pt(4)
         except Exception as e:
@@ -453,19 +453,25 @@ def create_docx_from_text(text_content, contract_data=None):
             subsection_style.font.name = 'Lato'
             subsection_style.font.size = Pt(11)
             subsection_style.font.bold = True
-            subsection_style.font.color.rgb = RGBColor(0, 51, 102)
+            subsection_style.font.color.rgb = RGBColor(0, 0, 0)
             subsection_style.font.all_caps = True  # UPPERCASE styling
             subsection_style.paragraph_format.space_before = Pt(12)
             subsection_style.paragraph_format.space_after = Pt(6)
         except Exception as e:
             logging.warning(f"Could not create Subsection Header style: {e}")
     
-    # Compile regex patterns once for performance
+    # Compile regex patterns once for performance - ENHANCED FOR NESTED STRUCTURES
     HEADING1_PATTERN = re.compile(r'^#\s+(.*?)$')
     HEADING2_PATTERN = re.compile(r'^##\s+(.*?)$') 
     HEADING3_PATTERN = re.compile(r'^###\s+(.*?)$')
     SUBSECTION_PATTERN = re.compile(r'^(OVERALL CONCLUSION|KEY FINDINGS|CONTRACT DATA SUMMARY|DOCUMENTS REVIEWED|DETAILED ANALYSIS|CONCLUSION)$')
-    BULLET_PATTERN = re.compile(r'^[\*\-]\s+(.*?)$')
+    
+    # Enhanced bullet patterns to capture indentation and different markers
+    NESTED_BULLET_PATTERN = re.compile(r'^(\s+)[\*\-]\s+(.*?)$')  # Captures leading whitespace
+    SUB_BULLET_PATTERN = re.compile(r'^-\s+(.*?)$')              # Hyphen as sub-bullet marker
+    MAIN_BULLET_PATTERN = re.compile(r'^[\*•]\s+(.*?)$')         # Asterisk/bullet as main bullet
+    BULLET_PATTERN = re.compile(r'^[\*\-•]\s+(.*?)$')           # Fallback for any bullet
+    
     NUMBERED_PATTERN = re.compile(r'^\d+\.\s+(.*?)$')
     BLOCKQUOTE_PATTERN = re.compile(r'^>\s*(.*?)$')
     HORIZONTAL_RULE_PATTERN = re.compile(r'^---+$')
@@ -504,18 +510,42 @@ def create_docx_from_text(text_content, contract_data=None):
             doc.add_paragraph(heading_text, style='Heading 3')
     
     def add_bullet_point(doc, match):
-        """Add bullet point with formatting support and smart indentation"""
+        """Add bullet point with intelligent structure-based indentation"""
         bullet_text = match.group(1)
         bullet_para = doc.add_paragraph()
         _parse_text_formatting(bullet_para, bullet_text)
+        bullet_para.style = 'List Bullet'
         
-        # A3-A5: Check if this should be a sub-bullet
-        # Sub-bullets start with specific patterns or are under performance obligations
-        if any(x in bullet_text for x in ["Logi-AI Suite", "Hardware", "Professional Services", "OptiScan-7", "Over Time", "Point in Time"]):
-            bullet_para.style = 'List Bullet'
-            bullet_para.paragraph_format.left_indent = Inches(0.5)  # Indent sub-bullets
-        else:
-            bullet_para.style = 'List Bullet'
+        # ROBUST APPROACH: Detect sub-bullet patterns structurally
+        # Method 1: Check for leading spaces/tabs in the original line (nested markdown)
+        full_line = match.group(0)  # Get the entire matched line including bullet marker
+        if full_line.startswith('  ') or full_line.startswith('\t'):
+            # This is a nested bullet with leading whitespace
+            bullet_para.paragraph_format.left_indent = Inches(0.5)
+            return
+        
+        # Method 2: Detect sub-bullet markers (e.g., "- " for sub-bullets vs "• " for main)
+        if full_line.strip().startswith('- '):
+            # Using hyphen as sub-bullet indicator
+            bullet_para.paragraph_format.left_indent = Inches(0.5)
+            return
+            
+        # Method 3: Contextual analysis - check if this follows a "parent" concept
+        # Look for patterns that indicate this is a breakdown of the previous item
+        sub_bullet_indicators = [
+            ':',  # Previous line ended with colon (introducing a list)
+            'obligations:',  # Performance obligations breakdown
+            'components:',   # Component breakdown
+            'includes:',     # Inclusion list
+            'consists of:',  # Composition breakdown
+        ]
+        
+        # Get the last few paragraphs to analyze context
+        recent_paragraphs = doc.paragraphs[-3:] if len(doc.paragraphs) >= 3 else doc.paragraphs
+        context_text = ' '.join([p.text.lower() for p in recent_paragraphs])
+        
+        if any(indicator in context_text for indicator in sub_bullet_indicators):
+            bullet_para.paragraph_format.left_indent = Inches(0.5)
     
     def add_numbered_item(doc, match):
         """Add numbered list item with formatting support"""
@@ -594,13 +624,45 @@ def create_docx_from_text(text_content, contract_data=None):
     lines = processed_content.split('\n')
     table_index = 0
     
-    # Define parsing rules in order of specificity (most specific first)
+    def add_nested_bullet_point(doc, match):
+        """Handle nested bullets with preserved indentation"""
+        whitespace = match.group(1)  # Captured leading whitespace
+        bullet_text = match.group(2)
+        bullet_para = doc.add_paragraph()
+        _parse_text_formatting(bullet_para, bullet_text)
+        bullet_para.style = 'List Bullet'
+        
+        # Calculate indentation based on whitespace amount
+        indent_level = len(whitespace.expandtabs(4)) // 4  # Convert tabs to spaces, then count levels
+        base_indent = 0.5 * indent_level  # 0.5 inches per level
+        bullet_para.paragraph_format.left_indent = Inches(base_indent)
+    
+    def add_sub_bullet_point(doc, match):
+        """Handle sub-bullets marked with hyphens"""
+        bullet_text = match.group(1)
+        bullet_para = doc.add_paragraph()
+        _parse_text_formatting(bullet_para, bullet_text)
+        bullet_para.style = 'List Bullet'
+        bullet_para.paragraph_format.left_indent = Inches(0.5)  # Standard sub-bullet indent
+    
+    def add_main_bullet_point(doc, match):
+        """Handle main bullets (asterisk/bullet points)"""
+        bullet_text = match.group(1)
+        bullet_para = doc.add_paragraph()
+        _parse_text_formatting(bullet_para, bullet_text)
+        bullet_para.style = 'List Bullet'
+        # No additional indentation for main bullets
+
+    # Define parsing rules in order of specificity (MOST SPECIFIC FIRST)
     parse_rules = [
         (HEADING1_PATTERN, add_heading1),
         (HEADING2_PATTERN, add_heading2), 
         (HEADING3_PATTERN, add_heading3),
-        (SUBSECTION_PATTERN, add_subsection_header),  # NEW: Handle subsection headers
-        (BULLET_PATTERN, add_bullet_point),
+        (SUBSECTION_PATTERN, add_subsection_header),
+        (NESTED_BULLET_PATTERN, add_nested_bullet_point),  # Check nested bullets first
+        (SUB_BULLET_PATTERN, add_sub_bullet_point),        # Then sub-bullet markers
+        (MAIN_BULLET_PATTERN, add_main_bullet_point),      # Then main bullets
+        (BULLET_PATTERN, add_bullet_point),                # Fallback for any remaining bullets
         (NUMBERED_PATTERN, add_numbered_item),
         (BLOCKQUOTE_PATTERN, add_blockquote),
         (HORIZONTAL_RULE_PATTERN, add_horizontal_rule),

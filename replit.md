@@ -8,6 +8,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (January/February 2025)
 
+### Robust Bullet Indentation System - Structure-Based Approach
+**Date**: February 5, 2025  
+**Status**: COMPLETED
+
+- **PROBLEM SOLVED**: Removed hardcoded product name dependencies ("Logi-AI Suite", "Hardware", etc.) for bullet indentation
+- **ROBUST DETECTION**: Implemented multiple structure-based indentation methods:
+  - **Method 1**: Leading whitespace detection (nested markdown with spaces/tabs)
+  - **Method 2**: Sub-bullet markers (hyphens "-" for sub-bullets, "•" for main bullets)
+  - **Method 3**: Contextual analysis (detects sub-bullets after colons, "obligations:", "includes:", etc.)
+  - **Method 4**: Fallback pattern matching for edge cases
+- **SCALABILITY**: Content-agnostic system works with any product names without code updates
+- **MAINTAINABILITY**: Separated formatting logic from content, eliminating brittle if/elif chains
+- **MULTIPLE LEVELS**: Supports unlimited indentation levels (0.5 inches per level)
+- **ARCHITECTURE**: Enhanced regex patterns with specific bullet type detection (NESTED_BULLET_PATTERN, SUB_BULLET_PATTERN, MAIN_BULLET_PATTERN)
+
 ### Enhanced DOCX Generation & Streamlined UX - Industry Standards Adoption
 **Date**: February 4, 2025  
 **Status**: COMPLETED
