@@ -1,141 +1,48 @@
 # ASC 606 PDF Processing PoC
 
 ## Overview
-This project is a multi-standard accounting analysis platform that generates complete contract analyses under various accounting standards (ASC 606, ASC 842, etc.). The system takes contracts as input and produces structured professional memos following the specific methodology of each standard. It uses authoritative FASB guidance and Big 4 interpretative publications as primary sources, with LLM general knowledge as fallback for edge cases. The business vision is to provide audit-ready, professional-quality accounting memos, adhering to Big 4 standards for accuracy and presentation, ultimately aiming for a comprehensive financial analysis platform.
+This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 842). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance and Big 4 interpretative publications. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-
-## Recent Changes (January/February 2025)
-
-### Simplified DOCX Header Architecture - Single Source of Truth
-**Date**: February 5, 2025  
-**Status**: COMPLETED
-
-- **ARCHITECTURAL IMPROVEMENT**: Eliminated duplicate header generation in create_docx_from_text function
-- **SINGLE SOURCE OF TRUTH**: Header now flows naturally from asc606_analyzer.py to both HTML and DOCX formats
-- **CODE SIMPLIFICATION**: Removed 58 lines of redundant header table creation and styling code
-- **CLEAN SEPARATION**: create_docx_from_text is now a pure markdown-to-DOCX translator
-- **ELIMINATED CONFLICTS**: No more risk of header mismatches between HTML preview and DOCX download
-- **REMOVED REGEX CLEANUP**: No longer strips analyzer-generated header from content
-- **MAINTAINABILITY**: Future header changes only need to be made in one place (analyzer)
-- **BENEFITS**: Simpler architecture, reduced complexity, better separation of concerns, easier testing
-
-### Robust Bullet Indentation System - Structure-Based Approach  
-**Date**: February 5, 2025  
-**Status**: COMPLETED
-
-- **PROBLEM SOLVED**: Removed hardcoded product name dependencies ("Logi-AI Suite", "Hardware", etc.) for bullet indentation
-- **ROBUST DETECTION**: Implemented multiple structure-based indentation methods:
-  - **Method 1**: Leading whitespace detection (nested markdown with spaces/tabs)
-  - **Method 2**: Sub-bullet markers (hyphens "-" for sub-bullets, "•" for main bullets)
-  - **Method 3**: Contextual analysis (detects sub-bullets after colons, "obligations:", "includes:", etc.)
-  - **Method 4**: Fallback pattern matching for edge cases
-- **SCALABILITY**: Content-agnostic system works with any product names without code updates
-- **MAINTAINABILITY**: Separated formatting logic from content, eliminating brittle if/elif chains
-- **MULTIPLE LEVELS**: Supports unlimited indentation levels (0.5 inches per level)
-- **ARCHITECTURE**: Enhanced regex patterns with specific bullet type detection (NESTED_BULLET_PATTERN, SUB_BULLET_PATTERN, MAIN_BULLET_PATTERN)
-
-### Enhanced DOCX Generation & Streamlined UX - Industry Standards Adoption
-**Date**: February 4, 2025  
-**Status**: COMPLETED
-
-- **FONT MODERNIZATION**: Updated both DOCX and HTML exports from Times New Roman to Lato for modern, professional appearance
-- **RULE-BASED PARSING**: Implemented robust, extensible parsing system replacing brittle if/elif chains with regex-based rules
-- **ENHANCED TEXT FORMATTING**: Added missing italic text support (*text*) alongside existing bold (**text**) formatting
-- **DYNAMIC TABLE HANDLING**: Replaced hardcoded table logic with intelligent column width distribution and markdown table parsing
-- **STREAMLINED UX**: Adopted industry-standard two-option model (Google Docs/Figma pattern):
-  - **Preview First**: Memo preview displayed immediately at top, expanded by default
-  - **Download Below**: Single primary Download DOCX button positioned after preview
-  - **Minimal Friction**: Content front and center before any actions
-  - **Removed**: Problematic "View in Browser" functionality
-- **COMPREHENSIVE DOCX FIXES**: Addressed detailed user feedback (A1-A10 tickmarks):
-  - **A1**: Contract table column widths optimized + Document Classification/Review Status added
-  - **A2**: Duplicate TECHNICAL ACCOUNTING MEMORANDUM header removed
-  - **A3-A5**: Sub-bullet indentation for performance obligations and recognition timing
-  - **A6**: Enhanced spacing before main section headers (Executive Summary, etc.)
-  - **A7**: Consistent spacing for subsections (Detailed Analysis)
-  - **A8**: Redundant "Conclusion:" text removed from headers
-  - **A9**: Analyst certification section completely removed
-  - **A10**: Enhanced table formatting with proper column distribution
-- **ADDITIONAL PROFESSIONAL ENHANCEMENTS**: Comprehensive visual improvements for audit-ready documents:
-  - **Enhanced Heading Hierarchy**: Improved spacing, keep-with-next formatting, professional color scheme
-  - **Subsection Header Styling**: Dedicated formatting for OVERALL CONCLUSION, KEY FINDINGS, CONTRACT DATA SUMMARY
-  - **Professional Table Design**: Blue headers with white text (#003366), alternating row colors, better cell padding
-  - **Enhanced Contract Citations**: Improved blockquote styling with subtle backgrounds for contract excerpts
-  - **Unified HTML/DOCX Styling**: Consistent professional appearance across both preview and download formats
-  - **Document Structure**: Better visual hierarchy, improved metadata section, professional color coding
-- **CODE CLEANUP**: Removed render_view_in_browser_button function and cleaned up html_export.py
-- **USER EXPERIENCE**: Preview-first approach with minimal content before results
-- **ARCHITECTURE**: html_export.py retained for embedded preview functionality while removing unused browser view features
-
-### Critical Judgment Consistency Fix - Unified Filtering Architecture
-**Date**: February 1, 2025
-**Status**: COMPLETED
-
-- **ROOT CAUSE IDENTIFIED**: Executive Summary and Conclusion prompts reported different judgment status than Key Professional Judgments section
-- **SOLUTION IMPLEMENTED**: Created shared `_filter_genuine_judgments()` function with consistent filtering logic across all three judgment-reporting sections
-- **ARCHITECTURE IMPROVED**: Replaced duplicated filtering code with single source of truth approach
-- **FILTERING LOGIC**: Removes standard ASC 606 application (e.g., "single performance obligation", "over time recognition") while preserving genuine judgments requiring estimation or choice between alternatives
-- **FUNCTIONS UPDATED**: get_key_judgments_prompt, get_enhanced_executive_summary_prompt, get_conclusion_prompt now use identical filtering
-- **NETFLIX MISMATCH RESOLVED**: All three sections now consistently report "no significant judgments" for simple subscription contracts
-- **DESIGN PRINCIPLE**: Maintained sophisticated filtering without over-engineering or preventing legitimate judgment detection in complex contracts
-
-### Major Architectural Refactor - System/User Prompt Architecture
-**Date**: January 31, 2025
-**Status**: COMPLETED
-
-- **IMPLEMENTED**: Complete System/User prompt architecture replacing monolithic prompts with modular design
-- **NEW PROMPT SYSTEM**: Separated core AI instructions (system prompts) from task-specific context (user prompts) for each of the 5 ASC 606 steps
-- **LLM INTEGRATION UPDATED**: Modified both sync/async LLM functions to handle message arrays instead of single prompt strings
-- **ENHANCED STEP-SPECIFIC RULES**: Each step now has focused, critical rules preventing hallucination (especially Step 3 variable consideration)
-- **CODE CLEANUP COMPLETED**: Removed ALL legacy get_step_specific_analysis_prompt functions (both wrapper and monolithic versions)
-- **FINAL STATE**: Only get_system_prompt() and get_user_prompt_for_step() functions remain for core analysis
-- **EXPECTED IMPROVEMENTS**: 
-  - Better LLM instruction adherence (system/user separation)
-  - Reduced token usage and improved performance
-  - More accurate variable consideration detection
-  - Cleaner Step 5 formatting and professional presentation
-
-**CRITICAL DEVELOPMENT RULES - PROMPT PROTECTION**:
-1. **NEVER modify prompt text content without explicit user approval** - The user has spent significant time fine-tuning prompt templates in utils/step_prompts.py and other files
-2. **ALWAYS ask permission before changing any prompt text or templates**
-3. **Protected files requiring user approval for content changes**:
-   - utils/step_prompts.py (all prompt methods)
-   - utils/prompt.py (all template content)
-   - pages/asc606.py (form labels, help text, user-facing content)
-   - Any file containing user-facing text or analysis instructions
-4. **Safe technical changes (no approval needed)**:
-   - Bug fixes to code logic/structure
-   - Adding missing methods/functions
-   - Performance improvements
-   - Import statements and technical infrastructure
-5. **When in doubt**: Always ask the user before making ANY content changes
-6. **Violation consequences**: User has to re-review entire codebase, causing significant frustration and lost work
-7. **MANDATORY ALERT PROTOCOL**: If the AI agent cannot make a necessary change due to these prompt protection rules, it MUST explicitly alert the user with: "⚠️ PROMPT PROTECTION ALERT: I cannot modify [specific file/content] due to the prompt protection rules in replit.md. You will need to make this change manually. Here's exactly what needs to be changed: [specific instructions]"
+Critical Development Rules - Prompt Protection:
+1. NEVER modify prompt text content without explicit user approval.
+2. ALWAYS ask permission before changing any prompt text or templates.
+3. Protected files requiring user approval for content changes:
+   - `utils/step_prompts.py` (all prompt methods)
+   - `utils/prompt.py` (all template content)
+   - `pages/asc606.py` (form labels, help text, user-facing content)
+   - Any file containing user-facing text or analysis instructions.
+4. Safe technical changes (no approval needed): Bug fixes to code logic/structure, adding missing methods/functions, performance improvements, import statements and technical infrastructure.
+5. When in doubt: Always ask the user before making ANY content changes.
+6. Violation consequences: User has to re-review entire codebase, causing significant frustration and lost work.
+7. MANDATORY ALERT PROTOCOL: If the AI agent cannot make a necessary change due to these prompt protection rules, it MUST explicitly alert the user with: "⚠️ PROMPT PROTECTION ALERT: I cannot modify [specific file/content] due to the prompt protection rules in replit.md. You will need to make this change manually. Here's exactly what needs to be changed: [specific instructions]".
 
 ## System Architecture
 
 ### Multi-Standard Platform Architecture
 - **Frontend**: Streamlit multi-page application with a Home dashboard.
-- **Core System**: Modular core components including analyzers, data models, knowledge base management, and UI helpers.
-- **Standard-Specific Pages**: Dedicated interfaces for different accounting standards (e.g., ASC 606, ASC 842).
+- **Core System**: Modular components for analyzers, data models, knowledge base management, and UI helpers.
+- **Standard-Specific Pages**: Dedicated interfaces for different accounting standards.
 - **Knowledge Base**: Multi-standard ChromaDB manager supporting collections per standard.
-- **Document Processing**: Unified document extractor supporting various formats.
+- **Document Processing**: Unified document extractor for various formats.
 - **Source Documents**: Standard-specific authoritative sources stored locally.
 
-### Core Components
-- **Hybrid RAG System**: Combines metadata filtering with semantic search for precise results, incorporating contract-specific term extraction for enhanced relevance.
+### Core Components and Design Decisions
+- **Hybrid RAG System**: Combines metadata filtering with semantic search, enhanced by contract-specific term extraction.
 - **Knowledge Base**: Contains 1,894 authoritative documents (ASC 606 official guidance + EY interpretative literature) in a ChromaDB vector database.
-- **Two-Stage Citation Process**: Extracts verbatim quotes first, then assembles analysis using structured evidence to ensure direct and auditable citations.
+- **Two-Stage Citation Process**: Extracts verbatim quotes and then assembles analysis with structured evidence for direct and auditable citations.
 - **Map-Reduce Contract Processing**: Analyzes full documents using overlapping chunks to prevent truncation.
 - **Multi-document Processing**: Handles up to 5 files (contracts, invoices, amendments).
 - **Professional Memo Generation**: Produces Big 4 quality accounting memos with audit-ready features, including narrative-driven analysis, professional formatting, and integration of actual contract data.
 - **Source Transparency**: Tracks hybrid RAG chunks used and relevance scores.
 - **System Integrity Monitoring**: Comprehensive logging and validation for detecting silent failures and ensuring data quality.
-- **Performance Optimization**: Utilizes caching for analyzers and persistent vector databases, with concurrent execution of analysis steps and memo assembly for significant speed improvements.
+- **Performance Optimization**: Utilizes caching for analyzers, persistent vector databases, and concurrent execution of analysis steps.
 - **Data Flow**: Ensures all user inputs (customer name, dates, focus areas, materiality, audience) flow systematically to the LLM for targeted analysis.
-- **UI/UX Design**: Prioritizes professional, clean interfaces with clear navigation, simplified input forms using expanders and toggles, and immediate access to primary actions like document download and browser view. Styling adheres to a professional aesthetic with Times New Roman and Big 4 color schemes.
+- **UI/UX Design**: Prioritizes professional, clean interfaces with clear navigation, simplified input forms, and immediate access to primary actions. Styling uses Lato font and Big 4 inspired color schemes.
+- **DOCX Generation**: Enhanced with robust bullet indentation (structure-based detection), comprehensive formatting (italic text support, dynamic table handling), and professional visual enhancements (enhanced heading hierarchy, professional table design, consistent HTML/DOCX styling).
+- **System/User Prompt Architecture**: Implemented a modular system/user prompt architecture, separating core AI instructions (system prompts) from task-specific context (user prompts) for each ASC 606 step. LLM integration handles message arrays.
+- **Judgment Consistency**: Implemented a shared `_filter_genuine_judgments()` function to ensure consistent filtering logic for judgments across executive summary, conclusion, and key professional judgments sections.
 
 ### File Structure
 ```
@@ -148,16 +55,16 @@ Preferred communication style: Simple, everyday language.
 │   └── images/
 │       └── logo.png                      # Controller.cpa logo
 ├── utils/                                # Core utilities
-│   ├── llm.py                           # OpenAI API calls, knowledge base, debugging tools
-│   ├── prompt.py                        # Centralized prompt templates
-│   ├── auth.py                          # Authentication utilities (placeholder)
-│   ├── document_extractor.py            # Multi-format document processing
-│   └── asc606_analyzer.py               # Consolidated ASC 606 hybrid analyzer
+│   ├── llm.py                            # OpenAI API calls, knowledge base, debugging tools
+│   ├── prompt.py                         # Centralized prompt templates
+│   ├── auth.py                           # Authentication utilities (placeholder)
+│   ├── document_extractor.py             # Multi-format document processing
+│   └── asc606_analyzer.py                # Consolidated ASC 606 hybrid analyzer
 ├── core/                                 # Shared backend logic
-│   ├── analyzers.py                     # Analyzer factory and base classes
-│   ├── models.py                        # Centralized data models
-│   ├── knowledge_base.py                # Multi-standard knowledge base manager
-│   └── ui_helpers.py                    # Shared UI components and styling
+│   ├── analyzers.py                      # Analyzer factory and base classes
+│   ├── models.py                         # Centralized data models
+│   ├── knowledge_base.py                 # Multi-standard knowledge base manager
+│   └── ui_helpers.py                     # Shared UI components and styling
 ├── attached_assets/                      # Authoritative sources (cleaned)
 ├── asc606_knowledge_base/                # ChromaDB vector database (single source)
 ├── pyproject.toml                        # Dependencies
@@ -166,15 +73,15 @@ Preferred communication style: Simple, everyday language.
 
 ## External Dependencies
 
-- **Streamlit**: Primary framework for the web application interface.
-- **pandas**: Used for data manipulation and analysis within the application.
-- **unstructured**: Utilized for advanced PDF processing capabilities.
-- **pdfplumber**: Employed for PDF text extraction.
-- **PyPDF2**: Used for basic PDF handling.
-- **ChromaDB**: Vector database for storing and managing the knowledge base.
-- **OpenAI API**: For large language model (LLM) interactions, including `gpt-4o` for analysis and `gpt-4o-mini` for memo assembly.
-- **FPDF**: For PDF generation.
-- **WeasyPrint**: For HTML-to-PDF conversion, addressing Unicode issues.
-- **python-docx**: For generating professional Word documents.
-- **Camelot & Tabula-py**: Specialized tools for table extraction from PDFs.
-- **PyMuPDF**: For coordinate-based layout analysis in PDF processing.
+- **Streamlit**: Web application framework.
+- **pandas**: Data manipulation and analysis.
+- **unstructured**: Advanced PDF processing.
+- **pdfplumber**: PDF text extraction.
+- **PyPDF2**: Basic PDF handling.
+- **ChromaDB**: Vector database for knowledge base.
+- **OpenAI API**: Large language model interactions (`gpt-4o`, `gpt-4o-mini`).
+- **FPDF**: PDF generation.
+- **WeasyPrint**: HTML-to-PDF conversion.
+- **python-docx**: Word document generation.
+- **Camelot & Tabula-py**: Table extraction from PDFs.
+- **PyMuPDF**: Coordinate-based layout analysis in PDF processing.
