@@ -560,14 +560,79 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
                                               s4: dict, s5: dict,
                                               analysis_title: str,
                                               customer_name: str) -> str:
-        """Enhanced executive summary prompt with clear role separation and professional structure."""
+        """Enhanced executive summary prompt with structured data extraction and clear role separation."""
         
+        # Step 1: Contract validity assessment
+        contract_exists = "Yes"
+        if s1_analysis := s1.get('step1_analysis'):
+            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+                failed_criteria = [c for c in s1_criteria if c.get('status') == 'Not Met']
+                if failed_criteria:
+                    contract_exists = "No"
+
+        # Step 2: Performance obligations extraction  
+        po_count = 0
+        po_descriptions = []
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                po_count = len(s2_pos) if s2_pos else 0
+                po_descriptions = [po.get('po_description', 'Unnamed PO') for po in s2_pos]
+
+        # Step 3: Transaction price details
+        total_price = "Not specified"
+        has_variable_consideration = False
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                total_price = s3_price.get('total_transaction_price', 'Not specified')
+                var_consideration = s3_price.get('variable_consideration')
+                if var_consideration:
+                    var_str = str(var_consideration).strip().lower()
+                    has_variable_consideration = (
+                        var_str not in ['n/a', 'not applicable', 'none', 'none identified', '']
+                        and len(var_str) > 10
+                        and 'variable' in var_str
+                    )
+
+        # Step 4: Allocation method
+        allocation_method = "Not applicable (single performance obligation)" if po_count <= 1 else "Not specified"
+        if s4_analysis := s4.get('step4_analysis'):
+            if s4_details := s4_analysis.get('allocation_details'):
+                if allocations := s4_details.get('allocations'):
+                    if len(allocations) > 1:
+                        allocation_method = "Price allocated across multiple POs based on standalone selling prices"
+
+        # Step 5: Revenue recognition methods
+        recognition_methods = []
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                recognition_methods = [
+                    f"{po.get('performance_obligation', 'Unknown PO')}: {po.get('recognition_method', 'Unknown')}"
+                    for po in s5_plan
+                ]
+
+        # Extract and filter critical judgments from all steps
+        all_step_judgments = []
+        for step_result in [s1, s2, s3, s4, s5]:
+            if judgments := step_result.get('professional_judgments'):
+                all_step_judgments.extend(judgments)
+        
+        critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
+
         return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo. This section serves as the strategic overview for executives, auditors, and stakeholders.
 
 ANALYSIS CONTEXT:
 - Contract Analysis: {analysis_title}
 - Customer: {customer_name}
-- Step Analysis Data: Available from 5-step ASC 606 analysis
+
+STRUCTURED DATA FROM 5-STEP ANALYSIS:
+- ASC 606 Contract Exists: {contract_exists}
+- Performance Obligations Count: {po_count}
+- Performance Obligations: {po_descriptions}
+- Total Transaction Price: {total_price}
+- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+- Allocation Method: {allocation_method}
+- Revenue Recognition Methods: {recognition_methods}
+- Critical Judgments: {critical_judgments}
 
 SECTION STRUCTURE & REQUIREMENTS:
 
@@ -578,12 +643,12 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
 **2. KEY FINDINGS** (Scannable dashboard format)
-- ASC 606 Contract Exists: Yes/No determination
-- Performance Obligations: Count and brief identification
-- Transaction Price: Total amount (note if variable consideration exists)
-- Allocation: Method used across performance obligations  
-- Revenue Recognition: High-level timing approach for each major component
-- Critical Judgments: Genuine professional judgments requiring significant estimation
+- ASC 606 Contract Exists: {contract_exists}
+- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- Allocation: {allocation_method}
+- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
@@ -591,7 +656,7 @@ SECTION STRUCTURE & REQUIREMENTS:
 - Focus on decision-useful information for senior stakeholders
 - Maintain consistent professional tone throughout
 
-Extract the relevant information from the step analysis data provided and create a cohesive, executive-level summary that respects readers' time while providing comprehensive oversight of the accounting conclusions."""
+Use the structured data provided above to create a cohesive, executive-level summary that respects readers' time while providing comprehensive oversight of the accounting conclusions."""
 
     @staticmethod
     def get_step1_schema() -> str:
