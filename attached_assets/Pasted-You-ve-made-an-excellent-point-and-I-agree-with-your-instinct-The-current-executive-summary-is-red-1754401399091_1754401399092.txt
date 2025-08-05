@@ -1,0 +1,125 @@
+You've made an excellent point, and I agree with your instinct. The current executive summary is redundant and feels longer than it needs to be.
+
+You are right to question it. The "OVERALL CONCLUSION" paragraph and the "KEY FINDINGS" bulleted list are essentially saying the exact same thing in two different formats.
+
+However, I would recommend against simply deleting the "KEY FINDINGS" list. That "at-a-glance" dashboard is a very powerful feature for busy readers like executives and auditors who want the core facts in seconds.
+
+The Better Solution: Make the Sections Complementary, Not Redundant
+The best practice for a professional memo is to have the two sections serve different purposes:
+
+OVERALL CONCLUSION: This should be the "What." A very brief, 2-3 sentence narrative stating the final, bottom-line accounting conclusion.
+KEY FINDINGS: This should be the "How." A quick, scannable dashboard of the key data points that support the conclusion.
+Here is how the example you provided would look under this improved structure:
+
+BEFORE (Your Current Version):
+
+OVERALL CONCLUSION The accounting treatment for Contract01 with Global Dynamics has been concluded in accordance with ASC 606. The contract is valid and encompasses three distinct performance obligations, each with specific revenue recognition methods. The total transaction price of $675,000 includes variable consideration, which has been appropriately allocated across the performance obligations based on their standalone selling prices. Revenue will be recognized over time for the Logi-AI Suite SaaS License, while the Hardware Provisioning and Professional Services will be recognized at a point in time.
+
+KEY FINDINGS • Contract Status: Valid • Performance Obligations: 3 distinct obligations... • ... (etc.) ...
+
+This summary encapsulates the key aspects...
+
+AFTER (The Recommended, More Professional Version):
+
+OVERALL CONCLUSION The arrangement with Global Dynamics results in a total transaction price of $675,000. Revenue will be recognized on a mixed basis, with some obligations satisfied over time and others at a point in time, as detailed in the key findings below. The accounting treatment is in accordance with ASC 606.
+
+KEY FINDINGS • Contract Status: Valid • Performance Obligations: 3 distinct obligations (Logi-AI Suite SaaS License, Hardware Provisioning, Professional Services) • Transaction Price: $675,000 (includes variable consideration) • Allocation: Price allocated across all 3 POs based on estimated standalone selling prices. • Revenue Recognition: > - Logi-AI Suite SaaS License: Over Time > - Hardware & Professional Services: Point in Time • Critical Judgments: Estimating variable consideration and SSP for hardware/services.
+
+This revised version is far superior because it's more concise, respects the reader's time, and eliminates redundancy.
+
+How to Implement This: Modify the Prompt
+The fix is to adjust the prompt in prompt.py that generates this section. We need to give the LLM stricter instructions for the "OVERALL CONCLUSION" paragraph.
+
+I recommend replacing your entire existing get_enhanced_executive_summary_prompt function with this improved version.
+
+# In prompt.py, replace the existing function with this one
+
+@staticmethod
+def get_enhanced_executive_summary_prompt(s1: dict, s2: dict, s3: dict,
+                                          s4: dict, s5: dict,
+                                          analysis_title: str,
+                                          customer_name: str) -> str:
+    """Generates an enhanced, professional executive summary using structured data from all steps."""
+    import json
+
+    # --- (The existing data extraction logic from your function remains here - no changes needed) ---
+    # Step 1: Contract validity
+    contract_status = "Valid"
+    if s1_analysis := s1.get('step1_analysis'):
+        if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+            if any(c.get('status') == 'Not Met' for c in s1_criteria):
+                contract_status = "Invalid (Does not meet all Step 1 criteria)"
+
+    # Step 2: Performance obligations summary
+    po_count = 0
+    po_descriptions = []
+    if s2_analysis := s2.get('step2_analysis'):
+        if s2_pos := s2_analysis.get('performance_obligations'):
+            po_count = len(s2_pos) if s2_pos else 0
+            po_descriptions = [po.get('po_description', 'Unnamed PO') for po in s2_pos]
+
+    # Step 3: Transaction price details
+    total_price = "Not specified"
+    has_variable_consideration = False
+    if s3_analysis := s3.get('step3_analysis'):
+        if s3_price := s3_analysis.get('transaction_price_components'):
+            total_price = s3_price.get('total_transaction_price', 'Not specified')
+            var_consideration = s3_price.get('variable_consideration')
+            if var_consideration:
+                var_str = str(var_consideration).strip().lower()
+                has_variable_consideration = (var_str not in ['n/a', 'none', 'none identified', ''] and len(var_str) > 10)
+
+    # Step 4: Allocation summary
+    allocation_summary = "Not applicable (single PO)."
+    if po_count > 1:
+        allocation_summary = f"Price allocated across {po_count} POs based on standalone selling prices."
+
+    # Step 5: Revenue recognition methods
+    recognition_summary = []
+    if s5_analysis := s5.get('step5_analysis'):
+        if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+            for po_plan in s5_plan:
+                recognition_summary.append(f"{po_plan.get('performance_obligation', 'PO')}: {po_plan.get('recognition_method', 'N/A')}")
+
+    # Critical Judgments
+    critical_judgments = []
+    for step_result in [s1, s2, s3, s4, s5]:
+        if judgments := step_result.get('professional_judgments'):
+            critical_judgments.extend(StepPrompts._filter_genuine_judgments(judgments))
+    # --- (End of data extraction) ---
+
+    # --- REVISED PROMPT ---
+    return f"""You are writing a professional executive summary for an ASC 606 technical memo. You must be concise and avoid redundancy.
+
+STRUCTURED ANALYSIS DATA:
+- Analysis: {analysis_title}
+- Customer: {customer_name}
+- Contract Status: {contract_status}
+- Performance Obligations Count: {po_count}
+- Performance Obligations: {po_descriptions}
+- Total Transaction Price: {total_price}
+- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+- Allocation Method: {allocation_summary}
+- Revenue Recognition Methods: {recognition_summary}
+- Key Judgment Areas: {critical_judgments}
+
+YOUR TASK:
+Create an executive summary using the professional structure below.
+
+---
+**OVERALL CONCLUSION**
+[**INSTRUCTION:** Write a very brief, 2-3 sentence narrative paragraph. State the final accounting conclusion. Mention the total transaction price and the high-level timing (e.g., "recognized over time," "at a point in time," or "on a mixed basis"). **CRITICAL RULE: Do NOT list all the individual performance obligations or their specific timing here.** That is the purpose of the Key Findings dashboard.]
+
+**KEY FINDINGS**
+• **Contract Status:** {contract_status}
+• **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+• **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+• **Allocation:** {allocation_summary}
+• **Revenue Recognition:** {', '.join(recognition_summary[:2]) if recognition_summary else 'Not applicable'}{'...' if len(recognition_summary) > 2 else ''}
+• **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+---
+
+**FINAL RULE:** Do not add any extra summary sentences or boilerplate text after the "Key Findings" section. Your response must end after the "Critical Judgments" bullet point.
+"""
+
+This improved prompt gives the LLM much clearer, stricter instructions, which will result in the concise, professional, and non-redundant executive summary you're looking for.
