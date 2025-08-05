@@ -1,6 +1,6 @@
 """
 Enhanced step-by-step prompt templates for ASC 606 analysis using System/User architecture.
-This approach separates the AI's core instructions (System Prompt) from the
+This appch separates the AI's core instructions (System Prompt) from the
 dynamic task-specific instructions (User Prompt).
 """
 
