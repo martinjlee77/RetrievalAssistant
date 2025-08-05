@@ -9,8 +9,10 @@ import logging
 import os
 import re
 import time
+import hashlib
 from datetime import datetime
 from typing import Dict, List, Any, Optional
+from functools import lru_cache
 from openai import OpenAI
 
 from core.models import ASC606Analysis
@@ -33,6 +35,9 @@ class ASC606Analyzer:
         self.logger = logging.getLogger(__name__)
         self.kb_manager = None
         self._initialize_knowledge_base()
+        # Cache for expensive operations
+        self._rag_cache = {}
+        self._prompt_cache = {}
 
     def _initialize_knowledge_base(self):
         """Initialize the knowledge base manager for RAG"""
@@ -44,8 +49,10 @@ class ASC606Analyzer:
                 f"Knowledge base manager initialization failed: {e}")
             self.kb_manager = None
 
+    @lru_cache(maxsize=128)
     def _clean_memo_section(self, text: str) -> str:
-        """Removes common unwanted markdown artifacts from LLM-generated text."""
+        """Removes common unwanted markdown artifacts from LLM-generated text.
+        CACHED: Text cleaning is expensive and often repeated."""
         if not isinstance(text, str):
             return text  # Return as-is if it's an error message or not a string
 
@@ -137,13 +144,20 @@ class ASC606Analyzer:
                     self.logger.info(
                         f"Extracted contract terms: {contract_terms}")
 
-                    # Query knowledge base with extracted terms using improved manager
-                    rag_results = self.kb_manager.search_relevant_guidance(
-                        standard="ASC 606",
-                        query_texts=
-                        contract_terms,  # Pass as list for better search
-                        step_context="comprehensive_analysis",
-                        n_results=self.GENERAL_RAG_RESULTS_COUNT)
+                    # Query knowledge base with caching for expensive operations
+                    cache_key = hashlib.md5(f"rag_{str(contract_terms)}_comprehensive_{self.GENERAL_RAG_RESULTS_COUNT}".encode()).hexdigest()
+                    
+                    if cache_key not in self._rag_cache:
+                        rag_results = self.kb_manager.search_relevant_guidance(
+                            standard="ASC 606",
+                            query_texts=contract_terms,  # Pass as list for better search
+                            step_context="comprehensive_analysis",
+                            n_results=self.GENERAL_RAG_RESULTS_COUNT)
+                        self._rag_cache[cache_key] = rag_results
+                        self.logger.info(f"RAG results cached for key: {cache_key[:8]}...")
+                    else:
+                        rag_results = self._rag_cache[cache_key]
+                        self.logger.info(f"Using cached RAG results for key: {cache_key[:8]}...")
 
                     # Enhanced logging with relevance insights
                     if rag_results:
@@ -217,7 +231,7 @@ class ASC606Analyzer:
                 self.logger.info(
                     f"Preparing Step {step_num}: {step_info['title']}")
 
-                # Step-specific RAG query
+                # Step-specific RAG query with caching
                 step_specific_context = ""
                 if self.kb_manager and contract_terms:
                     step_search_terms = {
@@ -247,11 +261,18 @@ class ASC606Analyzer:
                     enhanced_terms = contract_terms + step_search_terms.get(
                         step_num, [])
 
-                    step_rag_results = self.kb_manager.search_relevant_guidance(
-                        standard="ASC 606",
-                        query_texts=enhanced_terms,
-                        step_context=f"step_{step_num}",
-                        n_results=self.STEP_SPECIFIC_RAG_RESULTS_COUNT)
+                    # Cache step-specific RAG results
+                    step_cache_key = hashlib.md5(f"step_rag_{step_num}_{str(enhanced_terms)}_{self.STEP_SPECIFIC_RAG_RESULTS_COUNT}".encode()).hexdigest()
+                    
+                    if step_cache_key not in self._rag_cache:
+                        step_rag_results = self.kb_manager.search_relevant_guidance(
+                            standard="ASC 606",
+                            query_texts=enhanced_terms,
+                            step_context=f"step_{step_num}",
+                            n_results=self.STEP_SPECIFIC_RAG_RESULTS_COUNT)
+                        self._rag_cache[step_cache_key] = step_rag_results
+                    else:
+                        step_rag_results = self._rag_cache[step_cache_key]
 
                     if step_rag_results:
                         step_specific_context = f"\n\n**STEP {step_num} SPECIFIC GUIDANCE:**\n"
@@ -259,14 +280,20 @@ class ASC606Analyzer:
                             step_specific_context += f"\n**{result['source']} - {result['section']}** (Relevance: {result['relevance_score']:.2f})\n"
                             step_specific_context += f"{result['content']}\n"
 
-                # NEW: Prepare the messages list using the new architecture
-                system_prompt = StepPrompts.get_system_prompt()
-                user_prompt = StepPrompts.get_user_prompt_for_step(
-                    step_number=step_num,
-                    contract_text=contract_text,
-                    rag_context=retrieved_context + step_specific_context,
-                    contract_data=contract_data,
-                    debug_config=debug_config or {})
+                # NEW: Prepare the messages list using the new architecture with caching
+                prompt_cache_key = hashlib.md5(f"prompt_{step_num}_{len(contract_text)}_{len(retrieved_context + step_specific_context)}".encode()).hexdigest()
+                
+                if prompt_cache_key not in self._prompt_cache:
+                    system_prompt = StepPrompts.get_system_prompt()
+                    user_prompt = StepPrompts.get_user_prompt_for_step(
+                        step_number=step_num,
+                        contract_text=contract_text,
+                        rag_context=retrieved_context + step_specific_context,
+                        contract_data=contract_data,
+                        debug_config=debug_config or {})
+                    self._prompt_cache[prompt_cache_key] = (system_prompt, user_prompt)
+                else:
+                    system_prompt, user_prompt = self._prompt_cache[prompt_cache_key]
 
                 messages = [{
                     "role": "system",

@@ -290,6 +290,8 @@ def create_docx_from_text(text_content, contract_data=None):
     from datetime import datetime
     import re
     import logging
+    import hashlib
+    from functools import lru_cache
     
     document = Document()
     
@@ -610,10 +612,15 @@ def create_docx_from_text(text_content, contract_data=None):
         (TABLE_PLACEHOLDER_PATTERN, add_table_placeholder)
     ]
     
-    def _parse_text_formatting(paragraph, text):
-        """Enhanced text formatting parser supporting bold and italic"""
+    @lru_cache(maxsize=256)
+    def _parse_text_formatting_cached(text_hash: str, text: str):
+        """Cached helper for text formatting parsing"""
+        return _parse_text_formatting_logic(text)
+        
+    def _parse_text_formatting_logic(text: str):
+        """Core text formatting logic - separated for caching"""
         if not text:
-            return
+            return []
             
         # Handle bold (**text**) and italic (*text*) formatting
         parts = []
@@ -648,6 +655,17 @@ def create_docx_from_text(text_content, contract_data=None):
         # If no formatting found, treat as normal text
         if not parts:
             parts.append(('normal', text))
+        
+        return parts
+    
+    def _parse_text_formatting(paragraph, text):
+        """Enhanced text formatting parser supporting bold and italic with caching"""
+        if not text:
+            return
+        
+        # Use cached formatting parsing
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        parts = _parse_text_formatting_cached(text_hash, text)
         
         # Apply formatting to paragraph
         for format_type, content in parts:

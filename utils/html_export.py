@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any
 import base64
 import io
 import re
+from functools import lru_cache
 
 def _preprocess_markdown_for_html(memo_markdown: str) -> str:
     """
@@ -47,9 +48,11 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
 
     return processed_text
 
+@lru_cache(maxsize=1)
 def get_style_config() -> Dict[str, str]:
     """
     Configuration-driven styling for professional memos
+    CACHED: This function is expensive to compute and rarely changes
     
     Returns:
         Dictionary containing all styling parameters
