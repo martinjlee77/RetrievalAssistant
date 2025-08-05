@@ -43,6 +43,7 @@ Critical Development Rules - Prompt Protection:
 - **DOCX Generation**: Enhanced with robust bullet indentation (structure-based detection), comprehensive formatting (italic text support, dynamic table handling), and professional visual enhancements (enhanced heading hierarchy, professional table design, consistent HTML/DOCX styling).
 - **System/User Prompt Architecture**: Implemented a modular system/user prompt architecture, separating core AI instructions (system prompts) from task-specific context (user prompts) for each ASC 606 step. LLM integration handles message arrays.
 - **Judgment Consistency**: Implemented a shared `_filter_genuine_judgments()` function to ensure consistent filtering logic for judgments across executive summary, conclusion, and key professional judgments sections.
+- **Executive Summary Enhancement**: Restructured executive summary to eliminate redundancy between OVERALL CONCLUSION (strategic narrative) and KEY FINDINGS (scannable dashboard). Implemented "ASC 606 Contract Exists: Yes/No" terminology and professional role separation aligned with Big 4 audit documentation standards.
 
 ### File Structure
 ```

@@ -561,106 +561,38 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
                                               s4: dict, s5: dict,
                                               analysis_title: str,
                                               customer_name: str) -> str:
-        """Generates enhanced executive summary using structured data from all steps."""
-        import json
-
-        # Extract structured data for executive summary
-
-        # Step 1: Contract validity - FIXED to access nested structure
-        contract_status = "Valid"
-        failed_criteria = []
-        if s1_analysis := s1.get('step1_analysis'):
-            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
-                failed_criteria = [
-                    c.get('criterion', 'Unknown') for c in s1_criteria
-                    if c.get('status') == 'Not Met'
-                ]
-                if failed_criteria:
-                    contract_status = f"Invalid - Failed criteria: {', '.join(failed_criteria)}"
-
-        # Step 2: Performance obligations summary - FIXED to access nested structure
-        po_count = 0
-        po_descriptions = []
-        # First, get the nested analysis dictionary
-        if s2_analysis := s2.get('step2_analysis'):
-            # Then, get the performance obligations from inside it
-            if s2_pos := s2_analysis.get('performance_obligations'):
-                po_count = len(s2_pos) if s2_pos else 0
-                po_descriptions = [
-                    po.get('po_description', 'Unnamed PO') for po in s2_pos
-                ]
-
-        # Step 3: Transaction price details - FIXED to access nested structure
-        total_price = "Not specified"
-        has_variable_consideration = False
-        if s3_analysis := s3.get('step3_analysis'):
-            if s3_price := s3_analysis.get('transaction_price_components'):
-                total_price = s3_price.get('total_transaction_price',
-                                           'Not specified')
-                var_consideration = s3_price.get('variable_consideration')
-                if var_consideration:
-                    var_str = str(var_consideration).strip().lower()
-                    # Only treat as variable consideration if it's substantial and not N/A
-                    has_variable_consideration = (
-                        var_str not in ['n/a', 'not applicable', 'none', 'none identified', '']
-                        and len(var_str) > 10
-                        and 'variable' in var_str
-                    )
-
-        # Step 4: Allocation summary - FIXED to access nested structure
-        allocation_summary = "Not applicable (single performance obligation)."
-        if s4_analysis := s4.get('step4_analysis'):
-            if s4_details := s4_analysis.get('allocation_details'):
-                if allocations := s4_details.get('allocations'):
-                    if len(allocations) > 1:
-                        allocation_summary = f"Price allocated across {len(allocations)} POs based on standalone selling prices."
-
-        # Step 5: Revenue recognition methods - FIXED to access nested structure
-        recognition_summary = []
-        if s5_analysis := s5.get('step5_analysis'):
-            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
-                for po_plan in s5_plan:
-                    method = po_plan.get('recognition_method', 'Unknown')
-                    po_name = po_plan.get('performance_obligation', 'Unknown PO')
-                    recognition_summary.append(f"{po_name}: {method}")
-
-        # Extract actual critical judgments from step analyses (no defaults)  
-        all_step_judgments = []
-        for step_result in [s1, s2, s3, s4, s5]:
-            if judgments := step_result.get('professional_judgments'):
-                all_step_judgments.extend(judgments)
+        """Enhanced executive summary prompt with clear role separation and professional structure."""
         
-        # Apply consistent filtering using shared function
-        critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
+        return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo. This section serves as the strategic overview for executives, auditors, and stakeholders.
 
-        return f"""Write a professional executive summary for an ASC 606 technical accounting memo using a structured dashboard format.
-
-STRUCTURED ANALYSIS DATA:
-- Analysis: {analysis_title}
+ANALYSIS CONTEXT:
+- Contract Analysis: {analysis_title}
 - Customer: {customer_name}
-- Contract Status: {contract_status}
-- Performance Obligations Count: {po_count}
-- Performance Obligations: {po_descriptions}
-- Total Transaction Price: {total_price}
-- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
-- Allocation Method: {allocation_summary}
-- Revenue Recognition Methods: {recognition_summary}
-- Key Judgment Areas: {critical_judgments}
+- Step Analysis Data: Available from 5-step ASC 606 analysis
 
-Create an executive summary using this professional structure:
+SECTION STRUCTURE & REQUIREMENTS:
 
-**OVERALL CONCLUSION**
-[Single paragraph stating the **concluded accounting treatment** for the contract under ASC 606, including the overall revenue recognition approach, based on the structured data above.]
+**1. OVERALL CONCLUSION** (2-3 sentences maximum)
+- Provide the strategic, bottom-line accounting determination
+- State the total transaction price and high-level revenue recognition approach
+- Confirm ASC 606 compliance
+- **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
-**KEY FINDINGS**
-• Contract Status: {contract_status}
-• Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:3])) if po_descriptions else ''}{'...' if len(po_descriptions) > 3 else ''}
-• Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
-• Allocation: {allocation_summary}
-• Revenue Recognition: {', '.join(recognition_summary[:2]) if recognition_summary else 'No revenue recognition methods applicable due to lack of performance obligations'}{'...' if len(recognition_summary) > 2 else ''}
-• Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+**2. KEY FINDINGS** (Scannable dashboard format)
+- ASC 606 Contract Exists: Yes/No determination
+- Performance Obligations: Count and brief identification
+- Transaction Price: Total amount (note if variable consideration exists)
+- Allocation: Method used across performance obligations  
+- Revenue Recognition: High-level timing approach for each major component
+- Critical Judgments: Genuine professional judgments requiring significant estimation
 
-Keep this professional, concise, and focused on executive-level insights."""
+**PROFESSIONAL STANDARDS:**
+- Write with the authority and precision expected in Big 4 audit documentation
+- Ensure the two sections complement rather than duplicate each other
+- Focus on decision-useful information for senior stakeholders
+- Maintain consistent professional tone throughout
+
+Extract the relevant information from the step analysis data provided and create a cohesive, executive-level summary that respects readers' time while providing comprehensive oversight of the accounting conclusions."""
 
     @staticmethod
     def get_step1_schema() -> str:
