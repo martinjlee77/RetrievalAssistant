@@ -868,25 +868,125 @@ Write only the paragraph, no additional formatting or labels."""
     @staticmethod
     def get_key_judgments_prompt(s1: dict, s2: dict, s3: dict, s4: dict,
                                  s5: dict) -> str:
-        """Generates a highly discerning prompt for the Key Professional Judgments section."""
+        """Generates a highly discerning prompt for the Key Professional Judgments section with structured context."""
+        
+        # Extract structured context from step analyses for comprehensive judgment evaluation
+        
+        # Step 1: Contract criteria complexity
+        contract_complexity_factors = []
+        if s1_analysis := s1.get('step1_analysis'):
+            if s1_criteria := s1_analysis.get('contract_criteria_assessment'):
+                failed_criteria = [c for c in s1_criteria if c.get('status') == 'Not Met']
+                if failed_criteria:
+                    contract_complexity_factors.append(f"Failed criteria: {len(failed_criteria)}")
+        
+        # Step 2: Performance obligation complexity
+        po_complexity_factors = []
+        po_count = 0
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                po_count = len(s2_pos) if s2_pos else 0
+                if po_count > 2:
+                    po_complexity_factors.append(f"Multiple POs ({po_count})")
+                
+                # Check for distinct analysis complexity
+                complex_distinct_analysis = [po for po in s2_pos if 'distinct' in str(po.get('distinct_analysis', '')).lower() and len(str(po.get('distinct_analysis', ''))) > 50]
+                if complex_distinct_analysis:
+                    po_complexity_factors.append("Complex distinctiveness analysis")
+        
+        # Step 3: Transaction price complexity
+        price_complexity_factors = []
+        total_price = "Not specified"
+        if s3_analysis := s3.get('step3_analysis'):
+            if s3_price := s3_analysis.get('transaction_price_components'):
+                total_price = s3_price.get('total_transaction_price', 'Not specified')
+                
+                # Variable consideration complexity
+                var_consideration = s3_price.get('variable_consideration')
+                if var_consideration:
+                    var_str = str(var_consideration).strip().lower()
+                    if (var_str not in ['n/a', 'not applicable', 'none', 'none identified', ''] 
+                        and len(var_str) > 20 and 'variable' in var_str):
+                        price_complexity_factors.append("Variable consideration estimation")
+                
+                # Financing component complexity
+                financing = s3_price.get('financing_component_analysis', '')
+                if 'significant' in str(financing).lower():
+                    price_complexity_factors.append("Significant financing component")
+        
+        # Step 4: Allocation complexity
+        allocation_complexity_factors = []
+        if s4_analysis := s4.get('step4_analysis'):
+            if s4_details := s4_analysis.get('allocation_details'):
+                if allocations := s4_details.get('allocations'):
+                    estimation_count = sum(1 for alloc in allocations 
+                                         if 'estimation' in str(alloc.get('ssp_determination', '')).lower() 
+                                         or 'residual' in str(alloc.get('ssp_determination', '')).lower())
+                    if estimation_count > 0:
+                        allocation_complexity_factors.append(f"SSP estimation required ({estimation_count} POs)")
+        
+        # Step 5: Recognition complexity
+        recognition_complexity_factors = []
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                over_time_count = sum(1 for po in s5_plan if 'over time' in str(po.get('recognition_method', '')).lower())
+                if over_time_count > 0:
+                    recognition_complexity_factors.append(f"Over time recognition ({over_time_count} POs)")
+                
+                # Check for complex progress measurement
+                complex_measurement = [po for po in s5_plan if len(str(po.get('measure_of_progress', ''))) > 30]
+                if complex_measurement:
+                    recognition_complexity_factors.append("Complex progress measurement")
+
+        # Extract and filter professional judgments
         all_judgments = []
         for i, step in enumerate([s1, s2, s3, s4, s5], 1):
-            # The 'professional_judgments' key comes from the initial 5-step analysis
             judgments = step.get('professional_judgments', [])
             if judgments and isinstance(judgments, list):
-                # Apply consistent filtering using the shared utility function
                 filtered = StepPrompts._filter_genuine_judgments(judgments)
                 all_judgments.extend(filtered)
 
-        # If, after filtering, no genuine judgments remain, provide a standard statement.
+        # If no genuine judgments remain after filtering, provide standard statement
         if not all_judgments:
             return "RETURN_DIRECT_TEXT: The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
 
-        # If judgments were flagged, this prompt acts as a final, expert-level quality filter.
-        return f"""You are an accounting senior manager writing the "Key Professional Judgments" section of an audit-ready ASC 606 memo. Your role is to be a highly discerning final quality filter.
+        # Aggregate complexity indicators for context
+        all_complexity_factors = []
+        if contract_complexity_factors:
+            all_complexity_factors.extend(contract_complexity_factors)
+        if po_complexity_factors:
+            all_complexity_factors.extend(po_complexity_factors)
+        if price_complexity_factors:
+            all_complexity_factors.extend(price_complexity_factors)
+        if allocation_complexity_factors:
+            all_complexity_factors.extend(allocation_complexity_factors)
+        if recognition_complexity_factors:
+            all_complexity_factors.extend(recognition_complexity_factors)
+        return f"""You are writing the "Key Professional Judgments" section of a Big 4 quality ASC 606 memo. This section MUST represent only the most complex, high-judgment areas of the analysis requiring significant estimation or subjective interpretation.
 
-CONTEXT: The initial analysis flagged these potential judgment areas:
+STRUCTURED ANALYSIS CONTEXT:
+- Performance Obligations: {po_count} identified
+- Transaction Price: {total_price}
+- Complexity Indicators: {', '.join(all_complexity_factors) if all_complexity_factors else 'None identified'}
+
+CANDIDATE JUDGMENTS (filtered from 5-step analysis):
 {json.dumps(all_judgments, indent=2)}
+
+**CRITICAL QUALITY STANDARDS:**
+Your role is to act as a senior partner's final quality control. You must distinguish between:
+1. **Genuine Professional Judgments** (include these): Areas requiring significant estimation, complex interpretation, or subjective analysis where reasonable people could disagree
+2. **Standard Application of Accounting Principles** (exclude these): Routine application of clear guidance, factual determinations, or straightforward rule applications
+
+**ENHANCED JUDGMENT EVALUATION CRITERIA:**
+Consider the structured context above when evaluating each candidate judgment:
+- Does the complexity of the transaction support the judgment's significance?
+- Are multiple performance obligations or complex pricing involved?
+- Do the analysis complexity indicators align with the judgment areas?
+- Would external auditors likely focus on this area during their review?
+
+**EXAMPLES OF GENUINE JUDGMENTS TO INCLUDE:**
+- **Estimating Variable Consideration:** "Management applied significant judgment in estimating the transaction price constraint for the performance bonus, considering historical achievement rates and market volatility factors."
+- **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
 
 YOUR TASK:
 1.  **Review the Context:** Scrutinize the list above. Your primary task is to distinguish between genuine professional judgments and standard contract analysis.
