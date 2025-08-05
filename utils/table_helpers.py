@@ -48,8 +48,9 @@ def create_contract_table(doc, headers, data_rows):
     table.style = 'Table Grid'
     
     # Contract-specific column widths
-    table.columns[0].width = Inches(2.2)  # Element column
-    table.columns[1].width = Inches(4.3)  # Details column
+    if len(table.columns) >= 2:
+        table.columns[0].width = Inches(2.2)  # Element column
+        table.columns[1].width = Inches(4.3)  # Details column
     
     # Add headers
     header_row = table.rows[0]
@@ -60,11 +61,12 @@ def create_contract_table(doc, headers, data_rows):
     
     # Add data rows
     for row_idx, row_data in enumerate(data_rows):
-        table_row = table.rows[row_idx + 1]
-        for col_idx, cell_data in enumerate(row_data):
-            if col_idx < len(table_row.cells):
-                table_row.cells[col_idx].text = str(cell_data)
-                apply_data_cell_styling(table_row.cells[col_idx], row_idx)
+        if row_idx + 1 < len(table.rows):
+            table_row = table.rows[row_idx + 1]
+            for col_idx, cell_data in enumerate(row_data):
+                if col_idx < len(table_row.cells):
+                    table_row.cells[col_idx].text = str(cell_data)
+                    apply_data_cell_styling(table_row.cells[col_idx], row_idx)
     
     return table
 
@@ -74,11 +76,11 @@ def create_journal_entry_table(doc, headers, data_rows):
     table.style = 'Table Grid'
     
     # Journal entry specific column widths
-    if len(headers) == 3:  # Account, Debit, Credit
+    if len(headers) == 3 and len(table.columns) >= 3:  # Account, Debit, Credit
         table.columns[0].width = Inches(3.5)  # Account (wider for descriptions)
         table.columns[1].width = Inches(1.5)  # Debit
         table.columns[2].width = Inches(1.5)  # Credit
-    elif len(headers) == 4:  # Account, Description, Debit, Credit
+    elif len(headers) == 4 and len(table.columns) >= 4:  # Account, Description, Debit, Credit
         table.columns[0].width = Inches(2.0)  # Account
         table.columns[1].width = Inches(2.5)  # Description
         table.columns[2].width = Inches(1.25) # Debit
@@ -93,17 +95,18 @@ def create_journal_entry_table(doc, headers, data_rows):
     
     # Add data rows with right-alignment for monetary columns
     for row_idx, row_data in enumerate(data_rows):
-        table_row = table.rows[row_idx + 1]
-        for col_idx, cell_data in enumerate(row_data):
-            if col_idx < len(table_row.cells):
-                cell = table_row.cells[col_idx]
-                cell.text = str(cell_data)
-                apply_data_cell_styling(cell, row_idx)
-                
-                # Right-align monetary columns (last 2 columns)
-                if col_idx >= len(headers) - 2:
-                    for paragraph in cell.paragraphs:
-                        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        if row_idx + 1 < len(table.rows):
+            table_row = table.rows[row_idx + 1]
+            for col_idx, cell_data in enumerate(row_data):
+                if col_idx < len(table_row.cells):
+                    cell = table_row.cells[col_idx]
+                    cell.text = str(cell_data)
+                    apply_data_cell_styling(cell, row_idx)
+                    
+                    # Right-align monetary columns (last 2 columns)
+                    if col_idx >= len(headers) - 2:
+                        for paragraph in cell.paragraphs:
+                            paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     
     return table
 

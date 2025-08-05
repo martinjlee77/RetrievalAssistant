@@ -704,89 +704,35 @@ def create_docx_from_text(text_content, contract_data=None):
         if not data_rows:
             return
         
-        # Create table with dynamic sizing
-        table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
-        table.style = 'Table Grid'
-        
-        # A1: Custom column widths for Contract Data Summary table + add missing fields
+        # Add missing fields for contract tables
         if len(headers) == 2 and any("Element" in h or "Details" in h for h in headers):
-            # Contract table: narrow first column, wide second column
-            table.columns[0].width = Inches(2.2)  # Element column
-            table.columns[1].width = Inches(4.3)  # Details column
-            
-            # A1: Check if we need to add DOCUMENT CLASSIFICATION and REVIEW STATUS
             existing_rows = [row_data[0] for row_data in data_rows if row_data]
             if "Document Classification" not in str(existing_rows):
-                # Add missing rows to data_rows for this table
                 data_rows.extend([
                     ["Document Classification", "Internal Use Only"],
                     ["Review Status", "Preliminary Analysis"]
                 ])
-                # Recreate table with additional rows
-                table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
-                table.style = 'Table Grid'
-                table.columns[0].width = Inches(2.2)
-                table.columns[1].width = Inches(4.3)
-        elif len(headers) <= 3:
-            # For other small tables, distribute evenly
-            col_width = int(Inches(6.5) / len(headers))
-            for col in table.columns:
-                col.width = col_width
-        else:
-            # For larger tables, use autofit
-            table.autofit = True
         
-        # Add and format headers
-        header_row = table.rows[0]
-        for i, header in enumerate(headers):
-            if i < len(header_row.cells):
-                cell = header_row.cells[i]
-                cell.text = header
-                # Enhanced header formatting with better styling
-                for paragraph in cell.paragraphs:
-                    paragraph.alignment = 1  # Center alignment for headers
-                    for run in paragraph.runs:
-                        run.font.bold = True
-                        run.font.name = 'Lato'
-                        run.font.size = Pt(11)
-                        run.font.color.rgb = RGBColor(255, 255, 255)  # White text
-                # Add header background color
-                try:
-                    from docx.oxml.shared import qn
-                    from docx.oxml import parse_xml
-                    shading_elm = parse_xml(r'<w:shd {} w:fill="003366"/>'.format(qn('w:val')))
-                    cell._element.get_or_add_tcPr().append(shading_elm)
-                except Exception:
-                    pass  # Graceful fallback
-        
-        # Add and format data rows
-        for row_idx, row_data in enumerate(data_rows):
-            table_row = table.rows[row_idx + 1]
-            for col_idx, cell_data in enumerate(row_data):
-                if col_idx < len(table_row.cells):
-                    cell = table_row.cells[col_idx]
-                    # Use the enhanced text formatter for cell content
-                    cell_paragraph = cell.paragraphs[0]
-                    cell_paragraph.clear()  # Clear default content
-                    _parse_text_formatting(cell_paragraph, cell_data)
-                    
-                    # Enhanced data cell formatting
-                    for paragraph in cell.paragraphs:
-                        paragraph.paragraph_format.space_after = Pt(0)  # Tighter spacing
-                        for run in paragraph.runs:
-                            if not run.font.name:  # Only set if not already set by formatter
-                                run.font.name = 'Lato'
-                                run.font.size = Pt(10)
-                    
-                    # Add subtle alternating row colors for better readability
-                    if row_idx % 2 == 1:  # Odd rows (0-indexed, so this is actually even visual rows)
-                        try:
-                            from docx.oxml.shared import qn
-                            from docx.oxml import parse_xml
-                            shading_elm = parse_xml(r'<w:shd {} w:fill="F8F9FA"/>'.format(qn('w:val')))
-                            cell._element.get_or_add_tcPr().append(shading_elm)
-                        except Exception:
-                            pass
+        # Use smart table creation with proper formatting
+        try:
+            from utils.table_helpers import create_smart_table
+            create_smart_table(doc, headers, data_rows)
+        except ImportError:
+            # Fallback to basic table creation if import fails
+            table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
+            table.style = 'Table Grid'
+            
+            # Basic formatting
+            header_row = table.rows[0]
+            for i, header in enumerate(headers):
+                if i < len(header_row.cells):
+                    header_row.cells[i].text = header
+            
+            for row_idx, row_data in enumerate(data_rows):
+                table_row = table.rows[row_idx + 1]
+                for col_idx, cell_data in enumerate(row_data):
+                    if col_idx < len(table_row.cells):
+                        table_row.cells[col_idx].text = str(cell_data)
         
         doc.add_paragraph()  # Add spacing after table
 
@@ -820,56 +766,21 @@ def create_docx_from_text(text_content, contract_data=None):
             p = document.add_paragraph()
             _parse_text_formatting(p, stripped_line)
     
-    # === PHASE 3: ENHANCED DOCUMENT FEATURES ===
+    # === PHASE 3: SIMPLIFIED METADATA SECTION ===
     
-    # Add professional page break with document metadata
-    document.add_page_break()
+    # Add spacing and simplified metadata (no page break)
+    document.add_paragraph()
+    document.add_paragraph()
     
-    # Enhanced metadata section with professional styling
-    metadata_heading = document.add_paragraph()
-    metadata_heading.alignment = 1  # Center alignment
-    metadata_run = metadata_heading.add_run("DOCUMENT METADATA")
-    metadata_run.font.name = 'Lato'
-    metadata_run.font.size = Pt(14)
-    metadata_run.font.bold = True
-    metadata_run.font.color.rgb = RGBColor(0, 51, 102)
-    metadata_heading.paragraph_format.space_after = Pt(12)
-    
-    # Enhanced metadata table with better styling
-    metadata_table = document.add_table(rows=6, cols=2)  # Added one more row
-    metadata_table.style = 'Table Grid'
-    metadata_table.columns[0].width = Inches(2.5)
-    metadata_table.columns[1].width = Inches(4.5)
-    
-    # Get current date for metadata
+    # Simple metadata paragraphs instead of complex table
     current_date = datetime.now().strftime("%B %d, %Y")
     
-    metadata_info = [
-        ("Document Version:", "Final"),
-        ("Analysis Date:", current_date),
-        ("Analyst:", "ASC 606 AI Analyst"),
-        ("Review Status:", "Pending Management Review"),
-        ("File Classification:", "Internal Accounting Analysis"),
-        ("Page Count:", f"{len(document.paragraphs)} sections")  # Dynamic page info
-    ]
-    
-    for i, (label, content) in enumerate(metadata_info):
-        row = metadata_table.rows[i]
-        row.cells[0].text = label
-        row.cells[1].text = content
-        
-        # Enhanced cell formatting
-        for j, cell in enumerate(row.cells):
-            for paragraph in cell.paragraphs:
-                paragraph.paragraph_format.space_after = Pt(0)
-                for run in paragraph.runs:
-                    run.font.name = 'Lato'
-                    run.font.size = Pt(10)
-                    if j == 0:  # Label column
-                        run.font.bold = True
-                        run.font.color.rgb = RGBColor(0, 51, 102)
-    
-    # A9: Analyst certification section removed per user feedback
+    metadata_para = document.add_paragraph()
+    metadata_run = metadata_para.add_run(f"Analysis Date: {current_date} | Review Status: Preliminary Analysis | Internal Use")
+    metadata_run.font.name = 'Lato'
+    metadata_run.font.size = Pt(9)
+    metadata_run.font.color.rgb = RGBColor(102, 102, 102)
+    metadata_para.alignment = 1  # Center alignment
     
     bio = io.BytesIO()
     document.save(bio)
