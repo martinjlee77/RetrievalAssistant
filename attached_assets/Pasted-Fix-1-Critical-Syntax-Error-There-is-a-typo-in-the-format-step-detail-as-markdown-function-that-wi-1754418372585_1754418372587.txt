@@ -1,0 +1,155 @@
+Fix 1: Critical Syntax Error
+There is a typo in the format_step_detail_as_markdown function that will prevent the application from running.
+
+Location: format_step_detail_as_markdown Problem: A string was corrupted during an edit.
+
+REPLACE this broken line:
+
+# BROKEN LINE
+"\n---ailed Analysis:**\n"
+
+WITH this correct line:
+
+# CORRECTED LINE
+"\n---\n", "**Detailed Analysis:**\n"
+
+(Note: We will remove this line entirely in the next step to fix spacing, but it needs to be fixed syntactically first).
+
+Fix 2: Incorrect Bolding in Executive Summary
+The prompt that creates the "Key Findings" section has a formatting bug that misplaces the bolding asterisks.
+
+Location: get_enhanced_executive_summary_prompt Problem: The ** are at the end of the labels instead of wrapping them.
+
+REPLACE this block:
+
+# BEFORE
+**KEY FINDINGS** (Scannable dashboard format)
+- ASC 606 Contract Exists: {contract_exists}
+- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- Allocation: {allocation_method}
+- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- Critical Judgments: {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+
+WITH this corrected block:
+
+# AFTER
+**KEY FINDINGS** (Scannable dashboard format)
+- **ASC 606 Contract Exists:** {contract_exists}
+- **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- **Allocation:** {allocation_method}
+- **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+
+Fix 3: Spacing and Formatting Inconsistencies
+Now, let's apply the consistent spacing logic to the formatting functions at the end of the file. This involves removing manual spacing (""), internal separators (---), and using \n\n to create paragraphs.
+
+Function: format_step_detail_as_markdown
+This function has old, inconsistent logic in its fallback else block.
+
+REPLACE the entire function with this clean, corrected version:
+
+# REPLACE THE ENTIRE FUNCTION
+@staticmethod
+def format_step_detail_as_markdown(step_data: dict, step_number: int,
+                                   step_name: str) -> str:
+    """Format step analysis from narrative JSON structure into professional markdown."""
+    if not step_data or not isinstance(step_data, dict):
+        return f"### Step {step_number}: {step_name}\n\nNo analysis data was returned for this step.\n"
+
+    conclusion = step_data.get('executive_conclusion',
+                               'No conclusion was provided.')
+    analysis_points = step_data.get('analysis_points', [])
+
+    # Route to the correct helper function based on step number
+    if step_number == 2:
+        return StepPrompts._format_step2_with_filtering(
+            step_data, step_name, conclusion, analysis_points)
+    elif step_number == 3:
+        return StepPrompts._format_step3_with_filtering(
+            step_data, step_name, conclusion, analysis_points)
+    elif step_number in [1, 4, 5]:
+        return StepPrompts._format_general_step_with_filtering(
+            step_data, step_name, conclusion, analysis_points, step_number)
+
+    # Fallback for any unhandled steps (should not be reached)
+    markdown_sections = [
+        f"### Step {step_number}: {step_name}",
+        f"**Conclusion:**\n{conclusion}",
+        "**Detailed Analysis:**\n"
+    ]
+    if analysis_points:
+        for i, point in enumerate(analysis_points):
+            # Simplified fallback logic
+            topic_title = point.get('topic_title', f'Analysis Point {i+1}')
+            analysis_text = point.get('analysis_text', 'No analysis text provided.')
+            markdown_sections.append(f"**{i+1}. {topic_title}**")
+            markdown_sections.append(analysis_text)
+
+    final_content = [section for section in markdown_sections if str(section).strip()]
+    return "\n\n".join(final_content)
+
+Function: _format_step3_with_filtering
+This function needs its manual spacing and separator removed.
+
+REPLACE the entire function with this corrected version:
+
+# REPLACE THE ENTIRE FUNCTION
+@staticmethod
+def _format_step3_with_filtering(step_data: dict, step_name: str,
+                                 conclusion: str,
+                                 analysis_points: list) -> str:
+    """
+    Apply the Auditor's Method to Step 3: Merge structured components and
+    analysis points into a single, consistently formatted list.
+    """
+    markdown_sections = [
+        f"### Step 3: {step_name}", f"**Conclusion:**\n{conclusion}",
+        "**Detailed Analysis:**\n"
+    ]
+
+    all_points = []
+    transaction_components = step_data.get('step3_analysis', {}).get('transaction_price_components', {})
+    title_map = {
+        'total_transaction_price': 'Total Transaction Price', 'fixed_consideration': 'Fixed Consideration',
+        'variable_consideration': 'Variable Consideration', 'financing_component_analysis': 'Significant Financing Component',
+        'noncash_consideration_analysis': 'Noncash Consideration', 'consideration_payable_to_customer_analysis': 'Consideration Payable to Customer',
+        'other_considerations_analysis': 'Other Considerations'
+    }
+    processed_values = set()
+
+    for key, analysis_text in transaction_components.items():
+        is_not_applicable = (not analysis_text or str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
+                           str(analysis_text).strip().lower().startswith('n/a') or len(str(analysis_text).strip()) < 3)
+        if not is_not_applicable:
+            text_str = str(analysis_text).strip()
+            if key in ['fixed_consideration', 'total_transaction_price']:
+                if text_str in processed_values: continue
+                processed_values.add(text_str)
+                if len(text_str) < 30: continue
+            topic_title = title_map.get(key, key.replace('_', ' ').title())
+            all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
+
+    if analysis_points:
+        all_points.extend(analysis_points)
+
+    if not all_points:
+        markdown_sections.append("Only basic fixed consideration was identified in this contract.")
+    else:
+        for i, point in enumerate(all_points):
+            markdown_sections.append(f"**{i+1}. {point.get('topic_title', 'Analysis Point')}**")
+            markdown_sections.append(str(point.get('analysis_text', 'No analysis text provided.')))
+            if evidence_quotes := point.get('evidence_quotes', []):
+                if isinstance(evidence_quotes, list):
+                    for quote in evidence_quotes:
+                        if isinstance(quote, str) and quote:
+                            markdown_sections.append(f"> {quote}")
+
+    final_content = [section for section in markdown_sections if str(section).strip()]
+    return "\n\n".join(final_content)
+
+Functions: _format_step2_with_filtering and _format_general_step_with_filtering
+The versions you provided in the restored file for these two functions are already correct and do not need any further changes. They properly create paragraphs with \n\n.
+
+By applying these specific fixes, your step_prompts.py file will be both syntactically correct and will produce the consistently formatted output you want.
