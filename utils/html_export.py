@@ -126,7 +126,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;400italic;700italic&display=swap');
         
         body {{
-            font-family: '{style_config['font_family']}', serif;
+            font-family: '{style_config['font_family']}', 'Arial', 'Helvetica', sans-serif;
             font-size: {style_config['font_size']};
             line-height: {style_config['line_height']};
             max-width: {style_config['page_width']};
@@ -184,7 +184,7 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         
         /* Citation and quote styling - PROFESSIONAL MEMO STANDARDS */
         blockquote {{
-            font-family: '{style_config['font_family']}', serif; /* Same as body font for consistency */
+            font-family: '{style_config['font_family']}', 'Arial', 'Helvetica', sans-serif; /* Same as body font for consistency */
             font-style: italic;
             font-size: {style_config['font_size']}; /* Same size as body text */
             color: #333333; /* Professional dark grey */
