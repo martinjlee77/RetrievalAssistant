@@ -894,8 +894,8 @@ CONTEXT: The initial analysis flagged these potential judgment areas:
 
 YOUR TASK:
 1.  **Review the Context:** Scrutinize the list above. Your primary task is to distinguish between genuine professional judgments and standard contract analysis.
-2.  **Identify Genuine Judgments:** A **genuine judgment** involves significant estimation, a choice between viable accounting alternatives, or a "gray area" in the guidance.
-    - **Examples of Genuine Judgments:** "Estimating the standalone selling price (SSP) of a license using a residual approach," "Concluding that a performance bonus is not constrained," "Assessing whether a contract modification is a separate contract."
+2.  **Identify Genuine Judgments:** A **genuine judgment** involves significant estimation, a choice between viable accounting alternatives, or a "gray area" in the guidance. Use the authoritative and interpretative guidance to determine if the item is a genuine judgment.
+    - **Examples of Genuine Judgments:** "estimating the transaction price especially when those estimates involve variable consideration," "methods used to recognize revenue when it is not obvious (for example, the output method or input method used and how those methods are applied)," "for a performance obligation satisifed at a point in time, a significant judgment is made in evaluating when the customer obtains control of the promised goods or services."
     - **Standard analysis is NOT a judgment.** Do not include items like: "Concluding a SaaS service is a single performance obligation," or "Recognizing subscription revenue over time."
 3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a single, well-written paragraph called 'Rationale' that seamlessly combines the issue, analysis, and authoritative guidance.
 4.  **Provide a "No Judgments" Conclusion if Necessary:** If your review finds that none of the items in the context are genuine judgments, your entire response MUST be only the following sentence:
