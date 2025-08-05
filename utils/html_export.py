@@ -13,8 +13,8 @@ from functools import lru_cache
 
 def _preprocess_markdown_for_html(memo_markdown: str) -> str:
     """
-    Finds custom semantic tags ([QUOTE], [CITATION]) and converts them to
-    standard HTML tags with appropriate classes that our CSS can style.
+    ENHANCED: Comprehensive preprocessing for all HTML formatting fixes.
+    Finds custom semantic tags and fixes all user-identified formatting issues.
 
     This function should run BEFORE the main markdown2 conversion.
     
@@ -22,13 +22,62 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
         memo_markdown: Raw markdown content with custom semantic tags
         
     Returns:
-        Processed markdown with custom tags converted to HTML
+        Processed markdown with all formatting fixes applied
     """
     processed_text = memo_markdown
 
-    # 1. Convert [QUOTE]Your quote text[/QUOTE] to <blockquote>Your quote text</blockquote>
-    # The regex looks for the opening tag, captures the text inside (non-greedy),
-    # and finds the closing tag. It replaces the whole thing with an HTML blockquote.
+    # === CRITICAL HTML FORMATTING FIXES ===
+    
+    # 1. DOCUMENT TITLE FIX - Remove # from beginning and fix formatting
+    processed_text = re.sub(r'^#\s*TECHNICAL ACCOUNTING MEMORANDUM', 'TECHNICAL ACCOUNTING MEMORANDUM', processed_text, flags=re.MULTILINE)
+    
+    # 2. EXECUTIVE SUMMARY NUMBERING FIX - Remove "1." and "2." before subsections
+    processed_text = re.sub(r'^1\.\s*EXECUTIVE SUMMARY', 'EXECUTIVE SUMMARY', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^1\.\s*(Overall Conclusion|KEY FINDINGS)', r'\1', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^2\.\s*(Overall Conclusion|KEY FINDINGS)', r'\1', processed_text, flags=re.MULTILINE)
+    
+    # 3. SUB-BULLET INDENTATION FIX - Convert to proper HTML structure
+    lines = processed_text.split('\n')
+    fixed_lines = []
+    in_key_findings = False
+    
+    for line in lines:
+        stripped = line.strip()
+        
+        # Track KEY FINDINGS section
+        if 'KEY FINDINGS' in stripped:
+            in_key_findings = True
+            fixed_lines.append(line)
+            continue
+        elif stripped.startswith('##') or stripped.startswith('2.') or stripped.startswith('3.'):
+            in_key_findings = False
+        
+        # Fix sub-bullet indentation in KEY FINDINGS
+        if in_key_findings and stripped:
+            if any(keyword in stripped for keyword in ['ASC 606 Contract Exists:', 'Performance Obligations:', 'Transaction Price:', 'Allocation:', 'Revenue Recognition:', 'Critical Judgments:']):
+                fixed_lines.append('* ' + stripped.lstrip('•*- ').strip())
+            elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining']) and not line.startswith('    '):
+                fixed_lines.append('    * ' + stripped.lstrip('•*- ').strip())
+            else:
+                fixed_lines.append(line)
+        else:
+            fixed_lines.append(line)
+    
+    processed_text = '\n'.join(fixed_lines)
+    
+    # 4. DUPLICATE HEADER REMOVAL - Remove "Financial Impact" duplicates
+    processed_text = re.sub(r'Financial Impact\s*\n\s*(?=.*FINANCIAL IMPACT)', '', processed_text, flags=re.IGNORECASE)
+    
+    # 5. CONCLUSION HEADER FIX - Fix "6. CONCLUSION" formatting
+    processed_text = re.sub(r'6\.\s*CONCLUSION\s*\n\s*\n', '## CONCLUSION\n\n', processed_text)
+    processed_text = re.sub(r'## 6\. CONCLUSION', '## CONCLUSION', processed_text)
+    
+    # 6. HORIZONTAL LINE NORMALIZATION - Make consistent
+    processed_text = re.sub(r'^-{3,}$', '---', processed_text, flags=re.MULTILINE)
+    
+    # === ORIGINAL SEMANTIC TAG PROCESSING ===
+    
+    # Convert [QUOTE]Your quote text[/QUOTE] to <blockquote>Your quote text</blockquote>
     processed_text = re.sub(
         r'\[QUOTE\](.*?)\[/QUOTE\]', 
         r'<blockquote>\1</blockquote>', 
@@ -36,9 +85,7 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
         flags=re.DOTALL
     )
 
-    # 2. Convert [CITATION]Your citation text[/CITATION] to <span class="citation">...</span>
-    # This wraps the citation in a <span> tag and gives it the "citation" class,
-    # which our CSS already knows how to style.
+    # Convert [CITATION]Your citation text[/CITATION] to <span class="citation">...</span>
     processed_text = re.sub(
         r'\[CITATION\](.*?)\[/CITATION\]', 
         r'<span class="citation">\1</span>', 
@@ -67,7 +114,9 @@ def get_style_config() -> Dict[str, str]:
         'border_color': '#000000',
         'line_height': '1.6',
         'header_size': '16pt',
-        'subheader_size': '14pt'
+        'subheader_size': '14pt',
+        'memo_title_size': '18pt',  # Larger title for memo header
+        'consistent_spacing': '12pt'  # Consistent spacing between sections
     }
 
 def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = None) -> str:

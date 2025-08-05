@@ -51,38 +51,84 @@ class ASC606Analyzer:
 
     @lru_cache(maxsize=128)
     def _clean_memo_section(self, text: str) -> str:
-        """Removes common unwanted markdown artifacts from LLM-generated text.
+        """ENHANCED: Comprehensive formatting fixes for all identified issues.
         CACHED: Text cleaning is expensive and often repeated."""
         if not isinstance(text, str):
             return text  # Return as-is if it's an error message or not a string
 
-        # Remove leading blockquote characters from each line
-        cleaned_text = '\n'.join(
-            line.lstrip('> ') for line in text.split('\n'))
+        cleaned_text = text
 
-        # Remove duplicate section headers that LLM sometimes adds
-        # This fixes header duplication issues across all sections
+        # === CRITICAL FORMATTING FIXES FOR ALL USER-IDENTIFIED ISSUES ===
+        
+        # 1. EXECUTIVE SUMMARY NUMBERING FIX - Remove "1." and "2." before subsections
+        cleaned_text = re.sub(r'^1\.\s*(Overall Conclusion|KEY FINDINGS)', r'\1', cleaned_text, flags=re.MULTILINE)
+        cleaned_text = re.sub(r'^2\.\s*(Overall Conclusion|KEY FINDINGS)', r'\1', cleaned_text, flags=re.MULTILINE)
+        cleaned_text = re.sub(r'^1\.\s*EXECUTIVE SUMMARY', 'EXECUTIVE SUMMARY', cleaned_text, flags=re.MULTILINE)
+        
+        # 2. SUB-BULLET INDENTATION FIX - Convert flat lists to properly indented structure
+        lines = cleaned_text.split('\n')
+        fixed_lines = []
+        in_key_findings = False
+        
+        for line in lines:
+            stripped = line.strip()
+            
+            # Track when we're in KEY FINDINGS section
+            if 'KEY FINDINGS' in stripped:
+                in_key_findings = True
+                fixed_lines.append(line)
+                continue
+            elif stripped.startswith('##') or stripped.startswith('2.') or stripped.startswith('3.'):
+                in_key_findings = False
+            
+            # Fix sub-bullet indentation in KEY FINDINGS section
+            if in_key_findings and stripped:
+                # Main bullets (ASC 606 Contract, Performance Obligations, etc.)
+                if any(keyword in stripped for keyword in ['ASC 606 Contract Exists:', 'Performance Obligations:', 'Transaction Price:', 'Allocation:', 'Revenue Recognition:', 'Critical Judgments:']):
+                    fixed_lines.append('    • ' + stripped.lstrip('•- ').strip())
+                # Sub-bullets (specific details under main bullets)
+                elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining']) and not line.startswith('    '):
+                    fixed_lines.append('        ◦ ' + stripped.lstrip('•- ').strip())
+                else:
+                    fixed_lines.append(line)
+            else:
+                fixed_lines.append(line)
+        
+        cleaned_text = '\n'.join(fixed_lines)
+        
+        # 3. DUPLICATE HEADER REMOVAL - Enhanced removal of all duplicate headers
         unwanted_headers = [
-            "# EXECUTIVE SUMMARY", "## EXECUTIVE SUMMARY",
-            "### EXECUTIVE SUMMARY", "**EXECUTIVE SUMMARY**",
-            "EXECUTIVE SUMMARY", "# KEY PROFESSIONAL JUDGMENTS",
-            "## KEY PROFESSIONAL JUDGMENTS", "### KEY PROFESSIONAL JUDGMENTS",
-            "# CONCLUSION AND RECOMMENDATIONS", "## CONCLUSION AND RECOMMENDATIONS",
-            "### CONCLUSION AND RECOMMENDATIONS", "# CONCLUSION", "## CONCLUSION", 
-            "### CONCLUSION", "**CONCLUSION**", "CONCLUSION",
-            "# FINANCIAL IMPACT", "## FINANCIAL IMPACT", "### FINANCIAL IMPACT",
-            "**FINANCIAL IMPACT**", "FINANCIAL IMPACT"
+            "# EXECUTIVE SUMMARY", "## EXECUTIVE SUMMARY", "### EXECUTIVE SUMMARY", "**EXECUTIVE SUMMARY**",
+            "EXECUTIVE SUMMARY", "# KEY PROFESSIONAL JUDGMENTS", "## KEY PROFESSIONAL JUDGMENTS", 
+            "### KEY PROFESSIONAL JUDGMENTS", "# CONCLUSION AND RECOMMENDATIONS", "## CONCLUSION AND RECOMMENDATIONS",
+            "### CONCLUSION AND RECOMMENDATIONS", "# CONCLUSION", "## CONCLUSION", "### CONCLUSION", 
+            "**CONCLUSION**", "CONCLUSION", "# FINANCIAL IMPACT", "## FINANCIAL IMPACT", 
+            "### FINANCIAL IMPACT", "**FINANCIAL IMPACT**", "FINANCIAL IMPACT"
         ]
-
+        
+        # Remove duplicate Financial Impact headers specifically
+        cleaned_text = re.sub(r'Financial Impact\s*\n\s*(?=.*FINANCIAL IMPACT)', '', cleaned_text, flags=re.IGNORECASE)
+        
+        # 4. CONCLUSION HEADER FORMATTING FIX - Fix "6. CONCLUSION" issues
+        cleaned_text = re.sub(r'6\.\s*CONCLUSION\s*\n\s*\n', 'CONCLUSION\n\n', cleaned_text)
+        cleaned_text = re.sub(r'## 6\. CONCLUSION', 'CONCLUSION', cleaned_text)
+        
+        # 5. REMOVE MARKDOWN HEADERS AND COLORS - Clean all formatting artifacts
         lines = cleaned_text.split('\n')
         filtered_lines = []
         for line in lines:
+            # Remove leading blockquote characters
+            line = line.lstrip('> ')
             line_stripped = line.strip()
-            if not any(header in line_stripped.upper()
-                       for header in [h.upper() for h in unwanted_headers]):
+            
+            # Filter out unwanted duplicate headers
+            if not any(header in line_stripped.upper() for header in [h.upper() for h in unwanted_headers]):
                 filtered_lines.append(line)
-
+        
         cleaned_text = '\n'.join(filtered_lines)
+        
+        # 6. NORMALIZE WHITESPACE AND SPACING
+        cleaned_text = re.sub(r'\n\s*\n\s*\n+', '\n\n', cleaned_text)  # Fix excessive spacing
 
         return cleaned_text.strip()
 
@@ -669,7 +715,8 @@ class ASC606Analyzer:
 
             # Remove quality control note - internal processes don't belong in professional memos
 
-            memo_header = f"""#TECHNICAL ACCOUNTING MEMORANDUM
+            # FIXED: Remove # from title and format properly
+            memo_header = f"""TECHNICAL ACCOUNTING MEMORANDUM
 
 **TO:** {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}  
 **FROM:** ASC 606 AI Analyst

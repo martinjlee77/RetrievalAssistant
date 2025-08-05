@@ -303,9 +303,9 @@ def create_docx_from_text(text_content, contract_data=None):
     font.name = 'Calibri'  # Standard professional font
     font.size = Pt(12)
     
-    # Configure paragraph spacing (6pt after paragraphs)
+    # Configure paragraph spacing (consistent 12pt after paragraphs)
     paragraph_format = style.paragraph_format
-    paragraph_format.space_after = Pt(6)
+    paragraph_format.space_after = Pt(12)  # Consistent spacing
     paragraph_format.line_spacing = 1.15
     
     # Set standard accounting memo margins (1" all sides)
@@ -844,6 +844,17 @@ def create_docx_from_text(text_content, contract_data=None):
         stripped_line = line.strip()
         if not stripped_line:
             continue  # Skip empty lines to avoid extra paragraphs
+        
+        # SPECIAL HANDLING: Document title formatting
+        if "TECHNICAL ACCOUNTING MEMORANDUM" in stripped_line and not stripped_line.startswith('#'):
+            title_para = document.add_paragraph(stripped_line)
+            title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for run in title_para.runs:
+                run.font.name = 'Calibri'
+                run.font.size = Pt(16)
+                run.font.bold = True
+                run.font.color.rgb = RGBColor(0, 0, 0)
+            continue
         
         # Handle table placeholders specially
         if stripped_line == '[TABLE_PLACEHOLDER]' and table_index < len(extracted_tables):
