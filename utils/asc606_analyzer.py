@@ -121,16 +121,8 @@ class ASC606Analyzer:
             line = line.lstrip('> ')
             line_stripped = line.strip()
             
-            # FIXED: Only filter exact header matches, not content containing those words
-            # Check if the line is EXACTLY a header (not content that contains header words)
-            is_duplicate_header = any(
-                line_stripped.upper() == header.upper() or  # Exact match
-                line_stripped.upper().startswith(header.upper() + '\n') or  # Header followed by newline
-                (header.startswith('#') and line_stripped.upper() == header.upper().lstrip('#').strip())  # Markdown header match
-                for header in unwanted_headers
-            )
-            
-            if not is_duplicate_header:
+            # Filter out unwanted duplicate headers
+            if not any(header in line_stripped.upper() for header in [h.upper() for h in unwanted_headers]):
                 filtered_lines.append(line)
         
         cleaned_text = '\n'.join(filtered_lines)
@@ -738,7 +730,7 @@ class ASC606Analyzer:
                 memo_header,
                 f"## 1. EXECUTIVE SUMMARY\n{executive_summary}",
                 separator,
-                f"## 2. CONTRACT OVERVIEW\n\n{contract_data_table}\n\n{background}",
+                f"## 2. CONTRACT OVERVIEW\n{contract_data_table}\n{background}",
                 separator,
                 f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}",
                 separator,
@@ -748,7 +740,7 @@ class ASC606Analyzer:
                 separator,
                 f"## 6. CONCLUSION\n{conclusion}",
                 separator,
-                f"\n---\n\n**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
+                f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
 
             final_memo = "\n\n".join(final_memo_sections)
