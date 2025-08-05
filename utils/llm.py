@@ -342,65 +342,7 @@ def create_docx_from_text(text_content, contract_data=None):
     footer_run._r.append(instrText)
     footer_run._r.append(fldChar2)
     
-    # === PROFESSIONAL MEMO HEADER ===
-    
-    # Main title
-    title = document.add_paragraph()
-    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title.add_run("TECHNICAL ACCOUNTING MEMORANDUM")
-    title_run.font.name = 'Lato'
-    title_run.font.size = Pt(16)
-    title_run.font.bold = True
-    title_run.font.color.rgb = RGBColor(0, 51, 102)  # Professional blue
-    
-    document.add_paragraph()  # Spacing
-    
-    # Professional memo header table
-    header_table = document.add_table(rows=5, cols=2)
-    header_table.alignment = WD_TABLE_ALIGNMENT.LEFT
-    header_table.style = 'Table Grid'
-    
-    # Configure table width
-    header_table.autofit = False
-    header_table.columns[0].width = Inches(2)
-    header_table.columns[1].width = Inches(4.5)
-    
-    # Header content
-    current_date = datetime.now().strftime("%B %d, %Y")
-    analyst_name = "ASC 606 AI Analyst"
-    
-    memo_data = [
-        ("TO:", "Technical Accounting Team / Management"),
-        ("FROM:", analyst_name),
-        ("DATE:", current_date),
-        ("SUBJECT:", f"ASC 606 Revenue Recognition Analysis"),
-        ("REVIEW STATUS:", "Preliminary Analysis")
-    ]
-    
-    if contract_data:
-        memo_data[3] = ("SUBJECT:", f"ASC 606 Analysis: {getattr(contract_data, 'analysis_title', 'Contract Analysis')}")
-        if hasattr(contract_data, 'memo_audience'):
-            memo_data[0] = ("TO:", contract_data.memo_audience)
-    
-    for i, (label, content) in enumerate(memo_data):
-        row = header_table.rows[i]
-        label_cell = row.cells[0]
-        content_cell = row.cells[1]
-        
-        # Format label cell
-        label_para = label_cell.paragraphs[0]
-        label_run = label_para.add_run(label)
-        label_run.font.name = 'Lato'
-        label_run.font.size = Pt(11)
-        label_run.font.bold = True
-        
-        # Format content cell
-        content_para = content_cell.paragraphs[0]
-        content_run = content_para.add_run(content)
-        content_run.font.name = 'Lato'
-        content_run.font.size = Pt(11)
-    
-    document.add_paragraph()  # Spacing after header
+
     
     # === PHASE 2: CONTENT PARSING AND FORMATTING (ENHANCED) ===
     # This enhanced parser understands Markdown headings, bold, tables, and lists,
@@ -603,10 +545,7 @@ def create_docx_from_text(text_content, contract_data=None):
     # Preprocess content to handle HTML-like formatting and tables
     def preprocess_content(content):
         """Preprocess content to extract tables and clean formatting"""
-        # A2: Remove duplicate TECHNICAL ACCOUNTING MEMORANDUM headers
-        # Look for patterns like "#TECHNICAL ACCOUNTING MEMORANDUM" followed by the styled version
-        duplicate_header_pattern = r'#TECHNICAL ACCOUNTING MEMORANDUM\s*\n\s*\*\*TO:\*\*.*?\*\*REVIEW STATUS:\*\*[^\n]*\n'
-        content = re.sub(duplicate_header_pattern, '', content, flags=re.MULTILINE | re.DOTALL)
+        # The header is now passed in and does not need to be removed.
         
         # Extract and store contract overview tables
         table_pattern = r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\n(?:\|.*?\|\s*\n)*'
@@ -902,10 +841,13 @@ def create_docx_from_text(text_content, contract_data=None):
     metadata_table.columns[0].width = Inches(2.5)
     metadata_table.columns[1].width = Inches(4.5)
     
+    # Get current date for metadata
+    current_date = datetime.now().strftime("%B %d, %Y")
+    
     metadata_info = [
         ("Document Version:", "Final"),
         ("Analysis Date:", current_date),
-        ("Analyst:", analyst_name),
+        ("Analyst:", "ASC 606 AI Analyst"),
         ("Review Status:", "Pending Management Review"),
         ("File Classification:", "Internal Accounting Analysis"),
         ("Page Count:", f"{len(document.paragraphs)} sections")  # Dynamic page info

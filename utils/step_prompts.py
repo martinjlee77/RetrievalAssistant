@@ -84,16 +84,26 @@ Your analysis must be thorough. Weave in specific citations to support your conc
             """<ANALYSIS_STRUCTURE_RULE>
 For each `analysis_point`, your `analysis_text` MUST be a professional, narrative paragraph that follows this 3-part "IAC" structure:
 1.  **Issue:** Clearly state the accounting question being addressed (e.g., "Is the contract enforceable?", "Are the services distinct?").
-2.  **Analysis:** Present the relevant facts from the contract, cite the applicable guidance, both authoritative and interpretative (e.g., ASC 606, EY Guidance), and explain how the guidance applies to the facts.
-3.  **Conclusion:** Provide a definitive answer to the issue.
+2.  **Analysis:** This is the most critical part. Your analysis must be robust.
+    - First, identify and quote the most relevant terms or clauses from the provided contract evidence.
+    - Next, cite the specific, applicable guidance (e.g., ASC 606-10-25-21).
+    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** Explain *how* the specific words in the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them.
+3.  **Conclusion:** Provide a definitive answer to the issue raised.
 
-Weave these three parts into a seamless, easy-to-understand narrative.
+Weave these three parts into a seamless, easy-to-understand narrative. Follow the depth and pattern of the example below.
 
-**META-EXAMPLE OF STRUCTURE (Do NOT copy the content, only the pattern):**
-"The primary question is [state the issue] (Issue). The contract specifies that [key term or fact], and ASC 606-10-XX-X requires [paraphrase guidance]. Applying this, the facts indicate that [explain application] (Analysis). Therefore, we conclude that [state the conclusion] (Conclusion)."
+**META-EXAMPLE OF STRUCTURE (Follow this structural pattern and depth, but use the actual facts from the contract):**
+"The primary accounting question is [state the specific issue, e.g., 'whether the professional services are distinct from the main product'] (Issue). The contract includes specific language stating, '[Quote the relevant key phrase or sentence from the contract source text]'. The authoritative guidance in ASC XXX-XX-XX-X requires that [paraphrase the relevant accounting rule or criteria]. In this case, the quoted contract language directly impacts this assessment because [explain the reasoning that connects the quote to the rule; for instance, 'the service is described as being integral to the product's core function']. This indicates that the two promises are highly interrelated and not separately identifiable in the context of the contract (Analysis). Therefore, based on this analysis, we conclude that [state the definitive conclusion, e.g., 'the professional services and the product must be accounted for as a single performance obligation'] (Conclusion)."
+
 
 **For Steps 2 & 5:** Your analysis should also briefly explain *why an alternative accounting treatment, if any, was rejected*.
-</ANALYSIS_STRUCTURE_RULE>""",
+</ANALYSIS_STRUCTURE_RULE>
+
+<ALTERNATIVE_TREATMENT_RULE>
+**FOR STEP 2 AND STEP 5 ONLY:** After your main analysis paragraph, you MUST add a short, separate paragraph addressing why a potential alternative was rejected. For example: "An alternative view might be to treat the implementation as distinct, as the customer could use another vendor. However, this was rejected because the evidence suggests the core utility of the SaaS license is not realized without the proprietary configuration included in the service."
+</ALTERNATIVE_TREATMENT_RULE>
+
+""",
             critical_rules
         ]
         return "\n\n".join(prompt_parts)
