@@ -34,37 +34,56 @@ class StepPrompts:
         Defines the AI's core persona, universal rules, and mandatory output format.
         This is static and sent with every step-analysis call.
         """
-        return """You are an expert technical accountant specializing in ASC 606. Your analysis must be audit-ready, understandable, precise, and objective. You must follow all instructions and formatting rules precisely.
+        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 606. Your analysis must be audit-ready, understandable, precise, and objective.
 
-<OUTPUT_FORMAT_RULE>
-You MUST return your response as a single, well-formed JSON object. Do not add any text, explanations, or markdown formatting before or after the JSON object. Your entire response must be only the JSON.
-
-The JSON object MUST contain these top-level keys: "executive_conclusion", the relevant "step_X_analysis" block, "professional_judgments", and "analysis_points".
-</OUTPUT_FORMAT_RULE>
-
-<EVIDENCE_RULE>
-Every quote from the contract provided in the `evidence_quotes` array MUST include the source document name, formatted exactly as: 'Quote text... (Source: [Document Name])'.
-</EVIDENCE_RULE>
-
-<ANALYSIS_RULE>
-Your analysis must be thorough. Weave in specific citations to support your conclusions.
-- When citing the official standard, reference its **authoritative** source (e.g., ASC 606-10-25-1).
-- Where helpful, you may also cite **interpretative** guidance (e.g., from an EY source) to add practical context.
-</ANALYSIS_RULE>
+<UNIVERSAL_RULES>
+1.  **JSON Output Only:** You MUST return your response as a single, well-formed JSON object. Do not add any text or explanations before or after the JSON.
+2.  **Knowledge Hierarchy:** Your analysis MUST be based on the following hierarchy of sources, in order of priority:
+    a. **Contract Text:** The specific terms from the `<CONTRACT_TEXT>` are the primary evidence.
+    b. **Authoritative Guidance:** The retrieved guidance from `<AUTHORITATIVE_CONTEXT>` (e.g., ASC 606) is the primary basis for your conclusions.
+    c. **Interpretative Guidance:** Retrieved guidance from other sources (e.g., EY) should be used to support your analysis, especially in complex or high-judgment areas.
+3.  **Evidence Formatting:** Every quote in the `evidence_quotes` array MUST include the source document name, formatted as: 'Quote text... (Source: [Document Name])'.
+</UNIVERSAL_RULES>
 """
 
     @staticmethod
     def get_user_prompt_for_step(step_number: int, contract_text: str, rag_context: str, contract_data=None, debug_config=None) -> str:
         """
         Builds the dynamic, task-specific user prompt for a single step analysis.
-        This is the new replacement for the old get_step_specific_analysis_prompt.
+        This revision uses programmatic logic and explicit instructions for using multi-source RAG context.
         """
         step_info = StepPrompts.get_step_info()[step_number]
         step_schema_name = f"step{step_number}_analysis"
         step_schema_definition = StepPrompts._get_schema_for_step(step_number)
         critical_rules = StepPrompts._get_critical_rules_for_step(step_number, contract_text)
 
-        # Assemble the concise user prompt
+        # Main instructions are constant. Define as a multi-line string.
+        main_instructions = """### TASK-SPECIFIC INSTRUCTIONS FOR 'analysis_points' ###
+For each analysis point, you MUST generate the `analysis_text` using the "Issue, Analysis, Conclusion" (IAC) framework defined below.
+
+1.  **Issue:** State the specific accounting question.
+2.  **Analysis:** This is the most critical part. Your narrative must:
+    a. **Quote the Evidence:** Quote the most relevant clause from the `<CONTRACT_TEXT>`.
+    b. **State the Rules:** Cite the relevant **authoritative** guidance (e.g., ASC 606-10-25-1). If applicable, also cite **interpretative** guidance (e.g., from EY) to support your reasoning.
+    c. **Bridge the Gap:** Explicitly explain **how** the contract language interacts with the guidance to drive the conclusion. This requires multiple sentences of reasoning.
+3.  **Conclusion:** Provide a definitive answer to the Issue.
+
+**META-EXAMPLE:**
+"The issue is whether services are distinct (Issue). The contract requires 'proprietary configuration' (Analysis: Evidence). ASC 606-10-25-21 requires promises to be distinct, and EY guidance clarifies that essential services are not distinct (Analysis: Rules). The 'proprietary' requirement means the SaaS license's benefit is not available without the service, making them not distinct (Analysis: Bridge the Gap). Therefore, they are a single performance obligation (Conclusion)."
+"""
+
+        # Conditional instructions for specific steps
+        alternative_treatment_instructions = ""
+        if step_number in [2, 5]:
+            alternative_treatment_instructions = """
+### SPECIAL REQUIREMENT: Alternative View ###
+For this step, you MUST append a second, separate paragraph to your `analysis_text`, starting with the bolded heading **"Alternative View Rejected:"**. Explain the alternative and why it was rejected.
+"""
+
+        # Combine the instructions programmatically.
+        full_instructions = main_instructions + alternative_treatment_instructions
+
+        # Assemble the final prompt parts.
         prompt_parts = [
             f"Your task is to analyze a contract for Step {step_number}: {step_info['title']}.",
             f"PRIMARY GUIDANCE FOR THIS STEP: {step_info['primary_guidance']}",
@@ -72,7 +91,7 @@ Your analysis must be thorough. Weave in specific citations to support your conc
             f"<CONTRACT_TEXT>\n{contract_text}\n</CONTRACT_TEXT>",
             f"<CONTRACT_DATA>\nCustomer: {getattr(contract_data, 'customer_name', 'N/A')}\nAnalysis Focus: {getattr(contract_data, 'key_focus_areas', 'General ASC 606 compliance')}\n</CONTRACT_DATA>",
             "---",
-            "CRITICAL TASK: Analyze the contract based on the context provided. Populate the JSON structure below with your complete analysis. Adhere to all rules.",
+            "CRITICAL TASK: Analyze the contract based on the context provided. Populate the JSON structure below with your complete analysis. Adhere to all universal rules from the system prompt and the task-specific instructions that follow the JSON structure.",
             "```json",
             "{",
             f'  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the \'bottom line\'.",',
@@ -81,33 +100,11 @@ Your analysis must be thorough. Weave in specific citations to support your conc
             '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
             "}",
             "```",
-            """<ANALYSIS_STRUCTURE_RULE>
-For each `analysis_point`, your `analysis_text` MUST be a professional, narrative paragraph that follows this 3-part "IAC" structure:
-1.  **Issue:** Clearly state the accounting question being addressed (e.g., "Is the contract enforceable?", "Are the services distinct?").
-2.  **Analysis:** This is the most critical part. Your analysis must be robust and thorough.
-    - First, identify and quote the most relevant terms or clauses from the provided contract evidence.
-    - Next, cite the specific, applicable guidance (e.g., ASC 606-10-25-21).
-    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** 
-    - Explain *how* the specific words in or the nature of the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them. One or two sentences are not enough; you must provide a thorough explanation and support for the conclusion.
-3.  **Conclusion:** Provide a definitive answer to the issue raised.
-
-Weave these three parts into a seamless, easy-to-understand narrative. Follow the depth and pattern of the example below.
-
-**META-EXAMPLE OF STRUCTURE (Follow this structural pattern and depth, but use the actual facts from the contract):**
-"The primary accounting question is [state the specific issue, e.g., 'whether the professional services are distinct from the main product'] (Issue). The contract includes specific language stating, '[Quote the relevant key phrase or sentence from the contract source text]'. The authoritative guidance in ASC XXX-XX-XX-X requires that [paraphrase the relevant accounting rule or criteria]. In this case, the quoted contract language directly impacts this assessment because [explain the reasoning that connects the quote to the rule; for instance, 'the service is described as being integral to the product's core function']. This indicates that the two promises are highly interrelated and not separately identifiable in the context of the contract (Analysis). Therefore, based on this analysis, we conclude that [state the definitive conclusion, e.g., 'the professional services and the product must be accounted for as a single performance obligation'] (Conclusion)."
-
-
-**For Steps 2 & 5:** Your analysis should also briefly explain *why an alternative accounting treatment, if any, was rejected*.
-</ANALYSIS_STRUCTURE_RULE>
-
-<ALTERNATIVE_TREATMENT_RULE>
-**FOR STEP 2 AND STEP 5 ONLY:** After your main analysis paragraph, you MUST add a short, separate paragraph addressing why a potential alternative was rejected. For example: "An alternative view might be to treat the implementation as distinct, as the customer could use another vendor. However, this was rejected because the evidence suggests the core utility of the SaaS license is not realized without the proprietary configuration included in the service."
-</ALTERNATIVE_TREATMENT_RULE>
-
-""",
+            full_instructions,
             critical_rules
         ]
-        return "\n\n".join(prompt_parts)
+
+        return "\n\n".join(filter(None, prompt_parts))
 
     # --- NEW: Modular Helper Functions ---
 
