@@ -335,7 +335,7 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
             complexity_summary += f" - Reasons: {'; '.join(complexity_reasons)}"
         # --- End Enhanced Complexity Logic ---
 
-        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo. Your response must be concise and proportional to the complexity of the transaction.
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
 
 STRUCTURED ANALYSIS DATA:
 - Contract Status: {contract_valid}
@@ -347,7 +347,7 @@ STRUCTURED ANALYSIS DATA:
 - Transaction Complexity: {complexity_summary}
 
 YOUR TASK:
-Write a concise financial impact analysis.
+Write a concise financial impact analysis. Your analysis, including the narrative description and journal entries, MUST be based **exclusively** on the `STRUCTURED ANALYSIS DATA` provided. This data represents the official conclusions from the 5-step analysis, which was grounded in the knowledge hierarchy.
 
 **CRITICAL TAX RULE: Any sales tax collected from the customer generally is NOT revenue or deferred revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). The journal entry should show a debit to Cash or Accounts Receivable for the sales tax amount and a separate credit to Sales Tax Payable.
 
@@ -521,11 +521,10 @@ Begin writing the financial impact section, strictly adhering to the proportiona
 
         # --- End Enhanced Complexity Logic ---
 
-        return f"""You are an accounting senior manager writing the final "Conclusion" section of an ASC 606 memo. Your response must be professional, decisive, and proportional to the complexity of the transaction.
+        return f"""You are an accounting senior manager writing the final "Conclusion" section of an ASC 606 memo.
 
 **CRITICAL CONTRACT CLASSIFICATION:**
 This contract has been classified as: {"SIMPLE" if is_simple_contract else "COMPLEX"}
-
 
 STRUCTURED ANALYSIS DATA:
 - Performance Obligations Count: {len(performance_obligations)}
@@ -536,7 +535,7 @@ STRUCTURED ANALYSIS DATA:
 - Transaction Complexity: {complexity_summary}
 
 YOUR TASK:
-Write a final concluding section for the memo, strictly adhering to the proportionality rule below.
+Write a final concluding paragraph. Reaffirm that the accounting treatment outlined in the memo is appropriate because it is based on a rigorous application of the 5-step model and the knowledge hierarchy (analyzing the specific contract against authoritative and interpretative guidance).
 
 **CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
 
@@ -616,7 +615,7 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
 
         critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
 
-        return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo. This section serves as the strategic overview for executives, auditors, and stakeholders.
+        return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo.
 
 ANALYSIS CONTEXT:
 - Contract Analysis: {analysis_title}
@@ -632,10 +631,13 @@ STRUCTURED DATA FROM 5-STEP ANALYSIS:
 - Revenue Recognition Methods: {recognition_methods}
 - Critical Judgments: {critical_judgments}
 
+YOUR TASK:
+Synthesize the **structured data provided above** into a cohesive, executive-level summary. Your conclusions in the summary MUST be directly supported by the findings in the structured data. Do not introduce new analysis. The structured data is your single source of truth for this task, as it was derived from a rigorous application of the knowledge hierarchy (Contract → Authoritative → Interpretative).
+
 SECTION STRUCTURE & REQUIREMENTS:
 
 **OVERALL CONCLUSION** (2-3 sentences maximum)
-- Provide the strategic, bottom-line accounting determination
+- Provide the strategic, bottom-line accounting determination based on the structured data
 - State the total transaction price and high-level revenue recognition approach
 - Confirm ASC 606 compliance
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
@@ -650,9 +652,8 @@ SECTION STRUCTURE & REQUIREMENTS:
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
-- Ensure the two sections complement rather than duplicate each other
+- Ensure internal consistency with the detailed 5-step analysis that preceded this summary
 - Focus on decision-useful information for senior stakeholders
-- Maintain consistent professional tone throughout
 
 Use the structured data provided above to create a cohesive, executive-level summary that respects readers' time while providing comprehensive oversight of the accounting conclusions."""
 
@@ -960,7 +961,7 @@ Write only the paragraph, no additional formatting or labels."""
             all_complexity_factors.extend(allocation_complexity_factors)
         if recognition_complexity_factors:
             all_complexity_factors.extend(recognition_complexity_factors)
-        return f"""You are writing the "Key Professional Judgments" section of a Big 4 quality ASC 606 memo. This section MUST represent only the most complex, high-judgment areas of the analysis requiring significant estimation or subjective interpretation.
+        return f"""You are writing the "Key Professional Judgments" section of a Big 4 quality ASC 606 memo. This section MUST represent only the most complex, high-judgment areas.
 
 STRUCTURED ANALYSIS CONTEXT:
 - Performance Obligations: {po_count} identified
@@ -970,39 +971,26 @@ STRUCTURED ANALYSIS CONTEXT:
 CANDIDATE JUDGMENTS (filtered from 5-step analysis):
 {json.dumps(all_judgments, indent=2)}
 
-**CRITICAL QUALITY STANDARDS:**
-Your role is to act as a senior partner's final quality control. You must distinguish between:
-1. **Genuine Professional Judgments** (include these): Areas requiring significant estimation, complex interpretation, or subjective analysis where reasonable people could disagree
-2. **Standard Application of Accounting Principles** (exclude these): Routine application of clear guidance, factual determinations, or straightforward rule applications
-
-**ENHANCED JUDGMENT EVALUATION CRITERIA:**
-Consider the structured context above when evaluating each candidate judgment:
-- Does the complexity of the transaction support the judgment's significance?
-- Are multiple performance obligations or complex pricing involved?
-- Do the analysis complexity indicators align with the judgment areas?
-- Would external auditors likely focus on this area during their review?
-
-**EXAMPLES OF GENUINE JUDGMENTS TO INCLUDE:**
-- **Estimating Variable Consideration:** "Management applied significant judgment in estimating the transaction price constraint for the performance bonus, considering historical achievement rates and market volatility factors."
-- **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
-
 YOUR TASK:
-1.  **Review the Context:** Scrutinize the list above. Your primary task is to distinguish between genuine professional judgments and standard contract analysis.
-2.  **Identify Genuine Judgments:** A **genuine judgment** involves significant estimation, a choice between viable accounting alternatives, or a "gray area" in the guidance. Use the authoritative and interpretative guidance to determine if the item is a genuine judgment.
-    - **Examples of Genuine Judgments:** "estimating the transaction price especially when those estimates involve variable consideration," "methods used to recognize revenue when it is not obvious (for example, the output method or input method used and how those methods are applied)," "for a performance obligation satisifed at a point in time, a significant judgment is made in evaluating when the customer obtains control of the promised goods or services."
-    - **Standard analysis is NOT a judgment.** Do not include items like: "Concluding a SaaS service is a single performance obligation," or "Recognizing subscription revenue over time."
-3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a single, well-written paragraph called 'Rationale' that seamlessly combines the issue, analysis, and authoritative guidance.
-4.  **Provide a "No Judgments" Conclusion if Necessary:** If your review finds that none of the items in the context are genuine judgments, your entire response MUST be only the following sentence:
-    "The accounting for this arrangement is considered straightforward under ASC 606 and did not require any significant professional judgments outside of the standard application of the five-step model."
+1.  **Review the Candidate Judgments:** Scrutinize the list of candidate judgments provided.
+2.  **Identify Genuine Judgments:** A genuine judgment exists where the contract terms are ambiguous or the authoritative guidance is not definitive, requiring significant estimation or reliance on interpretative guidance.
+3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a 'Rationale' paragraph. This rationale MUST explain **why** it is a judgment by referencing the knowledge hierarchy. For example, explain that the authoritative guidance was silent on a specific matter, forcing reliance on interpretative guidance and management estimation.
+
+**KNOWLEDGE HIERARCHY REFERENCE:**
+A genuine judgment exists when:
+- **Contract Text** is ambiguous or silent on key terms
+- **Authoritative Guidance** (ASC 606) provides general principles but lacks specific direction
+- **Interpretative Guidance** (e.g., Big 4 publications) must be relied upon for practical application
+- **Management Estimation** is required to bridge gaps in the hierarchy
 
 ---
 ### EXAMPLE OF DESIRED OUTPUT:
 
 - **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
-  **Rationale:** The contract does not include a standalone price for the on-premise license, and an observable price is not available as the license is not sold separately. Therefore, a significant judgment was required to estimate the SSP. Per the hierarchy in ASC 606-10-32-33, we used the residual approach. This was deemed appropriate because the SSP for the professional services and support obligations were readily observable and stable. The total transaction price less the observable SSPs equals $450,000, representing the estimated fair value for the license component.
+  **Rationale:** A significant judgment was required because the **contract text** does not specify a price for the license, and the **authoritative guidance** in ASC 606-10-32-33 allows for estimation when an observable price is unavailable. We referenced **interpretative guidance** (e.g., from EY) which suggests the residual approach is appropriate in such cases. This forced an estimation, making it a key judgment.
 
 ---
-Begin your work. Your precision is critical to producing an audit-ready memo.
+Begin your work. Your precision is critical.
 """
 
     @staticmethod
