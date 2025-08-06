@@ -629,7 +629,6 @@ STRUCTURED DATA FROM 5-STEP ANALYSIS:
 - Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
 - Allocation Method: {allocation_method}
 - Revenue Recognition Methods: {recognition_methods}
-- Critical Judgments: {critical_judgments}
 
 YOUR TASK:
 Synthesize the **structured data provided above** into a cohesive, executive-level summary. Your conclusions in the summary MUST be directly supported by the findings in the structured data. Do not introduce new analysis. The structured data is your single source of truth for this task, as it was derived from a rigorous application of the knowledge hierarchy (Contract → Authoritative → Interpretative).
@@ -972,9 +971,10 @@ CANDIDATE JUDGMENTS (filtered from 5-step analysis):
 {json.dumps(all_judgments, indent=2)}
 
 YOUR TASK:
-1.  **Review the Candidate Judgments:** Scrutinize the list of candidate judgments provided.
-2.  **Identify Genuine Judgments:** A genuine judgment exists where the contract terms are ambiguous or the authoritative guidance is not definitive, requiring significant estimation or reliance on interpretative guidance.
-3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a 'Rationale' paragraph. This rationale MUST explain **why** it is a judgment by referencing the knowledge hierarchy. For example, explain that the authoritative guidance was silent on a specific matter, forcing reliance on interpretative guidance and management estimation.
+Your primary task is to **filter** the provided `CANDIDATE JUDGMENTS` and **rewrite** only the genuine ones into a professional, defensible format.
+
+1.  **Filter:** A genuine judgment is one that requires significant estimation or interpretation because the contract is silent or the authoritative guidance is not definitive. Discard standard applications of rules.
+2.  **Rewrite:** For each genuine judgment you keep, write a 'Rationale' paragraph that explicitly explains **why** it is a judgment, using the KNOWLEDGE HIERARCHY REFERENCE to structure your reasoning.
 
 **KNOWLEDGE HIERARCHY REFERENCE:**
 A genuine judgment exists when:
