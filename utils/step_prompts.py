@@ -84,10 +84,11 @@ Your analysis must be thorough. Weave in specific citations to support your conc
             """<ANALYSIS_STRUCTURE_RULE>
 For each `analysis_point`, your `analysis_text` MUST be a professional, narrative paragraph that follows this 3-part "IAC" structure:
 1.  **Issue:** Clearly state the accounting question being addressed (e.g., "Is the contract enforceable?", "Are the services distinct?").
-2.  **Analysis:** This is the most critical part. Your analysis must be robust.
+2.  **Analysis:** This is the most critical part. Your analysis must be robust and thorough.
     - First, identify and quote the most relevant terms or clauses from the provided contract evidence.
     - Next, cite the specific, applicable guidance (e.g., ASC 606-10-25-21).
-    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** Explain *how* the specific words in the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them. One or two sentences are not enough; you must provide a thorough explanation and support for the conclusion.
+    - **Crucially, you must then explicitly connect the contract language to the accounting guidance.** 
+    - Explain *how* the specific words in or the nature of the contract cause the arrangement to either meet or fail the criteria in the guidance. Do not just state the facts and the rule; explain the reasoning that links them. One or two sentences are not enough; you must provide a thorough explanation and support for the conclusion.
 3.  **Conclusion:** Provide a definitive answer to the issue raised.
 
 Weave these three parts into a seamless, easy-to-understand narrative. Follow the depth and pattern of the example below.
