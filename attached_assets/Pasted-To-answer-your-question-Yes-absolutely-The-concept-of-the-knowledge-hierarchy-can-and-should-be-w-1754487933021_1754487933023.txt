@@ -1,0 +1,94 @@
+To answer your question: Yes, absolutely. The concept of the knowledge hierarchy can and should be woven into the other prompt-generating functions in step_prompts.py.
+
+This is a powerful "prompt engineering pattern." By consistently reinforcing this core mental model (Contract → Authoritative → Interpretative → General Knowledge), you teach the AI to behave more predictably and reliably across the entire memo-generation process. It stops being a one-off rule for the analysis_text and becomes a fundamental principle of the AI's "thinking."
+
+Here are the most impactful places to apply this principle, with specific code suggestions.
+
+1. Prime Candidate: get_key_judgments_prompt()
+This is arguably the most important place to apply the hierarchy after the main step analysis. A "judgment" exists precisely because the lower levels of the hierarchy (e.g., authoritative guidance) are insufficient, forcing a reliance on higher levels (e.g., interpretative guidance or estimation).
+
+The Opportunity: Instead of just asking the AI to list judgments, we can instruct it to justify why an issue constitutes a judgment by explicitly referencing the knowledge hierarchy.
+
+Proposed Change in get_key_judgments_prompt:
+
+# ... (inside the get_key_judgments_prompt function) ...
+
+        return f"""You are writing the "Key Professional Judgments" section of a Big 4 quality ASC 606 memo. This section MUST represent only the most complex, high-judgment areas.
+
+# ... (rest of the prompt context) ...
+
+YOUR TASK:
+1.  **Review the Candidate Judgments:** Scrutinize the list of candidate judgments provided.
+2.  **Identify Genuine Judgments:** A genuine judgment exists where the contract terms are ambiguous or the authoritative guidance is not definitive, requiring significant estimation or reliance on interpretative guidance.
+3.  **Format Your Output:** For each genuine judgment you identify, create a bullet point with a 'Rationale' paragraph. This rationale MUST explain **why** it is a judgment by referencing the knowledge hierarchy. For example, explain that the authoritative guidance was silent on a specific matter, forcing reliance on interpretative guidance and management estimation.
+
+---
+### EXAMPLE OF DESIRED OUTPUT:
+
+- **Estimating the Standalone Selling Price (SSP) for the On-Premise License:**
+  **Rationale:** A significant judgment was required because the **contract text** does not specify a price for the license, and the **authoritative guidance** in ASC 606-10-32-33 allows for estimation when an observable price is unavailable. We referenced **interpretative guidance** (e.g., from EY) which suggests the residual approach is appropriate in such cases. This forced an estimation, making it a key judgment.
+
+---
+Begin your work. Your precision is critical.
+"""
+
+Why this is better: It forces the AI to connect the dots. It can't just say "Estimating SSP is a judgment." It has to explain that it's a judgment because the contract and authoritative guidance were insufficient, requiring a higher-level estimation technique supported by interpretative practice. This produces a much more robust and defensible memo section.
+
+2. Reinforcing Grounded Summaries: get_enhanced_executive_summary_prompt()
+The executive summary should be a faithful summary of the detailed analysis, not a fresh interpretation. We can reinforce this by reminding the AI that its source of truth is the structured data, which itself was generated using the hierarchy.
+
+Proposed Change in get_enhanced_executive_summary_prompt:
+
+# ... (inside the get_enhanced_executive_summary_prompt function) ...
+
+        return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo.
+
+# ... (STRUCTURED DATA FROM 5-STEP ANALYSIS goes here) ...
+
+YOUR TASK:
+Synthesize the **structured data provided above** into a cohesive, executive-level summary. Your conclusions in the summary MUST be directly supported by the findings in the structured data. Do not introduce new analysis. The structured data is your single source of truth for this task, as it was derived from a rigorous application of the knowledge hierarchy (Contract -> Authoritative -> Interpretative).
+
+SECTION STRUCTURE & REQUIREMENTS:
+
+**OVERALL CONCLUSION** (2-3 sentences maximum)
+...
+"""
+
+Why this is better: It explicitly constrains the AI, reducing the risk of it hallucinating or creating inconsistencies between the detailed analysis and the summary. It reminds the AI why it should trust the structured data.
+
+3. Ensuring Proportionality: get_financial_impact_prompt() and get_conclusion_prompt()
+For these sections, the goal is similar to the executive summary: ensure the narrative is directly tied to the preceding, rigorous analysis.
+
+Proposed Change in get_financial_impact_prompt:
+
+# ... (inside the get_financial_impact_prompt function) ...
+
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
+
+# ... (STRUCTURED ANALYSIS DATA goes here) ...
+
+YOUR TASK:
+Write a concise financial impact analysis. Your analysis, including the narrative description and journal entries, MUST be based **exclusively** on the `STRUCTURED ANALYSIS DATA` provided. This data represents the official conclusions from the 5-step analysis, which was grounded in the knowledge hierarchy.
+
+**CRITICAL RULE: Be Proportional.**
+...
+"""
+
+Proposed Change in get_conclusion_prompt:
+
+# ... (inside the get_conclusion_prompt function) ...
+
+        return f"""You are an accounting senior manager writing the final "Conclusion" section of an ASC 606 memo.
+
+# ... (STRUCTURED ANALYSIS DATA goes here) ...
+
+YOUR TASK:
+Write a final concluding paragraph. Reaffirm that the accounting treatment outlined in the memo is appropriate because it is based on a rigorous application of the 5-step model and the knowledge hierarchy (analyzing the specific contract against authoritative and interpretative guidance).
+
+**CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
+...
+"""
+
+Why this is better: These small additions act as constant "guardrails." They repeatedly tell the AI to ground its output in the work already done, improving the internal consistency and auditability of the final memo from top to bottom.
+
+By making these subtle but important changes, you elevate the "knowledge hierarchy" from a single instruction to a system-wide philosophy. This is how you build a truly reliable and high-quality AI system.
