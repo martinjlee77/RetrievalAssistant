@@ -199,9 +199,19 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
                                     s5: dict,
                                     customer_name: str,
                                     memo_audience: str,
-                                    contract_data=None) -> str:
-        """Generates proportional financial impact prompt based on structured data analysis."""
+                                    contract_data=None,
+                                    financial_facts = None) -> str:
+        """Generates proportional financial impact prompt based on structured data analysis.
+        Enhanced with pre-calculated financial facts for accurate journal entries."""
         import json
+        
+        # HYBRID APPROACH: Use pre-calculated financial facts if available
+        if financial_facts and financial_facts.get('total_transaction_price', 0) > 0:
+            return StepPrompts._get_enhanced_financial_impact_prompt_with_facts(
+                financial_facts, customer_name, memo_audience, s1, s2, s3, s4, s5
+            )
+        
+        # Fallback to original method if financial_facts not available
 
         # Extract structured data from each step
 
@@ -376,6 +386,74 @@ Write a concise financial impact analysis. Your analysis, including the narrativ
 
 Begin writing the financial impact section, strictly adhering to the proportionality rule.
 """
+
+    @staticmethod
+    def _get_enhanced_financial_impact_prompt_with_facts(
+        financial_facts: dict, customer_name: str, memo_audience: str,
+        s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
+        """Enhanced financial impact prompt using pre-calculated financial facts for accurate journal entries."""
+        
+        # Extract complexity indicators from step results for proportional response
+        po_count = len(financial_facts.get('component_details', []))
+        has_variable_consideration = financial_facts.get('variable_consideration', 0) > 0
+        
+        is_complex = (
+            po_count > 2 or 
+            has_variable_consideration or 
+            financial_facts.get('monthly_saas_revenue', 0) > 0
+        )
+        
+        # Prepare pre-calculated figures for injection
+        facts_section = f"""### PRE-CALCULATED FINANCIAL FACTS (Use These Exact Numbers) ###
+- **Total Transaction Price**: ${financial_facts['total_transaction_price']:,.2f}
+- **Fixed Consideration**: ${financial_facts['fixed_consideration']:,.2f}
+- **Variable Consideration**: ${financial_facts['variable_consideration']:,.2f}
+- **Total Cash/A/R (Initial Entry)**: ${financial_facts['total_upfront_cash']:,.2f}"""
+        
+        # Add component-specific amounts for journal entries
+        if financial_facts.get('monthly_saas_revenue', 0) > 0:
+            facts_section += f"""
+- **Monthly SaaS Revenue Recognition**: ${financial_facts['monthly_saas_revenue']:,.2f}
+- **SaaS Contract Term**: {financial_facts['saas_term_months']} months"""
+        
+        # Add component breakdowns
+        for detail in financial_facts.get('component_details', []):
+            facts_section += f"""
+- **{detail['name']} Amount**: ${detail['amount']:,.2f}"""
+        
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
+
+{facts_section}
+
+CRITICAL INSTRUCTIONS:
+1. **USE THE EXACT NUMBERS PROVIDED ABOVE** - Do NOT recalculate or modify these figures
+2. **DO NOT include sales tax** in journal entries (rate not specified in contract)
+3. **Ensure all journal entries balance** (Total Debits = Total Credits)
+4. **Be proportional**: {'Complex analysis required' if is_complex else 'Simple, concise treatment sufficient'}
+
+YOUR TASK:
+Write the financial impact analysis using the pre-calculated facts above.
+
+{'**FOR COMPLEX TRANSACTIONS:**' if is_complex else '**FOR SIMPLE TRANSACTIONS:**'}
+
+{'1. **Financial Statement Impact:** Narrative paragraph describing balance sheet and income statement effects' if is_complex else 'Provide a brief 1-2 sentence summary and one illustrative journal entry.'}
+
+{'2. **Illustrative Journal Entries:** Key journal entries in markdown table format:' if is_complex else 'Example:'}
+
+| Date | Account | Debit | Credit |
+|------|---------|-------|--------|
+| Contract Inception | Cash/Accounts Receivable | ${financial_facts['total_upfront_cash']:,.2f} | |
+| | Deferred Revenue | | ${financial_facts['fixed_consideration']:,.2f} |{f"
+| | Variable Consideration Liability | | ${financial_facts['variable_consideration']:,.2f} |" if has_variable_consideration else ""}
+| | *To record contract signing* | | |
+
+{'| Revenue Recognition | Deferred Revenue | [monthly amount] | |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
+{'| | Revenue | | [monthly amount] |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
+{'| | *To recognize monthly revenue* | | |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
+
+{f'3. **Internal Control Considerations:** Brief mention of processes needed for accurate revenue tracking and compliance.' if is_complex else ''}
+
+**Remember**: Use the exact figures from the PRE-CALCULATED FACTS section. These amounts are mathematically verified."""
 
     @staticmethod
     def get_conclusion_prompt(s1: dict,

@@ -208,9 +208,13 @@ class ASC606Analyzer:
             }
     
     def _calculate_transaction_price(self, fee_components: List[Dict]) -> Dict[str, Any]:
-        """Calculate transaction price totals using universal mathematical rules."""
+        """Calculate transaction price totals and detailed financial facts for journal entries."""
         fixed_total = 0
         variable_total = 0
+        
+        # Detailed breakdowns for journal entries
+        component_details = []
+        saas_components = []
         
         for component in fee_components:
             try:
@@ -219,6 +223,7 @@ class ASC606Analyzer:
                 duration = int(component.get("duration", 1))
                 is_variable = component.get("is_variable", False)
                 probability = float(component.get("probability", 0))
+                component_name = component.get("component_name", "Unknown")
                 
                 # Calculate total amount based on period
                 if period == "annual":
@@ -234,27 +239,69 @@ class ASC606Analyzer:
                 else:  # "usage-based" or unknown
                     total_amount = base_amount  # Use base amount as-is
                 
+                # Track SaaS components for monthly revenue calculation
+                if "saas" in component_name.lower() or "license" in component_name.lower():
+                    saas_components.append({
+                        "name": component_name,
+                        "total_amount": total_amount,
+                        "duration_months": duration * 12 if period == "annual" else (duration if period == "monthly" else duration),
+                        "period": period
+                    })
+                
                 # Classify as fixed or variable
                 if is_variable and period == "contingent":
                     # For variable consideration, include if probability > 50%
                     if probability > 0.5:
                         variable_total += total_amount
-                        self.logger.info(f"Including variable component '{component.get('component_name')}': ${total_amount:,.2f} (probability: {probability:.1%})")
+                        component_details.append({
+                            "name": component_name,
+                            "amount": total_amount,
+                            "type": "variable",
+                            "probability": probability
+                        })
+                        self.logger.info(f"Including variable component '{component_name}': ${total_amount:,.2f} (probability: {probability:.1%})")
                     else:
-                        self.logger.info(f"Excluding variable component '{component.get('component_name')}': ${total_amount:,.2f} (probability too low: {probability:.1%})")
+                        self.logger.info(f"Excluding variable component '{component_name}': ${total_amount:,.2f} (probability too low: {probability:.1%})")
                 else:
                     fixed_total += total_amount
+                    component_details.append({
+                        "name": component_name,
+                        "amount": total_amount,
+                        "type": "fixed"
+                    })
                     
             except (ValueError, TypeError) as e:
                 self.logger.warning(f"Error calculating component {component.get('component_name', 'Unknown')}: {e}")
                 continue
         
-        return {
+        # Calculate monthly SaaS revenue for journal entries
+        monthly_saas_revenue = 0
+        saas_term_months = 0
+        if saas_components:
+            # Use the first (likely largest) SaaS component for monthly calculation
+            primary_saas = saas_components[0]
+            if primary_saas["period"] == "annual" and primary_saas.get("duration_months", 0) > 0:
+                monthly_saas_revenue = primary_saas["total_amount"] / primary_saas["duration_months"]
+                saas_term_months = primary_saas["duration_months"]
+        
+        # Enhanced financial facts for journal entries
+        financial_facts = {
             "fixed_consideration": fixed_total,
             "variable_consideration": variable_total,
             "total_transaction_price": fixed_total + variable_total,
-            "calculation_method": "hybrid_extract_calculate"
+            "calculation_method": "hybrid_extract_calculate",
+            "component_details": component_details,
+            "monthly_saas_revenue": monthly_saas_revenue,
+            "saas_term_months": saas_term_months,
+            "total_upfront_cash": fixed_total + variable_total,  # Assuming all amounts are due upfront for simplicity
         }
+        
+        # Add component-specific amounts for journal entries
+        for detail in component_details:
+            name_key = detail["name"].lower().replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
+            financial_facts[f"{name_key}_amount"] = detail["amount"]
+        
+        return financial_facts
 
     async def analyze_contract(
             self,
@@ -718,12 +765,13 @@ class ASC606Analyzer:
                                             max_tokens=1000,
                                             temperature=0.3)))
 
-            # Task 4: Financial Impact
+            # Task 4: Financial Impact (HYBRID: Inject calculated financial facts)
             financial_prompt = StepPrompts.get_financial_impact_prompt(
                 s1, s2, s3, s4, s5,
                 getattr(contract_data, 'customer_name', 'Customer'),
                 getattr(contract_data, 'memo_audience',
-                        'Technical Accounting Team'), contract_data)
+                        'Technical Accounting Team'), contract_data,
+                financial_facts=financial_facts)  # Pass calculated financial facts
             financial_messages = [{
                 "role": "user",
                 "content": financial_prompt
