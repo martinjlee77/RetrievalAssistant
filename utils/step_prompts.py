@@ -1204,3 +1204,61 @@ Begin your work. Your precision is critical.
 
         final_content = [section for section in markdown_sections if str(section).strip()]
         return "\n\n".join(final_content)
+
+    @staticmethod
+    def get_financial_extraction_prompt(contract_text: str) -> str:
+        """Extracts structured financial data from contract text for reliable calculation."""
+        return f"""You are a financial data extraction specialist. Your ONLY job is to read the contract text and extract fee components into a structured JSON format. Do NOT perform any calculations, interpretations, or analysis.
+
+CONTRACT TEXT:
+{contract_text}
+
+YOUR TASK:
+Extract all fee components mentioned in the contract and return them as a JSON object. For each component, identify:
+- component_name: The exact name/description from the contract
+- base_amount: The numerical amount (without currency symbol)
+- period: "one-time", "annual", "monthly", "quarterly", "contingent", or "usage-based"
+- duration: Number of periods (if applicable)
+- is_variable: true if contingent/uncertain, false if fixed
+- probability: Decimal between 0-1 (only for variable consideration)
+- discount_applied: Percentage or amount of discount (if mentioned)
+- notes: Any important context from the contract
+
+RETURN FORMAT:
+{{
+  "fee_components": [
+    {{
+      "component_name": "SaaS License",
+      "base_amount": 240000,
+      "period": "annual",
+      "duration": 3,
+      "is_variable": false,
+      "notes": "From section 2.1, standard rate"
+    }},
+    {{
+      "component_name": "Hardware",
+      "base_amount": 50000,
+      "period": "one-time",
+      "is_variable": false,
+      "discount_applied": "10%",
+      "notes": "From section 2.2, post-discount amount"
+    }},
+    {{
+      "component_name": "Performance Bonus",
+      "base_amount": 30000,
+      "period": "contingent",
+      "is_variable": true,
+      "probability": 0.8,
+      "notes": "From section 2.4, 80% historical achievement rate"
+    }}
+  ]
+}}
+
+CRITICAL RULES:
+1. Extract numbers EXACTLY as written - do not calculate totals
+2. If a fee is mentioned as "discounted" or "reflects a discount", note it but use the stated amount
+3. For variable consideration, extract any probability indicators (e.g., "80% of customers")
+4. Include ALL fee components, even small ones
+5. Use the exact terminology from the contract for component names
+
+Return only the JSON object, no other text."""

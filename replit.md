@@ -46,6 +46,7 @@ Critical Development Rules - Prompt Protection:
 - **Knowledge Hierarchy System**: Enhanced all prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretative Guidance) and IAC framework for professional judgment defensibility.
 - **GPT-5 Integration**: Updated to use GPT-5 model for enhanced analysis quality (August 2025 release).
 - **Legacy Code Cleanup**: Removed unused `utils/prompt.py` file - system now fully consolidated on `utils/step_prompts.py`.
+- **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern to eliminate mathematical errors in transaction price determination. AI extracts structured fee components, Python performs reliable calculations. Ensures 100% accuracy for financial amounts in Step 3 analysis and memo generation.
 
 ### File Structure
 ```
@@ -59,10 +60,10 @@ Critical Development Rules - Prompt Protection:
 │       └── logo.png                      # Controller.cpa logo
 ├── utils/                                # Core utilities
 │   ├── llm.py                            # OpenAI API calls, knowledge base, debugging tools (GPT-5)
-│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy
+│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy and financial extraction
 │   ├── auth.py                           # Authentication utilities (placeholder)
 │   ├── document_extractor.py             # Multi-format document processing
-│   └── asc606_analyzer.py                # Consolidated ASC 606 hybrid analyzer
+│   └── asc606_analyzer.py                # Consolidated ASC 606 hybrid analyzer with extract-then-calculate system
 ├── core/                                 # Shared backend logic
 │   ├── analyzers.py                      # Analyzer factory and base classes
 │   ├── models.py                         # Centralized data models

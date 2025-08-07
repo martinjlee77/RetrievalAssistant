@@ -162,6 +162,100 @@ class ASC606Analyzer:
         else:
             return data
 
+    def _extract_financial_components(self, contract_text: str) -> Dict[str, Any]:
+        """Extract structured financial data using AI, then calculate reliable totals."""
+        try:
+            # Step 1: AI extracts structured fee components
+            extraction_prompt = StepPrompts.get_financial_extraction_prompt(contract_text)
+            
+            extraction_messages = [{
+                "role": "user", 
+                "content": extraction_prompt
+            }]
+            
+            extraction_result = make_llm_call(
+                self.client,
+                extraction_messages,
+                model='gpt-4o',
+                max_tokens=2000,
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            
+            # Step 2: Parse the extracted data
+            if not extraction_result:
+                raise ValueError("No extraction result received from LLM")
+            
+            extracted_data = json.loads(extraction_result)
+            fee_components = extracted_data.get("fee_components", [])
+            
+            # Step 3: Python calculates reliable totals
+            financial_facts = self._calculate_transaction_price(fee_components)
+            financial_facts["fee_components"] = fee_components  # Include original components for reference
+            
+            self.logger.info(f"Financial extraction successful: {len(fee_components)} components, Total: ${financial_facts['total_transaction_price']:,.2f}")
+            return financial_facts
+            
+        except Exception as e:
+            self.logger.error(f"Financial extraction failed: {e}")
+            # Return empty results to allow normal Step 3 processing as fallback
+            return {
+                "fixed_consideration": 0,
+                "variable_consideration": 0,
+                "total_transaction_price": 0,
+                "fee_components": [],
+                "extraction_error": str(e)
+            }
+    
+    def _calculate_transaction_price(self, fee_components: List[Dict]) -> Dict[str, Any]:
+        """Calculate transaction price totals using universal mathematical rules."""
+        fixed_total = 0
+        variable_total = 0
+        
+        for component in fee_components:
+            try:
+                base_amount = float(component.get("base_amount", 0))
+                period = component.get("period", "one-time")
+                duration = int(component.get("duration", 1))
+                is_variable = component.get("is_variable", False)
+                probability = float(component.get("probability", 0))
+                
+                # Calculate total amount based on period
+                if period == "annual":
+                    total_amount = base_amount * duration
+                elif period == "monthly":
+                    total_amount = base_amount * duration * 12  # Convert to annual equivalent
+                elif period == "quarterly":
+                    total_amount = base_amount * duration * 4   # Convert to annual equivalent
+                elif period == "one-time":
+                    total_amount = base_amount
+                elif period == "contingent":
+                    total_amount = base_amount  # Full amount, probability handled below
+                else:  # "usage-based" or unknown
+                    total_amount = base_amount  # Use base amount as-is
+                
+                # Classify as fixed or variable
+                if is_variable and period == "contingent":
+                    # For variable consideration, include if probability > 50%
+                    if probability > 0.5:
+                        variable_total += total_amount
+                        self.logger.info(f"Including variable component '{component.get('component_name')}': ${total_amount:,.2f} (probability: {probability:.1%})")
+                    else:
+                        self.logger.info(f"Excluding variable component '{component.get('component_name')}': ${total_amount:,.2f} (probability too low: {probability:.1%})")
+                else:
+                    fixed_total += total_amount
+                    
+            except (ValueError, TypeError) as e:
+                self.logger.warning(f"Error calculating component {component.get('component_name', 'Unknown')}: {e}")
+                continue
+        
+        return {
+            "fixed_consideration": fixed_total,
+            "variable_consideration": variable_total,
+            "total_transaction_price": fixed_total + variable_total,
+            "calculation_method": "hybrid_extract_calculate"
+        }
+
     async def analyze_contract(
             self,
             contract_text: str,
@@ -172,6 +266,11 @@ class ASC606Analyzer:
         analysis_start_time = time.time()
 
         try:
+            # === STEP 0: FINANCIAL EXTRACTION (HYBRID APPROACH) ===
+            # Extract and calculate financial data before Step 3 to ensure accuracy
+            self.logger.info("🧮 HYBRID APPROACH: Extracting financial components for reliable calculation...")
+            financial_facts = self._extract_financial_components(contract_text)
+            
             # === STEP 1: RETRIEVAL-AUGMENTED GENERATION WORKFLOW ===
             retrieved_context = ""
             contract_terms = []
@@ -324,14 +423,24 @@ class ASC606Analyzer:
                             step_specific_context += f"{result['content']}\n"
 
                 # NEW: Prepare the messages list using the new architecture with caching
-                prompt_cache_key = hashlib.md5(f"prompt_{step_num}_{len(contract_text)}_{len(retrieved_context + step_specific_context)}".encode()).hexdigest()
+                # Special handling for Step 3: inject calculated financial facts
+                financial_context = ""
+                if step_num == 3 and financial_facts.get("total_transaction_price", 0) > 0:
+                    financial_context = f"\n\n**CALCULATED FINANCIAL FACTS (Use These Exact Numbers):**\n"
+                    financial_context += f"- Fixed Consideration: ${financial_facts['fixed_consideration']:,.2f}\n"
+                    financial_context += f"- Variable Consideration: ${financial_facts['variable_consideration']:,.2f}\n"
+                    financial_context += f"- Total Transaction Price: ${financial_facts['total_transaction_price']:,.2f}\n"
+                    financial_context += f"- Fee Components: {len(financial_facts.get('fee_components', []))} identified\n"
+                    financial_context += "**CRITICAL:** Use these calculated amounts in your analysis. Do NOT recalculate.\n"
+                
+                prompt_cache_key = hashlib.md5(f"prompt_{step_num}_{len(contract_text)}_{len(retrieved_context + step_specific_context + financial_context)}".encode()).hexdigest()
                 
                 if prompt_cache_key not in self._prompt_cache:
                     system_prompt = StepPrompts.get_system_prompt()
                     user_prompt = StepPrompts.get_user_prompt_for_step(
                         step_number=step_num,
                         contract_text=contract_text,
-                        rag_context=retrieved_context + step_specific_context,
+                        rag_context=retrieved_context + step_specific_context + financial_context,
                         contract_data=contract_data,
                         debug_config=debug_config or {})
                     self._prompt_cache[prompt_cache_key] = (system_prompt, user_prompt)
@@ -408,6 +517,17 @@ class ASC606Analyzer:
                                 response) if response else {}
                             step_analysis_sanitized = self._sanitize_llm_json(
                                 step_analysis_raw)
+                            
+                            # HYBRID APPROACH: Inject calculated financial facts into Step 3
+                            if step_num == 3 and financial_facts.get("total_transaction_price", 0) > 0:
+                                # Ensure Step 3 contains the calculated financial data for consistent memo generation
+                                if "step3_analysis" in step_analysis_sanitized:
+                                    step_analysis_sanitized["step3_analysis"]["calculated_financial_facts"] = financial_facts
+                                else:
+                                    step_analysis_sanitized["calculated_financial_facts"] = financial_facts
+                                    
+                                self.logger.info(f"✅ HYBRID: Injected calculated financial facts into Step 3: ${financial_facts['total_transaction_price']:,.2f}")
+                            
                             step_results[
                                 f"step_{step_num}"] = step_analysis_sanitized
 
