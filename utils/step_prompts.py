@@ -349,7 +349,7 @@ STRUCTURED ANALYSIS DATA:
 YOUR TASK:
 Write a concise financial impact analysis. Your analysis, including the narrative description and journal entries, MUST be based **exclusively** on the `STRUCTURED ANALYSIS DATA` provided. This data represents the official conclusions from the 5-step analysis, which was grounded in the knowledge hierarchy.
 
-**CRITICAL TAX RULE: Any sales tax collected from the customer generally is NOT revenue or deferred revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). The journal entry should show a debit to Cash or Accounts Receivable for the sales tax amount and a separate credit to Sales Tax Payable.
+**CRITICAL TAX RULE: Any sales tax collected from the customer is NOT revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). **Since the tax rate is not specified in the contract data, you MUST OMIT sales tax from the illustrative journal entries and add a brief narrative sentence stating that the entries exclude any applicable sales tax.** Do not use placeholders like `[sales tax amount]`.
 
 **CRITICAL RULE: Be Proportional.**
 - **For SIMPLE transactions** (like a standard, single-element subscription): Provide a very brief, 1-2 sentence summary of the accounting treatment and one summary journal entry. DO NOT write a lengthy narrative or explain basic accounting principles.
@@ -357,11 +357,11 @@ Write a concise financial impact analysis. Your analysis, including the narrativ
 
 1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or deferred revenue liabilities).
 
-2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Use standard account names.
+2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Your entries MUST be balanced (Total Debits = Total Credits).
 **Focus on the most critical events, such as:**
-- **The journal entry upon contract signing/initial invoicing.**
-- **The journal entry to recognize the first period of revenue for 'Over Time' obligations.**
-- **The journal entry to recognize revenue for a 'Point in Time' obligation.**
+- **The journal entry upon contract signing/initial invoicing.** This should establish the total receivable and the corresponding deferred revenue liability for the entire contract value.
+- **The journal entry to recognize revenue for a 'Point in Time' obligation (e.g., hardware delivery).** This should show the debit to Deferred Revenue and the credit to Revenue.
+- **The journal entry to recognize the first period of revenue for 'Over Time' obligations (e.g., one month of SaaS).**
 
     | Date       | Account                          | Debit     | Credit    |
     |------------|----------------------------------|-----------|-----------|
@@ -1055,11 +1055,13 @@ Begin your work. Your precision is critical.
         }
         processed_values = set()
 
+        # PRIORITY: Use structured transaction components (authoritative)
         for key, analysis_text in transaction_components.items():
             is_not_applicable = (not analysis_text or str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
                                str(analysis_text).strip().lower().startswith('n/a') or len(str(analysis_text).strip()) < 3)
             if not is_not_applicable:
                 text_str = str(analysis_text).strip()
+                # Skip duplicate content to avoid redundancy
                 if key in ['fixed_consideration', 'total_transaction_price']:
                     if text_str in processed_values: continue
                     processed_values.add(text_str)
@@ -1067,8 +1069,14 @@ Begin your work. Your precision is critical.
                 topic_title = title_map.get(key, key.replace('_', ' ').title())
                 all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
 
+        # SECONDARY: Only add analysis_points that don't contradict structured data
+        # Filter out any analysis_points that mention dollar amounts to prevent mathematical contradictions
         if analysis_points:
-            all_points.extend(analysis_points)
+            for point in analysis_points:
+                analysis_text = str(point.get('analysis_text', ''))
+                # Skip points that contain dollar amounts or pricing to prevent contradictions
+                if not any(indicator in analysis_text.lower() for indicator in ['$', 'dollar', 'price', 'cost', 'fee', 'amount', 'total']):
+                    all_points.append(point)
 
         if not all_points:
             markdown_sections.append("Only basic fixed consideration was identified in this contract.")
