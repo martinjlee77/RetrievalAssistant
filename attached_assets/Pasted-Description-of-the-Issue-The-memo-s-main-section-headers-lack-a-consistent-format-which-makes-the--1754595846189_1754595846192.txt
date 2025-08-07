@@ -1,0 +1,122 @@
+Description of the Issue
+The memo's main section headers lack a consistent format, which makes the document look patched together and unprofessional.
+
+1. EXECUTIVE SUMMARY (Number, All Caps)
+Step 1: Identify the Contract ("Step X:", Title Case)
+4. KEY PROFESSIONAL JUDGMENTS (Number, All Caps)
+## CONCLUSION (Markdown H2 format)
+A professional memo should use a standardized format for all major sections, for example: 1. SECTION NAME.
+
+Analysis of Current Code
+This inconsistency is created during the final memo assembly in the analyze_contract method of asc606_analyzer.py. The code manually constructs the final memo by piecing together different text fragments, each with its own hardcoded header style.
+
+Here is the problematic code block in asc606_analyzer.py:
+
+# In asc606_analyzer.py, inside the analyze_contract method
+
+# ... after memo sections are generated ...
+
+            # FIXED: Remove # from title and format properly
+            memo_header = f"""# TECHNICAL ACCOUNTING MEMORANDUM
+
+**TO:** {getattr(contract_data, 'memo_audience', 'Technical Accounting Team / Audit File')}  
+**FROM:** ASC 606 AI Analyst
+**DATE:** {datetime.now().strftime('%B %d, %Y')}  
+**RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}\n\n\n
+"""
+
+            separator = "\n\n---\n\n"
+
+            final_memo_sections = [
+                memo_header,
+                f"## 1. EXECUTIVE SUMMARY\n{executive_summary}", # <-- Uses ## 1.
+                separator,
+                f"## 2. CONTRACT OVERVIEW\n{contract_data_table}\n{background}", # <-- Uses ## 2.
+                separator,
+                f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}", # <-- Uses ## 3.
+                separator,
+                f"## 4. KEY PROFESSIONAL JUDGMENTS\n{key_judgments}", # <-- Uses ## 4.
+                separator,
+                f"## 5. FINANCIAL IMPACT ASSESSMENT\n{financial_impact}", # <-- Uses ## 5.
+                separator,
+                f"## 6. CONCLUSION\n{conclusion}", # <-- Uses ## 6.
+                separator,
+                # ... footer ...
+            ]
+
+            final_memo = "\n\n".join(final_memo_sections)
+
+As you can see, the headers are hardcoded with numbers and markdown (##). Meanwhile, the detailed_analysis variable is built from the format_step_detail_as_markdown function, which uses a different format (### Step X: ...). This is where the inconsistency comes from.
+
+Proposed Changes
+We will standardize all section headers directly within the final_memo_sections list. We will adopt the ## X. SECTION NAME format for all top-level sections for a clean, consistent, and professional look.
+
+Here are the step-by-step instructions:
+
+Open the file: asc606_analyzer.py
+Navigate to the analyze_contract method.
+Locate the final_memo_sections list near the end of the method.
+Modify this list to apply a consistent header format to every section.
+This is the section of code you need to modify:
+
+# CODE SECTION TO MODIFY:
+            final_memo_sections = [
+                memo_header,
+                f"## 1. EXECUTIVE SUMMARY\n{executive_summary}",
+                separator,
+                f"## 2. CONTRACT OVERVIEW\n{contract_data_table}\n{background}",
+                separator,
+                f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}",
+                separator,
+                f"## 4. KEY PROFESSIONAL JUDGMENTS\n{key_judgments}",
+                separator,
+                f"## 5. FINANCIAL IMPACT ASSESSMENT\n{financial_impact}",
+                separator,
+                f"## 6. CONCLUSION\n{conclusion}",
+                separator,
+                f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
+            ]
+
+Instruction: Update the list as shown below. The main change is standardizing all headers to ## X. SECTION NAME IN ALL CAPS.
+
+# NEW, IMPROVED CODE SECTION:
+            final_memo_sections = [
+                memo_header,
+                f"## 1. EXECUTIVE SUMMARY\n{executive_summary}",
+                separator,
+                f"## 2. CONTRACT OVERVIEW\n{contract_data_table}\n{background}",
+                separator,
+                f"## 3. DETAILED ASC 606 ANALYSIS\n{detailed_analysis}",
+                separator,
+                f"## 4. KEY PROFESSIONAL JUDGMENTS\n{key_judgments}",
+                separator,
+                f"## 5. FINANCIAL IMPACT ASSESSMENT\n{financial_impact}",
+                separator,
+                f"## 6. CONCLUSION\n{conclusion}",
+                separator,
+                f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
+            ]
+
+At the same time, we need to adjust the format_step_detail_as_markdown functions in step_prompts.py so they format their sub-headers consistently as ### Step X: ... (using H3 markdown instead of H2).
+
+This change has two parts.
+
+Part 1: Modify step_prompts.py
+
+In step_prompts.py, find every function that formats markdown and ensure the step headers use ### (H3) instead of ## (H2). This applies to _format_step3_with_filtering and any other similar formatting functions.
+
+Instruction: In the _format_step3_with_filtering function (and any other _format_stepX functions), change the first line inside the markdown_sections list.
+
+# In _format_step3_with_filtering in step_prompts.py
+
+# BEFORE THE CHANGE:
+        markdown_sections = [
+            f"## Step 3: {step_name}", f"**Conclusion:**\n{conclusion}", #...
+
+# AFTER THE CHANGE:
+        markdown_sections = [
+            f"### Step 3: {step_name}", f"**Conclusion:**\n{conclusion}", #...
+
+You will need to make this change for each of the _format_... helper functions (_format_step2_with_filtering, _format_general_step_with_filtering).
+
+By making these two sets of changes, you ensure that main sections are H2 (##) and the five steps within the "Detailed Analysis" section are consistently formatted as sub-sections (H3 or ###), creating a clean visual hierarchy in the final document.
