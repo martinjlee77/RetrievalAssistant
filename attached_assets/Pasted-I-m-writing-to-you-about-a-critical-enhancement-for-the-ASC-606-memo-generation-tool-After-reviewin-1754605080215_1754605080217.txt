@@ -1,0 +1,70 @@
+I'm writing to you about a critical enhancement for the ASC 606 memo generation tool. After reviewing some recent outputs, we've identified an opportunity to significantly improve the accuracy and reliability of the financial figures, specifically the transaction price and the illustrative journal entries.
+
+The Core Problem
+
+Currently, the application relies on the LLM to perform mathematical calculations (like summing fees and calculating monthly revenue). While powerful, LLMs can be unreliable with arithmetic, leading to occasional but critical errors in the final memo. For an accounting tool, we need 100% accuracy on these figures.
+
+The Solution: The "Extract-Then-Calculate" Pattern
+
+To solve this, we're going to implement a two-stage hybrid workflow. The goal is to separate responsibilities: the LLM will interpret text, and our Python code will handle all math and logic.
+
+Here's the plan:
+
+Stage 1: AI Extracts Fee Components into a Structured JSON
+
+Task: We need to create a new, focused LLM call. Its only job is to read the source contract text and extract all relevant fee components into a structured JSON object. It should not perform any calculations.
+Example Prompt for this new LLM call:
+You are a data extraction bot. Read the provided contract text. Your ONLY job is to extract the fee components and return a JSON object. Do not add, subtract, or calculate anything. If a value is not present, use null.
+
+CONTRACT TEXT:
+"...{contract_text}..."
+
+JSON TO POPULATE:
+{
+  "fee_components": [
+    // Array of objects, one for each fee component
+  ]
+}
+
+Example JSON Output from this call:
+{
+  "fee_components": [
+    { "name": "Logi-AI Suite SaaS License", "amount": 240000, "period": "year", "duration": 3, "notes": "From SOW 2.1" },
+    { "name": "Hardware (OptiScan-7 Scanners)", "amount": 50000, "period": "one-time", "notes": "From SOW 2.2. Post-discount." },
+    { "name": "Professional Services", "amount": 75000, "period": "one-time", "notes": "From SOW 2.3. Post-discount." },
+    { "name": "Performance Bonus", "amount": 30000, "period": "contingent", "notes": "From SOW 2.4. Probability is 80%." }
+  ]
+}
+
+Stage 2: Python Calculates the Final Figures
+
+Task: Once we have the structured JSON from Stage 1, our Python code in asc606_analyzer.py will parse this object to perform all calculations and logical decisions.
+Implementation Steps:
+Receive the JSON from the "Extractor" call.
+Loop through the fee_components.
+Calculate the total_fixed_consideration.
+Apply logic to determine the probable_variable_consideration (e.g., if "contingent" and probability > 50%).
+Calculate the final total_transaction_price.
+Calculate any necessary revenue recognition amounts (e.g., monthly_saas_revenue = total_saas_fee / term_months).
+Store all these final, correct figures in a Python dictionary (e.g., financial_facts).
+Stage 3: Inject Pre-Calculated Facts into Existing Prompts
+
+Task: We will modify the existing prompt for the "Financial Impact" section. Instead of asking it to figure out the numbers, we will provide the pre-calculated numbers from financial_facts and instruct the LLM to use them.
+Example of the Modified Prompt:
+You are an expert accountant creating illustrative journal entries. Use the PRE-CALCULATED figures below to populate a Markdown table. Do NOT perform any calculations yourself. Use these exact numbers.
+
+### PRE-CALCULATED FACTS ###
+- Total Fixed Consideration (for initial A/R): ${financial_facts['fixed_consideration']}
+- Monthly SaaS Revenue Recognition: ${financial_facts['monthly_saas_revenue']}
+// etc.
+
+### YOUR TASK ###
+Create a Markdown table for the key journal entries using the figures provided above.
+
+Expected Outcome
+
+This enhancement will make our application's financial outputs completely reliable and accurate, eliminating calculation errors and ensuring the generated memos are audit-ready.
+
+Please let me know if you have any questions about this approach. I'm happy to discuss it further.
+
+Thanks,
