@@ -615,6 +615,10 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
 
         critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
 
+        # NEW: Format lists as proper markdown bullet points
+        recognition_list_str = "\n".join([f"  - {item}" for item in recognition_methods]) if recognition_methods else "  - None applicable"
+        judgments_list_str = "\n".join([f"  - {item}" for item in critical_judgments]) if critical_judgments else "  - None identified"
+
         return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo.
 
 ANALYSIS CONTEXT:
@@ -646,8 +650,10 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
 - **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 - **Allocation:** {allocation_method}
-- **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
-- **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+- **Revenue Recognition:**
+{recognition_list_str}
+- **Critical Judgments:**
+{judgments_list_str}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
