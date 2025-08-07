@@ -10,7 +10,6 @@ Critical Development Rules - Prompt Protection:
 2. ALWAYS ask permission before changing any prompt text or templates.
 3. Protected files requiring user approval for content changes:
    - `utils/step_prompts.py` (all prompt methods)
-   - `utils/prompt.py` (all template content)
    - `pages/asc606.py` (form labels, help text, user-facing content)
    - Any file containing user-facing text or analysis instructions.
 4. Safe technical changes (no approval needed): Bug fixes to code logic/structure, adding missing methods/functions, performance improvements, import statements and technical infrastructure.
@@ -44,6 +43,9 @@ Critical Development Rules - Prompt Protection:
 - **System/User Prompt Architecture**: Implemented a modular system/user prompt architecture, separating core AI instructions (system prompts) from task-specific context (user prompts) for each ASC 606 step. LLM integration handles message arrays.
 - **Judgment Consistency**: Implemented a shared `_filter_genuine_judgments()` function to ensure consistent filtering logic for judgments across executive summary, conclusion, and key professional judgments sections. Enhanced Key Professional Judgments prompt with structured data extraction from all 5 steps, providing complexity indicators and contextual evaluation criteria for more accurate judgment significance assessment.
 - **Executive Summary Enhancement**: Restructured executive summary to eliminate redundancy between OVERALL CONCLUSION (strategic narrative) and KEY FINDINGS (scannable dashboard). Implemented "ASC 606 Contract Exists: Yes/No" terminology and professional role separation aligned with Big 4 audit documentation standards. Added comprehensive data extraction for all Key Findings items (contract status, performance obligations, transaction price, allocation method, recognition methods, and filtered critical judgments) to ensure consistency with other system prompts and eliminate unreliable LLM improvisation.
+- **Knowledge Hierarchy System**: Enhanced all prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretative Guidance) and IAC framework for professional judgment defensibility.
+- **GPT-5 Integration**: Updated to use GPT-5 model for enhanced analysis quality (August 2025 release).
+- **Legacy Code Cleanup**: Removed unused `utils/prompt.py` file - system now fully consolidated on `utils/step_prompts.py`.
 
 ### File Structure
 ```
@@ -56,8 +58,8 @@ Critical Development Rules - Prompt Protection:
 │   └── images/
 │       └── logo.png                      # Controller.cpa logo
 ├── utils/                                # Core utilities
-│   ├── llm.py                            # OpenAI API calls, knowledge base, debugging tools
-│   ├── prompt.py                         # Centralized prompt templates
+│   ├── llm.py                            # OpenAI API calls, knowledge base, debugging tools (GPT-5)
+│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy
 │   ├── auth.py                           # Authentication utilities (placeholder)
 │   ├── document_extractor.py             # Multi-format document processing
 │   └── asc606_analyzer.py                # Consolidated ASC 606 hybrid analyzer

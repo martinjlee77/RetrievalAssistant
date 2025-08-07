@@ -18,7 +18,6 @@ from openai import OpenAI
 from core.models import ASC606Analysis
 from utils.llm import make_llm_call, make_llm_call_async, extract_contract_terms
 from core.knowledge_base import get_knowledge_base_manager
-from utils.prompt import ASC606PromptTemplates
 from utils.step_prompts import StepPrompts
 # Note: streamlit imported dynamically where needed to avoid import errors
 

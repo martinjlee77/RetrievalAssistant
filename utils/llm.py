@@ -27,7 +27,7 @@ async def make_llm_call_async(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -65,7 +65,7 @@ def make_llm_call(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -118,7 +118,7 @@ def handle_llm_error(error: Exception):
 def cached_llm_call(
     prompt: str, 
     system_message: str = None,
-    model: str = "gpt-4o",
+    model: str = "gpt-5",
     temperature: float = 0.3
 ) -> Optional[str]:
     """
@@ -135,7 +135,7 @@ def cached_llm_call(
 
 def stream_llm_response(
     messages: List[Dict[str, str]], 
-    model: str = "gpt-4o",
+    model: str = "gpt-5",
     temperature: float = 0.3
 ):
     """
@@ -168,8 +168,8 @@ def stream_llm_response(
 def get_model_options() -> Dict[str, str]:
     """Get available model options for debugging UI"""
     return {
-        "GPT-4o (Latest)": "gpt-4o",
-        "GPT-4o Mini": "gpt-4o-mini",
+        "GPT-5 (Latest)": "gpt-5",
+        "GPT-5 Mini": "gpt-5-mini",
         "GPT-4 Turbo": "gpt-4-turbo-preview"
     }
 
@@ -248,7 +248,7 @@ def extract_contract_terms(client, contract_text: str, step_context: str = "comp
         response = make_llm_call(
             client=client,
             messages=messages,  # Pass the new messages list
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             max_tokens=200,
             temperature=0.3
         )
@@ -271,7 +271,7 @@ def validate_api_key() -> bool:
         # Test with minimal API call
         openai_messages = cast(List[Any], [{"role": "user", "content": "test"}])
         client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             messages=openai_messages,
             max_tokens=5
         )
