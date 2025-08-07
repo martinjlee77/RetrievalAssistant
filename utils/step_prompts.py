@@ -189,7 +189,136 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
 
         return rules.get(step_number, "")
 
+    @staticmethod
+    def _get_enhanced_financial_impact_prompt_with_facts(
+            s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, 
+            customer_name: str, memo_audience: str, contract_data, financial_facts: dict) -> str:
+        """Enhanced financial impact prompt using pre-calculated financial facts for accuracy."""
+        import json
+        
+        # Extract performance obligations for journal entry context
+        performance_obligations = []
+        if s2_analysis := s2.get('step2_analysis'):
+            if s2_pos := s2_analysis.get('performance_obligations'):
+                performance_obligations = [
+                    po.get('po_description', 'Unknown PO') for po in s2_pos
+                ]
+        
+        # Extract revenue recognition methods
+        recognition_methods = []
+        if s5_analysis := s5.get('step5_analysis'):
+            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
+                recognition_methods = [(po.get('performance_obligation', 'Unknown'),
+                                       po.get('recognition_method', 'Unknown'),
+                                       po.get('measure_of_progress', 'Unknown'))
+                                      for po in s5_plan]
+        
+        # Determine complexity based on multiple POs and variable consideration
+        is_complex = (len(performance_obligations) > 1 or 
+                     financial_facts.get('variable_consideration', 0) > 0)
+        
+        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
+
+PRE-CALCULATED FINANCIAL FACTS (Use These Exact Numbers):
+- Fixed Consideration: ${financial_facts['fixed_consideration']:,.2f}
+- Variable Consideration: ${financial_facts['variable_consideration']:,.2f}
+- Total Transaction Price: ${financial_facts['total_transaction_price']:,.2f}
+- Monthly SaaS Revenue: ${financial_facts.get('monthly_saas_revenue', 0):,.2f}
+- SaaS Term: {financial_facts.get('saas_term_months', 0)} months
+- Component Details: {json.dumps(financial_facts.get('component_details', []), indent=2)}
+
+CONTRACT ANALYSIS CONTEXT:
+- Performance Obligations: {len(performance_obligations)} - {', '.join(performance_obligations)}
+- Revenue Recognition Methods: {recognition_methods}
+- Transaction Complexity: {'Complex' if is_complex else 'Simple'}
+
+YOUR TASK:
+Write a concise financial impact analysis using the PRE-CALCULATED FINANCIAL FACTS above. DO NOT recalculate any amounts.
+
+**CRITICAL RULE: Be Proportional.**
+- **For SIMPLE transactions**: Provide a brief summary and one journal entry
+- **For COMPLEX transactions**: Provide detailed analysis with multiple journal entries
+
+**CRITICAL TAX RULE:** Since tax rates are not specified, OMIT sales tax from journal entries and state that entries exclude applicable sales tax.
+
+**FOR COMPLEX TRANSACTIONS, use this structure:**
+
+1. **Financial Statement Impact:** Describe impact on income statement and balance sheet.
+
+2. **Illustrative Journal Entries:** Provide balanced entries using the exact amounts above:
+
+**Contract Inception:**
+| Date | Account | Debit | Credit |
+|------|---------|-------|--------|
+| [Date] | Cash/Accounts Receivable | ${financial_facts['total_transaction_price']:,.2f} | |
+| | Deferred Revenue | | ${financial_facts['total_transaction_price']:,.2f} |
+| | *To record contract inception* | | |
+
+**Monthly SaaS Revenue Recognition (if applicable):**
+| Date | Account | Debit | Credit |
+|------|---------|-------|--------|
+| [Date] | Deferred Revenue | ${financial_facts.get('monthly_saas_revenue', 0):,.2f} | |
+| | Revenue - SaaS License | | ${financial_facts.get('monthly_saas_revenue', 0):,.2f} |
+| | *To recognize monthly SaaS revenue* | | |
+
+**Point-in-Time Revenue Recognition (for hardware/services):**
+[Include entries for non-SaaS components at their allocated amounts]
+
+3. **Internal Control Considerations:** Mention controls needed for variable consideration tracking and performance obligation monitoring.
+
+**FOR SIMPLE TRANSACTIONS:**
+The ${financial_facts['total_transaction_price']:,.2f} will be recorded as deferred revenue and recognized [over time/at point in time] based on the analysis above.
+
+| Account | Debit | Credit |
+|---------|-------|--------|
+| Cash/Accounts Receivable | ${financial_facts['total_transaction_price']:,.2f} | |
+| Deferred Revenue | | ${financial_facts['total_transaction_price']:,.2f} |
+
+Begin writing the financial impact section using the exact calculated amounts provided.
+"""
+
     # --- EXISTING FUNCTIONS ---
+
+    @staticmethod
+    def get_financial_extraction_prompt(contract_text: str) -> str:
+        """Extracts structured financial data from contract text for reliable calculation."""
+        return f"""You are a financial data extraction specialist. Your ONLY job is to read the contract text and extract fee components into a structured JSON format. Do NOT perform any calculations, interpretations, or analysis.
+
+CONTRACT TEXT:
+{contract_text}
+
+YOUR TASK:
+Extract ALL fee components, pricing terms, and financial elements from the contract. For each component, identify:
+
+1. **Component Name**: The name/description of the fee (e.g., "SaaS License", "Professional Services", "Hardware", "Performance Bonus")
+2. **Base Amount**: The numerical amount mentioned (do not multiply or calculate)
+3. **Period**: The billing period ("annual", "monthly", "quarterly", "one-time", "contingent", "usage-based")
+4. **Duration**: Number of periods (e.g., 3 for a 3-year license)
+5. **Is Variable**: true if the amount depends on performance, usage, or other variables; false if fixed
+6. **Probability**: For variable components only - estimate likelihood of achievement as decimal (0.0 to 1.0)
+
+IMPORTANT RULES:
+- Extract amounts EXACTLY as stated - do not calculate totals
+- If an amount is "per year for 3 years", the base_amount is the yearly amount, duration is 3, period is "annual"
+- For bonuses or incentives, set is_variable=true and period="contingent"
+- For usage-based pricing, set period="usage-based"
+- Include ALL fees: licenses, services, hardware, bonuses, penalties, etc.
+
+OUTPUT FORMAT:
+Return a JSON object with this exact structure:
+{{
+  "fee_components": [
+    {{
+      "component_name": "Name of the fee component",
+      "base_amount": 0.00,
+      "period": "annual|monthly|quarterly|one-time|contingent|usage-based",
+      "duration": 1,
+      "is_variable": false,
+      "probability": 0.8
+    }}
+  ]
+}}
+"""
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict,
@@ -200,18 +329,14 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
                                     customer_name: str,
                                     memo_audience: str,
                                     contract_data=None,
-                                    financial_facts = None) -> str:
-        """Generates proportional financial impact prompt based on structured data analysis.
-        Enhanced with pre-calculated financial facts for accurate journal entries."""
-        import json
-        
-        # HYBRID APPROACH: Use pre-calculated financial facts if available
-        if financial_facts and financial_facts.get('total_transaction_price', 0) > 0:
+                                    financial_facts=None) -> str:
+        """Generates proportional financial impact prompt based on structured data analysis."""
+        # If financial_facts are provided, use the enhanced prompt with pre-calculated data
+        if financial_facts:
             return StepPrompts._get_enhanced_financial_impact_prompt_with_facts(
-                financial_facts, customer_name, memo_audience, s1, s2, s3, s4, s5
+                s1, s2, s3, s4, s5, customer_name, memo_audience, contract_data, financial_facts
             )
-        
-        # Fallback to original method if financial_facts not available
+        import json
 
         # Extract structured data from each step
 
@@ -386,74 +511,6 @@ Write a concise financial impact analysis. Your analysis, including the narrativ
 
 Begin writing the financial impact section, strictly adhering to the proportionality rule.
 """
-
-    @staticmethod
-    def _get_enhanced_financial_impact_prompt_with_facts(
-        financial_facts: dict, customer_name: str, memo_audience: str,
-        s1: dict, s2: dict, s3: dict, s4: dict, s5: dict) -> str:
-        """Enhanced financial impact prompt using pre-calculated financial facts for accurate journal entries."""
-        
-        # Extract complexity indicators from step results for proportional response
-        po_count = len(financial_facts.get('component_details', []))
-        has_variable_consideration = financial_facts.get('variable_consideration', 0) > 0
-        
-        is_complex = (
-            po_count > 2 or 
-            has_variable_consideration or 
-            financial_facts.get('monthly_saas_revenue', 0) > 0
-        )
-        
-        # Prepare pre-calculated figures for injection
-        facts_section = f"""### PRE-CALCULATED FINANCIAL FACTS (Use These Exact Numbers) ###
-- **Total Transaction Price**: ${financial_facts['total_transaction_price']:,.2f}
-- **Fixed Consideration**: ${financial_facts['fixed_consideration']:,.2f}
-- **Variable Consideration**: ${financial_facts['variable_consideration']:,.2f}
-- **Total Cash/A/R (Initial Entry)**: ${financial_facts['total_upfront_cash']:,.2f}"""
-        
-        # Add component-specific amounts for journal entries
-        if financial_facts.get('monthly_saas_revenue', 0) > 0:
-            facts_section += f"""
-- **Monthly SaaS Revenue Recognition**: ${financial_facts['monthly_saas_revenue']:,.2f}
-- **SaaS Contract Term**: {financial_facts['saas_term_months']} months"""
-        
-        # Add component breakdowns
-        for detail in financial_facts.get('component_details', []):
-            facts_section += f"""
-- **{detail['name']} Amount**: ${detail['amount']:,.2f}"""
-        
-        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
-
-{facts_section}
-
-CRITICAL INSTRUCTIONS:
-1. **USE THE EXACT NUMBERS PROVIDED ABOVE** - Do NOT recalculate or modify these figures
-2. **DO NOT include sales tax** in journal entries (rate not specified in contract)
-3. **Ensure all journal entries balance** (Total Debits = Total Credits)
-4. **Be proportional**: {'Complex analysis required' if is_complex else 'Simple, concise treatment sufficient'}
-
-YOUR TASK:
-Write the financial impact analysis using the pre-calculated facts above.
-
-{'**FOR COMPLEX TRANSACTIONS:**' if is_complex else '**FOR SIMPLE TRANSACTIONS:**'}
-
-{'1. **Financial Statement Impact:** Narrative paragraph describing balance sheet and income statement effects' if is_complex else 'Provide a brief 1-2 sentence summary and one illustrative journal entry.'}
-
-{'2. **Illustrative Journal Entries:** Key journal entries in markdown table format:' if is_complex else 'Example:'}
-
-| Date | Account | Debit | Credit |
-|------|---------|-------|--------|
-| Contract Inception | Cash/Accounts Receivable | ${financial_facts['total_upfront_cash']:,.2f} | |
-| | Deferred Revenue | | ${financial_facts['fixed_consideration']:,.2f} |{f"
-| | Variable Consideration Liability | | ${financial_facts['variable_consideration']:,.2f} |" if has_variable_consideration else ""}
-| | *To record contract signing* | | |
-
-{'| Revenue Recognition | Deferred Revenue | [monthly amount] | |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
-{'| | Revenue | | [monthly amount] |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
-{'| | *To recognize monthly revenue* | | |' if financial_facts.get('monthly_saas_revenue', 0) > 0 else ''}
-
-{f'3. **Internal Control Considerations:** Brief mention of processes needed for accurate revenue tracking and compliance.' if is_complex else ''}
-
-**Remember**: Use the exact figures from the PRE-CALCULATED FACTS section. These amounts are mathematically verified."""
 
     @staticmethod
     def get_conclusion_prompt(s1: dict,
@@ -693,10 +750,6 @@ Begin writing the "Conclusion" section. Do not add any other text, summaries, or
 
         critical_judgments = StepPrompts._filter_genuine_judgments(all_step_judgments)
 
-        # NEW: Format lists as proper markdown bullet points
-        recognition_list_str = "\n".join([f"  - {item}" for item in recognition_methods]) if recognition_methods else "  - None applicable"
-        judgments_list_str = "\n".join([f"  - {item}" for item in critical_judgments]) if critical_judgments else "  - None identified"
-
         return f"""You are writing the Executive Summary for a professional ASC 606 technical accounting memo.
 
 ANALYSIS CONTEXT:
@@ -728,10 +781,8 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
 - **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 - **Allocation:** {allocation_method}
-- **Revenue Recognition:**
-{recognition_list_str}
-- **Critical Judgments:**
-{judgments_list_str}
+- **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
@@ -1139,13 +1190,11 @@ Begin your work. Your precision is critical.
         }
         processed_values = set()
 
-        # PRIORITY: Use structured transaction components (authoritative)
         for key, analysis_text in transaction_components.items():
             is_not_applicable = (not analysis_text or str(analysis_text).strip().lower() in ('n/a', 'not applicable', '') or
                                str(analysis_text).strip().lower().startswith('n/a') or len(str(analysis_text).strip()) < 3)
             if not is_not_applicable:
                 text_str = str(analysis_text).strip()
-                # Skip duplicate content to avoid redundancy
                 if key in ['fixed_consideration', 'total_transaction_price']:
                     if text_str in processed_values: continue
                     processed_values.add(text_str)
@@ -1153,14 +1202,8 @@ Begin your work. Your precision is critical.
                 topic_title = title_map.get(key, key.replace('_', ' ').title())
                 all_points.append({'topic_title': topic_title, 'analysis_text': analysis_text, 'evidence_quotes': []})
 
-        # SECONDARY: Only add analysis_points that don't contradict structured data
-        # Filter out any analysis_points that mention dollar amounts to prevent mathematical contradictions
         if analysis_points:
-            for point in analysis_points:
-                analysis_text = str(point.get('analysis_text', ''))
-                # Skip points that contain dollar amounts or pricing to prevent contradictions
-                if not any(indicator in analysis_text.lower() for indicator in ['$', 'dollar', 'price', 'cost', 'fee', 'amount', 'total']):
-                    all_points.append(point)
+            all_points.extend(analysis_points)
 
         if not all_points:
             markdown_sections.append("Only basic fixed consideration was identified in this contract.")
@@ -1282,61 +1325,3 @@ Begin your work. Your precision is critical.
 
         final_content = [section for section in markdown_sections if str(section).strip()]
         return "\n\n".join(final_content)
-
-    @staticmethod
-    def get_financial_extraction_prompt(contract_text: str) -> str:
-        """Extracts structured financial data from contract text for reliable calculation."""
-        return f"""You are a financial data extraction specialist. Your ONLY job is to read the contract text and extract fee components into a structured JSON format. Do NOT perform any calculations, interpretations, or analysis.
-
-CONTRACT TEXT:
-{contract_text}
-
-YOUR TASK:
-Extract all fee components mentioned in the contract and return them as a JSON object. For each component, identify:
-- component_name: The exact name/description from the contract
-- base_amount: The numerical amount (without currency symbol)
-- period: "one-time", "annual", "monthly", "quarterly", "contingent", or "usage-based"
-- duration: Number of periods (if applicable)
-- is_variable: true if contingent/uncertain, false if fixed
-- probability: Decimal between 0-1 (only for variable consideration)
-- discount_applied: Percentage or amount of discount (if mentioned)
-- notes: Any important context from the contract
-
-RETURN FORMAT:
-{{
-  "fee_components": [
-    {{
-      "component_name": "SaaS License",
-      "base_amount": 240000,
-      "period": "annual",
-      "duration": 3,
-      "is_variable": false,
-      "notes": "From section 2.1, standard rate"
-    }},
-    {{
-      "component_name": "Hardware",
-      "base_amount": 50000,
-      "period": "one-time",
-      "is_variable": false,
-      "discount_applied": "10%",
-      "notes": "From section 2.2, post-discount amount"
-    }},
-    {{
-      "component_name": "Performance Bonus",
-      "base_amount": 30000,
-      "period": "contingent",
-      "is_variable": true,
-      "probability": 0.8,
-      "notes": "From section 2.4, 80% historical achievement rate"
-    }}
-  ]
-}}
-
-CRITICAL RULES:
-1. Extract numbers EXACTLY as written - do not calculate totals
-2. If a fee is mentioned as "discounted" or "reflects a discount", note it but use the stated amount
-3. For variable consideration, extract any probability indicators (e.g., "80% of customers")
-4. Include ALL fee components, even small ones
-5. Use the exact terminology from the contract for component names
-
-Return only the JSON object, no other text."""
