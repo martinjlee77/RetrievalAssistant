@@ -297,16 +297,17 @@ def create_docx_from_text(text_content, contract_data=None):
     
     # === PHASE 1: PROFESSIONAL DOCUMENT STRUCTURE ===
     
-    # Set default font to standard system font for consistency
+    # Set default font to match HTML memo styling
     style = document.styles['Normal']
     font = style.font
-    font.name = 'Segoe UI'  # Standard professional font
-    font.size = Pt(12)
+    font.name = 'Segoe UI'  # Matches HTML system font
+    font.size = Pt(12)  # Matches HTML 12pt
+    font.color.rgb = RGBColor(0, 0, 0)  # Black text like HTML
     
-    # Configure paragraph spacing (consistent 12pt after paragraphs)
+    # Configure paragraph spacing to match HTML (12pt consistent spacing)
     paragraph_format = style.paragraph_format
-    paragraph_format.space_after = Pt(12)  # Consistent spacing
-    paragraph_format.line_spacing = 1.15
+    paragraph_format.space_after = Pt(12)  # Matches HTML consistent_spacing
+    paragraph_format.line_spacing = 1.6  # Matches HTML line_height
     
     # Set standard accounting memo margins (1" all sides)
     sections = document.sections
@@ -356,27 +357,27 @@ def create_docx_from_text(text_content, contract_data=None):
     def configure_heading_styles():
         """Configure custom heading styles with enhanced professional formatting"""
         try:
-            # Heading 1 - Main sections (matches HTML h2)
+            # Heading 1 - Main sections (matches HTML header styling)
             heading1_style = document.styles.add_style('Custom Heading 1', 1)
             heading1_style.font.name = 'Segoe UI'
-            heading1_style.font.size = Pt(14)
+            heading1_style.font.size = Pt(16)  # Matches HTML header_size
             heading1_style.font.bold = True
-            heading1_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
-            heading1_style.paragraph_format.space_before = Pt(18)
-            heading1_style.paragraph_format.space_after = Pt(8)
+            heading1_style.font.color.rgb = RGBColor(0, 0, 0)  # Black like HTML
+            heading1_style.paragraph_format.space_before = Pt(16)  # More consistent spacing
+            heading1_style.paragraph_format.space_after = Pt(12)  # Matches HTML consistent_spacing
             heading1_style.paragraph_format.keep_with_next = True
         except Exception as e:
             logging.warning(f"Could not create Custom Heading 1 style: {e}")
             
         try:
-            # Heading 2 - Subsections (matches HTML h3)
+            # Heading 2 - Subsections (matches HTML subheader styling)
             heading2_style = document.styles.add_style('Custom Heading 2', 1)
             heading2_style.font.name = 'Segoe UI'
-            heading2_style.font.size = Pt(13)
+            heading2_style.font.size = Pt(14)  # Matches HTML subheader_size
             heading2_style.font.bold = True
-            heading2_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
-            heading2_style.paragraph_format.space_before = Pt(12)
-            heading2_style.paragraph_format.space_after = Pt(6)
+            heading2_style.font.color.rgb = RGBColor(0, 0, 0)  # Black like HTML
+            heading2_style.paragraph_format.space_before = Pt(12)  # Consistent with HTML
+            heading2_style.paragraph_format.space_after = Pt(12)  # Matches HTML consistent_spacing
             heading2_style.paragraph_format.keep_with_next = True
         except Exception as e:
             logging.warning(f"Could not create Custom Heading 2 style: {e}")
@@ -765,7 +766,7 @@ def create_docx_from_text(text_content, contract_data=None):
         doc.add_paragraph()  # Add spacing after table
     
     def _add_journal_entry_list(doc, table_markdown):
-        """Convert journal entry table to professional list format for DOCX"""
+        """Convert journal entry table to clean, professional list format for DOCX"""
         lines = [line.strip() for line in table_markdown.strip().split('\n') if line.strip()]
         if len(lines) < 3:  # Need header, separator, and at least one data row
             return
@@ -791,53 +792,102 @@ def create_docx_from_text(text_content, contract_data=None):
         if not data_rows:
             return
         
-        # Group entries by transaction (assuming first column is date or transaction identifier)
-        current_transaction = None
+        # Add section header for journal entries
+        header_para = doc.add_paragraph()
+        header_para.paragraph_format.space_before = Pt(6)
+        header_para.paragraph_format.space_after = Pt(12)
+        header_run = header_para.add_run("Illustrative Journal Entries")
+        header_run.font.name = 'Segoe UI'
+        header_run.font.bold = True
+        header_run.font.size = Pt(13)
+        
+        # Group entries by transaction date
+        current_date = None
+        transaction_total_debit = 0
+        transaction_total_credit = 0
         
         for row in data_rows:
-            if len(row) < 4:  # Need at least Date, Account, Debit, Credit
+            if len(row) < 3:  # Need at least Date, Account, and one amount
                 continue
                 
-            date_val = row[0] if row[0] and row[0] != current_transaction else ""
+            date_val = row[0] if row[0] and '[date]' not in row[0].lower() else "Contract Date"
             account = row[1] if len(row) > 1 else ""
             debit = row[2] if len(row) > 2 else ""
             credit = row[3] if len(row) > 3 else ""
             description = row[4] if len(row) > 4 else ""
             
+            # Skip empty rows or description-only rows
+            if not account or account.lower().startswith('to record'):
+                continue
+            
             # Start new transaction entry
-            if date_val and date_val != current_transaction:
-                if current_transaction:  # Add spacing between transactions
-                    doc.add_paragraph()
+            if date_val != current_date:
+                # Close previous transaction with totals if needed
+                if current_date and (transaction_total_debit > 0 or transaction_total_credit > 0):
+                    doc.add_paragraph()  # Spacing between transactions
                 
-                current_transaction = date_val
-                # Transaction header
-                header_para = doc.add_paragraph()
-                header_run = header_para.add_run(f"Journal Entry - {date_val}:")
-                header_run.font.name = 'Segoe UI'
-                header_run.font.bold = True
-                header_run.font.size = Pt(12)
+                current_date = date_val
+                transaction_total_debit = 0
+                transaction_total_credit = 0
+                
+                # Transaction date header
+                date_para = doc.add_paragraph()
+                date_para.paragraph_format.space_before = Pt(12)
+                date_para.paragraph_format.space_after = Pt(6)
+                date_run = date_para.add_run(f"{date_val}:")
+                date_run.font.name = 'Segoe UI'
+                date_run.font.bold = True
+                date_run.font.size = Pt(11)
             
-            # Format the journal entry line
+            # Clean up amounts
+            debit_clean = debit.strip().replace('$', '').replace(',', '') if debit and debit.strip() and debit.strip() != '-' else ''
+            credit_clean = credit.strip().replace('$', '').replace(',', '') if credit and credit.strip() and credit.strip() != '-' else ''
+            
+            # Format journal entry line
             entry_para = doc.add_paragraph()
-            entry_para.paragraph_format.left_indent = Inches(0.25)
+            entry_para.paragraph_format.left_indent = Inches(0.3)
+            entry_para.paragraph_format.space_after = Pt(3)
             
-            # Build the entry line with proper accounting format
-            if debit and debit.strip() and debit.strip() != "$0" and debit.strip() != "-":
+            # Create clean, readable format
+            if debit_clean:
                 # Debit entry
-                entry_text = f"Dr. {account:<30} {debit:>12}"
-            elif credit and credit.strip() and credit.strip() != "$0" and credit.strip() != "-":
+                amount_formatted = f"${debit_clean}" if not debit.startswith('$') else debit
+                entry_line = f"{account:<40} {amount_formatted:>12}"
+                # Track totals
+                try:
+                    transaction_total_debit += float(debit_clean)
+                except (ValueError, TypeError):
+                    pass
+            elif credit_clean:
                 # Credit entry (indented)
-                entry_text = f"     Cr. {account:<26} {credit:>12}"
+                amount_formatted = f"${credit_clean}" if not credit.startswith('$') else credit
+                entry_line = f"    {account:<36} {amount_formatted:>12}"
+                # Track totals
+                try:
+                    transaction_total_credit += float(credit_clean)
+                except (ValueError, TypeError):
+                    pass
             else:
-                # Description or other line
-                entry_text = f"   *{account}*" if account else ""
+                # No amount, just account name
+                entry_line = f"{account}"
             
-            if entry_text:
-                entry_run = entry_para.add_run(entry_text)
-                entry_run.font.name = 'Courier New'  # Monospace for alignment
-                entry_run.font.size = Pt(11)
+            # Add the formatted line
+            if entry_line.strip():
+                entry_run = entry_para.add_run(entry_line)
+                entry_run.font.name = 'Consolas'  # Clean monospace font
+                entry_run.font.size = Pt(10)
+                entry_run.font.color.rgb = RGBColor(0, 0, 0)
         
-        doc.add_paragraph()  # Add spacing after journal entries
+        # Add final spacing
+        doc.add_paragraph()
+        
+        # Add note about entries format
+        note_para = doc.add_paragraph()
+        note_run = note_para.add_run("Note: Journal entries exclude applicable sales tax and are presented for illustrative purposes.")
+        note_run.font.name = 'Segoe UI'
+        note_run.font.size = Pt(9)
+        note_run.font.italic = True
+        note_run.font.color.rgb = RGBColor(64, 64, 64)
 
     # === ENHANCED RULE-BASED PARSING LOOP ===
     for line in lines:
