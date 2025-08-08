@@ -152,9 +152,31 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
 - You MUST create a corresponding `analysis_points` entry for each of the five criteria.
 </CRITICAL_INSTRUCTION>""",
             2: """<CRITICAL_INSTRUCTION>
-- If no distinct performance obligations are found, `performance_obligations` MUST be an empty list `[]`, and you must explain why in the `analysis_points`. But an genuine ASC 606 contract should have at least one performance obligation.
-- For simple contracts with one obvious performance obligation, keep the analysis concise but complete.
-- Focus on the "separately identifiable" (also called "distinct within the context of the contract") criterion, as it is often the most decisive factor.
+Your analysis for this step must be exceptionally thorough. You will emulate the analytical style found in the ASC 606-10-55 implementation guidance (Example 11).
+
+Your final output must be in the `analysis_points` array. For EACH promised good or service (e.g., SaaS, Hardware, Services), you MUST create a distinct "topic_title" and the corresponding "analysis_text" MUST follow this exact three-part structure:
+
+**1. Assessment Against 606-10-25-19(a) (Benefit on its own):**
+- State whether the customer can benefit from the good/service either on its own or with other readily available resources.
+- Provide a brief justification. For example: "The customer can benefit from the hardware on its own by reselling it, or with other resources like third-party software."
+
+**2. Assessment Against 606-10-25-19(b) (Separately Identifiable):**
+- This section must explicitly evaluate the three factors from ASC 606-10-25-21.
+- **(i) Significant Integration Service:** Analyze whether you are providing a significant service of integrating the items into a combined output. Quote from the SOW and explain *why* this service is (or is not) significant. In your reasoning, you MUST directly address phrases from the SOW like "required for optimal use."
+- **(ii) Significant Modification:** Analyze whether one promised good/service significantly modifies or customizes another.
+- **(iii) Highly Interdependent/Interrelated:** Analyze whether the goods/services are highly dependent on each other. Explain *why* the entity would (or would not) be able to fulfill its promise to transfer one item independently of the others.
+- **(iv) Conclusion on Separately Identifiable:** Based on the three factors above, conclude whether the promise is distinct within the context of the contract.
+
+**3. Overall Conclusion on Distinctness:**
+- Based on the complete assessment above, identify the final performance obligation. For example: "On the basis of this assessment, the entity identifies the Hardware as a distinct performance obligation."
+
+**META-EXAMPLE OF DESIRED OUTPUT STYLE:**
+
+*Incorrect (too shallow):* "The hardware is distinct because title transfers at delivery."
+
+*Correct (in-depth, emulating the guidance):*
+"The entity determines that its promises to transfer the equipment and to provide the installation services are each separately identifiable. In making this determination, the entity considers the factors in 606-10-25-21. a) The entity is not providing a significant integration service because the entity would be able to fulfill its promise to transfer the equipment separately from its promise to subsequently install it. b) The installation services will not significantly modify the equipment. c) Although the customer can only benefit from the installation after receiving the equipment, the items are not highly interdependent because the equipment and services do not significantly affect each other. Therefore, the promise to provide the hardware is separately identifiable."
+
 </CRITICAL_INSTRUCTION>
 """,
             3: """<CRITICAL_INSTRUCTION>
@@ -162,13 +184,31 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
 - Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.
 </CRITICAL_INSTRUCTION>""",
             4: """<CRITICAL_INSTRUCTION>
-- If there is only one performance obligation identified in Step 2, the `analysis_points` array MUST be empty `[]`. The `step4_overall_conclusion` is sufficient.
-- Do NOT re-identify or re-analyze performance obligations or the transaction price in this step. Simply reference the POs from Step 2.
+Your analysis of price allocation must clearly state the principles that will be applied.
+
+1.  **Allocation Basis:** State that the total transaction price must be allocated to each performance obligation based on its relative Standalone Selling Price (SSP), as required by ASC 606-10-32-28.
+
+2.  **SSP Source:** Briefly mention that determining SSP may require analyzing data outside of the contract, such as standalone sales data or other estimation methods (market assessment, cost-plus, residual) if an observable price is not available.
+
+3.  **Discount Allocation:** If a discount exists, explicitly state how it should be allocated. Per ASC 606-10-32-37, if the discount does not relate to one specific PO, it should be allocated proportionally to all POs.
+
+Your role is to frame the necessary analysis, not to perform external market research.
+
 </CRITICAL_INSTRUCTION>""",
             5: """<CRITICAL_INSTRUCTION>
-- You MUST provide detailed analysis in both the `revenue_recognition_plan` and `analysis_points`. Do not use shortcuts like "No additional analysis required".
-- The `revenue_recognition_plan` must include a specific `recognition_justification` for each PO, citing which ASC 606-10-25-27 criterion is met for 'Over Time' recognition.
-- You must include a `measure_of_progress_analysis` explaining the method used (e.g., straight-line, input/output).
+Your analysis of revenue recognition timing must be precise and directly reference the authoritative guidance. For EACH performance obligation, your analysis MUST clearly state:
+
+1.  **Recognition Method:** State "Over Time" or "Point in Time".
+
+2.  **Recognition Justification (The most important part):**
+    *   **If "Over Time":** You MUST state which of the three criteria in ASC 606-10-25-27 is met and why.
+        - (a) Customer simultaneously receives and consumes the benefits.
+        - (b) The entity's performance creates or enhances an asset the customer controls.
+        - (c) The performance does not create an asset with an alternative use, and the entity has an enforceable right to payment for performance completed to date.
+    *   **If "Point in Time":** You MUST describe the specific event that signifies the transfer of control, referencing the indicators in ASC 606-10-25-30 (e.g., customer has legal title, physical possession, significant risks and rewards, etc.).
+
+3.  **Measure of Progress (for "Over Time" only):** If recognition is Over Time, describe the method used to measure progress (e.g., straight-line, output method like milestones, or input method like hours incurred) and justify why it best depicts the transfer of control.
+
 </CRITICAL_INSTRUCTION>"""
         }
 
@@ -189,136 +229,7 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
 
         return rules.get(step_number, "")
 
-    @staticmethod
-    def _get_enhanced_financial_impact_prompt_with_facts(
-            s1: dict, s2: dict, s3: dict, s4: dict, s5: dict, 
-            customer_name: str, memo_audience: str, contract_data, financial_facts: dict) -> str:
-        """Enhanced financial impact prompt using pre-calculated financial facts for accuracy."""
-        import json
-        
-        # Extract performance obligations for journal entry context
-        performance_obligations = []
-        if s2_analysis := s2.get('step2_analysis'):
-            if s2_pos := s2_analysis.get('performance_obligations'):
-                performance_obligations = [
-                    po.get('po_description', 'Unknown PO') for po in s2_pos
-                ]
-        
-        # Extract revenue recognition methods
-        recognition_methods = []
-        if s5_analysis := s5.get('step5_analysis'):
-            if s5_plan := s5_analysis.get('revenue_recognition_plan'):
-                recognition_methods = [(po.get('performance_obligation', 'Unknown'),
-                                       po.get('recognition_method', 'Unknown'),
-                                       po.get('measure_of_progress', 'Unknown'))
-                                      for po in s5_plan]
-        
-        # Determine complexity based on multiple POs and variable consideration
-        is_complex = (len(performance_obligations) > 1 or 
-                     financial_facts.get('variable_consideration', 0) > 0)
-        
-        return f"""You are a corporate controller writing the "Financial Impact" section of an ASC 606 memo.
-
-PRE-CALCULATED FINANCIAL FACTS (Use These Exact Numbers):
-- Fixed Consideration: ${financial_facts['fixed_consideration']:,.2f}
-- Variable Consideration: ${financial_facts['variable_consideration']:,.2f}
-- Total Transaction Price: ${financial_facts['total_transaction_price']:,.2f}
-- Monthly SaaS Revenue: ${financial_facts.get('monthly_saas_revenue', 0):,.2f}
-- SaaS Term: {financial_facts.get('saas_term_months', 0)} months
-- Component Details: {json.dumps(financial_facts.get('component_details', []), indent=2)}
-
-CONTRACT ANALYSIS CONTEXT:
-- Performance Obligations: {len(performance_obligations)} - {', '.join(performance_obligations)}
-- Revenue Recognition Methods: {recognition_methods}
-- Transaction Complexity: {'Complex' if is_complex else 'Simple'}
-
-YOUR TASK:
-Write a concise financial impact analysis using the PRE-CALCULATED FINANCIAL FACTS above. DO NOT recalculate any amounts.
-
-**CRITICAL RULE: Be Proportional.**
-- **For SIMPLE transactions**: Provide a brief summary and one journal entry
-- **For COMPLEX transactions**: Provide detailed analysis with multiple journal entries
-
-**CRITICAL TAX RULE:** Since tax rates are not specified, OMIT sales tax from journal entries and state that entries exclude applicable sales tax.
-
-**FOR COMPLEX TRANSACTIONS, use this structure:**
-
-1. **Financial Statement Impact:** Describe impact on income statement and balance sheet.
-
-2. **Illustrative Journal Entries:** Provide balanced entries using the exact amounts above:
-
-**Contract Inception:**
-| Date | Account | Debit | Credit |
-|------|---------|-------|--------|
-| [Date] | Cash/Accounts Receivable | ${financial_facts['total_transaction_price']:,.2f} | |
-| | Deferred Revenue | | ${financial_facts['total_transaction_price']:,.2f} |
-| | *To record contract inception* | | |
-
-**Monthly SaaS Revenue Recognition (if applicable):**
-| Date | Account | Debit | Credit |
-|------|---------|-------|--------|
-| [Date] | Deferred Revenue | ${financial_facts.get('monthly_saas_revenue', 0):,.2f} | |
-| | Revenue - SaaS License | | ${financial_facts.get('monthly_saas_revenue', 0):,.2f} |
-| | *To recognize monthly SaaS revenue* | | |
-
-**Point-in-Time Revenue Recognition (for hardware/services):**
-[Include entries for non-SaaS components at their allocated amounts]
-
-3. **Internal Control Considerations:** Mention controls needed for variable consideration tracking and performance obligation monitoring.
-
-**FOR SIMPLE TRANSACTIONS:**
-The ${financial_facts['total_transaction_price']:,.2f} will be recorded as deferred revenue and recognized [over time/at point in time] based on the analysis above.
-
-| Account | Debit | Credit |
-|---------|-------|--------|
-| Cash/Accounts Receivable | ${financial_facts['total_transaction_price']:,.2f} | |
-| Deferred Revenue | | ${financial_facts['total_transaction_price']:,.2f} |
-
-Begin writing the financial impact section using the exact calculated amounts provided.
-"""
-
     # --- EXISTING FUNCTIONS ---
-
-    @staticmethod
-    def get_financial_extraction_prompt(contract_text: str) -> str:
-        """Extracts structured financial data from contract text for reliable calculation."""
-        return f"""You are a financial data extraction specialist. Your ONLY job is to read the contract text and extract fee components into a structured JSON format. Do NOT perform any calculations, interpretations, or analysis.
-
-CONTRACT TEXT:
-{contract_text}
-
-YOUR TASK:
-Extract ALL fee components, pricing terms, and financial elements from the contract. For each component, identify:
-
-1. **Component Name**: The name/description of the fee (e.g., "SaaS License", "Professional Services", "Hardware", "Performance Bonus")
-2. **Base Amount**: The numerical amount mentioned (do not multiply or calculate)
-3. **Period**: The billing period ("annual", "monthly", "quarterly", "one-time", "contingent", "usage-based")
-4. **Duration**: Number of periods (e.g., 3 for a 3-year license)
-5. **Is Variable**: true if the amount depends on performance, usage, or other variables; false if fixed
-6. **Probability**: For variable components only - estimate likelihood of achievement as decimal (0.0 to 1.0)
-
-IMPORTANT RULES:
-- Extract amounts EXACTLY as stated - do not calculate totals
-- If an amount is "per year for 3 years", the base_amount is the yearly amount, duration is 3, period is "annual"
-- For bonuses or incentives, set is_variable=true and period="contingent"
-- For usage-based pricing, set period="usage-based"
-- Include ALL fees: licenses, services, hardware, bonuses, penalties, etc.
-
-OUTPUT FORMAT:
-Return a JSON object with this exact structure:
-{{
-  "fee_components": [
-    {{
-      "component_name": "Name of the fee component",
-      "base_amount": 0.00,
-      "period": "annual|monthly|quarterly|one-time|contingent|usage-based",
-      "duration": 1,
-      "is_variable": false,
-      "probability": 0.8
-    }}
-  ]
-}}
-"""
 
     @staticmethod
     def get_financial_impact_prompt(s1: dict,
@@ -328,14 +239,8 @@ Return a JSON object with this exact structure:
                                     s5: dict,
                                     customer_name: str,
                                     memo_audience: str,
-                                    contract_data=None,
-                                    financial_facts=None) -> str:
+                                    contract_data=None) -> str:
         """Generates proportional financial impact prompt based on structured data analysis."""
-        # If financial_facts are provided, use the enhanced prompt with pre-calculated data
-        if financial_facts:
-            return StepPrompts._get_enhanced_financial_impact_prompt_with_facts(
-                s1, s2, s3, s4, s5, customer_name, memo_audience, contract_data, financial_facts
-            )
         import json
 
         # Extract structured data from each step
@@ -670,9 +575,14 @@ STRUCTURED ANALYSIS DATA:
 - Transaction Complexity: {complexity_summary}
 
 YOUR TASK:
-Write a final concluding paragraph. Reaffirm that the accounting treatment outlined in the memo is appropriate because it is based on a rigorous application of the 5-step model and the knowledge hierarchy (analyzing the specific contract against authoritative and interpretative guidance).
+Write a final concluding paragraph. Your paragraph must:
 
-**CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.**
+1.  Reaffirm that the accounting treatment outlined in the memo is appropriate and in accordance with ASC 606.
+2.  Briefly summarize the key revenue recognition approach (e.g., "revenue for the SaaS is recognized over time, while hardware is at a point in time").
+3.  If significant judgments were made, you MUST briefly reference them in one sentence without repeating the details. For example: "This conclusion was reached after careful consideration of key judgments regarding SSP estimation and variable consideration, which are detailed in Section 4 of this memo."
+4.  Only mention ongoing monitoring if the contract has variable elements that require it.
+
+**CRITICAL RULE: Be Proportional and Avoid Generic Boilerplate.** Do NOT list the judgments again.
 
 ---
 **IF THE TRANSACTION or Contract IS COMPLEX, follow this structure:**
@@ -1106,10 +1016,11 @@ CANDIDATE JUDGMENTS (filtered from 5-step analysis):
 {json.dumps(all_judgments, indent=2)}
 
 YOUR TASK:
-Your primary task is to **filter** the provided `CANDIDATE JUDGMENTS` and **rewrite** only the genuine ones into a professional, defensible format.
+Your primary task is to **filter** the provided `CANDIDATE JUDGMENTS` and **rewrite** only the genuine ones into a professional, defensible format. A genuine judgment is one that requires significant estimation or interpretation because the contract is silent or the authoritative guidance is not definitive.
 
-1.  **Filter:** A genuine judgment is one that requires significant estimation or interpretation because the contract is silent or the authoritative guidance is not definitive. Discard standard applications of rules.
-2.  **Rewrite:** For each genuine judgment you keep, write a 'Rationale' paragraph that explicitly explains **why** it is a judgment, using the KNOWLEDGE HIERARCHY REFERENCE to structure your reasoning.
+For each genuine judgment you identify, you must provide a full, detailed 'Rationale' paragraph explaining *why* it is a judgment. This section is the single source of truth for the detailed justification of all professional judgments made.
+
+Use the KNOWLEDGE HIERARCHY REFERENCE to structure your reasoning.
 
 **KNOWLEDGE HIERARCHY REFERENCE:**
 A genuine judgment exists when:
