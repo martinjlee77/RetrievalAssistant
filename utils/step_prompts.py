@@ -755,13 +755,15 @@ SECTION STRUCTURE & REQUIREMENTS:
 
 **KEY FINDINGS** (Scannable dashboard format)
 
-**FORMATTING RULE:** For the 'KEY FINDINGS' section below, use clean bullet point format. Each line item MUST start with a dash and space `- `, followed by the header, colon, space, then content: `- Header: content`.
+**FORMATTING RULE:** For the 'KEY FINDINGS' section, use a structured bullet point format with sub-bullets where appropriate:
 
 - ASC 606 Contract Exists: {contract_exists}
-- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}
+  {chr(10).join([f'  • {po}' for po in po_descriptions]) if po_descriptions else ''}
 - Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 - Allocation: {allocation_method}
-- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- Revenue Recognition:
+  {chr(10).join([f'  • {method}' for method in recognition_methods]) if recognition_methods else '  • Not applicable'}
 - Critical Judgments: {', '.join([j.get('judgment_title', str(j)) if isinstance(j, dict) else str(j) for j in critical_judgments]) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
