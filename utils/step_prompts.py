@@ -217,7 +217,13 @@ Your analysis of price allocation must clearly state the principles that will be
 
 2.  **SSP Source:** Briefly mention that determining SSP may require analyzing data outside of the contract, such as standalone sales data or other estimation methods (market assessment, cost-plus, residual) if an observable price is not available.
 
-3.  **Discount Allocation:** If a discount exists, explicitly state how it should be allocated. Per ASC 606-10-32-37, if the discount does not relate to one specific PO, it should be allocated proportionally to all POs.
+3.  **CRITICAL DISCOUNT INTERPRETATION RULES:**
+   - When a contract states "The fees reflect a X% discount" or "The fees include a X% discount", the amounts listed are ALREADY POST-DISCOUNT amounts
+   - Use the exact amounts stated in the contract - do NOT apply additional discounts to amounts that are already discounted
+   - If the contract explicitly states which components are discounted and which are not (e.g., "The SaaS license is priced at its standard standalone rate. The hardware and services reflect a 10% discount"), treat each component according to its specified pricing
+   - Per ASC 606-10-32-37, if the discount does not relate to one specific PO, it should be allocated proportionally to all POs. However, if the contract clearly indicates which POs are discounted, allocate accordingly.
+
+4.  **Allocation Method:** Use the stated contract amounts as the basis for allocation - these represent the agreed-upon standalone selling prices as reflected in the contractual arrangement.
 
 Your role is to frame the necessary analysis, not to perform external market research.
 
