@@ -494,15 +494,18 @@ class ASC606Analyzer:
                             step_specific_context += f"{result['content']}\n"
 
                 # NEW: Prepare the messages list using the new architecture with caching
-                # Special handling for Step 3: inject calculated financial facts
+                # Special handling for Steps 3 and 4: inject calculated financial facts
                 financial_context = ""
-                if step_num == 3 and financial_facts.get("total_transaction_price", 0) > 0:
+                if (step_num in [3, 4]) and financial_facts.get("total_transaction_price", 0) > 0:
                     financial_context = f"\n\n**CALCULATED FINANCIAL FACTS (Use These Exact Numbers):**\n"
                     financial_context += f"- Fixed Consideration: ${financial_facts['fixed_consideration']:,.2f}\n"
                     financial_context += f"- Variable Consideration: ${financial_facts['variable_consideration']:,.2f}\n"
                     financial_context += f"- Total Transaction Price: ${financial_facts['total_transaction_price']:,.2f}\n"
                     financial_context += f"- Fee Components: {len(financial_facts.get('fee_components', []))} identified\n"
-                    financial_context += "**CRITICAL:** Use these calculated amounts in your analysis. Do NOT recalculate.\n"
+                    if step_num == 3:
+                        financial_context += "**CRITICAL:** Use these calculated amounts in your analysis. Do NOT recalculate.\n"
+                    elif step_num == 4:
+                        financial_context += "**CRITICAL:** Use the Total Transaction Price above for allocation. Do NOT recalculate the transaction price.\n"
                 
                 prompt_cache_key = hashlib.md5(f"prompt_{step_num}_{len(contract_text)}_{len(retrieved_context + step_specific_context + financial_context)}".encode()).hexdigest()
                 
