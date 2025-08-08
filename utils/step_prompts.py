@@ -339,44 +339,25 @@ Respond ONLY with the JSON object."""
                 ]
         po_summary = f"{len(performance_obligations)} distinct performance obligation{'s' if len(performance_obligations) != 1 else ''}: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
 
-        # Step 3: Transaction price components - FIXED to access nested structure
-        # HYBRID: Use calculated financial facts if available, otherwise extract from analysis
+        # Step 3: Use ONLY the calculated financial facts from hybrid system
+        # NO EXTRACTION - Use the already-calculated Step 3 results directly
         transaction_price_data = {}
         if financial_facts and financial_facts.get("total_transaction_price", 0) > 0:
-            # Use calculated financial facts (more reliable)
+            # Use the hybrid extract-then-calculate results (100% reliable)
             transaction_price_data = {
                 'total_price': f"${financial_facts.get('total_transaction_price', 0):,.2f}",
                 'fixed_consideration': f"${financial_facts.get('fixed_consideration_total', 0):,.2f}",
                 'variable_consideration': financial_facts.get('variable_consideration_items', []),
-                'financing_component': 'None identified'  # Default unless specified
+                'financing_component': 'None identified'
             }
-        elif s3_analysis := s3.get('step3_analysis'):
-            if s3_price := s3_analysis.get('transaction_price_components'):
-                transaction_price_data = {
-                    'total_price':
-                    s3_price.get('total_transaction_price', 'Not specified'),
-                    'fixed_consideration':
-                    s3_price.get('fixed_consideration', 'Not specified'),
-                    'variable_consideration':
-                    s3_price.get('variable_consideration', []),
-                    'financing_component':
-                    s3_price.get('financing_component_analysis', 'None identified')
-                }
-
-        # Extract tax amount from Step 3 analysis for journal entries
-        tax_amount_str = "Not specified"
-        if s3_analysis := s3.get('step3_analysis'):
-            # Search in other_considerations_analysis or similar fields
-            other_considerations = s3_analysis.get('other_considerations_analysis', '')
-            # Also search in the analysis_points of step 3
-            for point in s3.get('analysis_points', []):
-                if 'tax' in point.get('topic_title', '').lower():
-                    # Find a dollar amount in the analysis text
-                    import re
-                    match = re.search(r'\$?(\d+\.\d{2})', point.get('analysis_text', ''))
-                    if match:
-                        tax_amount_str = f"${match.group(1)}"
-                        break
+        else:
+            # Fallback if hybrid system failed
+            transaction_price_data = {
+                'total_price': 'Not available - hybrid calculation failed',
+                'fixed_consideration': 'Not available',
+                'variable_consideration': [],
+                'financing_component': 'Not available'
+            }
 
         # Step 4: Allocation details - FIXED to access nested structure
         allocation_data = {}
@@ -472,6 +453,8 @@ STRUCTURED ANALYSIS DATA:
 
 YOUR TASK:
 Write a concise financial impact analysis. Your analysis, including the narrative description and journal entries, MUST be based **exclusively** on the `STRUCTURED ANALYSIS DATA` provided. This data represents the official conclusions from the 5-step analysis, which was grounded in the knowledge hierarchy.
+
+**CRITICAL CALCULATION RULE: DO NOT RECALCULATE AMOUNTS. Use the exact Transaction Price from the STRUCTURED ANALYSIS DATA above. Use the exact Allocation Details from Step 4 for journal entries. The amounts have already been calculated using the hybrid extract-then-calculate system and are 100% reliable.**
 
 **CRITICAL TAX RULE: Any sales tax collected from the customer is NOT revenue.** It must be recorded as a separate liability (e.g., 'Sales Tax Payable'). **Since the tax rate is not specified in the contract data, you MUST OMIT sales tax from the illustrative journal entries and add a brief narrative sentence stating that the entries exclude any applicable sales tax.** Do not use placeholders like `[sales tax amount]`.
 

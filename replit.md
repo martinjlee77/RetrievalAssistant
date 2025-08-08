@@ -47,6 +47,7 @@ Critical Development Rules - Prompt Protection:
 - **GPT-5 Integration**: Updated to use GPT-5 model for enhanced analysis quality (August 2025 release).
 - **Legacy Code Cleanup**: Removed unused `utils/prompt.py` file - system now fully consolidated on `utils/step_prompts.py`.
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern to eliminate mathematical errors in transaction price determination. AI extracts structured fee components, Python performs reliable calculations. Ensures 100% accuracy for financial amounts in Step 3 analysis and memo generation.
+- **Unified Financial Data Flow**: Fixed architectural inconsistency where financial impact section was performing separate calculations instead of using completed Step 3, 4, and 5 results. Journal entries now derive amounts exclusively from the hybrid calculation system, eliminating calculation discrepancies (August 2025).
 
 ### File Structure
 ```
