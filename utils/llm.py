@@ -300,7 +300,7 @@ def create_docx_from_text(text_content, contract_data=None):
     # Set default font to standard system font for consistency
     style = document.styles['Normal']
     font = style.font
-    font.name = 'Calibri'  # Standard professional font
+    font.name = 'Segoe UI'  # Standard professional font
     font.size = Pt(12)
     
     # Configure paragraph spacing (consistent 12pt after paragraphs)
@@ -319,10 +319,10 @@ def create_docx_from_text(text_content, contract_data=None):
     # Add header with Controller.cpa branding
     header = document.sections[0].header
     header_para = header.paragraphs[0]
-    header_para.text = "Controller.cpa"
+    header_para.text = "VeritasLogic.ai"
     header_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     header_run = header_para.runs[0]
-    header_run.font.name = 'Calibri'
+    header_run.font.name = 'Segoe UI'
     header_run.font.size = Pt(10)
     header_run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
     
@@ -331,7 +331,7 @@ def create_docx_from_text(text_content, contract_data=None):
     footer_para = footer.paragraphs[0]
     footer_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     footer_run = footer_para.runs[0] if footer_para.runs else footer_para.add_run()
-    footer_run.font.name = 'Calibri'
+    footer_run.font.name = 'Segoe UI'
     footer_run.font.size = Pt(10)
     # Add page number field
     fldChar1 = OxmlElement('w:fldChar')
@@ -358,7 +358,7 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 1 - Main sections (matches HTML h2)
             heading1_style = document.styles.add_style('Custom Heading 1', 1)
-            heading1_style.font.name = 'Calibri'
+            heading1_style.font.name = 'Segoe UI'
             heading1_style.font.size = Pt(14)
             heading1_style.font.bold = True
             heading1_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
@@ -371,7 +371,7 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 2 - Subsections (matches HTML h3)
             heading2_style = document.styles.add_style('Custom Heading 2', 1)
-            heading2_style.font.name = 'Calibri'
+            heading2_style.font.name = 'Segoe UI'
             heading2_style.font.size = Pt(13)
             heading2_style.font.bold = True
             heading2_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
@@ -384,7 +384,7 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # Heading 3 - Sub-subsections  
             heading3_style = document.styles.add_style('Custom Heading 3', 1)
-            heading3_style.font.name = 'Calibri'
+            heading3_style.font.name = 'Segoe UI'
             heading3_style.font.size = Pt(12)
             heading3_style.font.bold = True
             heading3_style.font.color.rgb = RGBColor(0, 0, 0)  # Black only
@@ -396,7 +396,7 @@ def create_docx_from_text(text_content, contract_data=None):
         try:
             # NEW: Subsection Header Style for OVERALL CONCLUSION, KEY FINDINGS, etc.
             subsection_style = document.styles.add_style('Subsection Header', 1)
-            subsection_style.font.name = 'Calibri'
+            subsection_style.font.name = 'Segoe UI'
             subsection_style.font.size = Pt(11)
             subsection_style.font.bold = True
             subsection_style.font.color.rgb = RGBColor(0, 0, 0)
@@ -507,7 +507,7 @@ def create_docx_from_text(text_content, contract_data=None):
             # Fallback to manual formatting
             para = doc.add_paragraph()
             run = para.add_run(match.group(1))
-            run.font.name = 'Calibri'
+            run.font.name = 'Segoe UI'
             run.font.size = Pt(11)
             run.font.bold = True
             run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
@@ -672,7 +672,7 @@ def create_docx_from_text(text_content, contract_data=None):
             if not content:
                 continue
             run = paragraph.add_run(content)
-            run.font.name = 'Calibri'  # Ensure consistent font
+            run.font.name = 'Segoe UI'  # Ensure consistent font
             if format_type == 'bold':
                 run.bold = True
             elif format_type == 'italic':
@@ -813,7 +813,7 @@ def create_docx_from_text(text_content, contract_data=None):
                 # Transaction header
                 header_para = doc.add_paragraph()
                 header_run = header_para.add_run(f"Journal Entry - {date_val}:")
-                header_run.font.name = 'Calibri'
+                header_run.font.name = 'Segoe UI'
                 header_run.font.bold = True
                 header_run.font.size = Pt(12)
             
@@ -850,7 +850,7 @@ def create_docx_from_text(text_content, contract_data=None):
             title_para = document.add_paragraph(stripped_line)
             title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
             for run in title_para.runs:
-                run.font.name = 'Calibri'
+                run.font.name = 'Segoe UI'
                 run.font.size = Pt(16)
                 run.font.bold = True
                 run.font.color.rgb = RGBColor(0, 0, 0)
@@ -891,7 +891,7 @@ def create_docx_from_text(text_content, contract_data=None):
     
     metadata_para = document.add_paragraph()
     metadata_run = metadata_para.add_run(f"Analysis Date: {current_date} | Review Status: Preliminary Analysis | Internal Use")
-    metadata_run.font.name = 'Calibri'
+    metadata_run.font.name = 'Segoe UI'
     metadata_run.font.size = Pt(9)
     metadata_run.font.color.rgb = RGBColor(0, 0, 0)  # Black only
     metadata_para.alignment = 1  # Center alignment

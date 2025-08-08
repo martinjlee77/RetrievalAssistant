@@ -243,6 +243,54 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
     # --- EXISTING FUNCTIONS ---
 
     @staticmethod
+    def get_financial_extraction_prompt(contract_text: str) -> str:
+        """Generate prompt for extracting structured financial components from contract text."""
+        return f"""You are a financial analyst extracting structured fee components from a contract for precise calculation.
+
+CONTRACT TEXT:
+{contract_text}
+
+Your task: Extract all fee components from this contract into structured JSON format.
+
+REQUIRED JSON OUTPUT FORMAT:
+{{
+  "fee_components": [
+    {{
+      "description": "Brief description of the fee (e.g., 'SaaS License Year 1', 'Professional Services')",
+      "amount": 50000.00,
+      "frequency": "one-time" or "annual" or "monthly",
+      "type": "fixed" or "variable",
+      "notes": "Any additional details about this fee component"
+    }}
+  ],
+  "variable_considerations": [
+    {{
+      "description": "Description of variable consideration (e.g., 'Performance bonus')",
+      "amount": 30000.00,
+      "condition": "Condition for earning this amount",
+      "probability_notes": "Any notes about likelihood of achievement"
+    }}
+  ],
+  "discounts": [
+    {{
+      "description": "Description of discount",
+      "percentage": 10,
+      "applies_to": "Which components this discount applies to"
+    }}
+  ]
+}}
+
+INSTRUCTIONS:
+- Extract ALL monetary amounts mentioned in the contract
+- Convert percentages to decimal (10% = 0.10)
+- Use precise decimal amounts (no rounding)
+- Include both fixed and variable considerations
+- Note any bundle discounts or special pricing
+- Be thorough but accurate - do not add amounts not explicitly mentioned
+
+Respond ONLY with the JSON object."""
+
+    @staticmethod
     def get_financial_impact_prompt(s1: dict,
                                     s2: dict,
                                     s3: dict,
@@ -250,7 +298,8 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
                                     s5: dict,
                                     customer_name: str,
                                     memo_audience: str,
-                                    contract_data=None) -> str:
+                                    contract_data=None,
+                                    financial_facts=None) -> str:
         """Generates proportional financial impact prompt based on structured data analysis."""
         import json
 
@@ -276,8 +325,17 @@ This appears to be a simple, fixed-price contract. You MUST follow these rules:
         po_summary = f"{len(performance_obligations)} distinct performance obligation{'s' if len(performance_obligations) != 1 else ''}: {', '.join(performance_obligations)}" if performance_obligations else "Performance obligations not clearly identified"
 
         # Step 3: Transaction price components - FIXED to access nested structure
+        # HYBRID: Use calculated financial facts if available, otherwise extract from analysis
         transaction_price_data = {}
-        if s3_analysis := s3.get('step3_analysis'):
+        if financial_facts and financial_facts.get("total_transaction_price", 0) > 0:
+            # Use calculated financial facts (more reliable)
+            transaction_price_data = {
+                'total_price': f"${financial_facts.get('total_transaction_price', 0):,.2f}",
+                'fixed_consideration': f"${financial_facts.get('fixed_consideration_total', 0):,.2f}",
+                'variable_consideration': financial_facts.get('variable_consideration_items', []),
+                'financing_component': 'None identified'  # Default unless specified
+            }
+        elif s3_analysis := s3.get('step3_analysis'):
             if s3_price := s3_analysis.get('transaction_price_components'):
                 transaction_price_data = {
                     'total_price':
