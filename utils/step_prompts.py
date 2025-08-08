@@ -745,13 +745,13 @@ ANALYSIS CONTEXT:
 - Customer: {customer_name}
 
 STRUCTURED DATA FROM 5-STEP ANALYSIS:
-- ASC 606 Contract Exists: {contract_exists}
-- Performance Obligations Count: {po_count}
-- Performance Obligations: {po_descriptions}
-- Total Transaction Price: {total_price}
-- Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
-- Allocation Method: {allocation_method}
-- Revenue Recognition Methods: {recognition_methods}
+• ASC 606 Contract Exists: {contract_exists}
+• Performance Obligations Count: {po_count}
+• Performance Obligations: {po_descriptions}
+• Total Transaction Price: {total_price}
+• Has Variable Consideration: {"Yes" if has_variable_consideration else "No"}
+• Allocation Method: {allocation_method}
+• Revenue Recognition Methods: {recognition_methods}
 
 YOUR TASK:
 Synthesize the **structured data provided above** into a cohesive, executive-level summary. Your conclusions in the summary MUST be directly supported by the findings in the structured data. Do not introduce new analysis. The structured data is your single source of truth for this task, as it was derived from a rigorous application of the knowledge hierarchy (Contract → Authoritative → Interpretative).
@@ -766,7 +766,7 @@ SECTION STRUCTURE & REQUIREMENTS:
 
 **KEY FINDINGS** (Scannable dashboard format)
 
-**CRITICAL FORMATTING RULE:** For the 'KEY FINDINGS' section below, you MUST use the exact Markdown format provided. Each line item MUST be a bullet point starting with `- **Header:**` to ensure it is bolded correctly. Do not omit the asterisks.
+**CRITICAL FORMATTING RULE:** For the 'KEY FINDINGS' section below, you MUST use the EXACT format shown. Each line item MUST start with a dash and space `- `, followed by double asterisks, the header, colon, closing double asterisks, space, then content: `- **Header:** content`. Do not deviate from this format.
 
 - **ASC 606 Contract Exists:** {contract_exists}
 - **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
