@@ -307,7 +307,7 @@ def create_docx_from_text(text_content, contract_data=None):
     # Configure paragraph spacing to match HTML (12pt consistent spacing)
     paragraph_format = style.paragraph_format
     paragraph_format.space_after = Pt(12)  # Matches HTML consistent_spacing
-    paragraph_format.line_spacing = 1.6  # Matches HTML line_height
+    paragraph_format.line_spacing = 1.3  # Closer to HTML comfortable spacing
     
     # Set standard accounting memo margins (1" all sides)
     sections = document.sections
@@ -799,7 +799,8 @@ def create_docx_from_text(text_content, contract_data=None):
         header_run = header_para.add_run("Illustrative Journal Entries")
         header_run.font.name = 'Segoe UI'
         header_run.font.bold = True
-        header_run.font.size = Pt(13)
+        header_run.font.size = Pt(12)
+        header_run.font.color.rgb = RGBColor(0, 0, 0)  # Ensure black color
         
         # Group entries by transaction date
         current_date = None
