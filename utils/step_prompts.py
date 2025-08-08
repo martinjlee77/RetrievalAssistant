@@ -687,6 +687,9 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Critical Rule**: This is a narrative summary, NOT a detailed listing of components
 
 **KEY FINDINGS** (Scannable dashboard format)
+
+**CRITICAL FORMATTING RULE:** For the 'KEY FINDINGS' section below, you MUST use the exact Markdown format provided. Each line item MUST be a bullet point starting with `- **Header:**` to ensure it is bolded correctly. Do not omit the asterisks.
+
 - **ASC 606 Contract Exists:** {contract_exists}
 - **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
 - **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}

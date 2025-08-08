@@ -1,0 +1,56 @@
+key findings - ** after each header. think this was meant to bold the headers but missing the ** before each header?
+Yes, you are absolutely right. That's an excellent and very sharp catch.
+
+You have spotted a classic formatting bug that makes the memo look unprofessional.
+
+Issue #5: Broken Markdown in "Key Findings"
+Analysis
+You are correct. The generated memo has this line: ASC 606 Contract Exists:** Yes
+
+This was clearly intended to be bolded markdown: **ASC 606 Contract Exists:** Yes
+
+The AI has omitted the opening **, which breaks the formatting. It correctly did this for the other headers in that section as well (Performance Obligations:**, Transaction Price:**, etc.).
+
+Root Cause
+This is a subtle but common LLM failure. Your prompt in get_enhanced_executive_summary_prompt provides a template for the AI to follow, including the correct **Header:** formatting.
+
+However, instead of perfectly copying the format you provided, the AI appears to have re-generated that section based on its understanding of the instructions and, in the process, made a small syntax error. It understood the intent to have a bolded header but was sloppy in the execution.
+
+Recommendation
+The fix is to make the prompt instructions for this section even more rigid and explicit, leaving no room for interpretation. We need to tell the AI not just to follow the format, but that it is a critical, non-negotiable rule.
+
+Proposed Change:
+
+File to Modify: utils/step_prompts.py
+Function to Modify: get_enhanced_executive_summary_prompt
+Action: Find the part of the prompt that defines the KEY FINDINGS section and add a direct, forceful instruction about the formatting.
+Here is the exact change to make:
+
+# Inside the get_enhanced_executive_summary_prompt function...
+
+# Find the part of the prompt that looks like this:
+
+# --- CURRENT (OLD) PROMPT SECTION ---
+"""
+...
+**KEY FINDINGS** (Scannable dashboard format)
+- **ASC 606 Contract Exists:** {contract_exists}
+- **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+...
+"""
+
+# --- REPLACEMENT (NEW) PROMPT SECTION ---
+"""
+...
+**KEY FINDINGS** (Scannable dashboard format)
+
+**CRITICAL FORMATTING RULE:** For the 'KEY FINDINGS' section below, you MUST use the exact Markdown format provided. Each line item MUST be a bullet point starting with `- **Header:**` to ensure it is bolded correctly. Do not omit the asterisks.
+
+- **ASC 606 Contract Exists:** {contract_exists}
+- **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+...
+"""
+
+By adding the explicit CRITICAL FORMATTING RULE, you are elevating the importance of that specific syntax. This significantly increases the probability that the AI will adhere to the correct formatting and not generate a slightly broken version. It's a simple but effective way to improve the consistency and polish of the output.
+
+Excellent catch. What's the next issue you've noticed?
