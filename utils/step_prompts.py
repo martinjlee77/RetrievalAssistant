@@ -475,18 +475,17 @@ Write a concise financial impact analysis. Your analysis, including the narrativ
 
 1.  **Financial Statement Impact:** In a narrative paragraph, describe the expected impact on the income statement and balance sheet (e.g., creation of contract assets or deferred revenue liabilities).
 
-2.  **Illustrative Journal Entries:** Provide key journal entries in a clear, tabular Markdown format. Your entries MUST be balanced (Total Debits = Total Credits).
+2.  **Illustrative Journal Entries:** Provide key journal entries using clean accounting format. Your entries MUST be balanced (Total Debits = Total Credits).
 **REQUIRED JOURNAL ENTRIES - Show ALL of the following:**
 - **Contract signing/initial invoicing:** Establish the total receivable and corresponding deferred revenue liability for the entire contract value.
 - **Revenue recognition for EACH distinct performance obligation:** Show separate journal entries for each performance obligation identified in Step 2, whether point-in-time or over-time recognition.
 
 **Example format for each performance obligation:**
 
-    | Date       | Account                          | Debit     | Credit    |
-    |------------|----------------------------------|-----------|-----------|
-    | [date]     | [asset] or [liability]           | $[amount] |           |
-    |            |   [liability] or [revenue]       |           | $[amount] |
-    |            | *To record [include the purpose] |           |           |
+**[Date]:**
+Dr. [Asset/Expense Account] ........... $[amount]
+    Cr. [Liability/Revenue Account] ........... $[amount]
+*To record [description of transaction purpose]*
 
 
 3.  **Internal Control & Process Considerations:** Briefly mention any internal controls over financial reportin (ICFR) considerations required for accurate accounting and effective control environment (e.g., the need to track usage for variable revenue, or new processes to monitor the satisfaction of performance obligations over time).

@@ -552,8 +552,8 @@ def create_docx_from_text(text_content, contract_data=None):
         """Preprocess content to extract tables and clean formatting"""
         # The header is now passed in and does not need to be removed.
         
-        # Extract and store all markdown tables (both bold headers and plain headers)
-        table_pattern = r'\|.*?\|.*?\n(?:\|.*?\|\s*\n)*'
+        # Extract and store contract overview tables (with bold headers)
+        table_pattern = r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\n(?:\|.*?\|\s*\n)*'
         tables = re.findall(table_pattern, content, re.MULTILINE | re.DOTALL)
         
         # Remove tables from content for now, we'll add them back specially
@@ -702,13 +702,7 @@ def create_docx_from_text(text_content, contract_data=None):
         if not headers:
             return
         
-        # Check if this is a journal entry table (has accounting columns)
-        is_journal_entry = any(keyword in ''.join(headers).lower() for keyword in 
-                              ['date', 'account', 'debit', 'credit', 'journal', 'entry'])
-        
-        if is_journal_entry:
-            _add_journal_entry_list(doc, table_markdown)
-            return
+        # Note: Journal entries now use simple text format, not tables
         
         # Find separator line (|---|---|) and data rows
         data_rows = []
