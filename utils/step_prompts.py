@@ -256,26 +256,13 @@ REQUIRED JSON OUTPUT FORMAT:
 {{
   "fee_components": [
     {{
-      "description": "Brief description of the fee (e.g., 'SaaS License Year 1', 'Professional Services')",
-      "amount": 50000.00,
-      "frequency": "one-time" or "annual" or "monthly",
-      "type": "fixed" or "variable",
-      "notes": "Any additional details about this fee component"
-    }}
-  ],
-  "variable_considerations": [
-    {{
-      "description": "Description of variable consideration (e.g., 'Performance bonus')",
-      "amount": 30000.00,
-      "condition": "Condition for earning this amount",
-      "probability_notes": "Any notes about likelihood of achievement"
-    }}
-  ],
-  "discounts": [
-    {{
-      "description": "Description of discount",
-      "percentage": 10,
-      "applies_to": "Which components this discount applies to"
+      "component_name": "Brief, standardized name (e.g., 'SaaS License', 'Hardware Scanners')",
+      "base_amount": 240000.00,
+      "period": "annual" or "monthly" or "one-time" or "contingent",
+      "duration": 3,
+      "is_variable": false,
+      "probability": 1.0,
+      "notes": "Any source details, e.g., 'From SOW 2.1'"
     }}
   ]
 }}

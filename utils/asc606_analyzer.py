@@ -132,34 +132,20 @@ class ASC606Analyzer:
     def _sanitize_llm_json(self, data: Any) -> Any:
         """
         Recursively traverses a JSON object from the LLM and cleans up
-        common string formatting issues like character splitting.
+        common string formatting issues like character splitting and number spacing.
         """
         if isinstance(data, dict):
-            return {
-                key: self._sanitize_llm_json(value)
-                for key, value in data.items()
-            }
+            return {key: self._sanitize_llm_json(value) for key, value in data.items()}
         elif isinstance(data, list):
             return [self._sanitize_llm_json(item) for item in data]
         elif isinstance(data, str):
             # 1. Fix the "s p a c e d o u t" text issue
-            # This regex finds single characters separated by one or more spaces
-            # and joins them back together, but preserves spaces around currency symbols
-            sanitized_str = re.sub(r'\b([a-zA-Z])\s(?=[a-zA-Z]\b)', r'\1',
-                                   data)
+            sanitized_str = re.sub(r'\b([a-zA-Z])\s(?=[a-zA-Z]\b)', r'\1', data)
 
-            # 2. Fix spacing issues in currency amounts (e.g., "$720, 000" → "$720,000")
-            # Remove unwanted spaces between digits and commas in numbers
+            # 2. Fix spacing issues in currency amounts (e.g., "$720, 000" -> "$720,000")
             sanitized_str = re.sub(r'(\d,)\s+(\d)', r'\1\2', sanitized_str)
 
-            # 3. Preserve proper spacing around currency symbols and punctuation
-            # Ensure space before currency symbols like $, €, £
-            sanitized_str = re.sub(r'(\w)(\$€£¥)', r'\1 \2', sanitized_str)
-            # Ensure space after currency amounts
-            sanitized_str = re.sub(r'(\$\d+\.?\d*),(\w)', r'\1, \2',
-                                   sanitized_str)
-
-            # 4. Collapse multiple spaces into a single space
+            # 3. Collapse multiple spaces into a single space
             sanitized_str = re.sub(r'\s+', ' ', sanitized_str).strip()
 
             return sanitized_str
