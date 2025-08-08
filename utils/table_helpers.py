@@ -5,7 +5,7 @@ Provides consistent, reusable table styling functions.
 
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml.shared import qn
+from docx.oxml.ns import qn
 from docx.oxml import parse_xml
 import logging
 

@@ -767,14 +767,14 @@ SECTION STRUCTURE & REQUIREMENTS:
 
 **KEY FINDINGS** (Scannable dashboard format)
 
-**CRITICAL FORMATTING RULE:** For the 'KEY FINDINGS' section below, you MUST use the EXACT format shown. Each line item MUST start with a dash and space `- `, followed by double asterisks, the header, colon, closing double asterisks, space, then content: `- **Header:** content`. Do not deviate from this format.
+**FORMATTING RULE:** For the 'KEY FINDINGS' section below, use clean bullet point format. Each line item MUST start with a dash and space `- `, followed by the header, colon, space, then content: `- Header: content`.
 
-- **ASC 606 Contract Exists:** {contract_exists}
-- **Performance Obligations:** {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
-- **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
-- **Allocation:** {allocation_method}
-- **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
-- **Critical Judgments:** {', '.join([j.get('judgment_title', str(j)) if isinstance(j, dict) else str(j) for j in critical_judgments]) if critical_judgments else 'None identified'}
+- ASC 606 Contract Exists: {contract_exists}
+- Performance Obligations: {po_count} distinct obligation{'s' if po_count != 1 else ''}{(' - ' + ', '.join(po_descriptions[:2])) if po_descriptions else ''}{'...' if len(po_descriptions) > 2 else ''}
+- Transaction Price: {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
+- Allocation: {allocation_method}
+- Revenue Recognition: {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
+- Critical Judgments: {', '.join([j.get('judgment_title', str(j)) if isinstance(j, dict) else str(j) for j in critical_judgments]) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation

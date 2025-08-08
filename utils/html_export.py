@@ -252,10 +252,11 @@ def convert_memo_to_html(memo_markdown: str, contract_data: Optional[dict] = Non
         }}
         
         th {{
-            background-color: #003366;
-            color: white;
+            background-color: white;
+            color: black;
             font-weight: bold;
             text-align: center;
+            font-family: 'Segoe UI', sans-serif;
         }}
         
         /* Alternating row colors */

@@ -118,7 +118,7 @@ def handle_llm_error(error: Exception):
 def cached_llm_call(
     prompt: str, 
     system_message: str = None,
-    model: str = "gpt-4o",
+    model: str = "gpt-5",
     temperature: float = 0.3
 ) -> Optional[str]:
     """
@@ -135,7 +135,7 @@ def cached_llm_call(
 
 def stream_llm_response(
     messages: List[Dict[str, str]], 
-    model: str = "gpt-4o",
+    model: str = "gpt-5",
     temperature: float = 0.3
 ):
     """
