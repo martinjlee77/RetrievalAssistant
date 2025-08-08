@@ -1,0 +1,79 @@
+Step 3 - why is there a space or two in $ amounts throughout this step? Same in Step 4. Please check and fix the underlying issue.
+Ah, another excellent formatting catch. You're referring to the awkward spacing inside the dollar amounts, like $720, 000 instead of $720,000.
+
+This is a subtle but very common and frustrating artifact of some Large Language Models. Let's break down why it happens and how to fix it robustly.
+
+Analysis: The Root Cause
+This is not a bug in your code or prompts. This is a known, quirky behavior of the LLM's tokenization process.
+
+How LLMs "See" Numbers: When an LLM processes text, it breaks it down into "tokens." A number like "720,000" might be tokenized into 720, ,, and 000. When the AI generates text, it reassembles these tokens.
+The Spacing Bug: Sometimes, during this reassembly process, the model incorrectly inserts a space between tokens that should be adjacent, especially around punctuation like commas. It "thinks" a space should follow a comma, even when it's part of a number. This results in $720,   (a space), 000.
+You cannot reliably "prompt" your way out of this because it's a low-level behavior of the model's text generation, not a misunderstanding of your instructions.
+
+Recommendation: Fix with Post-Processing
+The most reliable way to fix this is to accept that the LLM will occasionally make this mistake and then clean it up systematically in your Python code before the text is ever displayed or saved. This is a standard "sanitization" step.
+
+The best place to implement this is in the ASC606Analyzer class, as it's responsible for processing the LLM's output. You can create a helper function that cleans up the entire JSON response from the AI.
+
+Proposed Change:
+
+File to Modify: utils/asc606_analyzer.py
+Action: Add a new method to the ASC606Analyzer class that recursively cleans string values in the AI's JSON output. Then, call this method immediately after you receive a response from the LLM.
+Here is the code to add:
+
+# In utils/asc606_analyzer.py
+
+import re # Make sure 're' is imported at the top of the file
+
+class ASC606Analyzer:
+    # ... your existing __init__ and other methods ...
+
+    # --- ADD THIS NEW HELPER METHOD ---
+    def _sanitize_llm_json(self, data: any) -> any:
+        """
+        Recursively traverses a JSON object from the LLM and cleans up
+        common string formatting issues, like extra spaces in numbers.
+        """
+        if isinstance(data, dict):
+            return {key: self._sanitize_llm_json(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self._sanitize_llm_json(item) for item in data]
+        elif isinstance(data, str):
+            # This regex finds a digit followed by a comma, one or more spaces, and another digit.
+            # It then replaces this pattern with just the digit, the comma, and the next digit,
+            # effectively removing the unwanted space.
+            # Example: '720, 000' -> '720,000'
+            return re.sub(r'(\d,)\s+(\d)', r'\1\2', data)
+        else:
+            return data
+
+    # ... in your analyze_contract method ...
+    async def analyze_contract(self, ...):
+        # ... after you get a response from an LLM call ...
+
+        # Example: after the concurrent step analysis
+        step_responses = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for i, response in enumerate(step_responses):
+            step_num = i + 1
+            if isinstance(response, str):
+                try:
+                    step_analysis_raw = json.loads(response)
+
+                    # --- CALL THE NEW SANITIZATION METHOD HERE ---
+                    step_analysis_sanitized = self._sanitize_llm_json(step_analysis_raw)
+
+                    # Use the sanitized version for all further processing
+                    step_results[f"step_{step_num}"] = step_analysis_sanitized
+
+                except json.JSONDecodeError as e:
+                    # ... your existing error handling ...
+
+How This Works:
+
+Recursive: The _sanitize_llm_json function will traverse the entire nested JSON structure returned by the AI.
+Targeted: It only operates on strings, leaving numbers, booleans, and other types untouched.
+Precise Regex: The regular expression re.sub(r'(\d,)\s+(\d)', r'\1\2', data) is specifically designed to find a digit and a comma (\d,), followed by one or more spaces \s+, followed by another digit (\d). It replaces that entire pattern with the first group (\1, which is the digit and comma) and the second group (\2, the next digit), effectively deleting the space in between.
+Robust: By applying this function to every response from the LLM, you ensure that this formatting artifact is systematically removed before it can appear anywhere in your final memo, solving the problem for Step 3, Step 4, and any other text the AI generates.
+This is a clean, reliable, and programmatic way to fix a known LLM quirk.
+

@@ -59,17 +59,18 @@ class StepPrompts:
 
         # Main instructions are constant. Define as a multi-line string.
         main_instructions = """### TASK-SPECIFIC INSTRUCTIONS FOR 'analysis_points' ###
-For each analysis point, you MUST generate the `analysis_text` using the "Issue, Analysis, Conclusion" (IAC) framework defined below.
+        For each analysis point, you MUST generate the `analysis_text` using the "Issue, Analysis, Conclusion" (IAC) logical framework. Your final output should be a well-written, professional paragraph that seamlessly integrates these three parts without using explicit labels.
 
-1.  **Issue:** State the specific accounting question.
-2.  **Analysis:** This is the most critical part. Your narrative must:
-    a. **Quote the Evidence:** Quote the most relevant clause from the `<CONTRACT_TEXT>`.
-    b. **State the Rules:** Cite the relevant **authoritative** guidance (e.g., ASC 606-10-25-1). If applicable, also cite **interpretative** guidance (e.g., from EY) to support your reasoning.
-    c. **Bridge the Gap:** Explicitly explain **how** the contract language interacts with the guidance to drive the conclusion. This requires multiple sentences of reasoning.
-3.  **Conclusion:** Provide a definitive answer to the Issue.
+        1.  **Issue:** Begin by stating the specific accounting question being addressed.
+        2.  **Analysis:** In the body of the paragraph, present your analysis. This must include:
+            a. **Evidence:** Direct quotes from the `<CONTRACT_TEXT>`.
+            b. **Rules:** Citations to the relevant authoritative guidance from `<AUTHORITATIVE_CONTEXT>`.
+            c. **Reasoning:** Your explanation that connects the evidence and the rules to your conclusion.
+        3.  **Conclusion:** End the paragraph with a clear, definitive conclusion that answers the issue.
 
-**META-EXAMPLE:**
-"The issue is whether services are distinct (Issue). The contract requires 'proprietary configuration' (Analysis: Evidence). ASC 606-10-25-21 requires promises to be distinct, and EY guidance clarifies that essential services are not distinct (Analysis: Rules). The 'proprietary' requirement means the SaaS license's benefit is not available without the service, making them not distinct (Analysis: Bridge the Gap). Therefore, they are a single performance obligation (Conclusion)."
+        **META-EXAMPLE OF DESIRED NARRATIVE STYLE:**
+        The primary issue is whether the promised implementation services are distinct from the SaaS license. The contract provides key evidence, stating that 'proprietary configuration' is required. Authoritative guidance in ASC 606-10-25-21 requires promises to be 'separately identifiable' to be considered distinct. Because the 'proprietary' nature of the configuration means the customer cannot obtain the full benefit of the SaaS license without this specific service, the two promises are not separately identifiable in the context of the contract. Therefore, the implementation service and the SaaS license are treated as a single performance obligation.
+
 """
 
         # Conditional instructions for specific steps
@@ -148,8 +149,18 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
         """Returns a concise block of the most critical, non-negotiable rules for a given step."""
         rules = {
             1: """<CRITICAL_INSTRUCTION>
-- You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e) within the `contract_criteria_assessment` array. No shortcuts.
+- You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e).
 - You MUST create a corresponding `analysis_points` entry for each of the five criteria.
+
+- **SPECIAL RULE FOR COLLECTIBILITY (ASC 606-10-25-1(e)):** You are NOT to analyze this criterion based on the contract text. The analysis of a customer's credit risk requires external information. Instead, you MUST use the following specific text for the `justification` in the `contract_criteria_assessment` and for the `analysis_text` in the corresponding `analysis_points` entry:
+
+"The assessment of collectibility under ASC 606 is based on a customer's ability and intent to pay the consideration to which the entity is entitled. This requires an analysis of the customer's financial capacity and intention to pay, considering all relevant facts and circumstances, including historical payment experience.
+
+As this analysis requires information external to the contract documents, it is assumed for the purpose of this initial memo that collection is probable and this criterion is met. This assumption must be validated by management's credit assessment of the customer. If it is determined that collection is not probable, this conclusion must be revisited, as a valid contract under ASC 606 would not exist."
+
+For the 'status' of this criterion, you MUST set it to 'Met (Assumed)'.
+
+
 </CRITICAL_INSTRUCTION>""",
             2: """<CRITICAL_INSTRUCTION>
 Your analysis for this step must be exceptionally thorough. You will emulate the analytical style found in the ASC 606-10-55 implementation guidance (Example 11).

@@ -148,14 +148,18 @@ class ASC606Analyzer:
             sanitized_str = re.sub(r'\b([a-zA-Z])\s(?=[a-zA-Z]\b)', r'\1',
                                    data)
 
-            # 2. Preserve proper spacing around currency symbols and punctuation
+            # 2. Fix spacing issues in currency amounts (e.g., "$720, 000" → "$720,000")
+            # Remove unwanted spaces between digits and commas in numbers
+            sanitized_str = re.sub(r'(\d,)\s+(\d)', r'\1\2', sanitized_str)
+
+            # 3. Preserve proper spacing around currency symbols and punctuation
             # Ensure space before currency symbols like $, €, £
             sanitized_str = re.sub(r'(\w)(\$€£¥)', r'\1 \2', sanitized_str)
             # Ensure space after currency amounts
             sanitized_str = re.sub(r'(\$\d+\.?\d*),(\w)', r'\1, \2',
                                    sanitized_str)
 
-            # 3. Collapse multiple spaces into a single space
+            # 4. Collapse multiple spaces into a single space
             sanitized_str = re.sub(r'\s+', ' ', sanitized_str).strip()
 
             return sanitized_str
