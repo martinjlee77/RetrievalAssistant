@@ -96,7 +96,7 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
             "{",
             f'  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the \'bottom line\'.",',
             f'  "{step_schema_name}": {step_schema_definition},',
-            '  "professional_judgments": [ "A list of strings describing conclusions that required significant professional judgment for this step. If none, return an empty list []." ],',
+            '  "professional_judgments": [ "A list of SHORT TITLES (2-4 words) for professional judgments made in this step. Examples: \'SSP Estimation\', \'Variable Consideration\', \'Contract Modification\', \'Revenue Timing\'. Use concise accounting terminology. If none, return an empty list []." ],',
             '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
             "}",
             "```",
