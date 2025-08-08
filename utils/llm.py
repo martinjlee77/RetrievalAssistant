@@ -552,8 +552,8 @@ def create_docx_from_text(text_content, contract_data=None):
         """Preprocess content to extract tables and clean formatting"""
         # The header is now passed in and does not need to be removed.
         
-        # Extract and store contract overview tables
-        table_pattern = r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\n(?:\|.*?\|\s*\n)*'
+        # Extract and store all markdown tables (both bold headers and plain headers)
+        table_pattern = r'\|.*?\|.*?\n(?:\|.*?\|\s*\n)*'
         tables = re.findall(table_pattern, content, re.MULTILINE | re.DOTALL)
         
         # Remove tables from content for now, we'll add them back specially
