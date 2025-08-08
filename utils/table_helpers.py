@@ -16,22 +16,18 @@ def apply_professional_header_styling(cell):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         for run in paragraph.runs:
             run.font.bold = True
-            run.font.name = 'Lato'
+            run.font.name = 'Segoe UI'
             run.font.size = Pt(11)
-            run.font.color.rgb = RGBColor(255, 255, 255)  # White text
+            # Use default text color (black) for readability
     
-    # Add blue header background
-    try:
-        shading_elm = parse_xml(r'<w:shd {} w:fill="003366"/>'.format(qn('w:val')))
-        cell._element.get_or_add_tcPr().append(shading_elm)
-    except Exception:
-        pass  # Graceful fallback
+    # No background color for clean, professional appearance
+    # Background remains default (white)
 
 def apply_data_cell_styling(cell, row_idx):
     """Apply consistent data cell styling with alternating row colors"""
     for paragraph in cell.paragraphs:
         for run in paragraph.runs:
-            run.font.name = 'Lato'
+            run.font.name = 'Segoe UI'
             run.font.size = Pt(10)
     
     # Alternating row colors for better readability

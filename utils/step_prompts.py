@@ -479,7 +479,6 @@ Write a concise financial impact analysis. Your analysis, including the narrativ
 **REQUIRED JOURNAL ENTRIES - Show ALL of the following:**
 - **Contract signing/initial invoicing:** Establish the total receivable and corresponding deferred revenue liability for the entire contract value.
 - **Revenue recognition for EACH distinct performance obligation:** Show separate journal entries for each performance obligation identified in Step 2, whether point-in-time or over-time recognition.
-- **Variable consideration:** If applicable, show adjustment entries when variable consideration becomes fixed or changes.
 
 **Example format for each performance obligation:**
 

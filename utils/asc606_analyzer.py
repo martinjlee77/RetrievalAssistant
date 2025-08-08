@@ -943,7 +943,7 @@ class ASC606Analyzer:
                 separator,
                 f"## 6. CONCLUSION\n{conclusion}",
                 separator,
-                f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
+                f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
 
             final_memo = "\n\n".join(final_memo_sections)
