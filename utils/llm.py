@@ -280,7 +280,7 @@ def validate_api_key() -> bool:
         return False
 
 def create_docx_from_text(text_content, contract_data=None):
-    """Creates a professional accounting memo in DOCX format with rule-based parsing and Lato font."""
+    """Creates a professional accounting memo in DOCX format with rule-based parsing and Segoe UI font."""
     from docx import Document
     from docx.shared import Inches, Pt, RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK
