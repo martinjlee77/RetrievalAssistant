@@ -414,10 +414,10 @@ def create_docx_from_text(text_content, contract_data=None):
     SUBSECTION_PATTERN = re.compile(r'^(OVERALL CONCLUSION|KEY FINDINGS|CONTRACT DATA SUMMARY|DOCUMENTS REVIEWED|DETAILED ANALYSIS|CONCLUSION)$')
     
     # Enhanced bullet patterns to capture indentation and different markers
-    NESTED_BULLET_PATTERN = re.compile(r'^(\s+)[\*\-]\s+(.*?)$')  # Captures leading whitespace
-    SUB_BULLET_PATTERN = re.compile(r'^-\s+(.*?)$')              # Hyphen as sub-bullet marker
-    MAIN_BULLET_PATTERN = re.compile(r'^[\*•]\s+(.*?)$')         # Asterisk/bullet as main bullet
-    BULLET_PATTERN = re.compile(r'^[\*\-•]\s+(.*?)$')           # Fallback for any bullet
+    NESTED_BULLET_PATTERN = re.compile(r'^(\s+)[\*\-•]\s+(.*?)$')  # Captures leading whitespace + bullet char
+    SUB_BULLET_PATTERN = re.compile(r'^-\s+(.*?)$')               # Hyphen as sub-bullet marker  
+    MAIN_BULLET_PATTERN = re.compile(r'^[\*•]\s+(.*?)$')          # Asterisk/bullet as main bullet
+    BULLET_PATTERN = re.compile(r'^[\*\-•]\s+(.*?)$')            # Fallback for any bullet
     
     NUMBERED_PATTERN = re.compile(r'^\d+\.\s+(.*?)$')
     BLOCKQUOTE_PATTERN = re.compile(r'^>\s*(.*?)$')

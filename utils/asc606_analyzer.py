@@ -930,7 +930,7 @@ class ASC606Analyzer:
 **RE:** ASC 606 Revenue Recognition Analysis - {getattr(contract_data, 'analysis_title', 'Revenue Contract Analysis')}\n\n\n
 """
 
-            separator = "\n\n---\n\n"
+            separator = "---"  # CHANGED: Remove all newlines from the separator
 
             final_memo_sections = [
                 memo_header,
@@ -949,7 +949,7 @@ class ASC606Analyzer:
                 f"**CONFIDENTIAL:** This memorandum contains confidential and proprietary information. Distribution is restricted to authorized personnel only.\n\n**PREPARED BY:** ASC 606 AI Analyst \n**REVIEWED BY:** [To be completed] \n**APPROVED BY:** [To be completed]"
             ]
 
-            final_memo = "\n\n".join(final_memo_sections)
+            final_memo = "\n".join(final_memo_sections)  # CHANGED: Use a single newline to join
 
             self.logger.info(
                 f"Python-assembled memo completed: {len(final_memo)} characters with all 6 sections"
