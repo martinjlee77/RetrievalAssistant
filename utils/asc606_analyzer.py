@@ -176,14 +176,25 @@ class ASC606Analyzer:
             if not extraction_result:
                 raise ValueError("No extraction result received from LLM")
             
+            # ENHANCED DEBUGGING: Log the raw LLM response before JSON parsing
+            self.logger.info(f"🧮 RAW LLM EXTRACTION RESULT:")
+            self.logger.info(f"  Raw JSON length: {len(extraction_result)} characters")
+            self.logger.info(f"  Raw JSON: {extraction_result}")
+            
             extracted_data = json.loads(extraction_result)
             fee_components = extracted_data.get("fee_components", [])
+            
+            # ENHANCED DEBUGGING: Log the parsed fee components
+            self.logger.info(f"🧮 PARSED FEE COMPONENTS:")
+            self.logger.info(f"  Found {len(fee_components)} components in extracted data")
+            for i, comp in enumerate(fee_components):
+                self.logger.info(f"  Component {i+1}: {comp}")
             
             # Step 3: Python calculates reliable totals
             financial_facts = self._calculate_transaction_price(fee_components)
             financial_facts["fee_components"] = fee_components  # Include original components for reference
             
-            self.logger.info(f"Financial extraction successful: {len(fee_components)} components, Total: ${financial_facts['total_transaction_price']:,.2f}")
+            self.logger.info(f"🧮 Financial extraction successful: {len(fee_components)} components, Total: ${financial_facts['total_transaction_price']:,.2f}")
             return financial_facts
             
         except Exception as e:
@@ -206,6 +217,11 @@ class ASC606Analyzer:
         component_details = []
         saas_components = []
         
+        # ENHANCED DEBUGGING: Log the extracted components before calculation
+        self.logger.info(f"🧮 CALCULATION DEBUG: Processing {len(fee_components)} fee components:")
+        for i, component in enumerate(fee_components):
+            self.logger.info(f"  Component {i+1}: {component}")
+        
         for component in fee_components:
             try:
                 base_amount = float(component.get("base_amount", 0))
@@ -215,19 +231,28 @@ class ASC606Analyzer:
                 probability = float(component.get("probability", 0))
                 component_name = component.get("component_name", "Unknown")
                 
+                # ENHANCED DEBUGGING: Log each component's values
+                self.logger.info(f"🧮 Processing '{component_name}': base=${base_amount:,.2f}, period={period}, duration={duration}, is_variable={is_variable}, probability={probability}")
+                
                 # Calculate total amount based on period
                 if period == "annual":
                     total_amount = base_amount * duration
+                    self.logger.info(f"  → Annual calculation: ${base_amount:,.2f} × {duration} years = ${total_amount:,.2f}")
                 elif period == "monthly":
                     total_amount = base_amount * duration * 12  # Convert to annual equivalent
+                    self.logger.info(f"  → Monthly calculation: ${base_amount:,.2f} × {duration} × 12 months = ${total_amount:,.2f}")
                 elif period == "quarterly":
                     total_amount = base_amount * duration * 4   # Convert to annual equivalent
+                    self.logger.info(f"  → Quarterly calculation: ${base_amount:,.2f} × {duration} × 4 quarters = ${total_amount:,.2f}")
                 elif period == "one-time":
                     total_amount = base_amount
+                    self.logger.info(f"  → One-time amount: ${total_amount:,.2f}")
                 elif period == "contingent":
                     total_amount = base_amount  # Full amount, probability handled below
+                    self.logger.info(f"  → Contingent amount: ${total_amount:,.2f}")
                 else:  # "usage-based" or unknown
                     total_amount = base_amount  # Use base amount as-is
+                    self.logger.info(f"  → Default (unknown period '{period}'): ${total_amount:,.2f}")
                 
                 # Track SaaS components for monthly revenue calculation
                 if "saas" in component_name.lower() or "license" in component_name.lower():
@@ -249,9 +274,9 @@ class ASC606Analyzer:
                             "type": "variable",
                             "probability": probability
                         })
-                        self.logger.info(f"Including variable component '{component_name}': ${total_amount:,.2f} (probability: {probability:.1%})")
+                        self.logger.info(f"  ✅ ADDING TO VARIABLE TOTAL: ${total_amount:,.2f} (probability: {probability:.1%}) | New variable total: ${variable_total:,.2f}")
                     else:
-                        self.logger.info(f"Excluding variable component '{component_name}': ${total_amount:,.2f} (probability too low: {probability:.1%})")
+                        self.logger.info(f"  ❌ EXCLUDING variable component '{component_name}': ${total_amount:,.2f} (probability too low: {probability:.1%})")
                 else:
                     fixed_total += total_amount
                     component_details.append({
@@ -259,6 +284,7 @@ class ASC606Analyzer:
                         "amount": total_amount,
                         "type": "fixed"
                     })
+                    self.logger.info(f"  ✅ ADDING TO FIXED TOTAL: ${total_amount:,.2f} | New fixed total: ${fixed_total:,.2f}")
                     
             except (ValueError, TypeError) as e:
                 self.logger.warning(f"Error calculating component {component.get('component_name', 'Unknown')}: {e}")
@@ -274,16 +300,24 @@ class ASC606Analyzer:
                 monthly_saas_revenue = primary_saas["total_amount"] / primary_saas["duration_months"]
                 saas_term_months = primary_saas["duration_months"]
         
+        # FINAL CALCULATION SUMMARY
+        total_transaction_price = fixed_total + variable_total
+        self.logger.info(f"🧮 FINAL CALCULATION SUMMARY:")
+        self.logger.info(f"  Fixed Consideration Total: ${fixed_total:,.2f}")
+        self.logger.info(f"  Variable Consideration Total: ${variable_total:,.2f}")
+        self.logger.info(f"  TOTAL TRANSACTION PRICE: ${total_transaction_price:,.2f}")
+        self.logger.info(f"  Components processed: {len(component_details)} added, {len(fee_components) - len(component_details)} excluded")
+
         # Enhanced financial facts for journal entries
         financial_facts = {
             "fixed_consideration": fixed_total,
             "variable_consideration": variable_total,
-            "total_transaction_price": fixed_total + variable_total,
+            "total_transaction_price": total_transaction_price,
             "calculation_method": "hybrid_extract_calculate",
             "component_details": component_details,
             "monthly_saas_revenue": monthly_saas_revenue,
             "saas_term_months": saas_term_months,
-            "total_upfront_cash": fixed_total + variable_total,  # Assuming all amounts are due upfront for simplicity
+            "total_upfront_cash": total_transaction_price,  # Assuming all amounts are due upfront for simplicity
         }
         
         # Add component-specific amounts for journal entries
