@@ -846,8 +846,22 @@ class ASC606Analyzer:
                 f"⚡ All 5 memo sections completed concurrently in {memo_duration:.2f}s"
             )
 
-            # Unpack concurrent results
+            # Unpack concurrent results and apply sanitization to all LLM outputs
             executive_summary, background, key_judgments, financial_impact, conclusion = memo_responses
+            
+            # ENHANCED: Apply sanitization to all memo LLM outputs before processing
+            if isinstance(executive_summary, str):
+                executive_summary = self._sanitize_llm_json(executive_summary)
+            if isinstance(background, str):
+                background = self._sanitize_llm_json(background)
+            if isinstance(key_judgments, str):
+                key_judgments = self._sanitize_llm_json(key_judgments)
+            if isinstance(financial_impact, str):
+                financial_impact = self._sanitize_llm_json(financial_impact)
+            if isinstance(conclusion, str):
+                conclusion = self._sanitize_llm_json(conclusion)
+            
+            self.logger.info("🧽 Applied _sanitize_llm_json to all memo section outputs")
 
             # Handle any exceptions in memo generation
             for i, response in enumerate(memo_responses):

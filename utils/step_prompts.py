@@ -97,7 +97,7 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
             "{",
             f'  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the \'bottom line\'.",',
             f'  "{step_schema_name}": {step_schema_definition},',
-            '  "professional_judgments": [ "A list of SHORT TITLES (2-4 words) for professional judgments made in this step. Examples: \'SSP Estimation\', \'Variable Consideration\', \'Contract Modification\', \'Revenue Timing\'. Use concise accounting terminology. If none, return an empty list []." ],',
+            '  "professional_judgments": [ {"judgment_title": "SHORT TITLE (2-4 words)", "judgment_rationale": "Brief explanation of the judgment and why it was necessary"} ],',
             '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
             "}",
             "```",
@@ -117,21 +117,37 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
 
         Returns only judgments that involve significant estimation, choice between 
         viable alternatives, or genuine uncertainty.
+        
+        Updated to handle both string and title/rationale object formats.
         """
         filtered_judgments = []
         for judgment in judgments:
-            judgment_lower = judgment.lower()
+            # Handle both old string format and new title/rationale object format
+            if isinstance(judgment, dict):
+                # New format: {"judgment_title": "...", "judgment_rationale": "..."}
+                judgment_text = f"{judgment.get('judgment_title', '')} {judgment.get('judgment_rationale', '')}".lower()
+                judgment_title = judgment.get('judgment_title', '')
+            elif isinstance(judgment, str):
+                # Old format: simple string
+                judgment_text = judgment.lower()
+                judgment_title = judgment
+            else:
+                continue
+                
             # Filter out standard ASC 606 application
             is_standard_application = (
-                "single performance obligation" in judgment_lower or
-                "over time" in judgment_lower or 
-                "point in time" in judgment_lower or
-                "distinct" in judgment_lower or
-                "revenue is recognized" in judgment_lower or
-                "subscription service" in judgment_lower
+                "single performance obligation" in judgment_text or
+                "over time" in judgment_text or 
+                "point in time" in judgment_text or
+                "distinct" in judgment_text or
+                "revenue is recognized" in judgment_text or
+                "subscription service" in judgment_text
             )
+            
             if not is_standard_application:
+                # Return the original judgment (preserving new format if it's an object)
                 filtered_judgments.append(judgment)
+        
         return filtered_judgments
 
     @staticmethod
@@ -751,7 +767,7 @@ SECTION STRUCTURE & REQUIREMENTS:
 - **Transaction Price:** {total_price}{' (includes variable consideration)' if has_variable_consideration else ''}
 - **Allocation:** {allocation_method}
 - **Revenue Recognition:** {', '.join(recognition_methods[:2]) if recognition_methods else 'Not applicable'}{'...' if len(recognition_methods) > 2 else ''}
-- **Critical Judgments:** {', '.join(critical_judgments) if critical_judgments else 'None identified'}
+- **Critical Judgments:** {', '.join([j.get('judgment_title', str(j)) if isinstance(j, dict) else str(j) for j in critical_judgments]) if critical_judgments else 'None identified'}
 
 **PROFESSIONAL STANDARDS:**
 - Write with the authority and precision expected in Big 4 audit documentation
