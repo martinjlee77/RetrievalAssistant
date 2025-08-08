@@ -283,12 +283,18 @@ REQUIRED JSON OUTPUT FORMAT:
   ]
 }}
 
+CRITICAL DISCOUNT INTERPRETATION RULES:
+1. When a contract states "The fees reflect a X% discount" or "The fees include a X% discount", the amounts listed are ALREADY POST-DISCOUNT amounts
+2. Use the exact amounts stated in the contract - do NOT apply additional discounts to amounts that are already discounted
+3. If the contract says "standard price minus X% discount", then calculate the discount. But if it says "the fees reflect a discount", use the stated amounts as-is
+4. Variable considerations (bonuses, penalties) are separate from bundle discounts
+
 INSTRUCTIONS:
 - Extract ALL monetary amounts mentioned in the contract
-- Convert percentages to decimal (10% = 0.10)
+- Use the EXACT amounts stated in the pricing section - do not recalculate discounted amounts
+- Convert percentages to decimal (10% = 0.10) only for probability calculations, not for fee amounts
 - Use precise decimal amounts (no rounding)
 - Include both fixed and variable considerations
-- Note any bundle discounts or special pricing
 - Be thorough but accurate - do not add amounts not explicitly mentioned
 
 Respond ONLY with the JSON object."""
