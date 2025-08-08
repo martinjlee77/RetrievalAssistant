@@ -307,7 +307,7 @@ def create_docx_from_text(text_content, contract_data=None):
     # Configure paragraph spacing to match HTML (12pt consistent spacing)
     paragraph_format = style.paragraph_format
     paragraph_format.space_after = Pt(12)  # Matches HTML consistent_spacing
-    paragraph_format.line_spacing = 1.3  # Closer to HTML comfortable spacing
+    paragraph_format.line_spacing = 1.0  # Single spacing as requested
     
     # Set standard accounting memo margins (1" all sides)
     sections = document.sections
