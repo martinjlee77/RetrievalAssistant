@@ -1037,7 +1037,9 @@ class ASC606Analyzer:
 
 **DOCUMENTS REVIEWED**
 
-{documents_list}"""
+{documents_list}
+
+"""
 
     def _format_documents_list(self, contract_data) -> str:
         """Format the list of documents reviewed for the analysis using robust contract_data approach."""
