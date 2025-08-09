@@ -73,13 +73,6 @@ pg = st.navigation([
     st.Page("pages/asc606.py",
             title="ASC 606 Contract Review",
             icon=":material/arrow_forward:"),
-    st.Page("pages/asc842.py",
-            title="ASC 842 Analyzer",
-            icon=":material/arrow_forward:"),
-    st.Page("pages/login.py", title="Login", icon=":material/login:"),
-    st.Page("pages/register.py",
-            title="Register",
-            icon=":material/person_add:"),
 ])
 
 # 5. Run the app.

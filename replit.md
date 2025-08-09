@@ -48,30 +48,35 @@ Critical Development Rules - Prompt Protection:
 - **Legacy Code Cleanup**: Removed unused `utils/prompt.py` file - system now fully consolidated on `utils/step_prompts.py`.
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern to eliminate mathematical errors in transaction price determination. AI extracts structured fee components, Python performs reliable calculations. Ensures 100% accuracy for financial amounts in Step 3 analysis and memo generation.
 - **Unified Financial Data Flow**: Fixed architectural inconsistency where financial impact section was performing separate calculations instead of using completed Step 3, 4, and 5 results. Journal entries now derive amounts exclusively from the hybrid calculation system, eliminating calculation discrepancies. Extended calculated financial facts injection to Step 4 allocation analysis to ensure consistent transaction price usage across all steps (August 2025).
+- **Comprehensive Cleanup**: Removed 99+ development note files, placeholder authentication pages, unused utility files, and old memo outputs. Retained only essential authoritative guidance (10 text files) and sample contracts (7 PDFs). Cleaned directory structure for next development phase (August 2025).
 
 ### File Structure
 ```
 ├── home.py                               # Streamlit app entry point with navigation
 ├── pages/                                # Streamlit pages
 │   ├── home_content.py                   # Home page dashboard content
-│   ├── asc606.py                         # ASC 606 revenue recognition
-│   └── asc842.py                         # ASC 842 lease analysis (placeholder)
+│   └── asc606.py                         # ASC 606 revenue recognition analysis
 ├── assets/                               # Static assets
 │   └── images/
 │       └── logo.png                      # Controller.cpa logo
 ├── utils/                                # Core utilities
-│   ├── llm.py                            # OpenAI API calls, knowledge base, debugging tools (GPT-5)
-│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy and financial extraction
-│   ├── auth.py                           # Authentication utilities (placeholder)
+│   ├── llm.py                            # OpenAI API calls, DOCX/HTML generation (GPT-4o)
+│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy
 │   ├── document_extractor.py             # Multi-format document processing
-│   └── asc606_analyzer.py                # Consolidated ASC 606 hybrid analyzer with extract-then-calculate system
+│   ├── asc606_analyzer.py                # ASC 606 hybrid analyzer with extract-then-calculate
+│   └── html_export.py                    # Professional HTML memo generation
 ├── core/                                 # Shared backend logic
 │   ├── analyzers.py                      # Analyzer factory and base classes
 │   ├── models.py                         # Centralized data models
 │   ├── knowledge_base.py                 # Multi-standard knowledge base manager
 │   └── ui_helpers.py                     # Shared UI components and styling
-├── attached_assets/                      # Authoritative sources (cleaned)
-├── asc606_knowledge_base/                # ChromaDB vector database (single source)
+├── attached_assets/                      # Essential authoritative sources only
+│   ├── 05_overview_background_*.txt      # ASC 606 official guidance sections
+│   ├── 10_objectives_*.txt               # (9 total ASC 606 text files)
+│   ├── netflix_*.pdf                     # Sample contract files (5 PDFs)
+│   └── contract_review_questions_*.txt   # Contract analysis framework
+├── asc606_knowledge_base/                # ChromaDB vector database
+├── seed_knowledge_base.py                # Knowledge base initialization
 ├── pyproject.toml                        # Dependencies
 └── replit.md                             # Project documentation
 ```
