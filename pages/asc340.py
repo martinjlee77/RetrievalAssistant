@@ -210,7 +210,7 @@ def process_analysis(form_data: dict):
             status_text.text("Initializing ASC 340-40 analysis...")
             progress_bar.progress(20)
             
-            # Run analysis
+            # Run analysis using correct method name
             result = asyncio.run(analyzer.analyze_contract_costs_policy(contract_data))
             
             progress_bar.progress(100)
@@ -245,14 +245,14 @@ def process_analysis(form_data: dict):
         st.error("Analysis completed but no memo was generated. Please try again.")
 
 def main():
-    """Main function for ASC 340-40 Contract Costs analysis page"""
+    """Main function for ASC 340-40 Contract Costs analysis page - follows ASC 606 pattern"""
     
-    # Check if we're in analysis mode or form mode
+    # Check if we're in results mode (like ASC 606)
     if "asc340_analysis_result" in st.session_state:
-        # Show analysis results on a new page
+        # Show analysis results on a new page (matching ASC 606 exactly)
         show_analysis_results()
     else:
-        # Show the form
+        # Show the form (matching ASC 606 pattern)
         form_data = render_single_page_form()
         
         # Process analysis if button clicked
@@ -260,69 +260,78 @@ def main():
             process_analysis(form_data)
 
 def show_analysis_results():
-    """Display analysis results in ASC 606 style with HTML preview and DOCX download only"""
+    """Display analysis results - EXACT copy of ASC 606 pattern"""
     result = st.session_state.asc340_analysis_result
     form_data = st.session_state.asc340_form_data
     
-    # Header with navigation
-    col1, col2 = st.columns([6, 1])
+    # Header with navigation (matching ASC 606 exactly)
+    col1, col2 = st.columns([3, 1])
     with col1:
-        st.title("📝 ASC 340-40 Policy Memorandum")
-        st.caption(f"Generated for {form_data['company_name']} • {form_data['analysis_title']}")
+        analysis_title = form_data.get('analysis_title', 'Unknown Analysis')
+        st.subheader(f"📊 Analysis Results: {analysis_title}")
     with col2:
-        if st.button("🔄 New Analysis", type="secondary"):
-            del st.session_state.asc340_analysis_result
-            del st.session_state.asc340_form_data
+        if st.button("🔄 Start New Analysis", use_container_width=True):
+            # Clear session state like ASC 606
+            for key in list(st.session_state.keys()):
+                if key.startswith('asc340_'):
+                    del st.session_state[key]
             st.rerun()
+
+    # Analysis status (matching ASC 606)
+    with st.container(border=True):
+        st.markdown("**✅ Analysis Complete**")
+        st.write("Professional ASC 340-40 policy memo generated using hybrid RAG system with authoritative sources.")
+
+    st.subheader("📋 ASC 340-40 Accounting Policy Memo")
     
-    # HTML Preview (matching ASC 606 style)
-    st.subheader("📄 Policy Memorandum Preview")
+    memo = getattr(result, 'professional_memo', None)
     
-    # Display memo content in HTML format
-    memo_content = result.professional_memo
-    if memo_content and memo_content.strip():
-        # Convert to HTML for preview
-        try:
-            from utils.html_export import convert_memo_to_html
-            html_content = convert_memo_to_html(memo_content)
+    if memo:
+        # Generate content once for both preview and download (exactly like ASC 606)
+        from utils.html_export import convert_memo_to_html
+        from utils.llm import create_docx_from_text
+        
+        # Create contract data object for HTML conversion (ASC 606 pattern)
+        contract_data_for_html = type('obj', (object,), {
+            'analysis_title': form_data.get('analysis_title', 'ASC340_Policy'),
+            'company_name': form_data.get('company_name', 'Company')
+        })()
+        
+        html_content = convert_memo_to_html(memo, contract_data_for_html)
+        analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
+
+        # --- PREVIEW FIRST (exactly like ASC 606) ---
+        with st.expander("📄 Memo Preview", expanded=True):
+            import streamlit.components.v1 as components
             
-            # Display HTML preview
-            st.components.v1.html(html_content, height=600, scrolling=True)
-            
-            # DOCX Download only (no HTML download to match ASC 606)
-            st.subheader("📥 Download Options")
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
+
+        # --- DOWNLOAD ACTION (exactly like ASC 606) ---
+        with st.container(border=True):
+            st.markdown("**Export Memo**")
+            st.write("Download the memo as an editable Word document for review and filing.")
+
+            # Single primary action - Download DOCX (exactly like ASC 606)
             try:
-                docx_content = create_docx_from_text(
-                    memo_content,
-                    form_data["analysis_title"]
-                )
+                docx_content = create_docx_from_text(memo, contract_data_for_html)
                 st.download_button(
-                    label="📄 Download DOCX",
+                    label="📄 Download as Word Document (.DOCX)",
                     data=docx_content,
-                    file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.docx",
+                    file_name=f"{analysis_title.replace(' ', '_')}_ASC340_Policy.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True,
                     type="primary",
-                    use_container_width=True
+                    help="Download the memo as a fully-formatted, editable Word document, ready for audit files."
                 )
             except Exception as e:
-                st.error(f"DOCX generation error: {str(e)}")
-                
-        except Exception as e:
-            st.error(f"Preview generation failed: {str(e)}")
-            # Fallback to markdown display
-            with st.container(border=True):
-                st.markdown(memo_content)
+                st.error(f"Error generating DOCX: {str(e)}")
+
     else:
-        st.error("Analysis completed but no memo was generated. Please try a new analysis.")
-    
-    # Analysis metadata (optional expandable section)
-    with st.expander("📊 Analysis Details"):
-        st.json({
-            "Analysis Duration": f"{getattr(result, 'analysis_duration_seconds', 'N/A')} seconds",
-            "Relevant Knowledge Chunks": getattr(result, 'relevant_chunks', 'N/A'),
-            "Analysis Timestamp": getattr(result, 'analysis_timestamp', 'N/A'),
-            "Analyzer Version": getattr(result, 'analyzer_version', 'ASC340_v1.0')
-        })
+        st.info("No memo was generated for this analysis.")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
