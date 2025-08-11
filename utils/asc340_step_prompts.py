@@ -52,7 +52,10 @@ class ASC340StepPrompts:
         # Build context information
         company_name = getattr(contract_data, 'company_name', 'the Company') if contract_data else 'the Company'
         contract_types = getattr(contract_data, 'contract_types_in_scope', []) if contract_data else []
-        cost_timing = getattr(contract_data, 'cost_timing', 'All Periods') if contract_data else 'All Periods'
+        cost_type = getattr(contract_data, 'cost_type', 'Incremental Cost of Obtaining') if contract_data else 'Incremental Cost of Obtaining'
+        recovery_probable = getattr(contract_data, 'recovery_probable', True) if contract_data else True
+        standard_amortization_period = getattr(contract_data, 'standard_amortization_period', 36) if contract_data else 36
+        practical_expedient = getattr(contract_data, 'practical_expedient', False) if contract_data else False
         
         # Step-specific instructions
         step_instructions = ASC340StepPrompts._get_step_instructions(step_number)
@@ -70,7 +73,10 @@ class ASC340StepPrompts:
 <ANALYSIS_CONTEXT>
 Company: {company_name}
 Contract Types in Scope: {', '.join(contract_types) if contract_types else 'General contract costs'}
-Cost Timing: {cost_timing}
+Cost Type Focus: {cost_type}
+Recovery Probable: {recovery_probable}
+Standard Amortization Period: {standard_amortization_period} months
+Practical Expedient Applied: {practical_expedient}
 Primary Guidance: {step_info['primary_guidance']}
 </ANALYSIS_CONTEXT>
 
@@ -81,7 +87,7 @@ Primary Guidance: {step_info['primary_guidance']}
 You must return a JSON object with this exact structure:
 {step_schema}
 
-**CRITICAL:** Your analysis must be policy-focused, establishing consistent principles for {company_name} rather than analyzing specific transactions."""
+**CRITICAL:** Your analysis must establish a policy framework for {company_name}, not analyze a single transaction. Focus on creating consistent application principles that accounting staff can follow across all similar arrangements."""
 
     @staticmethod
     def _get_step_instructions(step_number: int) -> str:
@@ -121,15 +127,15 @@ ANALYSIS REQUIREMENTS:
 Focus on establishing systematic, defensible approaches that ensure consistent application.""",
 
             4: """**STEP 4: ILLUSTRATIVE FINANCIAL IMPACT**
-Your task is to provide illustrative examples of the policy's financial impact.
+Your task is to provide illustrative examples of the policy's financial impact using placeholder amounts.
 
 ANALYSIS REQUIREMENTS:
-1. **Journal Entry Examples:** Provide template journal entries for capitalization and amortization
+1. **Journal Entry Examples:** Provide template journal entries for capitalization and amortization using a placeholder amount (e.g., $10,000)
 2. **Financial Statement Presentation:** Describe balance sheet and income statement presentation
 3. **Disclosure Requirements:** Summarize key disclosure requirements
 4. **Implementation Timeline:** Outline key implementation considerations
 
-Focus on practical application examples that demonstrate the policy in action."""
+**IMPORTANT:** Use placeholder amounts (e.g., $10,000) for all journal entries and include a disclaimer that entries are for illustrative purposes only. Focus on demonstrating the policy methodology, not calculating specific amounts."""
         }
         return instructions.get(step_number, "")
 

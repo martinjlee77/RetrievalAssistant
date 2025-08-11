@@ -56,7 +56,7 @@ def load_custom_css():
 
 # 1. Set the page configuration
 st.set_page_config(
-    page_title="Controller.cpa | Multi-Standard Accounting Platform",
+    page_title="VeritasLogic.ai | Multi-Standard Accounting Platform",
     page_icon="assets/images/logo.png",
     layout="wide",
     initial_sidebar_state="expanded")
@@ -75,7 +75,7 @@ pg = st.navigation([
             icon=":material/arrow_forward:"),
     st.Page("pages/asc340.py",
             title="ASC 340-40 Contract Costs",
-            icon=":material/policy:"),
+            icon=":material/arrow_forward:"),
 ])
 
 # 5. Run the app.

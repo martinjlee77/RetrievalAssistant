@@ -13,12 +13,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-try:
-    from core.models import ContractCostsData, ASC340Analysis
-except ImportError:
-    # Fallback import handling
-    sys.path.append('.')
-    from core.models import ContractCostsData, ASC340Analysis
+from core.models import ContractCostsData, ASC340Analysis
 from utils.asc340_analyzer import ASC340Analyzer
 from utils.document_extractor import DocumentExtractor
 from utils.llm import create_debug_sidebar, create_docx_from_text
@@ -105,21 +100,59 @@ def render_tab1_basic_information() -> dict:
 
 def render_tab2_analysis_context() -> dict:
     """Render Tab 2: Analysis context and focus areas"""
-    st.subheader(":material/tune: Provide Analysis Context")
+    st.subheader(":material/tune: Policy Analysis Parameters")
     
-    key_focus_areas = st.text_area(
-        "Key Areas of Focus (Optional)",
-        placeholder='e.g., "Focus on sales commission capitalization criteria and customer onboarding cost treatment."',
-        height=100,
-        help="Specify particular areas of ASC 340-40 that require special attention or are most relevant to your business.")
+    # Required fields section
+    st.markdown("### Required Parameters")
     
     col1, col2 = st.columns(2, gap="small")
     with col1:
+        cost_type = st.selectbox(
+            "Cost Type *",
+            ["Incremental Cost of Obtaining", "Cost to Fulfill a Contract", "Both Types"],
+            index=0,
+            help="Primary type of contract costs this policy will address.")
+        
+        recovery_probable = st.toggle(
+            "Is recovery of costs probable? *",
+            value=True,
+            help="Assessment of whether contract costs are expected to be recoverable.")
+    
+    with col2:
+        standard_amortization_period = st.number_input(
+            "Standard Amortization Period (months) *",
+            min_value=1,
+            max_value=120,
+            value=36,
+            help="Default amortization period for capitalized contract costs.")
+        
+        practical_expedient = st.toggle(
+            "Apply Practical Expedient (≤1 yr) *",
+            value=False,
+            help="Whether to apply the one-year practical expedient for immediate expensing.")
+    
+    # Optional fields section
+    st.markdown("### Optional Parameters")
+    
+    col3, col4 = st.columns(2, gap="small")
+    with col3:
+        contract_type_scope = st.multiselect(
+            "Contract Type Scope (Optional)",
+            ["Software as a Service (SaaS)", "Professional Services", "Product Sales", "Maintenance & Support", "Implementation Services"],
+            help="Specific contract types to focus on in the policy analysis.")
+        
         memo_audience = st.selectbox(
             "Primary Memo Audience",
             ["Technical Accounting Team", "Audit File Documentation", "Management Review", "Board Presentation"],
             help="Select the primary audience for the accounting policy memorandum.")
-    with col2:
+    
+    with col4:
+        cost_timing_focus = st.selectbox(
+            "Cost Timing Focus (Optional)",
+            [None, "Pre-contract Costs", "Contract Execution Costs", "Post-delivery Costs"],
+            format_func=lambda x: "All Periods" if x is None else x,
+            help="Temporal focus for the cost analysis.")
+        
         materiality_threshold = st.number_input(
             "Materiality Threshold (Optional)",
             min_value=0,
@@ -129,10 +162,15 @@ def render_tab2_analysis_context() -> dict:
     
     st.markdown("---")
     with st.container(border=True):
-        st.info("Complete the fields above, then continue to **3️⃣ Generate Analysis** to create your ASC 340-40 policy memorandum.")
+        st.info("Complete the required fields above, then continue to **3️⃣ Generate Analysis** to create your ASC 340-40 policy memorandum.")
     
     return {
-        "key_focus_areas": key_focus_areas,
+        "cost_type": cost_type,
+        "recovery_probable": recovery_probable,
+        "standard_amortization_period": standard_amortization_period,
+        "practical_expedient": practical_expedient,
+        "contract_type_scope": contract_type_scope,
+        "cost_timing_focus": cost_timing_focus,
         "memo_audience": memo_audience,
         "materiality_threshold": materiality_threshold
     }
@@ -143,8 +181,12 @@ def render_tab3_generate_analysis(tab1_data: dict, tab2_data: dict):
     st.subheader(":material/analytics: Generate ASC 340-40 Contract Costs Policy")
     
     # Validation
-    required_fields = ["analysis_title", "company_name", "contract_types_in_scope", "cost_timing", "policy_effective_date"]
-    missing_fields = [field for field in required_fields if not tab1_data.get(field)]
+    required_fields_tab1 = ["analysis_title", "company_name", "contract_types_in_scope", "cost_timing", "policy_effective_date"]
+    required_fields_tab2 = ["cost_type", "recovery_probable", "standard_amortization_period", "practical_expedient"]
+    
+    missing_fields = []
+    missing_fields.extend([field for field in required_fields_tab1 if not tab1_data.get(field)])
+    missing_fields.extend([field for field in required_fields_tab2 if tab2_data.get(field) is None])
     
     if missing_fields:
         st.error(f"Please complete the following required fields in previous tabs: {', '.join(missing_fields)}")
@@ -158,9 +200,10 @@ def render_tab3_generate_analysis(tab1_data: dict, tab2_data: dict):
             st.write(f"**Company:** {tab1_data['company_name']}")
             st.write(f"**Effective Date:** {tab1_data['policy_effective_date']}")
         with col2:
-            st.write(f"**Cost Timing:** {tab1_data['cost_timing']}")
-            st.write(f"**Contract Types:** {len(tab1_data['contract_types_in_scope'])} types")
-            st.write(f"**Audience:** {tab2_data['memo_audience']}")
+            st.write(f"**Cost Type:** {tab2_data['cost_type']}")
+            st.write(f"**Amortization Period:** {tab2_data['standard_amortization_period']} months")
+            st.write(f"**Recovery Probable:** {'Yes' if tab2_data['recovery_probable'] else 'No'}")
+            st.write(f"**Practical Expedient:** {'Yes' if tab2_data['practical_expedient'] else 'No'}")
     
     # Analysis button
     if st.button("🚀 Generate ASC 340-40 Policy Analysis", type="primary", use_container_width=True):
@@ -201,7 +244,12 @@ def generate_asc340_analysis(tab1_data: dict, tab2_data: dict):
             contract_types_in_scope=tab1_data["contract_types_in_scope"],
             cost_timing=tab1_data["cost_timing"],
             arrangement_description=tab1_data.get("arrangement_description"),
-            key_focus_areas=tab2_data.get("key_focus_areas"),
+            cost_type=tab2_data["cost_type"],
+            recovery_probable=tab2_data["recovery_probable"],
+            standard_amortization_period=tab2_data["standard_amortization_period"],
+            practical_expedient=tab2_data["practical_expedient"],
+            contract_type_scope=tab2_data.get("contract_type_scope"),
+            cost_timing_focus=tab2_data.get("cost_timing_focus"),
             memo_audience=tab2_data["memo_audience"],
             materiality_threshold=tab2_data.get("materiality_threshold"),
             documents=documents,

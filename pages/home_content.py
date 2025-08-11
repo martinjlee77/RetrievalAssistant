@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 # st.write(f"Running Streamlit Version: {st.__version__}")
 
 # --- Header Section ---
-st.title("Controller.cpa Platform")
+st.title("VeritasLogic.ai Platform")
 st.subheader("Welcome back. Please select an analysis tool below to begin.")
 
 # --- Main Content: Call-to-Action Containers ---

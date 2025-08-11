@@ -81,6 +81,55 @@ class ASC340Analyzer:
 
         return cleaned_text.strip()
 
+    async def extract_policy_terms(self, document_text: str) -> Dict[str, Any]:
+        """
+        Extract key policy terms from uploaded documents using targeted LLM call.
+        This feeds into Step 3 analysis for grounded policy methodology.
+        """
+        if not document_text or len(document_text.strip()) < 100:
+            return {"extracted_terms": [], "note": "Insufficient document content for policy term extraction"}
+        
+        try:
+            system_prompt = """You are an expert at extracting contract cost policy terms from business documents. Extract specific policy clauses, rates, thresholds, and methodologies that would inform ASC 340-40 contract costs accounting policy development."""
+            
+            user_prompt = f"""Extract key policy terms from this document that would be relevant for ASC 340-40 contract costs policy development.
+
+DOCUMENT TEXT:
+{document_text}
+
+Focus on extracting:
+1. Commission rates or percentages
+2. Fixed fees or amounts
+3. Cost categories mentioned
+4. Timing of cost recognition
+5. Amortization periods mentioned
+6. Capitalization criteria
+7. Any existing policy language
+
+Return the extracted terms as a JSON object with this structure:
+{{
+  "commission_rates": ["Any commission rates or percentages found"],
+  "fixed_amounts": ["Any fixed dollar amounts mentioned"],
+  "cost_categories": ["Types of costs mentioned"],
+  "timing_criteria": ["When costs are recognized or capitalized"],
+  "amortization_periods": ["Any amortization periods mentioned"],
+  "policy_language": ["Existing policy statements found"],
+  "other_relevant_terms": ["Any other relevant policy terms"]
+}}"""
+            
+            response = await make_llm_call_async(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model="gpt-4o",
+                json_mode=True
+            )
+            
+            return json.loads(response)
+            
+        except Exception as e:
+            self.logger.error(f"Policy term extraction failed: {str(e)}")
+            return {"error": f"Policy term extraction failed: {str(e)}"}
+
     def _get_rag_context(self, query: str, specific_keywords: List[str] = None) -> Dict[str, Any]:
         """Retrieve relevant context from ASC 340-40 knowledge base using hybrid search"""
         if not self.kb_manager:

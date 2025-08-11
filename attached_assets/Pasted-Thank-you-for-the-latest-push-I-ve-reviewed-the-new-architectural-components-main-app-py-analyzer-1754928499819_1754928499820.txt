@@ -1,0 +1,41 @@
+Thank you for the latest push. I've reviewed the new architectural components (main_app.py, analyzer_factory.py, and the updated knowledge_base_manager.py) as well as the initial build of the asc340 module.
+
+The work on the platform's architecture is outstanding. The new st.navigation router and the analyzer_factory pattern are significant improvements that make the entire system more professional, scalable, and maintainable. This is exactly the high-quality foundation we need to support many future standards.
+
+With the architecture now locked in, let's focus on the final implementation details for the ASC 340-40 module to fully align it with our "Accounting Policy Memo" objective.
+
+Here are the key areas to address:
+
+1. Critical UI Update (pages/asc340.py)
+This is the most important next step. The current UI in asc340.py is a great starting point, but we need to replace the generic inputs with the specific, judgment-driving fields we finalized. These inputs are essential for the AI to generate a meaningful and defensible policy memo.
+
+Please update Tab 2 ("Analysis Context") to include the following required and optional fields:
+
+Field Name	UI Control	Status	Default Value
+Cost Type	Dropdown	Required	Incremental Cost of Obtaining
+Is recovery of costs probable?	Toggle	Required	Yes
+Standard Amortization Period (in months)	Number Input	Required	36
+Practical Expedient (≤1 yr)	Toggle	Required	No
+Contract Type Scope	Multi-select	Optional	(None)
+Cost Timing	Dropdown	Optional	(None)
+(Note: The Policy Title, Description, and Uploader in Tab 1 are good as-is.)
+
+2. Refine AI Prompts for Policy Focus (utils/asc340_step_prompts.py)
+The 4-step structure is perfect. Now, let's refine the content of the prompts to ensure the AI's output is consistently policy-focused.
+
+General Tone: Please add a recurring instruction in each step's prompt, such as: "CRITICAL: Your analysis must establish a policy framework for [Company Name], not analyze a single transaction."
+Step 3 (Measurement & Amortization): The prompt for this step needs to specifically instruct the AI to define a methodology for measurement based on the extracted policy terms, rather than calculating a single amount.
+Step 4 (Illustrative Impact): Please update the prompt to explicitly instruct the AI to use a placeholder amount (e.g., $10,000) for the journal entry and to include a disclaimer that the entry is for illustrative purposes.
+3. Implement "Extract Policy Terms" Logic (utils/asc340_analyzer.py)
+As part of the Step 3 analysis, we need to implement the logic for extracting policy terms from the user-uploaded document. Please add a dedicated method within the ASC340Analyzer that:
+
+Takes the text from the uploaded document.
+Uses a targeted LLM call to identify and extract key policy clauses (e.g., "commission is 5% of TCV," "fixed fee of $2,500").
+Feeds this extracted text as specific context into the main Step 3 analysis prompt.
+This completes the loop, allowing the AI to ground its policy description in the user's source document.
+
+The architectural work is complete and exceptionally well done. These final refinements to the asc340 module will ensure its output precisely matches our strategic goals.
+
+Let me know if you have any questions about these implementation details. Fantastic progress!
+
+Best,

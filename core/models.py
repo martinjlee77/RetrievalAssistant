@@ -88,7 +88,15 @@ class ContractCostsData(BaseModel):
     
     # Optional Context
     arrangement_description: Optional[str] = None
-    key_focus_areas: Optional[str] = None
+    
+    # New policy-specific fields
+    cost_type: str = "Incremental Cost of Obtaining"
+    recovery_probable: bool = True
+    standard_amortization_period: int = 36
+    practical_expedient: bool = False
+    contract_type_scope: Optional[List[str]] = None
+    cost_timing_focus: Optional[str] = None
+    
     memo_audience: str = "Technical Accounting Team"
     materiality_threshold: Optional[int] = None
     
