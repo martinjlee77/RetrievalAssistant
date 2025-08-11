@@ -19,7 +19,7 @@ from core.models import ContractCostsData, ASC340Analysis
 from core.analyzers import get_analyzer
 from utils.document_extractor import DocumentExtractor
 from utils.llm import create_docx_from_text
-from utils.html_export import create_html_memo
+from utils.html_export import generate_html_content
 
 def render_single_page_form():
     """Render the complete single-page ASC 340-40 form"""
@@ -243,7 +243,7 @@ def process_analysis(form_data: dict):
         
         with col1:
             # HTML Export
-            html_content = create_html_memo(
+            html_content = generate_html_content(
                 result.professional_memo, 
                 form_data["analysis_title"], 
                 form_data["company_name"]
