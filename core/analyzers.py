@@ -39,6 +39,10 @@ def get_analyzer(standard: str):
         from utils.asc606_analyzer import ASC606Analyzer
         return ASC606Analyzer()
     
+    elif standard == "ASC340":
+        from utils.asc340_analyzer import ASC340Analyzer
+        return ASC340Analyzer()
+        
     elif standard == "ASC 340-40":
         from utils.asc340_analyzer import ASC340Analyzer
         return ASC340Analyzer()

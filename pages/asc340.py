@@ -1,5 +1,5 @@
 """
-ASC 340-40 Contract Costs Analysis - Single Page Design
+ASC 340-40 Contract Costs Analysis - Single Page Design V2
 Generates comprehensive accounting policy memorandums for contract costs under ASC 340-40.
 """
 
@@ -10,6 +10,7 @@ import time
 from datetime import date
 from typing import Optional, List
 from pydantic import ValidationError
+
 # Add root directory to path for imports
 import sys
 import os
