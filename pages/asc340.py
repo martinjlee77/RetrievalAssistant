@@ -228,25 +228,36 @@ def process_analysis(form_data: dict):
     
     # Display results
     if result and hasattr(result, 'professional_memo'):
+        # Debug memo content
+        memo_content = result.professional_memo
+        if not memo_content or not memo_content.strip():
+            st.error("Analysis completed but the generated memo is empty. Please check the documents and try again.")
+            st.info("Debug info: Result object exists but professional_memo field is empty or None")
+            return
+            
         st.subheader("📝 Generated Policy Memorandum")
         
         # Display memo
         with st.container(border=True):
-            st.markdown(result.professional_memo)
+            st.markdown(memo_content)
         
         # Export options
         st.subheader("📥 Export Options")
         col1, col2 = st.columns(2)
         
         with col1:
-            # HTML Export
-            html_content = convert_memo_to_html(result.professional_memo)
-            st.download_button(
-                label="📄 Download HTML",
-                data=html_content,
-                file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.html",
-                mime="text/html"
-            )
+            # HTML Export - only if memo has content
+            try:
+                html_content = convert_memo_to_html(memo_content)
+                st.download_button(
+                    label="📄 Download HTML",
+                    data=html_content,
+                    file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.html",
+                    mime="text/html"
+                )
+            except ValueError as e:
+                st.error(f"HTML export failed: {str(e)}")
+                st.info(f"Memo content length: {len(memo_content) if memo_content else 0} characters")
         
         with col2:
             # DOCX Export

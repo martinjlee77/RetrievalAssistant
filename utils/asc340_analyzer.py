@@ -277,11 +277,20 @@ Return the extracted terms as a JSON object with this structure:
                 "analyzer_version": "ASC340_v1.0"
             }
             
-            # Create final analysis object
+            # Create initial analysis object
             asc340_analysis = ASC340Analysis(**analysis_data)
             
+            # Generate the professional memo
+            professional_memo = await self.generate_full_memo(asc340_analysis)
+            
+            # Update analysis data with generated memo
+            analysis_data["professional_memo"] = professional_memo
+            
+            # Create final analysis object with memo
+            final_analysis = ASC340Analysis(**analysis_data)
+            
             self.logger.info("ASC 340-40 analysis completed successfully")
-            return asc340_analysis
+            return final_analysis
             
         except Exception as e:
             self.logger.error(f"ASC 340-40 analysis failed: {e}")
