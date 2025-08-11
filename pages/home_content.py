@@ -44,12 +44,12 @@ with col2:
     with st.container(border=True):
         st.markdown("##### 🏢 ASC 842 - Leases")
         st.write(
-            "Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities with full support."
+            "Coming Soon: Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities."
         )
-        st.page_link(
-            "pages/asc842.py",
-            label="Go to ASC 842 Analyzer",
-            icon="➡️"
+        st.button(
+            "Coming Soon",
+            disabled=True,
+            use_container_width=True
         )
 
 # --- Footer and Stats ---
