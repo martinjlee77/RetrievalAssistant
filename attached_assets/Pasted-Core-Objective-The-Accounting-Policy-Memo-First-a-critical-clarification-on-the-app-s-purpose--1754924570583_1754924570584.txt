@@ -1,0 +1,62 @@
+Core Objective: The "Accounting Policy Memo"
+First, a critical clarification on the app's purpose. We've realized the primary user—a technical accountant—is not using this tool to calculate a specific commission payment. They are using it to establish a formal accounting policy.
+
+Their goal is to analyze a representative document (like a company-wide Sales Commission Plan or a standard SOW) and generate a definitive memo that documents the correct accounting treatment for all costs that will arise under that plan.
+
+This means the app's focus shifts from calculating a single dollar amount to defining and documenting a repeatable methodology. This insight drives the following requirements.
+
+Task 1: Knowledge Base Preparation (Prerequisite)
+This task remains unchanged. It is the first priority.
+
+Please create a standalone Python script (e.g., scripts/seed_db.py) to prepare the knowledge base for ASC 340-40. I will provide you with the official ASC 340-40 text and an EY interpretative guide.
+
+Your script should:
+
+Extract text from the source documents.
+Chunk the text (using paragraph numbers for the official text and paragraph breaks for the EY guide).
+Create Metadata for each chunk (source_type: "authoritative" or "interpretative").
+Load the chunks and metadata into a new ChromaDB collection for ASC 340-40 using the knowledge_base_manager.py.
+Task 2: Application Architecture
+As you correctly recommended, we will maintain our existing, successful architecture.
+
+Add a new page file: pages/asc_340_page.py.
+Do not create a main_app.py or restructure the existing navigation.
+Task 3: Detailed Business & Technical Requirements
+The app will implement a 4-step analysis framework to generate the policy memo.
+
+1. Analysis Framework (The 4 Steps for the AI):
+
+Step 1: Scope Assessment: Confirms that costs arising from the submitted plan are governed by ASC 340-40.
+Step 2: Cost Classification & Capitalization Policy: Analyzes the terms within the plan to determine if they meet the criteria for capitalization (e.g., "Costs under Section X of this plan meet the criteria for capitalization.").
+Step 3: Measurement Methodology & Amortization Policy: This is a key change. The AI will not calculate a final amount. Instead, it will:
+Extract Policy Terms: Identify and extract the specific clauses or formulas from the plan that dictate how a cost is calculated (e.g., "5% of TCV").
+Summarize Methodology: Describe the calculation methodology in the memo (e.g., "The amount to be capitalized is determined per Exhibit A of the Plan.").
+Document Amortization Policy: Using user input for the "Amortization Period," formally document the policy (e.g., "The asset will be amortized on a straight-line basis over 36 months...").
+Step 4: Illustrative Financial Impact: To make the policy practical, the AI will generate a pro-forma journal entry using a placeholder amount (e.g., $10,000) to demonstrate how the policy is applied in practice.
+2. UI Input Fields Specification (pages/asc_340_page.py):
+
+The UI must be simplified to support the policy memo objective.
+
+Tab 1: Document Details
+
+Policy Title: Text Input (e.g., "Policy for FY2024 Sales Commission Plan")
+Document Description: Text Area (e.g., "This plan covers commissions for all new enterprise contracts...")
+REMOVED: We will not have a "Total Cost Amount" input field.
+Upload Document: File Uploader
+Tab 2: Policy Context
+
+Cost Type: Dropdown ["Incremental Cost of Obtaining", "Cost to Fulfill"]
+Is recovery of costs probable under this plan?: Toggle [Yes/No]
+Standard Amortization Period (in months): Number Input (Crucial Input)
+Materiality Threshold: Number Input
+Practical Expedient: Toggle [Elect to expense costs for periods ≤ 1 year?]
+3. Analysis Logic (utils/):
+
+Create utils/asc_340_analyzer.py and utils/step_prompts_340.py.
+Implement the prompt architecture from the ASC 606 module, adapted for our new 4-step policy framework.
+Crucially, ensure the "Extract-Then-Calculate" pattern is adapted for Step 3 to extract policy terms and formulas, not just dollar amounts.
+The RAG call within asc_340_analyzer.py must query standard="ASC 340-40".
+4. Output Requirements:
+
+Memo Structure: The memo output should use the same professional format as the ASC 606 memos, reusing the existing export utilities.
+Citations: Maintain the same high standard for citing authoritative and interpretative guidance.
