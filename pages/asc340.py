@@ -24,23 +24,18 @@ from utils.html_export import convert_memo_to_html
 
 def render_single_page_form():
     """Render the complete single-page ASC 340-40 form"""
-    st.title("🏗️ ASC 340-40 Contract Costs Policy Analysis")
-    st.markdown("Generate comprehensive accounting policy memorandums for contract costs under ASC 340-40.")
+    st.title("ASC 340-40 Contract Costs Policy Analysis")
+    st.markdown("Generate an accounting policy memorandum for contract costs under ASC 340-40.")
     
     # Section 1: Policy Information
-    st.subheader("📋 Policy Information")
+    st.subheader(":material/contract: Background Information")
     
-    col1, col2 = st.columns([3, 1], gap="medium")
+    col1, col2 = st.columns(2, gap="small")
     with col1:
         analysis_title = st.text_input(
-            "Policy Title *",
+            "Analysis Title *",
             placeholder='e.g., "Contract Costs Policy - Sales Commissions and Setup Costs"',
             help="Descriptive title for this contract costs accounting policy.")
-        
-        company_name = st.text_input(
-            "Company Name *",
-            placeholder='e.g., "TechCorp Solutions"',
-            help="The legal entity name for this accounting policy.")
         
         arrangement_description = st.text_area(
             "Contract Cost Summary (Optional)",
@@ -49,17 +44,20 @@ def render_single_page_form():
             help="Brief description of the business context and scope of this policy.")
     
     with col2:
+        company_name = st.text_input(
+            "Company Name *",
+            placeholder='e.g., "TechCorp Solutions"',
+            help="The legal entity name for this accounting policy.")
+            
         policy_effective_date = st.date_input(
             "Policy Effective Date (Optional)",
             value=None,
             help="The date when this accounting policy becomes effective. If left blank, will default to generation date.")
     
-    st.divider()
-    
     # Section 2: Document Upload (Now Required)
-    st.subheader("📄 Document Upload")
+    st.subheader(":material/upload_file: Upload Documents")
     uploaded_files = st.file_uploader(
-        "Upload Policy Document for Analysis (Required) *",
+        "Upload Contract Cost Documents for Analysis (Required) *",
         type=['pdf', 'docx', 'txt'],
         accept_multiple_files=True,
         help="Upload the primary source document that governs the costs, such as a Sales Commission Plan or a standard SOW for fulfillment.")
@@ -67,32 +65,25 @@ def render_single_page_form():
     # Validation for required file upload
     file_uploaded = uploaded_files is not None and len(uploaded_files) > 0
     
-    st.divider()
-    
     # Section 3: Cost Analysis Parameters
-    st.subheader("⚙️ Cost Analysis Parameters")
+    st.subheader(":material/settings: Cost Analysis Parameters")
     
     # Primary Cost Categories (Required)
-    primary_cost_categories = st.multiselect(
-        "Primary Cost Categories in Scope *",
-        [
-            "Sales Commissions (External)",
-            "Sales Commissions (Internal Employee)",
-            "Sales Bonuses & Incentives",
-            "Contract Setup & Onboarding Costs",
-            "Customer Migration & Data Conversion Costs",
-            "Fulfillment-Related Third-Party Fees",
-            "Other (please specify in description)"
-        ],
-        help="Select the primary categories of contract costs this policy will address.")
-    
-    col1, col2 = st.columns(2, gap="medium")
+    col1, col2 = st.columns(2, gap="small")
     with col1:
-        recovery_probable = st.toggle(
-            "Is recovery of costs probable? *",
-            value=True,
-            help="Assessment of whether contract costs are expected to be recoverable.")
-        
+        primary_cost_categories = st.multiselect(
+            "Primary Cost Categories in Scope *",
+            [
+                "Sales Commissions (External)",
+                "Sales Commissions (Internal Employee)",
+                "Sales Bonuses & Incentives",
+                "Contract Setup & Onboarding Costs",
+                "Customer Migration & Data Conversion Costs",
+                "Fulfillment-Related Third-Party Fees",
+                "Other (please specify in description)"
+            ],
+            help="Select the primary categories of contract costs this policy will address.")
+
     with col2:
         standard_amortization_period = st.number_input(
             "Standard Amortization Period (months) *",
@@ -101,6 +92,11 @@ def render_single_page_form():
             value=36,
             help="Default amortization period for capitalized contract costs.")
     
+    recovery_probable = st.toggle(
+        "Is recovery of costs probable? *",
+        value=True,
+        help="Assessment of whether contract costs are expected to be recoverable.")
+        
     practical_expedient = st.toggle(
         "Apply Practical Expedient (≤1 yr) *",
         value=False,
