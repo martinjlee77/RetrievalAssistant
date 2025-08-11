@@ -226,7 +226,7 @@ def process_analysis(form_data: dict):
             status_text.empty()
             return
     
-    # Display results
+    # Store results in session state and redirect to results page
     if result and hasattr(result, 'professional_memo'):
         # Debug memo content
         memo_content = result.professional_memo
@@ -235,67 +235,94 @@ def process_analysis(form_data: dict):
             st.info("Debug info: Result object exists but professional_memo field is empty or None")
             return
             
-        st.subheader("📝 Generated Policy Memorandum")
+        # Store in session state for results page
+        st.session_state.asc340_analysis_result = result
+        st.session_state.asc340_form_data = form_data
         
-        # Display memo
-        with st.container(border=True):
-            st.markdown(memo_content)
-        
-        # Export options
-        st.subheader("📥 Export Options")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # HTML Export - only if memo has content
-            try:
-                html_content = convert_memo_to_html(memo_content)
-                st.download_button(
-                    label="📄 Download HTML",
-                    data=html_content,
-                    file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.html",
-                    mime="text/html"
-                )
-            except ValueError as e:
-                st.error(f"HTML export failed: {str(e)}")
-                st.info(f"Memo content length: {len(memo_content) if memo_content else 0} characters")
-        
-        with col2:
-            # DOCX Export
-            try:
-                docx_content = create_docx_from_text(
-                    result.professional_memo,
-                    form_data["analysis_title"]
-                )
-                st.download_button(
-                    label="📄 Download DOCX",
-                    data=docx_content,
-                    file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                )
-            except Exception as e:
-                st.error(f"DOCX generation error: {str(e)}")
-        
-        # Analysis metadata
-        with st.expander("📊 Analysis Details"):
-            st.json({
-                "Analysis Duration": f"{getattr(result, 'analysis_duration_seconds', 'N/A')} seconds",
-                "Relevant Knowledge Chunks": getattr(result, 'relevant_chunks', 'N/A'),
-                "Analysis Timestamp": getattr(result, 'analysis_timestamp', 'N/A'),
-                "Analyzer Version": getattr(result, 'analyzer_version', 'ASC340_v1.0')
-            })
+        # Redirect to results display
+        st.rerun()
     else:
         st.error("Analysis completed but no memo was generated. Please try again.")
 
 def main():
     """Main function for ASC 340-40 Contract Costs analysis page"""
     
-    # Render the form
-    form_data = render_single_page_form()
+    # Check if we're in analysis mode or form mode
+    if "asc340_analysis_result" in st.session_state:
+        # Show analysis results on a new page
+        show_analysis_results()
+    else:
+        # Show the form
+        form_data = render_single_page_form()
+        
+        # Process analysis if button clicked
+        if form_data["generate_button"] and form_data["required_fields_complete"]:
+            process_analysis(form_data)
+
+def show_analysis_results():
+    """Display analysis results in ASC 606 style with HTML preview and DOCX download only"""
+    result = st.session_state.asc340_analysis_result
+    form_data = st.session_state.asc340_form_data
     
-    # Process analysis if button clicked
-    if form_data["generate_button"] and form_data["required_fields_complete"]:
-        st.markdown("---")
-        process_analysis(form_data)
+    # Header with navigation
+    col1, col2 = st.columns([6, 1])
+    with col1:
+        st.title("📝 ASC 340-40 Policy Memorandum")
+        st.caption(f"Generated for {form_data['company_name']} • {form_data['analysis_title']}")
+    with col2:
+        if st.button("🔄 New Analysis", type="secondary"):
+            del st.session_state.asc340_analysis_result
+            del st.session_state.asc340_form_data
+            st.rerun()
+    
+    # HTML Preview (matching ASC 606 style)
+    st.subheader("📄 Policy Memorandum Preview")
+    
+    # Display memo content in HTML format
+    memo_content = result.professional_memo
+    if memo_content and memo_content.strip():
+        # Convert to HTML for preview
+        try:
+            from utils.html_export import convert_memo_to_html
+            html_content = convert_memo_to_html(memo_content)
+            
+            # Display HTML preview
+            st.components.v1.html(html_content, height=600, scrolling=True)
+            
+            # DOCX Download only (no HTML download to match ASC 606)
+            st.subheader("📥 Download Options")
+            try:
+                docx_content = create_docx_from_text(
+                    memo_content,
+                    form_data["analysis_title"]
+                )
+                st.download_button(
+                    label="📄 Download DOCX",
+                    data=docx_content,
+                    file_name=f"ASC340_Policy_{form_data['company_name'].replace(' ', '_')}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    type="primary",
+                    use_container_width=True
+                )
+            except Exception as e:
+                st.error(f"DOCX generation error: {str(e)}")
+                
+        except Exception as e:
+            st.error(f"Preview generation failed: {str(e)}")
+            # Fallback to markdown display
+            with st.container(border=True):
+                st.markdown(memo_content)
+    else:
+        st.error("Analysis completed but no memo was generated. Please try a new analysis.")
+    
+    # Analysis metadata (optional expandable section)
+    with st.expander("📊 Analysis Details"):
+        st.json({
+            "Analysis Duration": f"{getattr(result, 'analysis_duration_seconds', 'N/A')} seconds",
+            "Relevant Knowledge Chunks": getattr(result, 'relevant_chunks', 'N/A'),
+            "Analysis Timestamp": getattr(result, 'analysis_timestamp', 'N/A'),
+            "Analyzer Version": getattr(result, 'analyzer_version', 'ASC340_v1.0')
+        })
 
 if __name__ == "__main__":
     main()

@@ -210,6 +210,7 @@ Return the extracted terms as a JSON object with this structure:
 
             # Make LLM call
             response = await make_llm_call_async(
+                client=self.client,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -322,6 +323,7 @@ Return the extracted terms as a JSON object with this structure:
 
             # Generate memo
             memo_response = await make_llm_call_async(
+                client=self.client,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
