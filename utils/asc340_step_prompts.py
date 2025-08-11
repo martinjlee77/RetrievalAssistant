@@ -51,7 +51,8 @@ class ASC340StepPrompts:
         
         # Build context information
         company_name = getattr(contract_data, 'company_name', 'the Company') if contract_data else 'the Company'
-        contract_types = getattr(contract_data, 'contract_types_in_scope', []) if contract_data else []
+        # contract_types_in_scope now contains cost categories
+        cost_categories = getattr(contract_data, 'contract_types_in_scope', []) if contract_data else []
         cost_type = getattr(contract_data, 'cost_type', 'Incremental Cost of Obtaining') if contract_data else 'Incremental Cost of Obtaining'
         recovery_probable = getattr(contract_data, 'recovery_probable', True) if contract_data else True
         standard_amortization_period = getattr(contract_data, 'standard_amortization_period', 36) if contract_data else 36
@@ -72,7 +73,7 @@ class ASC340StepPrompts:
 
 <ANALYSIS_CONTEXT>
 Company: {company_name}
-Contract Types in Scope: {', '.join(contract_types) if contract_types else 'General contract costs'}
+Cost Categories in Scope: {', '.join(cost_categories) if cost_categories else 'General contract costs'}
 Cost Type Focus: {cost_type}
 Recovery Probable: {recovery_probable}
 Standard Amortization Period: {standard_amortization_period} months

@@ -78,29 +78,28 @@ class ASC606Analysis(BaseModel):
 # ==================== ASC 340-40 MODELS ====================
 
 class ContractCostsData(BaseModel):
-    """Contract costs data model for ASC 340-40 analysis"""
+    """Contract costs data model for ASC 340-40 analysis - V2 Simplified"""
     # Basic Information
     analysis_title: str
     company_name: str
     policy_effective_date: Optional[date] = None
-    contract_types_in_scope: List[str] = Field(default_factory=list)
-    cost_timing: str = "All Periods"  # Current Period, Future Periods, All Periods
+    contract_types_in_scope: List[str] = Field(default_factory=list)  # Now primary cost categories
+    cost_timing: str = "All Periods"  # Fixed value since removed from UI
     
     # Optional Context
     arrangement_description: Optional[str] = None
     
-    # New policy-specific fields
-    cost_type: str = "Incremental Cost of Obtaining"
+    # Simplified policy-specific fields
+    cost_type: str = "Incremental Cost of Obtaining"  # Default since simplified
     recovery_probable: bool = True
     standard_amortization_period: int = 36
     practical_expedient: bool = False
     contract_type_scope: Optional[List[str]] = None
-    cost_timing_focus: Optional[str] = None
     
-    memo_audience: str = "Technical Accounting Team"
-    materiality_threshold: Optional[int] = None
+    # Hard-coded values as per requirements
+    memo_audience: str = "Technical Accounting Team"  # Hard-coded as requested
     
-    # Document information
+    # Document information (now required)
     documents: List[Dict[str, Any]] = Field(default_factory=list)
     document_names: List[str] = Field(default_factory=list)
 
