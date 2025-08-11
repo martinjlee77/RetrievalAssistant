@@ -1,7 +1,7 @@
 # ASC 606 PDF Processing PoC
 
 ## Overview
-This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 842). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance and Big 4 interpretative publications. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform.
+This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 340-40). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance and Big 4 interpretative publications. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -49,6 +49,7 @@ Critical Development Rules - Prompt Protection:
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern to eliminate mathematical errors in transaction price determination. AI extracts structured fee components, Python performs reliable calculations. Ensures 100% accuracy for financial amounts in Step 3 analysis and memo generation.
 - **Unified Financial Data Flow**: Fixed architectural inconsistency where financial impact section was performing separate calculations instead of using completed Step 3, 4, and 5 results. Journal entries now derive amounts exclusively from the hybrid calculation system, eliminating calculation discrepancies. Extended calculated financial facts injection to Step 4 allocation analysis to ensure consistent transaction price usage across all steps (August 2025).
 - **Comprehensive Cleanup**: Removed 99+ development note files, placeholder authentication pages, unused utility files, and old memo outputs. Retained only essential authoritative guidance (10 text files) and sample contracts (7 PDFs). Cleaned directory structure for next development phase (August 2025).
+- **ASC 340-40 Contract Costs Module**: Implemented complete ASC 340-40 module following proven ASC 606 architecture patterns. Added 4-step policy framework (Scope Assessment, Cost Classification, Measurement & Amortization Policy, Illustrative Financial Impact), RAG-enabled knowledge base with 139 chunks (37 authoritative + 102 EY interpretative), dedicated analyzer with hybrid search capabilities, and professional policy memorandum generation. Integrated into multi-standard platform with navigation and home page updates (August 2025).
 
 ### File Structure
 ```

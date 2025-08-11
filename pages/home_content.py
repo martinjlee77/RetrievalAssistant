@@ -42,6 +42,21 @@ with col1:
 
 with col2:
     with st.container(border=True):
+        st.markdown("##### 🏢 ASC 340-40 - Contract Costs")
+        st.write(
+            "Generate comprehensive accounting policy memorandums for contract costs. Establish consistent capitalization and amortization policies for your organization."
+        )
+        st.page_link(
+            "pages/asc340.py",
+            label="Go to ASC 340-40 Analyzer",
+            icon="➡️"
+        )
+
+# Second row for future modules
+col3, col4 = st.columns(2)
+
+with col3:
+    with st.container(border=True):
         st.markdown("##### 🏢 ASC 842 - Leases")
         st.write(
             "Coming Soon: Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities."
@@ -49,7 +64,21 @@ with col2:
         st.button(
             "Coming Soon",
             disabled=True,
-            use_container_width=True
+            use_container_width=True,
+            key="asc842_button"
+        )
+
+with col4:
+    with st.container(border=True):
+        st.markdown("##### 📈 More Standards")
+        st.write(
+            "Additional accounting standards coming soon. Our multi-standard platform will continue expanding with more FASB standards."
+        )
+        st.button(
+            "Coming Soon",
+            disabled=True,
+            use_container_width=True,
+            key="more_standards_button"
         )
 
 # --- Footer and Stats ---
@@ -57,8 +86,8 @@ st.divider()
 st.subheader("Platform at a Glance")
 
 stat_cols = st.columns(4)
-stat_cols[0].metric("Available Modules", "2", "ASC 606 & 842")
-stat_cols[1].metric("Knowledge Base", "1,510+", "Chunks")
+stat_cols[0].metric("Available Modules", "2", "ASC 606 & 340-40")
+stat_cols[1].metric("Knowledge Base", "2,033+", "Chunks")
 stat_cols[2].metric("Knowledge Sources", "FASB/ Industry", "Hybrid RAG")
 stat_cols[3].metric("Avg. Analysis Time", "~30s")
 

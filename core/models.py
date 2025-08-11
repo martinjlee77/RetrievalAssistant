@@ -73,6 +73,51 @@ class ASC606Analysis(BaseModel):
     contract_overview: Dict[str, Any] = Field(default_factory=dict)
     citations: List[str] = Field(default_factory=list)
     implementation_guidance: List[str] = Field(default_factory=list)
+
+
+# ==================== ASC 340-40 MODELS ====================
+
+class ContractCostsData(BaseModel):
+    """Contract costs data model for ASC 340-40 analysis"""
+    # Basic Information
+    analysis_title: str
+    company_name: str
+    policy_effective_date: Optional[date] = None
+    contract_types_in_scope: List[str] = Field(default_factory=list)
+    cost_timing: str = "All Periods"  # Current Period, Future Periods, All Periods
+    
+    # Optional Context
+    arrangement_description: Optional[str] = None
+    key_focus_areas: Optional[str] = None
+    memo_audience: str = "Technical Accounting Team"
+    materiality_threshold: Optional[int] = None
+    
+    # Document information
+    documents: List[Dict[str, Any]] = Field(default_factory=list)
+    document_names: List[str] = Field(default_factory=list)
+
+
+class ASC340Analysis(BaseModel):
+    """ASC 340-40 Contract Costs analysis results"""
+    
+    # Core contract data
+    contract_data: ContractCostsData
+    
+    # 4-Step Analysis Results
+    step1_scope_assessment: Dict[str, Any] = Field(default_factory=dict)
+    step2_cost_classification: Dict[str, Any] = Field(default_factory=dict)
+    step3_measurement_policy: Dict[str, Any] = Field(default_factory=dict)
+    step4_illustrative_impact: Dict[str, Any] = Field(default_factory=dict)
+    
+    # Generated Outputs
+    professional_memo: str = ""
+    policy_summary: str = ""
+    
+    # Analysis Metadata
+    analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    analyzer_version: str = "ASC340_v1.0"
+    relevant_chunks: int = 0
+    analysis_duration_seconds: int = 0
     
     # Legacy compatibility methods
     @property

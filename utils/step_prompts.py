@@ -2,6 +2,8 @@
 Refactored ASC 606 prompt templates using System/User architecture for improved LLM adherence.
 This approach separates the AI's core instructions (System Prompt) from the
 dynamic task-specific instructions (User Prompt).
+
+EXTENDED: ASC 340-40 Contract Costs prompt templates following the same proven architecture.
 """
 
 import json

@@ -32,12 +32,16 @@ class BaseAnalyzer(ABC):
         """Get knowledge base statistics for debugging purposes"""
         pass
 
-def get_analyzer(standard: str) -> BaseAnalyzer:
+def get_analyzer(standard: str):
     """Factory function to get the appropriate RAG-enabled analyzer for a standard"""
     
     if standard == "ASC 606":
         from utils.asc606_analyzer import ASC606Analyzer
         return ASC606Analyzer()
+    
+    elif standard == "ASC 340-40":
+        from utils.asc340_analyzer import ASC340Analyzer
+        return ASC340Analyzer()
     
     elif standard == "ASC 842":
         # Placeholder - will be implemented when ASC 842 documents are available

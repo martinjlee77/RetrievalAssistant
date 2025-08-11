@@ -64,6 +64,8 @@ class KnowledgeBaseManager:
         # Map to existing ASC 606 collection name for backward compatibility
         if standard == "ASC 606":
             collection_name = "asc606_paragraphs"
+        elif standard == "ASC 340-40":
+            collection_name = "asc340_contract_costs"
         else:
             collection_name = f"kb_{standard.lower().replace(' ', '_')}"
         
