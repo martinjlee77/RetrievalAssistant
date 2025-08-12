@@ -342,6 +342,3 @@ def show_analysis_results():
 
 if __name__ == "__main__":
     main()
-
-if __name__ == "__main__":
-    main()
