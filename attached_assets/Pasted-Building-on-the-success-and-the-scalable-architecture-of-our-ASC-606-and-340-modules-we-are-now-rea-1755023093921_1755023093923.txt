@@ -1,0 +1,105 @@
+Building on the success and the scalable architecture of our ASC 606 and 340 modules, we are now ready to kick off the next major expansion of the VeritasLogic.ai platform: a comprehensive suite of tools for **ASC 842, Leases**.
+
+This project represents a significant step forward, moving beyond a single memo generator to a suite of interconnected, purpose-built applications that guide the user through the entire lease accounting lifecycle. Your expertise in building robust, modular applications will be key to its success.
+
+#### **1. The Strategic Vision: A Modular "Lease Lifecycle" Suite**[](http://localhost:8501/#1-the-strategic-vision-a-modular-lease-lifecycle-suite)
+
+Unlike ASC 606, which is primarily a judgment and documentation exercise, ASC 842 is a hybrid of **judgment, calculation, and data transformation**. A single, monolithic memo-writer would be inefficient and clunky.
+
+Therefore, we will build a suite of three distinct but interconnected modules, each designed for a specific job in the lease accounting workflow. This "right tool for the job" approach will ensure a superior user experience and maximum efficiency.
+
+The three modules are:
+
+1. **The Lease Identification & Classification Tool** (LLM-powered)
+2. **The Lease Measurement & Amortization Calculator** (Pure Python)
+3. **The Journal Entry Generator** (Pure Python)
+
+A core design principle is that these modules must be **both sequentially interconnected for a guided workflow and independently usable** for expert users solving specific problems.
+
+---
+
+#### **2. Detailed Module Specifications**[](http://localhost:8501/#2-detailed-module-specifications)
+
+Here are the detailed requirements for each module.
+
+##### **Module 1: Lease Identification & Classification Tool**[](http://localhost:8501/#module-1-lease-identification-classification-tool)
+
+- **Purpose:** To analyze a contract, help the user determine if it contains a lease, and produce a definitive, audit-ready **Lease Classification Memo** (Operating vs. Finance).
+- **Core User Workflow:**
+    1. The user uploads a lease agreement (`.pdf`, `.docx`).
+    2. The application presents a guided questionnaire, stepping through the five key ASC 842 classification criteria (e.g., Transfer of Ownership, Purchase Option, Lease Term, Present Value, Alternative Use).
+    3. For each question, the AI uses RAG to search the document for relevant clauses and presents them to the user as evidence to help them make a judgment.
+    4. Upon completion, the AI generates a comprehensive memo documenting the analysis and conclusion.
+- **Key Inputs:** The lease agreement file; user answers (Yes/No/N/A) to the classification questionnaire.
+- **Primary Output:** A downloadable Lease Classification Memo in DOCX format.
+- **Technical Implementation:** This is the primary **LLM/RAG** module. It will require:
+    - A new knowledge base collection for ASC 842.
+    - A new `utils/asc_842_analyzer.py` file.
+    - A new `utils/step_prompts_842.py` file to manage the prompts for the classification analysis and memo generation.
+
+##### **Module 2: Lease Measurement & Amortization Calculator**[](http://localhost:8501/#module-2-lease-measurement-amortization-calculator)
+
+- **Purpose:** To perform the initial quantitative measurement of the lease and generate a full amortization schedule.
+- **Core User Workflow:**
+    1. The user navigates to the calculator (either from Module 1 or directly).
+    2. They enter the key financial terms into a simple form.
+    3. The application performs the calculations and displays the initial ROU Asset / Lease Liability and the full schedule.
+- **Key Inputs:** Lease Payments (amount), Lease Term (in months), Discount Rate (percentage).
+- **Primary Output:** A downloadable **Amortization Schedule** in CSV or Excel format.
+- **Technical Implementation:** This module is **pure Python**.
+    - No LLM should be used. This is a deterministic math problem.
+    - Use a financial library like `numpy-financial` for the Present Value (PV) calculations to ensure accuracy.
+    - Use the Pandas library to construct and display the amortization schedule dataframe, which makes it easy to export to CSV.
+
+##### **Module 3: The Journal Entry Generator**[](http://localhost:8501/#e0ba96f9)
+
+- **Purpose:** To convert a calculated amortization schedule into a complete set of journal entries for the life of the lease.
+- **Core User Workflow:**
+    1. The user navigates here from Module 2 (with the schedule data passed automatically) or directly uploads their own amortization schedule.
+    2. The application processes the schedule and generates the corresponding journal entries.
+- **Key Inputs:** An amortization schedule (as a Pandas dataframe from Module 2 or an uploaded CSV).
+- **Primary Output:** A downloadable CSV or TXT file of all journal entries, formatted for easy upload into an ERP system.
+- **Technical Implementation:** This module is **pure Python with rule-based logic**.
+    - No LLM is needed.
+    - The logic will simply loop through each row of the input schedule and apply a formatting template to create the debit/credit lines for each journal entry.
+
+---
+
+#### **3. Phased Implementation Plan**[](http://localhost:8501/#cad107bd)
+
+Let's build this suite in a logical, phased approach.
+
+**Phase 1: Knowledge Base Seeding (Prerequisite)**
+
+- **Task:** Create the standalone `scripts/seed_db_842.py` script.
+- **Action:** I will provide the official ASC 842 text and an EY interpretative guide. Please implement the logic to chunk these documents and load them into a new `asc842_leases` collection in ChromaDB, complete with appropriate metadata.
+
+**Phase 2: Build Module 1 - The Classification Tool**
+
+- **Task:** This is the most complex module and delivers the highest initial value.
+- **Action:**
+    - Create `pages/asc842_classifier.py` for the UI.
+    - Create `utils/asc_842_analyzer.py` and `utils/step_prompts_842.py` for the backend logic.
+    - Update `core/models.py` with Pydantic models for `LeaseClassificationData`.
+    - Update `analyzer_factory.py` to register the new `ASC842Analyzer`.
+
+**Phase 3: Build Module 2 - The Amortization Calculator**
+
+- **Task:** Build the pure Python calculation engine.
+- **Action:**
+    - Create `pages/asc842_calculator.py` for the UI.
+    - The calculation logic can live directly within this page or in a separate `utils/lease_calculator.py` file if it becomes complex.
+
+**Phase 4: Build Module 3 & Final Integration**
+
+- **Task:** Build the journal entry generator and interconnect the modules.
+- **Action:**
+    - Create `pages/asc842_journal_entries.py`.
+    - Implement the "Proceed to..." buttons in Modules 1 and 2 to pass data between the pages using `st.session_state`.
+    - Update `main_app.py` to include links to all three new module pages in the `st.navigation` list.
+
+---
+
+This modular plan allows us to build and potentially release value incrementally. It leverages our existing architecture perfectly while tailoring the technical approach to the specific needs of lease accounting.
+
+I'm truly excited to see this powerful new suite come to life. Please review this plan and let me know if you have any questions or suggestions before you begin.
