@@ -1,0 +1,39 @@
+Here is a clear, point-by-point letter to send to your developer. It explains the problem and provides a methodical debugging plan to fix it once and for all.
+
+Subject: Urgent Fix Required - Critical Data Pipeline Bug in ASC 340-40 Module
+
+Hi [Developer's Name],
+
+Thank you for your work on strengthening the prompts and adding the missing memo generation methods. That was a necessary and important step.
+
+However, we have a persistent, critical bug that is preventing these new prompts from working as intended. The core issue is that the text from the user-uploaded document is not being passed into the analysis engine. This is causing both the empty memo preview and the generic memo output.
+
+We need to fix this data pipeline bug as the top priority.
+
+Task 1: The "Empty Pantry" Bug - Fix the Data Flow (Top Priority)
+Please follow this methodical debugging process to isolate and fix the issue. At each step, log the output to the console so we can see exactly where the data is being lost.
+
+Step 1: Verify Text Extraction in pages/asc340.py
+
+In the process_analysis function, immediately after the doc_extractor.extract_text call inside the loop, add a log statement to confirm that text is actually being extracted.
+Code to add: st.info(f"Extracted {len(doc_result.get('text', ''))} characters from {uploaded_file.name}")
+Expected Outcome: You should see a message confirming several thousand characters were extracted from the sales commission plan. If you see "0 characters," the problem is in the DocumentExtractor.
+Step 2: Verify Text Combination in utils/asc340_analyzer.py
+
+In the analyze_contract_costs_policy method, find the line contract_text = self._extract_contract_text(...).
+Immediately after this line, add a log statement to confirm that the texts from all documents have been combined into a single string.
+Code to add: self.logger.info(f"COMBINED contract_text length is {len(contract_text)}. Preview: {contract_text[:500]}")
+Expected Outcome: You should see a log message with the total character count. This is the most likely point of failure. If this log shows an empty string, the bug is in the _extract_contract_text method's logic.
+Step 3: Verify Text in the Final Prompt in utils/asc340_analyzer.py
+
+Inside the analyze_step method, right before the make_llm_call_async line, log the user_prompt variable.
+Code to add: self.logger.info(f"User prompt for Step {step_number} is {len(user_prompt)} chars. Contract text included: {'5% of the Total Contract Value' in user_prompt}")
+Expected Outcome: This is the final check. The log should show a large character count, and the boolean check should return True, confirming that the specific terms from our test document are present in the prompt being sent to the AI.
+Task 2: Prompt Architecture Enhancement (After the Fix)
+Once the data is flowing correctly, we need to ensure the prompts are as effective as the ASC 606 ones. The "strengthening" was good, but we need to be even more prescriptive.
+
+Action: Please review the user prompts in asc606_prompts.py. Notice how they command the AI to use the "Issue, Analysis, Conclusion" (IAC) framework. This structure forces a higher level of analytical rigor.
+Please refactor the prompts in asc340_step_prompts.py to explicitly command the AI to follow this same IAC logical framework for each analysis point. This will force it to connect the evidence (from the contract) to the rules (from the RAG context) to reach a conclusion, which is the key to a truly defensible memo.
+Fixing the data pipeline is the immediate priority. Once that is done, the enhanced prompts will be able to function correctly, and we should finally see the high-quality, document-grounded output we expect.
+
+Please let me know what you find during the debugging process.

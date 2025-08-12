@@ -155,20 +155,7 @@ def render_single_page_form():
 def process_analysis(form_data: dict):
     """Process the ASC 340-40 analysis with form data"""
     
-    # Show analysis summary
-    st.subheader("📊 Analysis Summary")
-    with st.container(border=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write(f"**Policy Title:** {form_data['analysis_title']}")
-            st.write(f"**Company:** {form_data['company_name']}")
-            st.write(f"**Effective Date:** {form_data['policy_effective_date']}")
-        with col2:
-            st.write(f"**Cost Categories:** {', '.join(form_data['primary_cost_categories'][:2])}{'...' if len(form_data['primary_cost_categories']) > 2 else ''}")
-            st.write(f"**Amortization Period:** {form_data['standard_amortization_period']} months")
-            st.write(f"**Recovery Probable:** {'Yes' if form_data['recovery_probable'] else 'No'}")
-            st.write(f"**Practical Expedient:** {'Yes' if form_data['practical_expedient'] else 'No'}")
-    
+    # Analysis summary removed per user request - directly proceed to processing
     # Process documents
     documents = []
     if form_data.get("uploaded_files"):
@@ -206,25 +193,44 @@ def process_analysis(form_data: dict):
         st.error(f"Data validation error: {e}")
         return
     
-    # Progress tracking
+    # Progress tracking with ASC 606-style status messages
     progress_bar = st.progress(0)
     status_text = st.empty()
     
-    # Run analysis
+    # Run analysis with detailed status updates
     with st.spinner("🔍 Analyzing contract costs policy..."):
         try:
-            # Get analyzer for ASC 340-40 contract costs
-            analyzer = get_analyzer("ASC 340-40")
+            # Status: Document processing
+            status_text.text("📄 Verifying documents and extracting text...")
+            progress_bar.progress(10)
+            time.sleep(0.5)
             
-            # Update progress
-            status_text.text("Initializing ASC 340-40 analysis...")
+            # Status: Initialize analyzer
+            status_text.text("🚀 Initializing ASC 340-40 analyzer with hybrid RAG system...")
             progress_bar.progress(20)
+            analyzer = get_analyzer("ASC 340-40")
+            time.sleep(0.5)
+            
+            # Status: Analysis in progress
+            status_text.text("🧠 Analysis in progress, please be patient...")
+            progress_bar.progress(30)
+            time.sleep(0.5)
+            
+            # Status: Processing steps
+            status_text.text("⚙️ Processing 4-step policy framework (Scope, Classification, Measurement, Impact)...")
+            progress_bar.progress(50)
             
             # Run analysis using correct method name
             result = asyncio.run(analyzer.analyze_contract_costs_policy(contract_data))
             
+            # Status: Generating memo
+            status_text.text("📝 Generating professional accounting policy memorandum...")
+            progress_bar.progress(80)
+            time.sleep(0.5)
+            
+            # Status: Complete
             progress_bar.progress(100)
-            status_text.text("Analysis completed successfully!")
+            status_text.text("✅ Analysis completed successfully!")
             
             time.sleep(1)  # Brief pause for user experience
             progress_bar.empty()
@@ -270,7 +276,7 @@ def main():
             process_analysis(form_data)
 
 def show_analysis_results():
-    """Display analysis results - EXACT copy of ASC 606 pattern"""
+    """Display analysis results - following ASC 606 pattern without Analysis Summary"""
     result = st.session_state.asc340_analysis_result
     form_data = st.session_state.asc340_form_data
     
