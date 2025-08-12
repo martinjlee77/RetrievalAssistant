@@ -324,25 +324,8 @@ def show_analysis_results():
                 contract_types_in_scope=form_data.get('contract_types_in_scope', [])
             )
         
-        try:
-            html_content = convert_memo_to_html(memo, contract_costs_data)
-            analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
-            
-            # Debug: Check if HTML contains memo content
-            if "ACCOUNTING POLICY MEMORANDUM" in html_content and len(html_content) > 5000:
-                st.success("✅ HTML conversion successful")
-            else:
-                st.error("❌ HTML conversion issue detected")
-                st.write(f"Memo length: {len(memo)} | HTML length: {len(html_content)}")
-                st.write(f"Contains header: {'ACCOUNTING POLICY MEMORANDUM' in html_content}")
-                
-                # Show memo start and HTML middle
-                st.code(f"MEMO START: {memo[:200]}...")
-                st.code(f"HTML MIDDLE: {html_content[2000:2500] if len(html_content) > 2500 else html_content[500:1000]}")
-
-        except Exception as e:
-            st.error(f"HTML conversion failed: {e}")
-            return
+        html_content = convert_memo_to_html(memo, contract_costs_data)
+        analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
         # --- PREVIEW FIRST (exactly like ASC 606) ---
         with st.expander("📄 Memo Preview", expanded=True):

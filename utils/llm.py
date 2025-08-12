@@ -890,8 +890,8 @@ def create_docx_from_text(text_content, contract_data=None):
         if not stripped_line:
             continue  # Skip empty lines to avoid extra paragraphs
         
-        # SPECIAL HANDLING: Document title formatting
-        if "TECHNICAL ACCOUNTING MEMORANDUM" in stripped_line and not stripped_line.startswith('#'):
+        # SPECIAL HANDLING: Document title formatting (support both ASC 606 and ASC 340-40)
+        if ("TECHNICAL ACCOUNTING MEMORANDUM" in stripped_line or "ACCOUNTING POLICY MEMORANDUM" in stripped_line) and not stripped_line.startswith('#'):
             title_para = document.add_paragraph(stripped_line)
             title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
             for run in title_para.runs:
