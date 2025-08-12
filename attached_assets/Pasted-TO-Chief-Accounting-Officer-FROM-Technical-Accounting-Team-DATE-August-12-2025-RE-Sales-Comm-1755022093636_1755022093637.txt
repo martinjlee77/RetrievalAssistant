@@ -1,0 +1,25 @@
+TO: Chief Accounting Officer
+FROM: Technical Accounting Team
+DATE: August 12, 2025
+RE: Sales Comm 01
+EXECUTIVE SUMMARY
+This memorandum outlines the accounting policy for recognizing and amortizing sales commissions under ASC 340-40. The policy applies to the 5% sales commission for new customer contracts at VeritasLogic, ensuring compliance with authoritative guidance. The commission is recognized as an incremental cost of obtaining a contract, classified appropriately, and amortized over the initial contract term. This approach aligns with ASC 340-40 requirements, ensuring that costs are matched with the revenue they help generate.
+1.	SCOPE ASSESSMENT
+The 5% sales commission described in the FY2024 Sales Commission Plan is within the scope of ASC 340-40. The plan states: "The commission for a Commissionable Event is calculated as a flat rate of 5% of the Total Contract Value (TCV)." A Commissionable Event is defined as a fully executed customer contract for a new logo (new customer) acquisition. According to ASC 340-40-25-2, these commissions are incremental costs incurred to obtain a contract, as they are directly tied to the execution of a new customer contract. Therefore, the commission is in scope under ASC 340-40 as an incremental cost of obtaining a contract.
+2.	COST CLASSIFICATION FRAMEWORK
+The 5% sales commission qualifies as an incremental cost of obtaining a contract under ASC 340-40. The commission is directly attributable to securing a new customer contract, triggered by a "fully executed customer contract for a new logo (new customer) acquisition," as specified in the FY2024 Sales Commission Plan. It is not contingent on any other performance metrics unrelated to the contract itself. Therefore, this commission is classified as an incremental cost eligible for capitalization.
+3.	MEASUREMENT & AMORTIZATION POLICY
+The commission cost structure is measured and amortized based on the initial contract term. The FY2024 Sales Commission Plan specifies: "The commission for a Commissionable Event is calculated as a flat rate of 5% of the Total Contract Value (TCV)." According to ASC 340-40-35-1, the asset recognized should be amortized on a systematic basis consistent with the transfer to the customer of the goods or services to which the asset relates. Therefore, commissions will be amortized over the initial contract term as defined by the TCV. Commissions are recognized and amortized starting from the period in which the contract is executed, aligning with the timing of commission payments processed within ninety (90) days following the end of the calendar month of the Commissionable Event.
+4.	ILLUSTRATIVE FINANCIAL IMPACT
+For a $100,000 TCV, the commission is calculated as $100,000 * 5% = $5,000. This commission is recognized as an asset under ASC 340-40. The journal entry upon recognition is:
+•	Debit 'Contract Cost Asset' $5,000
+•	Credit 'Cash/Accounts Payable' $5,000
+The commission is amortized over 36 months, resulting in a monthly amortization expense of $5,000 / 36 = $138.89. The journal entry for monthly amortization is:
+•	Debit 'Amortization Expense' $138.89
+•	Credit 'Contract Cost Asset' $138.89
+Therefore, a $100,000 sale results in a recognized commission asset of $5,000, with a monthly amortization expense of $138.89 over 36 months.
+CONCLUSION
+The policy framework for recognizing and amortizing sales commissions at VeritasLogic aligns with ASC 340-40 guidance. The 5% sales commission is recognized as an incremental cost of obtaining a contract, classified for capitalization, and amortized over the initial contract term. This ensures that costs are matched with the revenue they help generate, providing a consistent and compliant approach to accounting for sales commissions.
+
+
+Analysis Date: August 12, 2025 | Review Status: Preliminary Analysis | Internal Use

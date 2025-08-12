@@ -331,8 +331,16 @@ def show_analysis_results():
         with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
             
-            # Display the styled HTML in a scrollable container
-            components.html(html_content, height=800, scrolling=True)
+            # DEBUG: Check HTML content before rendering
+            if html_content:
+                st.write(f"HTML content length: {len(html_content)}")
+                st.write(f"Contains 'ACCOUNTING POLICY': {'ACCOUNTING POLICY' in html_content}")
+                st.write(f"Contains 'Chief Accounting Officer': {'Chief Accounting Officer' in html_content}")
+                
+                # Display the styled HTML in a scrollable container
+                components.html(html_content, height=800, scrolling=True)
+            else:
+                st.error("HTML content is None or empty")
 
         # --- DOWNLOAD ACTION (Below Preview) ---
         with st.container(border=True):
