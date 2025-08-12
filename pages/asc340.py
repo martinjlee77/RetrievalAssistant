@@ -120,7 +120,8 @@ def render_single_page_form():
         "📝 Generate Policy Memo",
         type="primary",
         use_container_width=True,
-        disabled=not required_fields_complete
+        disabled=not required_fields_complete,
+        key="asc340_generate_memo_btn"
     )
     
     if not required_fields_complete and not file_uploaded:
@@ -270,7 +271,7 @@ def show_analysis_results():
         analysis_title = form_data.get('analysis_title', 'Unknown Analysis')
         st.subheader(f"📊 Analysis Results: {analysis_title}")
     with col2:
-        if st.button("🔄 Start New Analysis", use_container_width=True):
+        if st.button("🔄 Start New Analysis", use_container_width=True, key="asc340_new_analysis_btn"):
             # Clear session state like ASC 606
             for key in list(st.session_state.keys()):
                 if key.startswith('asc340_'):
