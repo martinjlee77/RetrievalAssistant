@@ -331,8 +331,7 @@ def show_analysis_results():
         with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
             
-            # Basic test - show memo and HTML lengths
-            st.info(f"Memo length: {len(memo)} chars, HTML length: {len(html_content)} chars")
+
             
             # Display the styled HTML in a scrollable container
             components.html(html_content, height=800, scrolling=True)
