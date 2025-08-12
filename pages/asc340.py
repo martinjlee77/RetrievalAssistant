@@ -324,15 +324,8 @@ def show_analysis_results():
                 contract_types_in_scope=form_data.get('contract_types_in_scope', [])
             )
         
-        # DEBUG: Show actual memo content to identify the root issue
-        st.write("**DEBUG - First 500 chars of generated memo:**")
-        st.code(memo[:500])
-        st.write("**DEBUG - Looking for header format:**")
-        st.code(f"Contains 'ACCOUNTING POLICY': {'ACCOUNTING POLICY' in memo}")
-        st.code(f"Contains '**TO:**': {'**TO:**' in memo}")
-        st.code(f"Contains 'TO:': {'TO:' in memo}")
-        
-        html_content = convert_memo_to_html(memo, contract_costs_data)
+        # Test bypassing contract_data parameter to isolate the issue
+        html_content = convert_memo_to_html(memo, None)
         analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
         # --- PREVIEW FIRST (exactly like ASC 606) ---
