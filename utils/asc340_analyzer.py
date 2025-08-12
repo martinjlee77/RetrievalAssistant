@@ -399,17 +399,20 @@ Return the extracted terms as a JSON object with this structure:
             cleaned_memo = self._clean_memo_section(memo_response)
             
             # CRITICAL FIX: Ensure ASC 340-40 memos always have the proper header
-            if cleaned_memo and not cleaned_memo.startswith("# ACCOUNTING POLICY MEMORANDUM"):
+            from utils.asc340_step_prompts import ASC340StepPrompts
+            expected_header = f"# {ASC340StepPrompts.MEMO_HEADER}"
+            
+            if cleaned_memo and not cleaned_memo.startswith(expected_header):
                 # If memo doesn't start with header, add it
                 if cleaned_memo.startswith("**TO:**"):
-                    cleaned_memo = "# ACCOUNTING POLICY MEMORANDUM\n\n" + cleaned_memo
+                    cleaned_memo = f"{expected_header}\n\n" + cleaned_memo
                 else:
                     # Find where the TO: line starts and insert header before it
                     lines = cleaned_memo.split('\n')
                     header_inserted = False
                     for i, line in enumerate(lines):
                         if line.strip().startswith("**TO:**"):
-                            lines.insert(i, "# ACCOUNTING POLICY MEMORANDUM")
+                            lines.insert(i, expected_header)
                             lines.insert(i + 1, "")
                             header_inserted = True
                             break
@@ -418,10 +421,10 @@ Return the extracted terms as a JSON object with this structure:
                         cleaned_memo = '\n'.join(lines)
                     else:
                         # Fallback: prepend header
-                        cleaned_memo = "# ACCOUNTING POLICY MEMORANDUM\n\n" + cleaned_memo
+                        cleaned_memo = f"{expected_header}\n\n" + cleaned_memo
             
             self.logger.info(f"DEBUG: Final memo with header: {len(cleaned_memo) if cleaned_memo else 0} chars")
-            self.logger.info(f"DEBUG: Header check - starts with ACCOUNTING POLICY: {cleaned_memo.startswith('# ACCOUNTING POLICY MEMORANDUM') if cleaned_memo else False}")
+            self.logger.info(f"DEBUG: Header check - starts with expected header: {cleaned_memo.startswith(expected_header) if cleaned_memo else False}")
             
             return cleaned_memo
             

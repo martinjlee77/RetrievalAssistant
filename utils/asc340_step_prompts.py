@@ -10,6 +10,9 @@ class ASC340StepPrompts:
     ASC 340-40 Contract Costs analysis prompts with Issue-Analysis-Conclusion (IAC) framework.
     Schemas aligned with narrative instructions to prevent AI confusion.
     """
+    
+    # Configuration: Centralized header management
+    MEMO_HEADER = "ACCOUNTING POLICY MEMORANDUM"
 
     @staticmethod
     def get_step_info() -> dict:
@@ -342,7 +345,7 @@ Audience: Technical Accounting Team
 
 Generate a professional accounting policy memorandum with the following structure:
 
-# ACCOUNTING POLICY MEMORANDUM
+# {ASC340StepPrompts.MEMO_HEADER}
 
 **TO:** Chief Accounting Officer  
 **FROM:** Technical Accounting Team  
