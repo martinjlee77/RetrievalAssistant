@@ -76,6 +76,9 @@ pg = st.navigation([
     st.Page("pages/asc340.py",
             title="ASC 340-40 Contract Costs",
             icon=":material/arrow_forward:"),
+    st.Page("pages/asc842.py",
+            title="ASC 842 Leases",
+            icon=":material/arrow_forward:"),
 ])
 
 # 5. Run the app.
