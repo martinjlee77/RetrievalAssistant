@@ -107,65 +107,105 @@ d. **Concrete Examples:** Use the actual terms from the contract (commission rat
     def _get_step_instructions(step_number: int) -> str:
         """Get specific instructions for each step"""
         instructions = {
-            1: """<CRITICAL_INSTRUCTION>
-**STEP 1: SCOPE ASSESSMENT**
-Your task is to establish the scope of ASC 340-40 application for the Company's contracts.
+            1: """**MANDATORY IAC FRAMEWORK - STEP 1: SCOPE ASSESSMENT**
 
-**YOUR ANALYSIS MUST INCLUDE:**
+You MUST use the Issue-Analysis-Conclusion (IAC) framework for EVERY cost category analysis.
 
-a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> above. You MUST quote specific language about commission structures, payment terms, eligibility criteria, and contract definitions found in the document.
+**FOR EACH COST CATEGORY IN THE CONTRACT:**
 
-b. **Specific Contract Terms:** You MUST reference actual percentages, amounts, timing provisions, and defined terms. For example, if the contract mentions "5% commission rate" or defines "Total Contract Value," you MUST quote these verbatim.
+**ISSUE:** What specific cost is described in the contract?
+- Quote EXACT language: rates, amounts, calculation methods, terms
+- Example: "The contract states '[EXACT QUOTE FROM CONTRACT]'"
+- NO generic examples - use ACTUAL contract language only
 
-c. **Cost Category Analysis:** Based on the ACTUAL cost types described in the contract text (not generic examples), determine which fall within ASC 340-40 scope.
+**ANALYSIS:** How does this specific contract term apply to ASC 340-40 scope?
+- Connect the EXACT contract language to ASC 340-40-15 requirements
+- Reference the specific rates/amounts from the contract in your analysis
+- Use authoritative guidance to evaluate the specific terms
 
-**MANDATORY:** Every scope determination must be tied to specific contract language. You cannot make generic statements about commission structures without quoting the actual terms from the uploaded document.
-</CRITICAL_INSTRUCTION>""",
+**CONCLUSION:** Does this specific cost qualify for ASC 340-40?
+- State definitive determination based on actual contract terms
+- Reference the specific amounts/rates that drive the conclusion
+- Establish clear policy boundaries using actual contract language
 
-            2: """<CRITICAL_INSTRUCTION>
-**STEP 2: COST CLASSIFICATION**
-Your task is to establish the classification framework for contract costs under ASC 340-40.
+**ABSOLUTE REQUIREMENT:** Every sentence must reference specific contract terms. Generic industry analysis will be rejected.
 
-**YOUR ANALYSIS MUST INCLUDE:**
+**ENFORCEMENT:** If you provide generic analysis without quoting actual contract terms, the analysis will be deemed inadequate.</CRITICAL_INSTRUCTION>""",
 
-a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing the specific cost structures, payment conditions, and eligibility requirements in the document.
+            2: """**MANDATORY IAC FRAMEWORK - STEP 2: COST CLASSIFICATION**
 
-b. **Incremental Cost Analysis:** Using the ACTUAL commission rates, payment triggers, and eligibility criteria from the contract, determine which costs qualify as incremental costs of obtaining contracts.
+You MUST use the Issue-Analysis-Conclusion (IAC) framework for EVERY cost type evaluation.
 
-c. **Contract-Specific Classification:** Quote the specific language about when commissions are earned, how they're calculated, and what triggers payment. Build your classification framework around these actual terms.
+**FOR EACH COST TYPE IN THE CONTRACT:**
 
-**MANDATORY:** You must reference the specific commission percentages, calculation methods, and payment terms found in the contract text. Generic policy statements without contract-specific evidence are not acceptable.
-</CRITICAL_INSTRUCTION>""",
+**ISSUE:** What is the specific cost structure described in the contract?
+- Quote EXACT commission rates, payment triggers, calculation methods
+- Example: "The contract specifies '[EXACT QUOTE FROM CONTRACT]'"
+- Reference specific percentages, thresholds, eligibility criteria from the document
 
-            3: """<CRITICAL_INSTRUCTION>
-**STEP 3: MEASUREMENT & AMORTIZATION POLICY**
-Your task is to establish the measurement and amortization policy framework.
+**ANALYSIS:** How does this specific cost structure meet ASC 340-40 classification criteria?
+- Apply ASC 340-40-25 tests to the ACTUAL contract terms
+- Connect specific contract language to incremental vs. fulfillment cost criteria
+- Use authoritative guidance to evaluate the specific terms and conditions
 
-**YOUR ANALYSIS MUST INCLUDE:**
+**CONCLUSION:** How should this specific cost be classified under ASC 340-40?
+- State definitive classification based on actual contract terms
+- Reference the specific rates/conditions that drive the classification
+- Establish clear policy framework using actual contract structure
 
-a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing contract terms, renewal periods, customer relationship duration, or other factors that affect amortization periods.
+**ABSOLUTE REQUIREMENT:** Every classification must be based on quoted contract terms. Generic cost classification guidance without specific contract evidence is inadequate.
 
-b. **Contract-Based Measurement:** Using the ACTUAL contract terms and commission structure described in the document, establish how costs will be initially measured.
+**ENFORCEMENT:** Analysis must reference actual commission rates, payment conditions, and eligibility criteria from the contract.</CRITICAL_INSTRUCTION>""",
 
-c. **Period Determination:** Based on the specific contract terms, customer relationships, or renewal provisions mentioned in the document, establish the amortization approach.
+            3: """**MANDATORY IAC FRAMEWORK - STEP 3: MEASUREMENT & AMORTIZATION POLICY**
 
-**MANDATORY:** Your amortization policy must be grounded in the specific contract terms and business model described in the uploaded document, not generic industry practices.
-</CRITICAL_INSTRUCTION>""",
+You MUST use the Issue-Analysis-Conclusion (IAC) framework for policy development.
 
-            4: """<CRITICAL_INSTRUCTION>
-**STEP 4: ILLUSTRATIVE FINANCIAL IMPACT**
-Your task is to provide illustrative examples of the policy's financial impact using the actual contract terms.
+**FOR EACH MEASUREMENT AND AMORTIZATION DECISION:**
 
-**YOUR ANALYSIS MUST INCLUDE:**
+**ISSUE:** What specific contract terms affect measurement and amortization?
+- Quote EXACT contract language about renewal periods, customer terms, contract duration
+- Example: "The contract states '[EXACT QUOTE FROM CONTRACT]'"
+- Reference specific commission amounts, timing provisions, renewal clauses
 
-a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing commission rates, payment terms, and calculation methods that will drive the financial impact.
+**ANALYSIS:** How do these specific contract terms impact ASC 340-40 measurement and amortization?
+- Apply ASC 340-40-35 requirements to the ACTUAL contract terms
+- Connect specific contract provisions to amortization period determination
+- Use authoritative guidance to evaluate the specific business model described
 
-b. **Contract-Based Examples:** Using the ACTUAL commission percentages and structures from the document, create illustrative examples that reflect the specific business model described.
+**CONCLUSION:** What measurement and amortization policy should be established?
+- State definitive policy framework based on actual contract terms
+- Reference the specific contract provisions that drive the policy
+- Establish clear amortization approach using actual business model
 
-c. **Specific Terms Integration:** Reference the actual commission rates (like "5% commission rate") and contract definitions when explaining financial impact calculations.
+**ABSOLUTE REQUIREMENT:** Every policy decision must be grounded in quoted contract terms. Generic amortization guidance without specific contract evidence is inadequate.
 
-**MANDATORY:** While using illustrative dollar amounts for calculations, you must ground all examples in the specific commission structure, rates, and terms found in the contract text. Your journal entries should reflect the actual business model described in the document.
-</CRITICAL_INSTRUCTION>"""
+**ENFORCEMENT:** Analysis must reference actual contract durations, renewal terms, and commission structures from the document.</CRITICAL_INSTRUCTION>""",
+
+            4: """**MANDATORY IAC FRAMEWORK - STEP 4: ILLUSTRATIVE FINANCIAL IMPACT**
+
+You MUST use the Issue-Analysis-Conclusion (IAC) framework for financial impact analysis.
+
+**FOR EACH FINANCIAL IMPACT SCENARIO:**
+
+**ISSUE:** What specific contract terms drive the financial impact?
+- Quote EXACT commission rates, payment terms, calculation methods from contract
+- Example: "Based on the contract rate of '[EXACT QUOTE FROM CONTRACT]'"
+- Reference specific amounts, percentages, thresholds that affect accounting
+
+**ANALYSIS:** How do these specific contract terms translate to financial impact under ASC 340-40?
+- Use ACTUAL commission rates and structures from the contract in calculations
+- Apply the specific business model described in the document to journal entries
+- Connect contract terms to balance sheet and income statement presentation
+
+**CONCLUSION:** What is the illustrative financial impact using actual contract terms?
+- Present journal entries using the specific commission structure from the contract
+- Reference the actual rates and amounts that drive the accounting treatment
+- Demonstrate financial statement impact based on the actual business model
+
+**ABSOLUTE REQUIREMENT:** Every financial example must use quoted contract terms. Generic illustrative amounts without contract-specific rates and structures are inadequate.
+
+**ENFORCEMENT:** Journal entries must reflect the actual commission rates, payment triggers, and business model described in the contract.</CRITICAL_INSTRUCTION>"""
         }
         return instructions.get(step_number, "")
 
