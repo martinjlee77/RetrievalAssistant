@@ -116,8 +116,8 @@ class ASC340Analysis(BaseModel):
     step3_measurement_policy: Dict[str, Any] = Field(default_factory=dict)
     step4_illustrative_impact: Dict[str, Any] = Field(default_factory=dict)
     
-    # Generated Outputs
-    professional_memo: str = ""
+    # Generated Outputs - REQUIRED field to ensure memo is stored
+    professional_memo: str
     policy_summary: str = ""
     
     # Analysis Metadata

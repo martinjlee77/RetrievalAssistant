@@ -308,10 +308,6 @@ def show_analysis_results():
     memo = getattr(result, 'professional_memo', None)
     
     if memo:
-        # DEBUG: Check memo content
-        st.info(f"DEBUG: Memo found with {len(memo)} characters")
-        st.info(f"DEBUG: First 200 characters: {memo[:200]}...")
-        
         # Generate content once for both preview and download (exactly like ASC 606)
         from utils.html_export import convert_memo_to_html
         from utils.llm import create_docx_from_text
@@ -322,22 +318,15 @@ def show_analysis_results():
             'company_name': form_data.get('company_name', 'Company')
         }
         
-        try:
-            html_content = convert_memo_to_html(memo, contract_data_for_html)
-            st.info(f"DEBUG: HTML conversion successful, {len(html_content)} characters")
-            analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
+        html_content = convert_memo_to_html(memo, contract_data_for_html)
+        analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
-            # --- PREVIEW FIRST (exactly like ASC 606) ---
-            with st.expander("📄 Memo Preview", expanded=True):
-                import streamlit.components.v1 as components
-                
-                # Display the styled HTML in a scrollable container
-                components.html(html_content, height=800, scrolling=True)
-        except Exception as e:
-            st.error(f"DEBUG: HTML conversion failed: {e}")
-            # Fallback: Show raw memo text
-            with st.expander("📄 Memo Preview (Raw Text)", expanded=True):
-                st.text_area("Raw Memo Content", memo, height=400, disabled=True)
+        # --- PREVIEW FIRST (exactly like ASC 606) ---
+        with st.expander("📄 Memo Preview", expanded=True):
+            import streamlit.components.v1 as components
+            
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
 
         # --- DOWNLOAD ACTION (exactly like ASC 606) ---
         with st.container(border=True):
