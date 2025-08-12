@@ -399,7 +399,6 @@ Return the extracted terms as a JSON object with this structure:
             cleaned_memo = self._clean_memo_section(memo_response)
             
             # CRITICAL FIX: Ensure ASC 340-40 memos always have the proper header
-            from utils.asc340_step_prompts import ASC340StepPrompts
             expected_header = f"# {ASC340StepPrompts.MEMO_HEADER}"
             
             if cleaned_memo and not cleaned_memo.startswith(expected_header):
