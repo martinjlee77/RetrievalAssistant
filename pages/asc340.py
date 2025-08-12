@@ -307,6 +307,13 @@ def show_analysis_results():
     
     memo = getattr(result, 'professional_memo', None)
     
+    # DEBUG: Check memo retrieval
+    st.error(f"DEBUG: memo variable = '{memo}' (type: {type(memo)})")
+    st.error(f"DEBUG: result object type = {type(result)}")
+    st.error(f"DEBUG: result has professional_memo attr = {hasattr(result, 'professional_memo')}")
+    if hasattr(result, 'professional_memo'):
+        st.error(f"DEBUG: result.professional_memo = '{result.professional_memo}' (len: {len(result.professional_memo)})")
+    
     if memo:
         # Generate content once for both preview and download (exactly like ASC 606)
         from utils.html_export import convert_memo_to_html
