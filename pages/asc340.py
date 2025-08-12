@@ -331,24 +331,8 @@ def show_analysis_results():
         with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
             
-            # DEBUG: Check HTML content before rendering
-            if html_content:
-                st.write(f"HTML content length: {len(html_content)}")
-                st.write(f"Contains 'ACCOUNTING POLICY': {'ACCOUNTING POLICY' in html_content}")
-                st.write(f"Contains 'Chief Accounting Officer': {'Chief Accounting Officer' in html_content}")
-                
-                # Show first 500 chars of HTML to see what's actually there
-                st.text_area("Raw HTML Preview (first 500 chars):", html_content[:500], height=150)
-                
-                # Also check the original memo content
-                st.write(f"Original memo length: {len(memo)}")
-                st.write(f"Memo contains 'ACCOUNTING POLICY': {'ACCOUNTING POLICY' in memo}")
-                st.text_area("Original memo preview (first 300 chars):", memo[:300], height=100)
-                
-                # Display the styled HTML in a scrollable container
-                components.html(html_content, height=800, scrolling=True)
-            else:
-                st.error("HTML content is None or empty")
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
 
         # --- DOWNLOAD ACTION (Below Preview) ---
         with st.container(border=True):
