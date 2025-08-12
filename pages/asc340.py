@@ -331,9 +331,11 @@ def show_analysis_results():
         with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
             
-            # Show first 500 chars of memo for debugging
+            # Show first 500 chars of memo and HTML for debugging
             st.write("**First 500 chars of memo:**")
             st.code(memo[:500])
+            st.write("**First 1000 chars of HTML:**")
+            st.code(html_content[:1000])
             
             # Display the styled HTML in a scrollable container
             components.html(html_content, height=800, scrolling=True)
