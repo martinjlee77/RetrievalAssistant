@@ -118,13 +118,19 @@ Return the extracted terms as a JSON object with this structure:
 }}"""
             
             response = await make_llm_call_async(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt,
-                model="gpt-4o",
-                json_mode=True
+                client=self.client,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                response_format={"type": "json_object"},
+                model="gpt-4o"
             )
             
-            return json.loads(response)
+            if response:
+                return json.loads(response)
+            else:
+                return {"error": "Empty response from policy term extraction"}
             
         except Exception as e:
             self.logger.error(f"Policy term extraction failed: {str(e)}")
@@ -147,7 +153,7 @@ Return the extracted terms as a JSON object with this structure:
             
             # Build enhanced query with keywords
             enhanced_query = query
-            if specific_keywords:
+            if specific_keywords and isinstance(specific_keywords, list):
                 enhanced_query += " " + " ".join(specific_keywords)
 
             # Perform semantic search
@@ -221,7 +227,10 @@ Return the extracted terms as a JSON object with this structure:
 
             # Parse and validate response
             try:
-                analysis_result = json.loads(response)
+                if response:
+                    analysis_result = json.loads(response)
+                else:
+                    analysis_result = {"error": "Empty response from LLM"}
                 
                 # Add metadata
                 analysis_result['step_number'] = step_number
@@ -300,14 +309,31 @@ Return the extracted terms as a JSON object with this structure:
     def _extract_contract_text(self, documents: List[Dict[str, Any]]) -> str:
         """Extract and combine text from uploaded documents"""
         if not documents:
-            return ""
+            self.logger.warning("No documents provided for contract text extraction")
+            return "No documents provided for analysis"
         
         combined_text = []
         for doc in documents:
-            if 'text' in doc and doc['text']:
-                combined_text.append(doc['text'])
+            # Try multiple possible text fields
+            text_content = ""
+            if isinstance(doc, dict):
+                text_content = doc.get('text', '') or doc.get('content', '') or doc.get('extracted_text', '')
+            
+            if text_content and text_content.strip():
+                # Add document metadata for better analysis
+                doc_name = doc.get('filename', doc.get('name', 'Document'))
+                combined_text.append(f"=== {doc_name} ===\n{text_content}")
+                self.logger.info(f"Extracted {len(text_content)} characters from {doc_name}")
+            else:
+                self.logger.warning(f"No text content found in document: {doc}")
         
-        return "\n\n--- DOCUMENT SEPARATOR ---\n\n".join(combined_text)
+        if not combined_text:
+            self.logger.error("No text content extracted from any documents")
+            return "No text content could be extracted from the uploaded documents"
+        
+        final_text = "\n\n--- DOCUMENT SEPARATOR ---\n\n".join(combined_text)
+        self.logger.info(f"Total extracted text length: {len(final_text)} characters")
+        return final_text
 
     async def generate_full_memo(self, analysis: ASC340Analysis) -> str:
         """Generate complete ASC 340-40 accounting policy memorandum"""

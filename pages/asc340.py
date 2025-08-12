@@ -213,8 +213,8 @@ def process_analysis(form_data: dict):
     # Run analysis
     with st.spinner("🔍 Analyzing contract costs policy..."):
         try:
-            # Get analyzer
-            analyzer = get_analyzer("ASC340")
+            # Get analyzer for ASC 340-40 contract costs
+            analyzer = get_analyzer("ASC 340-40")
             
             # Update progress
             status_text.text("Initializing ASC 340-40 analysis...")
@@ -283,7 +283,7 @@ def show_analysis_results():
         if st.button("🔄 Start New Analysis", use_container_width=True, key="asc340_new_analysis_btn"):
             # Clear session state like ASC 606
             for key in list(st.session_state.keys()):
-                if key.startswith('asc340_'):
+                if str(key).startswith('asc340_'):
                     del st.session_state[key]
             st.rerun()
 
@@ -301,11 +301,11 @@ def show_analysis_results():
         from utils.html_export import convert_memo_to_html
         from utils.llm import create_docx_from_text
         
-        # Create contract data object for HTML conversion (ASC 606 pattern)
-        contract_data_for_html = type('obj', (object,), {
+        # Create contract data dict for HTML conversion (ASC 606 pattern)
+        contract_data_for_html = {
             'analysis_title': form_data.get('analysis_title', 'ASC340_Policy'),
             'company_name': form_data.get('company_name', 'Company')
-        })()
+        }
         
         html_content = convert_memo_to_html(memo, contract_data_for_html)
         analysis_title = form_data.get('analysis_title', 'ASC340_Policy')

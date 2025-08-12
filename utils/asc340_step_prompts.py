@@ -300,3 +300,83 @@ Brief overview of the policy framework and key determinations.
 Summary of established policy framework.
 
 Write the complete memorandum focusing on practical policy implementation for {company_name}."""
+
+    @staticmethod
+    def get_memo_generation_system_prompt() -> str:
+        """System prompt for generating the complete ASC 340-40 policy memorandum"""
+        return """You are an expert technical accountant specializing in ASC 340-40 Contract Costs. Generate a comprehensive accounting policy memorandum that combines the 4-step analysis into a cohesive professional document.
+
+<MEMO_GENERATION_RULES>
+1. **Professional Format:** Use formal business memorandum structure with proper headers and sections.
+2. **Document-Specific Analysis:** Reference and analyze specific terms, rates, and conditions from the uploaded contract documents.
+3. **Policy Focus:** This is an accounting policy memo, not transaction analysis. Focus on establishing consistent application principles.
+4. **Evidence Integration:** Incorporate authoritative guidance citations to support policy positions.
+5. **Practical Implementation:** Include specific guidance for accounting staff on how to apply the policy.
+</MEMO_GENERATION_RULES>"""
+
+    @staticmethod
+    def get_memo_generation_user_prompt(analysis, rag_context: str) -> str:
+        """User prompt for generating the complete ASC 340-40 policy memorandum"""
+        
+        # Extract contract data
+        contract_data = analysis.contract_data
+        company_name = getattr(contract_data, 'company_name', 'the Company')
+        analysis_title = getattr(contract_data, 'analysis_title', 'Contract_Costs_Policy')
+        
+        # Extract step results
+        step1 = analysis.step1_scope_assessment
+        step2 = analysis.step2_cost_classification  
+        step3 = analysis.step3_measurement_policy
+        step4 = analysis.step4_illustrative_impact
+        
+        return f"""Generate a comprehensive ASC 340-40 accounting policy memorandum based on the following analysis:
+
+<COMPANY_CONTEXT>
+Company: {company_name}
+Policy Title: {analysis_title}
+</COMPANY_CONTEXT>
+
+<ANALYSIS_RESULTS>
+Step 1 - Scope Assessment:
+{step1}
+
+Step 2 - Cost Classification:
+{step2}
+
+Step 3 - Measurement & Amortization Policy:
+{step3}
+
+Step 4 - Illustrative Financial Impact:
+{step4}
+</ANALYSIS_RESULTS>
+
+<AUTHORITATIVE_GUIDANCE>
+{rag_context}
+</AUTHORITATIVE_GUIDANCE>
+
+Create a complete memorandum following this structure:
+
+**TO:** Chief Accounting Officer  
+**FROM:** Technical Accounting Team  
+**DATE:** [Current Date]  
+**RE:** ASC 340-40 Contract Costs Accounting Policy - {analysis_title}
+
+**1. EXECUTIVE SUMMARY**
+Brief overview of the policy framework and key determinations.
+
+**2. SCOPE ASSESSMENT**  
+[Based on Step 1 analysis]
+
+**3. COST CLASSIFICATION POLICY**  
+[Based on Step 2 analysis]
+
+**4. MEASUREMENT & AMORTIZATION POLICY**  
+[Based on Step 3 analysis]
+
+**5. FINANCIAL STATEMENT IMPACT & IMPLEMENTATION**  
+[Based on Step 4 analysis]
+
+**6. CONCLUSION**  
+Summary of established policy framework.
+
+Focus on practical policy implementation for {company_name} and reference specific document terms analyzed."""

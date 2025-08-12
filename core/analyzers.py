@@ -74,6 +74,16 @@ STANDARDS_CONFIG = {
         'rag_enabled': True,
         'capabilities': ['contract_term_extraction', 'authoritative_citations', 'professional_memos']
     },
+    'ASC 340-40': {
+        'name': 'Contract Costs',
+        'description': 'Analyze contract costs capitalization and accounting policy framework',
+        'status': 'available',
+        'analyzer_class': 'ASC340Analyzer',
+        'knowledge_base_collection': 'asc340_contract_costs',
+        'prompt_framework': 'asc340_framework',
+        'rag_enabled': True,
+        'capabilities': ['policy_term_extraction', 'authoritative_citations', 'policy_memos']
+    },
     'ASC 842': {
         'name': 'Leases',
         'description': 'Analyze lease classification and measurement',
