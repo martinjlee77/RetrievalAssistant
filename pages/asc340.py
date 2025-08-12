@@ -319,7 +319,14 @@ def show_analysis_results():
         }
         
         try:
+            st.write(f"DEBUG: About to convert memo with {len(memo)} characters")
+            st.write(f"DEBUG: First 200 chars of memo: {memo[:200]}")
+            
             html_content = convert_memo_to_html(memo, contract_data_for_html)
+            
+            st.write(f"DEBUG: HTML content generated with {len(html_content)} characters")
+            st.write(f"DEBUG: First 200 chars of HTML: {html_content[:200]}")
+            
             analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
             # --- PREVIEW FIRST (exactly like ASC 606) ---
