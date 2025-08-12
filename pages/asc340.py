@@ -308,6 +308,11 @@ def show_analysis_results():
     
     memo = getattr(result, 'professional_memo', None)
     
+    # Debug memo retrieval
+    st.write(f"DEBUG - Memo object: {type(memo)}")
+    st.write(f"DEBUG - Memo length: {len(memo) if memo else 0}")
+    st.write(f"DEBUG - Memo first 100 chars: {memo[:100] if memo else 'None'}")
+    
     if memo and memo.strip():
         # Generate content once for both preview and download (exactly like ASC 606)
         from utils.html_export import convert_memo_to_html
