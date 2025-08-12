@@ -1,0 +1,22 @@
+TO: Chief Accounting Officer
+FROM: Technical Accounting Team
+DATE: October 10, 2023
+RE: ASC 340-40 Contract Costs Accounting Policy - Sales Comm 01
+
+1. EXECUTIVE SUMMARY
+This memorandum outlines the accounting policy framework for VeritasLogic concerning the capitalization and amortization of sales commissions under ASC 340-40. The policy specifically addresses sales commissions related to initial contracts with new customers, ensuring these costs are capitalized and amortized systematically. This approach aligns with authoritative guidance to enhance consistency and accuracy in financial reporting.
+2. SCOPE ASSESSMENT
+In accordance with ASC 340-40-25-2, sales commissions are identified as incremental costs of obtaining a contract, warranting capitalization. This policy applies to commissions related to initial contracts with new customers, as defined in the Commissionable Event section of the Sales Commission Plan. Excluded from this scope are costs associated with contract renewals, upsells, and amendments, which are governed by separate policies. The standard amortization period for these capitalized costs is 36 months, with no specific materiality thresholds noted.
+3. COST CLASSIFICATION POLICY
+VeritasLogic's policy framework for cost classification under ASC 340-40 focuses on identifying incremental costs directly attributable to obtaining a specific contract. Sales commissions paid upon the signing of a new customer contract are capitalized, while general administrative costs and unsuccessful negotiation costs are excluded. The fulfillment costs must meet criteria ensuring they are directly related to a contract, enhance resources for future performance, and are expected to be recovered. The one-year practical expedient is not applied, ensuring all incremental costs are capitalized and amortized over the contract term.
+4. MEASUREMENT & AMORTIZATION POLICY
+Capitalized contract costs are initially measured at the amount of incremental costs expected to be recovered, including sales commissions paid for new customer contracts. Amortization is conducted on a straight-line basis over the expected period of benefit, typically aligning with the initial contract term. Renewals do not affect the original amortization period unless they significantly change the timing of goods or services transfer. Impairment assessments are conducted each reporting period, with any impairment losses recognized immediately and not reversed, in line with ASC 340-40-35-6.
+5. FINANCIAL STATEMENT IMPACT & IMPLEMENTATION
+The financial impact involves capitalizing eligible sales commission costs and amortizing them over 36 months. Journal entries include debiting the Contract Cost Asset and crediting Cash or Accounts Payable for capitalization, and debiting Amortization Expense and crediting Contract Cost Asset for amortization. On the balance sheet, capitalized costs are presented as 'Contract Cost Assets' under non-current assets, while amortization expenses appear within operating expenses on the income statement. Disclosure requirements include reporting closing balances of recognized assets, amortization amounts, and impairment losses, along with qualitative descriptions of capitalization judgments.
+6. CONCLUSION
+This policy framework ensures VeritasLogic consistently applies ASC 340-40 to capitalize and amortize sales commissions related to initial contracts with new customers. By adhering to this structured approach, VeritasLogic enhances its financial reporting accuracy and compliance with authoritative guidance, providing clear guidelines for accounting staff to implement the policy effectively.
+
+This memorandum serves as a comprehensive guide for the consistent application of ASC 340-40 regarding sales commissions, ensuring VeritasLogic's financial statements reflect accurate and compliant accounting practices.
+
+
+Analysis Date: August 12, 2025 | Review Status: Preliminary Analysis | Internal Use
