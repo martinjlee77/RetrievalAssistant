@@ -66,6 +66,8 @@ class KnowledgeBaseManager:
             collection_name = "asc606_paragraphs"
         elif standard == "ASC 340-40":
             collection_name = "asc340_contract_costs"
+        elif standard == "ASC 842":
+            collection_name = "asc842_leases"
         else:
             collection_name = f"kb_{standard.lower().replace(' ', '_')}"
         

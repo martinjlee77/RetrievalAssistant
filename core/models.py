@@ -123,6 +123,121 @@ class ASC340Analysis(BaseModel):
     # Analysis Metadata
     analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
     analyzer_version: str = "ASC340_v1.0"
+
+
+# ==================== ASC 842 MODELS ====================
+
+class LeaseClassificationData(BaseModel):
+    """Lease data model for ASC 842 classification analysis"""
+    # Basic Information
+    analysis_title: str
+    company_name: str
+    lease_description: str
+    lease_commencement_date: Optional[date] = None
+    
+    # Classification Criteria (5 tests)
+    ownership_transfer: Optional[bool] = None
+    ownership_transfer_details: Optional[str] = None
+    
+    purchase_option: Optional[bool] = None
+    purchase_option_details: Optional[str] = None
+    
+    lease_term_major_part: Optional[bool] = None
+    lease_term_details: Optional[str] = None
+    economic_life_years: Optional[int] = None
+    lease_term_years: Optional[int] = None
+    
+    present_value_substantially_all: Optional[bool] = None
+    present_value_details: Optional[str] = None
+    fair_value: Optional[float] = None
+    present_value_payments: Optional[float] = None
+    
+    alternative_use: Optional[bool] = None
+    alternative_use_details: Optional[str] = None
+    
+    # Document Information
+    documents: List[Dict[str, Any]] = Field(default_factory=list)
+    document_names: List[str] = Field(default_factory=list)
+    
+    # Analysis Context
+    memo_audience: str = "Technical Accounting Team"
+    materiality_threshold: Optional[str] = None
+
+
+class LeaseMeasurementData(BaseModel):
+    """Lease measurement data for calculation purposes"""
+    # Basic Information
+    analysis_title: str
+    lease_classification: str  # "Operating" or "Finance"
+    
+    # Financial Terms
+    monthly_payment: float
+    lease_term_months: int
+    discount_rate: float  # As percentage (e.g., 5.0 for 5%)
+    
+    # Optional Components
+    initial_direct_costs: Optional[float] = 0.0
+    prepaid_rent: Optional[float] = 0.0
+    lease_incentives: Optional[float] = 0.0
+    
+    # Calculated Values (populated by calculator)
+    present_value_payments: Optional[float] = None
+    initial_rou_asset: Optional[float] = None
+    initial_lease_liability: Optional[float] = None
+    
+    # Import Source
+    imported_from_classification: bool = False
+    classification_analysis_id: Optional[str] = None
+
+
+class LeaseJournalData(BaseModel):
+    """Journal entry data for lease accounting"""
+    # Basic Information
+    analysis_title: str
+    lease_classification: str
+    
+    # Schedule Information
+    total_periods: int
+    monthly_payment: float
+    discount_rate: float
+    
+    # Export Preferences
+    export_format: str = "CSV"  # CSV or JSON
+    erp_system: Optional[str] = None
+    include_headers: bool = True
+    
+    # Import Source
+    imported_from_calculator: bool = False
+    measurement_analysis_id: Optional[str] = None
+
+
+class ASC842Analysis(BaseModel):
+    """Complete ASC 842 lease analysis results"""
+    
+    # Analysis Type and Data
+    analysis_type: str  # "classification", "measurement", "journal_entries"
+    
+    # Core Data (optional based on analysis type)
+    classification_data: Optional[LeaseClassificationData] = None
+    measurement_data: Optional[LeaseMeasurementData] = None
+    journal_data: Optional[LeaseJournalData] = None
+    
+    # Analysis Results
+    classification_memo: str = ""  # For Module 1
+    amortization_schedule: List[Dict[str, Any]] = Field(default_factory=list)  # For Module 2
+    journal_entries: List[Dict[str, Any]] = Field(default_factory=list)  # For Module 3
+    
+    # Analysis Metadata
+    analysis_timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+    analyzer_version: str = "ASC842_v1.0"
+    
+    # Data Flow Between Modules
+    module_1_complete: bool = False
+    module_2_complete: bool = False
+    module_3_complete: bool = False
+    
+    # Export Capabilities
+    export_data: Dict[str, Any] = Field(default_factory=dict)
     relevant_chunks: int = 0
     analysis_duration_seconds: int = 0
     

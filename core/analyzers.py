@@ -48,8 +48,8 @@ def get_analyzer(standard: str):
         return ASC340Analyzer()
     
     elif standard == "ASC 842":
-        # Placeholder - will be implemented when ASC 842 documents are available
-        raise NotImplementedError(f"ASC 842 analyzer not yet implemented - awaiting authoritative source documents")
+        from utils.asc842_analyzer import ASC842Analyzer
+        return ASC842Analyzer()
     
     elif standard == "ASC 815":
         # Placeholder - will be implemented when ASC 815 documents are available  
@@ -86,13 +86,13 @@ STANDARDS_CONFIG = {
     },
     'ASC 842': {
         'name': 'Leases',
-        'description': 'Analyze lease classification and measurement',
-        'status': 'coming_soon',
+        'description': 'Analyze lease classification, measurement, and journal entries',
+        'status': 'in_development',
         'analyzer_class': 'ASC842Analyzer',
-        'knowledge_base_collection': 'kb_asc_842',
+        'knowledge_base_collection': 'asc842_leases',
         'prompt_framework': 'asc842_framework',
-        'rag_enabled': False,
-        'capabilities': ['awaiting_authoritative_sources']
+        'rag_enabled': True,
+        'capabilities': ['lease_classification', 'measurement_calculator', 'journal_generator']
     },
     'ASC 815': {
         'name': 'Derivatives and Hedging',
