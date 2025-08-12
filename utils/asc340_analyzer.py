@@ -316,28 +316,16 @@ Return the extracted terms as a JSON object with this structure:
                 "analyzer_version": "ASC340_v1.0"
             }
             
-            # Generate memo first, then create analysis with memo included
-            self.logger.info("DEBUG: Starting memo generation...")
-            
-            # Create temporary analysis object for memo generation
-            temp_analysis_data = analysis_data.copy()
-            temp_analysis_data["professional_memo"] = ""  # Temporary empty memo
-            temp_analysis = ASC340Analysis(**temp_analysis_data)
+            # Create initial analysis object (like ASC 606)
+            asc340_analysis = ASC340Analysis(**analysis_data)
             
             # Generate the professional memo
-            professional_memo = await self.generate_full_memo(temp_analysis)
+            professional_memo = await self.generate_full_memo(asc340_analysis)
             
-            # DEBUG: Check memo generation result
-            self.logger.info(f"DEBUG: Memo generated with {len(professional_memo) if professional_memo else 0} characters")
-            if not professional_memo or professional_memo.startswith("Error"):
-                self.logger.error(f"DEBUG: Memo generation failed: {professional_memo}")
-                professional_memo = "Error: Memo generation failed"
+            # Update analysis with generated memo
+            asc340_analysis.professional_memo = professional_memo
             
-            # Update analysis data with generated memo
-            analysis_data["professional_memo"] = professional_memo
-            
-            # Create final analysis object with memo
-            final_analysis = ASC340Analysis(**analysis_data)
+            final_analysis = asc340_analysis
             
             self.logger.info("ASC 340-40 analysis completed successfully")
             return final_analysis
