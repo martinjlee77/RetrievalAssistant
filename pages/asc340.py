@@ -163,9 +163,14 @@ def process_analysis(form_data: dict):
         for uploaded_file in form_data["uploaded_files"]:
             try:
                 doc_result = doc_extractor.extract_text(uploaded_file)
+                extracted_text = doc_result.get('text', '') if isinstance(doc_result, dict) else str(doc_result)
+                
+                # DEBUG: Step 1 - Verify text extraction immediately
+                st.info(f"Extracted {len(extracted_text)} characters from {uploaded_file.name}")
+                
                 documents.append({
                     'filename': uploaded_file.name,
-                    'text': doc_result.get('text', '') if isinstance(doc_result, dict) else str(doc_result)
+                    'text': extracted_text
                 })
             except Exception as e:
                 st.error(f"Error processing {uploaded_file.name}: {str(e)}")

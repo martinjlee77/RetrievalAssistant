@@ -237,6 +237,9 @@ Return the extracted terms as a JSON object with this structure:
                 else:
                     self.logger.error(f"Step {step_number} - CONTRACT_TEXT section is empty or too short!")
 
+            # DEBUG: Step 3 - Verify text in final prompt
+            self.logger.info(f"User prompt for Step {step_number} is {len(user_prompt)} chars. Contract text included: {'5% of the Total Contract Value' in user_prompt}")
+            
             # Make LLM call
             response = await make_llm_call_async(
                 client=self.client,
@@ -287,6 +290,9 @@ Return the extracted terms as a JSON object with this structure:
             
             # Extract contract text
             contract_text = self._extract_contract_text(contract_data.documents)
+            
+            # DEBUG: Step 2 - Verify text combination
+            self.logger.info(f"COMBINED contract_text length is {len(contract_text)}. Preview: {contract_text[:500]}")
             
             # Run all 4 steps concurrently
             step_tasks = []
