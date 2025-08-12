@@ -256,9 +256,10 @@ def process_analysis(form_data: dict):
             st.info("Debug info: Result object exists but professional_memo field is empty or None")
             return
             
-        # Store in session state for results page
+        # Store in session state for results page (including contract data like ASC 606)
         st.session_state.asc340_analysis_result = result
         st.session_state.asc340_form_data = form_data
+        st.session_state.asc340_contract_costs_data = contract_data
         
         # Redirect to results display
         st.rerun()
@@ -312,34 +313,26 @@ def show_analysis_results():
         from utils.html_export import convert_memo_to_html
         from utils.llm import create_docx_from_text
         
-        # Create contract data dict for HTML conversion (ASC 606 pattern)
-        contract_data_for_html = {
-            'analysis_title': form_data.get('analysis_title', 'ASC340_Policy'),
-            'company_name': form_data.get('company_name', 'Company')
-        }
+        # Pass the ContractCostsData object directly (exactly like ASC 606)
+        contract_costs_data = st.session_state.get('asc340_contract_costs_data')
+        if not contract_costs_data:
+            # Create a basic object if missing
+            from core.models import ContractCostsData
+            contract_costs_data = ContractCostsData(
+                analysis_title=form_data.get('analysis_title', 'ASC340_Policy'),
+                company_name=form_data.get('company_name', 'Company'),
+                contract_types_in_scope=form_data.get('contract_types_in_scope', [])
+            )
         
-        try:
-            st.write(f"DEBUG: About to convert memo with {len(memo)} characters")
-            st.write(f"DEBUG: First 200 chars of memo: {memo[:200]}")
-            
-            html_content = convert_memo_to_html(memo, contract_data_for_html)
-            
-            st.write(f"DEBUG: HTML content generated with {len(html_content)} characters")
-            st.write(f"DEBUG: First 200 chars of HTML: {html_content[:200]}")
-            
-            analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
+        html_content = convert_memo_to_html(memo, contract_costs_data)
+        analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
-            # --- PREVIEW FIRST (exactly like ASC 606) ---
-            with st.expander("📄 Memo Preview", expanded=True):
-                import streamlit.components.v1 as components
-                
-                # Display the styled HTML in a scrollable container
-                components.html(html_content, height=800, scrolling=True)
-        except Exception as e:
-            st.error(f"HTML conversion error: {e}")
-            # Fallback to text area
-            with st.expander("📄 Memo Preview (Text Format)", expanded=True):
-                st.text_area("Memo Content", memo, height=600, disabled=True)
+        # --- PREVIEW FIRST (exactly like ASC 606) ---
+        with st.expander("📄 Memo Preview", expanded=True):
+            import streamlit.components.v1 as components
+            
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
 
         # --- DOWNLOAD ACTION (exactly like ASC 606) ---
         with st.container(border=True):
@@ -348,7 +341,7 @@ def show_analysis_results():
 
             # Single primary action - Download DOCX (exactly like ASC 606)
             try:
-                docx_content = create_docx_from_text(memo, contract_data_for_html)
+                docx_content = create_docx_from_text(memo, contract_costs_data)
                 st.download_button(
                     label="📄 Download as Word Document (.DOCX)",
                     data=docx_content,
