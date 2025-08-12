@@ -213,6 +213,29 @@ Return the extracted terms as a JSON object with this structure:
                 rag_context=rag_context['context'],
                 contract_data=contract_data
             )
+            
+            # DEBUG: Log contract text length and preview to verify content flow
+            self.logger.info(f"Step {step_number} - Contract text length: {len(contract_text)}")
+            if contract_text and len(contract_text) > 100:
+                preview = contract_text[:200] + "..." if len(contract_text) > 200 else contract_text
+                self.logger.info(f"Step {step_number} - Contract text preview: {preview}")
+            else:
+                self.logger.warning(f"Step {step_number} - CONTRACT TEXT IS EMPTY OR TOO SHORT!")
+                
+            # DEBUG: Log user prompt length to verify it includes content
+            self.logger.info(f"Step {step_number} - User prompt length: {len(user_prompt)}")
+            if "sales commission" in user_prompt.lower() or "5%" in user_prompt:
+                self.logger.info(f"Step {step_number} - User prompt contains specific document terms ✓")
+            else:
+                self.logger.warning(f"Step {step_number} - User prompt may not contain specific document terms!")
+                
+            # Additional debug: Check if CONTRACT_TEXT section has content
+            if "<CONTRACT_TEXT>" in user_prompt and "</CONTRACT_TEXT>" in user_prompt:
+                contract_section = user_prompt[user_prompt.find("<CONTRACT_TEXT>"):user_prompt.find("</CONTRACT_TEXT>") + len("</CONTRACT_TEXT>")]
+                if len(contract_section) > 50:
+                    self.logger.info(f"Step {step_number} - CONTRACT_TEXT section found with {len(contract_section)} characters")
+                else:
+                    self.logger.error(f"Step {step_number} - CONTRACT_TEXT section is empty or too short!")
 
             # Make LLM call
             response = await make_llm_call_async(

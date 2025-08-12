@@ -28,8 +28,9 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
 
     # === CRITICAL HTML FORMATTING FIXES ===
     
-    # 1. DOCUMENT TITLE
+    # 1. DOCUMENT TITLE - Support both ASC 606 and ASC 340-40
     processed_text = re.sub(r'^(#\s*)?TECHNICAL ACCOUNTING MEMORANDUM', '# TECHNICAL ACCOUNTING MEMORANDUM', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^(#\s*)?ACCOUNTING POLICY MEMORANDUM', '# ACCOUNTING POLICY MEMORANDUM', processed_text, flags=re.MULTILINE)
     
     # 2. EXECUTIVE SUMMARY NUMBERING FIX - Remove "1." and "2." before subsections
     processed_text = re.sub(r'^1\.\s*EXECUTIVE SUMMARY', 'EXECUTIVE SUMMARY', processed_text, flags=re.MULTILINE)
@@ -52,11 +53,16 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
         elif stripped.startswith('##') or stripped.startswith('2.') or stripped.startswith('3.'):
             in_key_findings = False
         
-        # Fix sub-bullet indentation in KEY FINDINGS
+        # Fix sub-bullet indentation in KEY FINDINGS (support both ASC 606 and ASC 340-40)
         if in_key_findings and stripped:
-            if any(keyword in stripped for keyword in ['ASC 606 Contract Exists:', 'Performance Obligations:', 'Transaction Price:', 'Allocation:', 'Revenue Recognition:', 'Critical Judgments:']):
+            # ASC 606 keywords
+            asc606_keywords = ['ASC 606 Contract Exists:', 'Performance Obligations:', 'Transaction Price:', 'Allocation:', 'Revenue Recognition:', 'Critical Judgments:']
+            # ASC 340-40 keywords
+            asc340_keywords = ['Scope Assessment:', 'Cost Classification:', 'Measurement Policy:', 'Financial Impact:', 'Policy Framework:']
+            
+            if any(keyword in stripped for keyword in asc606_keywords + asc340_keywords):
                 fixed_lines.append('* ' + stripped.lstrip('•*- ').strip())
-            elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining']) and not line.startswith('    '):
+            elif any(keyword in stripped for keyword in ['License:', 'Provisioning:', 'Services:', 'Over Time', 'Point in Time', 'Estimating', 'Determining', 'Incremental', 'Fulfillment', 'Capitalization', 'Amortization']) and not line.startswith('    '):
                 fixed_lines.append('    * ' + stripped.lstrip('•*- ◦').strip())
             else:
                 fixed_lines.append(line)

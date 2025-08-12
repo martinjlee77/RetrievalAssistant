@@ -88,7 +88,13 @@ Primary Guidance: {step_info['primary_guidance']}
 You must return a JSON object with this exact structure:
 {step_schema}
 
-**CRITICAL:** Your analysis must establish a policy framework for {company_name}, not analyze a single transaction. Focus on creating consistent application principles that accounting staff can follow across all similar arrangements."""
+**CRITICAL REQUIREMENTS:**
+1. **Document-Specific Analysis:** You MUST analyze the specific terms, rates, amounts, and conditions found in the <CONTRACT_TEXT> section above. Reference specific percentages, dollar amounts, timing requirements, and other concrete terms from the uploaded documents.
+2. **Policy Framework Focus:** Your analysis must establish a policy framework for {company_name}, not analyze a single transaction. However, this policy must be grounded in the specific contract terms provided.
+3. **Evidence Integration:** Quote specific language from the contract text to support your policy recommendations. Include actual rates, amounts, and terms in your analysis.
+4. **Practical Application:** Create consistent application principles that accounting staff can follow, but base these on the real terms found in the uploaded documents.
+
+**EXAMPLE:** If the contract mentions "5% commission rate" or "Total Contract Value excludes taxes," your analysis must reference and build policy around these specific terms."""
 
     @staticmethod
     def _get_step_instructions(step_number: int) -> str:
@@ -103,7 +109,7 @@ ANALYSIS REQUIREMENTS:
 3. **Scope Boundaries:** Define what is included vs. excluded from the policy scope
 4. **Other Standards Interaction:** Identify any costs that should be accounted for under other standards
 
-Focus on establishing clear scope boundaries that can be consistently applied across all relevant contracts.""",
+Focus on establishing clear scope boundaries based on the specific contract terms in the <CONTRACT_TEXT>. Reference actual contract language, rates, and conditions when defining scope.""",
 
             2: """**STEP 2: COST CLASSIFICATION**
 Your task is to establish the classification framework for contract costs under ASC 340-40.
@@ -114,7 +120,7 @@ ANALYSIS REQUIREMENTS:
 3. **Expense Recognition Criteria:** Define when costs should be immediately expensed
 4. **Practical Expedient Application:** Determine approach for the one-year practical expedient
 
-Focus on creating clear, operational definitions that accounting staff can consistently apply.""",
+Focus on creating classification criteria based on the specific cost types, rates, and conditions described in the <CONTRACT_TEXT>. Quote specific contract language to support your classification framework.""",
 
             3: """**STEP 3: MEASUREMENT & AMORTIZATION POLICY**
 Your task is to establish the measurement and amortization policy framework.
