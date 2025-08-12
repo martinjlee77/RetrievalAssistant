@@ -32,6 +32,12 @@ def _preprocess_markdown_for_html(memo_markdown: str) -> str:
     processed_text = re.sub(r'^(#\s*)?TECHNICAL ACCOUNTING MEMORANDUM', '# TECHNICAL ACCOUNTING MEMORANDUM', processed_text, flags=re.MULTILINE)
     processed_text = re.sub(r'^(#\s*)?ACCOUNTING POLICY MEMORANDUM', '# ACCOUNTING POLICY MEMORANDUM', processed_text, flags=re.MULTILINE)
     
+    # 1a. ASC 340-40 memo header conversion - Convert bold TO/FROM/DATE/RE to proper markdown
+    processed_text = re.sub(r'^\*\*TO:\*\*', '**TO:**', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^\*\*FROM:\*\*', '**FROM:**', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^\*\*DATE:\*\*', '**DATE:**', processed_text, flags=re.MULTILINE)
+    processed_text = re.sub(r'^\*\*RE:\*\*', '**RE:**', processed_text, flags=re.MULTILINE)
+    
     # 2. EXECUTIVE SUMMARY NUMBERING FIX - Remove "1." and "2." before subsections
     processed_text = re.sub(r'^1\.\s*EXECUTIVE SUMMARY', 'EXECUTIVE SUMMARY', processed_text, flags=re.MULTILINE)
     processed_text = re.sub(r'^1\.\s*(Overall Conclusion|KEY FINDINGS)', r'\1', processed_text, flags=re.MULTILINE)
