@@ -88,61 +88,84 @@ Primary Guidance: {step_info['primary_guidance']}
 You must return a JSON object with this exact structure:
 {step_schema}
 
-**CRITICAL REQUIREMENTS:**
-1. **Document-Specific Analysis:** You MUST analyze the specific terms, rates, amounts, and conditions found in the <CONTRACT_TEXT> section above. Reference specific percentages, dollar amounts, timing requirements, and other concrete terms from the uploaded documents.
-2. **Policy Framework Focus:** Your analysis must establish a policy framework for {company_name}, not analyze a single transaction. However, this policy must be grounded in the specific contract terms provided.
-3. **Evidence Integration:** Quote specific language from the contract text to support your policy recommendations. Include actual rates, amounts, and terms in your analysis.
-4. **Practical Application:** Create consistent application principles that accounting staff can follow, but base these on the real terms found in the uploaded documents.
+### CRITICAL_REQUIREMENTS ###
+**YOUR ANALYSIS MUST INCLUDE:**
 
-**EXAMPLE:** If the contract mentions "5% commission rate" or "Total Contract Value excludes taxes," your analysis must reference and build policy around these specific terms."""
+a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> above. You MUST quote specific language, rates, amounts, definitions, and terms from the uploaded document.
+
+b. **Specific References:** You MUST reference actual percentages (like "5% commission rate"), dollar amounts, timing provisions, and defined terms found in the contract text.
+
+c. **Document Grounding:** Every policy recommendation must be tied to specific contract language. You cannot provide generic advice.
+
+d. **Concrete Examples:** Use the actual terms from the contract (commission rates, TCV definitions, eligibility criteria) in your analysis.
+
+**MANDATORY:** If the contract contains specific rates, amounts, or definitions, you MUST quote them verbatim and build your entire analysis around these actual terms. Generic or hypothetical examples are not acceptable.
+
+**FAILURE TO FOLLOW:** Any response that doesn't quote specific contract terms or uses generic examples instead of actual document content will be rejected."""
 
     @staticmethod
     def _get_step_instructions(step_number: int) -> str:
         """Get specific instructions for each step"""
         instructions = {
-            1: """**STEP 1: SCOPE ASSESSMENT**
+            1: """<CRITICAL_INSTRUCTION>
+**STEP 1: SCOPE ASSESSMENT**
 Your task is to establish the scope of ASC 340-40 application for the Company's contracts.
 
-ANALYSIS REQUIREMENTS:
-1. **Contract Types Assessment:** Determine which types of customer contracts fall within ASC 340-40 scope
-2. **Cost Categories Identification:** Identify the categories of costs that may be subject to ASC 340-40
-3. **Scope Boundaries:** Define what is included vs. excluded from the policy scope
-4. **Other Standards Interaction:** Identify any costs that should be accounted for under other standards
+**YOUR ANALYSIS MUST INCLUDE:**
 
-Focus on establishing clear scope boundaries based on the specific contract terms in the <CONTRACT_TEXT>. Reference actual contract language, rates, and conditions when defining scope.""",
+a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> above. You MUST quote specific language about commission structures, payment terms, eligibility criteria, and contract definitions found in the document.
 
-            2: """**STEP 2: COST CLASSIFICATION**
+b. **Specific Contract Terms:** You MUST reference actual percentages, amounts, timing provisions, and defined terms. For example, if the contract mentions "5% commission rate" or defines "Total Contract Value," you MUST quote these verbatim.
+
+c. **Cost Category Analysis:** Based on the ACTUAL cost types described in the contract text (not generic examples), determine which fall within ASC 340-40 scope.
+
+**MANDATORY:** Every scope determination must be tied to specific contract language. You cannot make generic statements about commission structures without quoting the actual terms from the uploaded document.
+</CRITICAL_INSTRUCTION>""",
+
+            2: """<CRITICAL_INSTRUCTION>
+**STEP 2: COST CLASSIFICATION**
 Your task is to establish the classification framework for contract costs under ASC 340-40.
 
-ANALYSIS REQUIREMENTS:
-1. **Incremental Costs Framework:** Define criteria for identifying incremental costs of obtaining contracts
-2. **Fulfillment Costs Framework:** Establish the three-criteria test for capitalizing fulfillment costs
-3. **Expense Recognition Criteria:** Define when costs should be immediately expensed
-4. **Practical Expedient Application:** Determine approach for the one-year practical expedient
+**YOUR ANALYSIS MUST INCLUDE:**
 
-Focus on creating classification criteria based on the specific cost types, rates, and conditions described in the <CONTRACT_TEXT>. Quote specific contract language to support your classification framework.""",
+a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing the specific cost structures, payment conditions, and eligibility requirements in the document.
 
-            3: """**STEP 3: MEASUREMENT & AMORTIZATION POLICY**
+b. **Incremental Cost Analysis:** Using the ACTUAL commission rates, payment triggers, and eligibility criteria from the contract, determine which costs qualify as incremental costs of obtaining contracts.
+
+c. **Contract-Specific Classification:** Quote the specific language about when commissions are earned, how they're calculated, and what triggers payment. Build your classification framework around these actual terms.
+
+**MANDATORY:** You must reference the specific commission percentages, calculation methods, and payment terms found in the contract text. Generic policy statements without contract-specific evidence are not acceptable.
+</CRITICAL_INSTRUCTION>""",
+
+            3: """<CRITICAL_INSTRUCTION>
+**STEP 3: MEASUREMENT & AMORTIZATION POLICY**
 Your task is to establish the measurement and amortization policy framework.
 
-ANALYSIS REQUIREMENTS:
-1. **Initial Measurement:** Define how capitalized contract costs will be initially measured
-2. **Amortization Method:** Establish the systematic amortization approach
-3. **Amortization Period:** Define how to determine the appropriate amortization period
-4. **Impairment Testing:** Establish the impairment assessment process and timing
+**YOUR ANALYSIS MUST INCLUDE:**
 
-Focus on establishing systematic, defensible approaches that ensure consistent application.""",
+a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing contract terms, renewal periods, customer relationship duration, or other factors that affect amortization periods.
 
-            4: """**STEP 4: ILLUSTRATIVE FINANCIAL IMPACT**
-Your task is to provide illustrative examples of the policy's financial impact using placeholder amounts.
+b. **Contract-Based Measurement:** Using the ACTUAL contract terms and commission structure described in the document, establish how costs will be initially measured.
 
-ANALYSIS REQUIREMENTS:
-1. **Journal Entry Examples:** Provide template journal entries for capitalization and amortization using a placeholder amount (e.g., $10,000)
-2. **Financial Statement Presentation:** Describe balance sheet and income statement presentation
-3. **Disclosure Requirements:** Summarize key disclosure requirements
-4. **Implementation Timeline:** Outline key implementation considerations
+c. **Period Determination:** Based on the specific contract terms, customer relationships, or renewal provisions mentioned in the document, establish the amortization approach.
 
-**IMPORTANT:** Use placeholder amounts (e.g., $10,000) for all journal entries and include a disclaimer that entries are for illustrative purposes only. Focus on demonstrating the policy methodology, not calculating specific amounts."""
+**MANDATORY:** Your amortization policy must be grounded in the specific contract terms and business model described in the uploaded document, not generic industry practices.
+</CRITICAL_INSTRUCTION>""",
+
+            4: """<CRITICAL_INSTRUCTION>
+**STEP 4: ILLUSTRATIVE FINANCIAL IMPACT**
+Your task is to provide illustrative examples of the policy's financial impact using the actual contract terms.
+
+**YOUR ANALYSIS MUST INCLUDE:**
+
+a. **Evidence:** Direct quotes from the <CONTRACT_TEXT> showing commission rates, payment terms, and calculation methods that will drive the financial impact.
+
+b. **Contract-Based Examples:** Using the ACTUAL commission percentages and structures from the document, create illustrative examples that reflect the specific business model described.
+
+c. **Specific Terms Integration:** Reference the actual commission rates (like "5% commission rate") and contract definitions when explaining financial impact calculations.
+
+**MANDATORY:** While using illustrative dollar amounts for calculations, you must ground all examples in the specific commission structure, rates, and terms found in the contract text. Your journal entries should reflect the actual business model described in the document.
+</CRITICAL_INSTRUCTION>"""
         }
         return instructions.get(step_number, "")
 
