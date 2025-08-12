@@ -308,12 +308,7 @@ def show_analysis_results():
     
     memo = getattr(result, 'professional_memo', None)
     
-    # Debug memo retrieval
-    st.write(f"DEBUG - Memo object: {type(memo)}")
-    st.write(f"DEBUG - Memo length: {len(memo) if memo else 0}")
-    st.write(f"DEBUG - Memo first 100 chars: {memo[:100] if memo else 'None'}")
-    
-    if memo and memo.strip():
+    if memo:
         # Generate content once for both preview and download (exactly like ASC 606)
         from utils.html_export import convert_memo_to_html
         from utils.llm import create_docx_from_text
@@ -329,81 +324,24 @@ def show_analysis_results():
                 contract_types_in_scope=form_data.get('contract_types_in_scope', [])
             )
         
-        # DEBUG HTML conversion
-        st.write("DEBUG - Starting HTML conversion...")
-        try:
-            html_content = convert_memo_to_html(memo, None)
-            st.write(f"DEBUG - HTML conversion successful, length: {len(html_content)}")
-            st.write(f"DEBUG - HTML contains ACCOUNTING POLICY: {'ACCOUNTING POLICY' in html_content}")
-            st.write(f"DEBUG - HTML preview (chars 1000-1200): {html_content[1000:1200]}")
-        except Exception as e:
-            st.error(f"DEBUG - HTML conversion failed: {e}")
-            html_content = None
-        
+        html_content = convert_memo_to_html(memo, contract_costs_data)
         analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
-    else:
-        # Handle empty memo by creating a test memo to verify our fixes work
-        st.warning("Memo generation failed due to API quota limits. Testing with sample memo to verify our fixes...")
-        
-        test_memo = """# ACCOUNTING POLICY MEMORANDUM
 
-**TO:** Chief Accounting Officer  
-**FROM:** Technical Accounting Team  
-**DATE:** August 12, 2025  
-**RE:** Sales Commission Plan - ASC 340-40 Contract Costs Policy
+        # --- PREVIEW FIRST (Front and Center) ---
+        with st.expander("📄 Memo Preview", expanded=True):
+            import streamlit.components.v1 as components
+            
+            # Display the styled HTML in a scrollable container
+            components.html(html_content, height=800, scrolling=True)
 
-## EXECUTIVE SUMMARY
-
-This memorandum establishes the accounting policy for sales commission costs under ASC 340-40. Based on our analysis of the FY2024 Sales Commission Plan, we have determined that commission costs qualify as incremental costs to obtain contracts and should be capitalized when they meet the recognition criteria.
-
-## 1. SCOPE ASSESSMENT
-
-The sales commission plan contains commission structures directly tied to contract acquisition, meeting the criteria for ASC 340-40 application.
-
-## 2. COST CLASSIFICATION FRAMEWORK
-
-Commission costs will be classified as incremental costs to obtain contracts when they would not have been incurred without the contract.
-
-## 3. MEASUREMENT & AMORTIZATION POLICY
-
-Capitalized commission costs will be amortized over the expected customer relationship period using a systematic approach.
-
-## 4. ILLUSTRATIVE FINANCIAL IMPACT
-
-Based on the commission structure, we estimate significant annual impacts requiring careful tracking and disclosure.
-
-## CONCLUSION
-
-This policy framework ensures consistent application of ASC 340-40 for contract cost accounting."""
-        
-        from utils.html_export import convert_memo_to_html
-        from utils.llm import create_docx_from_text
-        
-        html_content = convert_memo_to_html(test_memo, None)
-        analysis_title = "Test_ASC340_Policy"
-        memo = test_memo
-
-        # --- PREVIEW FIRST (exactly like ASC 606) ---
-        if html_content:
-            with st.expander("📄 Memo Preview", expanded=True):
-                import streamlit.components.v1 as components
-                
-                st.write("DEBUG - Rendering HTML in components.html...")
-                # Display the styled HTML in a scrollable container
-                components.html(html_content, height=800, scrolling=True)
-        else:
-            st.error("Cannot display memo preview - HTML conversion failed")
-
-        # --- DOWNLOAD ACTION (exactly like ASC 606) ---
+        # --- DOWNLOAD ACTION (Below Preview) ---
         with st.container(border=True):
             st.markdown("**Export Memo**")
             st.write("Download the memo as an editable Word document for review and filing.")
 
-            # Single primary action - Download DOCX (exactly like ASC 606)
-            st.write("DEBUG - Starting DOCX generation...")
+            # Single primary action - Download DOCX
             try:
                 docx_content = create_docx_from_text(memo, contract_costs_data)
-                st.write(f"DEBUG - DOCX generation successful, size: {len(docx_content)} bytes")
                 st.download_button(
                     label="📄 Download as Word Document (.DOCX)",
                     data=docx_content,
@@ -414,7 +352,9 @@ This policy framework ensures consistent application of ASC 340-40 for contract 
                     help="Download the memo as a fully-formatted, editable Word document, ready for audit files."
                 )
             except Exception as e:
-                st.error(f"DEBUG - DOCX generation failed: {str(e)}")
+                st.error(f"Error generating DOCX: {str(e)}")
+    else:
+        st.info("No memo was generated. Please ensure the analysis completed successfully.")
 
 if __name__ == "__main__":
     main()
