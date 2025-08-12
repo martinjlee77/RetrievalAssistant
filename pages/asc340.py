@@ -329,8 +329,17 @@ def show_analysis_results():
                 contract_types_in_scope=form_data.get('contract_types_in_scope', [])
             )
         
-        # Test bypassing contract_data parameter to isolate the issue
-        html_content = convert_memo_to_html(memo, None)
+        # DEBUG HTML conversion
+        st.write("DEBUG - Starting HTML conversion...")
+        try:
+            html_content = convert_memo_to_html(memo, None)
+            st.write(f"DEBUG - HTML conversion successful, length: {len(html_content)}")
+            st.write(f"DEBUG - HTML contains ACCOUNTING POLICY: {'ACCOUNTING POLICY' in html_content}")
+            st.write(f"DEBUG - HTML preview (chars 1000-1200): {html_content[1000:1200]}")
+        except Exception as e:
+            st.error(f"DEBUG - HTML conversion failed: {e}")
+            html_content = None
+        
         analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
     else:
         # Handle empty memo by creating a test memo to verify our fixes work
@@ -375,11 +384,15 @@ This policy framework ensures consistent application of ASC 340-40 for contract 
         memo = test_memo
 
         # --- PREVIEW FIRST (exactly like ASC 606) ---
-        with st.expander("📄 Memo Preview", expanded=True):
-            import streamlit.components.v1 as components
-            
-            # Display the styled HTML in a scrollable container
-            components.html(html_content, height=800, scrolling=True)
+        if html_content:
+            with st.expander("📄 Memo Preview", expanded=True):
+                import streamlit.components.v1 as components
+                
+                st.write("DEBUG - Rendering HTML in components.html...")
+                # Display the styled HTML in a scrollable container
+                components.html(html_content, height=800, scrolling=True)
+        else:
+            st.error("Cannot display memo preview - HTML conversion failed")
 
         # --- DOWNLOAD ACTION (exactly like ASC 606) ---
         with st.container(border=True):
@@ -387,8 +400,10 @@ This policy framework ensures consistent application of ASC 340-40 for contract 
             st.write("Download the memo as an editable Word document for review and filing.")
 
             # Single primary action - Download DOCX (exactly like ASC 606)
+            st.write("DEBUG - Starting DOCX generation...")
             try:
                 docx_content = create_docx_from_text(memo, contract_costs_data)
+                st.write(f"DEBUG - DOCX generation successful, size: {len(docx_content)} bytes")
                 st.download_button(
                     label="📄 Download as Word Document (.DOCX)",
                     data=docx_content,
@@ -399,7 +414,7 @@ This policy framework ensures consistent application of ASC 340-40 for contract 
                     help="Download the memo as a fully-formatted, editable Word document, ready for audit files."
                 )
             except Exception as e:
-                st.error(f"Error generating DOCX: {str(e)}")
+                st.error(f"DEBUG - DOCX generation failed: {str(e)}")
 
 if __name__ == "__main__":
     main()
