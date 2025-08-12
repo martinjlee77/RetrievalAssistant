@@ -307,14 +307,7 @@ def show_analysis_results():
     
     memo = getattr(result, 'professional_memo', None)
     
-    # DEBUG: Check memo retrieval
-    st.error(f"DEBUG: memo variable = '{memo}' (type: {type(memo)})")
-    st.error(f"DEBUG: result object type = {type(result)}")
-    st.error(f"DEBUG: result has professional_memo attr = {hasattr(result, 'professional_memo')}")
-    if hasattr(result, 'professional_memo'):
-        st.error(f"DEBUG: result.professional_memo = '{result.professional_memo}' (len: {len(result.professional_memo)})")
-    
-    if memo:
+    if memo and memo.strip():
         # Generate content once for both preview and download (exactly like ASC 606)
         from utils.html_export import convert_memo_to_html
         from utils.llm import create_docx_from_text
@@ -325,15 +318,21 @@ def show_analysis_results():
             'company_name': form_data.get('company_name', 'Company')
         }
         
-        html_content = convert_memo_to_html(memo, contract_data_for_html)
-        analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
+        try:
+            html_content = convert_memo_to_html(memo, contract_data_for_html)
+            analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
-        # --- PREVIEW FIRST (exactly like ASC 606) ---
-        with st.expander("📄 Memo Preview", expanded=True):
-            import streamlit.components.v1 as components
-            
-            # Display the styled HTML in a scrollable container
-            components.html(html_content, height=800, scrolling=True)
+            # --- PREVIEW FIRST (exactly like ASC 606) ---
+            with st.expander("📄 Memo Preview", expanded=True):
+                import streamlit.components.v1 as components
+                
+                # Display the styled HTML in a scrollable container
+                components.html(html_content, height=800, scrolling=True)
+        except Exception as e:
+            st.error(f"HTML conversion error: {e}")
+            # Fallback to text area
+            with st.expander("📄 Memo Preview (Text Format)", expanded=True):
+                st.text_area("Memo Content", memo, height=600, disabled=True)
 
         # --- DOWNLOAD ACTION (exactly like ASC 606) ---
         with st.container(border=True):
