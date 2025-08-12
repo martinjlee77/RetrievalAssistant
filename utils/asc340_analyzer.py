@@ -319,8 +319,14 @@ Return the extracted terms as a JSON object with this structure:
             # Create initial analysis object
             asc340_analysis = ASC340Analysis(**analysis_data)
             
-            # Generate the professional memo
+            # Generate the professional memo with debugging
+            self.logger.info("DEBUG: Starting memo generation...")
             professional_memo = await self.generate_full_memo(asc340_analysis)
+            
+            # DEBUG: Check memo generation result
+            self.logger.info(f"DEBUG: Memo generated with {len(professional_memo) if professional_memo else 0} characters")
+            if not professional_memo or professional_memo.startswith("Error"):
+                self.logger.error(f"DEBUG: Memo generation failed: {professional_memo}")
             
             # Update analysis data with generated memo
             analysis_data["professional_memo"] = professional_memo
@@ -368,15 +374,23 @@ Return the extracted terms as a JSON object with this structure:
         """Generate complete ASC 340-40 accounting policy memorandum"""
         try:
             # Get memo generation context
+            self.logger.info("DEBUG: Getting RAG context for memo generation...")
             rag_context = self._get_rag_context("accounting policy memorandum disclosure requirements")
+            self.logger.info(f"DEBUG: RAG context retrieved with {len(rag_context.get('context', ''))} chars")
             
+            # Get prompts
+            self.logger.info("DEBUG: Getting memo generation prompts...")
             system_prompt = ASC340StepPrompts.get_memo_generation_system_prompt()
             user_prompt = ASC340StepPrompts.get_memo_generation_user_prompt(
                 analysis=analysis,
                 rag_context=rag_context['context']
             )
+            
+            self.logger.info(f"DEBUG: System prompt: {len(system_prompt)} chars")
+            self.logger.info(f"DEBUG: User prompt: {len(user_prompt)} chars")
 
             # Generate memo
+            self.logger.info("DEBUG: Calling LLM for memo generation...")
             memo_response = await make_llm_call_async(
                 client=self.client,
                 messages=[
@@ -385,9 +399,12 @@ Return the extracted terms as a JSON object with this structure:
                 ],
                 model="gpt-4o"
             )
+            
+            self.logger.info(f"DEBUG: LLM response received: {len(memo_response) if memo_response else 0} chars")
 
             # Clean formatting
             cleaned_memo = self._clean_memo_section(memo_response)
+            self.logger.info(f"DEBUG: Cleaned memo: {len(cleaned_memo) if cleaned_memo else 0} chars")
             
             return cleaned_memo
             
