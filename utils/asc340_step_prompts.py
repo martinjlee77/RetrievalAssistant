@@ -170,6 +170,203 @@ c. **Specific Terms Integration:** Reference the actual commission rates (like "
         return instructions.get(step_number, "")
 
     @staticmethod
+    def get_memo_generation_system_prompt() -> str:
+        """System prompt for generating professional ASC 340-40 policy memorandums"""
+        return """You are a senior technical accounting specialist generating professional accounting policy memorandums for ASC 340-40 Contract Costs.
+
+Your task is to synthesize the step analysis results into a comprehensive, Big 4-quality accounting policy memorandum that establishes consistent application principles for the organization.
+
+CRITICAL REQUIREMENTS:
+1. **Professional Format**: Generate a formal accounting policy memorandum suitable for technical accounting teams
+2. **Evidence Integration**: Include specific contract terms, rates, and conditions from the source documents
+3. **Policy Framework**: Create actionable policy guidance that staff can consistently apply
+4. **Authoritative Support**: Reference ASC 340-40 guidance and interpretative sources appropriately
+
+OUTPUT FORMAT: Return plain text markdown suitable for professional presentation."""
+
+    @staticmethod
+    def get_memo_generation_user_prompt(analysis, rag_context: str) -> str:
+        """User prompt for generating complete ASC 340-40 policy memorandum"""
+        
+        # Extract contract data
+        contract_data = analysis.contract_data
+        company_name = contract_data.company_name
+        analysis_title = contract_data.analysis_title
+        policy_date = contract_data.policy_effective_date.strftime("%B %d, %Y")
+        
+        # Extract step results
+        step1 = analysis.step1_scope_assessment
+        step2 = analysis.step2_cost_classification  
+        step3 = analysis.step3_measurement_policy
+        step4 = analysis.step4_illustrative_impact
+        
+        return f"""Generate a comprehensive ASC 340-40 accounting policy memorandum based on the completed step analysis.
+
+### MEMO CONTEXT ###
+Company: {company_name}
+Policy Title: {analysis_title}
+Effective Date: {policy_date}
+Audience: Technical Accounting Team
+
+### ANALYSIS RESULTS ###
+
+**STEP 1 - SCOPE ASSESSMENT:**
+{step1}
+
+**STEP 2 - COST CLASSIFICATION:**
+{step2}
+
+**STEP 3 - MEASUREMENT & AMORTIZATION POLICY:**
+{step3}
+
+**STEP 4 - ILLUSTRATIVE FINANCIAL IMPACT:**
+{step4}
+
+### AUTHORITATIVE CONTEXT ###
+{rag_context}
+
+### REQUIRED OUTPUT FORMAT ###
+
+Generate a professional accounting policy memorandum with the following structure:
+
+# ACCOUNTING POLICY MEMORANDUM
+
+**TO:** Chief Accounting Officer  
+**FROM:** Technical Accounting Team  
+**DATE:** {policy_date}  
+**RE:** {analysis_title}
+
+## EXECUTIVE SUMMARY
+[Concise overview of policy framework and key determinations]
+
+## 1. SCOPE ASSESSMENT
+[Policy scope based on Step 1 analysis with specific contract terms]
+
+## 2. COST CLASSIFICATION FRAMEWORK  
+[Classification criteria based on Step 2 analysis with contract evidence]
+
+## 3. MEASUREMENT & AMORTIZATION POLICY
+[Policy framework based on Step 3 analysis with specific terms]
+
+## 4. ILLUSTRATIVE FINANCIAL IMPACT
+[Examples based on Step 4 analysis using actual contract structure]
+
+## CONCLUSION
+[Summary of policy framework and implementation guidance]
+
+**CRITICAL:** Ensure the memorandum includes specific contract terms, rates, and conditions from the underlying analysis. Reference actual percentages, amounts, and contractual language throughout the policy framework."""
+
+    @staticmethod
+    def _get_schema_for_step(step_number: int) -> str:
+        """Get JSON schema for each step"""
+        schemas = {
+            1: """{
+  "step1_analysis": {
+    "scope_determination": [
+      {
+        "cost_category": "Name of cost category (e.g., 'Sales Commissions', 'Contract Setup Costs')",
+        "in_scope_assessment": "Yes / No / Conditional",
+        "rationale": "Clear explanation based on ASC 340-40 scope requirements",
+        "other_standards_consideration": "Note any other GAAP standards that may apply"
+      }
+    ],
+    "policy_boundaries": {
+      "included_contract_types": "List the types of customer contracts included in scope",
+      "excluded_items": "List items explicitly excluded from the policy",
+      "materiality_considerations": "Note any materiality thresholds or considerations"
+    },
+    "step1_conclusion": "Clear summary of scope determination for the Company's policy"
+  },
+  "evidence_quotes": [
+    "Direct quote from authoritative guidance... (Source: ASC 340-40-15-2)"
+  ]
+}""",
+
+            2: """{
+  "step2_analysis": {
+    "incremental_costs_framework": {
+      "definition": "Clear definition of incremental costs for the Company",
+      "identification_criteria": "Specific criteria for identifying incremental costs",
+      "common_examples": "Examples of costs that typically qualify as incremental",
+      "common_exclusions": "Examples of costs that typically do NOT qualify"
+    },
+    "fulfillment_costs_framework": {
+      "three_criteria_application": "How the Company will apply the three criteria in ASC 340-40-25-5",
+      "direct_relationship_test": "How to assess if costs relate directly to a contract",
+      "resource_enhancement_test": "How to assess if costs generate/enhance resources",
+      "recoverability_test": "How to assess cost recoverability"
+    },
+    "practical_expedient_policy": {
+      "one_year_expedient": "The Company's approach to the one-year practical expedient",
+      "application_criteria": "When the expedient will be applied"
+    },
+    "step2_conclusion": "Summary of the Company's cost classification policy framework"
+  },
+  "evidence_quotes": [
+    "Direct quote from authoritative guidance... (Source: ASC 340-40-25-1)"
+  ]
+}""",
+
+            3: """{
+  "step3_analysis": {
+    "measurement_policy": {
+      "initial_measurement": "How the Company will initially measure capitalized contract costs",
+      "cost_components": "What components are included in the capitalized amount"
+    },
+    "amortization_framework": {
+      "amortization_method": "The systematic method the Company will use (e.g., straight-line, proportional)",
+      "amortization_period_determination": "How the Company will determine amortization periods",
+      "contract_renewal_consideration": "How renewals affect amortization periods"
+    },
+    "impairment_policy": {
+      "impairment_assessment_timing": "When the Company will assess for impairment",
+      "impairment_calculation_method": "How impairment will be calculated per ASC 340-40-35-3"
+    },
+    "step3_conclusion": "Summary of the Company's measurement and amortization policy"
+  },
+  "evidence_quotes": [
+    "Direct quote from authoritative guidance... (Source: ASC 340-40-35-1)"
+  ]
+}""",
+
+            4: """{
+  "step4_analysis": {
+    "illustrative_examples": [
+      {
+        "scenario_description": "Description of the illustrative scenario",
+        "journal_entries": [
+          {
+            "description": "Journal entry description",
+            "debit_account": "Account name",
+            "debit_amount": "Amount (use placeholders like $10,000)",
+            "credit_account": "Account name", 
+            "credit_amount": "Amount (use placeholders like $10,000)"
+          }
+        ]
+      }
+    ],
+    "financial_statement_presentation": {
+      "balance_sheet_presentation": "How contract costs will appear on the balance sheet",
+      "income_statement_presentation": "How amortization will appear on the income statement"
+    },
+    "disclosure_requirements": {
+      "required_disclosures": "Key disclosure requirements under ASC 340-40",
+      "policy_disclosure": "Accounting policy disclosure requirements"
+    },
+    "implementation_considerations": {
+      "system_requirements": "Key system or process considerations for implementation",
+      "timeline_considerations": "Implementation timeline factors"
+    },
+    "step4_conclusion": "Summary of financial impact and implementation approach"
+  },
+  "evidence_quotes": [
+    "Direct quote from authoritative guidance... (Source: ASC 340-40-50-1)"
+  ]
+}"""
+        }
+        return schemas.get(step_number, "{}")
+
+    @staticmethod
     def _get_schema_for_step(step_number: int) -> str:
         """Get JSON schema for each step"""
         schemas = {
