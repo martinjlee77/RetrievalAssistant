@@ -324,30 +324,19 @@ def show_analysis_results():
                 contract_types_in_scope=form_data.get('contract_types_in_scope', [])
             )
         
-        # Debug the exact issue
-        st.write(f"🔍 DEBUG: memo length = {len(memo)}")
-        st.write(f"🔍 DEBUG: contract_costs_data type = {type(contract_costs_data)}")
-        
-        try:
-            html_content = convert_memo_to_html(memo, contract_costs_data)
-            st.write(f"🔍 DEBUG: HTML generated successfully, length = {len(html_content)}")
-            st.success("HTML conversion successful!")
-        except Exception as e:
-            st.error(f"🚨 HTML conversion failed: {e}")
-            st.write("📄 Showing raw memo content instead:")
-            st.text_area("Raw Memo", memo, height=400, disabled=True)
-            return
-            
+        html_content = convert_memo_to_html(memo, contract_costs_data)
         analysis_title = form_data.get('analysis_title', 'ASC340_Policy')
 
         # --- PREVIEW FIRST (exactly like ASC 606) ---
         with st.expander("📄 Memo Preview", expanded=True):
             import streamlit.components.v1 as components
             
+            # Show first 500 chars of memo for debugging
+            st.write("**First 500 chars of memo:**")
+            st.code(memo[:500])
+            
             # Display the styled HTML in a scrollable container
-            st.write(f"🔍 DEBUG: About to render HTML with components.html")
             components.html(html_content, height=800, scrolling=True)
-            st.write(f"🔍 DEBUG: components.html call completed")
 
         # --- DOWNLOAD ACTION (exactly like ASC 606) ---
         with st.container(border=True):
