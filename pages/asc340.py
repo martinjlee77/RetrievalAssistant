@@ -396,8 +396,5 @@ This policy framework ensures consistent application of ASC 340-40 for contract 
             except Exception as e:
                 st.error(f"Error generating DOCX: {str(e)}")
 
-    else:
-        st.info("No memo was generated for this analysis.")
-
 if __name__ == "__main__":
     main()
