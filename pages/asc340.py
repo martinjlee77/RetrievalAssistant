@@ -35,24 +35,28 @@ def render_single_page_form():
         analysis_title = st.text_input(
             "Analysis Title *",
             placeholder='e.g., "Contract Costs Policy - Sales Commissions and Setup Costs"',
-            help="Descriptive title for this contract costs accounting policy.")
+            help="Descriptive title for this contract costs accounting policy.",
+            key="asc340_analysis_title")
         
         arrangement_description = st.text_area(
             "Contract Cost Summary (Optional)",
             placeholder='e.g., "This policy will govern sales commissions for new enterprise contracts and standard setup costs for customer onboarding."',
             height=80,
-            help="Brief description of the business context and scope of this policy.")
+            help="Brief description of the business context and scope of this policy.",
+            key="asc340_arrangement_desc")
     
     with col2:
         company_name = st.text_input(
             "Company Name *",
             placeholder='e.g., "TechCorp Solutions"',
-            help="The legal entity name for this accounting policy.")
+            help="The legal entity name for this accounting policy.",
+            key="asc340_company_name")
             
         policy_effective_date = st.date_input(
             "Policy Effective Date (Optional)",
             value=None,
-            help="The date when this accounting policy becomes effective. If left blank, will default to generation date.")
+            help="The date when this accounting policy becomes effective. If left blank, will default to generation date.",
+            key="asc340_effective_date")
     
     # Section 2: Document Upload (Now Required)
     st.subheader(":material/upload_file: Upload Documents")
@@ -60,7 +64,8 @@ def render_single_page_form():
         "Upload Contract Cost Documents for Analysis (Required) *",
         type=['pdf', 'docx', 'txt'],
         accept_multiple_files=True,
-        help="Upload the primary source document that governs the costs, such as a Sales Commission Plan or a standard SOW for fulfillment.")
+        help="Upload the primary source document that governs the costs, such as a Sales Commission Plan or a standard SOW for fulfillment.",
+        key="asc340_file_upload")
     
     # Validation for required file upload
     file_uploaded = uploaded_files is not None and len(uploaded_files) > 0
@@ -82,7 +87,8 @@ def render_single_page_form():
                 "Fulfillment-Related Third-Party Fees",
                 "Other (please specify in description)"
             ],
-            help="Select the primary categories of contract costs this policy will address.")
+            help="Select the primary categories of contract costs this policy will address.",
+            key="asc340_cost_categories")
 
     with col2:
         standard_amortization_period = st.number_input(
@@ -90,17 +96,20 @@ def render_single_page_form():
             min_value=1,
             max_value=120,
             value=36,
-            help="Default amortization period for capitalized contract costs.")
+            help="Default amortization period for capitalized contract costs.",
+            key="asc340_amort_period")
     
     recovery_probable = st.toggle(
         "Is recovery of costs probable? *",
         value=True,
-        help="Assessment of whether contract costs are expected to be recoverable.")
+        help="Assessment of whether contract costs are expected to be recoverable.",
+        key="asc340_recovery_probable")
         
     practical_expedient = st.toggle(
         "Apply Practical Expedient (≤1 yr) *",
         value=False,
-        help="Whether to apply the one-year practical expedient for immediate expensing.")
+        help="Whether to apply the one-year practical expedient for immediate expensing.",
+        key="asc340_practical_expedient")
     
     # Validation logic
     required_fields_complete = (

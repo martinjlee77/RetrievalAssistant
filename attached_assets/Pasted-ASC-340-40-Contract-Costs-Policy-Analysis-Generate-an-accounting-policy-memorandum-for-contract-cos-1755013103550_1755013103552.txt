@@ -1,0 +1,41 @@
+ASC 340-40 Contract Costs Policy Analysis
+Generate an accounting policy memorandum for contract costs under ASC 340-40.
+
+ Background Information
+streamlit.errors.StreamlitDuplicateElementId: There are multiple text_input elements with the same auto-generated ID. When this element is created, it is assigned an internal ID based on the element type and provided parameters. Multiple elements with the same type and parameters will cause this error.
+
+To fix this error, please pass a unique key argument to the text_input element.
+
+Traceback:
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 128, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 669, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/home.py", line 82, in <module>
+    pg.run()
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/navigation/page.py", line 300, in run
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/pages/asc340.py", line 338, in <module>
+    main()
+File "/home/runner/workspace/pages/asc340.py", line 257, in main
+    form_data = render_single_page_form()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/pages/asc340.py", line 35, in render_single_page_form
+    analysis_title = st.text_input(
+                     ^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 443, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/widgets/text_widgets.py", line 276, in text_input
+    return self._text_input(
+           ^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/widgets/text_widgets.py", line 328, in _text_input
+    element_id = compute_and_register_element_id(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 254, in compute_and_register_element_id
+    _register_element_id(ctx, element_type, element_id)
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/lib/utils.py", line 148, in _register_element_id
+    raise StreamlitDuplicateElementId(element_type)

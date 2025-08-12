@@ -27,7 +27,7 @@ async def make_llm_call_async(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -65,7 +65,7 @@ def make_llm_call(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-4o",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -168,7 +168,7 @@ def stream_llm_response(
 def get_model_options() -> Dict[str, str]:
     """Get available model options for debugging UI"""
     return {
-        "GPT-4o (Latest)": "gpt-4o",
+        "GPT-5 (Latest)": "gpt-5",
         "GPT-4o Mini": "gpt-4o-mini",
         "GPT-4 Turbo": "gpt-4-turbo-preview"
     }
