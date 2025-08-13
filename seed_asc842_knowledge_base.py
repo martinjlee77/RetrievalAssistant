@@ -77,8 +77,9 @@ def chunk_by_paragraphs(text: str, min_chunk_size: int = 200) -> List[str]:
         paragraphs = text.split('\n\n')
         current_chunk = ""
         for paragraph in paragraphs:
-            if len(current_chunk) + len(paragraph) > min_chunk_size and current_chunk:
-                chunks.append(current_chunk.strip())
+            if len(current_chunk) + len(paragraph) > 1500:  # Stricter limit for embeddings
+                if current_chunk:
+                    chunks.append(current_chunk.strip())
                 current_chunk = paragraph
             else:
                 current_chunk += "\n\n" + paragraph if current_chunk else paragraph
@@ -92,7 +93,7 @@ def chunk_by_paragraphs(text: str, min_chunk_size: int = 200) -> List[str]:
 def extract_docx_text(filepath: Path) -> str:
     """Extract text from DOCX file"""
     try:
-        doc = Document(filepath)
+        doc = Document(str(filepath))
         text_content = []
         
         for paragraph in doc.paragraphs:
@@ -118,58 +119,85 @@ def process_asc842_authoritative_file(filepath: Path) -> List[Dict[str, Any]]:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        # Clean the content
+        # Clean bullet formatting issues
         content = clean_bullet_formatting(content)
         
-        # Extract section info from filename - ASC 842 structure
-        filename = filepath.name.lower()
-        
-        # Map ASC 842 sections
-        section_mapping = {
-            'overview': {'section': '842-10-05', 'title': 'Overview and Background', 'topic': 'General'},
-            'objectives': {'section': '842-10-10', 'title': 'Objectives', 'topic': 'General'},
-            'scope': {'section': '842-10-15', 'title': 'Scope and Scope Exceptions', 'topic': 'General'},
-            'glossary': {'section': '842-10-20', 'title': 'Glossary', 'topic': 'General'},
-            'recognition': {'section': '842-10-25', 'title': 'Recognition', 'topic': 'General'},
-            'measurement': {'section': '842-10-30', 'title': 'Initial Measurement', 'topic': 'Measurement'},
-            'subsequent': {'section': '842-10-35', 'title': 'Subsequent Measurement', 'topic': 'Measurement'},
-            'classification': {'section': '842-10-25', 'title': 'Lease Classification', 'topic': 'Classification'},
-            'disclosure': {'section': '842-10-50', 'title': 'Disclosure', 'topic': 'Reporting'},
-            'implementation': {'section': '842-10-55', 'title': 'Implementation Guidance', 'topic': 'Implementation'},
-        }
-        
-        # Find matching section
-        section_info = None
-        for key, info in section_mapping.items():
-            if key in filename:
-                section_info = info
-                break
-        
-        if not section_info:
-            logger.warning(f"Unknown section for file: {filename}")
-            section_info = {'section': 'Unknown', 'title': 'Unknown Section', 'topic': 'General'}
-        
-        # Split into chunks using paragraph-aware chunking
+        # Create chunks based on ASC paragraph structure (smaller chunks for embedding)
         chunks = chunk_by_paragraphs(content, min_chunk_size=200)
         
         processed_chunks = []
         for i, chunk in enumerate(chunks):
+            # Extract paragraph number if present  
+            paragraph_match = re.search(r'(842-\d{2}-\d{2}-\d+)', chunk)
+            paragraph_number = paragraph_match.group(1) if paragraph_match else None
+            
+            # Determine section from paragraph number or filename
+            section = "842-10"
+            section_title = "General"
+            topic = "General"
+            
+            if paragraph_number:
+                parts = paragraph_number.split('-')
+                section_code = f"{parts[0]}-{parts[1]}"
+                subsection = parts[2]
+                
+                # Map subsections to topics
+                if section_code == "842-10":
+                    section_title = "Overall"
+                    if subsection == "05":
+                        topic = "Overview"
+                    elif subsection == "10":
+                        topic = "Objectives"  
+                    elif subsection == "15":
+                        topic = "Scope"
+                    elif subsection == "20":
+                        topic = "Definitions"
+                    elif subsection == "25":
+                        topic = "Classification"
+                    elif subsection == "30":
+                        topic = "Initial Measurement"
+                    elif subsection == "35":
+                        topic = "Subsequent Measurement"
+                    elif subsection == "50":
+                        topic = "Disclosure"
+                    elif subsection == "55":
+                        topic = "Implementation"
+                elif section_code == "842-20":
+                    section_title = "Lessee"
+                    topic = "Lessee Accounting"
+                
+                section = section_code
+            else:
+                # Fallback to filename-based detection
+                filename = filepath.name.lower()
+                if "overall" in filename:
+                    section_title = "Overall"
+                    topic = "General"
+                elif "lessee" in filename:
+                    section = "842-20"
+                    section_title = "Lessee"  
+                    topic = "Lessee Accounting"
+            
+            # Ensure no None values in metadata
+            paragraph_number = paragraph_number or "N/A"
+            
             processed_chunks.append({
                 'content': chunk,
                 'metadata': {
                     'source_file': filepath.name,
                     'source_type': 'authoritative',
                     'standard': 'ASC 842',
-                    'section': section_info['section'],
-                    'section_title': section_info['title'],
-                    'topic': section_info['topic'],
+                    'section': section,
+                    'section_title': section_title,
+                    'topic': topic,
+                    'paragraph_number': paragraph_number,
                     'chunk_index': i,
                     'total_chunks': len(chunks),
                     'chunk_id': f"asc842_auth_{filepath.stem}_{i}"
                 }
             })
         
-        logger.info(f"Processed {filepath.name}: {len(processed_chunks)} chunks")
+        logger.info(f"Processed {filepath.name}: {len(processed_chunks)} chunks, topics: {set(c['metadata']['topic'] for c in processed_chunks)}")
         return processed_chunks
         
     except Exception as e:
@@ -194,23 +222,40 @@ def process_ey_interpretative_file(filepath: Path) -> List[Dict[str, Any]]:
         # Clean the content
         content = clean_bullet_formatting(content)
         
-        # Determine topic based on content keywords
-        content_lower = content.lower()
-        topic = 'General'
-        if any(keyword in content_lower for keyword in ['classification', 'operating', 'finance']):
-            topic = 'Classification'
-        elif any(keyword in content_lower for keyword in ['measurement', 'present value', 'discount']):
-            topic = 'Measurement'
-        elif any(keyword in content_lower for keyword in ['disclosure', 'reporting']):
-            topic = 'Reporting'
-        elif any(keyword in content_lower for keyword in ['implementation', 'transition']):
-            topic = 'Implementation'
-        
-        # Split into chunks
+        # Split into chunks using paragraph-aware approach (smaller chunks for embedding)
         chunks = chunk_by_paragraphs(content, min_chunk_size=300)
         
         processed_chunks = []
         for i, chunk in enumerate(chunks):
+            # Determine topic based on chunk content keywords
+            chunk_lower = chunk.lower()
+            topic = 'General'
+            
+            # Classification keywords
+            classification_keywords = ['classification', 'operating lease', 'finance lease', 'ownership transfer', 'purchase option', 'lease term', 'present value', 'alternative use']
+            if any(keyword in chunk_lower for keyword in classification_keywords):
+                topic = 'Classification'
+            else:
+                # Measurement keywords  
+                measurement_keywords = ['measurement', 'present value', 'discount rate', 'incremental borrowing rate', 'lease liability', 'right-of-use asset', 'initial direct costs']
+                if any(keyword in chunk_lower for keyword in measurement_keywords):
+                    topic = 'Measurement'
+                else:
+                    # Implementation keywords
+                    implementation_keywords = ['implementation', 'transition', 'practical expedient', 'portfolio approach', 'commencement date']
+                    if any(keyword in chunk_lower for keyword in implementation_keywords):
+                        topic = 'Implementation'
+                    else:
+                        # Scope and identification keywords
+                        scope_keywords = ['scope', 'identified asset', 'lease identification', 'control', 'substantive substitution', 'economic benefits']
+                        if any(keyword in chunk_lower for keyword in scope_keywords):
+                            topic = 'Identification'
+                        else:
+                            # Disclosure keywords
+                            disclosure_keywords = ['disclosure', 'financial statement', 'reporting', 'maturity analysis', 'reconciliation']
+                            if any(keyword in chunk_lower for keyword in disclosure_keywords):
+                                topic = 'Disclosure'
+            
             processed_chunks.append({
                 'content': chunk,
                 'metadata': {
@@ -225,7 +270,14 @@ def process_ey_interpretative_file(filepath: Path) -> List[Dict[str, Any]]:
                 }
             })
         
-        logger.info(f"Processed {filepath.name}: {len(processed_chunks)} chunks, topic: {topic}")
+        # Log topic distribution
+        topic_counts = {}
+        for chunk in processed_chunks:
+            topic = chunk['metadata']['topic']
+            topic_counts[topic] = topic_counts.get(topic, 0) + 1
+        
+        logger.info(f"Processed {filepath.name}: {len(processed_chunks)} chunks")
+        logger.info(f"Topic distribution: {topic_counts}")
         return processed_chunks
         
     except Exception as e:
@@ -287,12 +339,27 @@ def create_asc842_knowledge_base():
     metadatas = [chunk['metadata'] for chunk in all_chunks]
     ids = [chunk['metadata']['chunk_id'] for chunk in all_chunks]
     
-    # Add to collection in batches
-    batch_size = 100
-    for i in range(0, len(documents), batch_size):
-        batch_docs = documents[i:i+batch_size]
-        batch_metadata = metadatas[i:i+batch_size]
-        batch_ids = ids[i:i+batch_size]
+    # Add to collection in smaller batches with length validation
+    batch_size = 25  # Much smaller batches to avoid token limits
+    
+    # Filter out any chunks that are too long (>6000 estimated tokens)
+    valid_documents = []
+    valid_metadatas = []
+    valid_ids = []
+    
+    for doc, meta, doc_id in zip(documents, metadatas, ids):
+        estimated_tokens = len(doc.split()) * 1.3  # Conservative estimate
+        if estimated_tokens <= 6000:
+            valid_documents.append(doc)
+            valid_metadatas.append(meta)
+            valid_ids.append(doc_id)
+        else:
+            logger.warning(f"Skipping oversized chunk {doc_id} ({estimated_tokens:.0f} estimated tokens)")
+    
+    for i in range(0, len(valid_documents), batch_size):
+        batch_docs = valid_documents[i:i+batch_size]
+        batch_metadata = valid_metadatas[i:i+batch_size]
+        batch_ids = valid_ids[i:i+batch_size]
         
         collection.add(
             documents=batch_docs,
