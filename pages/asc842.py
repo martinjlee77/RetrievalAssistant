@@ -7,65 +7,70 @@ import streamlit as st
 from datetime import datetime
 from typing import Optional
 
-from core.ui_helpers import load_custom_css
-from core.models import ASC842Analysis
+# Import statements similar to ASC 606 pattern
+import sys
+import os
+# Add root directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+try:
+    from core.models import ASC842Analysis
+except ImportError:
+    # Fallback import handling
+    sys.path.append('.')
+    from core.models import ASC842Analysis
 from core.analyzers import get_analyzer
 from utils.document_extractor import DocumentExtractor
 from utils.html_export import convert_memo_to_html
-# Remove import - will use inline solution
 
-def show_asc842_page():
-    """ASC 842 Lease Accounting - Module 1: Classification Tool"""
-    
-    # Load styling 
-    load_custom_css()
-    
-    # Page header
-    st.title("🏢 ASC 842 Lease Classification Tool")
-    st.markdown("### Professional Lease Analysis - Operating vs Finance")
-    
-    # Scope notice
-    st.info("""
-    **📋 Classification Analysis Scope**
-    
-    This tool analyzes lease contracts under ASC 842 to determine classification:
-    - **Operating Lease** vs **Finance Lease**
-    - Applies all 5 classification tests systematically
-    - Generates professional memorandums with ASC 842 citations
-    - Lessee accounting only
-    """)
-    
-    # Main interface
-    st.markdown("---")
-    
-    # File upload section
-    st.markdown("### 📄 Upload Lease Contract")
-    uploaded_file = st.file_uploader(
-        "Upload your lease agreement for analysis",
-        type=['pdf', 'docx', 'txt'],
-        help="Supported formats: PDF, DOCX, TXT"
-    )
-    
-    contract_text = ""
-    if uploaded_file:
-        try:
-            extractor = DocumentExtractor()
-            extraction_result = extractor.extract_text(uploaded_file)
-            contract_text = extraction_result.get('text', '') if extraction_result else ''
-            
-            if contract_text.strip():
-                st.success(f"✅ Contract extracted: {len(contract_text):,} characters")
-                with st.expander("📋 Preview Contract Text"):
-                    st.text(contract_text[:2000] + "..." if len(contract_text) > 2000 else contract_text)
-            else:
-                st.error("❌ No text could be extracted from the file")
-        except Exception as e:
-            st.error(f"❌ Error processing file: {str(e)}")
-    
-    # Lease data input section
-    st.markdown("### 📊 Lease Information")
-    
-    col1, col2 = st.columns(2)
+# Main page content - no function wrapper needed for Streamlit navigation
+
+# Page header
+st.title("🏢 ASC 842 Lease Classification Tool")
+st.markdown("### Professional Lease Analysis - Operating vs Finance")
+
+# Scope notice
+st.info("""
+**📋 Classification Analysis Scope**
+
+This tool analyzes lease contracts under ASC 842 to determine classification:
+- **Operating Lease** vs **Finance Lease**
+- Applies all 5 classification tests systematically
+- Generates professional memorandums with ASC 842 citations
+- Lessee accounting only
+""")
+
+# Main interface
+st.markdown("---")
+
+# File upload section
+st.markdown("### 📄 Upload Lease Contract")
+uploaded_file = st.file_uploader(
+    "Upload your lease agreement for analysis",
+    type=['pdf', 'docx', 'txt'],
+    help="Supported formats: PDF, DOCX, TXT"
+)
+
+contract_text = ""
+if uploaded_file:
+    try:
+        extractor = DocumentExtractor()
+        extraction_result = extractor.extract_text(uploaded_file)
+        contract_text = extraction_result.get('text', '') if extraction_result else ''
+        
+        if contract_text.strip():
+            st.success(f"✅ Contract extracted: {len(contract_text):,} characters")
+            with st.expander("📋 Preview Contract Text"):
+                st.text(contract_text[:2000] + "..." if len(contract_text) > 2000 else contract_text)
+        else:
+            st.error("❌ No text could be extracted from the file")
+    except Exception as e:
+        st.error(f"❌ Error processing file: {str(e)}")
+
+# Lease data input section
+st.markdown("### 📊 Lease Information")
+
+col1, col2 = st.columns(2)
     
     with col1:
         asset_type = st.text_input(
@@ -365,9 +370,6 @@ def show_asc842_page():
         **Independent Usage:** Each module can be used standalone
         """)
     
-    # Footer - use standard Streamlit footer
-    st.markdown("---")
-    st.markdown("*ASC 842 Lease Accounting Analysis - Professional Implementation*")
-
-if __name__ == "__main__":
-    show_asc842_page()
+# Footer - use standard Streamlit footer
+st.markdown("---")
+st.markdown("*ASC 842 Lease Accounting Analysis - Professional Implementation*")
