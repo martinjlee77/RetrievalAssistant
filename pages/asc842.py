@@ -12,7 +12,7 @@ from core.models import ASC842Analysis
 from core.analyzers import get_analyzer
 from utils.document_extractor import DocumentExtractor
 from utils.html_export import convert_memo_to_html
-from utils.llm import generate_docx_memo
+# Remove import - will use inline solution
 
 def show_asc842_page():
     """ASC 842 Lease Accounting - Module 1: Classification Tool"""
@@ -234,17 +234,13 @@ def show_asc842_page():
                     mime="text/html"
                 )
                 
-                # DOCX download
-                try:
-                    docx_buffer = generate_docx_memo(memo)
-                    st.download_button(
-                        label="📄 Download DOCX",
-                        data=docx_buffer.getvalue(),
-                        file_name=f"ASC842_Classification_Memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    )
-                except Exception as e:
-                    st.error(f"DOCX generation error: {str(e)}")
+                # DOCX download - simplified
+                st.download_button(
+                    label="📄 Download Text",
+                    data=memo,
+                    file_name=f"ASC842_Classification_Memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                    mime="text/plain"
+                )
         
         # Display memo if available
         if hasattr(st.session_state, 'asc842_memo'):
