@@ -224,3 +224,231 @@ Annual Payment: ${lease_data.annual_lease_payment:,.2f}
 *This memorandum documents the technical accounting analysis supporting the lease classification in accordance with ASC 842.*
 
 Generate a comprehensive, professional memorandum following this structure with specific details from the analysis."""
+
+    @staticmethod
+    def get_measurement_system_prompt() -> str:
+        """System prompt for lease measurement calculations"""
+        return """You are an expert lease accounting analyst specializing in ASC 842 initial and subsequent measurement calculations.
+
+MEASUREMENT FRAMEWORK (ASC 842-20-30):
+
+INITIAL MEASUREMENT AT COMMENCEMENT:
+1. LEASE LIABILITY (ASC 842-20-30-1):
+   - Present value of lease payments not paid at commencement
+   - Discount using rate implicit in lease OR incremental borrowing rate
+   - Include: Fixed payments, variable payments based on index/rate, exercise price of purchase options reasonably certain, penalties for terminating lease, amounts probable to be owed under residual value guarantees
+
+2. RIGHT-OF-USE ASSET (ASC 842-20-30-5):
+   - Initial lease liability amount
+   - PLUS: Prepaid lease payments
+   - PLUS: Initial direct costs incurred by lessee
+   - LESS: Lease incentives received
+
+SUBSEQUENT MEASUREMENT:
+1. LEASE LIABILITY (ASC 842-20-35-4):
+   - Increase by interest using discount rate
+   - Decrease by lease payments made
+
+2. RIGHT-OF-USE ASSET (ASC 842-20-35-8):
+   - Finance Leases: Amortize over shorter of lease term or useful life
+   - Operating Leases: Straight-line over lease term
+
+CALCULATION REQUIREMENTS:
+- Use effective interest method for liability
+- Account for variable payments when incurred
+- Handle modifications per ASC 842-20-25-10
+- Ensure mathematical precision for audit compliance
+
+Provide detailed calculations with period-by-period breakdown showing all components."""
+
+    @staticmethod
+    def get_measurement_user_prompt(
+        lease_data: LeaseClassificationData,
+        classification_result: str,
+        rag_context: str
+    ) -> str:
+        """User prompt for measurement calculations"""
+        return f"""Calculate initial and subsequent measurement for this lease:
+
+=== LEASE CLASSIFICATION RESULT ===
+{classification_result}
+
+=== LEASE MEASUREMENT DATA ===
+Asset Type: {lease_data.asset_type}
+Lease Term: {lease_data.lease_term_months} months
+Annual Payment: ${lease_data.annual_lease_payment:,.2f}
+Discount Rate: {lease_data.discount_rate}%
+Asset Fair Value: ${lease_data.asset_fair_value:,.2f}
+Purchase Option: {lease_data.purchase_option_exists}
+
+{rag_context}
+
+=== MEASUREMENT CALCULATIONS REQUIRED ===
+
+**INITIAL MEASUREMENT (Commencement Date)**
+
+1. **Lease Liability Calculation:**
+   - Payment Stream: [Detail all payments]
+   - Present Value Calculation: [Show PV formula and results]
+   - Initial Lease Liability: $[Amount]
+
+2. **Right-of-Use Asset Calculation:**
+   - Initial Lease Liability: $[Amount]
+   - Add: Prepaid Payments: $[Amount if any]
+   - Add: Initial Direct Costs: $[Amount if any]  
+   - Less: Lease Incentives: $[Amount if any]
+   - Initial ROU Asset: $[Amount]
+
+**SUBSEQUENT MEASUREMENT SCHEDULE**
+
+Create amortization table showing:
+- Period (Month/Year)
+- Beginning Liability Balance
+- Interest Expense (Rate × Beginning Balance)
+- Payment Amount
+- Principal Reduction
+- Ending Liability Balance
+- ROU Asset Amortization
+- ROU Asset Net Book Value
+
+**PERIODIC ACCOUNTING ENTRIES**
+
+For each significant period, show:
+- Interest expense calculation
+- ROU asset amortization method and amount
+- Any remeasurement triggers
+- Variable payment handling
+
+**FINANCIAL STATEMENT IMPACT**
+
+- Balance Sheet: Lease liability (current/non-current split)
+- Balance Sheet: ROU asset presentation
+- Income Statement: Interest expense + amortization
+- Cash Flow Statement: Operating vs financing classification
+
+Use authoritative ASC 842 guidance for all calculations and provide audit-ready documentation."""
+
+    @staticmethod
+    def get_journal_system_prompt() -> str:
+        """System prompt for journal entry generation"""
+        return """You are an expert lease accounting analyst specializing in ASC 842 journal entry preparation and ERP system integration.
+
+JOURNAL ENTRY FRAMEWORK:
+
+INITIAL RECOGNITION ENTRIES:
+1. Finance Lease:
+   Dr. Right-of-Use Asset [Initial Amount]
+   Cr. Lease Liability [Initial Amount]
+
+2. Operating Lease:
+   Dr. Right-of-Use Asset [Initial Amount] 
+   Cr. Lease Liability [Initial Amount]
+
+SUBSEQUENT ENTRIES:
+
+FINANCE LEASE (ASC 842-20-35):
+1. Interest Expense:
+   Dr. Interest Expense [Rate × Beginning Liability]
+   Cr. Lease Liability [Same]
+
+2. ROU Asset Amortization:
+   Dr. Amortization Expense [Straight-line or accelerated]
+   Cr. Accumulated Amortization - ROU Asset [Same]
+
+3. Lease Payment:
+   Dr. Lease Liability [Principal portion]
+   Dr. Interest Expense [Interest portion] 
+   Cr. Cash [Total payment]
+
+OPERATING LEASE (ASC 842-20-35):
+1. Single Lease Expense:
+   Dr. Lease Expense [Total lease cost ÷ lease term]
+   Cr. Lease Liability [Interest accretion]
+   Cr. ROU Asset [Balancing amount]
+
+2. Payment:
+   Dr. Lease Liability [Payment amount]
+   Cr. Cash [Payment amount]
+
+ERP INTEGRATION REQUIREMENTS:
+- Standard chart of accounts mapping
+- Period-end closing procedures
+- Multi-entity consolidation support
+- Audit trail preservation
+- Modification tracking
+
+Generate complete journal entry package ready for controller review and ERP import."""
+
+    @staticmethod
+    def get_journal_user_prompt(
+        measurement_results: str,
+        lease_data: LeaseClassificationData,
+        rag_context: str
+    ) -> str:
+        """User prompt for journal entry generation"""
+        return f"""Generate complete journal entry package based on these calculations:
+
+=== MEASUREMENT RESULTS ===
+{measurement_results}
+
+=== LEASE DATA ===
+Asset Type: {lease_data.asset_type}
+Term: {lease_data.lease_term_months} months
+Annual Payment: ${lease_data.annual_lease_payment:,.2f}
+
+{rag_context}
+
+=== JOURNAL ENTRY PACKAGE REQUIRED ===
+
+**INITIAL RECOGNITION (Commencement Date)**
+
+Entry #1: Lease Recognition
+Date: [Commencement Date]
+Description: Initial recognition of [Asset Type] lease per ASC 842
+Dr. Right-of-Use Asset - [Asset Type]          $[Amount]
+    Cr. Lease Liability                              $[Amount]
+
+**YEAR 1 PERIODIC ENTRIES**
+
+For each month/quarter, provide:
+
+Entry #[N]: [Finance/Operating] Lease - Period [X]
+Date: [Period End Date]
+Description: [Specific description based on lease type]
+[Detailed debits and credits with amounts]
+
+**SUPPORTING SCHEDULES**
+
+1. **Lease Liability Roll-Forward:**
+   - Beginning balance
+   - Interest accretion
+   - Payments made
+   - Ending balance
+
+2. **ROU Asset Roll-Forward:**
+   - Beginning balance  
+   - Amortization/reduction
+   - Ending balance
+
+**ERP EXPORT FORMATS**
+
+Provide entries in these formats:
+1. **Standard Journal Entry Format** (Human-readable)
+2. **CSV Export** (ERP import ready)
+3. **JSON Format** (API integration)
+
+**ACCOUNT MAPPING**
+- ROU Asset: Account #[XXXXX]
+- Lease Liability (Current): Account #[XXXXX]  
+- Lease Liability (Non-Current): Account #[XXXXX]
+- Interest Expense: Account #[XXXXX]
+- Amortization Expense: Account #[XXXXX]
+- Lease Expense: Account #[XXXXX]
+
+**CONTROLLER REVIEW PACKAGE**
+- Summary of key assumptions
+- ASC 842 compliance checklist
+- Disclosure impact assessment
+- Audit documentation references
+
+Generate professional controller-ready journal entry documentation with complete audit trail."""

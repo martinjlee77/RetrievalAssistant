@@ -255,31 +255,114 @@ def show_asc842_page():
                 # Fallback to markdown
                 st.markdown(memo)
     
+    # Module 2: Calculator Section
+    if hasattr(st.session_state, 'asc842_analysis'):
+        st.markdown("---")
+        st.markdown("### 🧮 Module 2: Measurement Calculator")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Calculate Lease Measurement", type="secondary"):
+                with st.spinner("Calculating initial and subsequent measurement..."):
+                    try:
+                        analyzer = get_analyzer("ASC 842")
+                        classification_result = st.session_state.asc842_analysis.lease_classification
+                        measurement_results = analyzer.calculate_lease_measurement(
+                            lease_data=st.session_state.asc842_lease_data,
+                            classification_result=classification_result
+                        )
+                        st.session_state.asc842_measurement = measurement_results
+                        st.success("✅ Measurement calculations completed!")
+                    except Exception as e:
+                        st.error(f"❌ Calculation failed: {str(e)}")
+        
+        # Display measurement results
+        if hasattr(st.session_state, 'asc842_measurement'):
+            with st.expander("📊 View Measurement Calculations"):
+                st.markdown(st.session_state.asc842_measurement)
+    
+    # Module 3: Journal Generator Section  
+    if hasattr(st.session_state, 'asc842_measurement'):
+        st.markdown("---")
+        st.markdown("### 📝 Module 3: Journal Entry Generator")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Generate Journal Entries", type="secondary"):
+                with st.spinner("Generating accounting journal entries..."):
+                    try:
+                        analyzer = get_analyzer("ASC 842")
+                        journal_entries = analyzer.generate_journal_entries(
+                            measurement_results=st.session_state.asc842_measurement,
+                            lease_data=st.session_state.asc842_lease_data
+                        )
+                        st.session_state.asc842_journals = journal_entries
+                        st.success("✅ Journal entries generated!")
+                    except Exception as e:
+                        st.error(f"❌ Journal generation failed: {str(e)}")
+        
+        with col2:
+            if hasattr(st.session_state, 'asc842_journals'):
+                # Download journal entries
+                journals = st.session_state.asc842_journals
+                
+                st.download_button(
+                    label="📄 Download Journal Entries",
+                    data=journals,
+                    file_name=f"ASC842_Journal_Entries_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                    mime="text/plain"
+                )
+        
+        # Display journal entries
+        if hasattr(st.session_state, 'asc842_journals'):
+            with st.expander("📋 View Journal Entries"):
+                st.markdown(st.session_state.asc842_journals)
+    
+    # Workflow Summary
+    if hasattr(st.session_state, 'asc842_analysis'):
+        st.markdown("---")
+        st.markdown("### 📋 Complete ASC 842 Analysis Summary")
+        
+        progress_items = []
+        if hasattr(st.session_state, 'asc842_analysis'):
+            progress_items.append("✅ Module 1: Lease Classification Complete")
+        if hasattr(st.session_state, 'asc842_measurement'):
+            progress_items.append("✅ Module 2: Measurement Calculations Complete")
+        if hasattr(st.session_state, 'asc842_journals'):
+            progress_items.append("✅ Module 3: Journal Entries Complete")
+        
+        if len(progress_items) == 3:
+            st.success("🎉 **Complete ASC 842 Lease Accounting Analysis Ready!**")
+            st.markdown("All three modules completed - ready for controller review and ERP integration.")
+        
+        for item in progress_items:
+            st.markdown(item)
+    
     # Information section
     st.markdown("---")
-    st.markdown("### ℹ️ ASC 842 Classification Tests")
+    st.markdown("### ℹ️ ASC 842 Three-Module Workflow")
     
-    with st.expander("📚 Learn About the 5 Classification Tests"):
+    with st.expander("📚 Understanding the Complete Process"):
         st.markdown("""
-        A lease is classified as a **Finance Lease** if it meets ANY ONE of these criteria:
+        **Module 1: Classification (Operating vs Finance)**
+        - Upload lease contract for analysis
+        - Apply 5 ASC 842 classification tests systematically
+        - Generate professional classification memorandum
         
-        **1. Ownership Transfer**
-        - Lease transfers ownership to lessee by end of term
+        **Module 2: Measurement Calculator**
+        - Calculate initial lease liability (present value)
+        - Determine right-of-use asset value  
+        - Generate period-by-period amortization schedule
         
-        **2. Purchase Option**
-        - Contains purchase option reasonably certain to be exercised
+        **Module 3: Journal Entry Generator**
+        - Convert calculations to accounting journal entries
+        - Support initial recognition and periodic entries
+        - Export in multiple formats for ERP systems
         
-        **3. Lease Term**
-        - Term covers major part (≥75%) of asset's economic life
-        - Exception: Near end of asset life
-        
-        **4. Present Value**
-        - PV of payments ≥ substantially all (≥90%) of asset fair value
-        
-        **5. Alternative Use**
-        - Asset so specialized it has no alternative use to lessor
-        
-        If **no tests are met** → **Operating Lease**
+        **Sequential Workflow:** Module 1 → Module 2 → Module 3
+        **Independent Usage:** Each module can be used standalone
         """)
     
     # Footer

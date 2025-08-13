@@ -261,6 +261,94 @@ class ASC842Analyzer:
         except Exception as e:
             logger.error(f"Memo generation failed: {e}")
             return "Error generating memorandum. Please try again."
+    
+    def calculate_lease_measurement(
+        self,
+        lease_data: LeaseClassificationData,
+        classification_result: str
+    ) -> str:
+        """Calculate initial and subsequent lease measurement"""
+        try:
+            # Search for measurement guidance
+            measurement_query = f"lease measurement initial subsequent liability ROU asset present value discount rate {lease_data.asset_type}"
+            
+            measurement_chunks = self._search_knowledge_base(
+                query=measurement_query,
+                topic_filter="Measurement",
+                n_results=8
+            )
+            
+            # Search for asset-specific measurement guidance
+            asset_query = f"{lease_data.asset_type} measurement calculation amortization"
+            asset_chunks = self._search_knowledge_base(
+                query=asset_query,
+                n_results=5
+            )
+            
+            all_chunks = measurement_chunks + asset_chunks
+            rag_context = self._format_rag_context(all_chunks)
+            
+            # Generate measurement calculations
+            system_prompt = ASC842StepPrompts.get_measurement_system_prompt()
+            user_prompt = ASC842StepPrompts.get_measurement_user_prompt(
+                lease_data=lease_data,
+                classification_result=classification_result,
+                rag_context=rag_context
+            )
+            
+            measurement_results = call_openai_api(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model="gpt-4o",
+                temperature=0.1  # Lower temperature for calculations
+            )
+            
+            logger.info("ASC 842 measurement calculations completed")
+            return measurement_results
+            
+        except Exception as e:
+            logger.error(f"Measurement calculation failed: {e}")
+            return "Error performing measurement calculations. Please try again."
+    
+    def generate_journal_entries(
+        self,
+        measurement_results: str,
+        lease_data: LeaseClassificationData
+    ) -> str:
+        """Generate complete journal entry package"""
+        try:
+            # Search for journal entry guidance
+            journal_query = f"journal entries accounting records initial recognition subsequent measurement {lease_data.asset_type}"
+            
+            journal_chunks = self._search_knowledge_base(
+                query=journal_query,
+                topic_filter="Implementation",
+                n_results=6
+            )
+            
+            rag_context = self._format_rag_context(journal_chunks)
+            
+            # Generate journal entries
+            system_prompt = ASC842StepPrompts.get_journal_system_prompt()
+            user_prompt = ASC842StepPrompts.get_journal_user_prompt(
+                measurement_results=measurement_results,
+                lease_data=lease_data,
+                rag_context=rag_context
+            )
+            
+            journal_entries = call_openai_api(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                model="gpt-4o",
+                temperature=0.1  # Lower temperature for precise entries
+            )
+            
+            logger.info("ASC 842 journal entries generated")
+            return journal_entries
+            
+        except Exception as e:
+            logger.error(f"Journal entry generation failed: {e}")
+            return "Error generating journal entries. Please try again."
 
 
 import os
