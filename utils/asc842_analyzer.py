@@ -12,7 +12,7 @@ import chromadb
 from chromadb.config import Settings
 import chromadb.utils.embedding_functions as embedding_functions
 
-from core.models import ASC842Analysis, LeaseClassificationData
+from core.models import ASC842Analysis
 from utils.llm import call_openai_api
 from utils.asc842_step_prompts import ASC842StepPrompts
 
@@ -107,7 +107,7 @@ class ASC842Analyzer:
     def analyze_lease_classification(
         self, 
         contract_text: str,
-        lease_data: LeaseClassificationData
+        lease_data: dict
     ) -> ASC842Analysis:
         """
         Analyze lease contract for classification (Operating vs Finance)
@@ -123,7 +123,7 @@ class ASC842Analyzer:
         
         try:
             # Search for classification guidance
-            classification_query = f"lease classification finance operating ownership transfer purchase option lease term present value alternative use {lease_data.asset_type}"
+            classification_query = f"lease classification finance operating ownership transfer purchase option lease term present value alternative use {lease_data['asset_type']}"
             
             classification_chunks = self._search_knowledge_base(
                 query=classification_query,
@@ -132,7 +132,7 @@ class ASC842Analyzer:
             )
             
             # Search for asset-specific guidance
-            asset_query = f"{lease_data.asset_type} lease accounting classification criteria"
+            asset_query = f"{lease_data['asset_type']} lease accounting classification criteria"
             asset_chunks = self._search_knowledge_base(
                 query=asset_query,
                 n_results=5
@@ -172,9 +172,9 @@ class ASC842Analyzer:
                 not_applicable_items=[]  # None for classification
             )
             
-            # Store classification data and chunks for reference
-            analysis._classification_data = lease_data
-            analysis._rag_chunks_used = len(all_chunks)
+            # Store classification data and chunks for reference (as attributes)
+            setattr(analysis, '_classification_data', lease_data)
+            setattr(analysis, '_rag_chunks_used', len(all_chunks))
             
             logger.info("ASC 842 classification analysis completed")
             return analysis
@@ -228,7 +228,7 @@ class ASC842Analyzer:
         
         return sorted(list(sources))
     
-    def generate_classification_memo(self, analysis: ASC842Analysis, lease_data: LeaseClassificationData) -> str:
+    def generate_classification_memo(self, analysis: ASC842Analysis, lease_data: dict) -> str:
         """Generate professional lease classification memorandum"""
         try:
             # Search for memo-specific guidance
@@ -264,13 +264,13 @@ class ASC842Analyzer:
     
     def calculate_lease_measurement(
         self,
-        lease_data: LeaseClassificationData,
+        lease_data: dict,
         classification_result: str
     ) -> str:
         """Calculate initial and subsequent lease measurement"""
         try:
             # Search for measurement guidance
-            measurement_query = f"lease measurement initial subsequent liability ROU asset present value discount rate {lease_data.asset_type}"
+            measurement_query = f"lease measurement initial subsequent liability ROU asset present value discount rate {lease_data['asset_type']}"
             
             measurement_chunks = self._search_knowledge_base(
                 query=measurement_query,
@@ -279,7 +279,7 @@ class ASC842Analyzer:
             )
             
             # Search for asset-specific measurement guidance
-            asset_query = f"{lease_data.asset_type} measurement calculation amortization"
+            asset_query = f"{lease_data['asset_type']} measurement calculation amortization"
             asset_chunks = self._search_knowledge_base(
                 query=asset_query,
                 n_results=5
@@ -313,12 +313,12 @@ class ASC842Analyzer:
     def generate_journal_entries(
         self,
         measurement_results: str,
-        lease_data: LeaseClassificationData
+        lease_data: dict
     ) -> str:
         """Generate complete journal entry package"""
         try:
             # Search for journal entry guidance
-            journal_query = f"journal entries accounting records initial recognition subsequent measurement {lease_data.asset_type}"
+            journal_query = f"journal entries accounting records initial recognition subsequent measurement {lease_data['asset_type']}"
             
             journal_chunks = self._search_knowledge_base(
                 query=journal_query,

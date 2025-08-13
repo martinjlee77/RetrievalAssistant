@@ -50,7 +50,7 @@ If NO tests are met → OPERATING LEASE"""
     @staticmethod
     def get_classification_user_prompt(
         contract_text: str, 
-        lease_data: LeaseClassificationData,
+        lease_data: dict,
         rag_context: str
     ) -> str:
         """User prompt for classification analysis with contract and data"""
@@ -60,14 +60,14 @@ If NO tests are met → OPERATING LEASE"""
 {contract_text}
 
 === LEASE DATA SUMMARY ===
-Asset Type: {lease_data.asset_type}
-Lease Term: {lease_data.lease_term_months} months
-Annual Payments: ${lease_data.annual_lease_payment:,.2f}
-Asset Fair Value: ${lease_data.asset_fair_value:,.2f} (if provided)
-Discount Rate: {lease_data.discount_rate}%
-Purchase Option: {lease_data.purchase_option_exists}
-Ownership Transfer: {lease_data.ownership_transfer}
-Economic Life: {lease_data.asset_economic_life_years} years (if provided)
+Asset Type: {lease_data['asset_type']}
+Lease Term: {lease_data['lease_term_months']} months
+Annual Payments: ${lease_data['annual_lease_payment']:,.2f}
+Asset Fair Value: ${lease_data['asset_fair_value']:,.2f} (if provided)
+Discount Rate: {lease_data['discount_rate']}%
+Purchase Option: {lease_data['purchase_option_exists']}
+Ownership Transfer: {lease_data['ownership_transfer']}
+Economic Life: {lease_data['asset_economic_life_years']} years (if provided)
 
 {rag_context}
 
@@ -149,7 +149,7 @@ TECHNICAL STANDARDS:
 - Ensure memo supports year-end financial statement assertions"""
 
     @staticmethod
-    def get_memo_user_prompt(analysis: ASC842Analysis, lease_data: LeaseClassificationData, rag_context: str) -> str:
+    def get_memo_user_prompt(analysis: ASC842Analysis, lease_data: dict, rag_context: str) -> str:
         """User prompt for memo generation"""
         return f"""Generate a professional lease classification memorandum based on this analysis:
 
@@ -263,7 +263,7 @@ Provide detailed calculations with period-by-period breakdown showing all compon
 
     @staticmethod
     def get_measurement_user_prompt(
-        lease_data: LeaseClassificationData,
+        lease_data: dict,
         classification_result: str,
         rag_context: str
     ) -> str:
@@ -274,12 +274,12 @@ Provide detailed calculations with period-by-period breakdown showing all compon
 {classification_result}
 
 === LEASE MEASUREMENT DATA ===
-Asset Type: {lease_data.asset_type}
-Lease Term: {lease_data.lease_term_months} months
-Annual Payment: ${lease_data.annual_lease_payment:,.2f}
-Discount Rate: {lease_data.discount_rate}%
-Asset Fair Value: ${lease_data.asset_fair_value:,.2f}
-Purchase Option: {lease_data.purchase_option_exists}
+Asset Type: {lease_data['asset_type']}
+Lease Term: {lease_data['lease_term_months']} months
+Annual Payment: ${lease_data['annual_lease_payment']:,.2f}
+Discount Rate: {lease_data['discount_rate']}%
+Asset Fair Value: ${lease_data['asset_fair_value']:,.2f}
+Purchase Option: {lease_data['purchase_option_exists']}
 
 {rag_context}
 
@@ -382,7 +382,7 @@ Generate complete journal entry package ready for controller review and ERP impo
     @staticmethod
     def get_journal_user_prompt(
         measurement_results: str,
-        lease_data: LeaseClassificationData,
+        lease_data: dict,
         rag_context: str
     ) -> str:
         """User prompt for journal entry generation"""
@@ -392,9 +392,9 @@ Generate complete journal entry package ready for controller review and ERP impo
 {measurement_results}
 
 === LEASE DATA ===
-Asset Type: {lease_data.asset_type}
-Term: {lease_data.lease_term_months} months
-Annual Payment: ${lease_data.annual_lease_payment:,.2f}
+Asset Type: {lease_data['asset_type']}
+Term: {lease_data['lease_term_months']} months
+Annual Payment: ${lease_data['annual_lease_payment']:,.2f}
 
 {rag_context}
 

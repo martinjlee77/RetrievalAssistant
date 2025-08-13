@@ -7,8 +7,8 @@ import streamlit as st
 from datetime import datetime
 from typing import Optional
 
-from core.ui_helpers import render_header, render_footer
-from core.models import LeaseClassificationData, ASC842Analysis
+from core.ui_helpers import load_custom_css
+from core.models import ASC842Analysis
 from core.analyzers import get_analyzer
 from utils.document_extractor import extract_text_from_file
 from utils.html_export import convert_memo_to_html
@@ -17,9 +17,10 @@ from utils.llm import generate_docx_memo
 def show_asc842_page():
     """ASC 842 Lease Accounting - Module 1: Classification Tool"""
     
-    # Page header
-    render_header()
+    # Load styling 
+    load_custom_css()
     
+    # Page header
     st.title("🏢 ASC 842 Lease Classification Tool")
     st.markdown("### Professional Lease Analysis - Operating vs Finance")
     
@@ -152,17 +153,17 @@ def show_asc842_page():
             # Perform analysis
             with st.spinner("Analyzing lease classification using ASC 842 guidance..."):
                 try:
-                    # Create lease data object
-                    lease_data = LeaseClassificationData(
-                        asset_type=asset_type,
-                        lease_term_months=lease_term_months,
-                        annual_lease_payment=annual_lease_payment,
-                        discount_rate=discount_rate,
-                        asset_fair_value=asset_fair_value,
-                        asset_economic_life_years=asset_economic_life_years,
-                        purchase_option_exists=purchase_option_exists == "Yes - Reasonably Certain to Exercise",
-                        ownership_transfer=ownership_transfer == "Yes"
-                    )
+                    # Create lease data dictionary for now
+                    lease_data = {
+                        "asset_type": asset_type,
+                        "lease_term_months": lease_term_months,
+                        "annual_lease_payment": annual_lease_payment,
+                        "discount_rate": discount_rate,
+                        "asset_fair_value": asset_fair_value,
+                        "asset_economic_life_years": asset_economic_life_years,
+                        "purchase_option_exists": purchase_option_exists == "Yes - Reasonably Certain to Exercise",
+                        "ownership_transfer": ownership_transfer == "Yes"
+                    }
                     
                     # Get ASC 842 analyzer
                     analyzer = get_analyzer("ASC 842")
@@ -365,8 +366,9 @@ def show_asc842_page():
         **Independent Usage:** Each module can be used standalone
         """)
     
-    # Footer
-    render_footer()
+    # Footer - use standard Streamlit footer
+    st.markdown("---")
+    st.markdown("*ASC 842 Lease Accounting Analysis - Professional Implementation*")
 
 if __name__ == "__main__":
     show_asc842_page()
