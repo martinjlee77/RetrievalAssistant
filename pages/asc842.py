@@ -10,7 +10,7 @@ from typing import Optional
 from core.ui_helpers import load_custom_css
 from core.models import ASC842Analysis
 from core.analyzers import get_analyzer
-from utils.document_extractor import extract_text_from_file
+from utils.document_extractor import DocumentExtractor
 from utils.html_export import convert_memo_to_html
 from utils.llm import generate_docx_memo
 
@@ -49,7 +49,10 @@ def show_asc842_page():
     contract_text = ""
     if uploaded_file:
         try:
-            contract_text = extract_text_from_file(uploaded_file)
+            extractor = DocumentExtractor()
+            extraction_result = extractor.extract_text(uploaded_file)
+            contract_text = extraction_result.get('text', '') if extraction_result else ''
+            
             if contract_text.strip():
                 st.success(f"✅ Contract extracted: {len(contract_text):,} characters")
                 with st.expander("📋 Preview Contract Text"):
