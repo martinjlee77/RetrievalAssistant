@@ -166,7 +166,7 @@ class ASC606Analyzer:
             extraction_result = make_llm_call(
                 self.client,
                 extraction_messages,
-                model='gpt-4o',
+                model='gpt-5',
                 max_tokens=2000,
                 temperature=0.1,
                 response_format={"type": "json_object"}
@@ -542,8 +542,8 @@ class ASC606Analyzer:
                         max_tokens=debug_config.get(
                             'max_tokens', 4000 if step_num == 2 else 3000)
                         if debug_config else (4000 if step_num == 2 else 3000),
-                        model=debug_config.get('model', 'gpt-4o')
-                        if debug_config else 'gpt-4o',
+                        model=debug_config.get('model', 'gpt-5')
+                        if debug_config else 'gpt-5',
                         response_format={"type": "json_object"}))
                 tasks.append(task)
 
@@ -670,7 +670,7 @@ class ASC606Analyzer:
                     }]
                     consistency_result = make_llm_call(self.client,
                                                        consistency_messages,
-                                                       model='gpt-4o',
+                                                       model='gpt-5',
                                                        max_tokens=1000,
                                                        temperature=0.1)
                 except Exception as e:
@@ -747,7 +747,7 @@ class ASC606Analyzer:
                 asyncio.create_task(
                     make_llm_call_async(self.client,
                                         summary_messages,
-                                        model='gpt-4o-mini',
+                                        model='gpt-5',
                                         max_tokens=800,
                                         temperature=0.3)))
 
@@ -762,7 +762,7 @@ class ASC606Analyzer:
                 asyncio.create_task(
                     make_llm_call_async(self.client,
                                         background_messages,
-                                        model='gpt-4o-mini',
+                                        model='gpt-5',
                                         max_tokens=600,
                                         temperature=0.3)))
 
@@ -788,7 +788,7 @@ class ASC606Analyzer:
                     asyncio.create_task(
                         make_llm_call_async(self.client,
                                             judgments_messages,
-                                            model='gpt-4o-mini',
+                                            model='gpt-5',
                                             max_tokens=1000,
                                             temperature=0.3)))
 
@@ -807,7 +807,7 @@ class ASC606Analyzer:
                 asyncio.create_task(
                     make_llm_call_async(self.client,
                                         financial_messages,
-                                        model='gpt-4o-mini',
+                                        model='gpt-5',
                                         max_tokens=1000,
                                         temperature=0.3)))
 
@@ -836,7 +836,7 @@ class ASC606Analyzer:
                     asyncio.create_task(
                         make_llm_call_async(self.client,
                                             conclusion_messages,
-                                            model='gpt-4o-mini',
+                                            model='gpt-5',
                                             max_tokens=800,
                                             temperature=0.3)))
 

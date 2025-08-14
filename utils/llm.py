@@ -155,12 +155,15 @@ def stream_llm_response(
     try:
         # Cast messages to proper type for OpenAI
         openai_messages = cast(List[Any], messages)
-        response = client.chat.completions.create(
-            model=model,
-            messages=openai_messages,
-            temperature=temperature,
-            stream=True
-        )
+        # Prepare request parameters with model-specific parameter handling
+        request_params = {
+            "model": model,
+            "messages": openai_messages,
+            "temperature": temperature,
+            "stream": True
+        }
+        
+        response = client.chat.completions.create(**request_params)
         
         def response_generator():
             for chunk in response:
