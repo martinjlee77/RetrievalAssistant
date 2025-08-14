@@ -1,0 +1,59 @@
+ below are the key parts of my prompt:
+
+prompts:
+
+Main instructions are constant. Define as a multi-line string.
+    main_instructions = """### TASK-SPECIFIC INSTRUCTIONS FOR 'analysis_points' ###
+    For each analysis point, you MUST generate the `analysis_text` using the "Issue, Analysis, Conclusion" (IAC) logical framework. Your final output should be a well-written, professional paragraph that seamlessly integrates these three parts without using explicit labels.
+
+    1.  **Issue:** Begin by stating the specific accounting question being addressed.
+    2.  **Analysis:** In the body of the paragraph, present your analysis. This must include:
+        a. **Evidence:** Direct quotes from the `<CONTRACT_TEXT>`.
+        b. **Rules:** Citations to the relevant authoritative guidance from `<AUTHORITATIVE_CONTEXT>`.
+        c. **Reasoning:** Your explanation that connects the evidence and the rules to your conclusion.
+    3.  **Conclusion:** End the paragraph with a clear, definitive conclusion that answers the issue.
+
+    **META-EXAMPLE OF DESIRED NARRATIVE STYLE:**
+    The primary issue is whether the promised implementation services are distinct from the SaaS license. The contract provides key evidence, stating that 'proprietary configuration' is required. Authoritative guidance in ASC 606-10-25-21 requires promises to be 'separately identifiable' to be considered distinct. Because the 'proprietary' nature of the configuration means the customer cannot obtain the full benefit of the SaaS license without this specific service, the two promises are not separately identifiable in the context of the contract. Therefore, the implementation service and the SaaS license are treated as a single performance obligation.
+2: """<CRITICAL_INSTRUCTION>
+Your analysis for this step must be exceptionally thorough. You will emulate the analytical style found in the ASC 606-10-55 implementation guidance (Example 11).
+
+Your final output must be in the analysis_points array. For EACH promised good or service (e.g., SaaS, Hardware, Services), you MUST create a distinct "topic_title" and the corresponding "analysis_text" MUST follow this exact three-part structure:
+
+1. Assessment Against 606-10-25-19(a) (Benefit on its own):
+
+State whether the customer can benefit from the good/service either on its own or with other readily available resources.
+Provide a brief justification. For example: "The customer can benefit from the hardware on its own by reselling it, or with other resources like third-party software."
+2. Assessment Against 606-10-25-19(b) (Separately Identifiable):
+
+This section must explicitly evaluate the three factors from ASC 606-10-25-21.
+(i) Significant Integration Service: Analyze whether you are providing a significant service of integrating the items into a combined output. Quote from the SOW and explain why this service is (or is not) significant. In your reasoning, you MUST directly address phrases from the SOW like "required for optimal use."
+(ii) Significant Modification: Analyze whether one promised good/service significantly modifies or customizes another.
+(iii) Highly Interdependent/Interrelated: Analyze whether the goods/services are highly dependent on each other. Explain why the entity would (or would not) be able to fulfill its promise to transfer one item independently of the others.
+(iv) Conclusion on Separately Identifiable: Based on the three factors above, conclude whether the promise is distinct within the context of the contract.
+3. Overall Conclusion on Distinctness:
+
+Based on the complete assessment above, identify the final performance obligation. For example: "On the basis of this assessment, the entity identifies the Hardware as a distinct performance obligation."
+META-EXAMPLE OF DESIRED OUTPUT STYLE:
+
+Incorrect (too shallow): "The hardware is distinct because title transfers at delivery."
+
+Correct (in-depth, emulating the guidance):
+"The entity determines that its promises to transfer the equipment and to provide the installation services are each separately identifiable. In making this determination, the entity considers the factors in 606-10-25-21. a) The entity is not providing a significant integration service because the entity would be able to fulfill its promise to transfer the equipment separately from its promise to subsequently install it. b) The installation services will not significantly modify the equipment. c) Although the customer can only benefit from the installation after receiving the equipment, the items are not highly interdependent because the equipment and services do not significantly affect each other. Therefore, the promise to provide the hardware is separately identifiable."
+
+</CRITICAL_INSTRUCTION>
+
+example LLM output:
+
+Detailed Analysis:
+
+Logi-AI Suite SaaS License
+The primary issue is whether the Logi-AI Suite SaaS license is a distinct performance obligation. The contract states that the SaaS license grants access to up to 500 users and includes standard support and maintenance (Source: gemini_sow.docx). According to ASC 606-10-25-19(a), a good or service is capable of being distinct if the customer can benefit from it on its own or with other readily available resources. The SaaS license is delivered independently and remains functional without the need for additional services, indicating it is capable of being distinct. Additionally, ASC 606-10-25-21 requires that the good or service be separately identifiable within the context of the contract. The SaaS license does not require significant integration with other deliverables, does not significantly modify or customize them, and is not highly interdependent with them, confirming it is separately identifiable. Therefore, the SaaS license is a distinct performance obligation. Alternative View Rejected: An alternative view might suggest the SaaS license is not distinct due to its integration with professional services. However, since the SaaS can be used independently and the integration services are not essential for its functionality, this view is rejected.
+
+2. Hardware Provisioning (OptiScan-7 Scanners)
+
+The issue is whether the hardware provisioning of OptiScan-7 scanners is a distinct performance obligation. The contract specifies that InnovateTech will provide 200 proprietary scanners required for optimal use of the Logi-AI Suite's features (Source: gemini_sow.docx). Under ASC 606-10-25-19(a), the hardware is capable of being distinct as the customer can benefit from it on its own or with other resources, such as resale or use with third-party software. For the hardware to be separately identifiable, ASC 606-10-25-21 requires that it not be significantly integrated with, modified by, or highly interdependent with other deliverables. The scanners do not require significant integration with the SaaS or services, do not significantly modify or customize them, and are not highly interdependent, confirming they are separately identifiable. Thus, the hardware is a distinct performance obligation. Alternative View Rejected: An alternative view could argue that the scanners are not distinct due to their role in enhancing the SaaS functionality. However, since the scanners can be used independently and are not essential for the SaaS's core functionality, this view is rejected.
+
+3. Professional Services (Implementation, Integration, Training)
+
+The issue is whether the professional services are a distinct performance obligation. The contract outlines a one-time engagement for implementation, system integration, and on-site user training, which significantly enhances the SaaS functionality (Source: gemini_sow.docx). According to ASC 606-10-25-19(a), these services are capable of being distinct as they enhance but are not necessary for the SaaS's use. ASC 606-10-25-21 requires that the services be separately identifiable, meaning they should not involve significant integration with, modification of, or high interdependence with other deliverables. The services do not involve significant integration with the SaaS or hardware, do not significantly modify or customize them, and are not highly interdependent, confirming they are separately identifiable. Therefore, the professional services are a distinct performance obligation. Alternative View Rejected: An alternative view might suggest the services are not distinct due to their role in enhancing the SaaS. However, since the SaaS can be used independently and the services are not essential for its core functionality, this view is rejected.
