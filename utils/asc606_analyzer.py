@@ -544,8 +544,8 @@ class ASC606Analyzer:
                                 max_tokens=debug_config.get(
                                     'max_tokens', 4000 if step_num == 2 else 3000)
                                 if debug_config else (4000 if step_num == 2 else 3000),
-                                model=debug_config.get('model', 'gpt-5')
-                                if debug_config else 'gpt-5',
+                                model=debug_config.get('model', 'gpt-4o')
+                                if debug_config else 'gpt-4o',
                                 response_format={"type": "json_object"})
                             
                             # If we get a valid response, return it

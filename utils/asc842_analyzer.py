@@ -156,7 +156,7 @@ class ASC842Analyzer:
             classification_response = call_openai_api(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                model="gpt-5",
+                model="gpt-4o",
                 temperature=0.3
             )
             
@@ -251,7 +251,7 @@ class ASC842Analyzer:
             memo = call_openai_api(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                model="gpt-5",
+                model="gpt-4o",
                 temperature=0.2
             )
             
@@ -299,7 +299,7 @@ class ASC842Analyzer:
             measurement_results = call_openai_api(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                model="gpt-5",
+                model="gpt-4o",
                 temperature=0.1  # Lower temperature for calculations
             )
             
@@ -339,7 +339,7 @@ class ASC842Analyzer:
             journal_entries = call_openai_api(
                 system_prompt=system_prompt,
                 user_prompt=user_prompt,
-                model="gpt-5",
+                model="gpt-4o",
                 temperature=0.1  # Lower temperature for precise entries
             )
             
