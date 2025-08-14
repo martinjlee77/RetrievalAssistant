@@ -1,7 +1,7 @@
 # ASC 606 PDF Processing PoC
 
 ## Overview
-This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 340-40). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance and Big 4 interpretative publications. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform.
+This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 340-40, ASC 842). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance and Big 4 interpretative publications. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform with high accuracy and efficiency.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -22,72 +22,27 @@ Critical Development Rules - Prompt Protection:
 ### Multi-Standard Platform Architecture
 - **Frontend**: Streamlit multi-page application with a Home dashboard.
 - **Core System**: Modular components for analyzers, data models, knowledge base management, and UI helpers.
-- **Standard-Specific Pages**: Dedicated interfaces for different accounting standards.
-- **Knowledge Base**: Multi-standard ChromaDB manager supporting collections per standard.
-- **Document Processing**: Unified document extractor for various formats.
+- **Standard-Specific Pages**: Dedicated interfaces for different accounting standards (ASC 606, ASC 340-40, ASC 842).
+- **Knowledge Base**: Multi-standard ChromaDB manager supporting collections per standard, using paragraph-aware chunking and topic classification.
+- **Document Processing**: Unified document extractor for various formats, including multi-document processing.
 - **Source Documents**: Standard-specific authoritative sources stored locally.
 
 ### Core Components and Design Decisions
-- **Hybrid RAG System**: Combines metadata filtering with semantic search, enhanced by contract-specific term extraction.
-- **Knowledge Base**: Contains 1,894 authoritative documents (ASC 606 official guidance + EY interpretative literature) in a ChromaDB vector database.
-- **Two-Stage Citation Process**: Extracts verbatim quotes and then assembles analysis with structured evidence for direct and auditable citations.
+- **Hybrid RAG System**: Combines metadata filtering with semantic search, enhanced by contract-specific term extraction, and a two-stage citation process for audit-ready evidence.
+- **Knowledge Base**: Contains comprehensive authoritative and interpretative guidance for ASC 606, ASC 340-40, and ASC 842.
 - **Map-Reduce Contract Processing**: Analyzes full documents using overlapping chunks to prevent truncation.
-- **Multi-document Processing**: Handles up to 5 files (contracts, invoices, amendments).
-- **Professional Memo Generation**: Produces Big 4 quality accounting memos with audit-ready features, including narrative-driven analysis, professional formatting, and integration of actual contract data.
-- **Source Transparency**: Tracks hybrid RAG chunks used and relevance scores.
-- **System Integrity Monitoring**: Comprehensive logging and validation for detecting silent failures and ensuring data quality.
-- **Performance Optimization**: Utilizes caching for analyzers, persistent vector databases, and concurrent execution of analysis steps.
-- **Data Flow**: Ensures all user inputs (customer name, dates, focus areas, materiality, audience) flow systematically to the LLM for targeted analysis.
-- **UI/UX Design**: Prioritizes professional, clean interfaces with clear navigation, simplified input forms, and immediate access to primary actions. Styling uses Lato font and Big 4 inspired color schemes.
-- **DOCX Generation**: Enhanced with robust bullet indentation (structure-based detection), comprehensive formatting (italic text support, dynamic table handling), and professional visual enhancements (enhanced heading hierarchy, professional table design, consistent HTML/DOCX styling).
-- **System/User Prompt Architecture**: Implemented a modular system/user prompt architecture, separating core AI instructions (system prompts) from task-specific context (user prompts) for each ASC 606 step. LLM integration handles message arrays.
-- **Judgment Consistency**: Implemented a shared `_filter_genuine_judgments()` function to ensure consistent filtering logic for judgments across executive summary, conclusion, and key professional judgments sections. Enhanced Key Professional Judgments prompt with structured data extraction from all 5 steps, providing complexity indicators and contextual evaluation criteria for more accurate judgment significance assessment.
-- **Executive Summary Enhancement**: Restructured executive summary to eliminate redundancy between OVERALL CONCLUSION (strategic narrative) and KEY FINDINGS (scannable dashboard). Implemented "ASC 606 Contract Exists: Yes/No" terminology and professional role separation aligned with Big 4 audit documentation standards. Added comprehensive data extraction for all Key Findings items (contract status, performance obligations, transaction price, allocation method, recognition methods, and filtered critical judgments) to ensure consistency with other system prompts and eliminate unreliable LLM improvisation.
-- **Knowledge Hierarchy System**: Enhanced all prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretative Guidance) and IAC framework for professional judgment defensibility.
-- **GPT-5 Integration**: Updated to use GPT-5 model for enhanced analysis quality (August 2025 release).
-- **Legacy Code Cleanup**: Removed unused `utils/prompt.py` file - system now fully consolidated on `utils/step_prompts.py`.
-- **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern to eliminate mathematical errors in transaction price determination. AI extracts structured fee components, Python performs reliable calculations. Ensures 100% accuracy for financial amounts in Step 3 analysis and memo generation.
-- **Unified Financial Data Flow**: Fixed architectural inconsistency where financial impact section was performing separate calculations instead of using completed Step 3, 4, and 5 results. Journal entries now derive amounts exclusively from the hybrid calculation system, eliminating calculation discrepancies. Extended calculated financial facts injection to Step 4 allocation analysis to ensure consistent transaction price usage across all steps (August 2025).
-- **Comprehensive Cleanup**: Removed 99+ development note files, placeholder authentication pages, unused utility files, and old memo outputs. Retained only essential authoritative guidance (10 text files) and sample contracts (7 PDFs). Cleaned directory structure for next development phase (August 2025).
-- **ASC 340-40 Contract Costs Module**: Implemented complete ASC 340-40 module following proven ASC 606 architecture patterns. Added 4-step policy framework (Scope Assessment, Cost Classification, Measurement & Amortization Policy, Illustrative Financial Impact), RAG-enabled knowledge base with 139 chunks (37 authoritative + 102 EY interpretative), dedicated analyzer with hybrid search capabilities, and professional policy memorandum generation. Integrated into multi-standard platform with navigation and home page updates (August 2025).
-- **ASC 340-40 V2 Radical UI Simplification**: Complete UI/UX overhaul removing tabbed interface in favor of clean single-page design. Implemented 12 specific refinements: required document upload with cost-focused labeling, "Primary Cost Categories in Scope" multiselect replacing confusing contract types, optional policy effective date (defaults to generation), removed unnecessary fields (Cost Timing Focus, Primary Memo Audience, Materiality Threshold), hard-coded memo audience to "Technical Accounting Team". Enhanced validation logic and streamlined data flow for policy-focused analysis (August 2025).
-- **ASC 340-40 HTML Preview Fix**: Resolved memo preview display issue caused by markdown preprocessing incompatibility with ASC 340-40 memo format. Added specific preprocessing for `**TO:**`, `**FROM:**`, `**DATE:**`, `**RE:**` headers and ensured proper object passing to HTML conversion function. System now generates and displays professional policy memorandums with "ACCOUNTING POLICY MEMORANDUM" header identical to working ASC 606 pattern (August 2025).
-- **ASC 340-40 DOCX Generation Fix**: Extended DOCX generation function to recognize "ACCOUNTING POLICY MEMORANDUM" header format (previously only supported "TECHNICAL ACCOUNTING MEMORANDUM"). Both HTML and DOCX now properly format ASC 340-40 policy memorandums with correct title styling and professional layout (August 2025).
-- **ASC 340-40 Display Logic Fix**: Resolved critical display issue by replacing complex conditional logic and debugging code with the proven ASC 606 display pattern. Fixed memo retrieval conditional from `if memo and memo.strip():` to `if memo:` and ensured proper data flow to both HTML preview and DOCX generation functions. System now displays generated memos correctly with both preview and download functionality working (August 2025).
-- **ASC 340-40 Configurable Header System**: Implemented centralized header management with `ASC340StepPrompts.MEMO_HEADER` configuration constant. All three components (memo generation, header validation, HTML conversion) now reference this single source, making header customization simple and maintainable. Includes fallback protection and dynamic regex support for future header changes (August 2025).
-- **ASC 842 Leases Module - Phase 1 Foundation**: Implemented comprehensive foundation for ASC 842 lease accounting suite. Created modular data models (`LeaseClassificationData`, `LeaseMeasurementData`, `LeaseJournalData`, `ASC842Analysis`) supporting three-module workflow. Built knowledge base seeding script with dual-source architecture (authoritative + EY interpretative). Updated analyzer factory and knowledge base manager for ASC 842 integration. Established data flow architecture enabling both sequential workflow and independent module usage (August 2025).
-- **ASC 842 Knowledge Base Seeding Complete**: Successfully seeded ASC 842 knowledge base with 563 chunks (900 authoritative + 234 EY interpretative). Used ASC 340-40's superior paragraph-aware chunking architecture rather than ASC 606's simple fixed-size approach. Implemented smart topic classification (Classification, Measurement, Implementation, Scope, etc.) and token-length validation for embedding compatibility. Ready for Phase 2 Module 1 implementation (August 2025).
-
-### File Structure
-```
-├── home.py                               # Streamlit app entry point with navigation
-├── pages/                                # Streamlit pages
-│   ├── home_content.py                   # Home page dashboard content
-│   └── asc606.py                         # ASC 606 revenue recognition analysis
-├── assets/                               # Static assets
-│   └── images/
-│       └── logo.png                      # Controller.cpa logo
-├── utils/                                # Core utilities
-│   ├── llm.py                            # OpenAI API calls, DOCX/HTML generation (GPT-4o)
-│   ├── step_prompts.py                   # Enhanced prompt system with knowledge hierarchy
-│   ├── document_extractor.py             # Multi-format document processing
-│   ├── asc606_analyzer.py                # ASC 606 hybrid analyzer with extract-then-calculate
-│   └── html_export.py                    # Professional HTML memo generation
-├── core/                                 # Shared backend logic
-│   ├── analyzers.py                      # Analyzer factory and base classes
-│   ├── models.py                         # Centralized data models
-│   ├── knowledge_base.py                 # Multi-standard knowledge base manager
-│   └── ui_helpers.py                     # Shared UI components and styling
-├── attached_assets/                      # Essential authoritative sources only
-│   ├── 05_overview_background_*.txt      # ASC 606 official guidance sections
-│   ├── 10_objectives_*.txt               # (9 total ASC 606 text files)
-│   ├── netflix_*.pdf                     # Sample contract files (5 PDFs)
-│   └── contract_review_questions_*.txt   # Contract analysis framework
-├── asc606_knowledge_base/                # ChromaDB vector database
-├── seed_knowledge_base.py                # Knowledge base initialization
-├── pyproject.toml                        # Dependencies
-└── replit.md                             # Project documentation
-```
+- **Professional Memo Generation**: Produces Big 4 quality accounting memos (Technical Accounting Memos, Accounting Policy Memos) with narrative-driven analysis, professional formatting, dynamic table handling, and robust DOCX/HTML generation.
+- **System Integrity Monitoring**: Comprehensive logging and validation for data quality.
+- **Performance Optimization**: Utilizes caching, persistent vector databases, and concurrent execution.
+- **Data Flow**: Ensures all user inputs flow systematically to the LLM for targeted analysis.
+- **UI/UX Design**: Prioritizes professional, clean interfaces with clear navigation, simplified input forms, and Big 4 inspired color schemes.
+- **System/User Prompt Architecture**: Modular prompt system separating core AI instructions from task-specific context.
+- **Judgment Consistency**: Implemented shared filtering logic and structured data extraction for professional judgments.
+- **Executive Summary Enhancement**: Restructured to clearly separate overall conclusion from scannable key findings with comprehensive data extraction.
+- **Knowledge Hierarchy System**: Enhanced prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretive Guidance) and IAC framework.
+- **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern for financial amounts, ensuring accuracy by using Python for calculations after AI extraction.
+- **Unified Financial Data Flow**: Ensures journal entries and financial impacts derive amounts exclusively from the hybrid calculation system.
+- **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards (ASC 606, ASC 340-40, ASC 842).
 
 ## External Dependencies
 
