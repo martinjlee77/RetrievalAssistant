@@ -58,7 +58,9 @@ async def make_llm_call_async(
             else:
                 request_params["max_tokens"] = max_tokens
         if response_format:
-            request_params["response_format"] = response_format
+            # GPT-5 and o1 models may not support structured output formats
+            if not (model.startswith("gpt-5") or model.startswith("o1")):
+                request_params["response_format"] = response_format
         
         # Make async API call
         response = await async_client.chat.completions.create(**request_params)
@@ -101,7 +103,9 @@ def make_llm_call(
             
             # Add optional parameters if provided
             if response_format:
-                request_params["response_format"] = response_format
+                # GPT-5 and o1 models may not support structured output formats
+                if not (model.startswith("gpt-5") or model.startswith("o1")):
+                    request_params["response_format"] = response_format
             if max_tokens:
                 # Use correct parameter name based on model
                 if model.startswith("gpt-5") or model.startswith("o1"):
