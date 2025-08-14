@@ -248,7 +248,7 @@ Return the extracted terms as a JSON object with this structure:
                     {"role": "user", "content": user_prompt}
                 ],
                 response_format={"type": "json_object"},
-                model="gpt-4o"  # Temporarily reverted to GPT-4o due to GPT-5 JSON issues
+                model="gpt-4o"  # Using latest model as specified in replit.md
             )
 
             # Parse and validate response

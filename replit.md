@@ -7,7 +7,6 @@ This project is a multi-standard accounting analysis platform designed to genera
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
-- **Emergency GPT-4o Revert Due to GPT-5 JSON Issues** (August 14, 2025): Temporarily reverted all analyzers back to GPT-4o due to widespread GPT-5 empty response issues. GPT-5 rollout has known problems with JSON structured output causing empty analysis results. Will re-attempt GPT-5 migration when OpenAI resolves the structured output compatibility issues.
 - **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Fixed critical ASC 340-40 chunking issue (was only 9 chunks, now properly 126 chunks). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (126 contract cost chunks - 48 authoritative + 78 interpretative), ASC 842 (563 lease chunks, 14MB). The ASC 340-40 RAG system is now functional - previously was relying only on LLM general knowledge. Updated KnowledgeBaseManager with automatic standard-to-database routing.
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.

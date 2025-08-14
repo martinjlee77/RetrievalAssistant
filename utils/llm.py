@@ -27,7 +27,7 @@ async def make_llm_call_async(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-5",  # User requested gpt-5 as the default model
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -38,47 +38,21 @@ async def make_llm_call_async(
         api_key = os.environ.get("OPENAI_API_KEY")
         async_client = AsyncOpenAI(api_key=api_key)
         
-        # Prepare request parameters with model-specific parameter handling
+        # Prepare request parameters
         request_params = {
             "model": model,
             "messages": messages,  # This now uses the passed-in messages list
+            "temperature": temperature
         }
         
-        # Handle temperature parameter based on model capabilities
-        if model.startswith("gpt-5") or model.startswith("o1"):
-            # GPT-5 and o1 models only support default temperature (1)
-            request_params["temperature"] = 1
-        else:
-            request_params["temperature"] = temperature
-        
         if max_tokens:
-            # Use correct parameter name based on model
-            if model.startswith("gpt-5") or model.startswith("o1"):
-                request_params["max_completion_tokens"] = max_tokens
-            else:
-                request_params["max_tokens"] = max_tokens
+            request_params["max_tokens"] = max_tokens
         if response_format:
-            # GPT-5 and o1 models may not support structured output formats
-            if not (model.startswith("gpt-5") or model.startswith("o1")):
-                request_params["response_format"] = response_format
+            request_params["response_format"] = response_format
         
         # Make async API call
         response = await async_client.chat.completions.create(**request_params)
-        content = response.choices[0].message.content
-        
-        # Enhanced GPT-5 JSON validation - if no response_format, check for valid JSON
-        if model.startswith("gpt-5") and content:
-            try:
-                # Try to parse as JSON to ensure it's valid
-                json.loads(content)
-            except json.JSONDecodeError:
-                # If not valid JSON, log and retry with explicit JSON instruction
-                import logging
-                logging.warning(f"GPT-5 returned non-JSON response, length: {len(content) if content else 0}")
-                # Return None to trigger retry logic in calling function
-                return None
-        
-        return content
+        return response.choices[0].message.content
         
     except Exception as e:
         # Log error internally without displaying technical details to users
@@ -91,7 +65,7 @@ def make_llm_call(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-5",  # User requested gpt-5 as the default model
+    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -102,47 +76,21 @@ def make_llm_call(
         with st.spinner("Analyzing with AI..."):
             # Messages are now passed in directly
             
-            # Prepare request parameters with model-specific parameter handling
+            # Prepare request parameters
             request_params = {
                 "model": model,
                 "messages": messages,
+                "temperature": temperature,
             }
-            
-            # Handle temperature parameter based on model capabilities
-            if model.startswith("gpt-5") or model.startswith("o1"):
-                # GPT-5 and o1 models only support default temperature (1)
-                request_params["temperature"] = 1
-            else:
-                request_params["temperature"] = temperature
             
             # Add optional parameters if provided
             if response_format:
-                # GPT-5 and o1 models may not support structured output formats
-                if not (model.startswith("gpt-5") or model.startswith("o1")):
-                    request_params["response_format"] = response_format
+                request_params["response_format"] = response_format
             if max_tokens:
-                # Use correct parameter name based on model
-                if model.startswith("gpt-5") or model.startswith("o1"):
-                    request_params["max_completion_tokens"] = max_tokens
-                else:
-                    request_params["max_tokens"] = max_tokens
+                request_params["max_tokens"] = max_tokens
                 
             response = client.chat.completions.create(**request_params)
-            content = response.choices[0].message.content
-            
-            # Enhanced GPT-5 JSON validation - if no response_format, check for valid JSON
-            if model.startswith("gpt-5") and content:
-                try:
-                    # Try to parse as JSON to ensure it's valid
-                    json.loads(content)
-                except json.JSONDecodeError:
-                    # If not valid JSON, log and retry with explicit JSON instruction
-                    import logging
-                    logging.warning(f"GPT-5 returned non-JSON response, length: {len(content) if content else 0}")
-                    # Return None to trigger retry logic in calling function
-                    return None
-            
-            return content
+        return response.choices[0].message.content
     
     except Exception as e:
         handle_llm_error(e)
@@ -199,21 +147,12 @@ def stream_llm_response(
     try:
         # Cast messages to proper type for OpenAI
         openai_messages = cast(List[Any], messages)
-        # Prepare request parameters with model-specific parameter handling
-        request_params = {
-            "model": model,
-            "messages": openai_messages,
-            "stream": True
-        }
-        
-        # Handle temperature parameter based on model capabilities
-        if model.startswith("gpt-5") or model.startswith("o1"):
-            # GPT-5 and o1 models only support default temperature (1)
-            request_params["temperature"] = 1
-        else:
-            request_params["temperature"] = temperature
-        
-        response = client.chat.completions.create(**request_params)
+        response = client.chat.completions.create(
+            model=model,
+            messages=openai_messages,
+            temperature=temperature,
+            stream=True
+        )
         
         def response_generator():
             for chunk in response:
@@ -230,7 +169,7 @@ def get_model_options() -> Dict[str, str]:
     """Get available model options for debugging UI"""
     return {
         "GPT-5 (Latest)": "gpt-5",
-        "GPT-5 Mini": "gpt-5-mini",
+        "GPT-4o Mini": "gpt-4o-mini",
         "GPT-4 Turbo": "gpt-4-turbo-preview"
     }
 
@@ -309,7 +248,7 @@ def extract_contract_terms(client, contract_text: str, step_context: str = "comp
         response = make_llm_call(
             client=client,
             messages=messages,  # Pass the new messages list
-            model="gpt-5-mini",
+            model="gpt-4o-mini",
             max_tokens=200,
             temperature=0.3
         )
@@ -332,7 +271,7 @@ def validate_api_key() -> bool:
         # Test with minimal API call
         openai_messages = cast(List[Any], [{"role": "user", "content": "test"}])
         client.chat.completions.create(
-            model="gpt-5-mini",
+            model="gpt-4o-mini",
             messages=openai_messages,
             max_tokens=5
         )
