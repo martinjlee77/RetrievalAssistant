@@ -532,19 +532,40 @@ class ASC606Analyzer:
                 # Store details for processing responses later
                 prompt_details[step_num] = {"step_info": step_info}
 
-                # Create async task for concurrent execution
-                task = asyncio.create_task(
-                    make_llm_call_async(
-                        self.client,
-                        messages,  # PASS the messages list here
-                        temperature=debug_config.get('temperature', 0.3)
-                        if debug_config else 0.3,
-                        max_tokens=debug_config.get(
-                            'max_tokens', 4000 if step_num == 2 else 3000)
-                        if debug_config else (4000 if step_num == 2 else 3000),
-                        model=debug_config.get('model', 'gpt-5')
-                        if debug_config else 'gpt-5',
-                        response_format={"type": "json_object"}))
+                # Create async task for concurrent execution with GPT-5 retry logic
+                async def step_with_retry():
+                    for attempt in range(3):  # 3 attempts max
+                        try:
+                            response = await make_llm_call_async(
+                                self.client,
+                                messages,  # PASS the messages list here
+                                temperature=debug_config.get('temperature', 0.3)
+                                if debug_config else 0.3,
+                                max_tokens=debug_config.get(
+                                    'max_tokens', 4000 if step_num == 2 else 3000)
+                                if debug_config else (4000 if step_num == 2 else 3000),
+                                model=debug_config.get('model', 'gpt-5')
+                                if debug_config else 'gpt-5',
+                                response_format={"type": "json_object"})
+                            
+                            # If we get a valid response, return it
+                            if response and len(response.strip()) > 0:
+                                return response
+                            else:
+                                self.logger.warning(f"Step {step_num}, attempt {attempt + 1}: Empty response, retrying...")
+                                
+                        except Exception as e:
+                            self.logger.warning(f"Step {step_num}, attempt {attempt + 1}: Error {e}, retrying...")
+                            
+                        # Add delay between retries
+                        if attempt < 2:  # Don't delay after the last attempt
+                            await asyncio.sleep(1)
+                    
+                    # If all attempts failed, return empty response
+                    self.logger.error(f"Step {step_num}: All 3 attempts failed")
+                    return ""
+                
+                task = asyncio.create_task(step_with_retry())
                 tasks.append(task)
 
             # Phase 2: Execute all 5 steps concurrently

@@ -64,7 +64,21 @@ async def make_llm_call_async(
         
         # Make async API call
         response = await async_client.chat.completions.create(**request_params)
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        
+        # Enhanced GPT-5 JSON validation - if no response_format, check for valid JSON
+        if model.startswith("gpt-5") and content:
+            try:
+                # Try to parse as JSON to ensure it's valid
+                json.loads(content)
+            except json.JSONDecodeError:
+                # If not valid JSON, log and retry with explicit JSON instruction
+                import logging
+                logging.warning(f"GPT-5 returned non-JSON response, length: {len(content) if content else 0}")
+                # Return None to trigger retry logic in calling function
+                return None
+        
+        return content
         
     except Exception as e:
         # Log error internally without displaying technical details to users
@@ -114,7 +128,21 @@ def make_llm_call(
                     request_params["max_tokens"] = max_tokens
                 
             response = client.chat.completions.create(**request_params)
-        return response.choices[0].message.content
+            content = response.choices[0].message.content
+            
+            # Enhanced GPT-5 JSON validation - if no response_format, check for valid JSON
+            if model.startswith("gpt-5") and content:
+                try:
+                    # Try to parse as JSON to ensure it's valid
+                    json.loads(content)
+                except json.JSONDecodeError:
+                    # If not valid JSON, log and retry with explicit JSON instruction
+                    import logging
+                    logging.warning(f"GPT-5 returned non-JSON response, length: {len(content) if content else 0}")
+                    # Return None to trigger retry logic in calling function
+                    return None
+            
+            return content
     
     except Exception as e:
         handle_llm_error(e)
