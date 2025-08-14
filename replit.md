@@ -7,7 +7,7 @@ This project is a multi-standard accounting analysis platform designed to genera
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
-- **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Eliminated mystery "ASC 606" folder (empty development leftover). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (9 contract cost chunks, dedicated database), ASC 842 (563 lease chunks, 14MB). Updated KnowledgeBaseManager with automatic standard-to-database routing for future scalability.
+- **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Fixed critical ASC 340-40 chunking issue (was only 9 chunks, now properly 126 chunks). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (126 contract cost chunks - 48 authoritative + 78 interpretative), ASC 842 (563 lease chunks, 14MB). The ASC 340-40 RAG system is now functional - previously was relying only on LLM general knowledge. Updated KnowledgeBaseManager with automatic standard-to-database routing.
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
 2. ALWAYS ask permission before changing any prompt text or templates.
