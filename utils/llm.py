@@ -27,7 +27,7 @@ async def make_llm_call_async(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # User requested gpt-5 as the default model
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -46,7 +46,11 @@ async def make_llm_call_async(
         }
         
         if max_tokens:
-            request_params["max_tokens"] = max_tokens
+            # Use correct parameter name based on model
+            if model.startswith("gpt-5") or model.startswith("o1"):
+                request_params["max_completion_tokens"] = max_tokens
+            else:
+                request_params["max_tokens"] = max_tokens
         if response_format:
             request_params["response_format"] = response_format
         
@@ -65,7 +69,7 @@ def make_llm_call(
     messages: List[Dict[str, str]],  # CHANGED from prompt: str
     temperature: float = 0.3,
     max_tokens: Optional[int] = None,
-    model: str = "gpt-5",  # the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    model: str = "gpt-5",  # User requested gpt-5 as the default model
     response_format: Optional[Dict[str, Any]] = None
 ) -> Optional[str]:
     """
@@ -87,7 +91,11 @@ def make_llm_call(
             if response_format:
                 request_params["response_format"] = response_format
             if max_tokens:
-                request_params["max_tokens"] = max_tokens
+                # Use correct parameter name based on model
+                if model.startswith("gpt-5") or model.startswith("o1"):
+                    request_params["max_completion_tokens"] = max_tokens
+                else:
+                    request_params["max_tokens"] = max_tokens
                 
             response = client.chat.completions.create(**request_params)
         return response.choices[0].message.content
