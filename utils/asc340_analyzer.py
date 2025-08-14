@@ -124,7 +124,7 @@ Return the extracted terms as a JSON object with this structure:
                     {"role": "user", "content": user_prompt}
                 ],
                 response_format={"type": "json_object"},
-                model="gpt-4o"
+                model="gpt-5"
             )
             
             if response:
@@ -248,7 +248,7 @@ Return the extracted terms as a JSON object with this structure:
                     {"role": "user", "content": user_prompt}
                 ],
                 response_format={"type": "json_object"},
-                model="gpt-4o"  # Using latest model as specified in replit.md
+                model="gpt-5"  # User requested GPT-5 as the default model
             )
 
             # Parse and validate response
@@ -390,7 +390,7 @@ Return the extracted terms as a JSON object with this structure:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                model="gpt-4o"
+                model="gpt-5"
             )
             
             self.logger.info(f"DEBUG: LLM response received: {len(memo_response) if memo_response else 0} chars")
