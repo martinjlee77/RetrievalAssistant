@@ -13,9 +13,10 @@ import os
 class KnowledgeBaseManager:
     """Manager for multi-standard knowledge bases using ChromaDB"""
     
-    def __init__(self, persist_directory: str = "asc606_knowledge_base"):
-        # Use the existing ASC 606 knowledge base directory
-        self.persist_directory = persist_directory
+    def __init__(self, standard: str = "ASC 606"):
+        # Map standard to dedicated database directory
+        self.standard = standard
+        self.persist_directory = self._get_database_path(standard)
         self.setup_logging()
         self.client = None
         self.collections = {}
@@ -30,6 +31,15 @@ class KnowledgeBaseManager:
             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
         self.logger = logging.getLogger(__name__)
+    
+    def _get_database_path(self, standard: str) -> str:
+        """Get database path for a specific standard"""
+        standard_paths = {
+            "ASC 606": "asc606_knowledge_base",
+            "ASC 340-40": "asc340_knowledge_base", 
+            "ASC 842": "asc842_knowledge_base"
+        }
+        return standard_paths.get(standard, f"asc{standard.replace(' ', '').replace('-', '')}_knowledge_base".lower())
     
     def initialize_client(self):
         """Initialize ChromaDB client"""

@@ -5,6 +5,9 @@ This project is a multi-standard accounting analysis platform designed to genera
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+
+## Recent Changes
+- **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Eliminated mystery "ASC 606" folder (empty development leftover). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (9 contract cost chunks, dedicated database), ASC 842 (563 lease chunks, 14MB). Updated KnowledgeBaseManager with automatic standard-to-database routing for future scalability.
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
 2. ALWAYS ask permission before changing any prompt text or templates.
@@ -23,7 +26,7 @@ Critical Development Rules - Prompt Protection:
 - **Frontend**: Streamlit multi-page application with a Home dashboard.
 - **Core System**: Modular components for analyzers, data models, knowledge base management, and UI helpers.
 - **Standard-Specific Pages**: Dedicated interfaces for different accounting standards (ASC 606, ASC 340-40, ASC 842).
-- **Knowledge Base**: Multi-standard ChromaDB manager supporting collections per standard, using paragraph-aware chunking and topic classification.
+- **Knowledge Base**: Separated database architecture with dedicated ChromaDB instances per standard (asc606_knowledge_base/, asc340_knowledge_base/, asc842_knowledge_base/), using paragraph-aware chunking and topic classification.
 - **Document Processing**: Unified document extractor for various formats, including multi-document processing.
 - **Source Documents**: Standard-specific authoritative sources stored locally.
 
