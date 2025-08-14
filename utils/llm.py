@@ -169,7 +169,7 @@ def get_model_options() -> Dict[str, str]:
     """Get available model options for debugging UI"""
     return {
         "GPT-5 (Latest)": "gpt-5",
-        "GPT-4o Mini": "gpt-4o-mini",
+        "GPT-5 Mini": "gpt-5-mini",
         "GPT-4 Turbo": "gpt-4-turbo-preview"
     }
 
@@ -248,7 +248,7 @@ def extract_contract_terms(client, contract_text: str, step_context: str = "comp
         response = make_llm_call(
             client=client,
             messages=messages,  # Pass the new messages list
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             max_tokens=200,
             temperature=0.3
         )
@@ -271,7 +271,7 @@ def validate_api_key() -> bool:
         # Test with minimal API call
         openai_messages = cast(List[Any], [{"role": "user", "content": "test"}])
         client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             messages=openai_messages,
             max_tokens=5
         )
