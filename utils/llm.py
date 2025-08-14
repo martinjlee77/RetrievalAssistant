@@ -38,12 +38,18 @@ async def make_llm_call_async(
         api_key = os.environ.get("OPENAI_API_KEY")
         async_client = AsyncOpenAI(api_key=api_key)
         
-        # Prepare request parameters
+        # Prepare request parameters with model-specific parameter handling
         request_params = {
             "model": model,
             "messages": messages,  # This now uses the passed-in messages list
-            "temperature": temperature
         }
+        
+        # Handle temperature parameter based on model capabilities
+        if model.startswith("gpt-5") or model.startswith("o1"):
+            # GPT-5 and o1 models only support default temperature (1)
+            request_params["temperature"] = 1
+        else:
+            request_params["temperature"] = temperature
         
         if max_tokens:
             # Use correct parameter name based on model
@@ -80,12 +86,18 @@ def make_llm_call(
         with st.spinner("Analyzing with AI..."):
             # Messages are now passed in directly
             
-            # Prepare request parameters
+            # Prepare request parameters with model-specific parameter handling
             request_params = {
                 "model": model,
                 "messages": messages,
-                "temperature": temperature,
             }
+            
+            # Handle temperature parameter based on model capabilities
+            if model.startswith("gpt-5") or model.startswith("o1"):
+                # GPT-5 and o1 models only support default temperature (1)
+                request_params["temperature"] = 1
+            else:
+                request_params["temperature"] = temperature
             
             # Add optional parameters if provided
             if response_format:
@@ -159,9 +171,15 @@ def stream_llm_response(
         request_params = {
             "model": model,
             "messages": openai_messages,
-            "temperature": temperature,
             "stream": True
         }
+        
+        # Handle temperature parameter based on model capabilities
+        if model.startswith("gpt-5") or model.startswith("o1"):
+            # GPT-5 and o1 models only support default temperature (1)
+            request_params["temperature"] = 1
+        else:
+            request_params["temperature"] = temperature
         
         response = client.chat.completions.create(**request_params)
         
