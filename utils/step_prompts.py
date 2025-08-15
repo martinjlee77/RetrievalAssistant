@@ -67,8 +67,14 @@ class StepPrompts:
         2.  **Analysis:** In the body of the paragraph, present your analysis. This must include:
             a. **Evidence:** Direct quotes from the `<CONTRACT_TEXT>`.
             b. **Rules:** Citations to the relevant authoritative guidance from `<AUTHORITATIVE_CONTEXT>`.
-            c. **Reasoning:** Your explanation that connects the evidence and the rules to your conclusion.
+            c. **Reasoning:** Your explanation that connects the evidence and the rules to your conclusion. CRITICAL: Use explicit "because" statements to show causal connections between evidence and conclusions.
+            d. **Gap Acknowledgment:** If contract language is ambiguous or key information is missing, explicitly acknowledge this limitation and state how you addressed it.
         3.  **Conclusion:** End the paragraph with a clear, definitive conclusion that answers the issue.
+
+        **ENHANCED REASONING REQUIREMENTS:**
+        - Every conclusion must include at least one "because" statement that directly links contract evidence to ASC 606 principles
+        - When making professional judgments, explicitly state the reasoning process and alternatives considered
+        - If relying on assumptions due to limited contract language, clearly identify these assumptions
 
         **META-EXAMPLE OF DESIRED NARRATIVE STYLE:**
         The primary issue is whether the promised implementation services are distinct from the SaaS license. The contract provides key evidence, stating that 'proprietary configuration' is required. Authoritative guidance in ASC 606-10-25-21 requires promises to be 'separately identifiable' to be considered distinct. Because the 'proprietary' nature of the configuration means the customer cannot obtain the full benefit of the SaaS license without this specific service, the two promises are not separately identifiable in the context of the contract. Therefore, the implementation service and the SaaS license are treated as a single performance obligation.
@@ -99,7 +105,7 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
             "{",
             f'  "executive_conclusion": "A clear, one-to-three sentence conclusion for this entire step. This is the \'bottom line\'.",',
             f'  "{step_schema_name}": {step_schema_definition},',
-            '  "professional_judgments": [ {"judgment_title": "SHORT TITLE (2-4 words)", "judgment_rationale": "Brief explanation of the judgment and why it was necessary"} ],',
+            '  "professional_judgments": [ {"judgment_title": "SHORT TITLE (2-4 words)", "judgment_rationale": "Brief explanation of the judgment, alternatives considered, and why this conclusion was reached"} ],',
             '  "analysis_points": [ { "topic_title": "...", "analysis_text": "...", "evidence_quotes": ["..."] } ]',
             "}",
             "```",
@@ -167,8 +173,10 @@ For this step, you MUST append a second, separate paragraph to your `analysis_te
         """Returns a concise block of the most critical, non-negotiable rules for a given step."""
         rules = {
             1: """<CRITICAL_INSTRUCTION>
-- You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e).
-- You MUST create a corresponding `analysis_points` entry for each of the five criteria.
+- You MUST evaluate ALL FIVE criteria from ASC 606-10-25-1(a) through (e) with enhanced reasoning requirements.
+- You MUST create a corresponding `analysis_points` entry for each of the five criteria using explicit "because" statements to link contract evidence to conclusions.
+- For criteria assessment, provide clear reasoning that connects specific contract language to ASC 606 requirements.
+- When contract terms are ambiguous or require interpretation, acknowledge this gap and state your analytical approach.
 
 - **SPECIAL RULE FOR COLLECTIBILITY (ASC 606-10-25-1(e)):** You are NOT to analyze this criterion based on the contract text. The analysis of a customer's credit risk requires external information. Instead, you MUST use the following specific text for the `justification` in the `contract_criteria_assessment` and for the `analysis_text` in the corresponding `analysis_points` entry:
 
@@ -178,6 +186,7 @@ As this analysis requires information external to the contract documents, it is 
 
 For the 'status' of this criterion, you MUST set it to 'Met (Assumed)'.
 
+- **ENHANCED REASONING REQUIREMENTS:** For the other four criteria, use "because" statements to show how contract terms support your conclusions about approval/commitment, rights identification, payment terms, and commercial substance.
 
 </CRITICAL_INSTRUCTION>""",
             2: """<CRITICAL_INSTRUCTION>
@@ -187,62 +196,75 @@ Your final output must be in the `analysis_points` array. For EACH promised good
 
 **1. Assessment Against 606-10-25-19(a) (Benefit on its own):**
 - State whether the customer can benefit from the good/service either on its own or with other readily available resources.
-- Provide a brief justification. For example: "The customer can benefit from the hardware on its own by reselling it, or with other resources like third-party software."
+- Provide a brief justification with explicit "because" reasoning. For example: "The customer can benefit from the hardware on its own by reselling it, or with other resources like third-party software, because the hardware has standalone functionality independent of the services."
 
 **2. Assessment Against 606-10-25-19(b) (Separately Identifiable):**
-- This section must explicitly evaluate the three factors from ASC 606-10-25-21.
-- **(i) Significant Integration Service:** Analyze whether you are providing a significant service of integrating the items into a combined output. Quote from the SOW and explain *why* this service is (or is not) significant. In your reasoning, you MUST directly address phrases from the SOW like "required for optimal use."
-- **(ii) Significant Modification:** Analyze whether one promised good/service significantly modifies or customizes another.
-- **(iii) Highly Interdependent/Interrelated:** Analyze whether the goods/services are highly dependent on each other. Explain *why* the entity would (or would not) be able to fulfill its promise to transfer one item independently of the others.
-- **(iv) Conclusion on Separately Identifiable:** Based on the three factors above, conclude whether the promise is distinct within the context of the contract.
+- This section must SYSTEMATICALLY evaluate ALL THREE factors from ASC 606-10-25-21 with supporting evidence for each:
+- **(i) Significant Integration Service:** Analyze whether you are providing a significant service of integrating the items into a combined output. Quote from the contract and explain with "because" statements why this service is (or is not) significant. You MUST directly address contract phrases like "required for optimal use," "turnkey solution," or "integrated system."
+- **(ii) Significant Modification:** Analyze whether one promised good/service significantly modifies or customizes another. Use contract evidence and "because" reasoning to support your conclusion.
+- **(iii) Highly Interdependent/Interrelated:** Analyze whether the goods/services are highly dependent on each other. Use "because" statements to explain why the entity would (or would not) be able to fulfill its promise to transfer one item independently of the others.
+- **(iv) Conclusion on Separately Identifiable:** Based on the three factors above, conclude whether the promise is distinct within the context of the contract. If any factor analysis lacks direct contract evidence, explicitly acknowledge this gap.
 
 **3. Overall Conclusion on Distinctness:**
-- Based on the complete assessment above, identify the final performance obligation. For example: "On the basis of this assessment, the entity identifies the Hardware as a distinct performance obligation."
+- Based on the complete assessment above, identify the final performance obligation with clear "because" reasoning. For example: "On the basis of this assessment, the entity identifies the Hardware as a distinct performance obligation because it satisfies both criteria in ASC 606-10-25-19."
+
+**SYSTEMATIC FACTOR ANALYSIS REQUIREMENTS:**
+- Each 25-21 factor must be supported by contract quotes when available
+- When contract language is unclear or missing for a specific factor, explicitly state this limitation
+- Professional judgments regarding distinctness must be captured in the professional_judgments array with clear rationale
 
 **META-EXAMPLE OF DESIRED OUTPUT STYLE:**
 
 *Incorrect (too shallow):* "The hardware is distinct because title transfers at delivery."
 
 *Correct (in-depth, emulating the guidance):*
-"The entity determines that its promises to transfer the equipment and to provide the installation services are each separately identifiable. In making this determination, the entity considers the factors in 606-10-25-21. a) The entity is not providing a significant integration service because the entity would be able to fulfill its promise to transfer the equipment separately from its promise to subsequently install it. b) The installation services will not significantly modify the equipment. c) Although the customer can only benefit from the installation after receiving the equipment, the items are not highly interdependent because the equipment and services do not significantly affect each other. Therefore, the promise to provide the hardware is separately identifiable."
+"The entity determines that its promises to transfer the equipment and to provide the installation services are each separately identifiable. In making this determination, the entity considers the factors in 606-10-25-21. a) The entity is not providing a significant integration service because the entity would be able to fulfill its promise to transfer the equipment separately from its promise to subsequently install it. b) The installation services will not significantly modify the equipment. c) Although the customer can only benefit from the installation after receiving the equipment, the items are not highly interdependent because the equipment and services do not significantly affect each other. Therefore, the promise to provide the hardware is separately identifiable because none of the three factors in ASC 606-10-25-21 are present."
 
 </CRITICAL_INSTRUCTION>
 """,
             3: """<CRITICAL_INSTRUCTION>
 - Your primary analysis MUST occur within the `transaction_price_components` JSON structure.
 - Only use `analysis_points` for truly separate or unusual considerations not already covered by the standard components.
+- For variable consideration analysis, use explicit "because" statements to link contract terms to constraint requirements under ASC 606-10-32-11.
+- When contract language regarding pricing is ambiguous, explicitly acknowledge this gap and state your analytical approach.
+- Professional judgments about transaction price estimates must include alternatives considered and reasoning for the selected approach.
 </CRITICAL_INSTRUCTION>""",
             4: """<CRITICAL_INSTRUCTION>
-Your analysis of price allocation must clearly state the principles that will be applied.
+Your analysis of price allocation must clearly state the principles that will be applied with enhanced reasoning requirements.
 
-1.  **Allocation Basis:** State that the total transaction price must be allocated to each performance obligation based on its relative Standalone Selling Price (SSP), as required by ASC 606-10-32-28.
+1.  **Allocation Basis:** State that the total transaction price must be allocated to each performance obligation based on its relative Standalone Selling Price (SSP), as required by ASC 606-10-32-28. Use "because" statements to connect contract evidence to SSP determinations.
 
-2.  **SSP Source:** Briefly mention that determining SSP may require analyzing data outside of the contract, such as standalone sales data or other estimation methods (market assessment, cost-plus, residual) if an observable price is not available.
+2.  **SSP Source:** Briefly mention that determining SSP may require analyzing data outside of the contract, such as standalone sales data or other estimation methods (market assessment, cost-plus, residual) if an observable price is not available. When SSP data is limited, explicitly acknowledge this gap and state your estimation approach with reasoning.
 
 3.  **CRITICAL DISCOUNT INTERPRETATION RULES:**
    - When a contract states "The fees reflect a X% discount" or "The fees include a X% discount", the amounts listed are ALREADY POST-DISCOUNT amounts
    - Use the exact amounts stated in the contract - do NOT apply additional discounts to amounts that are already discounted
    - If the contract explicitly states which components are discounted and which are not (e.g., "The SaaS license is priced at its standard standalone rate. The hardware and services reflect a 10% discount"), treat each component according to its specified pricing
    - Per ASC 606-10-32-37, if the discount does not relate to one specific PO, it should be allocated proportionally to all POs. However, if the contract clearly indicates which POs are discounted, allocate accordingly.
+   - Use explicit reasoning with "because" statements when making discount allocation decisions.
 
-4.  **Allocation Method:** Use the stated contract amounts as the basis for allocation - these represent the agreed-upon standalone selling prices as reflected in the contractual arrangement.
+4.  **Allocation Method:** Use the stated contract amounts as the basis for allocation - these represent the agreed-upon standalone selling prices as reflected in the contractual arrangement. Provide "because" reasoning for allocation decisions.
+
+5.  **Professional Judgments:** Capture significant SSP estimation decisions and allocation methodologies in the professional_judgments array, including alternatives considered and rationale for selected approach.
 
 Your role is to frame the necessary analysis, not to perform external market research.
 
 </CRITICAL_INSTRUCTION>""",
             5: """<CRITICAL_INSTRUCTION>
-Your analysis of revenue recognition timing must be precise and directly reference the authoritative guidance. For EACH performance obligation, your analysis MUST clearly state:
+Your analysis of revenue recognition timing must be precise and directly reference the authoritative guidance with enhanced reasoning requirements. For EACH performance obligation, your analysis MUST clearly state:
 
-1.  **Recognition Method:** State "Over Time" or "Point in Time".
+1.  **Recognition Method:** State "Over Time" or "Point in Time" with supporting contract evidence.
 
 2.  **Recognition Justification (The most important part):**
-    *   **If "Over Time":** You MUST state which of the three criteria in ASC 606-10-25-27 is met and why.
+    *   **If "Over Time":** You MUST state which of the three criteria in ASC 606-10-25-27 is met and provide explicit "because" reasoning linking contract terms to the selected criterion:
         - (a) Customer simultaneously receives and consumes the benefits.
         - (b) The entity's performance creates or enhances an asset the customer controls.
         - (c) The performance does not create an asset with an alternative use, and the entity has an enforceable right to payment for performance completed to date.
-    *   **If "Point in Time":** You MUST describe the specific event that signifies the transfer of control, referencing the indicators in ASC 606-10-25-30 (e.g., customer has legal title, physical possession, significant risks and rewards, etc.).
+    *   **If "Point in Time":** You MUST describe the specific event that signifies the transfer of control with "because" statements, referencing the indicators in ASC 606-10-25-30 (e.g., customer has legal title, physical possession, significant risks and rewards, etc.).
 
-3.  **Measure of Progress (for "Over Time" only):** If recognition is Over Time, describe the method used to measure progress (e.g., straight-line, output method like milestones, or input method like hours incurred) and justify why it best depicts the transfer of control.
+3.  **Measure of Progress (for "Over Time" only):** If recognition is Over Time, describe the method used to measure progress (e.g., straight-line, output method like milestones, or input method like hours incurred) and justify with "because" reasoning why it best depicts the transfer of control. If contract terms are unclear regarding progress measurement, acknowledge this gap.
+
+4.  **Professional Judgments:** Capture significant timing decisions and progress measurement choices in the professional_judgments array, including alternatives considered and reasoning for the selected approach.
 
 </CRITICAL_INSTRUCTION>"""
         }
