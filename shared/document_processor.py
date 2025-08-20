@@ -47,16 +47,16 @@ class SharedDocumentProcessor:
             return None, None
             
         try:
-            # Save uploaded file temporarily
-            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{uploaded_file.name.split('.')[-1]}") as tmp_file:
-                tmp_file.write(uploaded_file.getvalue())
-                temp_path = tmp_file.name
+            # Extract text using existing extractor (pass the uploaded file directly)
+            extraction_result = self.extractor.extract_text(uploaded_file)
             
-            # Extract text using existing extractor
-            extracted_text = self.extractor.extract_text(temp_path)
+            # Check for extraction errors
+            if extraction_result.get('error'):
+                st.error(f"Document extraction failed: {extraction_result['error']}")
+                return None, None
             
-            # Clean up temporary file
-            os.unlink(temp_path)
+            # Get the text from the extraction result
+            extracted_text = extraction_result.get('text', '')
             
             if not extracted_text or len(extracted_text.strip()) < 100:
                 st.error("Document appears to be empty or text extraction failed.")
@@ -68,13 +68,6 @@ class SharedDocumentProcessor:
             return extracted_text, uploaded_file.name
             
         except Exception as e:
-            # Clean up temporary file if it exists
-            if 'temp_path' in locals():
-                try:
-                    os.unlink(temp_path)
-                except:
-                    pass
-                    
             st.error(f"Error processing document: {str(e)}")
             logger.error(f"Document processing error: {str(e)}")
             return None, None
