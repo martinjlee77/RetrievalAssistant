@@ -199,7 +199,7 @@ Your final output must be in the `analysis_points` array. For EACH promised good
 - Provide a brief justification with explicit "because" reasoning. For example: "The customer can benefit from the hardware on its own by reselling it, or with other resources like third-party software, because the hardware has standalone functionality independent of the services."
 
 **2. Assessment Against 606-10-25-19(b) (Separately Identifiable):**
-- This section must SYSTEMATICALLY evaluate ALL THREE factors from ASC 606-10-25-21 with supporting evidence for each:
+- This section must SYSTEMATICALLY evaluate ALL THREE factors from ASC 606-10-25-21 with supporting evidence for each (if not a factor is not applicable, provide reasoning):
 - **(i) Significant Integration Service:** Analyze whether you are providing a significant service of integrating the items into a combined output. Quote from the contract and explain with "because" statements why this service is (or is not) significant. You MUST directly address contract phrases like "required for optimal use," "turnkey solution," or "integrated system."
 - **(ii) Significant Modification:** Analyze whether one promised good/service significantly modifies or customizes another. Use contract evidence and "because" reasoning to support your conclusion.
 - **(iii) Highly Interdependent/Interrelated:** Analyze whether the goods/services are highly dependent on each other. Use "because" statements to explain why the entity would (or would not) be able to fulfill its promise to transfer one item independently of the others.
