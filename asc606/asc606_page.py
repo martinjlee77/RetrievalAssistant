@@ -9,7 +9,7 @@ Author: Accounting Platform Team
 
 import streamlit as st
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from shared.ui_components import StandardPageLayout
 from shared.memo_generator import SharedMemoGenerator
@@ -55,6 +55,8 @@ def perform_asc606_analysis(contract_text: str, customer_name: str, analysis_tit
             analyzer = ASC606StepAnalyzer()
             knowledge_search = ASC606KnowledgeSearch()
             memo_generator = SharedMemoGenerator(template_path="asc606/templates/memo_template.md")
+            from shared.ui_components import SharedUIComponents
+            ui = SharedUIComponents()
         
         # Display progress
         steps = ["Contract Review", "Step 1", "Step 2", "Step 3", "Step 4", "Step 5", "Memo Generation"]
@@ -66,8 +68,6 @@ def perform_asc606_analysis(contract_text: str, customer_name: str, analysis_tit
         for step_num in range(1, 6):
             with progress_placeholder:
                 st.subheader(f"🔄 Analyzing Step {step_num}")
-                from shared.ui_components import SharedUIComponents
-                ui = SharedUIComponents()
                 ui.analysis_progress(steps, step_num)
             
             with st.spinner(f"Analyzing Step {step_num}..."):
