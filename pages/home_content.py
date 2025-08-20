@@ -35,7 +35,7 @@ with col1:
             "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and leading interpretative guidance."
         )
         st.page_link(
-            "pages/asc606.py",
+            "asc606/asc606_page.py",
             label="Go to ASC 606 Analyzer",
             icon="➡️"
         )

@@ -70,8 +70,8 @@ st.logo("assets/images/logo.png")
 # 4. Define all pages in your app.
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
-    st.Page("pages/asc606.py",
-            title="ASC 606 Contract Review",
+    st.Page("asc606/asc606_page.py",
+            title="ASC 606 Revenue Recognition",
             icon=":material/arrow_forward:"),
     st.Page("pages/asc340.py",
             title="ASC 340-40 Contract Costs",
