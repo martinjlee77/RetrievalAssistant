@@ -83,10 +83,10 @@ def validate_asc606_inputs(analysis_title, contract_text, customer_name):
     """Validate ASC 606 specific inputs."""
     errors = []
 
-    if not customer_name.strip():
+    if not customer_name or not customer_name.strip():
         errors.append("Please enter a customer name")
 
-    if not analysis_title.strip():
+    if not analysis_title or not analysis_title.strip():
         errors.append("Please enter an analysis title")
 
     if not contract_text:
@@ -101,8 +101,7 @@ def validate_asc606_inputs(analysis_title, contract_text, customer_name):
         else:
             # Check for revenue-related terms
             revenue_terms = [
-            'payment', 'fee', 'price', 'consideration', 'revenue', 'sale', 'service', 'invoice', 'billing', 'transaction', 'purchase', 'license', 'subscription',
-'agreement', 'arrangement', 'termination', 'project', 'deliverable', 'performance', 'support', 'term', 'acceptance', 'agree', 'cancellation', 'refund', 'account', 'warranties', 'warranty', 'liability', 'arbitration', 'governing law', 'software', 'maintenance', 'entity', 'business', 'privacy', 'data', 'membership', 'account', 'taxes', 'tax', 'indemnification', 'indemnify', 'insurance', 'audit rights', 'audit', 'force majeure', 'ship', 'deliver', 'shipment', 'delivery' 
+            'payment', 'payments', 'fees', 'fee', 'price', 'consideration', 'revenue', 'sale', 'sales', 'service', 'services', 'invoice', 'invoices', 'billing', 'transaction', 'purchase', 'license', 'subscription', 'agreement', 'agreements', 'arrangement', 'termination', 'project', 'deliverable', 'deliverables', 'performance', 'support', 'term', 'acceptance', 'agree', 'cancellation', 'refund', 'account', 'warranties', 'warranty', 'liability', 'arbitration', 'governing law', 'software', 'maintenance', 'entity', 'entities', 'business', 'businessnes', 'privacy', 'data', 'membership', 'account', 'taxes', 'tax', 'indemnification', 'indemnify', 'insurance', 'audit rights', 'audit', 'force majeure', 'ship', 'deliver', 'shipment', 'delivery', 'statement'
             ]
             contract_lower = contract_text.lower()
             found_revenue_terms = sum(1 for term in revenue_terms
