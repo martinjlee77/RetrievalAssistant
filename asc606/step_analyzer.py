@@ -28,7 +28,8 @@ class ASC606StepAnalyzer:
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        self.model = "gpt-5"  # Testing with higher token limit for reasoning
+        # Model selection: GPT-4o for development, GPT-5 for production
+        self.model = os.getenv("ASC606_MODEL", "gpt-4o")  # Default to GPT-4o, set ASC606_MODEL=gpt-5 for production
         
         # Load step prompts
         self.step_prompts = self._load_step_prompts()
@@ -119,8 +120,8 @@ class ASC606StepAnalyzer:
                         "content": prompt
                     }
                 ],
-                response_format={"type": "text"},  # Required for GPT-5 to return text content
-                max_completion_tokens=8000  # Much higher limit to accommodate GPT-5 reasoning + output
+                response_format={"type": "text"} if self.model.startswith("gpt-5") else {},  # Required for GPT-5
+                max_completion_tokens=8000 if self.model.startswith("gpt-5") else 2000  # Higher for GPT-5 reasoning
             )
             
             analysis_text = response.choices[0].message.content
