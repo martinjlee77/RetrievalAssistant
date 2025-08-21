@@ -31,14 +31,16 @@
 
 ---
 
-PREPARED BY:
-[Analyst Name]
-[Title]
+## APPROVAL
+
+**PREPARED BY:**  
+Technical Accounting Team  
+{current_date}
+
+**REVIEWED BY:**  
+[To be completed by reviewer]  
 [Date]
 
-REVIEWED BY:
-[Reviewer Name]
-[Title]
-[Date]
+---
 
 *This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.*
