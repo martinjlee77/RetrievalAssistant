@@ -92,10 +92,10 @@ def validate_asc606_inputs(analysis_title, contract_text, customer_name):
     if not contract_text:
         errors.append("Please upload a contract document")
 
-    # ASC 606 specific validation - check for revenue-related content
+    # ASC 606 specific validation - check to see if there are less than 100 characters in the contract text
     if contract_text:
         processor = SharedDocumentProcessor()
-        if not processor.validate_document_content(contract_text):
+        if len(contract_text.strip()) < 100:
             errors.append(
                 "Document appears to be incomplete or not a valid contract")
         else:
