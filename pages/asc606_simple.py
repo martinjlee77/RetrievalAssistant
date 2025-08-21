@@ -6,9 +6,11 @@ This page demonstrates the raw LLM output approach with direct markdown renderin
 
 import streamlit as st
 import time
+import tempfile
+import os
 from asc606.simple_analyzer import SimpleASC606Analyzer
-from shared.document_processor import DocumentProcessor
-from shared.ui_components import UIComponents
+from shared.document_processor import SharedDocumentProcessor
+from shared.ui_components import SharedUIComponents
 
 def show_asc606_simple_page():
     """Display the simplified ASC 606 analysis page."""
@@ -21,10 +23,10 @@ def show_asc606_simple_page():
         st.session_state.simple_analyzer = SimpleASC606Analyzer()
     
     if 'doc_processor' not in st.session_state:
-        st.session_state.doc_processor = DocumentProcessor()
+        st.session_state.doc_processor = SharedDocumentProcessor()
     
     if 'ui_components' not in st.session_state:
-        st.session_state.ui_components = UIComponents()
+        st.session_state.ui_components = SharedUIComponents()
     
     # Input section
     with st.container():
@@ -80,7 +82,15 @@ def show_asc606_simple_page():
             status_text.text("📄 Processing contract document...")
             progress_bar.progress(20)
             
-            contract_text = st.session_state.doc_processor.extract_text_from_file(uploaded_file)
+            # Process the uploaded file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(uploaded_file.name)[1]) as tmp_file:
+                tmp_file.write(uploaded_file.getvalue())
+                tmp_file_path = tmp_file.name
+            
+            try:
+                contract_text = st.session_state.doc_processor.extractor.extract_text(tmp_file_path)
+            finally:
+                os.unlink(tmp_file_path)
             
             if not contract_text or len(contract_text.strip()) < 100:
                 st.error("Could not extract sufficient text from the document. Please check the file format.")
