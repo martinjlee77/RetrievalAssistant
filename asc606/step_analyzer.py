@@ -98,7 +98,7 @@ class ASC606StepAnalyzer:
         
         # Generate overall analysis summary
         results['executive_summary'] = self.generate_executive_summary(results, customer_name)
-        results['issues_for_investigation'] = self._identify_issues(results, contract_text)
+        results['background'] = self.generate_background_section(results, customer_name)
         
         logger.info("ASC 606 analysis completed successfully")
         return results
@@ -129,6 +129,9 @@ class ASC606StepAnalyzer:
                 else:
                     logger.warning(f"Retrying Step {step_num} (attempt {attempt + 2}) after error: {str(e)}")
                     time.sleep(2)  # Wait before retry
+        
+        # This should never be reached due to the raise in the final attempt
+        raise RuntimeError(f"Unexpected error: Step {step_num} analysis failed without proper error handling")
     
     def _analyze_step(self, 
                      step_num: int,
