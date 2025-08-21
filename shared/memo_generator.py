@@ -281,9 +281,11 @@ class SharedMemoGenerator:
             return content
             
         # Fix currency formatting issues
+        content = re.sub(r'\$\$+', '$', content)  # Fix double dollar signs $$XXX -> $XXX
         content = re.sub(r'\$(\d+),\s*(\d+)', r'$\1,\2', content)  # $XXX, XXX -> $XXX,XXX
         content = re.sub(r'(\d+),\s*(\d+),\s*([a-z])', r'$\1,\2, \3', content)  # Add $ and fix spacing
         content = re.sub(r'(\d+),\s*(\d+)([a-z])', r'$\1,\2 \3', content)  # Add $ and space
+        content = re.sub(r'(\d+),\s*(\d+)inf ixed', r'$\1,\2 in fixed', content)  # Fix specific pattern
         
         # Fix major text run-together patterns
         content = re.sub(r'withthepotentialf or', 'with the potential for', content)
@@ -293,12 +295,17 @@ class SharedMemoGenerator:
         content = re.sub(r'f orthehardware', 'for the hardware', content)
         content = re.sub(r'withthepotential', 'with the potential', content)
         content = re.sub(r'totalling\s*(\d+)', r'totaling $\1', content)
+        content = re.sub(r'inf ixedconsiderationand', 'in fixed consideration and', content)
+        content = re.sub(r'T hisconsistsof', 'This consists of', content)
+        content = re.sub(r'f ortheLogi − AISuiteSaaSLicenseoverthreeyears', 'for the Logi-AI Suite SaaS License over three years', content)
+        content = re.sub(r'considerationand(\d+)', r'consideration and $\1', content)
         
         # Fix number formatting with extra spaces
         content = re.sub(r'(\d+),\s+(\d+)', r'\1,\2', content)
         
         # Fix date formatting
         content = re.sub(r'(\w+)\s+(\d+),(\d+)', r'\1 \2, \3', content)  # October 26,2023 -> October 26, 2023
+        content = re.sub(r'(\w+)\s+\$(\d+),(\d+)', r'\1 \2, \3', content)  # January $15,2022 -> January 15, 2022
         
         # Fix text run-together issues (general pattern)
         content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
@@ -324,6 +331,14 @@ class SharedMemoGenerator:
         # Fix HTML artifacts in template
         content = re.sub(r'<br>\s*', '\n', content)
         content = re.sub(r'<[^>]+>', '', content)  # Remove any remaining HTML tags
+        
+        # Fix duplicate "Executive Summary" headers
+        content = re.sub(r'## EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', '## EXECUTIVE SUMMARY\n\n', content)
+        content = re.sub(r'EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', 'EXECUTIVE SUMMARY\n\n', content)
+        
+        # Fix potential markdown/special character issues that might cause red highlighting
+        content = re.sub(r'[^\x00-\x7F]+', '', content)  # Remove non-ASCII characters
+        content = re.sub(r'[\x00-\x1F\x7F]', '', content)  # Remove control characters
         
         return content.strip()
     

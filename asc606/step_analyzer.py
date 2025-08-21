@@ -343,15 +343,16 @@ Provide your analysis in the following structure:
 
 FORMATTING REQUIREMENTS:
 - Write in narrative paragraph style, not bullet lists
-- Format ALL currency as $XXX,XXX (NEVER write numbers without $ symbol)
+- Format ALL currency as $XXX,XXX (NEVER write $$XXX or numbers without $ symbol)
 - Use bullet points ONLY for lists of 3+ distinct items
 - Keep paragraphs under 3 sentences each
 - Quote specific contract language as evidence
 - Cite relevant ASC 606 paragraphs  
 - Use "because" statements to show reasoning
 - Always include spaces after commas and periods
-- Never concatenate words together
+- Never concatenate words together (avoid "inf ixedconsiderationand")
 - Write dates with proper spacing (e.g., "October 26, 2023")
+- Use single $ symbol only, never $$
 """
         
         return prompt
@@ -439,22 +440,22 @@ FORMATTING REQUIREMENTS:
             if current_section and current_content:
                 result[current_section] = '\n'.join(current_content).strip()
         
-        # Special handling for Step 1 missing conclusion - look for "Conclusion:" pattern anywhere in text
-        if step_num == 1 and not result['conclusion'] and 'Conclusion:' in response_text:
+        # Special handling for missing conclusions - look for "Conclusion:" pattern anywhere in text
+        if not result['conclusion'] and 'Conclusion:' in response_text:
             parts = response_text.split('Conclusion:', 1)
             if len(parts) == 2:
                 result['analysis'] = parts[0].strip()
                 result['conclusion'] = parts[1].strip()
-                logger.info(f"DEBUG: Fixed Step 1 conclusion using 'Conclusion:' pattern")
+                logger.info(f"DEBUG: Fixed Step {step_num} conclusion using 'Conclusion:' pattern")
         
-        # Ensure we have minimal conclusion for Step 1
-        if step_num == 1 and not result['conclusion'] and result['analysis']:
+        # Ensure we have minimal conclusion for any step missing one
+        if not result['conclusion'] and result['analysis']:
             # Extract last paragraph as conclusion
             paragraphs = result['analysis'].split('\n\n')
             if len(paragraphs) > 1:
                 result['conclusion'] = paragraphs[-1].strip()
                 result['analysis'] = '\n\n'.join(paragraphs[:-1]).strip()
-                logger.info(f"DEBUG: Extracted Step 1 conclusion from last paragraph")
+                logger.info(f"DEBUG: Extracted Step {step_num} conclusion from last paragraph")
         
         # Last resort: put everything in analysis if parsing failed
         if not result['analysis'] and not result['conclusion']:
@@ -505,8 +506,9 @@ Requirements:
 5. State compliance conclusion clearly
 6. Highlight any significant findings or issues
 7. Use double line breaks between paragraphs for readability
-8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
-9. Include proper spacing after commas and periods"""
+8. ALWAYS format currency with single $ symbol (e.g., $240,000, never $$240,000)
+9. Include proper spacing after commas and periods
+10. Never start with "Executive Summary:" as header (template handles this)"""
 
         # Call LLM API
         try:
@@ -558,7 +560,7 @@ Instructions:
 4. Focus on compliance assessment
 5. Use professional accounting language without bullet points
 6. Use proper paragraph spacing
-7. ALWAYS format currency with $ symbol
+7. ALWAYS format currency with single $ symbol (never $$)
 8. Include proper spacing after commas and periods"""
 
         # Call LLM API
