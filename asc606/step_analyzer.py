@@ -400,7 +400,7 @@ Remember to:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'analysis'
                     current_content = []
-                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**''STEP CONCLUSION:']):
+                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**', 'STEP CONCLUSION:']):
                     if current_section and current_content:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'conclusion'
@@ -592,27 +592,7 @@ Instructions:
             clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
             return f"We have reviewed the contract documents provided by {clean_customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation."
     
-    def _identify_issues(self, results: Dict[str, Any], contract_text: str) -> List[str]:
-        """Identify issues for further investigation based on the analysis."""
-        
-        issues = []
-        
-        # Collect issues from each step
-        for step_key, step_data in results.get('steps', {}).items():
-            if isinstance(step_data, dict) and step_data.get('issues'):
-                step_issues = step_data['issues']
-                if step_issues and step_issues.strip() and 'none' not in step_issues.lower():
-                    issues.append(f"Step {step_key.split('_')[1]}: {step_issues}")
-        
-        # Add standard issues if none were identified
-        if not issues:
-            issues = [
-                "Validate completeness of contract documentation and any amendments",
-                "Confirm implementation timeline and system capability requirements",
-                "Review final accounting treatment with external auditors prior to implementation"
-            ]
-        
-        return issues
+
     
     def _load_step_prompts(self) -> Dict[str, str]:
         """Load step-specific prompts if available."""
