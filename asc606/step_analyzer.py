@@ -416,7 +416,7 @@ FORMATTING REQUIREMENTS:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'analysis'
                     current_content = []
-                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**', 'STEP CONCLUSION:']):
+                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**', 'STEP CONCLUSION:', 'CONCLUSION']):
                     if current_section and current_content:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'conclusion'
@@ -433,6 +433,23 @@ FORMATTING REQUIREMENTS:
             # Handle the last section
             if current_section and current_content:
                 result[current_section] = '\n'.join(current_content).strip()
+        
+        # Special handling for Step 1 missing conclusion - look for "Conclusion:" pattern anywhere in text
+        if step_num == 1 and not result['conclusion'] and 'Conclusion:' in response_text:
+            parts = response_text.split('Conclusion:', 1)
+            if len(parts) == 2:
+                result['analysis'] = parts[0].strip()
+                result['conclusion'] = parts[1].strip()
+                logger.info(f"DEBUG: Fixed Step 1 conclusion using 'Conclusion:' pattern")
+        
+        # Ensure we have minimal conclusion for Step 1
+        if step_num == 1 and not result['conclusion'] and result['analysis']:
+            # Extract last paragraph as conclusion
+            paragraphs = result['analysis'].split('\n\n')
+            if len(paragraphs) > 1:
+                result['conclusion'] = paragraphs[-1].strip()
+                result['analysis'] = '\n\n'.join(paragraphs[:-1]).strip()
+                logger.info(f"DEBUG: Extracted Step 1 conclusion from last paragraph")
         
         # Last resort: put everything in analysis if parsing failed
         if not result['analysis'] and not result['conclusion']:

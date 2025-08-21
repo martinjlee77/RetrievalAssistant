@@ -299,6 +299,11 @@ class SharedMemoGenerator:
         content = re.sub(r'peryear', 'per year', content)
         content = re.sub(r'f orthreeyears', 'for three years', content)
         content = re.sub(r'f romthe', 'from the', content)
+        content = re.sub(r'annualf eef or', 'annual fee for', content)
+        content = re.sub(r'annualf ee', 'annual fee', content)
+        content = re.sub(r'Saa S', 'SaaS', content)
+        content = re.sub(r'Opti Scan', 'OptiScan', content)
+        content = re.sub(r'(\d+),\s*(\d+)\s*\*\s*(\d+)', r'$\1,\2 × \3%', content)  # Fix calculation formatting
         
         return content.strip()
     
