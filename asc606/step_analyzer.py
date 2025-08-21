@@ -395,7 +395,7 @@ Remember to:
             for line in lines:
                 line_upper = line.strip().upper()
                 
-                if any(keyword in line_upper for keyword in ['ANALYSIS:', 'STEP ANALYSIS:']):
+                if any(keyword in line_upper for keyword in ['ANALYSIS:', '**ANALYSIS:**', 'STEP ANALYSIS:']):
                     if current_section and current_content:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'analysis'
