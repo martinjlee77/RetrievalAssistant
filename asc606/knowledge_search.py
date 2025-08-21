@@ -47,8 +47,8 @@ class ASC606KnowledgeSearch:
             # Create step-specific search query
             search_query = self._build_step_query(step_number, contract_text)
             
-            # Search the knowledge base (reduced for speed)
-            guidance = self.knowledge_base.search(search_query, max_results=5)
+            # Search the knowledge base for comprehensive guidance
+            guidance = self.knowledge_base.search(search_query, max_results=8)
             
             logger.info(f"Retrieved guidance for Step {step_number}")
             return guidance
