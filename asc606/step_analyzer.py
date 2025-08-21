@@ -214,16 +214,7 @@ You will analyze contracts step-by-step following ASC 606 methodology. For each 
 
 When contract information is ambiguous or missing, acknowledge this and state your analytical approach.
 
-FORMATTING REQUIREMENTS:
-- Write in narrative paragraph style, avoid excessive bullet points
-- Format ALL currency as $XXX,XXX (ALWAYS include $ symbol, no spaces in numbers)
-- Use bullet points ONLY for lists of 3+ distinct items
-- Separate analysis from conclusions with clear section headers
-- Keep sentences concise and professional
-- Use numbered lists only for sequential steps
-- Always include spaces after commas and periods
-- Never concatenate words together
-- Write dates with proper spacing (e.g., "October 26, 2023")"""
+Follow the detailed formatting instructions provided in the user prompt."""
     
     def _get_step_prompt(self, 
                         step_num: int,
