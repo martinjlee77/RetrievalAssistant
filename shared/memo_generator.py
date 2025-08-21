@@ -167,6 +167,10 @@ class SharedMemoGenerator:
     
     def _extract_background_section(self, memo_data: Dict[str, Any], customer_name: str) -> str:
         """Extract or generate background section."""
+        # Debug: log what we're getting as customer_name
+        logger.info(f"DEBUG: Received customer_name length: {len(customer_name) if customer_name else 0}")
+        logger.info(f"DEBUG: Customer name first 100 chars: {customer_name[:100] if customer_name else 'None'}")
+        
         # Clean customer name to prevent contract text bleeding through
         clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
         if len(clean_customer_name) > 100:  # Likely contract text, not a customer name

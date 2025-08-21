@@ -77,7 +77,7 @@ def get_asc606_inputs():
         ui = SharedUIComponents()
         ui.validation_errors(validation_errors)
 
-    return customer_name, analysis_title, contract_text, filename, validation_errors
+    return contract_text, filename, customer_name, analysis_title, validation_errors
 
 
 def validate_asc606_inputs(customer_name, analysis_title, contract_text):
@@ -150,7 +150,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         # Display progress
         steps = [
-            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
+            "Starting", "Step 1", "Step 2", "Step 3", "Step 4",
             "Step 5", "Memo Generation"
         ]
         progress_placeholder = st.empty()
@@ -177,12 +177,19 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
                 analysis_results[f'step_{step_num}'] = step_result
 
+                # Display step results immediately
+                display_step_results(step_num, step_result)
+
         # Generate final memo
         with progress_placeholder:
             st.subheader("📋 Generating Professional Memo")
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Generating memo..."):
+            # Debug: log what we're passing
+            logger.info(f"DEBUG: About to generate memo with customer_name: '{customer_name[:50] if customer_name else 'None'}...'")
+            logger.info(f"DEBUG: Customer name length: {len(customer_name) if customer_name else 0}")
+            
             memo_data = prepare_memo_data(analysis_results, customer_name,
                                           analysis_title)
             memo_content = memo_generator.generate_memo(
