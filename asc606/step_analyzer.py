@@ -8,8 +8,10 @@ Simplified, natural language approach with clear reasoning chains.
 import openai
 import os
 import logging
+import time
 from typing import Dict, Any, Optional, List
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +55,11 @@ class ASC606StepAnalyzer:
         """
         logger.info(f"Starting ASC 606 analysis for {customer_name}")
         
+        # Add large contract warning
+        word_count = len(contract_text.split())
+        if word_count > 50000:
+            logger.warning(f"Large contract ({word_count} words). Consider splitting if analysis fails.")
+        
         results = {
             'customer_name': customer_name,
             'analysis_title': analysis_title,
@@ -60,29 +67,34 @@ class ASC606StepAnalyzer:
             'steps': {}
         }
         
-        # Analyze each step sequentially
-        for step_num in range(1, 6):
-            try:
-                logger.info(f"Analyzing Step {step_num}")
-                
-                step_result = self._analyze_step(
+        # Analyze steps in parallel with error recovery
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Submit all step analyses
+            futures = {
+                executor.submit(
+                    self._analyze_step_with_retry,
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     customer_name=customer_name,
                     additional_context=additional_context
-                )
-                
-                results['steps'][f'step_{step_num}'] = step_result
-                logger.info(f"Completed Step {step_num}")
-                
-            except Exception as e:
-                logger.error(f"Error in Step {step_num}: {str(e)}")
-                results['steps'][f'step_{step_num}'] = {
-                    'title': self._get_step_title(step_num),
-                    'analysis': f"Error analyzing this step: {str(e)}",
-                    'conclusion': "Analysis incomplete due to error"
-                }
+                ): step_num
+                for step_num in range(1, 6)
+            }
+            
+            # Collect results as they complete
+            for future in futures:
+                step_num = futures[future]
+                try:
+                    results['steps'][f'step_{step_num}'] = future.result()
+                    logger.info(f"Completed Step {step_num}")
+                except Exception as e:
+                    logger.error(f"Final error in Step {step_num}: {str(e)}")
+                    results['steps'][f'step_{step_num}'] = {
+                        'title': self._get_step_title(step_num),
+                        'analysis': f"Error analyzing this step: {str(e)}",
+                        'conclusion': "Analysis incomplete due to error"
+                    }
         
         # Generate overall analysis summary
         results['executive_summary'] = self.generate_executive_summary(results, customer_name)
@@ -90,6 +102,33 @@ class ASC606StepAnalyzer:
         
         logger.info("ASC 606 analysis completed successfully")
         return results
+    
+    def _analyze_step_with_retry(self,
+                               step_num: int,
+                               contract_text: str,
+                               authoritative_context: str,
+                               customer_name: str,
+                               additional_context: str = "") -> Dict[str, str]:
+        """Analyze a single step with retry logic for transient errors."""
+        max_retries = 2
+        
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Analyzing Step {step_num} (attempt {attempt + 1})")
+                return self._analyze_step(
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    customer_name=customer_name,
+                    additional_context=additional_context
+                )
+            except Exception as e:
+                if attempt == max_retries - 1:  # Final attempt
+                    logger.error(f"Failed Step {step_num} after {max_retries} attempts: {str(e)}")
+                    raise  # Re-raise the exception to be handled by caller
+                else:
+                    logger.warning(f"Retrying Step {step_num} (attempt {attempt + 2}) after error: {str(e)}")
+                    time.sleep(2)  # Wait before retry
     
     def _analyze_step(self, 
                      step_num: int,
