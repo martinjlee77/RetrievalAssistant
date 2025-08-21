@@ -276,69 +276,26 @@ class SharedMemoGenerator:
         return cleaned_data
     
     def _clean_content_formatting(self, content: str) -> str:
-        """Clean common LLM formatting issues."""
+        """Clean common LLM formatting issues with minimal, essential patterns only."""
         if not content:
             return content
             
-        # Fix currency formatting issues
-        content = re.sub(r'\$\$+', '$', content)  # Fix double dollar signs $$XXX -> $XXX
-        content = re.sub(r'\$(\d+),\s*(\d+)', r'$\1,\2', content)  # $XXX, XXX -> $XXX,XXX
-        content = re.sub(r'(\d+),\s*(\d+),\s*([a-z])', r'$\1,\2, \3', content)  # Add $ and fix spacing
-        content = re.sub(r'(\d+),\s*(\d+)([a-z])', r'$\1,\2 \3', content)  # Add $ and space
-        content = re.sub(r'(\d+),\s*(\d+)inf ixed', r'$\1,\2 in fixed', content)  # Fix specific pattern
+        # Essential fixes only - let the improved prompts handle the rest
         
-        # Fix major text run-together patterns
-        content = re.sub(r'withthepotentialf or', 'with the potential for', content)
-        content = re.sub(r'f ortheLogi', 'for the Logi', content)
-        content = re.sub(r'f orP rof essional', 'for Professional', content)
-        content = re.sub(r'T hereispotentialf or', 'There is potential for', content)
-        content = re.sub(r'f orthehardware', 'for the hardware', content)
-        content = re.sub(r'withthepotential', 'with the potential', content)
-        content = re.sub(r'totalling\s*(\d+)', r'totaling $\1', content)
-        content = re.sub(r'inf ixedconsiderationand', 'in fixed consideration and', content)
-        content = re.sub(r'T hisconsistsof', 'This consists of', content)
-        content = re.sub(r'f ortheLogi − AISuiteSaaSLicenseoverthreeyears', 'for the Logi-AI Suite SaaS License over three years', content)
-        content = re.sub(r'considerationand(\d+)', r'consideration and $\1', content)
-        
-        # Fix number formatting with extra spaces
-        content = re.sub(r'(\d+),\s+(\d+)', r'\1,\2', content)
-        
-        # Fix date formatting
-        content = re.sub(r'(\w+)\s+(\d+),(\d+)', r'\1 \2, \3', content)  # October 26,2023 -> October 26, 2023
-        content = re.sub(r'(\w+)\s+\$(\d+),(\d+)', r'\1 \2, \3', content)  # January $15,2022 -> January 15, 2022
-        
-        # Fix text run-together issues (general pattern)
-        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
-        
-        # Ensure proper paragraph spacing
-        content = re.sub(r'\n\n\n+', '\n\n', content)
-        
-        # Fix bullet point consistency
-        content = re.sub(r'^[\*\+]\s', '- ', content, flags=re.MULTILINE)
-        
-        # Fix common text corruption patterns
-        content = re.sub(r'peryear', 'per year', content)
-        content = re.sub(r'f orthreeyears', 'for three years', content)
-        content = re.sub(r'f romthe', 'from the', content)
-        content = re.sub(r'annualf eef or', 'annual fee for', content)
-        content = re.sub(r'annualf ee', 'annual fee', content)
-        content = re.sub(r'Saa S', 'SaaS', content)
-        content = re.sub(r'Opti Scan', 'OptiScan', content)
-        
-        # Fix period-space issues
-        content = re.sub(r'(\d+)\.([A-Z])', r'\1. \2', content)  # 365,000.There -> 365,000. There
-        
-        # Fix HTML artifacts in template
+        # 1. Fix HTML artifacts (always needed for template cleanup)
         content = re.sub(r'<br>\s*', '\n', content)
-        content = re.sub(r'<[^>]+>', '', content)  # Remove any remaining HTML tags
+        content = re.sub(r'<[^>]+>', '', content)
         
-        # Fix duplicate "Executive Summary" headers
+        # 2. Fix duplicate headers (template-specific issue)
         content = re.sub(r'## EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', '## EXECUTIVE SUMMARY\n\n', content)
         content = re.sub(r'EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', 'EXECUTIVE SUMMARY\n\n', content)
         
-        # Fix potential markdown/special character issues that might cause red highlighting
-        content = re.sub(r'[^\x00-\x7F]+', '', content)  # Remove non-ASCII characters
-        content = re.sub(r'[\x00-\x1F\x7F]', '', content)  # Remove control characters
+        # 3. Ensure proper paragraph spacing (basic formatting)
+        content = re.sub(r'\n\n\n+', '\n\n', content)
+        
+        # 4. Remove non-ASCII characters (prevents display issues)
+        content = re.sub(r'[^\x00-\x7F]+', '', content)
+        content = re.sub(r'[\x00-\x1F\x7F]', '', content)
         
         return content.strip()
     
