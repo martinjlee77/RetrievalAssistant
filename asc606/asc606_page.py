@@ -4,6 +4,9 @@ ASC 606 Contract Analysis Page
 
 import streamlit as st
 import logging
+import hashlib
+import json
+from datetime import datetime
 from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
@@ -28,14 +31,38 @@ def render_asc606_page():
     contract_text, filename, customer_name, analysis_title, additional_context, validation_errors = get_asc606_inputs(
     )
 
-    # Show analysis button if inputs are valid
+    # Show analysis buttons if inputs are valid
     if not validation_errors and contract_text:
-        if st.button("➡️ Analyze Contract",
-                     type="primary",
-                     use_container_width=True,
-                     key="asc606_analyze"):
-            perform_asc606_analysis(contract_text, customer_name,
-                                    analysis_title, additional_context)
+        # Check for cached analysis
+        cache_key = _generate_cache_key(contract_text, customer_name, additional_context)
+        cached_analysis = _get_cached_analysis(cache_key)
+        
+        if cached_analysis:
+            st.success("🎯 Found previous analysis for this contract!")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                if st.button("⚡ Generate Memo from Cache",
+                           type="primary",
+                           use_container_width=True,
+                           key="asc606_from_cache"):
+                    _generate_memo_from_cache(cached_analysis, customer_name, analysis_title)
+            
+            with col2:
+                if st.button("🔄 Regenerate Analysis",
+                           type="secondary",
+                           use_container_width=True,
+                           key="asc606_regenerate"):
+                    _clear_cache(cache_key)
+                    perform_asc606_analysis(contract_text, customer_name,
+                                          analysis_title, additional_context, cache_key)
+        else:
+            if st.button("➡️ Analyze Contract",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc606_analyze"):
+                perform_asc606_analysis(contract_text, customer_name,
+                                      analysis_title, additional_context, cache_key)
 
 
 def get_asc606_inputs():
@@ -136,7 +163,7 @@ def validate_asc606_inputs(customer_name, analysis_title, contract_text):
 
 
 def perform_asc606_analysis(contract_text: str, customer_name: str,
-                            analysis_title: str, additional_context: str = ""):
+                            analysis_title: str, additional_context: str = "", cache_key: str = None):
     """Perform the complete ASC 606 analysis and display results."""
 
     try:
@@ -195,6 +222,15 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
                                           analysis_title, analyzer)
+            
+            # Cache analysis results if successful
+            if cache_key:
+                _cache_analysis_results(cache_key, {
+                    'analysis_results': analysis_results,
+                    'memo_data': memo_data,
+                    'timestamp': datetime.now().isoformat()
+                })
+            
             memo_content = memo_generator.generate_memo(
                 memo_data=memo_data,
                 customer_name=customer_name,
@@ -273,6 +309,63 @@ def main():
     """Main function called by Streamlit navigation."""
     render_asc606_page()
 
+
+# ===== CACHE HELPER FUNCTIONS =====
+# These are for development convenience and can be removed before deployment
+
+def _generate_cache_key(contract_text: str, customer_name: str, additional_context: str) -> str:
+    """Generate a cache key based on input parameters."""
+    content = f"{contract_text[:1000]}{customer_name}{additional_context}"  # Use first 1000 chars
+    return hashlib.md5(content.encode()).hexdigest()
+
+def _get_cached_analysis(cache_key: str) -> Dict[str, Any]:
+    """Get cached analysis results if they exist."""
+    if 'memo_cache' not in st.session_state:
+        return None
+    return st.session_state.memo_cache.get(cache_key)
+
+def _cache_analysis_results(cache_key: str, data: Dict[str, Any]) -> None:
+    """Cache analysis results for later use."""
+    if 'memo_cache' not in st.session_state:
+        st.session_state.memo_cache = {}
+    st.session_state.memo_cache[cache_key] = data
+
+def _clear_cache(cache_key: str = None) -> None:
+    """Clear specific cache entry or all cache."""
+    if 'memo_cache' not in st.session_state:
+        return
+    if cache_key:
+        st.session_state.memo_cache.pop(cache_key, None)
+    else:
+        st.session_state.memo_cache.clear()
+
+def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, analysis_title: str) -> None:
+    """Generate memo from cached analysis results."""
+    try:
+        st.info("⚡ Generating memo from cached analysis...")
+        
+        memo_generator = SharedMemoGenerator(template_path="asc606/templates/memo_template.md")
+        
+        # Use cached memo data directly
+        memo_data = cached_data.get('memo_data', {})
+        
+        memo_content = memo_generator.generate_memo(
+            memo_data=memo_data,
+            customer_name=customer_name,
+            analysis_title=analysis_title,
+            standard_name="ASC 606"
+        )
+        
+        st.success("✅ Memo generated from cache instantly!")
+        memo_generator.display_memo(memo_content)
+        
+        # Show cache info
+        cache_time = cached_data.get('timestamp', 'Unknown')
+        st.info(f"📅 This analysis was cached on: {cache_time}")
+        
+    except Exception as e:
+        st.error(f"❌ Error generating memo from cache: {str(e)}")
+        logger.error(f"Cache memo generation error: {str(e)}")
 
 # For direct execution/testing
 if __name__ == "__main__":
