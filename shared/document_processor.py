@@ -29,43 +29,72 @@ class SharedDocumentProcessor:
     
     def upload_and_process(self, label: str = "Upload Contract Document") -> Tuple[Optional[str], Optional[str]]:
         """
-        Handle file upload and extract text content.
+        Handle multiple file upload and extract combined text content.
         
         Args:
             label: Label for the file uploader widget
             
         Returns:
-            Tuple of (extracted_text, filename) or (None, None) if no file or error
+            Tuple of (combined_extracted_text, comma_separated_filenames) or (None, None) if no files or error
         """
-        uploaded_file = st.file_uploader(
+        uploaded_files = st.file_uploader(
             label,
             type=['pdf', 'docx'],
-            help="Upload a PDF or Word document for analysis"
+            help="Upload up to 5 contract documents (PDF or Word). All documents will be combined for analysis.",
+            accept_multiple_files=True
         )
         
-        if uploaded_file is None:
+        if not uploaded_files:
             return None, None
             
+        # Limit to 5 files for practical processing
+        if len(uploaded_files) > 5:
+            st.warning("⚠️ Maximum 5 files allowed. Using first 5 files only.")
+            uploaded_files = uploaded_files[:5]
+            
         try:
-            # Extract text using existing extractor (pass the uploaded file directly)
-            extraction_result = self.extractor.extract_text(uploaded_file)
+            combined_text = ""
+            processed_filenames = []
             
-            # Check for extraction errors
-            if extraction_result.get('error'):
-                st.error(f"Document extraction failed: {extraction_result['error']}")
-                return None, None
+            for uploaded_file in uploaded_files:
+                # Extract text using existing extractor
+                extraction_result = self.extractor.extract_text(uploaded_file)
+                
+                # Check for extraction errors
+                if extraction_result.get('error'):
+                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                    continue
+                
+                # Get the text from the extraction result
+                extracted_text = extraction_result.get('text', '')
+                
+                if not extracted_text or len(extracted_text.strip()) < 50:
+                    st.warning(f"⚠️ {uploaded_file.name} appears to be empty or extraction failed - skipping")
+                    continue
+                
+                # Add document separator and content
+                if combined_text:
+                    combined_text += "\n\n" + "="*80 + "\n"
+                    combined_text += f"DOCUMENT: {uploaded_file.name}\n"
+                    combined_text += "="*80 + "\n\n"
+                else:
+                    combined_text += f"DOCUMENT: {uploaded_file.name}\n"
+                    combined_text += "="*80 + "\n\n"
+                
+                combined_text += extracted_text
+                processed_filenames.append(uploaded_file.name)
+                
+                st.success(f"✅ Successfully processed {uploaded_file.name}")
+                logger.info(f"Successfully processed document: {uploaded_file.name}")
             
-            # Get the text from the extraction result
-            extracted_text = extraction_result.get('text', '')
-            
-            if not extracted_text or len(extracted_text.strip()) < 100:
-                st.error("Document appears to be empty or text extraction failed.")
+            if not combined_text:
+                st.error("❌ No documents could be processed successfully")
                 return None, None
                 
-            st.success(f"✅ Successfully processed {uploaded_file.name}")
-            logger.info(f"Successfully processed document: {uploaded_file.name}")
+            filenames_str = ", ".join(processed_filenames)
+            st.info(f"📄 Combined {len(processed_filenames)} document(s) for analysis")
             
-            return extracted_text, uploaded_file.name
+            return combined_text, filenames_str
             
         except Exception as e:
             st.error(f"Error processing document: {str(e)}")
@@ -105,7 +134,7 @@ class SharedDocumentProcessor:
             text: Extracted document text
             filename: Original filename
         """
-        with st.expander("📄 Document Information", expanded=False):
+        with st.expander("📄 Processed document information", expanded=False):
             col1, col2 = st.columns(2)
             
             with col1:
@@ -123,4 +152,4 @@ class SharedDocumentProcessor:
             # Show first few lines as preview
             lines = text.split('\n')[:10]
             preview = '\n'.join(line.strip() for line in lines if line.strip())[:500]
-            st.text_area("Document Preview", preview, height=100, disabled=True)
+            st.text_area("Document Preview (first few lines only)", preview, height=100, disabled=True)

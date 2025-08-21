@@ -28,7 +28,7 @@ class ASC606StepAnalyzer:
         if not openai.api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        self.model = "gpt-4o"  # Use the proven model
+        self.model = "gpt-5"  # Use the proven model
         
         # Load step prompts
         self.step_prompts = self._load_step_prompts()

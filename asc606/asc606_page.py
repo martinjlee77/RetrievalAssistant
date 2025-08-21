@@ -40,7 +40,7 @@ def render_asc606_page():
 
 def get_asc606_inputs():
     """Get ASC 606 specific inputs and validate them."""
-    st.subheader("ℹ️ Required Information")
+    st.subheader("Required Information")
 
     # ASC 606 specific inputs
     col1, col2 = st.columns(2)
@@ -69,7 +69,8 @@ def get_asc606_inputs():
         processor.display_document_info(contract_text, filename)
 
     # Validate inputs
-    validation_errors = validate_asc606_inputs(customer_name, analysis_title, contract_text)
+    validation_errors = validate_asc606_inputs(customer_name, analysis_title,
+                                               contract_text)
 
     # Display validation errors if any
     if validation_errors:
@@ -79,7 +80,7 @@ def get_asc606_inputs():
     return customer_name, analysis_title, contract_text, filename, validation_errors
 
 
-def validate_asc606_inputs(analysis_title, contract_text, customer_name):
+def validate_asc606_inputs(customer_name, analysis_title, contract_text):
     """Validate ASC 606 specific inputs."""
     errors = []
 
@@ -101,7 +102,19 @@ def validate_asc606_inputs(analysis_title, contract_text, customer_name):
         else:
             # Check for revenue-related terms
             revenue_terms = [
-            'payment', 'payments', 'fees', 'fee', 'price', 'consideration', 'revenue', 'sale', 'sales', 'service', 'services', 'invoice', 'invoices', 'billing', 'transaction', 'purchase', 'license', 'subscription', 'agreement', 'agreements', 'arrangement', 'termination', 'project', 'deliverable', 'deliverables', 'performance', 'support', 'term', 'acceptance', 'agree', 'cancellation', 'refund', 'account', 'warranties', 'warranty', 'liability', 'arbitration', 'governing law', 'software', 'maintenance', 'entity', 'entities', 'business', 'businessnes', 'privacy', 'data', 'membership', 'account', 'taxes', 'tax', 'indemnification', 'indemnify', 'insurance', 'audit rights', 'audit', 'force majeure', 'ship', 'deliver', 'shipment', 'delivery', 'statement'
+                'payment', 'payments', 'fees', 'fee', 'price', 'consideration', 
+                'revenue', 'sale', 'sales', 'service', 'services', 'invoice', 
+                'invoices', 'billing', 'transaction', 'purchase', 'license', 
+                'subscription', 'agreement', 'agreements', 'arrangement', 
+                'termination', 'project', 'deliverable', 'deliverables', 
+                'performance', 'support', 'term', 'acceptance', 'agree', 
+                'cancellation', 'refund', 'account', 'warranties', 'warranty', 
+                'liability', 'arbitration', 'governing law', 'software', 
+                'maintenance', 'entity', 'entities', 'business', 'businessnes', 
+                'privacy', 'data', 'membership', 'taxes', 'tax', 
+                'indemnification', 'indemnify', 'insurance', 'audit rights', 
+                'audit', 'force majeure', 'ship', 'deliver', 'shipment', 
+                'delivery', 'statement'
             ]
             contract_lower = contract_text.lower()
             found_revenue_terms = sum(1 for term in revenue_terms
