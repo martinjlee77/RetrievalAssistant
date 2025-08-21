@@ -6,38 +6,99 @@ import streamlit as st
 import logging
 from typing import Dict, Any, List
 
-from shared.ui_components import StandardPageLayout
+from shared.ui_components import SharedUIComponents
 from shared.memo_generator import SharedMemoGenerator
+from shared.document_processor import SharedDocumentProcessor
 from asc606.step_analyzer import ASC606StepAnalyzer
 from asc606.knowledge_search import ASC606KnowledgeSearch
 
 logger = logging.getLogger(__name__)
 
 def render_asc606_page():
- 
-    # Page setup
-    layout = StandardPageLayout(
-        standard_name="ASC 606",
-        subtitle="Revenue Recognition Analysis",
-        features=[
-            "5-step ASC 606 methodology",
-            "Authoritative guidance integration", 
-            "Professional memo generation",
-            "Issues identification",
-            "Natural language analysis"
-        ]
-    )
+    """Render the simplified ASC 606 analysis page."""
     
-    # Render page start
-    layout.render_page_start()
+    # Page header
+    st.title("📊 ASC 606 Revenue Recognition Analysis")
+    st.markdown("*Comprehensive 5-step revenue recognition analysis with professional memo generation*")
+    st.markdown("---")
     
     # Get user inputs
-    contract_text, filename, customer_name, analysis_title, validation_errors = layout.get_inputs()
+    contract_text, filename, customer_name, analysis_title, validation_errors = get_asc606_inputs()
     
     # Show analysis button if inputs are valid
     if not validation_errors and contract_text:
-        if layout.ui.analysis_button("🚀 Analyze Contract (ASC 606)", key="asc606_analyze"):
+        if st.button("🚀 Analyze Contract (ASC 606)", type="primary", use_container_width=True, key="asc606_analyze"):
             perform_asc606_analysis(contract_text, customer_name, analysis_title)
+
+
+def get_asc606_inputs():
+    """Get ASC 606 specific inputs and validate them."""
+    st.subheader("📄 Contract Information")
+    
+    # Document upload
+    processor = SharedDocumentProcessor()
+    contract_text, filename = processor.upload_and_process("Upload Contract Document for ASC 606 Analysis")
+    
+    # ASC 606 specific inputs
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        customer_name = st.text_input(
+            "Customer/Entity Name",
+            placeholder="Enter customer or entity name",
+            help="Name of the customer or entity for the revenue contract"
+        )
+    
+    with col2:
+        analysis_title = st.text_input(
+            "Analysis Title",
+            value="ASC 606 Revenue Recognition Analysis",
+            help="Title for this analysis (will appear in the memo)"
+        )
+    
+    # Display document info if processed
+    if contract_text and filename:
+        processor.display_document_info(contract_text, filename)
+    
+    # Validate inputs
+    validation_errors = validate_asc606_inputs(contract_text, customer_name, analysis_title)
+    
+    # Display validation errors if any
+    if validation_errors:
+        ui = SharedUIComponents()
+        ui.validation_errors(validation_errors)
+    
+    return contract_text, filename, customer_name, analysis_title, validation_errors
+
+
+def validate_asc606_inputs(contract_text, customer_name, analysis_title):
+    """Validate ASC 606 specific inputs."""
+    errors = []
+    
+    if not contract_text:
+        errors.append("Please upload a contract document")
+    
+    if not customer_name.strip():
+        errors.append("Please enter a customer/entity name")
+    
+    if not analysis_title.strip():
+        errors.append("Please enter an analysis title")
+    
+    # ASC 606 specific validation - check for revenue-related content
+    if contract_text:
+        processor = SharedDocumentProcessor()
+        if not processor.validate_document_content(contract_text):
+            errors.append("Document appears to be incomplete or not a valid contract")
+        else:
+            # Check for revenue-related terms
+            revenue_terms = ['payment', 'fee', 'price', 'consideration', 'revenue', 'sale', 'service']
+            contract_lower = contract_text.lower()
+            found_revenue_terms = sum(1 for term in revenue_terms if term in contract_lower)
+            
+            if found_revenue_terms < 2:
+                errors.append("Document may not be suitable for revenue recognition analysis - consider if this contains revenue-generating activities")
+    
+    return errors
 
 
 def perform_asc606_analysis(contract_text: str, customer_name: str, analysis_title: str):
