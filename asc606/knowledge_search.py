@@ -26,7 +26,8 @@ class ASC606KnowledgeSearch:
             logger.info("ASC 606 knowledge search initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize ASC 606 knowledge search: {str(e)}")
-            self.knowledge_base = None
+            # Don't continue without knowledge base - this is critical for ASC 606 analysis
+            raise RuntimeError(f"ASC 606 knowledge base is required but not available: {str(e)}. Please process the ASC 606 guidance documents first.")
     
     def search_for_step(self, step_number: int, contract_text: str) -> str:
         """
@@ -40,7 +41,7 @@ class ASC606KnowledgeSearch:
             Formatted authoritative guidance context
         """
         if not self.knowledge_base:
-            return self._get_fallback_guidance(step_number)
+            raise RuntimeError("ASC 606 knowledge base not available. Cannot perform authoritative analysis.")
         
         try:
             # Create step-specific search query
