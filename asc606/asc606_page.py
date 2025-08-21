@@ -1,10 +1,5 @@
 """
-ASC 606 Analysis Page
-
-Simplified ASC 606 revenue recognition analysis interface.
-Clean, minimal UI with natural language output.
-
-Author: Accounting Platform Team
+ASC 606 Contract Analysis Page
 """
 
 import streamlit as st
@@ -19,8 +14,7 @@ from asc606.knowledge_search import ASC606KnowledgeSearch
 logger = logging.getLogger(__name__)
 
 def render_asc606_page():
-    """Render the simplified ASC 606 analysis page."""
-    
+ 
     # Page setup
     layout = StandardPageLayout(
         standard_name="ASC 606",

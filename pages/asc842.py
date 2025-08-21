@@ -13,15 +13,19 @@ import os
 # Add root directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-try:
-    from core.models import ASC842Analysis
-except ImportError:
-    # Fallback import handling
-    sys.path.append('.')
-    from core.models import ASC842Analysis
-from core.analyzers import get_analyzer
+# Temporarily disabled - will be rebuilt with simplified architecture
+# try:
+#     from core.models import ASC842Analysis
+# except ImportError:
+#     # Fallback import handling
+#     sys.path.append('.')
+#     from core.models import ASC842Analysis
+# from core.analyzers import get_analyzer
 from utils.document_extractor import DocumentExtractor
-from utils.html_export import convert_memo_to_html
+# from utils.html_export import convert_memo_to_html
+
+st.error("⚠️ ASC 842 page is temporarily disabled while being rebuilt with the simplified architecture.")
+st.stop()
 
 # Main page content - no function wrapper needed for Streamlit navigation
 

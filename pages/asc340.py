@@ -16,11 +16,15 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.models import ContractCostsData, ASC340Analysis
-from core.analyzers import get_analyzer
+# Temporarily disabled - will be rebuilt with simplified architecture
+# from core.models import ContractCostsData, ASC340Analysis
+# from core.analyzers import get_analyzer
 from utils.document_extractor import DocumentExtractor
-from utils.llm import create_docx_from_text
-from utils.html_export import convert_memo_to_html
+# from utils.llm import create_docx_from_text
+# from utils.html_export import convert_memo_to_html
+
+st.error("⚠️ ASC 340-40 page is temporarily disabled while being rebuilt with the simplified architecture.")
+st.stop()
 
 def render_single_page_form():
     """Render the complete single-page ASC 340-40 form"""
