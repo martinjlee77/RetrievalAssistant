@@ -299,6 +299,79 @@ class SharedMemoGenerator:
         
         return content.strip()
     
+    def combine_markdown_steps(self, analysis_results: Dict[str, Any]) -> str:
+        """Combine markdown step results into complete memo."""
+        customer_name = analysis_results.get('customer_name', 'Unknown')
+        analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
+        analysis_date = analysis_results.get('analysis_date', datetime.now().strftime("%B %d, %Y"))
+        
+        # Build memo header
+        memo_parts = [
+            "# ASC 606 REVENUE RECOGNITION MEMORANDUM",
+            "",
+            f"**TO:** Chief Accounting Officer",
+            f"**FROM:** Technical Accounting Team - AI",
+            f"**DATE:** {analysis_date}",
+            f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
+            "",
+            "---",
+            ""
+        ]
+        
+        # Add executive summary if available
+        if 'executive_summary' in analysis_results:
+            memo_parts.extend([
+                "## EXECUTIVE SUMMARY",
+                "",
+                analysis_results['executive_summary'],
+                "",
+                "---",
+                ""
+            ])
+        
+        # Add background
+        memo_parts.extend([
+            "## BACKGROUND",
+            "",
+            f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation.",
+            "",
+            "---",
+            "",
+            "## ASC 606 ANALYSIS",
+            ""
+        ])
+        
+        # Add each step's markdown content
+        steps = analysis_results.get('steps', {})
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in steps and 'markdown_content' in steps[step_key]:
+                memo_parts.append(steps[step_key]['markdown_content'])
+                memo_parts.append("")
+        
+        # Add conclusion if available
+        if 'conclusion' in analysis_results:
+            memo_parts.extend([
+                "---",
+                "",
+                "## CONCLUSION",
+                "",
+                analysis_results['conclusion'],
+                ""
+            ])
+        
+        # Add footer
+        memo_parts.extend([
+            "---",
+            "",
+            "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
+            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]",
+            "",
+            "*This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.*"
+        ])
+        
+        return "\n".join(memo_parts)
+    
     def _replace_template_placeholders(self, template: str, variables: Dict[str, str]) -> str:
         """Replace all template placeholders with actual values."""
         content = template

@@ -140,10 +140,10 @@ class ASC606StepAnalyzer:
                      authoritative_context: str,
                      customer_name: str,
                      additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single ASC 606 step."""
+        """Analyze a single ASC 606 step - returns clean markdown."""
         
-        # Get step-specific prompt
-        prompt = self._get_step_prompt(
+        # Get step-specific prompt for markdown output
+        prompt = self._get_step_markdown_prompt(
             step_num=step_num,
             contract_text=contract_text,
             authoritative_context=authoritative_context,
@@ -160,14 +160,15 @@ class ASC606StepAnalyzer:
                 "messages": [
                     {
                         "role": "system",
-                        "content": self._get_system_prompt()
+                        "content": self._get_markdown_system_prompt()
                     },
                     {
                         "role": "user", 
                         "content": prompt
                     }
                 ],
-                "max_completion_tokens": 8000 if self.model == "gpt-5" else 2000
+                "max_completion_tokens": 8000 if self.model == "gpt-5" else 2000,
+                "temperature": 0.1
             }
             
             # Add response_format only for GPT-5
@@ -176,29 +177,32 @@ class ASC606StepAnalyzer:
             
             response = self.client.chat.completions.create(**request_params)
             
-            analysis_text = response.choices[0].message.content
+            markdown_content = response.choices[0].message.content
             
-            # Debug: Log the full response
-            logger.info(f"DEBUG: Full API response for Step {step_num}: {response}")
-            logger.info(f"DEBUG: Response content type: {type(analysis_text)}")
-            logger.info(f"DEBUG: Response content is None: {analysis_text is None}")
-            
-            if analysis_text is None:
+            if markdown_content is None:
                 logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
-                analysis_text = f"Error: GPT-5 returned empty response for Step {step_num}. Please try with GPT-4o instead."
+                markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
-                analysis_text = analysis_text.strip()
+                markdown_content = markdown_content.strip()
             
-            # Parse the natural language response
-            return self._parse_step_response(step_num, analysis_text)
+            logger.info(f"DEBUG: Generated markdown for Step {step_num} (length: {len(markdown_content)})")
+            
+            # Return clean markdown content
+            return {
+                'title': self._get_step_title(step_num),
+                'markdown_content': markdown_content,
+                'step_num': step_num
+            }
             
         except Exception as e:
             logger.error(f"API error in step {step_num}: {str(e)}")
             raise
     
-    def _get_system_prompt(self) -> str:
-        """Get the system prompt for the analyzer."""
+    def _get_markdown_system_prompt(self) -> str:
+        """Get the system prompt for markdown generation."""
         return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 606 revenue recognition. 
+
+Generate professional accounting analysis in clean markdown format. Your output will be displayed directly using markdown rendering.
 
 Your analysis must be:
 - Audit-ready and professional
@@ -206,24 +210,17 @@ Your analysis must be:
 - Based on authoritative guidance
 - Include explicit reasoning with "because" statements
 - Acknowledge any limitations or gaps in information
+- Formatted as clean, ready-to-display markdown
 
-You will analyze contracts step-by-step following ASC 606 methodology. For each step, provide:
-1. Clear analysis with supporting evidence from the contract
-2. Citations to relevant ASC 606 guidance  
-3. Explicit reasoning connecting evidence to conclusions
-4. Professional conclusion for the step
-
-When contract information is ambiguous or missing, acknowledge this and state your analytical approach.
-
-Follow the detailed formatting instructions provided in the user prompt."""
+Follow ALL formatting instructions in the user prompt precisely."""
     
-    def _get_step_prompt(self, 
+    def _get_step_markdown_prompt(self, 
                         step_num: int,
                         contract_text: str, 
                         authoritative_context: str,
                         customer_name: str,
                         additional_context: str = "") -> str:
-        """Generate prompt for a specific step."""
+        """Generate markdown prompt for a specific step."""
         
         step_info = {
             1: {
@@ -317,34 +314,29 @@ ANALYSIS REQUIRED:
 Analyze the contract for Step {step_num} focusing on:
 {chr(10).join([f"• {point}" for point in step['key_points']])}
 
-RESPONSE FORMAT:
-Provide your analysis in the following structure:
+REQUIRED OUTPUT FORMAT (Clean Markdown):
 
-**ANALYSIS:**
-[Write in narrative paragraph format with proper spacing. Use bullet points ONLY for lists of 3+ distinct items. Focus on flowing prose with professional reasoning.]
+## {step['title']}
 
-[Example: The contract demonstrates clear approval because both parties signed the document, establishing mutual commitment per ASC 606-10-25-1(a). Payment terms are explicitly outlined with specific amounts and due dates, satisfying the identification requirements.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations.]
 
-[Double line breaks between paragraphs]
+**Analysis:** [Detailed analysis with supporting evidence from the contract and citations to relevant ASC 606 guidance. Use explicit reasoning with "because" statements to connect evidence to conclusions.]
 
-**CONCLUSION:**
-[2-3 clear sentences with proper spacing]
+**Conclusion:** [Clear 2-3 sentence conclusion summarizing the findings for this step.]
 
-**ISSUES OR UNCERTAINTIES:**
-[Use bullet point format ONLY if multiple distinct issues exist]
+**Issues or Uncertainties:** [If any significant issues exist, list them clearly. Otherwise, state "None identified."]
 
-FORMATTING REQUIREMENTS:
-- Write in narrative paragraph style, not bullet lists
+CRITICAL FORMATTING REQUIREMENTS:
 - Format ALL currency as $XXX,XXX (NEVER write $$XXX or numbers without $ symbol)
+- Never concatenate words together (avoid "inf ixedconsiderationand")
+- Use single $ symbol only, never $$
+- Write dates with proper spacing (e.g., "October 26, 2023")
+- Always include spaces after commas and periods
 - Use bullet points ONLY for lists of 3+ distinct items
 - Keep paragraphs under 3 sentences each
 - Quote specific contract language as evidence
-- Cite relevant ASC 606 paragraphs  
-- Use "because" statements to show reasoning
-- Always include spaces after commas and periods
-- Never concatenate words together (avoid "inf ixedconsiderationand")
-- Write dates with proper spacing (e.g., "October 26, 2023")
-- Use single $ symbol only, never $$
+- Cite relevant ASC 606 paragraphs
+- Use professional accounting language
 """
         
         return prompt

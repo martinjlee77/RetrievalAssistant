@@ -231,11 +231,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                     'timestamp': datetime.now().isoformat()
                 })
             
-            memo_content = memo_generator.generate_memo(
-                memo_data=memo_data,
-                customer_name=customer_name,
-                analysis_title=analysis_title,
-                standard_name="ASC 606")
+            memo_content = memo_generator.combine_markdown_steps(analysis_results)
 
         # Display final memo
         progress_placeholder.empty()
@@ -349,12 +345,7 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
         # Use cached memo data directly
         memo_data = cached_data.get('memo_data', {})
         
-        memo_content = memo_generator.generate_memo(
-            memo_data=memo_data,
-            customer_name=customer_name,
-            analysis_title=analysis_title,
-            standard_name="ASC 606"
-        )
+        memo_content = memo_generator.combine_markdown_steps(cached_data.get('analysis_results', {}))
         
         st.success("✅ Memo generated from cache instantly!")
         memo_generator.display_memo(memo_content)
