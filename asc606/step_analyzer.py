@@ -191,7 +191,7 @@ class ASC606StepAnalyzer:
             return {
                 'title': self._get_step_title(step_num),
                 'markdown_content': markdown_content,
-                'step_num': step_num
+                'step_num': str(step_num)
             }
             
         except Exception as e:
@@ -340,17 +340,6 @@ CRITICAL FORMATTING REQUIREMENTS:
 """
         
         return prompt
-    
-    def _get_step_title(self, step_num: int) -> str:
-        """Get the title for a step."""
-        step_titles = {
-            1: "Step 1: Identify the Contract",
-            2: "Step 2: Identify Performance Obligations", 
-            3: "Step 3: Determine Transaction Price",
-            4: "Step 4: Allocate Transaction Price",
-            5: "Step 5: Recognize Revenue"
-        }
-        return step_titles.get(step_num, f"Step {step_num}")
     
     def _parse_step_response(self, step_num: int, response_text: str) -> Dict[str, str]:
         """Parse the natural language response into structured components."""
