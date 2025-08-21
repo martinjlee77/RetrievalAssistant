@@ -7,6 +7,7 @@ This project is a multi-standard accounting analysis platform designed to genera
 Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
+- **Simplified Architecture Implementation Complete** (August 20, 2025): Completely rebuilt the system with simplified, modular architecture. Removed complex JSON schemas in favor of natural language template-based memo generation. Implemented shared components (document processor, knowledge base, memo generator, UI components) that work across all standards. Created new simplified ASC 606 module with step analyzer and knowledge search. Added "Issues for Further Investigation" section to memos. Cleaned up unused legacy files (old analyzers, complex core modules). The system now has clear separation between standards while sharing common functionality.
 - **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Fixed critical ASC 340-40 chunking issue (was only 9 chunks, now properly 126 chunks). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (126 contract cost chunks - 48 authoritative + 78 interpretative), ASC 842 (563 lease chunks, 14MB). The ASC 340-40 RAG system is now functional - previously was relying only on LLM general knowledge. Updated KnowledgeBaseManager with automatic standard-to-database routing.
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
@@ -19,6 +20,47 @@ Critical Development Rules - Prompt Protection:
 5. When in doubt: Always ask the user before making ANY content changes.
 6. Violation consequences: User has to re-review entire codebase, causing significant frustration and lost work.
 7. MANDATORY ALERT PROTOCOL: If the AI agent cannot make a necessary change due to these prompt protection rules, it MUST explicitly alert the user with: "⚠️ PROMPT PROTECTION ALERT: I cannot modify [specific file/content] due to the prompt protection rules in replit.md. You will need to make this change manually. Here's exactly what needs to be changed: [specific instructions]".
+
+## ASC 606 Fine-Tuning Roadmap
+
+### Priority Files for Review/Editing (in order of importance):
+
+**1. asc606/step_analyzer.py** - CRITICAL
+- Contains all step-by-step analysis logic and prompts
+- Key areas to review: step_prompts, system_prompt, prompt generation logic
+- Fine-tune the 5-step methodology prompts for better analysis quality
+
+**2. asc606/knowledge_search.py** - HIGH PRIORITY  
+- Optimizes knowledge base search queries for each step
+- Review: step-specific query building, search term extraction
+- Note: Currently knowledge base collection doesn't exist (needs ASC 606 guidance loaded)
+
+**3. asc606/templates/memo_template.md** - HIGH PRIORITY
+- Controls final memo formatting and structure
+- Review: Professional language, section organization, Big 4 style formatting
+
+**4. shared/memo_generator.py** - MEDIUM PRIORITY
+- Template processing and section extraction logic
+- Review: How analysis results are formatted into memo sections
+
+**5. asc606/asc606_page.py** - MEDIUM PRIORITY
+- UI workflow and user experience
+- Review: Progress display, error handling, result presentation
+
+**6. shared/ui_components.py** - LOW PRIORITY
+- Shared UI elements and validation
+- Review: Input validation, user feedback, consistent styling
+
+**7. shared/knowledge_base.py** - LOW PRIORITY (infrastructure)
+- Knowledge base interface (works but needs ASC 606 collection created)
+
+**8. shared/document_processor.py** - LOW PRIORITY (working)
+- Document upload and processing (currently working well)
+
+### Known Issues to Address:
+- ASC 606 knowledge base collection doesn't exist (needs to be created/loaded)
+- Step analysis prompts may need refinement for better quality
+- Memo template may need professional formatting improvements
 
 ## System Architecture
 
