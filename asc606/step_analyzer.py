@@ -400,12 +400,12 @@ Remember to:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'analysis'
                     current_content = []
-                elif any(keyword in line_upper for keyword in ['CONCLUSION:', 'STEP CONCLUSION:']):
+                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**''STEP CONCLUSION:']):
                     if current_section and current_content:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'conclusion'
                     current_content = []
-                elif any(keyword in line_upper for keyword in ['ISSUES:', 'UNCERTAINTIES:']):
+                elif any(keyword in line_upper for keyword in ['ISSUES:', '**ISSUES:**', 'UNCERTAINTIES:', '**UNCERTAINTIES:**']):
                     if current_section and current_content:
                         result[current_section] = '\n'.join(current_content).strip()
                     current_section = 'issues'
