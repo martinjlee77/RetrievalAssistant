@@ -25,7 +25,7 @@ def render_asc606_page():
     )
 
     # Get user inputs
-    contract_text, filename, customer_name, analysis_title, validation_errors = get_asc606_inputs(
+    contract_text, filename, customer_name, analysis_title, additional_context, validation_errors = get_asc606_inputs(
     )
 
     # Show analysis button if inputs are valid
@@ -35,7 +35,7 @@ def render_asc606_page():
                      use_container_width=True,
                      key="asc606_analyze"):
             perform_asc606_analysis(contract_text, customer_name,
-                                    analysis_title)
+                                    analysis_title, additional_context)
 
 
 def get_asc606_inputs():
@@ -59,6 +59,13 @@ def get_asc606_inputs():
             # help="Title for this analysis (will appear in the memo)"
         )
 
+    # Additional context input (optional)
+    additional_context = st.text_area(
+        "Additional Context or Specific Questions (Optional)",
+        placeholder="e.g., Focus on warranty provisions, consider prior verbal agreements, analyze specific performance obligations...",
+        help="Provide any additional context, specific questions, or areas of focus for the analysis",
+        height=100)
+
     # Document upload
     processor = SharedDocumentProcessor()
     contract_text, filename = processor.upload_and_process(
@@ -77,7 +84,7 @@ def get_asc606_inputs():
         ui = SharedUIComponents()
         ui.validation_errors(validation_errors)
 
-    return contract_text, filename, customer_name, analysis_title, validation_errors
+    return contract_text, filename, customer_name, analysis_title, additional_context, validation_errors
 
 
 def validate_asc606_inputs(customer_name, analysis_title, contract_text):
@@ -129,7 +136,7 @@ def validate_asc606_inputs(customer_name, analysis_title, contract_text):
 
 
 def perform_asc606_analysis(contract_text: str, customer_name: str,
-                            analysis_title: str):
+                            analysis_title: str, additional_context: str = ""):
     """Perform the complete ASC 606 analysis and display results."""
 
     try:
@@ -168,12 +175,13 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                 authoritative_context = knowledge_search.search_for_step(
                     step_num, contract_text)
 
-                # Analyze the step
+                # Analyze the step with additional context
                 step_result = analyzer._analyze_step(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name)
+                    customer_name=customer_name,
+                    additional_context=additional_context)
 
                 analysis_results[f'step_{step_num}'] = step_result
 
@@ -186,7 +194,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             # Generate memo with validated inputs
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
-                                          analysis_title, analyzer)
+                                          analysis_title, analyzer, additional_context)
             memo_content = memo_generator.generate_memo(
                 memo_data=memo_data,
                 customer_name=customer_name,
@@ -209,7 +217,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         logger.error(f"ASC 606 analysis error: {str(e)}")
 
 def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
-                      analysis_title: str, step_analyzer) -> Dict[str, Any]:
+                      analysis_title: str, step_analyzer, additional_context: str = "") -> Dict[str, Any]:
     """Prepare analysis results for memo generation."""
 
     # Build analysis section with all steps
@@ -236,9 +244,11 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
         'analysis_content':
         "\n".join(analysis_content),
         'executive_summary':
-        step_analyzer.generate_executive_summary(analysis_results, customer_name),
+        step_analyzer.generate_executive_summary(analysis_results, customer_name, additional_context),
         'conclusion':
-        step_analyzer.generate_final_conclusion(analysis_results),
+        step_analyzer.generate_final_conclusion(analysis_results, additional_context),
+        'background_section':
+        step_analyzer.generate_background_section(analysis_results, customer_name, additional_context),
 
     }
 

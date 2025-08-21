@@ -94,7 +94,8 @@ class ASC606StepAnalyzer:
                      step_num: int,
                      contract_text: str,
                      authoritative_context: str,
-                     customer_name: str) -> Dict[str, str]:
+                     customer_name: str,
+                     additional_context: str = "") -> Dict[str, str]:
         """Analyze a single ASC 606 step."""
         
         # Get step-specific prompt
@@ -102,7 +103,8 @@ class ASC606StepAnalyzer:
             step_num=step_num,
             contract_text=contract_text,
             authoritative_context=authoritative_context,
-            customer_name=customer_name
+            customer_name=customer_name,
+            additional_context=additional_context
         )
         
         # Make API call
@@ -173,7 +175,8 @@ When contract information is ambiguous or missing, acknowledge this and state yo
                         step_num: int,
                         contract_text: str, 
                         authoritative_context: str,
-                        customer_name: str) -> str:
+                        customer_name: str,
+                        additional_context: str = "") -> str:
         """Generate prompt for a specific step."""
         
         step_info = {
@@ -242,7 +245,15 @@ CONTRACT INFORMATION:
 Customer: {customer_name}
 
 CONTRACT TEXT:
-{contract_text}
+{contract_text}"""
+
+        if additional_context.strip():
+            prompt += f"""
+
+ADDITIONAL CONTEXT:
+{additional_context}"""
+
+        prompt += f"""
 
 AUTHORITATIVE GUIDANCE:
 {authoritative_context}
@@ -379,7 +390,7 @@ Remember to:
         }
         return titles.get(step_num, f"Step {step_num}")
     
-    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
+    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str, additional_context: str = "") -> str:
         """Generate LLM-powered executive summary from analysis results."""
         
         # Extract conclusions from each step
@@ -394,7 +405,12 @@ Remember to:
         prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
 
 Step Conclusions:
-{conclusions_text}
+{conclusions_text}"""
+        
+        if additional_context.strip():
+            prompt += f"\nAdditional Context: {additional_context}"
+        
+        prompt += """
 
 Requirements:
 1. Write a 3-5 sentence executive summary
@@ -428,7 +444,7 @@ Requirements:
             # Fallback to simple summary
             return f"We have completed a comprehensive ASC 606 analysis for {customer_name}. Please review the detailed step-by-step analysis for specific findings and conclusions."
     
-    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any], additional_context: str = "") -> str:
         """Generate LLM-powered final conclusion from analysis results."""
         
         # Extract conclusions from each step
@@ -443,7 +459,12 @@ Requirements:
         prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
 
 Step Conclusions:
-{conclusions_text}
+{conclusions_text}"""
+        
+        if additional_context.strip():
+            prompt += f"\nAdditional Context: {additional_context}"
+        
+        prompt += """
 
 Instructions:
 1. Write 2-3 sentences assessing ASC 606 compliance
@@ -476,6 +497,63 @@ Instructions:
             logger.error(f"Final conclusion generation failed: {str(e)}")
             # Fallback to simple conclusion
             return "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition treatment is appropriate and complies with the authoritative guidance."
+    
+    def generate_background_section(self, analysis_results: Dict[str, Any], customer_name: str, additional_context: str = "") -> str:
+        """Generate LLM-powered background section from analysis results."""
+        
+        # Extract key conclusions for contract overview
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(analysis_results[step_key]['conclusion'])
+        
+        # Build prompt
+        conclusions_text = "\n".join(conclusions[:2])  # Use first 2 steps for contract overview
+        
+        prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
+
+Customer: {customer_name}
+Contract Summary: {conclusions_text}"""
+        
+        if additional_context.strip():
+            prompt += f"\nAdditional Context: {additional_context}"
+        
+        prompt += """
+
+Instructions:
+1. Describe what type of contract/arrangement was reviewed (high-level)
+2. Mention key contract elements (SaaS, hardware, services, etc.) if evident
+3. State the purpose of the ASC 606 analysis
+4. Professional accounting language
+5. Keep it high-level, no specific amounts or detailed terms"""
+
+        # Call LLM API
+        try:
+            request_params = {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
+                    },
+                    {
+                        "role": "user", 
+                        "content": prompt
+                    }
+                ],
+                "temperature": 0.2,
+                "max_completion_tokens": 150
+            }
+            
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Background section generation failed: {str(e)}")
+            # Fallback to simple background
+            clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
+            return f"We have reviewed the contract documents provided by {clean_customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation."
     
     def _identify_issues(self, results: Dict[str, Any], contract_text: str) -> List[str]:
         """Identify issues for further investigation based on the analysis."""
