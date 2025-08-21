@@ -186,9 +186,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Generating memo..."):
-            # Debug: log what we're passing
-            logger.info(f"DEBUG: About to generate memo with customer_name: '{customer_name[:50] if customer_name else 'None'}...'")
-            logger.info(f"DEBUG: Customer name length: {len(customer_name) if customer_name else 0}")
+            # Generate memo with validated inputs
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
                                           analysis_title)

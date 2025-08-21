@@ -262,43 +262,85 @@ Remember to:
             'issues': ''
         }
         
-        # Simple parsing logic for the structured response
-        sections = response_text.split('**')
-        current_section = None
-        current_content = []
+        # Log the raw response for debugging
+        logger.info(f"DEBUG: Raw AI response for Step {step_num} (first 200 chars): {response_text[:200]}")
         
-        for section in sections:
-            section = section.strip()
-            if not section:
-                continue
-                
-            if 'ANALYSIS' in section.upper():
-                if current_section and current_content:
-                    result[current_section] = '\n'.join(current_content).strip()
-                current_section = 'analysis'
-                current_content = []
-            elif 'CONCLUSION' in section.upper():
-                if current_section and current_content:
-                    result[current_section] = '\n'.join(current_content).strip()
-                current_section = 'conclusion'
-                current_content = []
-            elif 'ISSUES' in section.upper() or 'UNCERTAINTIES' in section.upper():
-                if current_section and current_content:
-                    result[current_section] = '\n'.join(current_content).strip()
-                current_section = 'issues'
-                current_content = []
-            else:
-                if current_section:
-                    current_content.append(section)
+        # More flexible parsing logic - look for common section patterns
+        response_upper = response_text.upper()
         
-        # Handle the last section
-        if current_section and current_content:
-            result[current_section] = '\n'.join(current_content).strip()
+        # Try different parsing approaches
+        if '**' in response_text:
+            # Original ** delimiter approach
+            sections = response_text.split('**')
+            current_section = None
+            current_content = []
+            
+            for section in sections:
+                section = section.strip()
+                if not section:
+                    continue
+                    
+                if any(keyword in section.upper() for keyword in ['ANALYSIS', 'STEP ANALYSIS']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'analysis'
+                    current_content = []
+                elif any(keyword in section.upper() for keyword in ['CONCLUSION', 'STEP CONCLUSION']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'conclusion'
+                    current_content = []
+                elif any(keyword in section.upper() for keyword in ['ISSUES', 'UNCERTAINTIES', 'MATTERS']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'issues'
+                    current_content = []
+                else:
+                    if current_section:
+                        current_content.append(section)
+            
+            # Handle the last section
+            if current_section and current_content:
+                result[current_section] = '\n'.join(current_content).strip()
         
-        # If parsing didn't work well, put everything in analysis
+        # If ** parsing didn't work, try line-based parsing
         if not result['analysis'] and not result['conclusion']:
-            result['analysis'] = response_text
-            result['conclusion'] = "See analysis above for conclusions."
+            lines = response_text.split('\n')
+            current_section = None
+            current_content = []
+            
+            for line in lines:
+                line_upper = line.strip().upper()
+                
+                if any(keyword in line_upper for keyword in ['ANALYSIS:', 'STEP ANALYSIS:']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'analysis'
+                    current_content = []
+                elif any(keyword in line_upper for keyword in ['CONCLUSION:', 'STEP CONCLUSION:']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'conclusion'
+                    current_content = []
+                elif any(keyword in line_upper for keyword in ['ISSUES:', 'UNCERTAINTIES:']):
+                    if current_section and current_content:
+                        result[current_section] = '\n'.join(current_content).strip()
+                    current_section = 'issues'
+                    current_content = []
+                else:
+                    if current_section and line.strip():
+                        current_content.append(line.strip())
+            
+            # Handle the last section
+            if current_section and current_content:
+                result[current_section] = '\n'.join(current_content).strip()
+        
+        # Last resort: put everything in analysis if parsing failed
+        if not result['analysis'] and not result['conclusion']:
+            result['analysis'] = response_text.strip()
+            result['conclusion'] = "Analysis completed. See detailed reasoning above."
+        
+        logger.info(f"DEBUG: Parsed Step {step_num} - Analysis length: {len(result['analysis'])}, Conclusion length: {len(result['conclusion'])}")
         
         return result
     
