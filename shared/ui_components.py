@@ -80,24 +80,19 @@ class SharedUIComponents:
             st.write(f"• {error}")
     
     @staticmethod
-    def display_knowledge_base_stats(kb_stats: Dict[str, Any]) -> None:
+    def display_knowledge_base_stats(kb_info: Dict[str, str]) -> None:
         """
-        Display knowledge base statistics - useful for debugging.
+        Display user-friendly knowledge base information.
         
         Args:
-            kb_stats: Knowledge base statistics dictionary
+            kb_info: User-friendly knowledge base information dictionary
         """
-        if kb_stats.get("error"):
-            st.error(f"Knowledge base error: {kb_stats['error']}")
+        if kb_info.get("status") == "Knowledge base information unavailable":
+            st.info(f"ℹ️ {kb_info.get('note', 'Analysis proceeding with general knowledge')}")
             return
         
         with st.expander("📚 Knowledge Base Information", expanded=False):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.metric("Documents", kb_stats.get("document_count", "Unknown"))
-                
-            with col2:
-                st.metric("Status", kb_stats.get("status", "Unknown").title())
-            
-            st.write(f"**Database:** {kb_stats.get('collection_name', 'Unknown')}")
+            st.write(f"**Standard:** {kb_info.get('standard', 'ASC 606 Revenue Recognition')}")
+            st.write(f"**Knowledge Base:** {kb_info.get('documents', 'guidance documents')}")
+            st.write(f"**Status:** {kb_info.get('status', 'Active')}")
+            st.write(f"_{kb_info.get('note', 'Analysis based on current authoritative guidance')}_")

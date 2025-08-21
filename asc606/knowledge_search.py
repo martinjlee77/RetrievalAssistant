@@ -8,6 +8,7 @@ Simple wrapper around the shared knowledge base for ASC 606 authoritative guidan
 
 import logging
 from typing import List, Dict, Any
+from datetime import datetime
 from shared.knowledge_base import ASC606KnowledgeBase
 
 logger = logging.getLogger(__name__)
@@ -240,15 +241,54 @@ class ASC606KnowledgeSearch:
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """
-        Get statistics about the ASC 606 knowledge base.
+        Get technical statistics about the ASC 606 knowledge base for internal monitoring.
         
         Returns:
             Dictionary with knowledge base statistics
         """
         if not self.knowledge_base:
-            return {"error": "Knowledge base not initialized"}
+            return {
+                "status": "unavailable",
+                "error": "Knowledge base not initialized",
+                "recommendation": "Process ASC 606 guidance documents first"
+            }
         
-        return self.knowledge_base.get_stats()
+        try:
+            stats = self.knowledge_base.get_stats()
+            # Add metadata for internal monitoring
+            stats["type"] = "ASC 606 Revenue Recognition Knowledge Base"
+            stats["timestamp"] = datetime.now().isoformat()
+            return stats
+        except Exception as e:
+            logger.error(f"Error getting knowledge base stats: {str(e)}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "recommendation": "Check knowledge base connection and initialization"
+            }
+    
+    def get_user_kb_info(self) -> Dict[str, str]:
+        """
+        Get user-friendly knowledge base information for display.
+        
+        Returns:
+            Simple dictionary with information suitable for end users
+        """
+        stats = self.get_knowledge_base_stats()
+        
+        if stats.get("status") not in ["active", "available"] or stats.get("error"):
+            return {
+                "status": "Knowledge base information unavailable",
+                "note": "Analysis proceeding with general ASC 606 knowledge"
+            }
+        
+        doc_count = stats.get("document_count", 0)
+        return {
+            "standard": "ASC 606 Revenue Recognition",
+            "documents": f"{doc_count:,} guidance documents" if doc_count else "guidance documents",
+            "status": "Active",
+            "note": "Analysis based on current ASC 606 authoritative and interpretive guidance"
+        }
     
     def is_available(self) -> bool:
         """Check if knowledge base is available."""

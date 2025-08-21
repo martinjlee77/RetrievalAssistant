@@ -207,10 +207,10 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         memo_generator.display_memo(memo_content)
 
-        # Display knowledge base stats if available
+        # Display knowledge base info if available
         if knowledge_search.is_available():
-            kb_stats = knowledge_search.get_knowledge_base_stats()
-            ui.display_knowledge_base_stats(kb_stats)
+            kb_info = knowledge_search.get_user_kb_info()
+            ui.display_knowledge_base_stats(kb_info)
 
     except Exception as e:
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
