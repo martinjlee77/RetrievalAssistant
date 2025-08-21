@@ -4,7 +4,6 @@ ASC 606 Knowledge Search
 This module provides ASC 606 specific knowledge base search functionality.
 Simple wrapper around the shared knowledge base for ASC 606 authoritative guidance.
 
-Author: Accounting Platform Team
 """
 
 import logging
@@ -128,27 +127,112 @@ class ASC606KnowledgeSearch:
         # Step-specific term extraction
         if step_number == 1:
             # Contract formation terms
-            terms = ['agreement', 'contract', 'binding', 'enforceable', 'signature', 'execution']
+            terms = [
+                # Approval and commitment (25-1a)
+                'approve', 'approval', 'commit', 'commitment', 'agreement', 'contract', 'accept', 'acceptance',
+                'signature', 'signed', 'execute', 'execution', 'effective', 'binding', 'enforceable',
+
+                # Rights and obligations (25-1b)
+                'rights', 'obligations', 'responsibilities', 'duties', 'promise', 'promises', 'obligate',
+
+                # Payment terms (25-1c)
+                'payment', 'pay', 'fee', 'fees', 'consideration', 'price', 'payment terms', 'payment schedule',
+                'invoice', 'billing', 'remittance',
+
+                # Commercial substance (25-1d)
+                'commercial', 'substance', 'economic', 'business purpose', 'arm\'s length',
+
+                # Collectibility (25-1e)
+                'collect', 'collectibility', 'ability to pay', 'credit', 'payment ability', 'financial ability',
+                'creditworthiness', 'solvency' 
+            ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 2:
             # Performance obligation terms
-            terms = ['software', 'hardware', 'services', 'license', 'implementation', 'support', 'maintenance', 'training']
+            terms = [
+                # Promised goods and services
+                'software', 'hardware', 'services', 'service', 'license', 'licensing', 'implementation',
+                'support', 'maintenance', 'training', 'consulting', 'development', 'customization',
+                'installation', 'configuration', 'updates', 'upgrades', 'warranty',
+
+                # Distinctness criteria (25-19, 25-21)
+                'distinct', 'separate', 'separately', 'independent', 'standalone', 'bundled', 'package',
+                'capable', 'benefit', 'identifiable', 'interdependent', 'interrelated', 'dependent',
+
+                # Customer options/material rights (25-20)
+                'option', 'options', 'renewal', 'extension', 'upgrade', 'discount', 'future services',
+                'material right', 'additional goods', 'additional services'              
+            ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 3:
             # Transaction price terms
-            terms = ['fee', 'price', 'payment', 'bonus', 'penalty', 'discount', 'variable', 'milestone']
+            terms = [
+                # Fixed consideration
+                'fee', 'fees', 'price', 'fixed price', 'fixed fee', 'base price', 'base fee',
+
+                # Variable consideration (32-5 to 32-14)
+                'variable', 'bonus', 'penalty', 'discount', 'rebate', 'credit', 'incentive',
+                'contingent', 'performance-based', 'usage-based', 'milestone', 'threshold',
+
+                # Financing components (32-15 to 32-20)
+                'financing', 'interest', 'payment terms', 'payment schedule', 'installment',
+                'deferred payment', 'time value', 'present value',
+
+                # Noncash consideration (32-21 to 32-25)
+                'noncash', 'non-cash', 'goods', 'services', 'equity', 'stock', 'shares', 'barter',
+
+                # Consideration to customer (32-26 to 32-27)
+                'refund', 'credit', 'reimbursement', 'cash back', 'customer credit'     
+            ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 4:
             # Allocation terms
-            terms = ['allocation', 'standalone', 'bundle', 'package', 'separate', 'individual']
+            terms = [
+                # Allocation concepts
+                'allocation', 'allocate', 'distribution', 'proportion', 'proportional', 'split',
+
+                # Standalone selling price (32-31 to 32-34)
+                'standalone', 'selling price', 'market price', 'list price', 'historical price',
+                'observed price', 'estimated price', 'cost-plus', 'margin',
+
+                # Allocation methodology
+                'relative', 'proportionate', 'percentage', 'ratio', 'weighted',
+
+                # Discount allocation (32-36)
+                'discount', 'discount allocation', 'bundle discount', 'package discount',
+
+                # Performance obligations
+                'obligation', 'obligations', 'deliverable', 'deliverables', 'component', 'elements'
+
+                
+            ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 5:
             # Recognition terms
-            terms = ['delivery', 'completion', 'milestone', 'progress', 'acceptance', 'installation']
+            terms = [
+
+                # Timing concepts
+                'delivery', 'completion', 'shipment', 'shipping', 'installation', 'acceptance',
+                'go-live', 'live', 'deployment', 'implementation',
+
+                # Over time vs. point in time (25-27)
+                'over time', 'point in time', 'time-based', 'event-based', 'milestone', 'phases',
+                'progress', 'percentage of completion',
+
+                # Control transfer (25-30)
+                'control', 'transfer', 'customer control', 'risk of loss', 'benefits', 'direct',
+                'obligation', 'performance obligation',
+
+                # Progress measurement (25-31 to 25-33)
+                'progress', 'completion', 'input method', 'output method', 'cost-to-cost',
+                'efforts-expended', 'units-of-delivery', 'units-of-production'
+
+                
+            ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
         
         # Limit to most relevant terms to avoid overly long queries
