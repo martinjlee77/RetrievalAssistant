@@ -28,7 +28,7 @@ class ASC606StepAnalyzer:
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        self.model = "gpt-5"  # Premium model for complex accounting analysis
+        self.model = "gpt-4o"  # Reliable model until GPT-5 reasoning token issue resolved
         
         # Load step prompts
         self.step_prompts = self._load_step_prompts()
@@ -120,7 +120,7 @@ class ASC606StepAnalyzer:
                     }
                 ],
                 response_format={"type": "text"},  # Required for GPT-5 to return text content
-                max_completion_tokens=2000
+                max_completion_tokens=4000  # Higher limit for GPT-5 reasoning + output tokens
             )
             
             analysis_text = response.choices[0].message.content
