@@ -179,10 +179,10 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         # Generate final memo
         with progress_placeholder:
-            st.subheader("📋 Generating Professional Memo")
+            st.subheader("📋 Analyzing and generating a memo...")
             ui.analysis_progress(steps, 6)
 
-        with st.spinner("Generating memo..."):
+        with st.spinner("Analyzing and generating a memo..."):
             # Generate memo with validated inputs
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
@@ -195,7 +195,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         # Display final memo
         progress_placeholder.empty()
-        st.success("✅ Analysis completed successfully!")
+        st.success("✅ Work is completed successfully!")
 
         memo_generator.display_memo(memo_content)
 
@@ -205,36 +205,8 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             ui.display_knowledge_base_stats(kb_stats)
 
     except Exception as e:
-        st.error(f"Analysis failed: {str(e)}")
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 606 analysis error: {str(e)}")
-
-
-def display_step_results(step_num: int, step_result: Dict[str, str]):
-    """Display results for a single step analysis."""
-
-    step_title = step_result.get('title', f'Step {step_num}')
-
-    with st.expander(f"📋 {step_title}", expanded=True):
-
-        # Analysis section
-        if step_result.get('analysis'):
-            st.markdown("**Analysis:**")
-            st.markdown(step_result['analysis'])
-            st.markdown("---")
-
-        # Conclusion section
-        if step_result.get('conclusion'):
-            st.markdown("**Conclusion:**")
-            st.markdown(step_result['conclusion'])
-
-        # Issues section
-        if step_result.get('issues') and step_result['issues'].strip():
-            if 'none' not in step_result['issues'].lower(
-            ) and 'not applicable' not in step_result['issues'].lower():
-                st.markdown("---")
-                st.markdown("**Issues/Uncertainties:**")
-                st.markdown(step_result['issues'])
-
 
 def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
                       analysis_title: str) -> Dict[str, Any]:
