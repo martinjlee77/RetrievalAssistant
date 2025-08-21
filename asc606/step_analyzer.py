@@ -215,12 +215,12 @@ You will analyze contracts step-by-step following ASC 606 methodology. For each 
 When contract information is ambiguous or missing, acknowledge this and state your analytical approach.
 
 FORMATTING REQUIREMENTS:
-- Use proper paragraph breaks (double line breaks between paragraphs)
+- Write in narrative paragraph style, avoid excessive bullet points
 - Format ALL currency as $XXX,XXX (ALWAYS include $ symbol, no spaces in numbers)
-- Use consistent bullet points with dashes (-)
+- Use bullet points ONLY for lists of 3+ distinct items
 - Separate analysis from conclusions with clear section headers
 - Keep sentences concise and professional
-- Use numbered lists for sequential items
+- Use numbered lists only for sequential steps
 - Always include spaces after commas and periods
 - Never concatenate words together
 - Write dates with proper spacing (e.g., "October 26, 2023")"""
@@ -329,10 +329,9 @@ RESPONSE FORMAT:
 Provide your analysis in the following structure:
 
 **ANALYSIS:**
-[Use bullet points and proper spacing:]
-- Key finding one because [reasoning]
-- Key finding two because [reasoning]  
-- Financial amounts in $XXX,XXX format
+[Write in narrative paragraph format with proper spacing. Use bullet points ONLY for lists of 3+ distinct items. Focus on flowing prose with professional reasoning.]
+
+[Example: The contract demonstrates clear approval because both parties signed the document, establishing mutual commitment per ASC 606-10-25-1(a). Payment terms are explicitly outlined with specific amounts and due dates, satisfying the identification requirements.]
 
 [Double line breaks between paragraphs]
 
@@ -340,18 +339,18 @@ Provide your analysis in the following structure:
 [2-3 clear sentences with proper spacing]
 
 **ISSUES OR UNCERTAINTIES:**
-[Use bullet point format if any issues exist]
+[Use bullet point format ONLY if multiple distinct issues exist]
 
 FORMATTING REQUIREMENTS:
-- Use proper paragraph breaks (double line breaks)
+- Write in narrative paragraph style, not bullet lists
 - Format ALL currency as $XXX,XXX (NEVER write numbers without $ symbol)
-- Use bullet points (-) for all lists
-- Keep paragraphs under 3 sentences
+- Use bullet points ONLY for lists of 3+ distinct items
+- Keep paragraphs under 3 sentences each
 - Quote specific contract language as evidence
 - Cite relevant ASC 606 paragraphs  
 - Use "because" statements to show reasoning
 - Always include spaces after commas and periods
-- Never concatenate words together (e.g., avoid "withthepotential")
+- Never concatenate words together
 - Write dates with proper spacing (e.g., "October 26, 2023")
 """
         
@@ -499,9 +498,9 @@ Step Conclusions:
 {conclusions_text}
 
 Requirements:
-1. Write 3-5 sentences with proper paragraph breaks
-2. Format all currency as $XXX,XXX (no spaces in numbers)
-3. Use professional accounting language
+1. Write 3-5 sentences in flowing narrative paragraphs
+2. Format all currency as $XXX,XXX (no spaces in numbers)  
+3. Use professional accounting language without excessive bullet points
 4. Include specific number of performance obligations identified
 5. State compliance conclusion clearly
 6. Highlight any significant findings or issues
@@ -553,11 +552,11 @@ Step Conclusions:
 {conclusions_text}
 
 Instructions:
-1. Write 2-3 sentences assessing ASC 606 compliance
+1. Write 2-3 sentences in narrative paragraph format assessing ASC 606 compliance
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Be direct - if there are concerns, state them clearly
 4. Focus on compliance assessment
-5. Use professional accounting language
+5. Use professional accounting language without bullet points
 6. Use proper paragraph spacing
 7. ALWAYS format currency with $ symbol
 8. Include proper spacing after commas and periods"""
