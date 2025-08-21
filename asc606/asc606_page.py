@@ -194,7 +194,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             # Generate memo with validated inputs
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
-                                          analysis_title, analyzer, additional_context)
+                                          analysis_title, analyzer)
             memo_content = memo_generator.generate_memo(
                 memo_data=memo_data,
                 customer_name=customer_name,
@@ -217,7 +217,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         logger.error(f"ASC 606 analysis error: {str(e)}")
 
 def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
-                      analysis_title: str, step_analyzer, additional_context: str = "") -> Dict[str, Any]:
+                      analysis_title: str, step_analyzer) -> Dict[str, Any]:
     """Prepare analysis results for memo generation."""
 
     # Build analysis section with all steps
@@ -244,11 +244,11 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
         'analysis_content':
         "\n".join(analysis_content),
         'executive_summary':
-        step_analyzer.generate_executive_summary(analysis_results, customer_name, additional_context),
+        step_analyzer.generate_executive_summary(analysis_results, customer_name),
         'conclusion':
-        step_analyzer.generate_final_conclusion(analysis_results, additional_context),
+        step_analyzer.generate_final_conclusion(analysis_results),
         'background_section':
-        step_analyzer.generate_background_section(analysis_results, customer_name, additional_context),
+        step_analyzer.generate_background_section(analysis_results, customer_name),
 
     }
 

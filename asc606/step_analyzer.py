@@ -390,7 +390,7 @@ Remember to:
         }
         return titles.get(step_num, f"Step {step_num}")
     
-    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str, additional_context: str = "") -> str:
+    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
         """Generate LLM-powered executive summary from analysis results."""
         
         # Extract conclusions from each step
@@ -405,12 +405,7 @@ Remember to:
         prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
 
 Step Conclusions:
-{conclusions_text}"""
-        
-        if additional_context.strip():
-            prompt += f"\nAdditional Context: {additional_context}"
-        
-        prompt += """
+{conclusions_text}
 
 Requirements:
 1. Write a 3-5 sentence executive summary
@@ -444,7 +439,7 @@ Requirements:
             # Fallback to simple summary
             return f"We have completed a comprehensive ASC 606 analysis for {customer_name}. Please review the detailed step-by-step analysis for specific findings and conclusions."
     
-    def generate_final_conclusion(self, analysis_results: Dict[str, Any], additional_context: str = "") -> str:
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
         
         # Extract conclusions from each step
@@ -459,12 +454,7 @@ Requirements:
         prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
 
 Step Conclusions:
-{conclusions_text}"""
-        
-        if additional_context.strip():
-            prompt += f"\nAdditional Context: {additional_context}"
-        
-        prompt += """
+{conclusions_text}
 
 Instructions:
 1. Write 2-3 sentences assessing ASC 606 compliance
@@ -498,7 +488,7 @@ Instructions:
             # Fallback to simple conclusion
             return "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition treatment is appropriate and complies with the authoritative guidance."
     
-    def generate_background_section(self, analysis_results: Dict[str, Any], customer_name: str, additional_context: str = "") -> str:
+    def generate_background_section(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
         """Generate LLM-powered background section from analysis results."""
         
         # Extract key conclusions for contract overview
@@ -514,12 +504,7 @@ Instructions:
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
 
 Customer: {customer_name}
-Contract Summary: {conclusions_text}"""
-        
-        if additional_context.strip():
-            prompt += f"\nAdditional Context: {additional_context}"
-        
-        prompt += """
+Contract Summary: {conclusions_text}
 
 Instructions:
 1. Describe what type of contract/arrangement was reviewed (high-level)
