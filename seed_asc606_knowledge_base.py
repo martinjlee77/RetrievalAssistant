@@ -16,6 +16,7 @@ import sys
 import logging
 import chromadb
 from chromadb.config import Settings
+from chromadb.utils import embedding_functions
 from typing import List, Dict, Any
 import re
 
@@ -68,9 +69,20 @@ class ASC606KnowledgeBaseSeeder:
         except Exception:
             pass
         
-        # Create new collection
+        # Initialize OpenAI embedding function (same as knowledge base)
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        if not openai_api_key:
+            raise ValueError("OPENAI_API_KEY environment variable not set")
+            
+        embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+            api_key=openai_api_key,
+            model_name="text-embedding-3-small"
+        )
+        
+        # Create new collection with OpenAI embeddings
         self.collection = self.client.create_collection(
             name=self.collection_name,
+            embedding_function=embedding_function,
             metadata={"description": "ASC 606 Revenue Recognition Authoritative Guidance"}
         )
         

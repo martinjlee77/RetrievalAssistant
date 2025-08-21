@@ -144,7 +144,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                 ui = SharedUIComponents()
             except RuntimeError as e:
                 st.error(f"❌ Critical Error: {str(e)}")
-                st.error("Please ensure the ASC 606 knowledge base has been properly seeded.")
+                st.error("ASC 606 knowledge base is not available. Try again and contact support if this persists.")
                 st.stop()
                 return
 
