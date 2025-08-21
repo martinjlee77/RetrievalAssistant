@@ -212,7 +212,15 @@ You will analyze contracts step-by-step following ASC 606 methodology. For each 
 3. Explicit reasoning connecting evidence to conclusions
 4. Professional conclusion for the step
 
-When contract information is ambiguous or missing, acknowledge this and state your analytical approach."""
+When contract information is ambiguous or missing, acknowledge this and state your analytical approach.
+
+FORMATTING REQUIREMENTS:
+- Use proper paragraph breaks (double line breaks between paragraphs)
+- Format currency as $XXX,XXX (no spaces in numbers)
+- Use consistent bullet points with dashes (-)
+- Separate analysis from conclusions with clear section headers
+- Keep sentences concise and professional
+- Use numbered lists for sequential items"""
     
     def _get_step_prompt(self, 
                         step_num: int,
@@ -318,19 +326,27 @@ RESPONSE FORMAT:
 Provide your analysis in the following structure:
 
 **ANALYSIS:**
-[Detailed analysis with contract evidence, ASC 606 citations, and explicit "because" reasoning]
+[Use bullet points and proper spacing:]
+- Key finding one because [reasoning]
+- Key finding two because [reasoning]  
+- Financial amounts in $XXX,XXX format
+
+[Double line breaks between paragraphs]
 
 **CONCLUSION:**
-[Clear, definitive conclusion for this step]
+[2-3 clear sentences with proper spacing]
 
 **ISSUES OR UNCERTAINTIES:**
-[Any areas requiring further investigation or clarification]
+[Use bullet point format if any issues exist]
 
-Remember to:
+FORMATTING REQUIREMENTS:
+- Use proper paragraph breaks (double line breaks)
+- Format all currency as $XXX,XXX (no spaces between digits)
+- Use bullet points (-) for all lists
+- Keep paragraphs under 3 sentences
 - Quote specific contract language as evidence
 - Cite relevant ASC 606 paragraphs  
 - Use "because" statements to show reasoning
-- Acknowledge any information gaps or ambiguities
 """
         
         return prompt
@@ -460,10 +476,13 @@ Step Conclusions:
 {conclusions_text}
 
 Requirements:
-1. Write a 3-5 sentence executive summary
-2. Highlight any significant findings or issues  
-3. State whether the proposed accounting treatment is consistent with ASC 606
-4. Use professional accounting language"""
+1. Write 3-5 sentences with proper paragraph breaks
+2. Format all currency as $XXX,XXX (no spaces in numbers)
+3. Use professional accounting language
+4. Include specific number of performance obligations identified
+5. State compliance conclusion clearly
+6. Highlight any significant findings or issues
+7. Use double line breaks between paragraphs for readability"""
 
         # Call LLM API
         try:
@@ -510,9 +529,11 @@ Step Conclusions:
 
 Instructions:
 1. Write 2-3 sentences assessing ASC 606 compliance
-2. Be direct - if there are concerns, state them clearly
-3. Focus on compliance assessment
-4. Use professional accounting language"""
+2. Format all currency as $XXX,XXX (no spaces in numbers)
+3. Be direct - if there are concerns, state them clearly
+4. Focus on compliance assessment
+5. Use professional accounting language
+6. Use proper paragraph spacing"""
 
         # Call LLM API
         try:

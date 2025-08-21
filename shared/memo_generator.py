@@ -53,9 +53,12 @@ class SharedMemoGenerator:
             # Load template
             template = self._load_template()
             
+            # Clean content formatting before template processing
+            cleaned_memo_data = self._clean_memo_data_formatting(memo_data)
+            
             # Prepare template variables
             template_vars = self._prepare_template_variables(
-                memo_data, customer_name, analysis_title, standard_name
+                cleaned_memo_data, customer_name, analysis_title, standard_name
             )
             
             # Replace template placeholders
@@ -257,6 +260,47 @@ class SharedMemoGenerator:
         """Extract step number from key."""
         match = re.search(r'step\s*(\d+)', key.lower())
         return match.group(1) if match else None
+    
+    def _clean_memo_data_formatting(self, memo_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Clean common LLM formatting issues in memo data."""
+        cleaned_data = memo_data.copy()
+        
+        # Content fields that need cleaning
+        content_fields = ['analysis_content', 'executive_summary', 'conclusion', 
+                         'background_section', 'analysis_section']
+        
+        for field in content_fields:
+            if field in cleaned_data and cleaned_data[field]:
+                cleaned_data[field] = self._clean_content_formatting(cleaned_data[field])
+        
+        return cleaned_data
+    
+    def _clean_content_formatting(self, content: str) -> str:
+        """Clean common LLM formatting issues."""
+        if not content:
+            return content
+            
+        # Fix currency formatting ($XXX, XXX -> $XXX,XXX)
+        content = re.sub(r'\$(\d+),\s*(\d+)', r'$\1,\2', content)
+        
+        # Fix text run-together issues (common LLM problem)
+        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
+        
+        # Fix number formatting with extra spaces
+        content = re.sub(r'(\d+),\s+(\d+)', r'\1,\2', content)
+        
+        # Ensure proper paragraph spacing (no triple+ line breaks)
+        content = re.sub(r'\n\n\n+', '\n\n', content)
+        
+        # Fix bullet point consistency (* or + -> -)
+        content = re.sub(r'^[\*\+]\s', '- ', content, flags=re.MULTILINE)
+        
+        # Fix common text corruption patterns
+        content = re.sub(r'peryear', 'per year', content)
+        content = re.sub(r'f orthreeyears', 'for three years', content)
+        content = re.sub(r'f romthe', 'from the', content)
+        
+        return content.strip()
     
     def _replace_template_placeholders(self, template: str, variables: Dict[str, str]) -> str:
         """Replace all template placeholders with actual values."""
