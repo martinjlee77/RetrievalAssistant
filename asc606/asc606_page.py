@@ -211,6 +211,13 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                     additional_context=additional_context)
 
                 analysis_results[f'step_{step_num}'] = step_result
+                logger.info(f"DEBUG: Stored step {step_num} result with keys: {list(step_result.keys()) if isinstance(step_result, dict) else 'Not a dict'}")
+                
+                # Debug: Print the actual markdown content
+                if isinstance(step_result, dict) and 'markdown_content' in step_result:
+                    logger.info(f"DEBUG: Step {step_num} markdown content preview: {step_result['markdown_content'][:200]}...")
+                else:
+                    logger.error(f"ERROR: Step {step_num} missing markdown_content! Keys: {list(step_result.keys()) if isinstance(step_result, dict) else 'Not a dict'}")
 
         # Generate final memo
         with progress_placeholder:

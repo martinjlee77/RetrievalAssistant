@@ -342,12 +342,27 @@ class SharedMemoGenerator:
         ])
         
         # Add each step's markdown content
-        steps = analysis_results.get('steps', {})
+        logger.info(f"DEBUG: Analysis results keys: {list(analysis_results.keys())}")
+        
+        steps_added = 0
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
-            if step_key in steps and 'markdown_content' in steps[step_key]:
-                memo_parts.append(steps[step_key]['markdown_content'])
-                memo_parts.append("")
+            if step_key in analysis_results:
+                step_data = analysis_results[step_key]
+                logger.info(f"DEBUG: Step {step_num} data keys: {list(step_data.keys()) if isinstance(step_data, dict) else 'Not a dict'}")
+                
+                if isinstance(step_data, dict) and 'markdown_content' in step_data:
+                    memo_parts.append(step_data['markdown_content'])
+                    memo_parts.append("")
+                    steps_added += 1
+                    logger.info(f"DEBUG: Added step {step_num} markdown content ({len(step_data['markdown_content'])} chars)")
+                else:
+                    logger.warning(f"Step {step_num} missing markdown_content - Keys: {list(step_data.keys()) if isinstance(step_data, dict) else 'Not dict'}")
+                    memo_parts.append(f"## Step {step_num}: Analysis Error")
+                    memo_parts.append("Step analysis data not available in expected format.")
+                    memo_parts.append("")
+        
+        logger.info(f"DEBUG: Total steps added to memo: {steps_added}/5")
         
         # Add conclusion if available
         if 'conclusion' in analysis_results:
