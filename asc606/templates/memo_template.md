@@ -33,6 +33,4 @@ We have reviewed the contract documents provided by {customer_name} to determine
 
 ---
 
-{issues_section}
-
 *This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.*

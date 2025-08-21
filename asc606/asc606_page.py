@@ -239,8 +239,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
         step_analyzer.generate_executive_summary(analysis_results, customer_name),
         'conclusion':
         step_analyzer.generate_final_conclusion(analysis_results),
-        'issues_for_investigation':
-        collect_all_issues(analysis_results)
+
     }
 
     return memo_data
@@ -252,28 +251,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
 # Final conclusion generation moved to ASC606StepAnalyzer class
 
 
-def collect_all_issues(analysis_results: Dict[str, Any]) -> List[str]:
-    """Collect all issues from step analyses."""
-
-    all_issues = []
-
-    for step_key, step_data in analysis_results.items():
-        if isinstance(step_data, dict) and step_data.get('issues'):
-            issues_text = step_data['issues'].strip()
-            if issues_text and 'none' not in issues_text.lower(
-            ) and 'not applicable' not in issues_text.lower():
-                step_num = step_key.split('_')[1]
-                all_issues.append(f"Step {step_num}: {issues_text}")
-
-    # Add standard issues if none found
-    if not all_issues:
-        all_issues = [
-            "Validate completeness of contract documentation and any amendments",
-            "Confirm implementation timeline and system capability requirements",
-            "Review final accounting treatment with external auditors prior to implementation"
-        ]
-
-    return all_issues
+# Issues collection removed - issues are already included in individual step analyses
 
 
 # Configure logging
