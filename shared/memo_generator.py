@@ -167,13 +167,13 @@ class SharedMemoGenerator:
     
     def _extract_background_section(self, memo_data: Dict[str, Any], customer_name: str) -> str:
         """Extract or generate background section."""
-        background = f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate accounting treatment. "
-        
-        # Add any contract specifics if available
-        if 'contract_description' in memo_data:
-            background += memo_data['contract_description']
-        else:
-            background += "The analysis focuses on the key accounting considerations and judgments required."
+        # Clean customer name to prevent contract text bleeding through
+        clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
+        if len(clean_customer_name) > 100:  # Likely contract text, not a customer name
+            clean_customer_name = "the client"
+            
+        background = f"We have reviewed the contract documents provided by {clean_customer_name} to determine the appropriate revenue recognition treatment under ASC 606. "
+        background += "This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation."
             
         return background
     
@@ -225,19 +225,30 @@ class SharedMemoGenerator:
         if 'uncertainties' in memo_data:
             issues.extend(memo_data['uncertainties'])
         
-        # If no specific issues, create default
+        # Only show issues section if there are real issues
         if not issues:
-            issues = [
-                "Validate the completeness of contract documentation reviewed",
-                "Confirm implementation timeline and system capability requirements",
-                "Review final accounting treatment with external auditors prior to implementation"
-            ]
+            return ""  # Return empty string to hide the section
         
-        # Format as professional list
-        formatted_issues = []
-        for i, issue in enumerate(issues, 1):
-            formatted_issues.append(f"{i}. {issue.strip()}")
+        # Filter out generic/default issues
+        real_issues = []
+        for issue in issues:
+            issue_lower = issue.lower().strip()
+            if not any(generic in issue_lower for generic in [
+                'validate completeness', 'confirm implementation', 
+                'review final accounting', 'external auditor', 'validate the completeness'
+            ]):
+                real_issues.append(issue.strip())
         
+        # If only generic issues remain, don't show section
+        if not real_issues:
+            return ""
+            
+        # Format as professional list with section header
+        formatted_issues = ["## ISSUES FOR FURTHER INVESTIGATION", "", "The following items require additional review or clarification:", ""]
+        for i, issue in enumerate(real_issues, 1):
+            formatted_issues.append(f"{i}. {issue}")
+        
+        formatted_issues.extend(["", "---"])
         return "\n".join(formatted_issues)
     
     def _extract_step_number(self, key: str) -> Optional[str]:
