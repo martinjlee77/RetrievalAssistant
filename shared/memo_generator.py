@@ -301,9 +301,11 @@ class SharedMemoGenerator:
     
     def combine_markdown_steps(self, analysis_results: Dict[str, Any]) -> str:
         """Combine markdown step results into complete memo."""
-        customer_name = analysis_results.get('customer_name', 'Unknown')
+        
+        # Set defaults with fallbacks
+        customer_name = analysis_results.get('customer_name', 'Customer')
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
-        analysis_date = analysis_results.get('analysis_date', datetime.now().strftime("%B %d, %Y"))
+        analysis_date = datetime.now().strftime("%B %d, %Y")
         
         # Build memo header
         memo_parts = [
