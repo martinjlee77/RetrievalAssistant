@@ -3,8 +3,6 @@ ASC 606 Step Analyzer
 
 This module handles the 5-step ASC 606 revenue recognition analysis.
 Simplified, natural language approach with clear reasoning chains.
-
-Author: Accounting Platform Team
 """
 
 import openai
@@ -31,14 +29,15 @@ class ASC606StepAnalyzer:
         # Model selection: Change "gpt-4o" to "gpt-5" for premium analysis
         self.model = "gpt-4o"
         
-        # Load step prompts
+        # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
     
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
                         customer_name: str,
-                        analysis_title: str) -> Dict[str, Any]:
+                        analysis_title: str,
+                        additional_context: str = "") -> Dict[str, Any]:
         """
         Perform complete 5-step ASC 606 analysis.
         
@@ -47,6 +46,7 @@ class ASC606StepAnalyzer:
             authoritative_context: Retrieved ASC 606 guidance
             customer_name: Customer name
             analysis_title: Analysis title
+            additional_context: Optional user-provided context
             
         Returns:
             Dictionary containing analysis results for each step
@@ -69,7 +69,8 @@ class ASC606StepAnalyzer:
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name
+                    customer_name=customer_name,
+                    additional_context=additional_context
                 )
                 
                 results['steps'][f'step_{step_num}'] = step_result
@@ -507,7 +508,7 @@ Customer: {customer_name}
 Contract Summary: {conclusions_text}
 
 Instructions:
-1. Describe what type of contract/arrangement was reviewed (high-level)
+1. Describe what type of arrangement was reviewed (high-level)
 2. Mention key contract elements (SaaS, hardware, services, etc.) if evident
 3. State the purpose of the ASC 606 analysis
 4. Professional accounting language
