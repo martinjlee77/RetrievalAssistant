@@ -28,8 +28,8 @@ class ASC606StepAnalyzer:
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        # Model selection: GPT-4o for development, GPT-5 for production
-        self.model = os.getenv("ASC606_MODEL", "gpt-4o")  # Default to GPT-4o, set ASC606_MODEL=gpt-5 for production
+        # Model selection: Change "gpt-4o" to "gpt-5" for premium analysis
+        self.model = "gpt-4o"
         
         # Load step prompts
         self.step_prompts = self._load_step_prompts()
@@ -108,9 +108,10 @@ class ASC606StepAnalyzer:
         # Make API call
         try:
             logger.info(f"DEBUG: Making API call to {self.model} for Step {step_num}")
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Build request parameters
+            request_params = {
+                "model": self.model,
+                "messages": [
                     {
                         "role": "system",
                         "content": self._get_system_prompt()
@@ -120,9 +121,14 @@ class ASC606StepAnalyzer:
                         "content": prompt
                     }
                 ],
-                response_format={"type": "text"} if self.model.startswith("gpt-5") else {},  # Required for GPT-5
-                max_completion_tokens=8000 if self.model.startswith("gpt-5") else 2000  # Higher for GPT-5 reasoning
-            )
+                "max_completion_tokens": 8000 if self.model == "gpt-5" else 2000
+            }
+            
+            # Add response_format only for GPT-5
+            if self.model == "gpt-5":
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
             
             analysis_text = response.choices[0].message.content
             
