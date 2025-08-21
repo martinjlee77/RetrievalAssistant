@@ -23,9 +23,9 @@ class ASC606StepAnalyzer:
     
     def __init__(self):
         """Initialize the analyzer."""
-        # Set up OpenAI client
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        if not openai.api_key:
+        # Set up OpenAI client  
+        self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
         self.model = "gpt-5"  # Premium model for complex accounting analysis
@@ -106,7 +106,8 @@ class ASC606StepAnalyzer:
         
         # Make API call
         try:
-            response = openai.chat.completions.create(
+            logger.info(f"DEBUG: Making API call to {self.model} for Step {step_num}")
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
                     {
@@ -121,7 +122,18 @@ class ASC606StepAnalyzer:
                 max_completion_tokens=2000
             )
             
-            analysis_text = response.choices[0].message.content.strip()
+            analysis_text = response.choices[0].message.content
+            
+            # Debug: Log the full response
+            logger.info(f"DEBUG: Full API response for Step {step_num}: {response}")
+            logger.info(f"DEBUG: Response content type: {type(analysis_text)}")
+            logger.info(f"DEBUG: Response content is None: {analysis_text is None}")
+            
+            if analysis_text is None:
+                logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
+                analysis_text = f"Error: GPT-5 returned empty response for Step {step_num}. Please try with GPT-4o instead."
+            else:
+                analysis_text = analysis_text.strip()
             
             # Parse the natural language response
             return self._parse_step_response(step_num, analysis_text)
@@ -263,7 +275,7 @@ Remember to:
         }
         
         # Log the raw response for debugging
-        logger.info(f"DEBUG: Raw AI response for Step {step_num} (first 200 chars): {response_text[:200]}")
+        logger.info(f"DEBUG: Raw AI response for Step {step_num} (length: {len(response_text)}): '{response_text[:200]}'")
         
         # More flexible parsing logic - look for common section patterns
         response_upper = response_text.upper()
@@ -337,8 +349,12 @@ Remember to:
         
         # Last resort: put everything in analysis if parsing failed
         if not result['analysis'] and not result['conclusion']:
-            result['analysis'] = response_text.strip()
-            result['conclusion'] = "Analysis completed. See detailed reasoning above."
+            if response_text and response_text.strip():
+                result['analysis'] = response_text.strip()
+                result['conclusion'] = "Analysis completed. See detailed reasoning above."
+            else:
+                result['analysis'] = "ERROR: Empty response received from AI model. This may indicate a problem with GPT-5 compatibility."
+                result['conclusion'] = "Unable to complete analysis due to empty AI response."
         
         logger.info(f"DEBUG: Parsed Step {step_num} - Analysis length: {len(result['analysis'])}, Conclusion length: {len(result['conclusion'])}")
         
