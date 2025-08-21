@@ -40,7 +40,7 @@ class ASC606KnowledgeSearch:
             Formatted authoritative guidance context
         """
         if not self.knowledge_base:
-            return "Knowledge base not available. Analysis will proceed with general ASC 606 knowledge."
+            return self._get_fallback_guidance(step_number)
         
         try:
             # Create step-specific search query
@@ -168,3 +168,56 @@ class ASC606KnowledgeSearch:
     def is_available(self) -> bool:
         """Check if knowledge base is available."""
         return self.knowledge_base is not None
+    
+    def _get_fallback_guidance(self, step_number: int) -> str:
+        """Provide fallback ASC 606 guidance when knowledge base is unavailable."""
+        step_guidance = {
+            1: """Step 1: Identify the Contract with a Customer
+Key considerations:
+- Legal enforceability under relevant law  
+- Commercial substance (parties are committed to perform)
+- Approved contract and commitment of parties to perform obligations
+- Payment terms are identified
+- Collection is probable (customer has ability and intention to pay)
+
+Assess whether the arrangement meets the definition of a contract under ASC 606-10-25-1.""",
+            
+            2: """Step 2: Identify the Performance Obligations in the Contract  
+Key considerations:
+- Promise to transfer goods or services that are distinct
+- Distinct = capable of being distinct AND distinct within context of contract
+- Capable of being distinct: customer can benefit from good/service on its own
+- Distinct within context: promise is separately identifiable from other promises
+
+Apply ASC 606-10-25-14 through 25-22 to identify distinct performance obligations.""",
+            
+            3: """Step 3: Determine the Transaction Price
+Key considerations:  
+- Amount of consideration expected to be entitled to in exchange for goods/services
+- Variable consideration and constraint (ASC 606-10-32-11)
+- Significant financing component (ASC 606-10-32-15)
+- Noncash consideration (ASC 606-10-32-21)
+- Consideration payable to customer (ASC 606-10-32-25)
+
+Calculate total transaction price per ASC 606-10-32-2 through 32-27.""",
+            
+            4: """Step 4: Allocate the Transaction Price to Performance Obligations
+Key considerations:
+- Relative standalone selling price approach (ASC 606-10-32-31)
+- Standalone selling price estimation methods when not observable
+- Allocation of discounts and variable consideration
+- Contract modifications affecting allocation
+
+Allocate transaction price per ASC 606-10-32-28 through 32-41.""",
+            
+            5: """Step 5: Recognize Revenue When Performance Obligations are Satisfied
+Key considerations:
+- Control transfer to customer (ASC 606-10-25-23)
+- Over time vs. point in time recognition (ASC 606-10-25-27)
+- Over time criteria: customer benefits, customer controls, no alternative use + enforceable payment right
+- Measure progress for over time recognition (output vs. input methods)
+
+Recognize revenue per ASC 606-10-25-23 through 25-37."""
+        }
+        
+        return step_guidance.get(step_number, "Step guidance not available.")

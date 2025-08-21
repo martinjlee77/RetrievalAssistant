@@ -144,7 +144,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         # Display progress
         steps = [
-            "Contract Review", "Step 1", "Step 2", "Step 3", "Step 4",
+            "Document Review", "Step 1", "Step 2", "Step 3", "Step 4",
             "Step 5", "Memo Generation"
         ]
         progress_placeholder = st.empty()
