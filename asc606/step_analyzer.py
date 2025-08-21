@@ -84,7 +84,7 @@ class ASC606StepAnalyzer:
                 }
         
         # Generate overall analysis summary
-        results['executive_summary'] = self._generate_executive_summary(results)
+        results['executive_summary'] = self.generate_executive_summary(results, customer_name)
         results['issues_for_investigation'] = self._identify_issues(results, contract_text)
         
         logger.info("ASC 606 analysis completed successfully")
@@ -379,26 +379,54 @@ Remember to:
         }
         return titles.get(step_num, f"Step {step_num}")
     
-    def _generate_executive_summary(self, results: Dict[str, Any]) -> str:
-        """Generate an executive summary based on the step analysis."""
+    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
+        """Generate LLM-powered executive summary from analysis results."""
         
-        # Extract key conclusions from each step
-        step_conclusions = []
-        for step_key, step_data in results.get('steps', {}).items():
-            if isinstance(step_data, dict) and step_data.get('conclusion'):
-                step_conclusions.append(step_data['conclusion'])
+        # Extract conclusions from each step
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
         
-        # Create a professional summary
-        summary = f"""We have completed a comprehensive ASC 606 revenue recognition analysis for {results.get('customer_name', 'the customer')}. """
-        
-        if len(step_conclusions) >= 5:
-            summary += """The analysis confirms that a valid contract exists under ASC 606, identifies the distinct performance obligations, establishes the transaction price, allocates pricing appropriately, and determines the timing of revenue recognition. """
-        else:
-            summary += """The analysis addresses the key ASC 606 requirements for revenue recognition. """
-        
-        summary += """The proposed accounting treatment is consistent with ASC 606 requirements and industry best practices."""
-        
-        return summary
+        # Build prompt
+        conclusions_text = "\n".join(conclusions)
+        prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
+
+Step Conclusions:
+{conclusions_text}
+
+Requirements:
+1. Write a 3-5 sentence executive summary
+2. Highlight any significant findings or issues  
+3. State whether the proposed accounting treatment is consistent with ASC 606
+4. Use professional accounting language"""
+
+        # Call LLM API
+        try:
+            request_params = {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
+                    },
+                    {
+                        "role": "user", 
+                        "content": prompt
+                    }
+                ],
+                "temperature": 0.2,
+                "max_completion_tokens": 200
+            }
+            
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Executive summary generation failed: {str(e)}")
+            # Fallback to simple summary
+            return f"We have completed a comprehensive ASC 606 analysis for {customer_name}. Please review the detailed step-by-step analysis for specific findings and conclusions."
     
     def _identify_issues(self, results: Dict[str, Any], contract_text: str) -> List[str]:
         """Identify issues for further investigation based on the analysis."""

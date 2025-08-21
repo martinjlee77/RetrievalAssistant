@@ -186,7 +186,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             # Generate memo with validated inputs
             
             memo_data = prepare_memo_data(analysis_results, customer_name,
-                                          analysis_title)
+                                          analysis_title, analyzer)
             memo_content = memo_generator.generate_memo(
                 memo_data=memo_data,
                 customer_name=customer_name,
@@ -209,7 +209,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         logger.error(f"ASC 606 analysis error: {str(e)}")
 
 def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
-                      analysis_title: str) -> Dict[str, Any]:
+                      analysis_title: str, step_analyzer) -> Dict[str, Any]:
     """Prepare analysis results for memo generation."""
 
     # Build analysis section with all steps
@@ -236,7 +236,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
         'analysis_content':
         "\n".join(analysis_content),
         'executive_summary':
-        generate_executive_summary(analysis_results, customer_name),
+        step_analyzer.generate_executive_summary(analysis_results, customer_name),
         'conclusion':
         generate_final_conclusion(analysis_results),
         'issues_for_investigation':
@@ -246,17 +246,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
     return memo_data
 
 
-def generate_executive_summary(analysis_results: Dict[str, Any],
-                               customer_name: str) -> str:
-    """Generate executive summary from analysis results."""
-
-    summary = f"We have completed a comprehensive ASC 606 revenue recognition analysis for {customer_name}. "
-    summary += "The analysis follows the five-step ASC 606 methodology and addresses contract identification, "
-    summary += "performance obligation determination, transaction price establishment, price allocation, "
-    summary += "and revenue recognition timing. "
-    summary += "The proposed accounting treatment is consistent with ASC 606 requirements."
-
-    return summary
+# Executive summary generation moved to ASC606StepAnalyzer class
 
 
 def generate_final_conclusion(analysis_results: Dict[str, Any]) -> str:
