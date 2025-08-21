@@ -341,7 +341,7 @@ Key considerations:
 - Over time vs. point in time recognition (ASC 606-10-25-27)
 - Over time criteria: customer benefits, customer controls, no alternative use + enforceable payment right
 - Measure progress for over time recognition (output vs. input methods)
-
+ 
 Recognize revenue per ASC 606-10-25-23 through 25-37."""
         }
         

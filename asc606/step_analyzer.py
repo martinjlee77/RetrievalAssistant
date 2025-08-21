@@ -9,6 +9,7 @@ import openai
 import os
 import logging
 import time
+import re
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -451,11 +452,19 @@ FORMATTING REQUIREMENTS:
         # Last resort: put everything in analysis if parsing failed
         if not result['analysis'] and not result['conclusion']:
             if response_text and response_text.strip():
-                result['analysis'] = response_text.strip()
+                # Apply basic formatting before storing
+                cleaned_text = self._apply_basic_formatting(response_text.strip())
+                result['analysis'] = cleaned_text
                 result['conclusion'] = "Analysis completed. See detailed reasoning above."
             else:
                 result['analysis'] = "ERROR: Empty response received from AI model. This may indicate a problem with GPT-5 compatibility."
                 result['conclusion'] = "Unable to complete analysis due to empty AI response."
+        
+        # Apply formatting to parsed sections
+        if result['analysis']:
+            result['analysis'] = self._apply_basic_formatting(result['analysis'])
+        if result['conclusion']:
+            result['conclusion'] = self._apply_basic_formatting(result['conclusion'])
         
         logger.info(f"DEBUG: Parsed Step {step_num} - Analysis length: {len(result['analysis'])}, Conclusion length: {len(result['conclusion'])}")
         
@@ -471,6 +480,25 @@ FORMATTING REQUIREMENTS:
             5: "Step 5: Recognize Revenue"
         }
         return titles.get(step_num, f"Step {step_num}")
+    
+    def _apply_basic_formatting(self, text: str) -> str:
+        """Apply essential formatting fixes to text."""
+        if not text:
+            return text
+            
+        # Fix currency formatting issues first
+        text = re.sub(r'(\d+),\s*(\d+)(?![,\d])', r'$\1,\2', text)  # 845, 000 -> $845,000
+        text = re.sub(r'\$\$+', '$', text)  # $$XXX -> $XXX
+        
+        # Fix text run-together patterns
+        text = re.sub(r'(\d+)([a-z])', r'\1 \2', text)  # 50,000f -> 50,000 f
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # wordWord -> word Word
+        
+        # Fix common spacing issues
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # Fix camelCase
+        text = re.sub(r'(\w)([A-Z][a-z])', r'\1 \2', text)  # Fix WordCase
+        
+        return text
     
     def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
         """Generate LLM-powered executive summary from analysis results."""
