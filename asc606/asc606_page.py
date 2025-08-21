@@ -238,7 +238,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
         'executive_summary':
         step_analyzer.generate_executive_summary(analysis_results, customer_name),
         'conclusion':
-        generate_final_conclusion(analysis_results),
+        step_analyzer.generate_final_conclusion(analysis_results),
         'issues_for_investigation':
         collect_all_issues(analysis_results)
     }
@@ -249,22 +249,7 @@ def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
 # Executive summary generation moved to ASC606StepAnalyzer class
 
 
-def generate_final_conclusion(analysis_results: Dict[str, Any]) -> str:
-    """Generate final conclusion from step results."""
-
-    conclusion = "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition "
-    conclusion += "treatment is appropriate and complies with the authoritative guidance. "
-
-    # Count successful steps
-    successful_steps = len(
-        [k for k, v in analysis_results.items() if v.get('conclusion')])
-
-    if successful_steps >= 4:
-        conclusion += "All key ASC 606 requirements have been addressed in this analysis."
-    else:
-        conclusion += "The analysis addresses the primary ASC 606 considerations for this contract."
-
-    return conclusion
+# Final conclusion generation moved to ASC606StepAnalyzer class
 
 
 def collect_all_issues(analysis_results: Dict[str, Any]) -> List[str]:

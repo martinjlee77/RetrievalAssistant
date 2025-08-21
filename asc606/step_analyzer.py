@@ -428,6 +428,55 @@ Requirements:
             # Fallback to simple summary
             return f"We have completed a comprehensive ASC 606 analysis for {customer_name}. Please review the detailed step-by-step analysis for specific findings and conclusions."
     
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
+        """Generate LLM-powered final conclusion from analysis results."""
+        
+        # Extract conclusions from each step
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
+        
+        # Build prompt
+        conclusions_text = "\n".join(conclusions)
+        prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
+
+Step Conclusions:
+{conclusions_text}
+
+Instructions:
+1. Write 2-3 sentences assessing ASC 606 compliance
+2. Be direct - if there are concerns, state them clearly
+3. Focus on compliance assessment
+4. Use professional accounting language"""
+
+        # Call LLM API
+        try:
+            request_params = {
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
+                    },
+                    {
+                        "role": "user", 
+                        "content": prompt
+                    }
+                ],
+                "temperature": 0.2,
+                "max_completion_tokens": 150
+            }
+            
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Final conclusion generation failed: {str(e)}")
+            # Fallback to simple conclusion
+            return "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition treatment is appropriate and complies with the authoritative guidance."
+    
     def _identify_issues(self, results: Dict[str, Any], contract_text: str) -> List[str]:
         """Identify issues for further investigation based on the analysis."""
         
