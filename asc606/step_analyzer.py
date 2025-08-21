@@ -227,21 +227,27 @@ When contract information is ambiguous or missing, acknowledge this and state yo
                 'title': 'Identify the Contract',
                 'focus': 'Determine if a valid contract exists under ASC 606-10-25-1 criteria',
                 'key_points': [
-                    'Approval and commitment by parties',
-                    'Identification of rights and obligations', 
-                    'Payment terms identification',
-                    'Commercial substance',
-                    'Collectibility assessment'
+                    'Verify that the parties have approved the contract and are committed to perform (ASC 606-10-25-1(a))',
+                    'Identify each party\'s rights regarding the goods or services to be transferred (ASC 606-10-25-1(b))',
+                    'Identify each party\'s payment terms for the transferred goods or services (ASC 606-10-25-1(c))',
+                    'Assess whether the contract has commercial substance (ASC 606-10-25-1(d))',
+                    'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e))'
                 ]
             },
             2: {
                 'title': 'Identify Performance Obligations', 
-                'focus': 'Identify distinct goods or services using ASC 606-10-25-19 and 25-21',
+                'focus': 'Identify distinct goods or services using ASC 606-10-25-14 and 25-22',
                 'key_points': [
-                    'Promised goods and services in the contract',
-                    'Capability of being distinct (ASC 606-10-25-19a)',
-                    'Separately identifiable (ASC 606-10-25-21 factors)',
-                    'Final performance obligation determination'
+                    'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
+                    'Evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
+                    'Evaluate whether each promised good or service is distinct within the context of the contract per ASC 606-10-25-21(a-c):',
+                    '   a. The good or service is regularly sold separately',
+                    '   b. The customer can benefit from the good or service on its own or with other readily available resources',
+                    '   c. The good or service is not highly interdependent with other promises in the contract',
+                    'Combine non-distinct goods/services into single performance obligations (ASC 606-10-25-22)',
+                    'Determine final list of performance obligations',
+                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-25-75 to 25-79)',
+                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-25-20)'
                 ]
             },
             3: {
@@ -249,30 +255,33 @@ When contract information is ambiguous or missing, acknowledge this and state yo
                 'focus': 'Establish the transaction price per ASC 606-10-32-2',
                 'key_points': [
                     'Fixed consideration amounts',
-                    'Variable consideration and constraints',
-                    'Significant financing components',
-                    'Noncash consideration',
-                    'Total transaction price'
+                    'Variable consideration amounts (ASC 606-10-32-5 to 32-10)',
+                    'Constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-14',
+                    'Total transaction price calculation',
+                    'Significant financing components (if present)',
+                    'Noncash consideration (if present)',
+                    'Consideration paid or payable to a customer (if present)'
                 ]
             },
             4: {
                 'title': 'Allocate the Transaction Price',
-                'focus': 'Allocate price to performance obligations based on standalone selling prices',
+                'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
                 'key_points': [
-                    'Standalone selling price determination',
-                    'Price allocation methodology',
-                    'Discount allocation considerations',
-                    'Final allocation amounts'
+                    'Summarize Identify the performance obligations determined in Step 2',
+                    'State that standalone selling prices (SSPs) should be determined separately based on observable data (ASC 606-10-32-31 to 32-34)',
+                    'Describe the allocation methodology to be used (proportional to SSPs)',
+                    'Note any discount allocation considerations (ASC 606-10-32-36)',
+                    'Provide the final allocation approach (subject to SSP determination)'
                 ]
             },
             5: {
                 'title': 'Recognize Revenue',
                 'focus': 'Determine when revenue should be recognized for each performance obligation',
                 'key_points': [
-                    'Over time vs. point in time assessment',
-                    'Control transfer analysis',
-                    'Measurement of progress (if over time)',
-                    'Revenue recognition timing'
+                    'Determine over-time vs. point-in-time recognition for each performance obligation',
+                    'Analyze when control transfers to the customer',
+                    'Specify revenue recognition timing for each obligation',
+                    'Identify any measurement methods for over-time recognition'
                 ]
             }
         }
