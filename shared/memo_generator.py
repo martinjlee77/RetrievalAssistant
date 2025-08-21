@@ -280,19 +280,33 @@ class SharedMemoGenerator:
         if not content:
             return content
             
-        # Fix currency formatting ($XXX, XXX -> $XXX,XXX)
-        content = re.sub(r'\$(\d+),\s*(\d+)', r'$\1,\2', content)
+        # Fix currency formatting issues
+        content = re.sub(r'\$(\d+),\s*(\d+)', r'$\1,\2', content)  # $XXX, XXX -> $XXX,XXX
+        content = re.sub(r'(\d+),\s*(\d+),\s*([a-z])', r'$\1,\2, \3', content)  # Add $ and fix spacing
+        content = re.sub(r'(\d+),\s*(\d+)([a-z])', r'$\1,\2 \3', content)  # Add $ and space
         
-        # Fix text run-together issues (common LLM problem)
-        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
+        # Fix major text run-together patterns
+        content = re.sub(r'withthepotentialf or', 'with the potential for', content)
+        content = re.sub(r'f ortheLogi', 'for the Logi', content)
+        content = re.sub(r'f orP rof essional', 'for Professional', content)
+        content = re.sub(r'T hereispotentialf or', 'There is potential for', content)
+        content = re.sub(r'f orthehardware', 'for the hardware', content)
+        content = re.sub(r'withthepotential', 'with the potential', content)
+        content = re.sub(r'totalling\s*(\d+)', r'totaling $\1', content)
         
         # Fix number formatting with extra spaces
         content = re.sub(r'(\d+),\s+(\d+)', r'\1,\2', content)
         
-        # Ensure proper paragraph spacing (no triple+ line breaks)
+        # Fix date formatting
+        content = re.sub(r'(\w+)\s+(\d+),(\d+)', r'\1 \2, \3', content)  # October 26,2023 -> October 26, 2023
+        
+        # Fix text run-together issues (general pattern)
+        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
+        
+        # Ensure proper paragraph spacing
         content = re.sub(r'\n\n\n+', '\n\n', content)
         
-        # Fix bullet point consistency (* or + -> -)
+        # Fix bullet point consistency
         content = re.sub(r'^[\*\+]\s', '- ', content, flags=re.MULTILINE)
         
         # Fix common text corruption patterns
@@ -303,7 +317,13 @@ class SharedMemoGenerator:
         content = re.sub(r'annualf ee', 'annual fee', content)
         content = re.sub(r'Saa S', 'SaaS', content)
         content = re.sub(r'Opti Scan', 'OptiScan', content)
-        content = re.sub(r'(\d+),\s*(\d+)\s*\*\s*(\d+)', r'$\1,\2 × \3%', content)  # Fix calculation formatting
+        
+        # Fix period-space issues
+        content = re.sub(r'(\d+)\.([A-Z])', r'\1. \2', content)  # 365,000.There -> 365,000. There
+        
+        # Fix HTML artifacts in template
+        content = re.sub(r'<br>\s*', '\n', content)
+        content = re.sub(r'<[^>]+>', '', content)  # Remove any remaining HTML tags
         
         return content.strip()
     

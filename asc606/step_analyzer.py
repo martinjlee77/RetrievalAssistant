@@ -216,11 +216,14 @@ When contract information is ambiguous or missing, acknowledge this and state yo
 
 FORMATTING REQUIREMENTS:
 - Use proper paragraph breaks (double line breaks between paragraphs)
-- Format currency as $XXX,XXX (no spaces in numbers)
+- Format ALL currency as $XXX,XXX (ALWAYS include $ symbol, no spaces in numbers)
 - Use consistent bullet points with dashes (-)
 - Separate analysis from conclusions with clear section headers
 - Keep sentences concise and professional
-- Use numbered lists for sequential items"""
+- Use numbered lists for sequential items
+- Always include spaces after commas and periods
+- Never concatenate words together
+- Write dates with proper spacing (e.g., "October 26, 2023")"""
     
     def _get_step_prompt(self, 
                         step_num: int,
@@ -341,12 +344,15 @@ Provide your analysis in the following structure:
 
 FORMATTING REQUIREMENTS:
 - Use proper paragraph breaks (double line breaks)
-- Format all currency as $XXX,XXX (no spaces between digits)
+- Format ALL currency as $XXX,XXX (NEVER write numbers without $ symbol)
 - Use bullet points (-) for all lists
 - Keep paragraphs under 3 sentences
 - Quote specific contract language as evidence
 - Cite relevant ASC 606 paragraphs  
 - Use "because" statements to show reasoning
+- Always include spaces after commas and periods
+- Never concatenate words together (e.g., avoid "withthepotential")
+- Write dates with proper spacing (e.g., "October 26, 2023")
 """
         
         return prompt
@@ -499,7 +505,9 @@ Requirements:
 4. Include specific number of performance obligations identified
 5. State compliance conclusion clearly
 6. Highlight any significant findings or issues
-7. Use double line breaks between paragraphs for readability"""
+7. Use double line breaks between paragraphs for readability
+8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
+9. Include proper spacing after commas and periods"""
 
         # Call LLM API
         try:
@@ -550,7 +558,9 @@ Instructions:
 3. Be direct - if there are concerns, state them clearly
 4. Focus on compliance assessment
 5. Use professional accounting language
-6. Use proper paragraph spacing"""
+6. Use proper paragraph spacing
+7. ALWAYS format currency with $ symbol
+8. Include proper spacing after commas and periods"""
 
         # Call LLM API
         try:
