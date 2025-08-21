@@ -1,0 +1,34 @@
+15 Scope and Scope Exceptions
+General Note: The Scope and Scope Exceptions Section outlines the items (for example, the entities, transactions, instruments, or events) to which the guidance in the Subtopic does or does not apply. In some cases, the Section may contain definitional or other text to frame the scope.
+General
+> Entities
+606-10-15-1
+The guidance in this Subtopic applies to all entities.
+> Transactions
+606-10-15-2
+An entity shall apply the guidance in this Topic to all contracts with customers, except the following:
+aLease contracts within the scope of Topic 842, Leases.
+bContracts within the scope of Topic 944, Financial Services—Insurance.
+cFinancial instruments and other contractual rights or obligations within the scope of the following Topics:
+1Topic 310, Receivables
+2Topic 320, Investments—Debt Securities
+2aTopic 321, Investments—Equity Securities
+3Topic 323, Investments—Equity Method and Joint Ventures
+4Topic 325, Investments—Other
+5Topic 405, Liabilities
+6Topic 470, Debt
+7Topic 815, Derivatives and Hedging
+8Topic 825, Financial Instruments
+9Topic 860, Transfers and Servicing.
+dGuarantees (other than product or service warranties) within the scope of Topic 460, Guarantees.
+eNonmonetary exchanges between entities in the same line of business to facilitate sales to customers or potential customers. For example, this Topic would not apply to a contract between two oil companies that agree to an exchange of oil to fulfill demand from their customers in different specified locations on a timely basis. Topic 845 on nonmonetary transactions may apply to nonmonetary exchanges that are not within the scope of this Topic.
+606-10-15-2A
+An entity shall consider the guidance in Subtopic 958-605 on not-for-profit entities—revenue recognition—contributions when determining whether a transaction is a contribution within the scope of Subtopic 958-605 or a transaction within the scope of this Topic.
+606-10-15-3
+An entity shall apply the guidance in this Topic to a contract (other than a contract listed in paragraph 606-10-15-2) only if the counterparty to the contract is a customer. A customer is a party that has contracted with an entity to obtain goods or services that are an output of the entity's ordinary activities in exchange for consideration.
+606-10-15-4
+A contract with a customer may be partially within the scope of this Topic and partially within the scope of other Topics listed in paragraph 606-10-15-2.
+aIf the other Topics specify how to separate and/or initially measure one or more parts of the contract, then an entity shall first apply the separation and/or measurement guidance in those Topics. An entity shall exclude from the transaction price the amount of the part (or parts) of the contract that are initially measured in accordance with other Topics and shall apply paragraphs 606-10-32-28 through 32-41 to allocate the amount of the transaction price that remains (if any) to each performance obligation within the scope of this Topic and to any other parts of the contract identified by paragraph 606-10-15-4(b).
+bIf the other Topics do not specify how to separate and/or initially measure one or more parts of the contract, then the entity shall apply the guidance in this Topic to separate and/or initially measure the part (or parts) of the contract.
+606-10-15-5
+Subtopic 340-40 on other assets and deferred costs from contracts with customers includes guidance on accounting for the incremental costs of obtaining a contract with a customer and for the costs incurred to fulfill a contract with a customer if those costs are not within the scope of another Topic (see Subtopic 340-40). An entity shall apply that guidance only to the costs incurred that relate to a contract with a customer (or part of that contract) that is within the scope of the guidance in this Topic.

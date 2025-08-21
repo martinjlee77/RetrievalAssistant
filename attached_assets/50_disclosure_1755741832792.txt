@@ -1,0 +1,101 @@
+50 Disclosure
+General Note: The Disclosure Section provides guidance regarding the disclosure in the notes to financial statements. In some cases, disclosure may relate to disclosure on the face of the financial statements.
+General
+606-10-50-1
+The objective of the disclosure requirements in this Topic is for an entity to disclose sufficient information to enable users of financial statements to understand the nature, amount, timing, and uncertainty of revenue and cash flows arising from contracts with customers. To achieve that objective, an entity shall disclose qualitative and quantitative information about all of the following:
+aIts contracts with customers (see paragraphs 606-10-50-4 through 50-16)
+bThe significant judgments, and changes in the judgments, made in applying the guidance in this Topic to those contracts (see paragraphs 606-10-50-17 through 50-21)
+cAny assets recognized from the costs to obtain or fulfill a contract with a customer in accordance with paragraph 340-40-25-1 or 340-40-25-5 (see paragraphs 340-40-50-1 through 50-6).
+606-10-50-2
+An entity shall consider the level of detail necessary to satisfy the disclosure objective and how much emphasis to place on each of the various requirements. An entity shall aggregate or disaggregate disclosures so that useful information is not obscured by either the inclusion of a large amount of insignificant detail or the aggregation of items that have substantially different characteristics.
+606-10-50-3
+Amounts disclosed are for each reporting period for which a statement of comprehensive income (statement of activities) is presented and as of each reporting period for which a statement of financial position is presented. An entity need not disclose information in accordance with the guidance in this Topic if it has provided the information in accordance with another Topic.
+> Contracts with Customers
+606-10-50-4
+An entity shall disclose all of the following amounts for the reporting period unless those amounts are presented separately in the statement of comprehensive income (statement of activities) in accordance with other Topics:
+aRevenue recognized from contracts with customers, which the entity shall disclose separately from its other sources of revenue
+bCredit losses recorded (in accordance with Subtopic 326-20 on financial instruments measured at amortized cost) on any receivables or contract assets arising from an entity's contracts with customers, which the entity shall disclose separately from credit losses from other contracts.
+· > Disaggregation of Revenue
+606-10-50-5
+An entity shall disaggregate revenue recognized from contracts with customers into categories that depict how the nature, amount, timing, and uncertainty of revenue and cash flows are affected by economic factors. An entity shall apply the guidance in paragraphs 606-10-55-89 through 55-91 when selecting the categories to use to disaggregate revenue.
+606-10-50-6
+In addition, an entity shall disclose sufficient information to enable users of financial statements to understand the relationship between the disclosure of disaggregated revenue (in accordance with paragraph 606-10-50-5) and revenue information that is disclosed for each reportable segment, if the entity applies Topic 280 on segment reporting.
+606-10-50-7
+An entity, except for a public business entity, a not-for-profit entity that has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market, or an employee benefit plan that files or furnishes financial statements with or to the Securities and Exchange Commission (SEC), may elect not to apply the quantitative disaggregation disclosure guidance in paragraphs 606-10-50-5 through 50-6 and 606-10-55-89 through 55-91. If an entity elects not to provide those disclosures, the entity shall disclose, at a minimum, revenue disaggregated according to the timing of transfer of goods or services (for example, revenue from goods or services transferred to customers at a point in time and revenue from goods or services transferred to customers over time) and qualitative information about how economic factors (such as type of customer, geographical location of customers, and type of contract) affect the nature, amount, timing, and uncertainty of revenue and cash flows.
+· > Contract Balances
+606-10-50-8
+An entity shall disclose all of the following:
+aThe opening and closing balances of receivables, contract assets, and contract liabilities from contracts with customers, if not otherwise separately presented or disclosed
+bRevenue recognized in the reporting period that was included in the contract liability balance at the beginning of the period
+cSubparagraph superseded by Accounting Standards Update No. 2016-20.
+606-10-50-9
+An entity shall explain how the timing of satisfaction of its performance obligations (see paragraph 606-10-50-12(a)) relates to the typical timing of payment (see paragraph 606-10-50-12(b)) and the effect that those factors have on the contract asset and the contract liability balances. The explanation provided may use qualitative information.
+606-10-50-10
+An entity shall provide an explanation of the significant changes in the contract asset and the contract liability balances during the reporting period. The explanation shall include qualitative and quantitative information. Examples of changes in the entity's balances of contract assets and contract liabilities include any of the following:
+aChanges due to business combinations
+bCumulative catch-up adjustments to revenue that affect the corresponding contract asset or contract liability, including adjustments arising from a change in the measure of progress, a change in an estimate of the transaction price (including any changes in the assessment of whether an estimate of variable consideration is constrained), or a contract modification
+cImpairment of a contract asset
+dA change in the time frame for a right to consideration to become unconditional (that is, for a contract asset to be reclassified to a receivable)
+eA change in the time frame for a performance obligation to be satisfied (that is, for the recognition of revenue arising from a contract liability).
+606-10-50-11
+An entity, except for a public business entity, a not-for-profit entity that has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market, or an employee benefit plan that files or furnishes financial statements with or to the SEC, may elect not to provide any or all of the disclosures in paragraphs 606-10-50-8 through 50-10 and 606-10-50-12A. However, if an entity elects not to provide the disclosures in paragraphs 606-10-50-8 through 50-10 and 606-10-50-12A, the entity shall provide the disclosure in paragraph 606-10-50-8(a), which requires the disclosure of the opening and closing balances of receivables, contract assets, and contract liabilities from contracts with customers, if not otherwise separately presented or disclosed.
+· > Performance Obligations
+606-10-50-12
+An entity shall disclose information about its performance obligations in contracts with customers, including a description of all of the following:
+aWhen the entity typically satisfies its performance obligations (for example, upon shipment, upon delivery, as services are rendered, or upon completion of service) including when performance obligations are satisfied in a bill-and-hold arrangement
+bThe significant payment terms (for example, when payment typically is due, whether the contract has a significant financing component, whether the consideration amount is variable, and whether the estimate of variable consideration is typically constrained in accordance with paragraphs 606-10-32-11 through 32-13)
+cThe nature of the goods or services that the entity has promised to transfer, highlighting any performance obligations to arrange for another party to transfer goods or services (that is, if the entity is acting as an agent)
+dObligations for returns, refunds, and other similar obligations
+eTypes of warranties and related obligations.
+606-10-50-12A
+An entity shall disclose revenue recognized in the reporting period from performance obligations satisfied (or partially satisfied) in previous periods (for example, changes in transaction price).
+· > Transaction Price Allocated to the Remaining Performance Obligations
+606-10-50-13
+An entity shall disclose the following information about its remaining performance obligations:
+aThe aggregate amount of the transaction price allocated to the performance obligations that are unsatisfied (or partially unsatisfied) as of the end of the reporting period
+bAn explanation of when the entity expects to recognize as revenue the amount disclosed in accordance with paragraph 606-10-50-13(a), which the entity shall disclose in either of the following ways:
+1On a quantitative basis using the time bands that would be most appropriate for the duration of the remaining performance obligations
+2By using qualitative information.
+606-10-50-14
+An entity need not disclose the information in paragraph 606-10-50-13 for a performance obligation if either of the following conditions is met:
+aThe performance obligation is part of a contract that has an original expected duration of one year or less.
+bThe entity recognizes revenue from the satisfaction of the performance obligation in accordance with paragraph 606-10-55-18.
+606-10-50-14A
+An entity need not disclose the information in paragraph 606-10-50-13 for variable consideration for which either of the following conditions is met:
+aThe variable consideration is a sales-based or usage-based royalty promised in exchange for a license of intellectual property accounted for in accordance with paragraphs 606-10-55-65 through 55-65B.
+bThe variable consideration is allocated entirely to a wholly unsatisfied performance obligation or to a wholly unsatisfied promise to transfer a distinct good or service that forms part of a single performance obligation in accordance with paragraph 606-10-25-14(b), for which the criteria in paragraph 606-10-32-40 have been met.
+606-10-50-14B
+The optional exemptions in paragraphs 606-10-50-14(b) and 606-10-50-14A shall not be applied to fixed consideration.
+606-10-50-15
+An entity shall disclose which optional exemptions in paragraphs 606-10-50-14 through 50-14A it is applying. In addition, an entity applying the optional exemptions in paragraphs 606-10-50-14 through 50-14A shall disclose the nature of the performance obligations, the remaining duration (see paragraph 606-10-25-3), and a description of the variable consideration (for example, the nature of the variability and how that variability will be resolved) that has been excluded from the information disclosed in accordance with paragraph 606-10-50-13. This information shall include sufficient detail to enable users of financial statements to understand the remaining performance obligations that the entity excluded from the information disclosed in accordance with paragraph 606-10-50-13. In addition, an entity shall explain whether any consideration from contracts with customers is not included in the transaction price and, therefore, not included in the information disclosed in accordance with paragraph 606-10-50-13. For example, an estimate of the transaction price would not include any estimated amounts of variable consideration that are constrained (see paragraphs 606-10-32-11 through 32-13).
+606-10-50-16
+An entity, except for a public business entity, a not-for-profit entity that has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market, or an employee benefit plan that files or furnishes financial statements with or to the SEC, may elect not to provide the disclosures in paragraphs 606-10-50-13 through 50-15.
+> Significant Judgments in the Application of the Guidance in This Topic
+606-10-50-17
+An entity shall disclose the judgments, and changes in the judgments, made in applying the guidance in this Topic that significantly affect the determination of the amount and timing of revenue from contracts with customers. In particular, an entity shall explain the judgments, and changes in the judgments, used in determining both of the following:
+aThe timing of satisfaction of performance obligations (see paragraphs 606-10-50-18 through 50-19)
+bThe transaction price and the amounts allocated to performance obligations (see paragraph 606-10-50-20).
+· > Determining the Timing of Satisfaction of Performance Obligations
+606-10-50-18
+For performance obligations that an entity satisfies over time, an entity shall disclose both of the following:
+aThe methods used to recognize revenue (for example, a description of the output methods or input methods used and how those methods are applied)
+bAn explanation of why the methods used provide a faithful depiction of the transfer of goods or services.
+606-10-50-19
+For performance obligations satisfied at a point in time, an entity shall disclose the significant judgments made in evaluating when a customer obtains control of promised goods or services.
+· > Determining the Transaction Price and the Amounts Allocated to Performance Obligations
+606-10-50-20
+An entity shall disclose information about the methods, inputs, and assumptions used for all of the following:
+aDetermining the transaction price, which includes, but is not limited to, estimating variable consideration, adjusting the consideration for the effects of the time value of money, and measuring noncash consideration
+bAssessing whether an estimate of variable consideration is constrained
+cAllocating the transaction price, including estimating standalone selling prices of promised goods or services and allocating discounts and variable consideration to a specific part of the contract (if applicable)
+dMeasuring obligations for returns, refunds, and other similar obligations.
+606-10-50-21
+An entity except for a public business entity, a not-for-profit entity that has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market, or an employee benefit plan that files or furnishes financial statements with or to the SEC, may elect not to provide any or all of the following disclosures:
+aParagraph 606-10-50-18(b), which states that an entity shall disclose, for performance obligations satisfied over time, an explanation of why the methods used to recognize revenue provide a faithful depiction of the transfer of goods or services to a customer
+bParagraph 606-10-50-19, which states that an entity shall disclose, for performance obligations satisfied at a point in time, the significant judgments made in evaluating when a customer obtains control of promised goods or services
+cParagraph 606-10-50-20, which states that an entity shall disclose the methods, inputs, and assumptions used to determine the transaction price and to allocate the transaction price. However, if an entity elects not to provide the disclosures in paragraph 606-10-50-20, the entity shall provide the disclosure in paragraph 606-10-50-20(b), which states that an entity shall disclose the methods, inputs, and assumptions used to assess whether an estimate of variable consideration is constrained.
+> Practical Expedients
+606-10-50-22
+If an entity elects to use the practical expedient in either paragraph 606-10-32-18 (about the existence of a significant financing component) or paragraph 340-40-25-4 (about the incremental costs of obtaining a contract), the entity shall disclose that fact.
+606-10-50-23
+An entity, except for a public business entity, a not-for-profit entity that has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market, or an employee benefit plan that files or furnishes financial statements with or to the SEC, may elect not to provide the disclosures in paragraph 606-10-50-22.
