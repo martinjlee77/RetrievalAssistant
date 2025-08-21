@@ -47,8 +47,8 @@ class ASC606KnowledgeSearch:
             # Create step-specific search query
             search_query = self._build_step_query(step_number, contract_text)
             
-            # Search the knowledge base
-            guidance = self.knowledge_base.search(search_query, max_results=8)
+            # Search the knowledge base (reduced for speed)
+            guidance = self.knowledge_base.search(search_query, max_results=5)
             
             logger.info(f"Retrieved guidance for Step {step_number}")
             return guidance
@@ -71,7 +71,7 @@ class ASC606KnowledgeSearch:
             return "Knowledge base not available."
         
         try:
-            return self.knowledge_base.search(query, max_results=10)
+            return self.knowledge_base.search(query, max_results=6)
         except Exception as e:
             logger.error(f"Error in general search: {str(e)}")
             return f"Search error: {str(e)}"

@@ -28,7 +28,7 @@ class ASC606StepAnalyzer:
         if not openai.api_key:
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        self.model = "gpt-5"  # Use the proven model
+        self.model = "gpt-4o"  # Fast, cost-effective model for structured analysis
         
         # Load step prompts
         self.step_prompts = self._load_step_prompts()
@@ -118,7 +118,7 @@ class ASC606StepAnalyzer:
                         "content": prompt
                     }
                 ],
-                max_completion_tokens=2000
+                max_completion_tokens=1000
             )
             
             analysis_text = response.choices[0].message.content.strip()

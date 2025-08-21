@@ -177,9 +177,6 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
                 analysis_results[f'step_{step_num}'] = step_result
 
-                # Display step results immediately
-                display_step_results(step_num, step_result)
-
         # Generate final memo
         with progress_placeholder:
             st.subheader("📋 Generating Professional Memo")
