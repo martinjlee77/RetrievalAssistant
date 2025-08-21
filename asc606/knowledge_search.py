@@ -287,7 +287,7 @@ class ASC606KnowledgeSearch:
             "standard": "ASC 606 Revenue Recognition",
             "documents": f"{doc_count:,} guidance documents" if doc_count else "guidance documents",
             "status": "Active",
-            "note": "Analysis based on current ASC 606 authoritative and interpretive guidance"
+            "note": "Analysis based on current FASB's ASC 606 authoritative guidance"
         }
     
     def is_available(self) -> bool:

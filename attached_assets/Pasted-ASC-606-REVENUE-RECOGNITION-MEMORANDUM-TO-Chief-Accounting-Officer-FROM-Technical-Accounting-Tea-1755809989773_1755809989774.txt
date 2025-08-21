@@ -1,0 +1,190 @@
+ASC 606 REVENUE RECOGNITION MEMORANDUM
+TO: Chief Accounting Officer
+FROM: Technical Accounting Team
+DATE: August 21, 2025
+RE: contract01 - ASC 606 Revenue Recognition Analysis CC: Management
+
+EXECUTIVE SUMMARY
+Executive Summary:
+
+This analysis of Global Dynamics' revenue recognition under ASC 606 identifies three distinct performance obligations: the Logi-AI Suite SaaS License, OptiScan-7 Handheld Scanners, and Professional Services. The total fixed transaction price of 
+845
+,
+000
+,
+w
+i
+t
+h
+a
+n
+a
+d
+d
+i
+t
+i
+o
+n
+a
+l
+p
+o
+t
+e
+n
+t
+i
+a
+l
+p
+e
+r
+f
+o
+r
+m
+a
+n
+c
+e
+b
+o
+n
+u
+s
+o
+f
+845,000,withanadditionalpotentialperformancebonusof30,000, has been appropriately allocated based on relative standalone selling prices, ensuring compliance with ASC 606-10-32-28 to 32-34. Revenue recognition for the SaaS License will occur over time, while the Hardware will be recognized at a point in time upon delivery, and Professional Services will be recognized over time as rendered. The proposed accounting treatment is consistent with ASC 606, with no significant issues identified that would affect the integrity of the revenue recognition process.
+
+BACKGROUND
+We have reviewed the contract documents provided by Global Dynamics to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation.
+
+ASC 606 ANALYSIS
+Step 1: Identify the Contract
+Approval and Commitment (ASC 606-10-25-1(a)): The contract specifically states that it is a "Statement of Work (SOW) entered into as of October 26, 2023, by and between InnovateTech Solutions Inc. and Global Dynamics Corp., under the terms of the Master Services Agreement (MSA) dated January 15, 2022." This indicates that both parties have formally documented approval of the contract and its terms. The inclusion of a signature date implies commitment, fulfilling the criterion under ASC 606-10-25-1(a).
+
+Rights Regarding Goods or Services (ASC 606-10-25-1(b)): The SOW clearly delineates the rights and obligations associated with the following:
+
+Provision of a "3-year subscription license to the Logi-AI Suite" including "standard support and maintenance."
+Delivery of "200 proprietary 'OptiScan-7' handheld scanners."
+Performance of professional services for "implementation, system integration, and on-site user training." These descriptions provide sufficient detail about what each party is responsible for providing and receiving, satisfying ASC 606-10-25-1(b).
+Payment Terms (ASC 606-10-25-1(c)): The payment terms are well-defined in Section 2.0:
+
+Logi-AI Suite SaaS License: $240,000/year, with the first year's fee due Net 30 from the Effective Date and subsequent years due at the start of each contract year.
+Hardware Provisioning: A one-time fee of $50,000, due Net 30 from the Effective Date.
+Professional Services: A one-time fee of $75,000, due Net 30 from the Effective Date. These explicit terms satisfy the requirement of ASC 606-10-25-1(c) that the payment terms be established.
+Commercial Substance (ASC 606-10-25-1(d)): The contract has commercial substance because it will result in changes to InnovateTech's cash flows. The inclusion of various fees for software, hardware, and professional services indicates that the contract will lead to significant revenue for InnovateTech. As such, the risk, timing, or amount of InnovateTech’s future cash flows is expected to change, in accordance with ASC 606-10-25-1(d).
+
+Probable Collection (ASC 606-10-25-1(e)): Based on the contract, it is probable that InnovateTech will collect the consideration because the payment terms are clear, and Global Dynamics is explicitly named as the customer. There is no indication of credit risk or inability to pay within the document. Thus, based on available information, this criterion seems to be met. However, additional confirmation of the customer's creditworthiness might be required for full assurance under ASC 606-10-25-1(e).
+
+Step 2: Identify Performance Obligations
+Identification of Promised Goods and Services:
+
+The contract specifies three primary deliverables: the "Logi-AI Suite" SaaS license, the "OptiScan-7" handheld scanners, and professional services for implementation and training (Section 1.0).
+There is also a performance bonus mentioned (Section 2.4) and a bundle discount (Section 2.5).
+Evaluation of Distinctiveness:
+Logi-AI Suite SaaS License:
+Capability of Being Distinct (ASC 606-10-25-19(a)): The SaaS license can be considered distinct as the customer can benefit from it on its own, given its standalone pricing and the inclusion of support and updates. - Distinct in Context (ASC 606-10-25-21): It is marketed as a separate product and is not highly interdependent with other services, indicating it is distinct within the contract.
+
+OptiScan-7 Scanners:
+Capability of Being Distinct (ASC 606-10-25-19(a)): The scanners can be used with the SaaS platform; however, they are emphasized as enhancing its use rather than being necessary. The transfer of title and risk upon delivery supports the notion of distinctness. - Distinct in Context (ASC 606-10-25-21): These are standardized products sold separately, thus not highly dependent on the other offerings, making them distinct.
+
+Professional Services:
+Capability of Being Distinct (ASC 606-10-25-19(a)): While the Logi-AI Suite could be implemented without the additional services, they provide a significant enhancement, indicating the customer can benefit from them. - Distinct in Context (ASC 606-10-25-21): The professional services enhance the software integration but are not crucial for the function of the product by itself. Hence, the services are distinct but are closely related to enhancing the customer's use of the SaaS product.
+
+Performance Bonus and Bundle Discount:
+Performance Bonus: While it is a conditional payment, under ASC 606, it does not constitute a separate performance obligation but rather a contingent consideration.
+Bundle Discount: The discount affects the transaction price but does not directly impact the identification of performance obligations.
+
+Principal vs. Agent Evaluation & Additional Options:
+
+There is no indication of third-party involvement that would necessitate a principal vs. agent evaluation.
+No options for additional goods or services or material rights are indicated beyond the initial contract terms.
+Conclusion: Based on ASC 606, the contract contains three distinct performance obligations:
+
+The "Logi-AI Suite" SaaS License (ASC 606-10-25-14 and 25-19).
+The "OptiScan-7" Handheld Scanners (distinct goods, ASC 606-10-25-21(a-c)).
+Professional Services (substantively enhancing but distinct).
+Step 3: Determine the Transaction Price
+Discounts and Consideration to Customer:
+
+A 10% bundle discount is applied to the hardware and services but not the SaaS license, suggesting the discount doesn't affect the stated license transaction price (ASC 606-10-32-7). The discount is part of the contract's agreed-upon pricing and should not require additional adjustment unless there are changes in standalone prices.
+Conclusion: The total fixed transaction price, exclusive of the performance bonus, is 
+845
+,
+000
+,
+c
+a
+l
+c
+u
+l
+a
+t
+e
+d
+a
+s
+f
+o
+l
+l
+o
+w
+s
+:
+845,000,calculatedasfollows:720,000 for the SaaS License, 
+50
+,
+000
+f
+o
+r
+h
+a
+r
+d
+w
+a
+r
+e
+,
+a
+n
+d
+50,000forhardware,and75,000 for professional services. The $30,000 potential performance bonus represents a variable consideration, likely includable in the transaction price due to the high likelihood of achievement. There is no significant financing component or noncash consideration involved in this agreement.
+
+Step 4: Allocate the Transaction Price
+In Step 4 of allocating the transaction price, we start by reviewing the performance obligations determined in Step 2. According to the contract, the identified performance obligations are:
+
+Logi-AI Suite SaaS License
+Hardware Provisioning (OptiScan-7 Scanners)
+Professional Services (implementation, integration, training) Standalone Selling Prices (SSPs): According to ASC 606-10-32-31, standalone selling prices should be determined at the contract inception for each distinct good or service. While the SaaS license has a specified fee in the contract ($240,000 per year), the contract indicates that this represents the standard standalone rate, meaning no estimation for SSP is required.
+For Hardware and Professional Services, because the contract states that a 10% discount applies to these obligations, the SSPs are not directly observable. Under ASC 606-10-32-33, we should estimate the SSP for these items either by referring to observable data or the company's customary pricing for similar goods/services. Discount Allocation: The contract specifies that a combined 10% discount applies to Hardware and Professional Services, indicating that these SSPs will require adjustment. According to ASC 606-10-32-37, when a discount relates to only one or more, but not all, performance obligations, it should be allocated proportionately only to those affected obligations. Allocation Methodology: Per ASC 606-10-32-29, we allocate the transaction price to each performance obligation based on their relative standalone selling prices. Given that only the Hardware and Professional Services have a combined SSP discount, we will first allocate the undiscounted transaction price proportionately to these SSPs and then apply the 10% discount.
+
+For example (assuming estimated SSPs):
+
+Logi-AI Suite SaaS License: Stated at SSP $240,000/year
+Hardware (OptiScan-7 Scanners): Estimate required
+Professional Services: Estimate required Final Allocation: Once SSPs for Hardware and Professional Services are estimated, allocate the transaction price proportionately:
+Remove the discount from their total combined SSP and allocate the discounted amounts.
+Conclusion: The Logi-AI Suite SaaS License is allocated at its standard standalone price ($240,000 per year). The total transaction price is proportionately allocated to the Hardware and Professional Services based on their estimated SSPs, after applying a 10% discount exclusively to these obligations. This allocation ensures adherence to ASC 606-10-32-28 to 32-34, regarding using relative standalone selling prices as the basis.
+
+Step 5: Recognize Revenue
+Logi-AI Suite SaaS License: The Logi-AI Suite SaaS license is a subscription service intended for use over the 3-year contract term. In accordance with ASC 606-10-25-27, revenue should be recognized over time because the customer "simultaneously receives and consumes the benefits provided by the entity’s performance as the entity performs." This is evident from the continuous access to the software and the provision of updates and maintenance over the subscription period. Measurement of progress could be based on time elapsed, as the benefits are provided consistently over the contract duration (ASC 606-10-25-31). Hardware Provisioning (OptiScan-7 Scanners): For the hardware component, revenue recognition occurs at a point in time. As indicated by the contract under Section 1.2, “Title and risk of loss for the scanners transfer to the Customer upon delivery.” According to ASC 606-10-25-23, control is transferred when the customer has the ability to direct the use of and obtain substantially all of the remaining benefits from the asset, which occurs upon delivery. Therefore, revenue should be recognized when the scanners are delivered to the customer. Professional Services: The professional services include implementation, system integration, and training, which are stated to be completed upon customer acceptance. Section 1.3 of the contract emphasizes the necessity for customer’s written acceptance, indicating the completion of service and transfer of control. According to ASC 606-10-25-27, these services comply with the criterion for recognizing revenue over time through the receipt and consumption of benefits. Therefore, progress towards completion, potentially measured by milestones or cost-to-cost method, could be appropriate (ASC 606-10-55-17). Revenue would be fully recognized upon the customer’s sign-off on acceptance. Performance Bonus: The performance bonus is contingent on achieving a specific result—a 15% reduction in shipping costs. This falls under variable consideration (ASC 606-10-32-8). Given the historical track record of achieving this target with similar customers, a significant portion of this variable consideration could be recognized when it is highly probable that a significant reversal will not occur. However, precise recognition would require monitoring the achievement over the first 12 months.
+
+Conclusion: - Logi-AI Suite SaaS License: Revenue to be recognized over time based on time elapsed over the 3-year period.
+Hardware Provisioning: Revenue to be recognized at a point in time, upon delivery and transfer of control to the customer.
+Professional Services: Recognize revenue over time as services are rendered, finalized upon customer acceptance.
+Performance Bonus: Recognized when it's probable there will not be a significant reversal, based on achievement verification.
+
+CONCLUSION
+In conclusion, the analysis demonstrates compliance with ASC 606, as the contract appropriately identifies and allocates distinct performance obligations, ensuring that revenue recognition aligns with the transfer of control and the nature of the services provided. The allocation of the transaction price based on standalone selling prices adheres to the guidance outlined in ASC 606-10-32, and the recognition patterns for each performance obligation are consistent with the principles of recognizing revenue over time or at a point in time as applicable. However, it is essential to continuously monitor the achievement of the performance bonus to ensure that revenue recognition remains appropriate and does not lead to significant reversals, which could impact overall compliance.
+
+PREPARED BY: [Analyst Name] [Title] [Date]
+
+REVIEWED BY: [Reviewer Name] [Title] [Date]
+
+This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.
