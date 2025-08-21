@@ -135,12 +135,18 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
     try:
         # Initialize components
         with st.spinner("Initializing analysis components..."):
-            analyzer = ASC606StepAnalyzer()
-            knowledge_search = ASC606KnowledgeSearch()
-            memo_generator = SharedMemoGenerator(
-                template_path="asc606/templates/memo_template.md")
-            from shared.ui_components import SharedUIComponents
-            ui = SharedUIComponents()
+            try:
+                analyzer = ASC606StepAnalyzer()
+                knowledge_search = ASC606KnowledgeSearch()
+                memo_generator = SharedMemoGenerator(
+                    template_path="asc606/templates/memo_template.md")
+                from shared.ui_components import SharedUIComponents
+                ui = SharedUIComponents()
+            except RuntimeError as e:
+                st.error(f"❌ Critical Error: {str(e)}")
+                st.error("Please ensure the ASC 606 knowledge base has been properly seeded.")
+                st.stop()
+                return
 
         # Display progress
         steps = [
@@ -158,12 +164,9 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                 ui.analysis_progress(steps, step_num)
 
             with st.spinner(f"Analyzing Step {step_num}..."):
-                # Get relevant guidance
-                if knowledge_search.is_available():
-                    authoritative_context = knowledge_search.search_for_step(
-                        step_num, contract_text)
-                else:
-                    authoritative_context = "Knowledge base not available. Analysis will proceed with general ASC 606 knowledge."
+                # Get relevant guidance from knowledge base
+                authoritative_context = knowledge_search.search_for_step(
+                    step_num, contract_text)
 
                 # Analyze the step
                 step_result = analyzer._analyze_step(
