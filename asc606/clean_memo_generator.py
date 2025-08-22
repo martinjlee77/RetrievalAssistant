@@ -34,7 +34,6 @@ class CleanMemoGenerator:
             f"**DATE:** {analysis_date}",
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
             "",
-            "---",
             ""
         ]
         
@@ -45,7 +44,6 @@ class CleanMemoGenerator:
                 "",
                 analysis_results['executive_summary'],
                 "",
-                "---",
                 ""
             ])
         
@@ -58,22 +56,19 @@ class CleanMemoGenerator:
         if 'background' in analysis_results:
             memo_lines.extend([
                 analysis_results['background'],
-                "",
-                "---", 
+                "", 
                 ""
             ])
         else:
             memo_lines.extend([
                 f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology.",
-                "",
-                "---", 
+                "", 
                 ""
             ])
         
         # Add Analysis Section Header
         memo_lines.extend([
             "## ASC 606 ANALYSIS",
-            ""
         ])
         
         # Add each step's clean markdown content - check both locations
@@ -102,7 +97,6 @@ class CleanMemoGenerator:
         # Add Conclusion Section
         if 'conclusion' in analysis_results:
             memo_lines.extend([
-                "---",
                 "",
                 "## CONCLUSION",
                 "",
@@ -168,7 +162,7 @@ class CleanMemoGenerator:
                 html_lines.append(f'<p style="margin: 8px 0;">{line}</p>')
             # Convert horizontal rules
             elif line.strip() == '---':
-                html_lines.append('<hr style="margin: 15px 0;">')
+                html_lines.append('<hr style="margin: 25px 0;">')
             # Empty lines - skip them to reduce spacing
             elif line.strip() == '':
                 continue  # Don't add empty breaks
@@ -179,7 +173,7 @@ class CleanMemoGenerator:
         # Join with safer inline-only styling
         html_content = f"""
         <div style="font-family: Georgia, 'Times New Roman', sans-serif; 
-        line-height: 1.4; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
+        line-height: 1.5; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
             {''.join(html_lines)}
         </div>
         """

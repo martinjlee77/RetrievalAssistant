@@ -342,7 +342,7 @@ Analyze the contract for Step {step_num} focusing on:
 
 REQUIRED OUTPUT FORMAT (Clean Markdown):
 
-## {step['title']}
+### {step['title']}
 
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations.]
 
