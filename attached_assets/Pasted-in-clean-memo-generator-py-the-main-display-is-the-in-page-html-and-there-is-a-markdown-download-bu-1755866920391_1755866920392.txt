@@ -1,0 +1,57 @@
+in clean_memo_generator.py, the main display is the in page html and there is a markdown download button. what do you think about the download option? i want to keep things simple but want to offer what's helpful. options are: get rid of the download option, markdown download only (i don't know of accountants who know how to work with markdown), docx only or both.
+
+You raise a valid point about the download option. Offering both Markdown and DOCX would be ideal but adds complexity. Let's weigh the options:
+
+1. Get Rid of the Download Option: This simplifies the code but deprives users of a potentially valuable feature (saving the memo for later reference). This is not recommended.
+
+2. Markdown Download Only: This is the simplest code-wise but least user-friendly. Most accountants are not likely to work directly with Markdown files. This is not recommended.
+
+3. DOCX Only: This is more user-friendly since DOCX is a widely used and familiar format for accountants. However, it adds complexity to the code, requiring a markdown-to-docx conversion library.
+
+4. Both Markdown and DOCX: This is the most comprehensive but also the most complex to implement. It requires the markdown-to-docx conversion and adds more to the user interface.
+
+Recommendation:
+
+Given the context of a professional accounting platform, I recommend Option 3: DOCX only. It provides the most user-friendly experience while still keeping things relatively simple. The added complexity is justified by the improved user experience.
+
+Here's how you would modify the display_clean_memo function in clean_memo_generator.py:
+
+import docx
+from docx import Document
+from docx.shared import Inches
+
+#...other imports...
+
+def display_clean_memo(self, memo_content: str) -> None:
+    """Display clean memo content using HTML to preserve formatting."""
+    st.markdown("## 📋 Generated Memo")
+
+    # Convert markdown to HTML manually to bypass Streamlit's markdown processor
+    html_content = self._convert_markdown_to_html(memo_content)
+
+    # Use HTML display which preserves formatting
+    st.markdown(html_content, unsafe_allow_html=True)
+
+    # Download button (DOCX only)
+    try:
+        document = Document()
+        document.add_heading('ASC 606 MEMORANDUM', 0)
+        for line in memo_content.split('\n'):
+            document.add_paragraph(line) #Add all paragraphs
+
+        # Save the document to a BytesIO object
+        from io import BytesIO
+        buffer = BytesIO()
+        document.save(buffer)
+        buffer.seek(0)
+
+        st.download_button(
+            label="📥 Download Memo (DOCX)",
+            data=buffer.read(),
+            file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
+    except Exception as e:
+        st.error(f"Error generating DOCX file: {str(e)}")
+
+This simplified version only offers a DOCX download. You'll need to install the python-docx library (pip install python-docx). This is a good balance of usability and maintainability for a professional tool. Remember that error handling is crucial for this conversion. Always handle exceptions appropriately so the application does not crash.

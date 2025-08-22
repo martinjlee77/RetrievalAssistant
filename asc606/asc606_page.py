@@ -22,11 +22,14 @@ def render_asc606_page():
     """Render the ASC 606 analysis page."""
 
     # Page header
-    st.title("📃 ASC 606 Contract Review")
+    st.title("ASC 606 Revenue Recognition Analyzer")
     st.markdown(
-        "AI-generated comprehensive 5-step revenue recognition memo. Enter the required information below to begin."
+        "Automatically analyze revenue contracts under ASC 606. This tool performs the five-step revenue recognition analysis, generating a comprehensive review memo that details the findings. Enter your contract details below to proceed."
     )
 
+    st.warning("**Important:** Upload complete contract documents for accurate analysis.  Incomplete documents may lead to inaccurate results.")
+
+    
     # Get user inputs with progressive disclosure
     contract_text, filename, customer_name, analysis_title, additional_context, is_ready = get_asc606_inputs()
 
@@ -67,7 +70,7 @@ def render_asc606_page():
                 perform_asc606_analysis(contract_text, customer_name,
                                       analysis_title, additional_context, cache_key)
         else:
-            if st.button("➡️ Analyze Contract",
+            if st.button("Analyze Contract & Generate Memo",
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
@@ -84,48 +87,45 @@ def render_asc606_page():
             missing_items.append("contract document")
         
         if missing_items:
-            st.button("➡️ Analyze Contract", 
+            st.button("Analyze Contract & Generate Memo", 
                      disabled=True, 
                      use_container_width=True,
-                     help=f"Please provide: {', '.join(missing_items)}")
+                     help=f"The analysis cannot begin until the required fields above are completed. Please fill in the missing {', '.join(missing_items)}.")
         else:
-            st.button("➡️ Analyze Contract", 
+            st.button("Analyze Contract & Generate Memo", 
                      disabled=True, 
                      use_container_width=True)
 
 
 def get_asc606_inputs():
     """Get ASC 606 specific inputs with progressive disclosure."""
-    st.subheader("Contract Information")
-    st.caption("* Required fields")
+    st.subheader("Contract Details")
 
     # ASC 606 specific inputs with clear required indicators
     col1, col2 = st.columns(2)
 
     with col1:
         customer_name = st.text_input(
-            "Customer name *",
+            "Customer name (required)",
             placeholder="ABC Corp.",
-            help="Required: Name of the customer for the revenue contract"
         )
 
     with col2:
         analysis_title = st.text_input(
-            "Analysis title *",
+            "Analysis title (required)",
             placeholder="Contract_123", 
-            help="Required: Title for this analysis (will appear in the memo)"
+            help="Unique identifier for this analysis; used to track the memo and results.  This title will appear on the generated memo."
         )
 
     # Document upload with clear required indicator
     processor = SharedDocumentProcessor()
     contract_text, filename = processor.upload_and_process(
-        "Upload contract documents * (PDF or DOCX format)")
+        "Upload contract and related documents (required)")
 
     # Additional context input (clearly marked as optional)
     additional_context = st.text_area(
-        "Additional Context (Optional)",
-        placeholder="e.g., Focus on warranty provisions, consider prior verbal agreements, analyze specific performance obligations...",
-        help="Optional: Provide any additional context, specific questions, or areas of focus for the analysis",
+        "Additional context (optional)",
+        placeholder="Provide specific guidance to the AI (e.g., highlight focus areas or key clauses or mention a verbal agreement.",
         height=100)
 
     # Check completion status for smart button enablement
@@ -162,7 +162,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         # Display progress
         steps = [
-            "Starting", "Step 1", "Step 2", "Step 3", "Step 4",
+            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
             "Step 5", "Memo Generation"
         ]
         progress_placeholder = st.empty()

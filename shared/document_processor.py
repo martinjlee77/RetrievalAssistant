@@ -40,7 +40,7 @@ class SharedDocumentProcessor:
         uploaded_files = st.file_uploader(
             label,
             type=['pdf', 'docx'],
-            help="Upload up to 5 contract documents (PDF or Word). All documents will be combined for analysis.",
+            help="Upload up to 5 relevant contract documents (PDF or DOCX). The system will automatically combine these into a single arrangement for analysis. Incomplete or missing documentation may lead to inaccurate analysis results.",
             accept_multiple_files=True
         )
         
