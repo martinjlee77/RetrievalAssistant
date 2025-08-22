@@ -76,34 +76,61 @@ class CleanMemoGenerator:
         return final_memo
     
     def display_clean_memo(self, memo_content: str) -> None:
-        """Display clean memo content in Streamlit."""
+        """Display clean memo content using HTML to preserve formatting."""
         st.markdown("## 📋 Generated Memo")
         
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
-        # BYPASS STREAMLIT MARKDOWN - Use text display instead
-        st.text_area("Raw Memo Content (No Processing):", memo_content, height=600)
+        # Convert markdown to HTML manually to bypass Streamlit's markdown processor
+        html_content = self._convert_markdown_to_html(memo_content)
         
-        # Also try code block to see if it preserves formatting
-        st.code(memo_content, language="markdown")
+        # Use HTML display which preserves formatting
+        st.markdown(html_content, unsafe_allow_html=True)
         
-        # Download button to verify the actual file content
+        # Download button
         st.download_button(
             label="📥 Download Memo (Markdown)",
             data=memo_content,
             file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
             mime="text/markdown"
         )
+    
+    def _convert_markdown_to_html(self, markdown_content: str) -> str:
+        """Convert markdown to HTML manually to preserve currency formatting."""
         
-        # Show character-by-character analysis
-        currency_positions = []
-        for i, char in enumerate(memo_content):
-            if char == '$' and i < len(memo_content) - 10:
-                sample = memo_content[i:i+10]
-                currency_positions.append(f"Position {i}: {repr(sample)}")
+        # Split into lines and process each one
+        lines = markdown_content.split('\n')
+        html_lines = []
         
-        if currency_positions:
-            st.write("**Currency Analysis in Raw Content:**")
-            for pos in currency_positions[:5]:  # Show first 5
-                st.write(pos)
+        for line in lines:
+            # Convert headers
+            if line.startswith('# '):
+                html_lines.append(f'<h1>{line[2:]}</h1>')
+            elif line.startswith('## '):
+                html_lines.append(f'<h2>{line[3:]}</h2>')
+            elif line.startswith('### '):
+                html_lines.append(f'<h3>{line[4:]}</h3>')
+            # Convert bold text
+            elif '**' in line:
+                # Simple bold conversion
+                line = line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(f'<p>{line}</p>')
+            # Convert horizontal rules
+            elif line.strip() == '---':
+                html_lines.append('<hr>')
+            # Empty lines become breaks
+            elif line.strip() == '':
+                html_lines.append('<br>')
+            # Regular paragraphs
+            else:
+                html_lines.append(f'<p>{line}</p>')
+        
+        # Join with proper HTML structure
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px;">
+            {''.join(html_lines)}
+        </div>
+        """
+        
+        return html_content
