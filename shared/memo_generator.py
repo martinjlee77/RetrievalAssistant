@@ -356,8 +356,11 @@ class SharedMemoGenerator:
         """Display the generated memo in Streamlit with download option."""
         st.markdown("## 📋 Generated Memo")
         
-        # Display memo content
-        st.markdown(memo_content)
+        # Debug: Log the actual content being displayed
+        logger.info(f"DEBUG: Displaying memo content sample: {repr(memo_content[:200])}")
+        
+        # Display memo content with explicit unsafe_allow_html=False to prevent any HTML processing
+        st.markdown(memo_content, unsafe_allow_html=False)
         
         # Add download button
         st.download_button(
