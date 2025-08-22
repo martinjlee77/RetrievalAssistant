@@ -53,19 +53,18 @@ class SharedMemoGenerator:
             # Load template
             template = self._load_template()
             
-            # Clean content formatting before template processing
-            cleaned_memo_data = self._clean_memo_data_formatting(memo_data)
+            # NO CLEANING - use clean memo data directly
             
             # Prepare template variables
             template_vars = self._prepare_template_variables(
-                cleaned_memo_data, customer_name, analysis_title, standard_name
+                memo_data, customer_name, analysis_title, standard_name
             )
             
             # Replace template placeholders
             memo_content = self._replace_template_placeholders(template, template_vars)
             
-            # Clean up and format
-            final_memo = self._clean_and_format_memo(memo_content)
+            # NO PROCESSING - return clean content directly
+            final_memo = memo_content
             
             logger.info(f"Generated memo for {customer_name} - {standard_name}")
             return final_memo
