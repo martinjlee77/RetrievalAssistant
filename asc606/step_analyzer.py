@@ -113,7 +113,12 @@ class ASC606StepAnalyzer:
                     logger.error(f"DEBUG: {step_key} contains 'Conclusion:': {'Conclusion:' in content}")
                     logger.error(f"DEBUG: {step_key} sample: {content[:500]}...")
         
-        conclusions_text = self._extract_conclusions_from_steps(results['steps'])
+        # Fix: Check if steps data has nested 'steps' key (data structure issue)
+        steps_for_extraction = results['steps']
+        if 'steps' in steps_for_extraction and len(steps_for_extraction) == 1:
+            # Double-nested structure - extract the inner steps
+            steps_for_extraction = steps_for_extraction['steps']
+        conclusions_text = self._extract_conclusions_from_steps(steps_for_extraction)
         logger.info(f"DEBUG: Extracted conclusions text: {conclusions_text[:200]}...")
         
         # Generate executive summary, background, and conclusion
