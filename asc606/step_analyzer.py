@@ -511,12 +511,28 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
                 if isinstance(step_data, dict) and 'markdown_content' in step_data:
                     # Extract conclusion from markdown content
                     content = step_data['markdown_content']
-                    if '**Conclusion:**' in content:
-                        parts = content.split('**Conclusion:**', 1)
-                        if len(parts) == 2:
-                            conclusion = parts[1].split('**Issues or Uncertainties:**')[0].strip()
-                            conclusions.append(f"Step {step_num}: {conclusion}")
-                            logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
+                    
+                    # Try multiple conclusion patterns
+                    conclusion = None
+                    for pattern in ['**Conclusion:**', 'Conclusion:', '**Conclusion**']:
+                        if pattern in content:
+                            parts = content.split(pattern, 1)
+                            if len(parts) == 2:
+                                # Extract until next section or end
+                                conclusion_part = parts[1]
+                                # Stop at next major section
+                                for end_pattern in ['**Issues or Uncertainties:**', 'Issues or Uncertainties:', '**Issues**', 'Issues:']:
+                                    if end_pattern in conclusion_part:
+                                        conclusion_part = conclusion_part.split(end_pattern)[0]
+                                        break
+                                conclusion = conclusion_part.strip()
+                                break
+                    
+                    if conclusion:
+                        conclusions.append(f"Step {step_num}: {conclusion}")
+                        logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
+                    else:
+                        logger.warning(f"No conclusion found in Step {step_num} content")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
