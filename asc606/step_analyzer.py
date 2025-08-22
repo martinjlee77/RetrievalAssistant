@@ -98,7 +98,12 @@ class ASC606StepAnalyzer:
                     }
         
         # Generate additional sections using clean LLM calls
+        logger.info("DEBUG: Starting additional section generation...")
+        logger.info(f"DEBUG: Results structure keys: {results.keys()}")
+        logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
+        
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
+        logger.info(f"DEBUG: Extracted conclusions text: {conclusions_text[:200]}...")
         
         # Generate executive summary, background, and conclusion
         logger.info("Generating executive summary...")
@@ -107,6 +112,7 @@ class ASC606StepAnalyzer:
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        logger.info("DEBUG: All additional sections generated successfully")
         
         logger.info("ASC 606 analysis completed successfully")
         return results
