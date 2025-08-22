@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VeritasLogic.ai - Option 3: Monochromatic with Texture</title>
+    <title>VeritasLogic.ai - Domain-Specific AI for Accounting Professionals</title>
+    <meta name="description" content="Generate comprehensive, accurate ASC analyses in minutes with domain-specific AI. Built by 20+ year EY veteran for accounting professionals.">
+    <link rel="canonical" href="https://veritaslogic.ai">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -82,6 +85,16 @@
         .nav-cta:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(255,255,255,0.3);
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
         /* Hero Section */
@@ -168,6 +181,34 @@
         .demo-link:hover {
             border-color: rgba(255,255,255,0.6);
             background: rgba(255,255,255,0.1);
+        }
+
+        /* Trust Indicators */
+        .trust-indicators {
+            padding: 50px 0;
+            background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+            text-align: center;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .trust-item {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        .trust-number {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: block;
         }
 
         /* Value Proposition Section */
@@ -308,6 +349,30 @@
             color: #ffffff;
         }
 
+        .demo-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .demo-step {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .step-number {
+            background: rgba(255,255,255,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            font-weight: 600;
+        }
+
         /* Technical Credibility */
         .tech-section {
             padding: 100px 0;
@@ -360,10 +425,51 @@
             font-size: 0.95rem;
         }
 
+        /* Pricing Section */
+        .pricing-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+            position: relative;
+        }
+
+        .pricing-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pricing-card {
+            background: rgba(255,255,255,0.08);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            margin: 2rem 0;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: #ffffff;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
         /* Testimonials */
         .testimonials {
             padding: 100px 0;
-            background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+            background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
             color: white;
             position: relative;
         }
@@ -408,7 +514,7 @@
         /* About Preview */
         .about-preview {
             padding: 100px 0;
-            background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+            background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
             position: relative;
         }
 
@@ -459,6 +565,31 @@
             margin-bottom: 1rem;
         }
 
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta-content h2 {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .cta-content p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 2rem;
+        }
+
         /* Footer */
         .footer {
             background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
@@ -500,10 +631,66 @@
             color: rgba(255,255,255,0.6);
         }
 
+        /* Contact Form */
+        .contact-form {
+            background: rgba(255,255,255,0.05);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .form-submit {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            color: #212F3C;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255,255,255,0.3);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
             }
             
             .hero h1 {
@@ -522,6 +709,25 @@
             .hero-cta {
                 display: block;
                 margin-bottom: 1rem;
+                margin-right: 0;
+            }
+            
+            .demo-link {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-container {
+                padding: 0 1rem;
             }
         }
     </style>
@@ -530,14 +736,16 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo">VeritasLogic.ai</a>
+            <a href="#home" class="logo">VeritasLogic.ai</a>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#features">Features</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="#demo">Demo</a></li>
                 <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <button class="mobile-menu-btn">☰</button>
             <a href="#trial" class="nav-cta">Start Free Trial</a>
         </div>
     </nav>
@@ -545,15 +753,41 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-container">
-            <h1>Transforming Accounting with<br> Domain-Specific AI</h1>
+            <h1>Transforming Accounting with Domain-Specific AI</h1>
             <p>Generate comprehensive, accurate ASC analyses in minutes, not days. Built by accountants for accountants, powered by advanced AI and comprehensive FASB guidance.</p>
-            <a href="#trial" class="hero-cta">Start Free Trial</a>
-            <a href="#demo" class="demo-link">View Interactive Demo →</a>
+            <div style="margin-top: 2rem;">
+                <a href="#trial" class="hero-cta">Start Free Trial</a>
+                <a href="#demo" class="demo-link">View Interactive Demo →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Indicators -->
+    <section class="trust-indicators">
+        <div class="container">
+            <div class="trust-grid">
+                <div class="trust-item">
+                    <span class="trust-number">20+</span>
+                    Years EY Experience
+                </div>
+                <div class="trust-item">
+                    <span class="trust-number">3</span>
+                    ASC Standards Supported
+                </div>
+                <div class="trust-item">
+                    <span class="trust-number">80%</span>
+                    Time Reduction
+                </div>
+                <div class="trust-item">
+                    <span class="trust-number">100%</span>
+                    Data Security
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Value Propositions -->
-    <section class="value-props">
+    <section class="value-props" id="features">
         <div class="container">
             <div class="section-header">
                 <h2>Save Time. Reduce Costs. Improve Quality.</h2>
@@ -563,7 +797,7 @@
             <div class="value-grid">
                 <div class="value-card">
                     <h3>Instant Analysis</h3>
-                    <p>Generate comprehensive ASC 606, 340-40, and 842 analyses in minutes. What used to take hours of research and writing is now automated with audit-ready precision.</p>
+                    <p>Generate comprehensive ASC 606, 340-40, and 842 analyses in minutes. What used to take days of research and writing is now automated with professional precision.</p>
                 </div>
                 
                 <div class="value-card">
@@ -595,8 +829,21 @@
             <div class="demo-container">
                 <div class="demo-placeholder">
                     <h4>Interactive Demo Coming Soon</h4>
-                    <p>Full ASC 606 analysis workflow using fictional company "TechStart Corp"</p>
-                    <p>Upload contract → AI analysis → Complete memo in under 3 minutes</p>
+                    <div class="demo-steps">
+                        <div class="demo-step">
+                            <div class="step-number">1</div>
+                            <p>Upload Contract</p>
+                        </div>
+                        <div class="demo-step">
+                            <div class="step-number">2</div>
+                            <p>AI Analysis</p>
+                        </div>
+                        <div class="demo-step">
+                            <div class="step-number">3</div>
+                            <p>Complete Memo</p>
+                        </div>
+                    </div>
+                    <p style="margin-top: 1rem;">Full ASC 606 analysis workflow using fictional company "TechStart Corp" - Complete professional memo generated in under 3 minutes</p>
                 </div>
                 <a href="#trial" class="hero-cta">Try With Your Own Contract</a>
             </div>
@@ -635,16 +882,48 @@
         </div>
     </section>
 
+    <!-- Pricing Section -->
+    <section class="pricing-section" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Transparent Pricing</h2>
+                <p>Pay only for what you use. No hidden fees or long-term commitments.</p>
+            </div>
+            
+            <div class="pricing-container">
+                <div class="pricing-card">
+                    <h3 style="font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif; font-size: 1.8rem; margin-bottom: 1rem;">Consumption-Based Pricing</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 2rem; color: rgba(255,255,255,0.8);">Start with free trial credits, then pay per analysis generated</p>
+                    
+                    <ul class="pricing-features">
+                        <li>Free trial credits to get started</li>
+                        <li>Pay only for analyses you generate</li>
+                        <li>All ASC standards included (606, 340-40, 842)</li>
+                        <li>Enterprise-grade security</li>
+                        <li>Email support included</li>
+                        <li>Optional human review service</li>
+                        <li>No monthly minimums or maximums</li>
+                        <li>Cancel anytime</li>
+                    </ul>
+                    
+                    <a href="#trial" class="hero-cta" style="margin-top: 2rem;">Start Your Free Trial</a>
+                    <p style="font-size: 0.9rem; margin-top: 1rem; color: rgba(255,255,255,0.6);">No credit card required for trial</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Testimonials -->
     <section class="testimonials">
         <div class="container">
             <div class="section-header">
                 <h2 style="color: white;">Trusted by Accounting Professionals</h2>
+                <p style="color: rgba(255,255,255,0.8);">See what controllers and CPAs are saying about VeritasLogic.ai</p>
             </div>
             
             <div class="testimonial-card">
                 <blockquote>
-                    "VeritasLogic.ai reduced our ASC 606 analysis time by 80%. The quality is exceptional and having the human review option gives us complete confidence in our deliverables."
+                    "VeritasLogic.ai reduced our ASC 606 analysis time by 80%. The quality is exceptional and having the human review option gives us complete confidence in our deliverables. This is exactly what we needed for our technical accounting workflow."
                 </blockquote>
                 <div class="testimonial-author">
                     Sarah Chen, Controller at [Beta User Company]
@@ -665,8 +944,53 @@
                     <h3>Built by an Accounting Expert</h3>
                     <p>VeritasLogic.ai was founded by a former EY partner with over 20 years of experience in complex accounting standards and audit requirements.</p>
                     <p>After decades of seeing the same time-consuming analyses repeated across clients, our founder recognized the opportunity to leverage AI to automate routine technical accounting work without sacrificing quality.</p>
-                    <p>The result is a domain-specific AI platform that understands the nuances of accounting standards and generates audit-ready analyses that meet the highest professional standards.</p>
+                    <p>The result is a domain-specific AI platform that understands the nuances of accounting standards and generates professional analyses that meet the highest industry standards.</p>
+                    <p><strong>Why VeritasLogic.ai?</strong> Because accounting professionals deserve AI tools built by someone who understands the complexities of technical accounting, not generic solutions adapted for accounting.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="trial">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Transform Your Accounting Workflow?</h2>
+                <p>Join accounting professionals who are already saving days of work with domain-specific AI</p>
+                
+                <div class="contact-form" style="max-width: 500px; margin: 2rem auto;">
+                    <form id="trial-form">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Business Email</label>
+                            <input type="email" id="email" name="email" required placeholder="you@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" required placeholder="Your company name">
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <input type="text" id="role" name="role" placeholder="e.g., Controller, CPA, Technical Accountant">
+                        </div>
+                        <button type="submit" class="form-submit">Start Free Trial</button>
+                    </form>
+                    <p style="font-size: 0.9rem; margin-top: 1rem; color: rgba(255,255,255,0.6); text-align: center;">We'll send you trial credits and setup instructions within 24 hours.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" style="padding: 50px 0; background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);">
+        <div class="container">
+            <div style="text-align: center;">
+                <h3 style="font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif; font-size: 1.8rem; margin-bottom: 1rem; color: #ffffff;">Questions? Let's Talk</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 2rem;">Get in touch with our team for demos, technical questions, or partnership opportunities</p>
+                <a href="mailto:hello@veritaslogic.ai" style="color: #ffffff; text-decoration: none; font-weight: 600; padding: 1rem 2rem; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; transition: all 0.3s ease;">hello@veritaslogic.ai</a>
             </div>
         </div>
     </section>
@@ -677,7 +1001,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>VeritasLogic.ai</h4>
-                    <p>Transforming accounting with domain-specific AI technology built by accounting professionals.</p>
+                    <p>Transforming accounting with domain-specific AI technology built by accounting professionals for accounting professionals.</p>
                 </div>
                 
                 <div class="footer-section">
@@ -691,8 +1015,8 @@
                 <div class="footer-section">
                     <h4>Company</h4>
                     <a href="#about">About Us</a>
-                    <a href="#blog">Blog</a>
                     <a href="#contact">Contact</a>
+                    <a href="mailto:hello@veritaslogic.ai">Support</a>
                 </div>
                 
                 <div class="footer-section">
@@ -704,9 +1028,31 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+                <p>&copy; 2025 VeritasLogic.ai. All rights reserved. Built by accountants, for accountants.</p>
             </div>
         </div>
     </footer>
+
+    <script>
+        // Simple form handling
+        document.getElementById('trial-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your interest! We will contact you within 24 hours with trial access.');
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
