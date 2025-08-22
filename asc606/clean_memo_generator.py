@@ -178,17 +178,8 @@ class CleanMemoGenerator:
         
         # Join with proper HTML structure
         html_content = f"""
-        <div style="
-            font-family: Georgia, 'Times New Roman', sans-serif; 
-            line-height: 1.4; 
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 25px;
-            color: #222;
-            border: 1px solid #e0e0e0;
-            border-radius: 2px;
-            
-            ">
+        <div style="font-family: Georgia, 'Times New Roman', sans-serif; 
+        line-height: 1.5; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
             {''.join(html_lines)}
         </div>
         """

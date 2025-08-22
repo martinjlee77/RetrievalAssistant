@@ -200,29 +200,58 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         ]
         progress_placeholder = st.empty()
 
-        # Complete analysis using analyzer's analyze_contract method
-        with st.spinner("Performing complete ASC 606 analysis..."):
-            # Get consolidated authoritative context
-            authoritative_context = knowledge_search.search_for_step(1, contract_text)
+        # Step-by-step analysis with progress indicators
+        analysis_results = {}
+        
+        # Run 5 ASC 606 steps with progress
+        for step_num in range(1, 6):
+            with progress_placeholder:
+                st.subheader(f"🔄 Analyzing Step {step_num}")
+                ui.analysis_progress(steps, step_num)
+
+            with st.spinner(f"Analyzing Step {step_num}..."):
+                # Get relevant guidance from knowledge base
+                authoritative_context = knowledge_search.search_for_step(
+                    step_num, contract_text)
+
+                # Analyze the step with additional context
+                step_result = analyzer._analyze_step(
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    customer_name=customer_name,
+                    additional_context=additional_context)
+
+                analysis_results[f'step_{step_num}'] = step_result
+                logger.info(f"DEBUG: Completed step {step_num}")
+
+        # Generate additional sections (Executive Summary, Background, Conclusion)
+        with progress_placeholder:
+            st.subheader("📋 Generating additional sections...")
+            ui.analysis_progress(steps, 6)
+
+        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
+            # Add the additional sections to results structure
+            additional_sections = analyzer._generate_additional_sections(analysis_results, customer_name, analysis_title)
             
-            # Use the complete analyze_contract method which includes additional sections
-            analysis_results = analyzer.analyze_contract(
-                contract_text=contract_text,
-                authoritative_context=authoritative_context,
-                customer_name=customer_name,
-                analysis_title=analysis_title,
-                additional_context=additional_context
-            )
+            # Combine into the expected structure for memo generator
+            final_results = {
+                'customer_name': customer_name,
+                'analysis_title': analysis_title,
+                'analysis_date': datetime.now().strftime("%B %d, %Y"),
+                'steps': analysis_results,
+                **additional_sections  # Add executive_summary, background, conclusion
+            }
             
             # Cache analysis results if successful
             if cache_key:
                 _cache_analysis_results(cache_key, {
-                    'analysis_results': analysis_results,
+                    'analysis_results': final_results,
                     'timestamp': datetime.now().isoformat()
                 })
             
             # Generate memo directly from complete analysis results
-            memo_content = memo_generator.combine_clean_steps(analysis_results)
+            memo_content = memo_generator.combine_clean_steps(final_results)
 
         # Display final memo
         progress_placeholder.empty()
