@@ -540,7 +540,8 @@ Requirements:
 6. Highlight any significant findings or issues
 7. Use double line breaks between paragraphs for readability
 8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
-9. Include proper spacing after commas and periods"""
+9. Include proper spacing after commas and periods
+10. DO NOT include any title or header like "Executive Summary:" - only provide the summary content"""
 
         try:
             response = self.client.chat.completions.create(
