@@ -169,17 +169,24 @@ class CleanMemoGenerator:
             # Convert horizontal rules
             elif line.strip() == '---':
                 html_lines.append('<hr>')
-            # Empty lines become breaks
+            # Empty lines - skip them to reduce spacing
             elif line.strip() == '':
-                html_lines.append('<br>')
+                continue  # Don't add empty breaks
             # Regular paragraphs
             else:
                 html_lines.append(f'<p>{line}</p>')
         
-        # Join with proper HTML structure
+        # Join with proper HTML structure and custom CSS for tighter spacing
         html_content = f"""
         <div style="font-family: Georgia, 'Times New Roman', sans-serif; 
-        line-height: 1.5; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
+        line-height: 1.4; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
+            <style>
+                p {{ margin: 8px 0; }}
+                h1 {{ margin: 16px 0 12px 0; }}
+                h2 {{ margin: 14px 0 10px 0; }}
+                h3 {{ margin: 12px 0 8px 0; }}
+                hr {{ margin: 15px 0; }}
+            </style>
             {''.join(html_lines)}
         </div>
         """
