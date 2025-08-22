@@ -41,21 +41,31 @@ def render_asc606_page():
             st.success("🎯 Found previous analysis for this contract!")
             col1, col2 = st.columns(2)
             
+            # Track if memo should be generated from cache
+            generate_from_cache = False
+            regenerate_analysis = False
+            
             with col1:
                 if st.button("⚡ Generate Memo from Cache",
                            type="primary",
                            use_container_width=True,
                            key="asc606_from_cache"):
-                    _generate_memo_from_cache(cached_analysis, customer_name, analysis_title)
+                    generate_from_cache = True
             
             with col2:
                 if st.button("🔄 Regenerate Analysis",
                            type="secondary",
                            use_container_width=True,
                            key="asc606_regenerate"):
-                    _clear_cache(cache_key)
-                    perform_asc606_analysis(contract_text, customer_name,
-                                          analysis_title, additional_context, cache_key)
+                    regenerate_analysis = True
+            
+            # Generate memo outside of columns for full width display
+            if generate_from_cache:
+                _generate_memo_from_cache(cached_analysis, customer_name, analysis_title)
+            elif regenerate_analysis:
+                _clear_cache(cache_key)
+                perform_asc606_analysis(contract_text, customer_name,
+                                      analysis_title, additional_context, cache_key)
         else:
             if st.button("➡️ Analyze Contract",
                        type="primary",
