@@ -94,8 +94,7 @@ class SharedDocumentProcessor:
                 return None, None
                 
             filenames_str = ", ".join(processed_filenames)
-            # Show brief success message
-            st.success(f"✅ Processed {len(processed_filenames)} document(s): {filenames_str}")
+            # Success is indicated by button activation - no need for additional message
             
             return combined_text, filenames_str
             
