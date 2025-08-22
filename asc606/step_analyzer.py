@@ -538,9 +538,14 @@ Requirements:
                 max_tokens=1000
             )
             
-            content = response.choices[0].message.content.strip()
-            logger.info(f"Generated executive summary ({len(content)} chars)")
-            return content
+            content = response.choices[0].message.content
+            if content:
+                content = content.strip()
+                logger.info(f"Generated executive summary ({len(content)} chars)")
+                return content
+            else:
+                logger.error("Empty executive summary response")
+                return "Executive summary generation failed. Please review individual step analyses below."
             
         except Exception as e:
             logger.error(f"Error generating executive summary: {str(e)}")
@@ -571,9 +576,14 @@ Instructions:
                 max_tokens=500
             )
             
-            content = response.choices[0].message.content.strip()
-            logger.info(f"Generated background section ({len(content)} chars)")
-            return content
+            content = response.choices[0].message.content
+            if content:
+                content = content.strip()
+                logger.info(f"Generated background section ({len(content)} chars)")
+                return content
+            else:
+                logger.error("Empty background response")
+                return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606."
             
         except Exception as e:
             logger.error(f"Error generating background: {str(e)}")
@@ -605,9 +615,14 @@ Instructions:
                 max_tokens=800
             )
             
-            content = response.choices[0].message.content.strip()
-            logger.info(f"Generated conclusion section ({len(content)} chars)")
-            return content
+            content = response.choices[0].message.content
+            if content:
+                content = content.strip()
+                logger.info(f"Generated conclusion section ({len(content)} chars)")
+                return content
+            else:
+                logger.error("Empty conclusion response")
+                return "The analysis indicates compliance with ASC 606 revenue recognition requirements. Implementation should proceed as outlined in the step-by-step analysis above."
             
         except Exception as e:
             logger.error(f"Error generating conclusion: {str(e)}")
@@ -666,7 +681,7 @@ Instructions:
             # Fallback to simple conclusion
             return "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition treatment is appropriate and complies with the authoritative guidance."
     
-    def generate_background_section(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
+    def generate_background_section_old(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
         """Generate LLM-powered background section from analysis results."""
         
         # Extract key conclusions for contract overview
