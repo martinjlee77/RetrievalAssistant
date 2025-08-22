@@ -320,9 +320,9 @@ STEP {step_num}: {step['title'].upper()}
 OBJECTIVE: {step['focus']}
 
 CONTRACT INFORMATION:
-Contract Analysis: Between the service provider and customer {customer_name}
+Contract Analysis: Between the company that is providing the good or service and customer {customer_name}
 
-Instructions: Analyze this contract from the service provider's perspective. {customer_name} is the customer receiving services.
+Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving services.
 
 CONTRACT TEXT:
 {contract_text}"""
@@ -535,11 +535,30 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
                         logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
                     else:
                         logger.warning(f"No conclusion found in Step {step_num} content")
+                        logger.debug(f"Step {step_num} content sample: {content[:200]}...")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
         conclusions_text = '\n\n'.join(conclusions)
         logger.info(f"Total conclusions extracted: {len(conclusions)}, text length: {len(conclusions_text)}")
+        
+        # DEBUG: If no conclusions extracted, log step data structure for troubleshooting
+        if len(conclusions) == 0:
+            logger.error("DEBUG: No conclusions extracted! Checking step data structure...")
+            for step_num in range(1, 6):
+                step_key = f'step_{step_num}'
+                if step_key in steps_data:
+                    step_data = steps_data[step_key]
+                    logger.error(f"DEBUG: {step_key} type: {type(step_data)}")
+                    if isinstance(step_data, dict):
+                        logger.error(f"DEBUG: {step_key} keys: {list(step_data.keys())}")
+                        if 'markdown_content' in step_data:
+                            content = step_data['markdown_content']
+                            logger.error(f"DEBUG: {step_key} content length: {len(content)}")
+                            logger.error(f"DEBUG: {step_key} has '**Conclusion:**': {'**Conclusion:**' in content}")
+                            logger.error(f"DEBUG: {step_key} has 'Conclusion:': {'Conclusion:' in content}")
+                            logger.error(f"DEBUG: {step_key} sample: {content[:300]}...")
+        
         return conclusions_text
     
     def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
