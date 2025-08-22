@@ -225,19 +225,14 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Analyzing and generating a memo..."):
-            # Generate memo with validated inputs
-            
-            memo_data = prepare_memo_data(analysis_results, customer_name,
-                                          analysis_title, analyzer)
-            
             # Cache analysis results if successful
             if cache_key:
                 _cache_analysis_results(cache_key, {
                     'analysis_results': analysis_results,
-                    'memo_data': memo_data,
                     'timestamp': datetime.now().isoformat()
                 })
             
+            # Generate memo directly from clean markdown - NO OLD PROCESSING
             memo_content = memo_generator.combine_markdown_steps(analysis_results)
 
         # Display final memo
@@ -255,43 +250,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 606 analysis error: {str(e)}")
 
-def prepare_memo_data(analysis_results: Dict[str, Any], customer_name: str,
-                      analysis_title: str, step_analyzer) -> Dict[str, Any]:
-    """Prepare analysis results for memo generation."""
-
-    # Build analysis section with all steps
-    analysis_content = []
-
-    for step_num in range(1, 6):
-        step_key = f'step_{step_num}'
-        if step_key in analysis_results:
-            step_data = analysis_results[step_key]
-            step_title = step_data.get('title', f'Step {step_num}')
-
-            step_content = f"### {step_title}\n\n"
-
-            if step_data.get('analysis'):
-                step_content += f"{step_data['analysis']}\n\n"
-
-            if step_data.get('conclusion'):
-                step_content += f"**Conclusion:** {step_data['conclusion']}\n\n"
-
-            analysis_content.append(step_content)
-
-    # Prepare memo data
-    memo_data = {
-        'analysis_content':
-        "\n".join(analysis_content),
-        'executive_summary':
-        step_analyzer.generate_executive_summary(analysis_results, customer_name),
-        'conclusion':
-        step_analyzer.generate_final_conclusion(analysis_results),
-        'background_section':
-        step_analyzer.generate_background_section(analysis_results, customer_name),
-
-    }
-
-    return memo_data
+# OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
 
 
 # Executive summary generation moved to ASC606StepAnalyzer class

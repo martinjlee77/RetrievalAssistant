@@ -261,43 +261,9 @@ class SharedMemoGenerator:
         match = re.search(r'step\s*(\d+)', key.lower())
         return match.group(1) if match else None
     
-    def _clean_memo_data_formatting(self, memo_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Clean common LLM formatting issues in memo data."""
-        cleaned_data = memo_data.copy()
-        
-        # Content fields that need cleaning
-        content_fields = ['analysis_content', 'executive_summary', 'conclusion', 
-                         'background_section', 'analysis_section']
-        
-        for field in content_fields:
-            if field in cleaned_data and cleaned_data[field]:
-                cleaned_data[field] = self._clean_content_formatting(cleaned_data[field])
-        
-        return cleaned_data
+    # REMOVED: _clean_memo_data_formatting - using clean markdown directly
     
-    def _clean_content_formatting(self, content: str) -> str:
-        """Clean common LLM formatting issues with minimal, essential patterns only."""
-        if not content:
-            return content
-            
-        # Essential fixes only - let the improved prompts handle the rest
-        
-        # 1. Fix HTML artifacts (always needed for template cleanup)
-        content = re.sub(r'<br>\s*', '\n', content)
-        content = re.sub(r'<[^>]+>', '', content)
-        
-        # 2. Fix duplicate headers (template-specific issue)
-        content = re.sub(r'## EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', '## EXECUTIVE SUMMARY\n\n', content)
-        content = re.sub(r'EXECUTIVE SUMMARY\s*\n\s*Executive Summary[:\s]*\n?', 'EXECUTIVE SUMMARY\n\n', content)
-        
-        # 3. Ensure proper paragraph spacing (basic formatting)
-        content = re.sub(r'\n\n\n+', '\n\n', content)
-        
-        # 4. Remove non-ASCII characters (prevents display issues)
-        content = re.sub(r'[^\x00-\x7F]+', '', content)
-        content = re.sub(r'[\x00-\x1F\x7F]', '', content)
-        
-        return content.strip()
+    # REMOVED: _clean_content_formatting - using clean markdown directly
     
     def combine_markdown_steps(self, analysis_results: Dict[str, Any]) -> str:
         """Combine markdown step results into complete memo."""
@@ -320,16 +286,7 @@ class SharedMemoGenerator:
             ""
         ]
         
-        # Add executive summary if available
-        if 'executive_summary' in analysis_results:
-            memo_parts.extend([
-                "## EXECUTIVE SUMMARY",
-                "",
-                analysis_results['executive_summary'],
-                "",
-                "---",
-                ""
-            ])
+        # Skip executive summary - using step markdown only
         
         # Add background
         memo_parts.extend([
@@ -354,6 +311,7 @@ class SharedMemoGenerator:
                 logger.info(f"DEBUG: Step {step_num} data keys: {list(step_data.keys()) if isinstance(step_data, dict) else 'Not a dict'}")
                 
                 if isinstance(step_data, dict) and 'markdown_content' in step_data:
+                    # Add clean markdown content directly - NO PROCESSING
                     memo_parts.append(step_data['markdown_content'])
                     memo_parts.append("")
                     steps_added += 1
@@ -366,16 +324,7 @@ class SharedMemoGenerator:
         
         logger.info(f"DEBUG: Total steps added to memo: {steps_added}/5")
         
-        # Add conclusion if available
-        if 'conclusion' in analysis_results:
-            memo_parts.extend([
-                "---",
-                "",
-                "## CONCLUSION",
-                "",
-                analysis_results['conclusion'],
-                ""
-            ])
+        # Skip conclusion - using step markdown only
         
         # Add footer
         memo_parts.extend([
@@ -387,7 +336,10 @@ class SharedMemoGenerator:
             "*This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.*"
         ])
         
-        return "\n".join(memo_parts)
+        # Return clean memo content - NO PROCESSING
+        clean_memo = "\n".join(memo_parts)
+        logger.info(f"DEBUG: Final memo length: {len(clean_memo)} chars")
+        return clean_memo
     
     def _replace_template_placeholders(self, template: str, variables: Dict[str, str]) -> str:
         """Replace all template placeholders with actual values."""
@@ -399,18 +351,7 @@ class SharedMemoGenerator:
         
         return content
     
-    def _clean_and_format_memo(self, memo_content: str) -> str:
-        """Clean up and format the final memo."""
-        # Remove excessive blank lines
-        memo_content = re.sub(r'\n\s*\n\s*\n', '\n\n', memo_content)
-        
-        # Ensure consistent section spacing
-        memo_content = re.sub(r'\n---\n', '\n\n---\n\n', memo_content)
-        
-        # Clean up any remaining formatting issues
-        memo_content = memo_content.strip()
-        
-        return memo_content
+    # REMOVED: _clean_and_format_memo - using clean markdown directly
     
     def display_memo(self, memo_content: str) -> None:
         """Display the generated memo in Streamlit with download option."""

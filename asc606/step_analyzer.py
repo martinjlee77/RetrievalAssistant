@@ -183,10 +183,10 @@ class ASC606StepAnalyzer:
                 logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
-                # Log RAW content from GPT-4o before any processing
+                # Log RAW content from GPT-4o - NO PROCESSING
                 logger.info(f"DEBUG: RAW GPT-4o response for Step {step_num} FULL TEXT: {repr(markdown_content)}")
                 
-                # Check for common corruption patterns in raw response
+                # Check for currency patterns in raw response (logging only)
                 if '$' in markdown_content:
                     currency_samples = []
                     import re
@@ -194,13 +194,13 @@ class ASC606StepAnalyzer:
                         currency_samples.append(repr(match.group()))
                     logger.info(f"DEBUG: Currency patterns in raw response: {currency_samples}")
                 
+                # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
-                # Apply critical formatting fixes
-                markdown_content = self._fix_formatting_issues(markdown_content)
+                
+                # Log sample of clean content for verification
+                logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
             
-            logger.info(f"DEBUG: Generated markdown for Step {step_num} (length: {len(markdown_content)})")
-            
-            # Return clean markdown content
+            # Return clean markdown content - NO PROCESSING
             return {
                 'title': self._get_step_title(step_num),
                 'markdown_content': markdown_content,
@@ -354,37 +354,7 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         
         return prompt
     
-    def _fix_formatting_issues(self, content: str) -> str:
-        """Fix common formatting issues in AI-generated content."""
-        if not content:
-            return content
-        
-        # Fix currency formatting issues
-        import re
-        
-        # Fix spaced currency: "$240, 000" -> "$240,000"
-        content = re.sub(r'\$(\d+),?\s+(\d{3})', r'$\1,\2', content)
-        
-        # Fix concatenated words - common patterns
-        content = re.sub(r'prof essional', 'professional', content)
-        content = re.sub(r'f ees', 'fees', content)
-        content = re.sub(r'f or', 'for', content)
-        content = re.sub(r'T he', 'The', content)
-        content = re.sub(r'one − time', 'one-time', content)
-        content = re.sub(r'and−', 'and', content)
-        
-        # Fix spacing issues around currency
-        content = re.sub(r'(\$\d+,?\d*)(peryear|annually|monthly)', r'\1 per year', content)
-        content = re.sub(r'(\$\d+,?\d*)\.T he', r'\1. The', content)
-        
-        # Fix general word concatenation
-        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
-        
-        # Ensure spaces after periods and commas
-        content = re.sub(r'\.([A-Z])', r'. \1', content)
-        content = re.sub(r',([A-Z])', r', \1', content)
-        
-        return content
+    # REMOVED: _fix_formatting_issues - using clean GPT-4o markdown directly
     
     def _parse_step_response(self, step_num: int, response_text: str) -> Dict[str, str]:
         """Parse the natural language response into structured components."""
@@ -518,79 +488,9 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         }
         return titles.get(step_num, f"Step {step_num}")
     
-    def _apply_basic_formatting(self, text: str) -> str:
-        """Apply essential formatting fixes to text."""
-        if not text:
-            return text
-            
-        # Fix currency formatting issues first
-        text = re.sub(r'(\d+),\s*(\d+)(?![,\d])', r'$\1,\2', text)  # 845, 000 -> $845,000
-        text = re.sub(r'\$\$+', '$', text)  # $$XXX -> $XXX
-        
-        # Fix text run-together patterns
-        text = re.sub(r'(\d+)([a-z])', r'\1 \2', text)  # 50,000f -> 50,000 f
-        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # wordWord -> word Word
-        
-        # Fix common spacing issues
-        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # Fix camelCase
-        text = re.sub(r'(\w)([A-Z][a-z])', r'\1 \2', text)  # Fix WordCase
-        
-        return text
+    # REMOVED: _apply_basic_formatting - using clean GPT-4o markdown directly
     
-    def generate_executive_summary(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
-        """Generate LLM-powered executive summary from analysis results."""
-        
-        # Extract conclusions from each step
-        conclusions = []
-        for step_num in range(1, 6):
-            step_key = f'step_{step_num}'
-            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
-                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
-        
-        # Build prompt
-        conclusions_text = "\n".join(conclusions)
-        prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
-
-Step Conclusions:
-{conclusions_text}
-
-Requirements:
-1. Write 3-5 sentences in flowing narrative paragraphs
-2. Format all currency as $XXX,XXX (no spaces in numbers)  
-3. Use professional accounting language without excessive bullet points
-4. Include specific number of performance obligations identified
-5. State compliance conclusion clearly
-6. Highlight any significant findings or issues
-7. Use double line breaks between paragraphs for readability
-8. ALWAYS format currency with single $ symbol (e.g., $240,000, never $$240,000)
-9. Include proper spacing after commas and periods
-10. Never start with "Executive Summary:" as header (template handles this)"""
-
-        # Call LLM API
-        try:
-            request_params = {
-                "model": "gpt-4o-mini",
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
-                    },
-                    {
-                        "role": "user", 
-                        "content": prompt
-                    }
-                ],
-                "temperature": 0.2,
-                "max_completion_tokens": 200
-            }
-            
-            response = self.client.chat.completions.create(**request_params)
-            return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            logger.error(f"Executive summary generation failed: {str(e)}")
-            # Fallback to simple summary
-            return f"We have completed a comprehensive ASC 606 analysis for {customer_name}. Please review the detailed step-by-step analysis for specific findings and conclusions."
+    # REMOVED: generate_executive_summary - using step markdown only
     
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
