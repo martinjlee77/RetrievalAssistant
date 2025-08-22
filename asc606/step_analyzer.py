@@ -558,8 +558,9 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
                         conclusions.append(f"Step {step_num}: {conclusion}")
                         logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
                     else:
-                        logger.warning(f"No conclusion found in Step {step_num} content")
-                        logger.debug(f"Step {step_num} content sample: {content[:200]}...")
+                        logger.error(f"FAILED to extract conclusion from Step {step_num}")
+                        logger.error(f"Step {step_num} content contains '**Conclusion:**': {'**Conclusion:**' in content}")
+                        logger.error(f"Step {step_num} content sample: {content[:500]}...")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
