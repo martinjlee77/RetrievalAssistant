@@ -38,7 +38,8 @@ def render_asc606_page():
         cached_analysis = _get_cached_analysis(cache_key)
         
         if cached_analysis:
-            st.success("🎯 Found previous analysis for this contract!")
+            # Subtle indication of cached analysis instead of big success box
+            st.info("💾 Previous analysis available")
             col1, col2 = st.columns(2)
             
             # Track if memo should be generated from cache

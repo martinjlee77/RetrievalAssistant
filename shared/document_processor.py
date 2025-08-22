@@ -84,7 +84,7 @@ class SharedDocumentProcessor:
                 combined_text += extracted_text
                 processed_filenames.append(uploaded_file.name)
                 
-                st.success(f"✅ Successfully processed {uploaded_file.name}")
+                # Keep logging but remove UI clutter
                 logger.info(f"Successfully processed document: {uploaded_file.name}")
             
             if not combined_text:
@@ -92,7 +92,7 @@ class SharedDocumentProcessor:
                 return None, None
                 
             filenames_str = ", ".join(processed_filenames)
-            st.info(f"📄 Combined {len(processed_filenames)} document(s) for analysis")
+            # Removed "Combined X documents" message to reduce UI clutter
             
             return combined_text, filenames_str
             
@@ -134,22 +134,6 @@ class SharedDocumentProcessor:
             text: Extracted document text
             filename: Original filename
         """
-        with st.expander("📄 Processed document information", expanded=False):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.write(f"**Filename:** {filename}")
-                st.write(f"**Character Count:** {len(text):,}")
-                
-            with col2:
-                word_count = len(text.split())
-                st.write(f"**Word Count:** {word_count:,}")
-                
-                # Estimate reading time
-                reading_time = max(1, word_count // 200)  # 200 WPM average
-                st.write(f"**Est. Reading Time:** {reading_time} min")
-            
-            # Show first few lines as preview
-            lines = text.split('\n')[:10]
-            preview = '\n'.join(line.strip() for line in lines if line.strip())[:500]
-            st.text_area("Document Preview (first few lines only)", preview, height=100, disabled=True)
+        # Simplified - removed collapsible section to reduce UI clutter
+        # Document info is shown in the file upload area instead
+        pass
