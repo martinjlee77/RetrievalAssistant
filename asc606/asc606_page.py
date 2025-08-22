@@ -90,11 +90,13 @@ def render_asc606_page():
             st.button("Analyze Contract & Generate Memo", 
                      disabled=True, 
                      use_container_width=True,
+                     key="asc606_analyze_disabled_missing",
                      help=f"The analysis cannot begin until the required fields above are completed. Please fill in the missing {', '.join(missing_items)}.")
         else:
             st.button("Analyze Contract & Generate Memo", 
                      disabled=True, 
-                     use_container_width=True)
+                     use_container_width=True,
+                     key="asc606_analyze_disabled_ready")
 
 
 def get_asc606_inputs():
