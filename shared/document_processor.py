@@ -56,43 +56,46 @@ class SharedDocumentProcessor:
             combined_text = ""
             processed_filenames = []
             
-            for uploaded_file in uploaded_files:
-                # Extract text using existing extractor
-                extraction_result = self.extractor.extract_text(uploaded_file)
-                
-                # Check for extraction errors
-                if extraction_result.get('error'):
-                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
-                    continue
-                
-                # Get the text from the extraction result
-                extracted_text = extraction_result.get('text', '')
-                
-                if not extracted_text or len(extracted_text.strip()) < 50:
-                    st.warning(f"⚠️ {uploaded_file.name} appears to be empty or extraction failed - skipping")
-                    continue
-                
-                # Add document separator and content
-                if combined_text:
-                    combined_text += "\n\n" + "="*80 + "\n"
-                    combined_text += f"DOCUMENT: {uploaded_file.name}\n"
-                    combined_text += "="*80 + "\n\n"
-                else:
-                    combined_text += f"DOCUMENT: {uploaded_file.name}\n"
-                    combined_text += "="*80 + "\n\n"
-                
-                combined_text += extracted_text
-                processed_filenames.append(uploaded_file.name)
-                
-                # Keep logging but remove UI clutter
-                logger.info(f"Successfully processed document: {uploaded_file.name}")
+            # Show processing status to users
+            with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
+                for uploaded_file in uploaded_files:
+                    # Extract text using existing extractor
+                    extraction_result = self.extractor.extract_text(uploaded_file)
+                    
+                    # Check for extraction errors
+                    if extraction_result.get('error'):
+                        st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                        continue
+                    
+                    # Get the text from the extraction result
+                    extracted_text = extraction_result.get('text', '')
+                    
+                    if not extracted_text or len(extracted_text.strip()) < 50:
+                        st.warning(f"⚠️ {uploaded_file.name} appears to be empty or extraction failed - skipping")
+                        continue
+                    
+                    # Add document separator and content
+                    if combined_text:
+                        combined_text += "\n\n" + "="*80 + "\n"
+                        combined_text += f"DOCUMENT: {uploaded_file.name}\n"
+                        combined_text += "="*80 + "\n\n"
+                    else:
+                        combined_text += f"DOCUMENT: {uploaded_file.name}\n"
+                        combined_text += "="*80 + "\n\n"
+                    
+                    combined_text += extracted_text
+                    processed_filenames.append(uploaded_file.name)
+                    
+                    # Keep logging but remove UI clutter
+                    logger.info(f"Successfully processed document: {uploaded_file.name}")
             
             if not combined_text:
                 st.error("❌ No documents could be processed successfully")
                 return None, None
                 
             filenames_str = ", ".join(processed_filenames)
-            # Removed "Combined X documents" message to reduce UI clutter
+            # Show brief success message
+            st.success(f"✅ Processed {len(processed_filenames)} document(s): {filenames_str}")
             
             return combined_text, filenames_str
             
