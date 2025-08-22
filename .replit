@@ -40,5 +40,9 @@ externalPort = 80
 localPort = 5001
 externalPort = 3000
 
+[[ports]]
+localPort = 8000
+externalPort = 8000
+
 [agent]
 integrations = ["python_openai==1.0.0"]
