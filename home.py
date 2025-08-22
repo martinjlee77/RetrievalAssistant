@@ -61,12 +61,7 @@ def load_custom_css():
                 border: 1px solid transparent;
             }}
 
-            /* --- Navigation Icons --- */
-            [data-testid="stSidebarNav"] ul li a span:first-child {{
-                margin-right: 0.75rem;
-                font-size: 1.1rem;
-                opacity: 0.8;
-            }}
+
 
             /* --- Hover Effect --- */
             [data-testid="stSidebarNav"] ul li a:hover {{
@@ -85,11 +80,7 @@ def load_custom_css():
                 box-shadow: 0 2px 8px rgba(197, 165, 101, 0.3);
             }}
 
-            /* --- Active Page Icon --- */
-            [data-testid="stSidebarNav"] ul li a[aria-current="page"] span:first-child {{
-                opacity: 1;
-                color: white;
-            }}
+
 
             /* --- Home Link Special Styling --- */
             [data-testid="stSidebarNav"] ul li:first-child a {{
@@ -128,16 +119,10 @@ st.logo("assets/images/logo.png")
 
 # 4. Define all pages in your app.
 pg = st.navigation([
-    st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
-    st.Page("asc606/asc606_page.py",
-            title="ASC 606 Revenue Recognition",
-            icon=":material/receipt_long:"),
-    st.Page("pages/asc340.py",
-            title="ASC 340-40 Contract Costs",
-            icon=":material/contract:"),
-    st.Page("pages/asc842.py",
-            title="ASC 842 Leases",
-            icon=":material/apartment:"),
+    st.Page("pages/home_content.py", title="Home"),
+    st.Page("asc606/asc606_page.py", title="ASC 606 Revenue Recognition"),
+    st.Page("pages/asc340.py", title="ASC 340-40 Contract Costs"),
+    st.Page("pages/asc842.py", title="ASC 842 Leases"),
 ])
 
 # 5. Run the app.
