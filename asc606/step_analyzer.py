@@ -184,7 +184,7 @@ class ASC606StepAnalyzer:
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
                 # Log RAW content from GPT-4o before any processing
-                logger.info(f"DEBUG: RAW GPT-4o response for Step {step_num} (first 500 chars): {repr(markdown_content[:500])}")
+                logger.info(f"DEBUG: RAW GPT-4o response for Step {step_num} FULL TEXT: {repr(markdown_content)}")
                 
                 # Check for common corruption patterns in raw response
                 if '$' in markdown_content:
