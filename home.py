@@ -21,34 +21,93 @@ def load_custom_css():
             [data-testid="stSidebar"] {{
                 background-color: {bg_color};
                 border-right: 1px solid #e0e0e0;
+                padding-top: 1rem;
             }}
 
-            /* --- Sidebar Navigation Links General Style --- */
+            /* --- Sidebar Navigation Container --- */
+            [data-testid="stSidebarNav"] {{
+                padding: 0 1rem;
+            }}
+
+            /* --- Navigation List --- */
+            [data-testid="stSidebarNav"] ul {{
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                gap: 0.5rem;
+                display: flex;
+                flex-direction: column;
+            }}
+
+            /* --- Navigation List Items --- */
+            [data-testid="stSidebarNav"] ul li {{
+                margin: 0;
+                padding: 0;
+            }}
+
+            /* --- Navigation Links General Style --- */
             [data-testid="stSidebarNav"] ul li a {{
-            
-                padding: 0.5rem 0.75rem;
-                transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+                display: flex;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                margin: 0.25rem 0;
+                transition: all 0.2s ease-in-out;
                 text-decoration: none;
                 border-radius: 8px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: {primary_color};
+                background-color: transparent;
+                border: 1px solid transparent;
             }}
 
-            /* --- Hover effect for navigation links --- */
+            /* --- Navigation Icons --- */
+            [data-testid="stSidebarNav"] ul li a span:first-child {{
+                margin-right: 0.75rem;
+                font-size: 1.1rem;
+                opacity: 0.8;
+            }}
+
+            /* --- Hover Effect --- */
             [data-testid="stSidebarNav"] ul li a:hover {{
                 background-color: #F8F9FA;
+                border-color: #DEE2E6;
+                transform: translateX(2px);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }}
 
-            /* --- Active Page Link Style --- */
+            /* --- Active Page Style --- */
             [data-testid="stSidebarNav"] ul li a[aria-current="page"] {{
                 background-color: {secondary_color};
-                font-weight: 800;
+                color: white;
+                font-weight: 600;
+                border-color: {secondary_color};
+                box-shadow: 0 2px 8px rgba(197, 165, 101, 0.3);
             }}
 
-            /* --- Login/Register links separator --- */
-            [data-testid="stSidebarNav"] ul li:nth-last-child(1) a,
-            [data-testid="stSidebarNav"] ul li:nth-last-child(2) a {{
-                border-top: 1px solid #ddd;
-                margin-top: 20px;
-                padding-top: 20px;
+            /* --- Active Page Icon --- */
+            [data-testid="stSidebarNav"] ul li a[aria-current="page"] span:first-child {{
+                opacity: 1;
+                color: white;
+            }}
+
+            /* --- Home Link Special Styling --- */
+            [data-testid="stSidebarNav"] ul li:first-child a {{
+                border-bottom: 1px solid #DEE2E6;
+                margin-bottom: 0.75rem;
+                padding-bottom: 1rem;
+            }}
+
+            /* --- Coming Soon Indicator for Future Modules --- */
+            [data-testid="stSidebarNav"] ul li:last-child a {{
+                opacity: 0.6;
+                cursor: not-allowed;
+            }}
+
+            /* --- Logo Spacing --- */
+            [data-testid="stSidebar"] [data-testid="stImage"] {{
+                margin-bottom: 1.5rem;
+                padding: 0 1rem;
             }}
         </style>
     """
@@ -72,13 +131,13 @@ pg = st.navigation([
     st.Page("pages/home_content.py", title="Home", icon=":material/home:"),
     st.Page("asc606/asc606_page.py",
             title="ASC 606 Revenue Recognition",
-            icon=":material/arrow_forward:"),
+            icon=":material/receipt_long:"),
     st.Page("pages/asc340.py",
             title="ASC 340-40 Contract Costs",
-            icon=":material/arrow_forward:"),
+            icon=":material/contract:"),
     st.Page("pages/asc842.py",
             title="ASC 842 Leases",
-            icon=":material/arrow_forward:"),
+            icon=":material/apartment:"),
 ])
 
 # 5. Run the app.
