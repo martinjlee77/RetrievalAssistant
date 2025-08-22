@@ -516,6 +516,7 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         """Extract conclusion text from all completed steps."""
         conclusions = []
         logger.info(f"Extracting conclusions from {len(steps_data)} steps")
+        logger.error(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
         
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
