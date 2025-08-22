@@ -320,7 +320,9 @@ STEP {step_num}: {step['title'].upper()}
 OBJECTIVE: {step['focus']}
 
 CONTRACT INFORMATION:
-Customer: {customer_name}
+Contract Analysis: Between the service provider and customer {customer_name}
+
+Instructions: Analyze this contract from the service provider's perspective. {customer_name} is the customer receiving services.
 
 CONTRACT TEXT:
 {contract_text}"""
