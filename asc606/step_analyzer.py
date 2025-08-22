@@ -250,7 +250,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
         
         step_info = {
             1: {
-                'title': 'Identify the Contract',
+                'title': 'Step 1: Identify the Contract',
                 'focus': 'Determine if a valid contract exists under ASC 606-10-25-1 criteria',
                 'key_points': [
                     'Verify that the parties have approved the contract and are committed to perform (ASC 606-10-25-1(a))',
@@ -261,7 +261,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 ]
             },
             2: {
-                'title': 'Identify Performance Obligations', 
+                'title': 'Step 2: Identify Performance Obligations', 
                 'focus': 'Identify distinct goods or services using ASC 606-10-25-14 and 25-22',
                 'key_points': [
                     'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
@@ -277,7 +277,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 ]
             },
             3: {
-                'title': 'Determine the Transaction Price',
+                'title': 'Step 3: Determine the Transaction Price',
                 'focus': 'Establish the transaction price per ASC 606-10-32-2',
                 'key_points': [
                     'Fixed consideration amounts',
@@ -290,7 +290,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 ]
             },
             4: {
-                'title': 'Allocate the Transaction Price',
+                'title': 'Step 4: Allocate the Transaction Price',
                 'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
                 'key_points': [
                     'Summarize Identify the performance obligations determined in Step 2',
@@ -301,7 +301,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 ]
             },
             5: {
-                'title': 'Recognize Revenue',
+                'title': 'Step 5: Recognize Revenue',
                 'focus': 'Determine when revenue should be recognized for each performance obligation',
                 'key_points': [
                     'Determine over-time vs. point-in-time recognition for each performance obligation',

@@ -285,6 +285,7 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
     try:
         st.info("⚡ Generating memo from cached analysis...")
         
+        from asc606.clean_memo_generator import CleanMemoGenerator
         memo_generator = CleanMemoGenerator()
         
         # Use cached memo data directly
