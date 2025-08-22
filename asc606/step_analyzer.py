@@ -102,6 +102,17 @@ class ASC606StepAnalyzer:
         logger.info(f"DEBUG: Results structure keys: {results.keys()}")
         logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
         
+        # DEBUG: Log step data before extraction
+        logger.error(f"DEBUG: About to extract conclusions from steps: {list(results['steps'].keys())}")
+        for step_key, step_data in results['steps'].items():
+            if isinstance(step_data, dict):
+                logger.error(f"DEBUG: {step_key} structure: {list(step_data.keys())}")
+                if 'markdown_content' in step_data:
+                    content = step_data['markdown_content']
+                    logger.error(f"DEBUG: {step_key} content length: {len(content)}")
+                    logger.error(f"DEBUG: {step_key} contains 'Conclusion:': {'Conclusion:' in content}")
+                    logger.error(f"DEBUG: {step_key} sample: {content[:500]}...")
+        
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
         logger.info(f"DEBUG: Extracted conclusions text: {conclusions_text[:200]}...")
         
