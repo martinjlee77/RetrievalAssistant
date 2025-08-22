@@ -183,6 +183,17 @@ class ASC606StepAnalyzer:
                 logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
+                # Log RAW content from GPT-4o before any processing
+                logger.info(f"DEBUG: RAW GPT-4o response for Step {step_num} (first 500 chars): {repr(markdown_content[:500])}")
+                
+                # Check for common corruption patterns in raw response
+                if '$' in markdown_content:
+                    currency_samples = []
+                    import re
+                    for match in re.finditer(r'\$[0-9,\s]+', markdown_content):
+                        currency_samples.append(repr(match.group()))
+                    logger.info(f"DEBUG: Currency patterns in raw response: {currency_samples}")
+                
                 markdown_content = markdown_content.strip()
                 # Apply critical formatting fixes
                 markdown_content = self._fix_formatting_issues(markdown_content)
