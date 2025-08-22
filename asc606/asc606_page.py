@@ -189,42 +189,20 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
         ]
         progress_placeholder = st.empty()
 
-        # Step-by-step analysis with knowledge base integration
-        analysis_results = {}
-
-        for step_num in range(1, 6):
-            with progress_placeholder:
-                st.subheader(f"🔄 Analyzing Step {step_num}")
-                ui.analysis_progress(steps, step_num)
-
-            with st.spinner(f"Analyzing Step {step_num}..."):
-                # Get relevant guidance from knowledge base
-                authoritative_context = knowledge_search.search_for_step(
-                    step_num, contract_text)
-
-                # Analyze the step with additional context
-                step_result = analyzer._analyze_step(
-                    step_num=step_num,
-                    contract_text=contract_text,
-                    authoritative_context=authoritative_context,
-                    customer_name=customer_name,
-                    additional_context=additional_context)
-
-                analysis_results[f'step_{step_num}'] = step_result
-                logger.info(f"DEBUG: Stored step {step_num} result with keys: {list(step_result.keys()) if isinstance(step_result, dict) else 'Not a dict'}")
-                
-                # Debug: Print the actual markdown content
-                if isinstance(step_result, dict) and 'markdown_content' in step_result:
-                    logger.info(f"DEBUG: Step {step_num} markdown content preview: {step_result['markdown_content'][:200]}...")
-                else:
-                    logger.error(f"ERROR: Step {step_num} missing markdown_content! Keys: {list(step_result.keys()) if isinstance(step_result, dict) else 'Not a dict'}")
-
-        # Generate final memo
-        with progress_placeholder:
-            st.subheader("📋 Analyzing and generating a memo...")
-            ui.analysis_progress(steps, 6)
-
-        with st.spinner("Analyzing and generating a memo..."):
+        # Complete analysis using analyzer's analyze_contract method
+        with st.spinner("Performing complete ASC 606 analysis..."):
+            # Get consolidated authoritative context
+            authoritative_context = knowledge_search.search_for_step(1, contract_text)
+            
+            # Use the complete analyze_contract method which includes additional sections
+            analysis_results = analyzer.analyze_contract(
+                contract_text=contract_text,
+                authoritative_context=authoritative_context,
+                customer_name=customer_name,
+                analysis_title=analysis_title,
+                additional_context=additional_context
+            )
+            
             # Cache analysis results if successful
             if cache_key:
                 _cache_analysis_results(cache_key, {
@@ -232,7 +210,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                     'timestamp': datetime.now().isoformat()
                 })
             
-            # Generate memo directly from clean markdown - NO OLD PROCESSING
+            # Generate memo directly from complete analysis results
             memo_content = memo_generator.combine_clean_steps(analysis_results)
 
         # Display final memo
