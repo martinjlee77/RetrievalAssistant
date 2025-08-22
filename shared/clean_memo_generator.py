@@ -82,13 +82,28 @@ class CleanMemoGenerator:
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
-        # Display content as-is
-        st.markdown(memo_content)
+        # BYPASS STREAMLIT MARKDOWN - Use text display instead
+        st.text_area("Raw Memo Content (No Processing):", memo_content, height=600)
         
-        # Download button
+        # Also try code block to see if it preserves formatting
+        st.code(memo_content, language="markdown")
+        
+        # Download button to verify the actual file content
         st.download_button(
             label="📥 Download Memo (Markdown)",
             data=memo_content,
             file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
             mime="text/markdown"
         )
+        
+        # Show character-by-character analysis
+        currency_positions = []
+        for i, char in enumerate(memo_content):
+            if char == '$' and i < len(memo_content) - 10:
+                sample = memo_content[i:i+10]
+                currency_positions.append(f"Position {i}: {repr(sample)}")
+        
+        if currency_positions:
+            st.write("**Currency Analysis in Raw Content:**")
+            for pos in currency_positions[:5]:  # Show first 5
+                st.write(pos)
