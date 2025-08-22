@@ -97,9 +97,9 @@ class ASC606StepAnalyzer:
                         'conclusion': "Analysis incomplete due to error"
                     }
         
-        # Generate overall analysis summary
-        results['executive_summary'] = self.generate_executive_summary(results, customer_name)
-        results['background'] = self.generate_background_section(results, customer_name)
+        # Skip executive summary generation - using clean step markdown only
+        results['executive_summary'] = "Analysis complete - see individual step analysis below"
+        results['background'] = f"Contract analysis for {customer_name} completed using ASC 606 methodology"
         
         logger.info("ASC 606 analysis completed successfully")
         return results
@@ -459,19 +459,15 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         # Last resort: put everything in analysis if parsing failed
         if not result['analysis'] and not result['conclusion']:
             if response_text and response_text.strip():
-                # Apply basic formatting before storing
-                cleaned_text = self._apply_basic_formatting(response_text.strip())
-                result['analysis'] = cleaned_text
+                # Store clean text without formatting
+                result['analysis'] = response_text.strip()
                 result['conclusion'] = "Analysis completed. See detailed reasoning above."
             else:
                 result['analysis'] = "ERROR: Empty response received from AI model. This may indicate a problem with GPT-5 compatibility."
                 result['conclusion'] = "Unable to complete analysis due to empty AI response."
         
-        # Apply formatting to parsed sections
-        if result['analysis']:
-            result['analysis'] = self._apply_basic_formatting(result['analysis'])
-        if result['conclusion']:
-            result['conclusion'] = self._apply_basic_formatting(result['conclusion'])
+        # Keep sections clean without formatting
+        # Note: Using clean markdown directly from GPT-4o
         
         logger.info(f"DEBUG: Parsed Step {step_num} - Analysis length: {len(result['analysis'])}, Conclusion length: {len(result['conclusion'])}")
         
