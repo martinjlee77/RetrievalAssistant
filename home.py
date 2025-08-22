@@ -124,6 +124,7 @@ pg = st.navigation([
     st.Page("pages/asc340.py", title="ASC 340-40 Contract Costs"),
     st.Page("pages/asc842.py", title="ASC 842 Leases"),
     st.Page("pages/website_preview.py", title="Website Preview"),
+    st.Page("pages/multipage_website_preview.py", title="Multi-Page Website"),
 ])
 
 # 5. Run the app.
