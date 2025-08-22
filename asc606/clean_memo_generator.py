@@ -111,7 +111,7 @@ class CleanMemoGenerator:
             "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
             "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]", 
             "",
-            "*This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details.*"
+            "This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details."
         ])
         
         # Join and return - NO PROCESSING
