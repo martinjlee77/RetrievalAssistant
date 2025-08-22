@@ -199,7 +199,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
             # Extract conclusions from the 5 steps
-            conclusions_text = analyzer._extract_conclusions_from_steps({'steps': analysis_results})
+            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
             
             # Generate the three additional sections
             executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)

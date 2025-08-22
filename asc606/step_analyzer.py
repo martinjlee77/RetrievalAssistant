@@ -113,29 +113,7 @@ class ASC606StepAnalyzer:
                     logger.error(f"DEBUG: {step_key} contains 'Conclusion:': {'Conclusion:' in content}")
                     logger.error(f"DEBUG: {step_key} sample: {content[:500]}...")
         
-        # DEBUG: Check what we're actually passing to conclusion extraction
-        logger.error(f"DEBUG: results['steps'] type: {type(results['steps'])}")
-        logger.error(f"DEBUG: results['steps'] keys: {list(results['steps'].keys()) if isinstance(results['steps'], dict) else 'Not a dict'}")
-        
-        # The issue is that _extract_conclusions_from_steps expects step data directly
-        # but we're passing the wrong structure. Let me check what results['steps'] actually contains
-        if isinstance(results['steps'], dict):
-            # Check if this contains step_1, step_2, etc. keys directly
-            step_keys = [k for k in results['steps'].keys() if k.startswith('step_')]
-            logger.error(f"DEBUG: Found step keys: {step_keys}")
-            if step_keys:
-                # This is the correct structure - pass it directly
-                conclusions_text = self._extract_conclusions_from_steps(results['steps'])
-            else:
-                # Check if there's a nested 'steps' key
-                if 'steps' in results['steps']:
-                    logger.error("DEBUG: Found nested 'steps' key, extracting from there")
-                    conclusions_text = self._extract_conclusions_from_steps(results['steps']['steps'])
-                else:
-                    logger.error("DEBUG: No valid step structure found")
-                    conclusions_text = ""
-        else:
-            conclusions_text = ""
+        conclusions_text = self._extract_conclusions_from_steps(results['steps'])
         logger.info(f"DEBUG: Extracted conclusions text: {conclusions_text[:200]}...")
         
         # Generate executive summary, background, and conclusion
