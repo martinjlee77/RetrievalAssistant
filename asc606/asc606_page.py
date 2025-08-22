@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
-from shared.memo_generator import SharedMemoGenerator
+from shared.clean_memo_generator import CleanMemoGenerator
 from shared.document_processor import SharedDocumentProcessor
 from asc606.step_analyzer import ASC606StepAnalyzer
 from asc606.knowledge_search import ASC606KnowledgeSearch
@@ -172,7 +172,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             try:
                 analyzer = ASC606StepAnalyzer()
                 knowledge_search = ASC606KnowledgeSearch()
-                memo_generator = SharedMemoGenerator(
+                memo_generator = CleanMemoGenerator(
                     template_path="asc606/templates/memo_template.md")
                 from shared.ui_components import SharedUIComponents
                 ui = SharedUIComponents()
@@ -233,13 +233,13 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                 })
             
             # Generate memo directly from clean markdown - NO OLD PROCESSING
-            memo_content = memo_generator.combine_markdown_steps(analysis_results)
+            memo_content = memo_generator.combine_clean_steps(analysis_results)
 
         # Display final memo
         progress_placeholder.empty()
         st.success("✅ Work is completed successfully!")
 
-        memo_generator.display_memo(memo_content)
+        memo_generator.display_clean_memo(memo_content)
 
         # Display knowledge base info if available
         if knowledge_search.is_available():
@@ -306,15 +306,15 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
     try:
         st.info("⚡ Generating memo from cached analysis...")
         
-        memo_generator = SharedMemoGenerator(template_path="asc606/templates/memo_template.md")
+        memo_generator = CleanMemoGenerator()
         
         # Use cached memo data directly
         memo_data = cached_data.get('memo_data', {})
         
-        memo_content = memo_generator.combine_markdown_steps(cached_data.get('analysis_results', {}))
+        memo_content = memo_generator.combine_clean_steps(cached_data.get('analysis_results', {}))
         
         st.success("✅ Memo generated from cache instantly!")
-        memo_generator.display_memo(memo_content)
+        memo_generator.display_clean_memo(memo_content)
         
         # Show cache info
         cache_time = cached_data.get('timestamp', 'Unknown')
