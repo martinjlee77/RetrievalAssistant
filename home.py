@@ -107,7 +107,7 @@ def load_custom_css():
 # 1. Set the page configuration
 st.set_page_config(
     page_title="VeritasLogic.ai | Multi-Standard Accounting Platform",
-    page_icon="assets/images/logo.png",
+    page_icon="assets/images/VL_black_nobk.png",
     layout="wide",
     initial_sidebar_state="expanded")
 

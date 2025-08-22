@@ -5,6 +5,35 @@ import os
 st.title("VeritasLogic.ai Complete Multi-Page Website")
 st.write("**Production-ready multi-page website with all planned features implemented**")
 
+# Load CSS and JS once and cache it
+@st.cache_data
+def load_assets():
+    try:
+        with open("veritaslogic_multipage_website/styles.css", "r") as f:
+            css_content = f.read()
+        with open("veritaslogic_multipage_website/script.js", "r") as f:
+            js_content = f.read()
+        return css_content, js_content
+    except Exception as e:
+        st.error(f"Could not load assets: {e}")
+        return "", ""
+
+css_content, js_content = load_assets()
+
+def inject_styles(html_content):
+    """Inject CSS and JS into HTML content"""
+    if not css_content or not js_content:
+        return html_content
+    
+    styled_content = html_content.replace(
+        '<link rel="stylesheet" href="styles.css">',
+        f'<style>{css_content}</style>'
+    ).replace(
+        '<script src="script.js"></script>',
+        f'<script>{js_content}</script>'
+    )
+    return styled_content
+
 # Create tabs for different pages
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Home", "About", "Features", "Pricing", "Blog", "Contact"])
 
@@ -13,23 +42,10 @@ with tab1:
     st.write("**Hero section, trust indicators, feature summary, compliance, human review, blog preview, and CTA**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/index.html", "r") as f:
             home_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = home_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(home_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
@@ -48,23 +64,10 @@ with tab2:
     st.write("**Founder story, vision, values, team, and recognition sections**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/about.html", "r") as f:
             about_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = about_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(about_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
@@ -83,23 +86,10 @@ with tab3:
     st.write("**Detailed feature showcase, interactive demo, human review, security, and comparison table**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/features.html", "r") as f:
             features_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = features_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(features_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
@@ -118,23 +108,10 @@ with tab4:
     st.write("**Consumption-based pricing, add-ons, volume tiers, cost comparison, and FAQ**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/pricing.html", "r") as f:
             pricing_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = pricing_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(pricing_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
@@ -153,23 +130,10 @@ with tab5:
     st.write("**Separate blog section with full articles, categories, sidebar, and subscription**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/blog.html", "r") as f:
             blog_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = blog_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(blog_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
@@ -188,23 +152,10 @@ with tab6:
     st.write("**Trial signup, demo request, enterprise contact, academic pricing, and multiple contact forms**")
     
     try:
-        # Read all necessary files
         with open("veritaslogic_multipage_website/contact.html", "r") as f:
             contact_content = f.read()
-        with open("veritaslogic_multipage_website/styles.css", "r") as f:
-            css_content = f.read()
-        with open("veritaslogic_multipage_website/script.js", "r") as f:
-            js_content = f.read()
         
-        # Inject CSS and JS into the HTML
-        styled_content = contact_content.replace(
-            '<link rel="stylesheet" href="styles.css">',
-            f'<style>{css_content}</style>'
-        ).replace(
-            '<script src="script.js"></script>',
-            f'<script>{js_content}</script>'
-        )
-        
+        styled_content = inject_styles(contact_content)
         components.html(styled_content, width=None, height=800, scrolling=True)
         
         st.download_button(
