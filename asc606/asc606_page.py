@@ -97,6 +97,7 @@ def render_asc606_page():
 def get_asc606_inputs():
     """Get ASC 606 specific inputs with progressive disclosure."""
     st.subheader("Contract Information")
+    st.caption("* Required fields")
 
     # ASC 606 specific inputs with clear required indicators
     col1, col2 = st.columns(2)
