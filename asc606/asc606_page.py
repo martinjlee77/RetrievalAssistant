@@ -231,8 +231,13 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Add the additional sections to results structure
-            additional_sections = analyzer._generate_additional_sections(analysis_results, customer_name, analysis_title)
+            # Extract conclusions from the 5 steps
+            conclusions_text = analyzer._extract_conclusions_from_steps({'steps': analysis_results})
+            
+            # Generate the three additional sections
+            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
+            background = analyzer.generate_background_section(conclusions_text, customer_name)
+            conclusion = analyzer.generate_conclusion_section(conclusions_text)
             
             # Combine into the expected structure for memo generator
             final_results = {
@@ -240,7 +245,9 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
                 'steps': analysis_results,
-                **additional_sections  # Add executive_summary, background, conclusion
+                'executive_summary': executive_summary,
+                'background': background,
+                'conclusion': conclusion
             }
             
             # Cache analysis results if successful
