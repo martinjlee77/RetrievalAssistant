@@ -101,8 +101,11 @@ class ASC606StepAnalyzer:
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
         
         # Generate executive summary, background, and conclusion
+        logger.info("Generating executive summary...")
         results['executive_summary'] = self.generate_executive_summary(conclusions_text, customer_name)
+        logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
+        logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
         
         logger.info("ASC 606 analysis completed successfully")
@@ -493,6 +496,7 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
     def _extract_conclusions_from_steps(self, steps_data: Dict[str, Any]) -> str:
         """Extract conclusion text from all completed steps."""
         conclusions = []
+        logger.info(f"Extracting conclusions from {len(steps_data)} steps")
         
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
@@ -506,8 +510,13 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
                         if len(parts) == 2:
                             conclusion = parts[1].split('**Issues or Uncertainties:**')[0].strip()
                             conclusions.append(f"Step {step_num}: {conclusion}")
+                            logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
+                else:
+                    logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
-        return '\n\n'.join(conclusions)
+        conclusions_text = '\n\n'.join(conclusions)
+        logger.info(f"Total conclusions extracted: {len(conclusions)}, text length: {len(conclusions_text)}")
+        return conclusions_text
     
     def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
         """Generate executive summary using clean LLM call."""
