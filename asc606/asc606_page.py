@@ -27,12 +27,11 @@ def render_asc606_page():
         "AI-generated comprehensive 5-step revenue recognition memo. Enter the required information below to begin."
     )
 
-    # Get user inputs
-    contract_text, filename, customer_name, analysis_title, additional_context, validation_errors = get_asc606_inputs(
-    )
+    # Get user inputs with progressive disclosure
+    contract_text, filename, customer_name, analysis_title, additional_context, is_ready = get_asc606_inputs()
 
-    # Show analysis buttons if inputs are valid
-    if not validation_errors and contract_text:
+    # Show analysis buttons with smart states
+    if is_ready:
         # Check for cached analysis
         cache_key = _generate_cache_key(contract_text, customer_name, additional_context)
         cached_analysis = _get_cached_analysis(cache_key)
@@ -74,103 +73,69 @@ def render_asc606_page():
                        key="asc606_analyze"):
                 perform_asc606_analysis(contract_text, customer_name,
                                       analysis_title, additional_context, cache_key)
+    else:
+        # Show disabled button with helpful message when not ready
+        missing_items = []
+        if not customer_name or not customer_name.strip():
+            missing_items.append("customer name")
+        if not analysis_title or not analysis_title.strip():
+            missing_items.append("analysis title")
+        if not contract_text:
+            missing_items.append("contract document")
+        
+        if missing_items:
+            st.button("➡️ Analyze Contract", 
+                     disabled=True, 
+                     use_container_width=True,
+                     help=f"Please provide: {', '.join(missing_items)}")
+        else:
+            st.button("➡️ Analyze Contract", 
+                     disabled=True, 
+                     use_container_width=True)
 
 
 def get_asc606_inputs():
-    """Get ASC 606 specific inputs and validate them."""
-    st.subheader("Required Information")
+    """Get ASC 606 specific inputs with progressive disclosure."""
+    st.subheader("Contract Information")
 
-    # ASC 606 specific inputs
+    # ASC 606 specific inputs with clear required indicators
     col1, col2 = st.columns(2)
 
     with col1:
         customer_name = st.text_input(
-            "Customer name",
+            "Customer name *",
             placeholder="ABC Corp.",
-            # help="Name of the customer for the revenue contract"
+            help="Required: Name of the customer for the revenue contract"
         )
 
     with col2:
         analysis_title = st.text_input(
-            "Analysis title",
-            placeholder="Contract_123",
-            # help="Title for this analysis (will appear in the memo)"
+            "Analysis title *",
+            placeholder="Contract_123", 
+            help="Required: Title for this analysis (will appear in the memo)"
         )
 
-    # Additional context input (optional)
-    additional_context = st.text_area(
-        "Additional Context or Specific Questions (Optional)",
-        placeholder="e.g., Focus on warranty provisions, consider prior verbal agreements, analyze specific performance obligations...",
-        help="Provide any additional context, specific questions, or areas of focus for the analysis",
-        height=100)
-
-    # Document upload
+    # Document upload with clear required indicator
     processor = SharedDocumentProcessor()
     contract_text, filename = processor.upload_and_process(
-        "**Upload all** relevant contract documents in PDF or DOCX format")
+        "Upload contract documents * (PDF or DOCX format)")
 
-    # Display document info if processed
-    if contract_text and filename:
-        processor.display_document_info(contract_text, filename)
+    # Additional context input (clearly marked as optional)
+    additional_context = st.text_area(
+        "Additional Context (Optional)",
+        placeholder="e.g., Focus on warranty provisions, consider prior verbal agreements, analyze specific performance obligations...",
+        help="Optional: Provide any additional context, specific questions, or areas of focus for the analysis",
+        height=100)
 
-    # Validate inputs
-    validation_errors = validate_asc606_inputs(customer_name, analysis_title,
-                                               contract_text)
+    # Check completion status for smart button enablement
+    is_ready = bool(customer_name and customer_name.strip() and 
+                   analysis_title and analysis_title.strip() and 
+                   contract_text)
 
-    # Display validation errors if any
-    if validation_errors:
-        ui = SharedUIComponents()
-        ui.validation_errors(validation_errors)
-
-    return contract_text, filename, customer_name, analysis_title, additional_context, validation_errors
+    return contract_text, filename, customer_name, analysis_title, additional_context, is_ready
 
 
-def validate_asc606_inputs(customer_name, analysis_title, contract_text):
-    """Validate ASC 606 specific inputs."""
-    errors = []
-
-    if not customer_name or not customer_name.strip():
-        errors.append("Please enter a customer name")
-
-    if not analysis_title or not analysis_title.strip():
-        errors.append("Please enter an analysis title")
-
-    if not contract_text:
-        errors.append("Please upload a contract document")
-
-    # ASC 606 specific validation - check to see if there are less than 100 characters in the contract text
-    if contract_text:
-        processor = SharedDocumentProcessor()
-        if len(contract_text.strip()) < 100:
-            errors.append(
-                "Document appears to be incomplete or not a valid contract")
-        else:
-            # Check for revenue-related terms
-            revenue_terms = [
-                'payment', 'payments', 'fees', 'fee', 'price', 'consideration', 
-                'revenue', 'sale', 'sales', 'service', 'services', 'invoice', 
-                'invoices', 'billing', 'transaction', 'purchase', 'license', 
-                'subscription', 'agreement', 'agreements', 'arrangement', 
-                'termination', 'project', 'deliverable', 'deliverables', 
-                'performance', 'support', 'term', 'acceptance', 'agree', 
-                'cancellation', 'refund', 'account', 'warranties', 'warranty', 
-                'liability', 'arbitration', 'governing law', 'software', 
-                'maintenance', 'entity', 'entities', 'business', 'businessnes', 
-                'privacy', 'data', 'membership', 'taxes', 'tax', 
-                'indemnification', 'indemnify', 'insurance', 'audit rights', 
-                'audit', 'force majeure', 'ship', 'deliver', 'shipment', 
-                'delivery', 'statement'
-            ]
-            contract_lower = contract_text.lower()
-            found_revenue_terms = sum(1 for term in revenue_terms
-                                      if term in contract_lower)
-
-            if found_revenue_terms < 2:
-                errors.append(
-                    "Document may not be suitable for revenue recognition analysis - consider if this contains revenue-generating activities"
-                )
-
-    return errors
+# Old validation function removed - using progressive disclosure approach instead
 
 
 def perform_asc606_analysis(contract_text: str, customer_name: str,
