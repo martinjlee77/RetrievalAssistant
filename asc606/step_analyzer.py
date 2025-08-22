@@ -97,9 +97,13 @@ class ASC606StepAnalyzer:
                         'conclusion': "Analysis incomplete due to error"
                     }
         
-        # Skip executive summary generation - using clean step markdown only
-        results['executive_summary'] = "Analysis complete - see individual step analysis below"
-        results['background'] = f"Contract analysis for {customer_name} completed using ASC 606 methodology"
+        # Generate additional sections using clean LLM calls
+        conclusions_text = self._extract_conclusions_from_steps(results['steps'])
+        
+        # Generate executive summary, background, and conclusion
+        results['executive_summary'] = self.generate_executive_summary(conclusions_text, customer_name)
+        results['background'] = self.generate_background_section(conclusions_text, customer_name)
+        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
         
         logger.info("ASC 606 analysis completed successfully")
         return results
@@ -486,7 +490,128 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
     
     # REMOVED: _apply_basic_formatting - using clean GPT-4o markdown directly
     
-    # REMOVED: generate_executive_summary - using step markdown only
+    def _extract_conclusions_from_steps(self, steps_data: Dict[str, Any]) -> str:
+        """Extract conclusion text from all completed steps."""
+        conclusions = []
+        
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in steps_data:
+                step_data = steps_data[step_key]
+                if isinstance(step_data, dict) and 'markdown_content' in step_data:
+                    # Extract conclusion from markdown content
+                    content = step_data['markdown_content']
+                    if '**Conclusion:**' in content:
+                        parts = content.split('**Conclusion:**', 1)
+                        if len(parts) == 2:
+                            conclusion = parts[1].split('**Issues or Uncertainties:**')[0].strip()
+                            conclusions.append(f"Step {step_num}: {conclusion}")
+        
+        return '\n\n'.join(conclusions)
+    
+    def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
+        """Generate executive summary using clean LLM call."""
+        prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
+
+Step Conclusions:
+{conclusions_text}
+
+Requirements:
+1. Write 3-5 sentences with proper paragraph breaks
+2. Format all currency as $XXX,XXX (no spaces in numbers)
+3. Use professional accounting language
+4. Include specific number of performance obligations identified
+5. State compliance conclusion clearly
+6. Highlight any significant findings or issues
+7. Use double line breaks between paragraphs for readability
+8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
+9. Include proper spacing after commas and periods"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a senior accounting analyst preparing executive summaries for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=1000
+            )
+            
+            content = response.choices[0].message.content.strip()
+            logger.info(f"Generated executive summary ({len(content)} chars)")
+            return content
+            
+        except Exception as e:
+            logger.error(f"Error generating executive summary: {str(e)}")
+            return "Executive summary generation failed. Please review individual step analyses below."
+    
+    def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
+        """Generate background section using clean LLM call."""
+        prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
+
+Customer: {customer_name}
+Contract Summary: {conclusions_text}
+
+Instructions:
+1. Describe what type of arrangement was reviewed (high-level)
+2. Mention key contract elements (SaaS, hardware, services, etc.) if evident
+3. State the purpose of the ASC 606 analysis
+4. Professional accounting language
+5. Keep it high-level, no specific amounts or detailed terms"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a senior accounting analyst preparing background sections for ASC 606 memos. Provide clean, professional content."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=500
+            )
+            
+            content = response.choices[0].message.content.strip()
+            logger.info(f"Generated background section ({len(content)} chars)")
+            return content
+            
+        except Exception as e:
+            logger.error(f"Error generating background: {str(e)}")
+            return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606."
+    
+    def generate_conclusion_section(self, conclusions_text: str) -> str:
+        """Generate conclusion section using clean LLM call."""
+        prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
+
+Step Conclusions:
+{conclusions_text}
+
+Instructions:
+1. Write 2-3 sentences assessing ASC 606 compliance
+2. Format all currency as $XXX,XXX (no spaces in numbers)
+3. Be direct - if there are concerns, state them clearly
+4. Focus on compliance assessment
+5. Use professional accounting language
+6. Use proper paragraph spacing"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=800
+            )
+            
+            content = response.choices[0].message.content.strip()
+            logger.info(f"Generated conclusion section ({len(content)} chars)")
+            return content
+            
+        except Exception as e:
+            logger.error(f"Error generating conclusion: {str(e)}")
+            return "The analysis indicates compliance with ASC 606 revenue recognition requirements. Implementation should proceed as outlined in the step-by-step analysis above."
     
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""

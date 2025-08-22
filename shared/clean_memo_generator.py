@@ -35,16 +35,46 @@ class CleanMemoGenerator:
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
             "",
             "---",
-            "",
-            "## BACKGROUND",
-            "",
-            f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation.",
-            "",
-            "---", 
-            "",
-            "## ASC 606 ANALYSIS",
             ""
         ]
+        
+        # Add Executive Summary
+        if 'executive_summary' in analysis_results:
+            memo_lines.extend([
+                "## EXECUTIVE SUMMARY",
+                "",
+                analysis_results['executive_summary'],
+                "",
+                "---",
+                ""
+            ])
+        
+        # Add Background
+        memo_lines.extend([
+            "## BACKGROUND",
+            ""
+        ])
+        
+        if 'background' in analysis_results:
+            memo_lines.extend([
+                analysis_results['background'],
+                "",
+                "---", 
+                ""
+            ])
+        else:
+            memo_lines.extend([
+                f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology.",
+                "",
+                "---", 
+                ""
+            ])
+        
+        # Add Analysis Section Header
+        memo_lines.extend([
+            "## ASC 606 ANALYSIS",
+            ""
+        ])
         
         # Add each step's clean markdown content
         steps_added = 0
@@ -59,6 +89,17 @@ class CleanMemoGenerator:
                     memo_lines.append("")
                     steps_added += 1
                     logger.info(f"Added clean step {step_num} content ({len(clean_content)} chars)")
+        
+        # Add Conclusion Section
+        if 'conclusion' in analysis_results:
+            memo_lines.extend([
+                "---",
+                "",
+                "## CONCLUSION",
+                "",
+                analysis_results['conclusion'],
+                "",
+            ])
         
         # Add footer
         memo_lines.extend([
