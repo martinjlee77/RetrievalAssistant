@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
-from shared.clean_memo_generator import CleanMemoGenerator
+# CleanMemoGenerator import moved to initialization section
 from shared.document_processor import SharedDocumentProcessor
 from asc606.step_analyzer import ASC606StepAnalyzer
 from asc606.knowledge_search import ASC606KnowledgeSearch
@@ -172,6 +172,7 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             try:
                 analyzer = ASC606StepAnalyzer()
                 knowledge_search = ASC606KnowledgeSearch()
+                from asc606.clean_memo_generator import CleanMemoGenerator
                 memo_generator = CleanMemoGenerator(
                     template_path="asc606/templates/memo_template.md")
                 from shared.ui_components import SharedUIComponents
