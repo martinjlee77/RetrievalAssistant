@@ -154,39 +154,32 @@ class CleanMemoGenerator:
         html_lines = []
         
         for line in lines:
-            # Convert headers
+            # Convert headers with inline styles for tighter spacing
             if line.startswith('# '):
-                html_lines.append(f'<h1>{line[2:]}</h1>')
+                html_lines.append(f'<h1 style="margin: 16px 0 12px 0;">{line[2:]}</h1>')
             elif line.startswith('## '):
-                html_lines.append(f'<h2>{line[3:]}</h2>')
+                html_lines.append(f'<h2 style="margin: 14px 0 10px 0;">{line[3:]}</h2>')
             elif line.startswith('### '):
-                html_lines.append(f'<h3>{line[4:]}</h3>')
+                html_lines.append(f'<h3 style="margin: 12px 0 8px 0;">{line[4:]}</h3>')
             # Convert bold text
             elif '**' in line:
-                # Simple bold conversion
+                # Simple bold conversion with reduced paragraph margins
                 line = line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
-                html_lines.append(f'<p>{line}</p>')
+                html_lines.append(f'<p style="margin: 8px 0;">{line}</p>')
             # Convert horizontal rules
             elif line.strip() == '---':
-                html_lines.append('<hr>')
+                html_lines.append('<hr style="margin: 15px 0;">')
             # Empty lines - skip them to reduce spacing
             elif line.strip() == '':
                 continue  # Don't add empty breaks
-            # Regular paragraphs
+            # Regular paragraphs with reduced margins
             else:
-                html_lines.append(f'<p>{line}</p>')
+                html_lines.append(f'<p style="margin: 8px 0;">{line}</p>')
         
-        # Join with proper HTML structure and custom CSS for tighter spacing
+        # Join with safer inline-only styling
         html_content = f"""
         <div style="font-family: Georgia, 'Times New Roman', sans-serif; 
         line-height: 1.4; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
-            <style>
-                p {{ margin: 8px 0; }}
-                h1 {{ margin: 16px 0 12px 0; }}
-                h2 {{ margin: 14px 0 10px 0; }}
-                h3 {{ margin: 12px 0 8px 0; }}
-                hr {{ margin: 15px 0; }}
-            </style>
             {''.join(html_lines)}
         </div>
         """
