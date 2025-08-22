@@ -30,7 +30,7 @@ class ASC606StepAnalyzer:
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
         # Model selection: Change "gpt-4o" to "gpt-5" for premium analysis
-        self.model = "gpt-5"
+        self.model = "gpt-4o"
         
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
