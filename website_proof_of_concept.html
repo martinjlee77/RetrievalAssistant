@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritasLogic.ai - Transforming Accounting with Domain-Specific AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: #002D62;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #C5A565;
+        }
+
+        .nav-cta {
+            background-color: #C5A565;
+            color: #002D62;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            background-color: #D4B874;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #002D62 0%, #0A4A7A 100%);
+            color: white;
+            padding: 150px 0 100px 0;
+            text-align: center;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            color: #E6F2FF;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            background-color: #C5A565;
+            color: #002D62;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+        }
+
+        .hero-cta:hover {
+            background-color: #D4B874;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(197, 165, 101, 0.3);
+        }
+
+        .demo-link {
+            color: #C5A565;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        /* Value Proposition Section */
+        .value-props {
+            padding: 100px 0;
+            background-color: #F8F9FA;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: #002D62;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .value-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .value-card h3 {
+            font-size: 1.5rem;
+            color: #002D62;
+            margin-bottom: 1rem;
+        }
+
+        .value-card p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .demo-container {
+            background-color: #F8F9FA;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .demo-placeholder {
+            background-color: #002D62;
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .demo-placeholder h4 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Technical Credibility */
+        .tech-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .tech-feature {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid #C5A565;
+        }
+
+        .tech-feature h4 {
+            color: #002D62;
+            margin-bottom: 0.5rem;
+        }
+
+        .tech-feature p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background-color: #002D62;
+            color: white;
+        }
+
+        .testimonial-card {
+            background: rgba(255,255,255,0.1);
+            padding: 3rem;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card blockquote {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #C5A565;
+        }
+
+        /* About Preview */
+        .about-preview {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background-color: #E9ECEF;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .about-text h3 {
+            font-size: 2rem;
+            color: #002D62;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-text p {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #002D62;
+            color: white;
+            padding: 3rem 0 2rem 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #C5A565;
+        }
+
+        .footer-section a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a:hover {
+            color: #C5A565;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #0A4A7A;
+            padding-top: 2rem;
+            text-align: center;
+            color: #B0C4DE;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .value-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-cta {
+                display: block;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">VeritasLogic.ai</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#trial" class="nav-cta">Start Free Trial</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <h1>Transforming Accounting with Domain-Specific AI</h1>
+            <p>Generate audit-ready ASC analyses in minutes, not hours. Built by accountants for accountants, powered by advanced AI and comprehensive FASB guidance.</p>
+            <a href="#trial" class="hero-cta">Start Free Trial</a>
+            <a href="#demo" class="demo-link">View Interactive Demo →</a>
+        </div>
+    </section>
+
+    <!-- Value Propositions -->
+    <section class="value-props">
+        <div class="container">
+            <div class="section-header">
+                <h2>Save Time. Reduce Costs. Improve Quality.</h2>
+                <p>Advanced AI technology that understands accounting standards as well as you do</p>
+            </div>
+            
+            <div class="value-grid">
+                <div class="value-card">
+                    <h3>⚡ Instant Analysis</h3>
+                    <p>Generate comprehensive ASC 606, 340-40, and 842 analyses in minutes. What used to take hours of research and writing is now automated with audit-ready precision.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>🎯 Domain Expertise</h3>
+                    <p>Built with 20+ years of Big Four experience and comprehensive FASB guidance integration. Not generic AI - purpose-built for accounting professionals.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>🔒 Secure & Reliable</h3>
+                    <p>Enterprise-grade security with GPT-5 API integration. Your data is never shared or stored. Human review services available for additional quality assurance.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>💰 Pay Per Use</h3>
+                    <p>No monthly subscriptions or setup fees. Pay only for analyses you generate with transparent, consumption-based pricing that scales with your needs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section class="demo-section" id="demo">
+        <div class="container">
+            <div class="section-header">
+                <h2>See It In Action</h2>
+                <p>Experience the full memo generation process with our interactive demo</p>
+            </div>
+            
+            <div class="demo-container">
+                <div class="demo-placeholder">
+                    <h4>Interactive Demo Coming Soon</h4>
+                    <p>Full ASC 606 analysis workflow using fictional company "TechStart Corp"</p>
+                    <p>Upload contract → AI analysis → Complete memo in under 3 minutes</p>
+                </div>
+                <a href="#trial" class="hero-cta">Try With Your Own Contract</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Credibility -->
+    <section class="tech-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Advanced Technology, Simple Results</h2>
+                <p>Sophisticated AI systems designed specifically for accounting professionals</p>
+            </div>
+            
+            <div class="tech-grid">
+                <div class="tech-feature">
+                    <h4>GPT-5 Integration</h4>
+                    <p>Latest OpenAI technology optimized for accounting analysis with secure API integration ensuring your data never leaves our protected environment.</p>
+                </div>
+                
+                <div class="tech-feature">
+                    <h4>FASB RAG System</h4>
+                    <p>Retrieval Augmented Generation powered by comprehensive FASB Accounting Standards Codification. Our AI retrieves relevant guidance for every analysis.</p>
+                </div>
+                
+                <div class="tech-feature">
+                    <h4>Domain-Specific Training</h4>
+                    <p>Unlike generic AI tools, our system understands accounting concepts, terminology, and the precise requirements of professional memo generation.</p>
+                </div>
+                
+                <div class="tech-feature">
+                    <h4>Human Review Option</h4>
+                    <p>Optional professional review service by experienced accountants for additional quality assurance and peace of mind on critical analyses.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 style="color: white;">Trusted by Accounting Professionals</h2>
+            </div>
+            
+            <div class="testimonial-card">
+                <blockquote>
+                    "VeritasLogic.ai reduced our ASC 606 analysis time by 80%. The quality is exceptional and having the human review option gives us complete confidence in our deliverables."
+                </blockquote>
+                <div class="testimonial-author">
+                    Sarah Chen, Controller at [Beta User Company]
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Preview -->
+    <section class="about-preview" id="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-image">
+                    Professional Headshot Placeholder<br>
+                    (Approachable Expert Style)
+                </div>
+                <div class="about-text">
+                    <h3>Built by an Accounting Expert</h3>
+                    <p>VeritasLogic.ai was founded by a former EY partner with over 20 years of experience in complex accounting standards and audit requirements.</p>
+                    <p>After decades of seeing the same time-consuming analyses repeated across clients, our founder recognized the opportunity to leverage AI to automate routine technical accounting work without sacrificing quality.</p>
+                    <p>The result is a domain-specific AI platform that understands the nuances of accounting standards and generates audit-ready analyses that meet the highest professional standards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>VeritasLogic.ai</h4>
+                    <p>Transforming accounting with domain-specific AI technology built by accounting professionals.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#demo">Demo</a>
+                    <a href="#trial">Free Trial</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <a href="#about">About Us</a>
+                    <a href="#blog">Blog</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <a href="#privacy">Privacy Policy</a>
+                    <a href="#terms">Terms of Service</a>
+                    <a href="#security">Security</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
