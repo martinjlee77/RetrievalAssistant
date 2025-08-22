@@ -184,6 +184,8 @@ class ASC606StepAnalyzer:
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
                 markdown_content = markdown_content.strip()
+                # Apply critical formatting fixes
+                markdown_content = self._fix_formatting_issues(markdown_content)
             
             logger.info(f"DEBUG: Generated markdown for Step {step_num} (length: {len(markdown_content)})")
             
@@ -326,20 +328,52 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly. Otherwise, state "None identified."]
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Format ALL currency as $XXX,XXX (NEVER write $$XXX or numbers without $ symbol)
-- Never concatenate words together (avoid "inf ixedconsiderationand")
-- Use single $ symbol only, never $$
-- Write dates with proper spacing (e.g., "October 26, 2023")
-- Always include spaces after commas and periods
-- Use bullet points ONLY for lists of 3+ distinct items
-- Keep paragraphs under 3 sentences each
-- Quote specific contract language as evidence
-- Cite relevant ASC 606 paragraphs
-- Use professional accounting language
+CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
+- Format currency as: $240,000 (with comma, NO SPACES between numbers)
+- NEVER write: $$240,000 or $240, 000 or 240,000 or $240000
+- ALWAYS put spaces after periods and commas in sentences
+- NEVER concatenate words: Write "professional services" NOT "professionalservices"
+- NEVER split words: Write "fees" NOT "f ees"
+- Write complete words: "the" NOT "T he", "and" NOT "and−"
+- Use normal dashes (-) NOT special characters (−)
+- Keep all text readable and properly spaced
+- Double-check ALL currency amounts for proper formatting
+- Use professional accounting language with proper spacing
 """
         
         return prompt
+    
+    def _fix_formatting_issues(self, content: str) -> str:
+        """Fix common formatting issues in AI-generated content."""
+        if not content:
+            return content
+        
+        # Fix currency formatting issues
+        import re
+        
+        # Fix spaced currency: "$240, 000" -> "$240,000"
+        content = re.sub(r'\$(\d+),?\s+(\d{3})', r'$\1,\2', content)
+        
+        # Fix concatenated words - common patterns
+        content = re.sub(r'prof essional', 'professional', content)
+        content = re.sub(r'f ees', 'fees', content)
+        content = re.sub(r'f or', 'for', content)
+        content = re.sub(r'T he', 'The', content)
+        content = re.sub(r'one − time', 'one-time', content)
+        content = re.sub(r'and−', 'and', content)
+        
+        # Fix spacing issues around currency
+        content = re.sub(r'(\$\d+,?\d*)(peryear|annually|monthly)', r'\1 per year', content)
+        content = re.sub(r'(\$\d+,?\d*)\.T he', r'\1. The', content)
+        
+        # Fix general word concatenation
+        content = re.sub(r'([a-z])([A-Z])', r'\1 \2', content)
+        
+        # Ensure spaces after periods and commas
+        content = re.sub(r'\.([A-Z])', r'. \1', content)
+        content = re.sub(r',([A-Z])', r', \1', content)
+        
+        return content
     
     def _parse_step_response(self, step_num: int, response_text: str) -> Dict[str, str]:
         """Parse the natural language response into structured components."""
