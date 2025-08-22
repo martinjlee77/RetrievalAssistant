@@ -76,19 +76,28 @@ class CleanMemoGenerator:
             ""
         ])
         
-        # Add each step's clean markdown content
+        # Add each step's clean markdown content - check both locations
         steps_added = 0
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
+            step_data = None
+            
+            # Check if steps are in analysis_results directly
             if step_key in analysis_results:
                 step_data = analysis_results[step_key]
-                if isinstance(step_data, dict) and 'markdown_content' in step_data:
-                    # Add clean content directly - ZERO PROCESSING
-                    clean_content = step_data['markdown_content']
-                    memo_lines.append(clean_content)
-                    memo_lines.append("")
-                    steps_added += 1
-                    logger.info(f"Added clean step {step_num} content ({len(clean_content)} chars)")
+            # Check if steps are in analysis_results['steps']
+            elif 'steps' in analysis_results and step_key in analysis_results['steps']:
+                step_data = analysis_results['steps'][step_key]
+            
+            if step_data and isinstance(step_data, dict) and 'markdown_content' in step_data:
+                # Add clean content directly - ZERO PROCESSING
+                clean_content = step_data['markdown_content']
+                memo_lines.append(clean_content)
+                memo_lines.append("")
+                steps_added += 1
+                logger.info(f"Added clean step {step_num} content ({len(clean_content)} chars)")
+            else:
+                logger.warning(f"Step {step_num} not found or missing markdown_content. Available keys: {list(analysis_results.keys())}")
         
         # Add Conclusion Section
         if 'conclusion' in analysis_results:
