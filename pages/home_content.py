@@ -70,16 +70,16 @@ with col3:
 
 with col4:
     with st.container(border=True):
-        st.markdown("##### 📈 More Standards")
+        st.markdown("##### 🌐 Website Preview")
         st.write(
-            "Additional accounting standards coming soon. Our multi-standard platform will continue expanding with more FASB standards."
+            "View your complete multi-page website with all features, pages, and functionality."
         )
-        st.button(
-            "Coming Soon",
-            disabled=True,
+        if st.button(
+            "View Website Preview",
             use_container_width=True,
-            key="more_standards_button"
-        )
+            key="website_preview_button"
+        ):
+            st.switch_page("pages/multipage_website_preview.py")
 
 # --- Footer and Stats ---
 st.divider()
