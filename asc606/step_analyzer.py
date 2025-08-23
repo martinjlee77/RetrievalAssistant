@@ -35,6 +35,13 @@ class ASC606StepAnalyzer:
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
     
+    def _get_temperature(self):
+        """Get appropriate temperature based on model."""
+        if self.model == "gpt-5":
+            return 1  # GPT-5 only supports default temperature of 1
+        else:
+            return 0.3  # GPT-4o and other models can use 0.3
+    
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
@@ -192,7 +199,7 @@ class ASC606StepAnalyzer:
                     }
                 ],
                 "max_completion_tokens": 8000 if self.model == "gpt-5" else 2000,
-                "temperature": 0.1
+                "temperature": self._get_temperature()
             }
             
             # Add response_format only for GPT-5
@@ -610,7 +617,7 @@ Requirements:
                     {"role": "system", "content": "You are a senior accounting analyst preparing executive summaries for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3,
+                temperature=self._get_temperature(),
                 max_tokens=1000
             )
             
@@ -648,7 +655,7 @@ Instructions:
                     {"role": "system", "content": "You are a senior accounting analyst preparing background sections for ASC 606 memos. Provide clean, professional content."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3,
+                temperature=self._get_temperature(),
                 max_tokens=500
             )
             
@@ -687,7 +694,7 @@ Instructions:
                     {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3,
+                temperature=self._get_temperature(),
                 max_tokens=800
             )
             
@@ -745,7 +752,7 @@ Instructions:
                         "content": prompt
                     }
                 ],
-                "temperature": 0.2,
+                "temperature": self._get_temperature(),
                 "max_completion_tokens": 150
             }
             
@@ -796,7 +803,7 @@ Instructions:
                         "content": prompt
                     }
                 ],
-                "temperature": 0.2,
+                "temperature": self._get_temperature(),
                 "max_completion_tokens": 150
             }
             

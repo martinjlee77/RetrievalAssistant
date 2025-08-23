@@ -45,7 +45,7 @@ def render_memo_page():
         st.markdown(f"**Customer:** {customer_name} | **Analysis:** {analysis_title}")
     
     with col3:
-        if st.button("🔄 Analyze Another", 
+        if st.button("🔄 Analyze Another Contract", 
                     type="primary",
                     help="Start a new ASC 606 analysis"):
             # Clear current memo data and navigate back
