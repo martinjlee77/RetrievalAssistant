@@ -227,7 +227,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
 
         # Store memo data in session state and navigate to memo page
         progress_placeholder.empty()
-        st.success(\n            \"✅ **ANALYSIS COMPLETE!** \\n\\n\"\n            \"Your professional ASC 606 memo is ready. \"\n            \"Redirecting to view your results...\"\n        )
+        st.success(
+            "✅ **ANALYSIS COMPLETE!** \\n\\n"
+            "Your professional ASC 606 memo is ready. "
+            "Redirecting to view your results..."
+        )
         
         # Store memo data for the memo page
         st.session_state.asc606_memo_data = {
