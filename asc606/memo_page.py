@@ -32,28 +32,26 @@ def render_memo_page():
     customer_name = memo_data.get('customer_name', 'Customer')
     analysis_title = memo_data.get('analysis_title', 'Contract Analysis')
     
-    # Page header with navigation
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # Navigation buttons on the left
+    col1, col2 = st.columns([2, 6])
     with col1:
-        if st.button("← Back to Analysis", 
-                    type="secondary",
-                    help="Return to the ASC 606 analysis page"):
-            st.switch_page("asc606/asc606_page.py")
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            if st.button("← Back", 
+                        type="secondary",
+                        help="Return to the ASC 606 analysis page"):
+                st.switch_page("asc606/asc606_page.py")
+        with btn_col2:
+            if st.button("🔄 Analyze Another", 
+                        type="primary",
+                        help="Start a new ASC 606 analysis"):
+                # Clear current memo data and navigate back
+                if hasattr(st.session_state, 'asc606_memo_data'):
+                    del st.session_state.asc606_memo_data
+                st.switch_page("asc606/asc606_page.py")
     
-    with col2:
-        st.title("📋 ASC 606 Analysis Memo")
-        st.markdown(f"**Customer:** {customer_name} | **Analysis:** {analysis_title}")
-    
-    with col3:
-        if st.button("🔄 Analyze Another Contract", 
-                    type="primary",
-                    help="Start a new ASC 606 analysis"):
-            # Clear current memo data and navigate back
-            if hasattr(st.session_state, 'asc606_memo_data'):
-                del st.session_state.asc606_memo_data
-            st.switch_page("asc606/asc606_page.py")
-    
-    st.markdown("---")
+    # Customer and Analysis info - left aligned
+    st.markdown(f"**Customer:** {customer_name} | **Analysis:** {analysis_title}")
     
     # Display the memo using the CleanMemoGenerator display method
     if memo_content:

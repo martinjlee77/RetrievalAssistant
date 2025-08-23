@@ -121,7 +121,6 @@ class CleanMemoGenerator:
     
     def display_clean_memo(self, memo_content: str) -> None:
         """Display clean memo content using HTML to preserve formatting."""
-        st.markdown("## 📋 Generated Memo")
         
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
@@ -146,34 +145,72 @@ class CleanMemoGenerator:
         # Split into lines and process each one
         lines = markdown_content.split('\n')
         html_lines = []
+        in_list = False
         
         for line in lines:
-            # Convert headers with inline styles for tighter spacing
+            # Convert headers with better spacing
             if line.startswith('# '):
-                html_lines.append(f'<h1 style="margin: 16px 0 12px 0;">{line[2:]}</h1>')
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h1 style="margin: 20px 0 15px 0; color: #1f1f1f; font-weight: bold;">{line[2:]}</h1>')
             elif line.startswith('## '):
-                html_lines.append(f'<h2 style="margin: 14px 0 10px 0;">{line[3:]}</h2>')
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h2 style="margin: 18px 0 12px 0; color: #2f2f2f; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>')
             elif line.startswith('### '):
-                html_lines.append(f'<h3 style="margin: 12px 0 8px 0;">{line[4:]}</h3>')
-            # Convert bold text
-            elif '**' in line:
-                # Simple bold conversion with reduced paragraph margins
-                line = line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
-                html_lines.append(f'<p style="margin: 8px 0;">{line}</p>')
-            # Convert horizontal rules
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h3 style="margin: 16px 0 10px 0; color: #3f3f3f; font-weight: 600;">{line[4:]}</h3>')
+            # Handle bullet points better
+            elif line.strip().startswith('- '):
+                if not in_list:
+                    html_lines.append('<ul style="margin: 10px 0; padding-left: 25px;">')
+                    in_list = True
+                content = line.strip()[2:].strip()
+                # Handle bold text in list items
+                if '**' in content:
+                    while '**' in content:
+                        content = content.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(f'<li style="margin: 6px 0; line-height: 1.4;">{content}</li>')
+            # Convert bold text in paragraphs
+            elif '**' in line and line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                # Handle multiple bold sections
+                processed_line = line
+                while '**' in processed_line:
+                    processed_line = processed_line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{processed_line}</p>')
+            # Skip horizontal rules (as requested)
             elif line.strip() == '---':
-                html_lines.append('<hr style="margin: 25px 0;">')
-            # Empty lines - skip them to reduce spacing
+                continue
+            # Empty lines - add small spacing
             elif line.strip() == '':
-                continue  # Don't add empty breaks
-            # Regular paragraphs with reduced margins
-            else:
-                html_lines.append(f'<p style="margin: 8px 0;">{line}</p>')
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                continue
+            # Regular paragraphs
+            elif line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{line}</p>')
         
-        # Join with safer inline-only styling
+        # Close any open lists
+        if in_list:
+            html_lines.append('</ul>')
+        
+        # Join with improved styling
         html_content = f"""
-        <div style="font-family: Georgia, 'Times New Roman', sans-serif; 
-        line-height: 1.5; max-width: 800px; padding: 25px; background-color: #f8f9fa;">
+        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+        line-height: 1.6; max-width: 850px; padding: 30px; 
+        background-color: #ffffff; border: 1px solid #e1e5e9; 
+        border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             {''.join(html_lines)}
         </div>
         """
