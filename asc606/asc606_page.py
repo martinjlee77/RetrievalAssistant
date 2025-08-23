@@ -241,13 +241,27 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
         
-        # Display knowledge base info if available (briefly before redirect)
+        # Display knowledge base info if available
         if knowledge_search.is_available():
             kb_info = knowledge_search.get_user_kb_info()
             ui.display_knowledge_base_stats(kb_info)
         
-        # Navigate to memo page
-        st.switch_page("asc606/memo_page.py")
+        # Display memo inline instead of switching pages
+        st.markdown("---")
+        st.subheader("📋 Your ASC 606 Analysis Results")
+        
+        # Display the memo using CleanMemoGenerator
+        memo_generator_display = CleanMemoGenerator()
+        memo_generator_display.display_clean_memo(memo_content)
+        
+        # Add navigation buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+                st.rerun()
+        with col2:
+            if st.button("🏠 Back to Home", type="secondary", use_container_width=True):
+                st.switch_page("pages/home_content.py")
 
     except Exception as e:
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
@@ -327,12 +341,26 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
         
-        # Show cache info briefly before redirect
+        # Show cache info
         cache_time = cached_data.get('timestamp', 'Unknown')
         st.info(f"📅 This analysis was cached on: {cache_time}")
         
-        # Navigate to memo page
-        st.switch_page("asc606/memo_page.py")
+        # Display memo inline instead of switching pages
+        st.markdown("---")
+        st.subheader("📋 Your ASC 606 Analysis Results")
+        
+        # Display the memo using CleanMemoGenerator
+        memo_generator_display = CleanMemoGenerator()
+        memo_generator_display.display_clean_memo(memo_content)
+        
+        # Add navigation buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
+                st.rerun()
+        with col2:
+            if st.button("🏠 Back to Home", type="secondary", use_container_width=True, key="cache_back_home"):
+                st.switch_page("pages/home_content.py")
         
     except Exception as e:
         st.error(f"❌ Error generating memo from cache: {str(e)}")
