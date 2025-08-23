@@ -30,7 +30,7 @@ class ASC606StepAnalyzer:
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
         # Model selection: Change "gpt-4o" to "gpt-5" for premium analysis
-        self.model = "gpt-4o"
+        self.model = "gpt-5"
         
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
@@ -208,7 +208,7 @@ class ASC606StepAnalyzer:
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
                 # Log RAW content from GPT-4o - NO PROCESSING
-                logger.info(f"DEBUG: RAW GPT-4o response for Step {step_num} FULL TEXT: {repr(markdown_content)}")
+                logger.info(f"DEBUG: RAW GPT-5 response for Step {step_num} FULL TEXT: {repr(markdown_content)}")
                 
                 # Check for currency patterns in raw response (logging only)
                 if '$' in markdown_content:
@@ -331,9 +331,9 @@ STEP {step_num}: {step['title'].upper()}
 OBJECTIVE: {step['focus']}
 
 CONTRACT INFORMATION:
-Contract Analysis: Between the company that is providing the good or service and customer {customer_name}
+Contract Analysis: Analyze  the contract with the customer {customer_name} to determine the appropriate revenue recognition treatment under ASC 606 for the company.
 
-Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving services.
+Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving goods or services.
 
 CONTRACT TEXT:
 {contract_text}"""
