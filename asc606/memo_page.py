@@ -45,9 +45,8 @@ def render_memo_page():
             if st.button("🔄 Analyze Another", 
                         type="primary",
                         help="Start a new ASC 606 analysis"):
-                # Clear current memo data and navigate back
-                if hasattr(st.session_state, 'asc606_memo_data'):
-                    del st.session_state.asc606_memo_data
+                # Set flag to clear data and navigate
+                st.session_state.clear_memo_and_restart = True
                 st.switch_page("asc606/asc606_page.py")
     
     # Customer and Analysis info - left aligned

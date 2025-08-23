@@ -20,6 +20,12 @@ logger = logging.getLogger(__name__)
 
 def render_asc606_page():
     """Render the ASC 606 analysis page."""
+    
+    # Check if we need to clear memo data (from "Analyze Another" button)
+    if hasattr(st.session_state, 'clear_memo_and_restart') and st.session_state.clear_memo_and_restart:
+        if hasattr(st.session_state, 'asc606_memo_data'):
+            del st.session_state.asc606_memo_data
+        del st.session_state.clear_memo_and_restart
 
     # Page header
     st.title("ASC 606 Revenue Recognition Analyzer")
