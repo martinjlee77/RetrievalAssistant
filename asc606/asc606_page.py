@@ -123,6 +123,10 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         "Switching to another tab or closing this browser will stop the analysis and lose your progress."
     )
     
+    # Initialize analysis complete status in session state (if not already present)
+    if 'asc606_analysis_complete' not in st.session_state:
+        st.session_state.asc606_analysis_complete = False
+    
     # Auto-extract customer name and generate analysis title
     customer_name = _extract_customer_name(contract_text)
     analysis_title = _generate_analysis_title()
@@ -213,13 +217,16 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             # Generate memo directly from complete analysis results
             memo_content = memo_generator.combine_clean_steps(final_results)
 
-        # Store memo data in session state and navigate to memo page
-        progress_placeholder.empty()
+        # Store memo data in session state and clear progress message
+        progress_message_placeholder.empty()  # Correctly clears the in-progress message
         st.success(
             "✅ **ANALYSIS COMPLETE!** \\n\\n"
             "Your professional ASC 606 memo is ready. "
             "Redirecting to view your results..."
         )
+        
+        # Signal completion
+        st.session_state.asc606_analysis_complete = True
         
         # Store memo data for the memo page
         st.session_state.asc606_memo_data = {
@@ -262,6 +269,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 606 analysis error: {str(e)}")
+        st.session_state.asc606_analysis_complete = True  # Signal completion (even on error)
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
 
