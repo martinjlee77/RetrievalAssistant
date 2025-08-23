@@ -629,6 +629,12 @@ Requirements:
             params.update(self._get_max_tokens_param(1000))
             response = self.client.chat.completions.create(**params)
             
+            # Debug logging
+            logger.info(f"Executive summary API response: {response}")
+            logger.info(f"Response choices: {response.choices}")
+            if response.choices:
+                logger.info(f"Message content: {repr(response.choices[0].message.content)}")
+            
             content = response.choices[0].message.content
             if content:
                 content = content.strip()

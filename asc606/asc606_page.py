@@ -37,12 +37,12 @@ def render_asc606_page():
 
     
     # Get user inputs with progressive disclosure
-    contract_text, filename, customer_name, analysis_title, additional_context, is_ready = get_asc606_inputs()
+    contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
     # Show analysis buttons with smart states
     if is_ready:
         # Check for cached analysis
-        cache_key = _generate_cache_key(contract_text, customer_name, additional_context)
+        cache_key = _generate_cache_key(contract_text, additional_context)
         cached_analysis = _get_cached_analysis(cache_key)
         
         if cached_analysis and cached_analysis.get('analysis_results'):
@@ -70,86 +70,55 @@ def render_asc606_page():
             
             # Generate memo outside of columns for full width display
             if generate_from_cache:
-                _generate_memo_from_cache(cached_analysis, customer_name, analysis_title)
+                _generate_memo_from_cache(cached_analysis)
             elif regenerate_analysis:
                 _clear_cache(cache_key)
-                perform_asc606_analysis(contract_text, customer_name,
-                                      analysis_title, additional_context, cache_key)
+                perform_asc606_analysis(contract_text, additional_context, cache_key)
         else:
             if st.button("Analyze Contract & Generate Memo",
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
-                perform_asc606_analysis(contract_text, customer_name,
-                                      analysis_title, additional_context, cache_key)
+                perform_asc606_analysis(contract_text, additional_context, cache_key)
     else:
         # Show disabled button with helpful message when not ready
-        missing_items = []
-        if not customer_name or not customer_name.strip():
-            missing_items.append("customer name")
-        if not analysis_title or not analysis_title.strip():
-            missing_items.append("analysis title")
-        if not contract_text:
-            missing_items.append("contract document")
-        
-        if missing_items:
-            st.button("Analyze Contract & Generate Memo", 
-                     disabled=True, 
-                     use_container_width=True,
-                     key="asc606_analyze_disabled_missing",
-                     help=f"The analysis cannot begin until the required fields above are completed. Please fill in the missing {', '.join(missing_items)}.")
-        else:
-            st.button("Analyze Contract & Generate Memo", 
-                     disabled=True, 
-                     use_container_width=True,
-                     key="asc606_analyze_disabled_ready")
+        st.button("Analyze Contract & Generate Memo", 
+                 disabled=True, 
+                 use_container_width=True,
+                 key="asc606_analyze_disabled",
+                 help="Please upload contract documents to begin the analysis.")
 
 
 def get_asc606_inputs():
     """Get ASC 606 specific inputs with progressive disclosure."""
     st.subheader("Contract Details")
 
-    # ASC 606 specific inputs with clear required indicators
-    col1, col2 = st.columns(2)
-
-    with col1:
-        customer_name = st.text_input(
-            "Customer name (required)",
-            placeholder="ABC Corp.",
-        )
-
-    with col2:
-        analysis_title = st.text_input(
-            "Analysis title (required)",
-            placeholder="Contract_123", 
-            help="Unique identifier for this analysis; used to track the memo and results.  This title will appear on the generated memo."
-        )
-
-    # Document upload with clear required indicator
+    # Document upload - now the primary requirement
     processor = SharedDocumentProcessor()
     contract_text, filename = processor.upload_and_process(
         "Upload contract and related documents (required)")
 
-    # Additional context input (clearly marked as optional)
+    # Additional context input (optional)
     additional_context = st.text_area(
         "Additional context (optional)",
         placeholder="Provide specific guidance to the AI (e.g., highlight focus areas or key clauses or mention a verbal agreement.",
         height=100)
 
-    # Check completion status for smart button enablement
-    is_ready = bool(customer_name and customer_name.strip() and 
-                   analysis_title and analysis_title.strip() and 
-                   contract_text)
+    # Check completion status - only contract text required
+    is_ready = bool(contract_text)
 
-    return contract_text, filename, customer_name, analysis_title, additional_context, is_ready
+    return contract_text, filename, additional_context, is_ready
 
 
 # Old validation function removed - using progressive disclosure approach instead
 
 
-def perform_asc606_analysis(contract_text: str, customer_name: str,
-                            analysis_title: str, additional_context: str = "", cache_key: str = None):
+def perform_asc606_analysis(contract_text: str, additional_context: str = "", cache_key: str = None):
     """Perform the complete ASC 606 analysis and display results."""
+    
+    # Auto-extract customer name and generate analysis title
+    customer_name = _extract_customer_name(contract_text)
+    analysis_title = _generate_analysis_title()
 
     try:
         # Initialize components
@@ -284,9 +253,9 @@ def main():
 # ===== CACHE HELPER FUNCTIONS =====
 # These are for development convenience and can be removed before deployment
 
-def _generate_cache_key(contract_text: str, customer_name: str, additional_context: str) -> str:
+def _generate_cache_key(contract_text: str, additional_context: str) -> str:
     """Generate a cache key based on input parameters."""
-    content = f"{contract_text[:1000]}{customer_name}{additional_context}"  # Use first 1000 chars
+    content = f"{contract_text[:1000]}{additional_context}"  # Use first 1000 chars
     return hashlib.md5(content.encode()).hexdigest()
 
 def _get_cached_analysis(cache_key: str) -> Dict[str, Any]:
@@ -310,7 +279,7 @@ def _clear_cache(cache_key: str = None) -> None:
     else:
         st.session_state.memo_cache.clear()
 
-def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, analysis_title: str) -> None:
+def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
     """Generate memo from cached analysis results."""
     try:
         st.info("⚡ Generating memo from cached analysis...")
@@ -325,11 +294,11 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
         
         st.success("✅ Memo generated from cache instantly! Redirecting to memo...")
         
-        # Store memo data for the memo page
+        # Store memo data for the memo page (using cached data info)
         st.session_state.asc606_memo_data = {
             'memo_content': memo_content,
-            'customer_name': customer_name,
-            'analysis_title': analysis_title,
+            'customer_name': cached_data.get('analysis_results', {}).get('customer_name', 'Customer'),
+            'analysis_title': cached_data.get('analysis_results', {}).get('analysis_title', 'Analysis'),
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
         
@@ -343,6 +312,48 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
     except Exception as e:
         st.error(f"❌ Error generating memo from cache: {str(e)}")
         logger.error(f"Cache memo generation error: {str(e)}")
+
+
+def _extract_customer_name(contract_text: str) -> str:
+    """Auto-extract customer name from contract text using simple patterns."""
+    try:
+        import re
+        
+        # Look for common patterns in first 1000 characters
+        text_sample = contract_text[:1000]
+        
+        # Common patterns for customer identification
+        patterns = [
+            r'Customer[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
+            r'(?:Client|Company)[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
+            r'Bill\s+To[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
+            r'([A-Za-z\s&-]+(?:Corp|Corporation|Inc|LLC|Ltd|Co))',
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, text_sample, re.IGNORECASE)
+            if matches:
+                customer_name = matches[0].strip()
+                # Filter reasonable length names
+                if 3 < len(customer_name) < 80:
+                    return customer_name
+        
+        # Fallback: look for capitalized words that might be company names
+        words = re.findall(r'\b[A-Z][a-zA-Z]+\b', text_sample[:200])
+        if len(words) >= 2:
+            return ' '.join(words[:2])  # Take first two capitalized words
+        
+        return "Customer"  # Default fallback
+        
+    except Exception as e:
+        logger.error(f"Error extracting customer name: {str(e)}")
+        return "Customer"
+
+
+def _generate_analysis_title() -> str:
+    """Generate analysis title with timestamp."""
+    return f"ASC606_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
+
 
 # For direct execution/testing
 if __name__ == "__main__":
