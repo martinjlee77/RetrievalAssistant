@@ -45,8 +45,8 @@ class ASC606StepAnalyzer:
     def _get_max_tokens_param(self, token_count):
         """Get appropriate max tokens parameter based on model."""
         if self.model == "gpt-5":
-            # GPT-5 uses tokens for reasoning, so increase significantly
-            gpt5_tokens = token_count * 3  # Triple the tokens for GPT-5
+            # GPT-5 uses tokens for reasoning, match the 8000 that works for main analysis
+            gpt5_tokens = max(token_count * 8, 8000)  # At least 8000 tokens for GPT-5
             return {"max_completion_tokens": gpt5_tokens}
         else:
             return {"max_tokens": token_count}
