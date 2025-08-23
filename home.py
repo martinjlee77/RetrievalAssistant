@@ -115,7 +115,7 @@ st.set_page_config(
 load_custom_css()
 
 # 3. Add your logo to the sidebar.
-st.logo("assets/images/logo.png")
+st.logo("assets/images/VL_black_nobk.png")
 
 # 4. Define all pages in your app.
 pg = st.navigation([
