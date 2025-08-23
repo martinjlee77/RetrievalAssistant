@@ -21,15 +21,9 @@ logger = logging.getLogger(__name__)
 def render_asc606_page():
     """Render the ASC 606 analysis page."""
     
-    # Check if we need to clear memo data (from "Analyze Another" button)
-    if hasattr(st.session_state, 'clear_memo_and_restart') and st.session_state.clear_memo_and_restart:
-        # Clear all analysis related session state
-        if hasattr(st.session_state, 'asc606_memo_data'):
-            del st.session_state.asc606_memo_data
-        if hasattr(st.session_state, 'memo_cache'):
-            st.session_state.memo_cache.clear()
-        del st.session_state.clear_memo_and_restart
-        st.rerun()  # Force refresh to clear any lingering state
+    # File uploader key initialization (for clearing file uploads)
+    if 'file_uploader_key' not in st.session_state:
+        st.session_state.file_uploader_key = 0
 
     # Page header
     st.title("ASC 606 Revenue Recognition Analyzer")
@@ -258,6 +252,12 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+                # Clear file uploader and analysis state for fresh start
+                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+                if 'asc606_memo_data' in st.session_state:
+                    del st.session_state.asc606_memo_data
+                if 'memo_cache' in st.session_state:
+                    st.session_state.memo_cache.clear()
                 st.rerun()
         with col2:
             if st.button("🏠 Back to Home", type="secondary", use_container_width=True):
@@ -357,6 +357,12 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
+                # Clear file uploader and analysis state for fresh start
+                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+                if 'asc606_memo_data' in st.session_state:
+                    del st.session_state.asc606_memo_data
+                if 'memo_cache' in st.session_state:
+                    st.session_state.memo_cache.clear()
                 st.rerun()
         with col2:
             if st.button("🏠 Back to Home", type="secondary", use_container_width=True, key="cache_back_home"):

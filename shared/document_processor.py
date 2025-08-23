@@ -37,11 +37,16 @@ class SharedDocumentProcessor:
         Returns:
             Tuple of (combined_extracted_text, comma_separated_filenames) or (None, None) if no files or error
         """
+        # Use session state to control file uploader key for clearing
+        if 'file_uploader_key' not in st.session_state:
+            st.session_state.file_uploader_key = 0
+            
         uploaded_files = st.file_uploader(
             label,
             type=['pdf', 'docx'],
             help="Upload up to 5 relevant contract documents (PDF or DOCX). The system will automatically combine these into a single arrangement for analysis. Incomplete or missing documentation may lead to inaccurate analysis results.",
-            accept_multiple_files=True
+            accept_multiple_files=True,
+            key=f"contract_files_{st.session_state.file_uploader_key}"
         )
         
         if not uploaded_files:
