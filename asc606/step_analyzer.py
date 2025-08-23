@@ -42,6 +42,13 @@ class ASC606StepAnalyzer:
         else:
             return 0.3  # GPT-4o and other models can use 0.3
     
+    def _get_max_tokens_param(self, token_count):
+        """Get appropriate max tokens parameter based on model."""
+        if self.model == "gpt-5":
+            return {"max_completion_tokens": token_count}
+        else:
+            return {"max_tokens": token_count}
+    
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
@@ -611,15 +618,16 @@ Requirements:
 10. DO NOT include any title or header like "Executive Summary:" - only provide the summary content"""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            params = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": "You are a senior accounting analyst preparing executive summaries for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=self._get_temperature(),
-                max_tokens=1000
-            )
+                "temperature": self._get_temperature()
+            }
+            params.update(self._get_max_tokens_param(1000))
+            response = self.client.chat.completions.create(**params)
             
             content = response.choices[0].message.content
             if content:
@@ -649,15 +657,16 @@ Instructions:
 5. Keep it high-level, no specific amounts or detailed terms"""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            params = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": "You are a senior accounting analyst preparing background sections for ASC 606 memos. Provide clean, professional content."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=self._get_temperature(),
-                max_tokens=500
-            )
+                "temperature": self._get_temperature()
+            }
+            params.update(self._get_max_tokens_param(500))
+            response = self.client.chat.completions.create(**params)
             
             content = response.choices[0].message.content
             if content:
@@ -688,15 +697,16 @@ Instructions:
 6. Use proper paragraph spacing"""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            params = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=self._get_temperature(),
-                max_tokens=800
-            )
+                "temperature": self._get_temperature()
+            }
+            params.update(self._get_max_tokens_param(800))
+            response = self.client.chat.completions.create(**params)
             
             content = response.choices[0].message.content
             if content:
