@@ -14,7 +14,7 @@ def render_memo_page():
     """Render the ASC 606 memo display page."""
     
     # Check if memo data exists in session state
-    if not hasattr(st.session_state, 'asc606_memo_data'):
+    if not hasattr(st.session_state, 'asc606_memo_data') or not st.session_state.asc606_memo_data:
         st.error("No memo data found. Please complete an ASC 606 analysis first.")
         
         # Provide navigation back to analysis

@@ -122,6 +122,11 @@ class CleanMemoGenerator:
     def display_clean_memo(self, memo_content: str) -> None:
         """Display clean memo content using HTML to preserve formatting."""
         
+        # Validate memo content
+        if not memo_content or memo_content.strip() == "":
+            st.error("Memo content is empty. Please regenerate the analysis.")
+            return
+            
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
@@ -131,13 +136,16 @@ class CleanMemoGenerator:
         # Use HTML display which preserves formatting
         st.markdown(html_content, unsafe_allow_html=True)
         
-        # Download button
-        st.download_button(
-            label="📥 Download Memo (Markdown)",
-            data=memo_content,
-            file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-            mime="text/markdown"
-        )
+        # Download button - only show if content exists
+        if memo_content and len(memo_content.strip()) > 50:
+            st.download_button(
+                label="📥 Download Memo (Markdown)",
+                data=memo_content,
+                file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+                mime="text/markdown"
+            )
+        else:
+            st.warning("Memo content too short for download. Please regenerate the analysis.")
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

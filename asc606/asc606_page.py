@@ -23,14 +23,18 @@ def render_asc606_page():
     
     # Check if we need to clear memo data (from "Analyze Another" button)
     if hasattr(st.session_state, 'clear_memo_and_restart') and st.session_state.clear_memo_and_restart:
+        # Clear all analysis related session state
         if hasattr(st.session_state, 'asc606_memo_data'):
             del st.session_state.asc606_memo_data
+        if hasattr(st.session_state, 'memo_cache'):
+            st.session_state.memo_cache.clear()
         del st.session_state.clear_memo_and_restart
+        st.rerun()  # Force refresh to clear any lingering state
 
     # Page header
     st.title("ASC 606 Revenue Recognition Analyzer")
     st.markdown(
-        "Automatically analyze revenue contracts under ASC 606. This tool performs the five-step revenue recognition analysis, generating a comprehensive review memo that details the findings. Enter your contract details below to proceed."
+        "Automatically analyze revenue contracts under ASC 606. This tool performs the five-step revenue recognition analysis, generating a comprehensive review memo that details the findings. Simply upload your contract documents to begin."
     )
 
     st.warning("**Important:** Upload complete contract documents for accurate analysis.  Incomplete documents may lead to inaccurate results.")
