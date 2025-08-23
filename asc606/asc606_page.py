@@ -43,8 +43,15 @@ def render_asc606_page():
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
-    # Show analysis buttons with smart states
+    # Critical user warning before analysis
     if is_ready:
+        st.warning(
+            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+            "• Analysis takes 3-5 minutes and costs significant API tokens\n"
+            "• Switching tabs or closing the browser will stop the analysis\n"
+            "• Stay on this tab until analysis is complete\n"
+            "• You'll see a completion message when it's done"
+        )
         # Check for cached analysis
         cache_key = _generate_cache_key(contract_text, additional_context)
         cached_analysis = _get_cached_analysis(cache_key)
@@ -79,6 +86,7 @@ def render_asc606_page():
                 _clear_cache(cache_key)
                 perform_asc606_analysis(contract_text, additional_context, cache_key)
         else:
+            st.markdown("**📊 Estimated completion time: 3-5 minutes**")
             if st.button("Analyze Contract & Generate Memo",
                        type="primary",
                        use_container_width=True,
@@ -120,6 +128,13 @@ def get_asc606_inputs():
 def perform_asc606_analysis(contract_text: str, additional_context: str = "", cache_key: str = None):
     """Perform the complete ASC 606 analysis and display results."""
     
+    # Show analysis-in-progress warning prominently
+    st.error(
+        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+        "Your analysis is running and will take 3-5 minutes. "
+        "Switching to another tab or closing this browser will stop the analysis and lose your progress."
+    )
+    
     # Auto-extract customer name and generate analysis title
     customer_name = _extract_customer_name(contract_text)
     analysis_title = _generate_analysis_title()
@@ -155,6 +170,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         for step_num in range(1, 6):
             with progress_placeholder:
                 st.subheader(f"🔄 Analyzing Step {step_num}")
+                st.info(f"⏱️ Step {step_num} of 5 • Stay on this tab • ~{6-step_num} minutes remaining")
                 ui.analysis_progress(steps, step_num)
 
             with st.spinner(f"Analyzing Step {step_num}..."):
@@ -176,6 +192,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Generate additional sections (Executive Summary, Background, Conclusion)
         with progress_placeholder:
             st.subheader("📋 Generating additional sections...")
+            st.info("⏱️ Final step • Stay on this tab • ~1 minute remaining")
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
@@ -210,7 +227,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
 
         # Store memo data in session state and navigate to memo page
         progress_placeholder.empty()
-        st.success("✅ Analysis completed successfully! Redirecting to memo...")
+        st.success(\n            \"✅ **ANALYSIS COMPLETE!** \\n\\n\"\n            \"You can now safely navigate away from this tab. \"\n            \"Redirecting to your professional ASC 606 memo...\"\n        )
         
         # Store memo data for the memo page
         st.session_state.asc606_memo_data = {
