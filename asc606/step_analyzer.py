@@ -45,7 +45,9 @@ class ASC606StepAnalyzer:
     def _get_max_tokens_param(self, token_count):
         """Get appropriate max tokens parameter based on model."""
         if self.model == "gpt-5":
-            return {"max_completion_tokens": token_count}
+            # GPT-5 uses tokens for reasoning, so increase significantly
+            gpt5_tokens = token_count * 3  # Triple the tokens for GPT-5
+            return {"max_completion_tokens": gpt5_tokens}
         else:
             return {"max_tokens": token_count}
     
@@ -628,16 +630,7 @@ Requirements:
             }
             params.update(self._get_max_tokens_param(1000))
             
-            # Debug the exact parameters being sent
-            logger.info(f"Executive summary API params: {params}")
-            
             response = self.client.chat.completions.create(**params)
-            
-            # Debug logging
-            logger.info(f"Executive summary API response: {response}")
-            logger.info(f"Response choices: {response.choices}")
-            if response.choices:
-                logger.info(f"Message content: {repr(response.choices[0].message.content)}")
             
             content = response.choices[0].message.content
             if content:
@@ -677,16 +670,7 @@ Instructions:
             }
             params.update(self._get_max_tokens_param(500))
             
-            # Debug the exact parameters being sent
-            logger.info(f"Background API params: {params}")
-            
             response = self.client.chat.completions.create(**params)
-            
-            # Debug logging for background section
-            logger.info(f"Background API response: {response}")
-            logger.info(f"Background response choices: {response.choices}")
-            if response.choices:
-                logger.info(f"Background message content: {repr(response.choices[0].message.content)}")
             
             content = response.choices[0].message.content
             if content:
@@ -727,16 +711,7 @@ Instructions:
             }
             params.update(self._get_max_tokens_param(800))
             
-            # Debug the exact parameters being sent
-            logger.info(f"Conclusion API params: {params}")
-            
             response = self.client.chat.completions.create(**params)
-            
-            # Debug logging for conclusion section
-            logger.info(f"Conclusion API response: {response}")
-            logger.info(f"Conclusion response choices: {response.choices}")
-            if response.choices:
-                logger.info(f"Conclusion message content: {repr(response.choices[0].message.content)}")
             
             content = response.choices[0].message.content
             if content:
