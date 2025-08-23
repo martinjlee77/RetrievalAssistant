@@ -142,7 +142,8 @@ class CleanMemoGenerator:
                 label="📥 Download Memo (Markdown)",
                 data=memo_content,
                 file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                mime="text/markdown"
+                mime="text/markdown",
+                key="memo_download_btn"
             )
         else:
             st.warning("Memo content too short for download. Please regenerate the analysis.")
