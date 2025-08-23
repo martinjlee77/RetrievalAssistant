@@ -42,14 +42,28 @@ class ASC606StepAnalyzer:
         else:
             return 0.3  # GPT-4o and other models can use 0.3
     
-    def _get_max_tokens_param(self, token_count):
-        """Get appropriate max tokens parameter based on model."""
+    def _get_max_tokens_param(self, request_type="default"):
+        """Get appropriate max tokens parameter based on model and request type."""
         if self.model == "gpt-5":
-            # GPT-5 uses tokens for reasoning, match the 8000 that works for main analysis
-            gpt5_tokens = max(token_count * 8, 8000)  # At least 8000 tokens for GPT-5
-            return {"max_completion_tokens": gpt5_tokens}
+            # GPT-5 needs high token counts due to reasoning overhead
+            token_limits = {
+                "step_analysis": 8000,
+                "executive_summary": 8000,
+                "background": 8000,
+                "conclusion": 8000,
+                "default": 8000
+            }
+            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
         else:
-            return {"max_tokens": token_count}
+            # GPT-4o and other models use standard limits
+            token_limits = {
+                "step_analysis": 2000,
+                "executive_summary": 1000,
+                "background": 500,
+                "conclusion": 800,
+                "default": 2000
+            }
+            return {"max_tokens": token_limits.get(request_type, 2000)}
     
     def analyze_contract(self, 
                         contract_text: str,
@@ -207,7 +221,7 @@ class ASC606StepAnalyzer:
                         "content": prompt
                     }
                 ],
-                "max_completion_tokens": 8000 if self.model == "gpt-5" else 2000,
+                **self._get_max_tokens_param("step_analysis"),
                 "temperature": self._get_temperature()
             }
             
@@ -628,7 +642,7 @@ Requirements:
                 ],
                 "temperature": self._get_temperature()
             }
-            params.update(self._get_max_tokens_param(1000))
+            params.update(self._get_max_tokens_param("executive_summary"))
             
             response = self.client.chat.completions.create(**params)
             
@@ -668,7 +682,7 @@ Instructions:
                 ],
                 "temperature": self._get_temperature()
             }
-            params.update(self._get_max_tokens_param(500))
+            params.update(self._get_max_tokens_param("background"))
             
             response = self.client.chat.completions.create(**params)
             
@@ -709,7 +723,7 @@ Instructions:
                 ],
                 "temperature": self._get_temperature()
             }
-            params.update(self._get_max_tokens_param(800))
+            params.update(self._get_max_tokens_param("conclusion"))
             
             response = self.client.chat.completions.create(**params)
             
