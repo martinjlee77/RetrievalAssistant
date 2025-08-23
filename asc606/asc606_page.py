@@ -26,25 +26,20 @@ def render_asc606_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title("ASC 606 Revenue Recognition Analyzer")
-    st.markdown(
-        "Automatically analyze revenue contracts under ASC 606. This tool performs the five-step revenue recognition analysis, generating a comprehensive review memo that details the findings. Simply upload your contract documents to begin."
-    )
-
-    st.warning("**Important:** Upload complete contract documents for accurate analysis.  Incomplete documents may lead to inaccurate results.")
-
+    st.title("ASC 606 Analyzer & Memo Generator")
     
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
     # Critical user warning before analysis
     if is_ready:
-        st.warning(
+        warning_placeholder = st.empty()  # Create a placeholder for the warning
+        warning_placeholder.warning(
             "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-            "• Analysis takes 3-5 minutes and costs significant API tokens\n"
-            "• Switching tabs or closing the browser will stop the analysis\n"
-            "• Stay on this tab until analysis is complete\n"
-            "• You'll see a completion message when it's done"
+            "* Analysis takes **3-5 minutes** and costs significant API tokens\n"
+            "* Switching tabs or closing the browser will stop the analysis\n"
+            "* Stay on this tab until analysis is complete\n"
+            "* You'll see a completion message when it's done"
         )
         # Check for cached analysis
         cache_key = _generate_cache_key(contract_text, additional_context)
@@ -80,34 +75,32 @@ def render_asc606_page():
                 _clear_cache(cache_key)
                 perform_asc606_analysis(contract_text, additional_context, cache_key)
         else:
-            st.markdown("**📊 Estimated completion time: 3-5 minutes**")
             if st.button("Analyze Contract & Generate Memo",
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
+                warning_placeholder.empty()  # Clear the warning after the button is pressed
                 perform_asc606_analysis(contract_text, additional_context, cache_key)
     else:
         # Show disabled button with helpful message when not ready
         st.button("Analyze Contract & Generate Memo", 
                  disabled=True, 
                  use_container_width=True,
-                 key="asc606_analyze_disabled",
-                 help="Please upload contract documents to begin the analysis.")
+                 key="asc606_analyze_disabled")
 
 
 def get_asc606_inputs():
-    """Get ASC 606 specific inputs with progressive disclosure."""
-    st.subheader("Contract Details")
+    """Get ASC 606 specific inputs."""
 
-    # Document upload - now the primary requirement
+    # Document upload
     processor = SharedDocumentProcessor()
     contract_text, filename = processor.upload_and_process(
-        "Upload contract and related documents (required)")
+        "Upload a **complete contract and related documents**, e.g., executed agreement, standard T&Cs, MSA, SOW, purchase order, invoice (required)")
 
-    # Additional context input (optional)
+    # Additional info (optional)
     additional_context = st.text_area(
-        "Additional context (optional)",
-        placeholder="Provide specific guidance to the AI (e.g., highlight focus areas or key clauses or mention a verbal agreement.",
+        "Additional information or concerns (optional)",
+        placeholder="Provide any guidance to the AI that is either not obviously present in the uploaded documents (e.g., verbal agreement) or mention your focus areas or specific concerns.",
         height=100)
 
     # Check completion status - only contract text required
@@ -122,8 +115,9 @@ def get_asc606_inputs():
 def perform_asc606_analysis(contract_text: str, additional_context: str = "", cache_key: str = None):
     """Perform the complete ASC 606 analysis and display results."""
     
-    # Show analysis-in-progress warning prominently
-    st.error(
+    # Create placeholder for the in-progress message
+    progress_message_placeholder = st.empty()
+    progress_message_placeholder.error(
         "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
         "Your analysis is running and will take 3-5 minutes. "
         "Switching to another tab or closing this browser will stop the analysis and lose your progress."
@@ -264,6 +258,8 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
                 st.switch_page("pages/home_content.py")
 
     except Exception as e:
+        # Clear the progress message even on error
+        progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 606 analysis error: {str(e)}")
 

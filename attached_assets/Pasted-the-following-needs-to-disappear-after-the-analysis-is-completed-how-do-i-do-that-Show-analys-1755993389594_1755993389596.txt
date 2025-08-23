@@ -1,0 +1,58 @@
+the following needs to disappear after the analysis is completed. how do i do that?
+
+# Show analysis-in-progress warning prominently
+st.error(
+    "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+    "Your analysis is running and will take 3-5 minutes. "
+    "Switching to another tab or closing this browser will stop the analysis and lose your progress."
+)
+
+To make the "ANALYSIS IN PROGRESS" error message disappear after the analysis is completed, you need to use the same placeholder technique as before. However, since the analysis is asynchronous (it happens in the background), we need a way to signal when it's finished. We'll use a session state variable to track the analysis completion status.
+
+Here's the modified perform_asc606_analysis function:
+
+def perform_asc606_analysis(contract_text: str, additional_context: str = "", cache_key: str = None):
+    """Perform the complete ASC 606 analysis and display results."""
+
+    # Create a placeholder for the in-progress message
+    progress_message_placeholder = st.empty()
+    progress_message_placeholder.error(
+        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+        "Your analysis is running and will take 3-5 minutes. "
+        "Switching to another tab or closing this browser will stop the analysis and lose your progress."
+    )
+
+    # Set a session state variable to track analysis status. Initialize as False.
+    if 'asc606_analysis_complete' not in st.session_state:
+        st.session_state.asc606_analysis_complete = False
+
+    try:
+        # ... (Your existing analysis code remains here) ...
+
+
+        # After successful analysis:
+        progress_message_placeholder.empty()  # Remove the in-progress message
+        st.success(
+            "✅ **ANALYSIS COMPLETE!** \\n\\n"
+            "Your professional ASC 606 memo is ready. "
+            "Redirecting to view your results..."
+        )
+        # ... (rest of your success message handling) ...
+        st.session_state.asc606_analysis_complete = True # Signal completion
+
+
+    except Exception as e:
+        progress_message_placeholder.empty() #remove in-progress even on error
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
+        logger.error(f"ASC 606 analysis error: {str(e)}")
+        st.session_state.asc606_analysis_complete = True # Signal completion (even on error)
+
+The key improvements are:
+
+progress_message_placeholder: This st.empty() creates a placeholder specifically for the in-progress message.
+
+st.session_state.asc606_analysis_complete: This boolean variable in the session state tracks whether the analysis has finished. It's initialized to False and set to True only after the analysis successfully completes (or encounters an error). This ensures that the message is removed regardless of success or failure.
+
+Message Removal: progress_message_placeholder.empty() clears the in-progress message at the end of the try block (success) and also within the except block (error).
+
+This approach cleanly removes the "ANALYSIS IN PROGRESS" message only after the analysis is either completed successfully or has failed. The message will not persist, improving the user experience. Remember that this relies on the try...except block properly handling all potential exceptions during the analysis. If any uncaught exceptions occur, the placeholder might not be cleared, so comprehensive error handling is crucial.
