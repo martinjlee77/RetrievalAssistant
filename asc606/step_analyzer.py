@@ -29,23 +29,37 @@ class ASC606StepAnalyzer:
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
         
-        # Model selection: Change "gpt-4o" to "gpt-5" for premium analysis
-        self.model = "gpt-5"
+        # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
+        # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
+        self.use_premium_models = True
+        
+        # Model selection based on configuration
+        if self.use_premium_models:
+            self.main_model = "gpt-5"           # For 5-step analysis
+            self.light_model = "gpt-5-mini"     # For summaries/background
+        else:
+            self.main_model = "gpt-4o"          # For 5-step analysis  
+            self.light_model = "gpt-4o-mini"    # For summaries/background
+            
+        # Backward compatibility
+        self.model = self.main_model
         
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
     
-    def _get_temperature(self):
+    def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
-        if self.model == "gpt-5":
-            return 1  # GPT-5 only supports default temperature of 1
+        target_model = model_name or self.model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            return 1  # GPT-5 models only support default temperature of 1
         else:
-            return 0.3  # GPT-4o and other models can use 0.3
+            return 0.3  # GPT-4o models can use 0.3
     
-    def _get_max_tokens_param(self, request_type="default"):
+    def _get_max_tokens_param(self, request_type="default", model_name=None):
         """Get appropriate max tokens parameter based on model and request type."""
-        if self.model == "gpt-5":
-            # GPT-5 needs high token counts due to reasoning overhead
+        target_model = model_name or self.model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
                 "step_analysis": 8000,
                 "executive_summary": 8000,
@@ -55,7 +69,7 @@ class ASC606StepAnalyzer:
             }
             return {"max_completion_tokens": token_limits.get(request_type, 8000)}
         else:
-            # GPT-4o and other models use standard limits
+            # GPT-4o models use standard limits
             token_limits = {
                 "step_analysis": 2000,
                 "executive_summary": 1000,
@@ -226,7 +240,7 @@ class ASC606StepAnalyzer:
             }
             
             # Add response_format only for GPT-5
-            if self.model == "gpt-5":
+            if self.model in ["gpt-5", "gpt-5-mini"]:
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
@@ -770,7 +784,7 @@ Instructions:
         # Call LLM API
         try:
             request_params = {
-                "model": "gpt-4o-mini",
+                "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
@@ -781,8 +795,8 @@ Instructions:
                         "content": prompt
                     }
                 ],
-                "temperature": self._get_temperature(),
-                "max_completion_tokens": 150
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("conclusion", self.light_model)
             }
             
             response = self.client.chat.completions.create(**request_params)
@@ -821,7 +835,7 @@ Instructions:
         # Call LLM API
         try:
             request_params = {
-                "model": "gpt-4o-mini",
+                "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
@@ -832,8 +846,8 @@ Instructions:
                         "content": prompt
                     }
                 ],
-                "temperature": self._get_temperature(),
-                "max_completion_tokens": 150
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("background", self.light_model)
             }
             
             response = self.client.chat.completions.create(**request_params)
