@@ -20,6 +20,10 @@ author = "agent"
 task = "workflow.run"
 args = "Multi-Standard Platform"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Website Preview"
+
 [[workflows.workflow]]
 name = "Multi-Standard Platform"
 author = "agent"
@@ -31,6 +35,22 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "Website Preview"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run view_multipage_website.py --server.port 3000 --server.address 0.0.0.0"
+waitForPort = 3000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 3000
+externalPort = 3001
 
 [[ports]]
 localPort = 5000
