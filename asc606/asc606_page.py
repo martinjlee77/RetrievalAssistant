@@ -39,7 +39,7 @@ def render_asc606_page():
         cache_key = _generate_cache_key(contract_text, customer_name, additional_context)
         cached_analysis = _get_cached_analysis(cache_key)
         
-        if cached_analysis:
+        if cached_analysis and cached_analysis.get('analysis_results'):
             # Subtle indication of cached analysis instead of big success box
             st.info("💾 Previous analysis available")
             col1, col2 = st.columns(2)
@@ -229,16 +229,25 @@ def perform_asc606_analysis(contract_text: str, customer_name: str,
             # Generate memo directly from complete analysis results
             memo_content = memo_generator.combine_clean_steps(final_results)
 
-        # Display final memo
+        # Store memo data in session state and navigate to memo page
         progress_placeholder.empty()
-        st.success("✅ Work is completed successfully!")
-
-        memo_generator.display_clean_memo(memo_content)
-
-        # Display knowledge base info if available
+        st.success("✅ Analysis completed successfully! Redirecting to memo...")
+        
+        # Store memo data for the memo page
+        st.session_state.asc606_memo_data = {
+            'memo_content': memo_content,
+            'customer_name': customer_name,
+            'analysis_title': analysis_title,
+            'analysis_date': datetime.now().strftime("%B %d, %Y")
+        }
+        
+        # Display knowledge base info if available (briefly before redirect)
         if knowledge_search.is_available():
             kb_info = knowledge_search.get_user_kb_info()
             ui.display_knowledge_base_stats(kb_info)
+        
+        # Navigate to memo page
+        st.switch_page("asc606/memo_page.py")
 
     except Exception as e:
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
@@ -277,8 +286,8 @@ def _generate_cache_key(contract_text: str, customer_name: str, additional_conte
 def _get_cached_analysis(cache_key: str) -> Dict[str, Any]:
     """Get cached analysis results if they exist."""
     if 'memo_cache' not in st.session_state:
-        return None
-    return st.session_state.memo_cache.get(cache_key)
+        return {}
+    return st.session_state.memo_cache.get(cache_key, {})
 
 def _cache_analysis_results(cache_key: str, data: Dict[str, Any]) -> None:
     """Cache analysis results for later use."""
@@ -308,12 +317,22 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any], customer_name: str, a
         
         memo_content = memo_generator.combine_clean_steps(cached_data.get('analysis_results', {}))
         
-        st.success("✅ Memo generated from cache instantly!")
-        memo_generator.display_clean_memo(memo_content)
+        st.success("✅ Memo generated from cache instantly! Redirecting to memo...")
         
-        # Show cache info
+        # Store memo data for the memo page
+        st.session_state.asc606_memo_data = {
+            'memo_content': memo_content,
+            'customer_name': customer_name,
+            'analysis_title': analysis_title,
+            'analysis_date': datetime.now().strftime("%B %d, %Y")
+        }
+        
+        # Show cache info briefly before redirect
         cache_time = cached_data.get('timestamp', 'Unknown')
         st.info(f"📅 This analysis was cached on: {cache_time}")
+        
+        # Navigate to memo page
+        st.switch_page("asc606/memo_page.py")
         
     except Exception as e:
         st.error(f"❌ Error generating memo from cache: {str(e)}")

@@ -21,6 +21,7 @@ st.logo("assets/images/VL_black_nobk.png")
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home"),
     st.Page("asc606/asc606_page.py", title="ASC 606 Revenue Recognition"),
+    st.Page("asc606/memo_page.py", title="ASC 606 Memo", url_path="asc606-memo"),
     st.Page("pages/asc340.py", title="ASC 340-40 Contract Costs"),
     st.Page("pages/asc842.py", title="ASC 842 Leases"),
 ])
