@@ -235,12 +235,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
-        
-        # Display knowledge base info if available
-        if knowledge_search.is_available():
-            kb_info = knowledge_search.get_user_kb_info()
-            ui.display_knowledge_base_stats(kb_info)
-        
+              
         # Display memo inline instead of switching pages
         st.markdown("---")
                 
@@ -248,20 +243,17 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
         
-        # Add navigation buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-                # Clear file uploader and analysis state for fresh start
-                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-                if 'asc606_memo_data' in st.session_state:
-                    del st.session_state.asc606_memo_data
-                if 'memo_cache' in st.session_state:
-                    st.session_state.memo_cache.clear()
-                st.rerun()
-        with col2:
-            if st.button("🏠 Back to Home", type="secondary", use_container_width=True):
-                st.switch_page("pages/home_content.py")
+        # Add FASB standards messaging and navigation
+        st.info("💡 This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
+        
+        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+            # Clear file uploader and analysis state for fresh start
+            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+            if 'asc606_memo_data' in st.session_state:
+                del st.session_state.asc606_memo_data
+            if 'memo_cache' in st.session_state:
+                st.session_state.memo_cache.clear()
+            st.rerun()
 
     except Exception as e:
         # Clear the progress message even on error
@@ -355,21 +347,23 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
+
+        # Display knowledge base info if available
+        if knowledge_search.is_available():
+            kb_info = knowledge_search.get_user_kb_info()
+            ui.display_knowledge_base_stats(kb_info)
         
-        # Add navigation buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
-                # Clear file uploader and analysis state for fresh start
-                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-                if 'asc606_memo_data' in st.session_state:
-                    del st.session_state.asc606_memo_data
-                if 'memo_cache' in st.session_state:
-                    st.session_state.memo_cache.clear()
-                st.rerun()
-        with col2:
-            if st.button("🏠 Back to Home", type="secondary", use_container_width=True, key="cache_back_home"):
-                st.switch_page("pages/home_content.py")
+        # Add FASB standards messaging and navigation
+        st.info("💡 This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
+        
+        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
+            # Clear file uploader and analysis state for fresh start
+            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+            if 'asc606_memo_data' in st.session_state:
+                del st.session_state.asc606_memo_data
+            if 'memo_cache' in st.session_state:
+                st.session_state.memo_cache.clear()
+            st.rerun()
         
     except Exception as e:
         st.error(f"❌ Error generating memo from cache: {str(e)}")
