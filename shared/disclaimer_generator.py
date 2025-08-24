@@ -25,7 +25,9 @@ class DisclaimerGenerator:
         
         return """---
 
-*Disclaimer Version: [v1.0] (Effective [08/23/2025])*
+<small>*Disclaimer Version: [v1.0] (Effective [08/23/2025])*</small>
+
+<small>
 
 ## IMPORTANT NOTICE AND BASIS OF PREPARATION
 
@@ -95,4 +97,6 @@ class DisclaimerGenerator:
 
 ### Acceptance
 
-*By using or relying on this memorandum, management acknowledges and agrees to the foregoing notices, responsibilities, and limitations and confirms that the memorandum will be used only in conjunction with management's own review, professional judgment, and consultation with qualified advisors, as appropriate.*"""
+*By using or relying on this memorandum, management acknowledges and agrees to the foregoing notices, responsibilities, and limitations and confirms that the memorandum will be used only in conjunction with management's own review, professional judgment, and consultation with qualified advisors, as appropriate.*
+
+</small>"""
