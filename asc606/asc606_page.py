@@ -162,7 +162,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         for step_num in range(1, 6):
             with progress_placeholder:
                 st.subheader(f"🔄 Analyzing Step {step_num}")
-                st.info(f"⏱️ Step {step_num} of 5 • Stay on this tab • ~{6-step_num} minutes remaining")
                 ui.analysis_progress(steps, step_num)
 
             with st.spinner(f"Analyzing Step {step_num}..."):
@@ -184,7 +183,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Generate additional sections (Executive Summary, Background, Conclusion)
         with progress_placeholder:
             st.subheader("📋 Generating additional sections...")
-            st.info("⏱️ Final step • Stay on this tab • ~1 minute remaining")
             ui.analysis_progress(steps, 6)
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
