@@ -27,7 +27,7 @@ def render_asc606_page():
 
     # Page header
     st.title("ASC 606 Analyzer & Memo Generator")
-    
+    st.info("This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
@@ -220,9 +220,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Store memo data in session state and clear progress message
         progress_message_placeholder.empty()  # Correctly clears the in-progress message
         st.success(
-            "✅ **ANALYSIS COMPLETE!** \\n\\n"
+            "✅ **ANALYSIS COMPLETE!**"
             "Your professional ASC 606 memo is ready. "
-            "Redirecting to view your results..."
+            "Scroll down to view the results."
         )
         
         # Signal completion
@@ -243,8 +243,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         
         # Display memo inline instead of switching pages
         st.markdown("---")
-        st.subheader("📋 Your ASC 606 Analysis Results")
-        
+                
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
