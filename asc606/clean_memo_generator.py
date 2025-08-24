@@ -7,6 +7,7 @@ import streamlit as st
 import logging
 from datetime import datetime
 from typing import Dict, Any
+from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class CleanMemoGenerator:
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%d %b, %Y")
         
-        # Build memo with header
+        # Build memo with header and top disclaimer
         memo_lines = [
             "# ASC 606 MEMORANDUM",
             "",
@@ -33,6 +34,8 @@ class CleanMemoGenerator:
             f"**FROM:** Technical Accounting Team - AI", 
             f"**DATE:** {analysis_date}",
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
+            "",
+            DisclaimerGenerator.get_top_banner(),
             "",
             ""
         ]
@@ -104,14 +107,14 @@ class CleanMemoGenerator:
                 "",
             ])
         
-        # Add footer
+        # Add footer with full disclaimer
         memo_lines.extend([
             "---",
             "",
             "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
-            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]", 
+            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]",
             "",
-            "This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis of specific implementation details."
+            DisclaimerGenerator.get_full_disclaimer()
         ])
         
         # Join and return - NO PROCESSING

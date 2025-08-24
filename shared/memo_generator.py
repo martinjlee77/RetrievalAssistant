@@ -13,6 +13,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 import logging
 import re
+from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -85,38 +86,43 @@ class SharedMemoGenerator:
         return self.default_template
     
     def _get_default_template(self) -> str:
-        """Default Big 4 style memo template."""
-        return """
+        """Default Big 4 style memo template with disclaimers."""
+        top_banner = DisclaimerGenerator.get_top_banner()
+        full_disclaimer = DisclaimerGenerator.get_full_disclaimer()
+        
+        return f"""
 # ACCOUNTING MEMORANDUM
 
 **TO:** Chief Accounting Officer  
 **FROM:** Technical Accounting Team  
-**DATE:** {current_date}  
-**RE:** {analysis_title}
+**DATE:** {{current_date}}  
+**RE:** {{analysis_title}}
+
+{top_banner}
 
 ---
 
 ## EXECUTIVE SUMMARY
 
-{executive_summary}
+{{executive_summary}}
 
 ---
 
 ## BACKGROUND
 
-{background_section}
+{{background_section}}
 
 ---
 
 ## ANALYSIS
 
-{analysis_section}
+{{analysis_section}}
 
 ---
 
 ## CONCLUSION
 
-{conclusion_section}
+{{conclusion_section}}
 
 ---
 
@@ -126,7 +132,7 @@ class SharedMemoGenerator:
 
 ---
 
-*This memorandum represents our preliminary analysis based on the contract documents provided. Final implementation should be reviewed with external auditors and may require additional documentation or analysis.*
+{full_disclaimer}
 """
     
     def _prepare_template_variables(self, 

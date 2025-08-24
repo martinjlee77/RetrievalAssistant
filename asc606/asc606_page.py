@@ -235,10 +235,12 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
-              
+             
         # Display memo inline instead of switching pages
         st.markdown("---")
-                
+
+        st.info("If you are happy with the results, you can copy the memo content below and paste it into your preferred document editor. Or you can download the memo as a markdown file (a link to download is available at the bottom of the page)."))
+        
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
