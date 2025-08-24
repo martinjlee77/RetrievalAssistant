@@ -26,16 +26,16 @@ class CleanMemoGenerator:
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%d %b, %Y")
         
-        # Build memo with header and top disclaimer
+        # Build memo with disclaimer at very top
         memo_lines = [
+            DisclaimerGenerator.get_top_banner(),
+            "",
             "# ASC 606 MEMORANDUM",
             "",
             f"**TO:** Chief Accounting Officer",
             f"**FROM:** Technical Accounting Team - AI", 
             f"**DATE:** {analysis_date}",
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
-            "",
-            DisclaimerGenerator.get_top_banner(),
             "",
             ""
         ]

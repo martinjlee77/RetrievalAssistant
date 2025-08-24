@@ -90,15 +90,14 @@ class SharedMemoGenerator:
         top_banner = DisclaimerGenerator.get_top_banner()
         full_disclaimer = DisclaimerGenerator.get_full_disclaimer()
         
-        return f"""
+        return f"""{top_banner}
+
 # ACCOUNTING MEMORANDUM
 
 **TO:** Chief Accounting Officer  
 **FROM:** Technical Accounting Team  
 **DATE:** {{current_date}}  
 **RE:** {{analysis_title}}
-
-{top_banner}
 
 ---
 

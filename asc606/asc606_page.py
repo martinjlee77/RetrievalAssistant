@@ -220,7 +220,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Store memo data in session state and clear progress message
         progress_message_placeholder.empty()  # Correctly clears the in-progress message
         st.success(
-            "✅ **ANALYSIS COMPLETE!** \\n\\n"
+            "✅ **ANALYSIS COMPLETE!**"
             "Your professional ASC 606 memo is ready. "
             "Scroll down to view the results."
         )
@@ -244,9 +244,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
-        
-        # Add FASB standards messaging and navigation
-        st.info("💡 This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
             # Clear file uploader and analysis state for fresh start
