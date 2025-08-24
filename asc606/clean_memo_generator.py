@@ -136,6 +136,9 @@ class CleanMemoGenerator:
         # Use HTML display which preserves formatting
         st.markdown(html_content, unsafe_allow_html=True)
         
+        # Add blank line for spacing
+        st.markdown("")
+        
         # Download button - only show if content exists
         if memo_content and len(memo_content.strip()) > 50:
             st.download_button(

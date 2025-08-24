@@ -27,7 +27,7 @@ def render_asc606_page():
 
     # Page header
     st.title("ASC 606 Analyzer & Memo Generator")
-    st.info("This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
+    st.info("This application leverages the FASB's Accounting Standards Codification (ASC) for contract analysis, unlike general-purpose LLMs that rely on broader knowledge bases.")
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
@@ -351,11 +351,7 @@ def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
         # Display knowledge base info if available
         if knowledge_search.is_available():
             kb_info = knowledge_search.get_user_kb_info()
-            ui.display_knowledge_base_stats(kb_info)
-        
-        # Add FASB standards messaging and navigation
-        st.info("💡 This application ensures accuracy and compliance by leveraging the most up-to-date FASB ASC 606 authoritative guidance, unlike LLMs that rely on general knowledge.")
-        
+            ui.display_knowledge_base_stats(kb_info)     
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
             # Clear file uploader and analysis state for fresh start
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
