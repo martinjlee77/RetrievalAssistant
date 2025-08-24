@@ -220,7 +220,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Store memo data in session state and clear progress message
         progress_message_placeholder.empty()  # Correctly clears the in-progress message
         st.success(
-            "✅ **ANALYSIS COMPLETE!**"
+            "✅ **ANALYSIS COMPLETE!** \\n\\n"
             "Your professional ASC 606 memo is ready. "
             "Scroll down to view the results."
         )
@@ -239,7 +239,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        st.info("If you are happy with the results, you can copy the memo content below and paste it into your preferred document editor. Or you can download the memo as a markdown file (a link to download is available at the bottom of the page)."))
+        st.info("If you are happy with the results, you can copy the memo content below and paste it into your preferred document editor. Or you can download the memo as a markdown file (a link to download is available at the bottom of the page).")
         
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()

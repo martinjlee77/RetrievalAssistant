@@ -24,6 +24,8 @@ class DisclaimerGenerator:
         """Get the full disclaimer for the bottom of memos."""
         
         return """---
+        
+*Disclaimer Version: [v1.0] (Effective [08/23/2025])*
 
 ## IMPORTANT NOTICE AND BASIS OF PREPARATION
 
