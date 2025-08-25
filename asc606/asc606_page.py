@@ -219,13 +219,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
 
         # Store memo data in session state and clear progress message
         progress_message_placeholder.empty()  # Correctly clears the in-progress message
-        
-        # Show success message in a placeholder so we can clear it
-        success_placeholder = st.empty()
-        with success_placeholder:
-            st.success(
-                f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
-            )
+        st.success(
+            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
+        )
         
         # Signal completion
         st.session_state.asc606_analysis_complete = True
@@ -237,18 +233,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
-        
-        # Brief delay to show completion, then clear progress elements for clean interface
-        import time
-        time.sleep(2.5)
-        progress_placeholder.empty()  # Clear the 6 step progress boxes
-        success_placeholder.empty()   # Clear the success message
              
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
