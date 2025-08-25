@@ -238,10 +238,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         st.markdown("---")
 
         with st.container(border=True):
-            st.markdown("""
-            Your ASC 606 memo is displayed below. To save the results, you can either:
-                    - :primary[**Copy and Paste**] : Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-                    - :primary[**Download as Markdown**] :  Download the memo as a Markdown file for later use (download link below).
+            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:\n\n"
+                    "- **Copy and Paste**: Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).\n"
+                    "- **Download as Markdown**:  Download the memo as a Markdown file for later use (download link below)."
                 """)
         
         # Display the memo using CleanMemoGenerator
