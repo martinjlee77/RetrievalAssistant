@@ -17,27 +17,35 @@ class SharedUIComponents:
     """Universal UI components that work across all accounting standards."""
     
     @staticmethod
-    def analysis_progress(steps: List[str], current_step: int = 0) -> None:
+    def analysis_progress(steps: List[str], current_step: int = 0, placeholder=None) -> None:
         """
         Display analysis progress indicator - works for any number of steps.
         
         Args:
             steps: List of step names
             current_step: Current step index (0-based)
+            placeholder: Optional st.empty() placeholder to render progress in (for clearable progress)
         """
-        st.subheader("🔄 Analysis Progress")
+        def _render_progress():
+            st.subheader("🔄 Analysis Progress")
+            
+            # Create progress columns (handle different numbers of steps)
+            cols = st.columns(min(len(steps), 6))  # Max 6 columns for readability
+            
+            for i, (col, step) in enumerate(zip(cols, steps)):
+                with col:
+                    if i < current_step:
+                        st.success(f"✅ {step}")
+                    elif i == current_step:
+                        st.info(f"🔄 {step}")
+                    else:
+                        st.write(f"⏳ {step}")
         
-        # Create progress columns (handle different numbers of steps)
-        cols = st.columns(min(len(steps), 6))  # Max 6 columns for readability
-        
-        for i, (col, step) in enumerate(zip(cols, steps)):
-            with col:
-                if i < current_step:
-                    st.success(f"✅ {step}")
-                elif i == current_step:
-                    st.info(f"🔄 {step}")
-                else:
-                    st.write(f"⏳ {step}")
+        if placeholder:
+            with placeholder.container():
+                _render_progress()
+        else:
+            _render_progress()
     
     @staticmethod
     def loading_spinner(message: str = "Processing..."):

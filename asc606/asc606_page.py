@@ -125,11 +125,16 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         # Step-by-step analysis with progress indicators
         analysis_results = {}
         
+        # Create a separate placeholder for progress indicators that can be cleared
+        progress_indicator_placeholder = st.empty()
+        
         # Run 5 ASC 606 steps with progress
         for step_num in range(1, 6):
             with progress_placeholder:
                 st.subheader(f"🔄 Analyzing Step {step_num}")
-                ui.analysis_progress(steps, step_num)
+                
+            # Show progress indicators in clearable placeholder
+            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
 
             with st.spinner(f"Analyzing Step {step_num}..."):
                 # Get relevant guidance from knowledge base
@@ -150,7 +155,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         # Generate additional sections (Executive Summary, Background, Conclusion)
         with progress_placeholder:
             st.subheader("📋 Generating additional sections...")
-            ui.analysis_progress(steps, 6)
+            
+        # Show final progress indicators in clearable placeholder
+        ui.analysis_progress(steps, 6, progress_indicator_placeholder)
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
             # Extract conclusions from the 5 steps
@@ -176,8 +183,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
             # Generate memo directly from complete analysis results
             memo_content = memo_generator.combine_clean_steps(final_results)
 
-        # Store memo data in session state and clear progress message
-        progress_message_placeholder.empty()  # Correctly clears the in-progress message
+        # Store memo data in session state and clear progress messages
+        progress_message_placeholder.empty()  # Clears the in-progress message
+        progress_placeholder.empty()  # Clears the step headers
+        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
+        
         st.success(
             f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
         )
