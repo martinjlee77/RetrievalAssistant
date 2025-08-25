@@ -4,8 +4,6 @@ ASC 606 Contract Analysis Page
 
 import streamlit as st
 import logging
-import hashlib
-import json
 from datetime import datetime
 from typing import Dict, Any, List
 
@@ -43,46 +41,13 @@ def render_asc606_page():
             "- Stay on this tab until analysis is complete\n"
             "- You'll see a completion message when it's done"
         )
-        # Check for cached analysis
-        cache_key = _generate_cache_key(contract_text, additional_context)
-        cached_analysis = _get_cached_analysis(cache_key)
-        
-        if cached_analysis and cached_analysis.get('analysis_results'):
-            # Subtle indication of cached analysis instead of big success box
-            st.info("💾 Previous analysis available")
-            col1, col2 = st.columns(2)
-            
-            # Track if memo should be generated from cache
-            generate_from_cache = False
-            regenerate_analysis = False
-            
-            with col1:
-                if st.button("⚡ Generate Memo from Cache",
-                           type="primary",
-                           use_container_width=True,
-                           key="asc606_from_cache"):
-                    generate_from_cache = True
-            
-            with col2:
-                if st.button("🔄 Regenerate Analysis",
-                           type="secondary",
-                           use_container_width=True,
-                           key="asc606_regenerate"):
-                    regenerate_analysis = True
-            
-            # Generate memo outside of columns for full width display
-            if generate_from_cache:
-                _generate_memo_from_cache(cached_analysis)
-            elif regenerate_analysis:
-                _clear_cache(cache_key)
-                perform_asc606_analysis(contract_text, additional_context, cache_key)
-        else:
-            if st.button("3️⃣ Analyze Contract & Generate Memo",
-                       type="primary",
-                       use_container_width=True,
-                       key="asc606_analyze"):
-                warning_placeholder.empty()  # Clear the warning after the button is pressed
-                perform_asc606_analysis(contract_text, additional_context, cache_key)
+        if st.button("3️⃣ Analyze Contract & Generate Memo",
+                   type="primary",
+                   use_container_width=True,
+                   key="asc606_analyze"):
+            warning_placeholder.empty()  # Clear the warning after the button is pressed
+            if contract_text:  # Type guard to ensure contract_text is not None
+                perform_asc606_analysis(contract_text, additional_context)
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Contract & Generate Memo", 
@@ -114,7 +79,7 @@ def get_asc606_inputs():
 # Old validation function removed - using progressive disclosure approach instead
 
 
-def perform_asc606_analysis(contract_text: str, additional_context: str = "", cache_key: str = None):
+def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
     """Perform the complete ASC 606 analysis and display results."""
     
     # Create placeholder for the in-progress message
@@ -207,12 +172,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
                 'conclusion': conclusion
             }
             
-            # Cache analysis results if successful
-            if cache_key:
-                _cache_analysis_results(cache_key, {
-                    'analysis_results': final_results,
-                    'timestamp': datetime.now().isoformat()
-                })
             
             # Generate memo directly from complete analysis results
             memo_content = memo_generator.combine_clean_steps(final_results)
@@ -237,7 +196,8 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        with st.container(border=True):
+            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -252,8 +212,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
             if 'asc606_memo_data' in st.session_state:
                 del st.session_state.asc606_memo_data
-            if 'memo_cache' in st.session_state:
-                st.session_state.memo_cache.clear()
+
             st.rerun()
 
     except Exception as e:
@@ -285,86 +244,6 @@ def main():
     render_asc606_page()
 
 
-# ===== CACHE HELPER FUNCTIONS =====
-# These are for development convenience and can be removed before deployment
-
-def _generate_cache_key(contract_text: str, additional_context: str) -> str:
-    """Generate a cache key based on input parameters."""
-    content = f"{contract_text[:1000]}{additional_context}"  # Use first 1000 chars
-    return hashlib.md5(content.encode()).hexdigest()
-
-def _get_cached_analysis(cache_key: str) -> Dict[str, Any]:
-    """Get cached analysis results if they exist."""
-    if 'memo_cache' not in st.session_state:
-        return {}
-    return st.session_state.memo_cache.get(cache_key, {})
-
-def _cache_analysis_results(cache_key: str, data: Dict[str, Any]) -> None:
-    """Cache analysis results for later use."""
-    if 'memo_cache' not in st.session_state:
-        st.session_state.memo_cache = {}
-    st.session_state.memo_cache[cache_key] = data
-
-def _clear_cache(cache_key: str = None) -> None:
-    """Clear specific cache entry or all cache."""
-    if 'memo_cache' not in st.session_state:
-        return
-    if cache_key:
-        st.session_state.memo_cache.pop(cache_key, None)
-    else:
-        st.session_state.memo_cache.clear()
-
-def _generate_memo_from_cache(cached_data: Dict[str, Any]) -> None:
-    """Generate memo from cached analysis results."""
-    try:
-        st.info("⚡ Generating memo from cached analysis...")
-        
-        from asc606.clean_memo_generator import CleanMemoGenerator
-        memo_generator = CleanMemoGenerator()
-        
-        # Use cached memo data directly
-        memo_data = cached_data.get('memo_data', {})
-        
-        memo_content = memo_generator.combine_clean_steps(cached_data.get('analysis_results', {}))
-        
-        st.success("✅ Memo generated from cache instantly! Redirecting to memo...")
-        
-        # Store memo data for the memo page (using cached data info)
-        st.session_state.asc606_memo_data = {
-            'memo_content': memo_content,
-            'customer_name': cached_data.get('analysis_results', {}).get('customer_name', 'Customer'),
-            'analysis_title': cached_data.get('analysis_results', {}).get('analysis_title', 'Analysis'),
-            'analysis_date': datetime.now().strftime("%B %d, %Y")
-        }
-        
-        # Show cache info
-        cache_time = cached_data.get('timestamp', 'Unknown')
-        st.info(f"📅 This analysis was cached on: {cache_time}")
-        
-        # Display memo inline instead of switching pages
-        st.markdown("---")
-        st.subheader("📋 Your ASC 606 Analysis Results")
-        
-        # Display the memo using CleanMemoGenerator
-        memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
-
-        # Display knowledge base info if available
-        if knowledge_search.is_available():
-            kb_info = knowledge_search.get_user_kb_info()
-            ui.display_knowledge_base_stats(kb_info)     
-        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True, key="cache_analyze_another"):
-            # Clear file uploader and analysis state for fresh start
-            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-            if 'asc606_memo_data' in st.session_state:
-                del st.session_state.asc606_memo_data
-            if 'memo_cache' in st.session_state:
-                st.session_state.memo_cache.clear()
-            st.rerun()
-        
-    except Exception as e:
-        st.error(f"❌ Error generating memo from cache: {str(e)}")
-        logger.error(f"Cache memo generation error: {str(e)}")
 
 
 def _extract_customer_name(contract_text: str) -> str:
