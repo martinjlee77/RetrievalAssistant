@@ -168,17 +168,17 @@ class CleanMemoGenerator:
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h1 style="margin: 20px 0 15px 0; color: #1f1f1f; font-weight: bold;">{line[2:]}</h1>')
+                html_lines.append(f'<h1 style="margin: 20px 0 15px 0; font-weight: bold;">{line[2:]}</h1>')
             elif line.startswith('## '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h2 style="margin: 18px 0 12px 0; color: #2f2f2f; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>')
+                html_lines.append(f'<h2 style="margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>')
             elif line.startswith('### '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h3 style="margin: 16px 0 10px 0; color: #3f3f3f; font-weight: 600;">{line[4:]}</h3>')
+                html_lines.append(f'<h3 style="margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>')
             # Handle bullet points better
             elif line.strip().startswith('- '):
                 if not in_list:
@@ -224,7 +224,7 @@ class CleanMemoGenerator:
         html_content = f"""
         <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
         line-height: 1.6; max-width: 850px; padding: 30px; 
-        background-color: #ffffff; border: 1px solid #e1e5e9; 
+        border: 1px solid #e1e5e9; 
         border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             {''.join(html_lines)}
         </div>
