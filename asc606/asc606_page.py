@@ -121,7 +121,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
     progress_message_placeholder = st.empty()
     progress_message_placeholder.error(
         "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
-        "Your analysis is running and will take 3-5 minutes. "
+        "Your analysis is running and will take up to 3-5 minutes. "
         "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
     )
     
@@ -219,6 +219,8 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
 
         # Store memo data in session state and clear progress message
         progress_message_placeholder.empty()  # Correctly clears the in-progress message
+        
+        # Show success message in a placeholder so we can clear it
         success_placeholder = st.empty()
         with success_placeholder:
             st.success(
@@ -246,9 +248,10 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", ca
         st.markdown("---")
 
         with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:\n\n"
-                    "- **Copy and Paste**: Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).\n"
-                    "- **Download as Markdown**:  Download the memo as a Markdown file for later use (download link below)."
+            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+            
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
+- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
                 """)
         
         # Display the memo using CleanMemoGenerator

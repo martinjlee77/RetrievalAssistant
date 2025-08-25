@@ -24,7 +24,7 @@ class CleanMemoGenerator:
         # Get basic info
         customer_name = analysis_results.get('customer_name', 'Customer')
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
-        analysis_date = datetime.now().strftime("%d %b, %Y")
+        analysis_date = datetime.now().strftime("%B %d, %Y")
         
         # Build memo with disclaimer at very top
         memo_lines = [
