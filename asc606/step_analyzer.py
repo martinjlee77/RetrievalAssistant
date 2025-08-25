@@ -147,18 +147,16 @@ class ASC606StepAnalyzer:
         logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
         
         # DEBUG: Log step data before extraction
-        logger.error(f"DEBUG: About to extract conclusions from steps: {list(results['steps'].keys())}")
+        logger.info(f"DEBUG: About to extract conclusions from steps: {list(results['steps'].keys())}")
         for step_key, step_data in results['steps'].items():
             if isinstance(step_data, dict):
-                logger.error(f"DEBUG: {step_key} structure: {list(step_data.keys())}")
+                logger.info(f"DEBUG: {step_key} structure: {list(step_data.keys())}")
                 if 'markdown_content' in step_data:
                     content = step_data['markdown_content']
-                    logger.error(f"DEBUG: {step_key} content length: {len(content)}")
-                    logger.error(f"DEBUG: {step_key} contains 'Conclusion:': {'Conclusion:' in content}")
-                    logger.error(f"DEBUG: {step_key} sample: {content[:500]}...")
+                    logger.info(f"DEBUG: {step_key} content length: {len(content)}")
         
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
-        logger.info(f"DEBUG: Extracted conclusions text: {conclusions_text[:200]}...")
+        logger.info(f"DEBUG: Extracted conclusions text length: {len(conclusions_text)} chars")
         
         # Generate executive summary, background, and conclusion
         logger.info("Generating executive summary...")
@@ -251,16 +249,7 @@ class ASC606StepAnalyzer:
                 logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
                 markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
             else:
-                # Log RAW content from GPT-4o - NO PROCESSING
-                logger.info(f"DEBUG: RAW GPT-5 response for Step {step_num} FULL TEXT: {repr(markdown_content)}")
-                
-                # Check for currency patterns in raw response (logging only)
-                if '$' in markdown_content:
-                    currency_samples = []
-                    import re
-                    for match in re.finditer(r'\$[0-9,\s]+', markdown_content):
-                        currency_samples.append(repr(match.group()))
-                    logger.info(f"DEBUG: Currency patterns in raw response: {currency_samples}")
+                # Content received successfully
                 
                 # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
@@ -425,123 +414,7 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         return prompt
     
     # REMOVED: _fix_formatting_issues - using clean GPT-4o markdown directly
-    
-    def _parse_step_response(self, step_num: int, response_text: str) -> Dict[str, str]:
-        """Parse the natural language response into structured components."""
-        
-        result = {
-            'title': self._get_step_title(step_num),
-            'analysis': '',
-            'conclusion': '',
-            'issues': ''
-        }
-        
-        # Log the raw response for debugging
-        logger.info(f"DEBUG: Raw AI response for Step {step_num} (length: {len(response_text)}): '{response_text[:200]}'")
-        
-        # More flexible parsing logic - look for common section patterns
-        response_upper = response_text.upper()
-        
-        # Try different parsing approaches
-        if '**' in response_text:
-            # Original ** delimiter approach
-            sections = response_text.split('**')
-            current_section = None
-            current_content = []
-            
-            for section in sections:
-                section = section.strip()
-                if not section:
-                    continue
-                    
-                if any(keyword in section.upper() for keyword in ['ANALYSIS', 'STEP ANALYSIS']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'analysis'
-                    current_content = []
-                elif any(keyword in section.upper() for keyword in ['CONCLUSION', 'STEP CONCLUSION']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'conclusion'
-                    current_content = []
-                elif any(keyword in section.upper() for keyword in ['ISSUES', 'UNCERTAINTIES', 'MATTERS']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'issues'
-                    current_content = []
-                else:
-                    if current_section:
-                        current_content.append(section)
-            
-            # Handle the last section
-            if current_section and current_content:
-                result[current_section] = '\n'.join(current_content).strip()
-        
-        # If ** parsing didn't work, try line-based parsing
-        if not result['analysis'] and not result['conclusion']:
-            lines = response_text.split('\n')
-            current_section = None
-            current_content = []
-            
-            for line in lines:
-                line_upper = line.strip().upper()
-                
-                if any(keyword in line_upper for keyword in ['ANALYSIS:', '**ANALYSIS:**', 'STEP ANALYSIS:']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'analysis'
-                    current_content = []
-                elif any(keyword in line_upper for keyword in ['CONCLUSION:', '**CONCLUSION:**', 'STEP CONCLUSION:', 'CONCLUSION']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'conclusion'
-                    current_content = []
-                elif any(keyword in line_upper for keyword in ['ISSUES:', '**ISSUES:**', 'UNCERTAINTIES:', '**UNCERTAINTIES:**']):
-                    if current_section and current_content:
-                        result[current_section] = '\n'.join(current_content).strip()
-                    current_section = 'issues'
-                    current_content = []
-                else:
-                    if current_section and line.strip():
-                        current_content.append(line.strip())
-            
-            # Handle the last section
-            if current_section and current_content:
-                result[current_section] = '\n'.join(current_content).strip()
-        
-        # Special handling for missing conclusions - look for "Conclusion:" pattern anywhere in text
-        if not result['conclusion'] and 'Conclusion:' in response_text:
-            parts = response_text.split('Conclusion:', 1)
-            if len(parts) == 2:
-                result['analysis'] = parts[0].strip()
-                result['conclusion'] = parts[1].strip()
-                logger.info(f"DEBUG: Fixed Step {step_num} conclusion using 'Conclusion:' pattern")
-        
-        # Ensure we have minimal conclusion for any step missing one
-        if not result['conclusion'] and result['analysis']:
-            # Extract last paragraph as conclusion
-            paragraphs = result['analysis'].split('\n\n')
-            if len(paragraphs) > 1:
-                result['conclusion'] = paragraphs[-1].strip()
-                result['analysis'] = '\n\n'.join(paragraphs[:-1]).strip()
-                logger.info(f"DEBUG: Extracted Step {step_num} conclusion from last paragraph")
-        
-        # Last resort: put everything in analysis if parsing failed
-        if not result['analysis'] and not result['conclusion']:
-            if response_text and response_text.strip():
-                # Store clean text without formatting
-                result['analysis'] = response_text.strip()
-                result['conclusion'] = "Analysis completed. See detailed reasoning above."
-            else:
-                result['analysis'] = "ERROR: Empty response received from AI model. This may indicate a problem with GPT-5 compatibility."
-                result['conclusion'] = "Unable to complete analysis due to empty AI response."
-        
-        # Keep sections clean without formatting
-        # Note: Using clean markdown directly from GPT-4o
-        
-        logger.info(f"DEBUG: Parsed Step {step_num} - Analysis length: {len(result['analysis'])}, Conclusion length: {len(result['conclusion'])}")
-        
-        return result
+    # REMOVED: _parse_step_response - unused method (replaced by direct markdown approach)
     
     def _get_step_title(self, step_num: int) -> str:
         """Get the title for a step."""
@@ -560,7 +433,7 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
         """Extract conclusion text from all completed steps."""
         conclusions = []
         logger.info(f"Extracting conclusions from {len(steps_data)} steps")
-        logger.error(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
+        logger.info(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
         
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
@@ -602,9 +475,9 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
                         conclusions.append(f"Step {step_num}: {conclusion}")
                         logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
                     else:
-                        logger.error(f"FAILED to extract conclusion from Step {step_num}")
-                        logger.error(f"Step {step_num} content contains '**Conclusion:**': {'**Conclusion:**' in content}")
-                        logger.error(f"Step {step_num} content sample: {content[:500]}...")
+                        logger.info(f"DEBUG: Failed to extract conclusion from Step {step_num}")
+                        logger.info(f"DEBUG: Step {step_num} content contains '**Conclusion:**': {'**Conclusion:**' in content}")
+                        logger.info(f"DEBUG: Step {step_num} content sample: {content[:100]}...")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
