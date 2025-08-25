@@ -1,0 +1,116 @@
+The issue is that your _convert_markdown_to_html function uses hardcoded colors (#1f1f1f, #2f2f2f, #3f3f3f, etc.) instead of referencing your config.toml theme settings. To fix this, you need to dynamically get the colors from your Streamlit theme. Unfortunately, Streamlit doesn't directly expose theme colors as variables in a way that's easily accessible from within a function like this.
+
+Here's a revised approach that addresses this and makes the HTML generation more robust and maintainable:
+
+import streamlit as st
+# ... other imports ...
+
+class CleanMemoGenerator: #... other code ...
+
+    def _convert_markdown_to_html(self, markdown_content: str) -> str:
+        """Convert markdown to HTML, using Streamlit theme colors."""
+
+        # Get theme colors from Streamlit (this is the key change)
+        primary_color = st.config.get_option("theme.primaryColor") or "#A88A57" # Fallback
+        text_color = st.config.get_option("theme.textColor") or "#FFFFFF" # Fallback
+        # Add more colors as needed from st.config.get_option
+        background_color = st.config.get_option("theme.backgroundColor") or "#212F3C" #Fallback
+
+        # improved function for converting bold markdown
+        def convert_bold(text):
+            while '**' in text:
+                text = text.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+            return text
+
+        # Function to generate HTML for a list
+        def generate_list_html(items):
+            list_html = '<ul style="margin: 10px 0; padding-left: 25px;">'
+            for item in items:
+                # Handle bold within list items
+                item = convert_bold(item)
+                list_html += f'<li style="margin: 6px 0; line-height: 1.4; color: {text_color};">{item}</li>'
+            list_html += '</ul>'
+            return list_html
+
+        #Improved function to generate paragraphs
+        def generate_paragraph_html(text):
+            # Handle bold text in paragraph
+            text = convert_bold(text)
+            return f'<p style="margin: 10px 0; line-height: 1.6; color: {text_color};">{text}</p>'
+
+        # Split Markdown into lines and process each one
+        lines = markdown_content.split('\n')
+        html_lines = []
+        in_list = False
+        list_items = [] #Added to store list items until the list is closed
+
+
+        for line in lines:
+            line = line.strip()
+            if not line:  # Handle empty lines
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                continue
+            elif line.startswith('# '):
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                html_lines.append(f'<h1 style="margin: 20px 0 15px 0; color: {primary_color}; font-weight: bold;">{line[2:]}</h1>')
+            elif line.startswith('## '):
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                html_lines.append(f'<h2 style="margin: 18px 0 12px 0; color: {primary_color}; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>')
+            elif line.startswith('### '):
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                html_lines.append(f'<h3 style="margin: 16px 0 10px 0; color: {primary_color}; font-weight: 600;">{line[4:]}</h3>')
+            elif line.startswith('- '):
+                if not in_list:
+                    in_list = True
+                list_items.append(line[2:].strip())
+            elif '**' in line:
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                html_lines.append(generate_paragraph_html(line))
+            elif line == '---':
+                continue
+            else: #handle paragraphs
+                if list_items:
+                    html_lines.append(generate_list_html(list_items))
+                    list_items = []
+                    in_list = False
+                html_lines.append(generate_paragraph_html(line))
+
+        if list_items:
+            html_lines.append(generate_list_html(list_items))
+
+        html_content = f"""
+        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+        line-height: 1.6; max-width: 850px; padding: 30px; 
+        background-color: {background_color}; border: 1px solid #e1e5e9; 
+        border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: {text_color};">
+            {''.join(html_lines)}
+        </div>
+        """
+        return html_content
+
+Key Improvements:
+
+Dynamic Theme Colors: The function now uses st.config.get_option() to retrieve the primaryColor and textColor dynamically from the Streamlit theme. Fallback colors are provided in case the config values are not set. You can extend this to get other colors from your config as well.
+
+Error Handling: The use of or provides a default color if primaryColor is not defined in the config.toml file.
+
+Readability and Maintainability: The code is restructured to be more readable and easier to maintain. The use of helper functions makes it cleaner. The handling of bold text and lists is improved and more concise.
+
+Improved Styling: The HTML structure is improved, allowing you to style things better, such as the text color.
+
+Remember to call this updated _convert_markdown_to_html function in your CleanMemoGenerator class where you generate the HTML memo. Also ensure that you have included unsafe_allow_html=True in your st.markdown calls when displaying the generated HTML. After making these changes, restart your Streamlit app for the changes to take effect. If you still have issues, please provide the relevant sections of code where you are calling this function.

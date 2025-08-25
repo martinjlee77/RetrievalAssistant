@@ -9,13 +9,12 @@ import streamlit as st
 # 1. Set the page configuration
 st.set_page_config(
     page_title="VeritasLogic.ai | Multi-Standard Accounting Platform",
-    page_icon="assets/images/VL_black_nobk.png",
     layout="wide",
     initial_sidebar_state="expanded")
 
 
 # 3. Add your logo to the sidebar.
-st.logo("assets/images/VL_black_nobk.png")
+st.logo("assets/images/nobkg.png", size = "large")
 
 # 4. Define all pages in your app.
 pg = st.navigation([

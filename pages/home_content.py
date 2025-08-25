@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 # --- Header Section ---
 st.title("VeritasLogic.ai Platform")
 st.subheader("Welcome back. Please select an analysis tool below to begin.")
+st.markdown("This application uses the FASB's Accounting Standards Codification for contract analysis, unlike general-purpose LLMs that rely on general knowledge.")
 
 # --- Main Content: Call-to-Action Containers ---
 st.divider()

@@ -4,8 +4,20 @@ address = "0.0.0.0"
 port = 5000
 
 [theme]
-base = "light"
-primaryColor = "#0A2B4C"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#E9ECEF"
-textColor = "#212529"
+base = "dark"
+primaryColor = "#A88A57" # Lighter blue
+backgroundColor = "#212F3C" # Very dark navy blue, also secondaryBackgroundColor for sidebar
+secondaryBackgroundColor = "#36404A" # Darker gray, also backgroundColor for sidebar
+# textColor = "#FFFFFF"
+# showSidebarBorder = true
+# linkColor = "#000000"
+# linkUnderline = true
+# codeBackgroundColor = "#000000" 
+# baseRadius = "10px"
+# buttonRadius = "10px"
+# buttonColor = "#FFFFFF"
+# dataframeBorderColor = "#000000"
+# theme.dataframeHeaderBackgroundColor = "#000000"
+# showWidgetBorder = true
+
+[theme.sidebar]
