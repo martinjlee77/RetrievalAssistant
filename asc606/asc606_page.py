@@ -30,7 +30,7 @@ def render_asc606_page():
         st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a professional ASC 606 memo. Simply upload your documents to begin.")
     
     # Get user inputs with progressive disclosure
-    contract_text, filename, additional_context, is_ready = get_asc606_inputs()
+    contract_text, filename, additional_context, customer_name, is_ready = get_asc606_inputs()
 
     # Critical user warning before analysis
     if is_ready:
@@ -42,19 +42,26 @@ def render_asc606_page():
             "- Stay on this tab until analysis is complete\n"
             "- You'll see a completion message when it's done"
         )
-        if st.button("3️⃣ Analyze Contract & Generate Memo",
+        if st.button("4️⃣ Analyze Contract & Generate Memo",
                    type="primary",
                    use_container_width=True,
                    key="asc606_analyze"):
             warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc606_analysis(contract_text, additional_context)
+            if contract_text and customer_name:  # Type guard to ensure both are available
+                perform_asc606_analysis(contract_text, additional_context, customer_name)
     else:
         # Show disabled button with helpful message when not ready
-        st.button("3️⃣ Analyze Contract & Generate Memo", 
-                 disabled=True, 
-                 use_container_width=True,
-                 key="asc606_analyze_disabled")
+        if not contract_text:
+            st.button("4️⃣ Analyze Contract & Generate Memo", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc606_analyze_disabled")
+        else:
+            st.info("Please confirm or edit the customer name above to proceed.")
+            st.button("4️⃣ Analyze Contract & Generate Memo", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc606_analyze_disabled")
 
 
 def get_asc606_inputs():
@@ -65,22 +72,44 @@ def get_asc606_inputs():
     contract_text, filename = processor.upload_and_process(
         "1️⃣ Upload a **complete contract and related documents**, e.g., executed agreement, standard T&Cs, MSA, SOW, purchase order, invoice (required)")
 
+    # Customer name extraction and confirmation (when contract is uploaded)
+    customer_name = None
+    if contract_text:
+        extracted_name = _extract_customer_name(contract_text)
+        
+        # Simple customer name confirmation
+        st.markdown("**2️⃣ Customer Identification**")
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            customer_name = st.text_input(
+                "Customer Name (auto-detected)",
+                value=extracted_name,
+                help="The customer receiving goods/services. Edit if the auto-detection is incorrect.",
+                key="customer_name_input")
+        
+        with col2:
+            if customer_name != extracted_name and customer_name.strip():
+                st.info("✏️ Edited")
+            elif customer_name == extracted_name:
+                st.success("✓ Detected")
+
     # Additional info (optional)
     additional_context = st.text_area(
-        "2️⃣ Additional information or concerns (optional)",
+        "3️⃣ Additional information or concerns (optional)",
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specificy your areas of focus or concerns.",
         height=100)
 
-    # Check completion status - only contract text required
-    is_ready = bool(contract_text)
+    # Check completion status - contract text and customer name required
+    is_ready = bool(contract_text and customer_name and customer_name.strip())
 
-    return contract_text, filename, additional_context, is_ready
+    return contract_text, filename, additional_context, customer_name, is_ready
 
 
 # Old validation function removed - using progressive disclosure approach instead
 
 
-def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
+def perform_asc606_analysis(contract_text: str, additional_context: str = "", customer_name: str = ""):
     """Perform the complete ASC 606 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
@@ -103,8 +132,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
-    # Auto-extract customer name and generate analysis title
-    customer_name = _extract_customer_name(contract_text)
+    # Use provided customer name and generate analysis title
+    if not customer_name or customer_name.strip() == "":
+        customer_name = _extract_customer_name(contract_text)  # Fallback if somehow not provided
     analysis_title = _generate_analysis_title()
 
     try:
@@ -272,34 +302,49 @@ def main():
 
 
 def _extract_customer_name(contract_text: str) -> str:
-    """Auto-extract customer name from contract text using simple patterns."""
+    """Auto-extract customer name from contract text using improved patterns."""
     try:
         import re
         
-        # Look for common patterns in first 1000 characters
-        text_sample = contract_text[:1000]
+        # Look for common patterns in first 1500 characters (increased for better context)
+        text_sample = contract_text[:1500]
         
-        # Common patterns for customer identification
+        # PRIORITY-ORDERED patterns for customer identification
         patterns = [
-            r'Customer[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
-            r'(?:Client|Company)[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
-            r'Bill\s+To[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',
+            # PRIORITY 1: Explicit customer labels in contract preambles (fixes the InnovateTech issue)
+            r'and\s+([A-Za-z0-9\s,\.&-]+?)\s*\(\s*["\']?Customer["\']?\s*\)',  # "and Global Dynamics Corp. ("Customer")"
+            r'between\s+[^,]+,?\s+and\s+([A-Za-z0-9\s,\.&-]+?)\s*\(\s*["\']?Customer["\']?\s*\)',  # Alternative preamble format
+            
+            # PRIORITY 2: Direct customer identification
+            r'Customer[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',  # "Customer: Company Name"
+            r'Client[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)',    # "Client: Company Name"
+            r'Bill\s+To[:\s]+([A-Za-z0-9\s,\.&-]+?)(?:[\n,;]|$)', # "Bill To: Company Name"
+            
+            # PRIORITY 3: Last resort - any company name (moved to end)
             r'([A-Za-z\s&-]+(?:Corp|Corporation|Inc|LLC|Ltd|Co))',
         ]
         
-        for pattern in patterns:
-            matches = re.findall(pattern, text_sample, re.IGNORECASE)
+        for i, pattern in enumerate(patterns):
+            matches = re.findall(pattern, text_sample, re.IGNORECASE | re.MULTILINE)
             if matches:
                 customer_name = matches[0].strip()
+                # Clean up common artifacts
+                customer_name = re.sub(r'^(and\s+|between\s+)', '', customer_name, flags=re.IGNORECASE)
+                customer_name = customer_name.strip(' ,.')
+                
                 # Filter reasonable length names
                 if 3 < len(customer_name) < 80:
+                    logger.info(f"Extracted customer name using pattern {i+1}: '{customer_name}'")
                     return customer_name
         
         # Fallback: look for capitalized words that might be company names
         words = re.findall(r'\b[A-Z][a-zA-Z]+\b', text_sample[:200])
         if len(words) >= 2:
-            return ' '.join(words[:2])  # Take first two capitalized words
+            fallback_name = ' '.join(words[:2])
+            logger.info(f"Using fallback customer name: '{fallback_name}'")
+            return fallback_name
         
+        logger.warning("No customer name found, using default")
         return "Customer"  # Default fallback
         
     except Exception as e:
