@@ -557,15 +557,14 @@ Step Conclusions:
 
 Requirements:
 1. Write 3-5 sentences with proper paragraph breaks
-2. Format all currency as $XXX,XXX (no spaces in numbers)
-3. Use professional accounting language
-4. Include specific number of performance obligations identified
-5. State compliance conclusion clearly
-6. Highlight any significant findings or issues
-7. Use double line breaks between paragraphs for readability
-8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
-9. Include proper spacing after commas and periods
-10. DO NOT include any title or header like "Executive Summary:" - only provide the summary content"""
+2. Use professional accounting language
+3. Include specific number of performance obligations identified
+4. State compliance conclusion clearly
+5. Highlight any significant findings or issues
+6. Use double line breaks between paragraphs for readability
+7. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
+8. Include proper spacing after commas and periods
+9. DO NOT include any title or header like "Executive Summary:" - only provide the summary content"""
 
         try:
             params = {

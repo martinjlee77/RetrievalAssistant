@@ -342,28 +342,20 @@ Follow ALL formatting instructions in the user prompt precisely."""
         
         step_info = {
             1: {
-                'title': 'Step 1: Scope',
-                'focus': 'Determine whether each plan element (commissions or compensation) is within the scope of ASC 340-40',
+                'title': 'Step 1: Scoping and Incremental Test',
+                'focus': 'Determine whether the commission plan is within the scope and capitalizable under ASC 340-40',
                 'key_points': [
-                    'Verify that the commissions costs are related to the incremental costs of obtaining a contract with a customer within the scope of ASC 606 on revenue from contracts with customers (ASC 340-40-15-2)',
-                    'Note that this analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-2 to 15-8)',
-                    'Note that this analysis does not cover consideration payable to a customer (ASC 606-10-32-25 through 32-27): rebates, credits, referral or marketing fees paid to a customer or the customer’s customer; treat as contra revenue unless a distinct good/service is received at fair value.',
-                    'Note that this analysis does not cover share-based compensation (ASC 718): equity or equity-classified awards and associated accounting are under ASC 718; not 340-40',
-                    'If plan terms clearly indicate recoverability is not expected (rare for commissions), flag for expense'
-                ]
-            },
-            2: {
-                'title': 'Step 2: Incremental Costs of Obtaining a Contract', 
-                'focus': 'Determine whether the cost should be recognized as an asset or expense (ASC 340-40-25-1 to 25-4',
-                'key_points': [
+                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer',
+                    'All other costs to obtain a contract regardless of whether they are incremental or not are within the scope of ASC 34-40',
+                    'This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-2 to 15-8)',
                     'Capitalize (i.e., recognize an asset) if and only if incremental: the cost is incurred solely because a specific contract is obtained, and recovery is expected (ASC 340-40-25-1 to 25-3).',
                     'Expense if not incremental or recovery not expected (ASC 340-40-25-3).',
-                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution/booking/activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract, recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions if entity policy elects to include.',
+                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution, booking or activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract, recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions if entity policy elects to include.',
                     'Common expense (typically not incremental): base salary, contests based on aggregate metrics not tied to specific contracts, nonrecoverable draws/guarantees, training, recruiting, enablement stipends, SPIFFs not contingent on a specific contract or that can be earned absent a specific contract.'
                 ]
             },
-            3: {
-                'title': 'Step 3: Guidance for Amortization, Practical Expedient, and Impairment',
+            2: {
+                'title': 'Step 2: Guidance for Amortization, Practical Expedient, and Impairment',
                 'focus': 'Provide policy boilerplate and guidance only; no calculations or anlaysis.',
                 'key_points': [
                     'Capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. If renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. The period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
@@ -608,7 +600,7 @@ Step Conclusions:
 
 Instructions:
 1. Write 2-3 sentences assessing ASC 340-40 compliance
-2. Format all currency as $XXX,XXX (no spaces in numbers)
+2. Do not include specific dollar amounts or placeholders
 3. Be direct - if there are concerns, state them clearly
 4. Focus on compliance assessment
 5. Use professional accounting language
