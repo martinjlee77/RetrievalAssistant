@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 class ASC340StepAnalyzer:
     """
     Simplified ASC 340-40 step-by-step analyzer using natural language output.
+    Performs 2-step analysis: (1) Scoping & Incremental Test, (2) Amortization & Impairment.
     No complex JSON schemas - just clear, professional analysis.
     """
     
@@ -86,7 +87,7 @@ class ASC340StepAnalyzer:
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
-        Perform complete 3-step ASC 340-40 analysis.
+        Perform complete 2-step ASC 340-40 analysis.
         
         Args:
             contract_text: The contract document text
@@ -124,7 +125,7 @@ class ASC340StepAnalyzer:
                     company_name=company_name,
                     additional_context=additional_context
                 ): step_num
-                for step_num in range(1, 4)
+                for step_num in range(1, 3)
             }
             
             # Collect results as they complete
@@ -426,9 +427,8 @@ CRITICAL FORMATTING REQUIREMENTS:
     def _get_step_title(self, step_num: int) -> str:
         """Get the title for a step."""
         titles = {
-            1: "Step 1: Scope",
-            2: "Step 2: Incremental Costs of Obtaining a Contract", 
-            3: "Step 3: Guidance for Amortization, Practical Expedient, and Impairment"
+            1: "Step 1: Scoping and Incremental Test",
+            2: "Step 2: Guidance for Amortization, Practical Expedient, and Impairment"
         }
         return titles.get(step_num, f"Step {step_num}")
     
@@ -440,7 +440,7 @@ CRITICAL FORMATTING REQUIREMENTS:
         logger.info(f"Extracting conclusions from {len(steps_data)} steps")
         logger.info(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
         
-        for step_num in range(1, 4):
+        for step_num in range(1, 3):
             step_key = f'step_{step_num}'
             if step_key in steps_data:
                 step_data = steps_data[step_key]
@@ -492,7 +492,7 @@ CRITICAL FORMATTING REQUIREMENTS:
         # If still no conclusions, generate fallback from step summaries
         if len(conclusions) == 0:
             logger.warning("No conclusions extracted - using fallback summary generation")
-            for step_num in range(1, 4):
+            for step_num in range(1, 3):
                 step_key = f'step_{step_num}'
                 if step_key in steps_data:
                     step_data = steps_data[step_key]

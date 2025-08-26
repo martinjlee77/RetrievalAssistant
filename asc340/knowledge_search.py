@@ -34,7 +34,7 @@ class ASC340KnowledgeSearch:
         Search for relevant ASC 340-40 guidance for a specific step.
         
         Args:
-            step_number: ASC 340-40 step number (1-3)
+            step_number: ASC 340-40 step number (1-2)
             contract_text: Contract text to help focus the search
             
         Returns:
@@ -87,11 +87,10 @@ class ASC340KnowledgeSearch:
         Returns:
             Optimized search query string
         """
-        # Base step queries
+        # Base step queries (updated for 2-step structure)
         step_queries = {
-            1: "ASC 340-40 scope contract costs incremental costs obtaining contract commissions compensation ASC 340-40-15-2",
-            2: "incremental costs obtaining contract capitalize expense ASC 340-40-25-1 recovery expected solely because",
-            3: "amortization practical expedient impairment systematic basis ASC 340-40-35-1 one year or less"
+            1: "ASC 340-40 scope contract costs incremental costs obtaining contract commissions compensation ASC 340-40-15-2 capitalize expense ASC 340-40-25-1 recovery expected solely because",
+            2: "amortization practical expedient impairment systematic basis ASC 340-40-35-1 one year or less"
         }
         
         base_query = step_queries.get(step_number, "ASC 340-40 contract costs")
@@ -112,7 +111,7 @@ class ASC340KnowledgeSearch:
         
         Args:
             contract_text: Contract text
-            step_number: ASC 340-40 step number
+            step_number: ASC 340-40 step number (1-2)
             
         Returns:
             List of relevant search terms
@@ -148,42 +147,23 @@ class ASC340KnowledgeSearch:
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 2:
-            # Performance obligation terms
+            # Amortization, practical expedient, and impairment terms
             terms = [
-                # Promised goods and services
-                'software', 'hardware', 'services', 'service', 'license', 'licensing', 'implementation',
-                'support', 'maintenance', 'training', 'consulting', 'development', 'customization',
-                'installation', 'configuration', 'updates', 'upgrades', 'warranty',
-
-                # Distinctness criteria (25-19, 25-21)
-                'distinct', 'separate', 'separately', 'independent', 'standalone', 'bundled', 'package',
-                'capable', 'benefit', 'identifiable', 'interdependent', 'interrelated', 'dependent',
-
-                # Customer options/material rights (25-20)
-                'option', 'options', 'renewal', 'extension', 'upgrade', 'discount', 'future services',
-                'material right', 'additional goods', 'additional services'              
-            ]
-            relevant_terms.extend([term for term in terms if term in contract_lower])
-            
-        elif step_number == 3:
-            # Transaction price terms
-            terms = [
-                # Fixed consideration
-                'fee', 'fees', 'price', 'fixed price', 'fixed fee', 'base price', 'base fee',
-
-                # Variable consideration (32-5 to 32-14)
-                'variable', 'bonus', 'penalty', 'discount', 'rebate', 'credit', 'incentive',
-                'contingent', 'performance-based', 'usage-based', 'milestone', 'threshold',
-
-                # Financing components (32-15 to 32-20)
-                'financing', 'interest', 'payment terms', 'payment schedule', 'installment',
-                'deferred payment', 'time value', 'present value',
-
-                # Noncash consideration (32-21 to 32-25)
-                'noncash', 'non-cash', 'goods', 'services', 'equity', 'stock', 'shares', 'barter',
-
-                # Consideration to customer (32-26 to 32-27)
-                'refund', 'credit', 'reimbursement', 'cash back', 'customer credit'     
+                # Amortization terms
+                'amortize', 'amortization', 'amortizing', 'systematic basis', 'period of benefit', 
+                'expected customer life', 'contract term', 'service period', 'benefit period',
+                
+                # Practical expedient terms
+                'practical expedient', 'expense as incurred', 'one year', 'twelve months', '12 months',
+                'amortization period', 'expedient', 'policy', 'portfolio',
+                
+                # Impairment terms
+                'impairment', 'impair', 'carrying amount', 'recoverable', 'recoverability',
+                'expected consideration', 'remaining consideration', 'uncollectible', 'write-down',
+                
+                # Commission cost terms
+                'commission', 'commissions', 'sales commission', 'capitalize', 'capitalization',
+                'incremental', 'contract costs', 'deferred', 'asset'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             

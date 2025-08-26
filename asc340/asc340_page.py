@@ -187,7 +187,7 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
 
         # Display progress (match ASC 606 - no memo generation step shown)
         steps = [
-            "Processing", "Step 1", "Step 2", "Step 3"
+            "Processing", "Step 1", "Step 2"
         ]
         progress_placeholder = st.empty()
 
@@ -197,8 +197,8 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
         # Create a separate placeholder for progress indicators that can be cleared
         progress_indicator_placeholder = st.empty()
         
-        # Run 3 ASC 340-40 steps with progress
-        for step_num in range(1, 4):
+        # Run 2 ASC 340-40 steps with progress
+        for step_num in range(1, 3):
             # Show progress indicators in clearable placeholder
             ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
 
@@ -222,7 +222,7 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
         # Don't show memo generation step indicator to match ASC 606
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Extract conclusions from the 3 steps
+            # Extract conclusions from the 2 steps
             conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
             
             # Generate the three additional sections
