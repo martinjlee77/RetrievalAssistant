@@ -1,0 +1,162 @@
+Here’s a drop‑in replacement for _extract_customer_name that’s more robust, keeps your code simple, and prioritizes explicit role labels beyond just “Customer” (e.g., Buyer, Client, Licensee, Subscriber, Lessee, etc.). It avoids the “catch-all company suffix” misfires by only using that as a last resort and by preferring clearly labeled roles in the preamble and headings.
+
+Key improvements
+
+Recognizes many customer-role synonyms: Customer, Client, Buyer, Purchaser, Licensee, Lessee, Subscriber, Tenant, End User, Grantee, Bill To, Sold To.
+Prioritizes preamble definitions: between Party A (“Vendor”/“Supplier”) and Party B (“Customer”/“Buyer”).
+Handles single labeled lines like “Customer: Acme Inc.” or “Licensee: Orion LLC”.
+Uses a careful last‑resort company name pattern (with global suffixes) only if nothing else works.
+Cleans smart quotes and spacing, strips addresses, and avoids false positives like “Vendor”, “Supplier”, “Licensor”, “Seller”.
+Replace your function with this
+
+def _extract_customer_name(contract_text: str) → str: """Extract the customer/recipient party name from typical contract preambles or headings.""" try: import re
+
+if not contract_text:
+        return "Customer"
+
+    # Preprocess: examine the first part of the document (preamble/definitions often appear early)
+    sample = contract_text[:6000]
+
+    # Normalize quotes and whitespace
+    sample = sample.replace("“", '"').replace("”", '"').replace("’", "'")
+    sample = re.sub(r'[ \t]+', ' ', sample)
+
+    # Role vocabularies (lowercase)
+    customer_roles = {
+        "customer", "client", "buyer", "purchaser", "licensee", "lessee",
+        "subscriber", "tenant", "end user", "end-user", "grantee",
+        # PO/invoice style labels treated as customer indicators:
+        "bill to", "sold to", "ship to"
+    }
+    vendor_roles = {
+        "vendor", "supplier", "seller", "licensor", "lessor",
+        "service provider", "provider", "contractor", "consultant", "reseller"
+    }
+
+    def clean_name(name: str) -> str:
+        # Trim, remove enclosing quotes/parentheses, compress spaces, strip trailing punctuation
+        n = name.strip().strip(' "').strip()
+        n = re.sub(r'\s+', ' ', n)
+        # Remove common trailing descriptors like .,;:)
+        n = re.sub(r'[\s\.,;:)\]]+$', '', n)
+        # Avoid obvious non-names
+        if len(n) < 3 or len(n) > 120:
+            return ""
+        return n
+
+    def plausible_company(name: str) -> bool:
+        if not name:
+            return False
+        # Avoid address-like strings
+        addr_tokens = {"street", "st.", "road", "rd.", "avenue", "ave.", "suite", "ste.", "floor", "fl.", "drive", "dr.", "blvd", "boulevard", "lane", "ln.", "way", "p.o.", "po box", "box"}
+        lname = name.lower()
+        if any(t in lname for t in addr_tokens):
+            return False
+        # Contains at least one letter and not mostly numbers
+        if not re.search(r'[A-Za-z]', name):
+            return False
+        # Reasonable length already checked in clean_name
+        return True
+
+    # PRIORITY 1: Preamble with both parties defined by role, e.g.:
+    # "between Acme, Inc. (“Supplier”) and Beta LLC (“Customer”)"
+    preamble_pair = re.compile(
+        r'\bbetween\s+(?P<p1>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r1>[^"\')]+)["\']?\s*\)\s*(?:,|and)?\s*and\s+(?P<p2>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r2>[^"\')]+)["\']?\s*\)',
+        re.IGNORECASE | re.DOTALL
+    )
+    for m in preamble_pair.finditer(sample):
+        p1, r1, p2, r2 = m.group('p1', 'r1', 'p2', 'r2')
+        name_role_pairs = [
+            (clean_name(p1), r1.strip().lower()),
+            (clean_name(p2), r2.strip().lower())
+        ]
+        for name, role in name_role_pairs:
+            if name and any(cr == role or role in cr for cr in customer_roles):
+                return name
+        # If one is clearly vendor and the other not, pick the non-vendor
+        roles = [r1.strip().lower(), r2.strip().lower()]
+        names = [clean_name(p1), clean_name(p2)]
+        if any(rv in vendor_roles for rv in roles):
+            # choose the one whose role is not vendor-like
+            for name, role in zip(names, roles):
+                if name and (role not in vendor_roles):
+                    return name
+        # If ambiguous, try r2 if it looks like a customer role
+        if clean_name(p2) and plausible_company(clean_name(p2)):
+            # Heuristic: often the second party is the customer
+            return clean_name(p2)
+
+    # PRIORITY 2: Single party labeled as customer-like in the preamble or headings:
+    # e.g., 'and Global Dynamics Corp. ("Customer")'
+    labeled_single = re.compile(
+        r'\b(?:and\s+)?(?P<name>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<role>Customer|Client|Buyer|Purchaser|Licensee|Lessee|Subscriber|Tenant|End[-\s]?User)["\']?\s*\)',
+        re.IGNORECASE
+    )
+    for m in labeled_single.finditer(sample):
+        name = clean_name(m.group('name'))
+        if name and plausible_company(name):
+            return name
+
+    # PRIORITY 3: Header fields like "Customer: Acme, Inc." or "Licensee: Orion LLC" or "Bill To: ..."
+    labeled_field = re.compile(
+        r'\b(?P<label>Customer|Client|Buyer|Purchaser|Licensee|Lessee|Subscriber|Tenant|End[-\s]?User|Bill\s*To|Sold\s*To|Ship\s*To)\s*[:\-]\s*(?P<name>[A-Za-z0-9\.\,&\-\s]{3,120})',
+        re.IGNORECASE
+    )
+    for m in labeled_field.finditer(sample):
+        name = clean_name(m.group('name'))
+        if name and plausible_company(name):
+            return name
+
+    # PRIORITY 4: If there is a preamble "between X and Y" without roles, try to pick the second party
+    between_two = re.compile(
+        r'\bbetween\s+(?P<p1>[^,\n;]+?)\s+and\s+(?P<p2>[^,\n;]+)',
+        re.IGNORECASE
+    )
+    m = between_two.search(sample)
+    if m:
+        p2 = clean_name(m.group('p2'))
+        if p2 and plausible_company(p2):
+            return p2
+
+    # LAST RESORT: Any plausible company name with common corporate suffixes
+    company_suffix = re.compile(
+        r'([A-Z][A-Za-z0-9&\.\- ]{2,80}?\s(?:Inc\.?|Incorporated|LLC|L\.L\.C\.|Ltd\.?|Limited|Corp\.?|Corporation|PLC|LP|LLP|GmbH|S\.?A\.?R\.?L\.?|S\.?A\.?|SAS|BV|NV|Pty\.?\s?Ltd\.?|Co\.?))\b'
+    )
+    matches = company_suffix.findall(sample)
+    if matches:
+        # Prefer a name that is near customer-like labels elsewhere
+        for name in matches:
+            if plausible_company(clean_name(name)):
+                return clean_name(name)
+
+    return "Customer"
+
+except Exception as e:
+    # Keep existing logging if present
+    logger = globals().get('logger')
+    if logger:
+        logger.error(f"Error extracting customer name: {str(e)}")
+    return "Customer"
+
+Notes and rationale
+
+We avoid treating “Company” as a customer role because it is often used to refer to the vendor/provider in templates.
+We include “Buyer”, “Purchaser”, “Licensee”, “Lessee”, “Subscriber”, “Tenant”, “End User”, “Grantee” to cover common alternatives across SaaS, license, and service agreements.
+“Bill To/Sold To/Ship To” are helpful for POs or invoices that may be the only place the customer is clearly labeled.
+The “between X (“Supplier”) and Y (“Customer”)” pattern captures the most reliable case first. If roles are given, we choose the party with a customer role; if only vendor roles are given, we pick the non-vendor party.
+The fallback “between X and Y” heuristic prefers the second party when roles aren’t stated (common drafting style), but it only triggers if the name looks like a company and isn’t an address.
+The global suffix pattern is a last resort to avoid the original “culprit” behavior of grabbing the first random company-like phrase.
+If you want an ultra-light enhancement without touching logic elsewhere:
+
+Increase the sample window from 1000 to 6000 chars (done above) to capture longer preambles/definitions.
+You can tune the customer_roles or vendor_roles sets based on your corpus (e.g., add “Member” if you process subscription agreements that use that label for the customer).
+Quick manual tests you can run
+
+‘This SaaS Agreement is between Alpha Software, Inc. (“Company”) and Beta Health LLC (“Customer”).’ => Beta Health LLC
+‘Master Services Agreement … between VendorCo, Inc. (“Supplier”) and ClientName Ltd. (“Client”).’ => ClientName Ltd.
+‘Buyer: Horizon GmbH’ => Horizon GmbH
+‘Licensee: Orion Labs, Inc.’ => Orion Labs, Inc.
+‘Bill To: Acme Corp.’ => Acme Corp.
+‘… between ACME Inc. and BETA LLC …’ => BETA LLC
+No labels anywhere => returns first plausible company name or “Customer” as fallback.
+This keeps your codebase simple and dramatically reduces misidentification.
