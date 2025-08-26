@@ -50,7 +50,7 @@ def render_asc340_page():
                    key="asc340_analyze"):
             warning_placeholder.empty()  # Clear the warning after the button is pressed
             if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc340_analysis(contract_text, additional_context)
+                perform_asc340_analysis(contract_text, filename, additional_context)
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Documents & Generate Memo", 
@@ -141,7 +141,7 @@ def _upload_and_process_asc340():
 # Old validation function removed - using progressive disclosure approach instead
 
 
-def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
+def perform_asc340_analysis(contract_text: str, filename: str, additional_context: str = ""):
     """Perform the complete ASC 340-40 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
