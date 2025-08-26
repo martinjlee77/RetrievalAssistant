@@ -176,6 +176,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
                 'customer_name': customer_name,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
+                'filename': filename,
                 'steps': analysis_results,
                 'executive_summary': executive_summary,
                 'background': background,
