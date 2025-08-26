@@ -29,7 +29,7 @@ def render_asc340_page():
     # Page header
     st.title(":primary[ASC 340-40 Commission Cost Analyzer]")
     with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze commissions and related documents and generate a professional policy memo. Simply upload your documents to begin.")
+        st.markdown(":primary[**Purpose:**] Automatically analyze commission and related documents and generate a professional policy memo. Simply upload your documents to begin. Note that this tool only analyzes the cost of obtaining a contract, not the costs to fulfill a contract. ")
     
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc340_inputs()
@@ -120,7 +120,6 @@ def _upload_and_process_asc340():
                 if extracted_text and extracted_text.strip():
                     combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
                     processed_filenames.append(uploaded_file.name)
-                    st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
                 else:
                     st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
         
@@ -130,9 +129,6 @@ def _upload_and_process_asc340():
         
         # Create comma-separated filename string
         filename_string = ", ".join(processed_filenames)
-        
-        st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
-        st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
         
         return combined_text.strip(), filename_string
         
