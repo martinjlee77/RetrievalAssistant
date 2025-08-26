@@ -104,7 +104,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
         st.session_state[analysis_key] = False
     
     # Auto-extract customer name and generate analysis title
-    customer_name = _extract_customer_name(contract_text)
+    company_name = _extract_company_name(contract_text)
     analysis_title = _generate_analysis_title()
 
     try:
@@ -151,7 +151,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    company_name=company_name,
                     additional_context=additional_context)
 
                 analysis_results[f'step_{step_num}'] = step_result
@@ -166,13 +166,13 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
             conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
             
             # Generate the three additional sections
-            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
-            background = analyzer.generate_background_section(conclusions_text, customer_name)
+            executive_summary = analyzer.generate_executive_summary(conclusions_text, company_name)
+            background = analyzer.generate_background_section(conclusions_text, company_name)
             conclusion = analyzer.generate_conclusion_section(conclusions_text)
             
             # Combine into the expected structure for memo generator
             final_results = {
-                'customer_name': customer_name,
+                'company_name': company_name,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
                 'filename': filename,
@@ -204,7 +204,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
         memo_key = f'asc340_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
-            'customer_name': customer_name,
+            'company_name': company_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
@@ -271,7 +271,7 @@ def main():
 
 
 
-def _extract_customer_name(contract_text: str) -> str:
+def _extract_company_name(contract_text: str) -> str:
     """Extract the customer/recipient party name from typical contract preambles or headings."""
     try:
         import re

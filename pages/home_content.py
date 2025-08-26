@@ -48,7 +48,7 @@ with col2:
             "Generate comprehensive accounting policy memorandums for contract costs. Establish consistent capitalization and amortization policies for your organization."
         )
         st.page_link(
-            "pages/asc340.py",
+            "asc340/asc340_page.py",
             label="Go to ASC 340-40 Analyzer",
             icon="➡️"
         )

@@ -22,7 +22,7 @@ class CleanMemoGenerator:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
-        customer_name = analysis_results.get('customer_name', 'Customer')
+        company_name = analysis_results.get('company_name', 'Company')
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%B %d, %Y")
         
@@ -30,13 +30,13 @@ class CleanMemoGenerator:
         memo_lines = [
             DisclaimerGenerator.get_top_banner(),
             "",
-            "# ASC 606 MEMORANDUM",
+            "# ASC 340-40 MEMORANDUM",
             "",
             f"**TO:** Chief Accounting Officer",
             f"**FROM:** Technical Accounting Team - AI", 
             f"**DATE:** {analysis_date}",
-            f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
-            f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}"
+            f"**RE:** {analysis_title} - ASC 340-40 Contract Cost Analysis",
+            f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}",
             "",
             ""
         ]
@@ -65,14 +65,14 @@ class CleanMemoGenerator:
             ])
         else:
             memo_lines.extend([
-                f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology.",
+                f"We have reviewed the contract cost documents provided by {company_name} to determine the appropriate accounting treatment under ASC 340-40. This memorandum presents our analysis following the ASC 340-40 methodology.",
                 "", 
                 ""
             ])
         
         # Add Analysis Section Header
         memo_lines.extend([
-            "## ASC 606 ANALYSIS",
+            "## ASC 340-40 ANALYSIS",
         ])
         
         # Add each step's clean markdown content - check both locations

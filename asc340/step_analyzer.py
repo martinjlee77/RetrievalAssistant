@@ -45,8 +45,7 @@ class ASC340StepAnalyzer:
         # Backward compatibility
         self.model = self.main_model
         
-        # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
-        self.step_prompts = self._load_step_prompts()
+        # Initialize component
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
@@ -83,23 +82,23 @@ class ASC340StepAnalyzer:
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
-                        customer_name: str,
+                        company_name: str,
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
-        Perform complete 5-step ASC 340-40 analysis.
+        Perform complete 3-step ASC 340-40 analysis.
         
         Args:
             contract_text: The contract document text
             authoritative_context: Retrieved ASC 340-40 guidance
-            customer_name: Customer name
+            company_name: Company name
             analysis_title: Analysis title
             additional_context: Optional user-provided context
             
         Returns:
             Dictionary containing analysis results for each step
         """
-        logger.info(f"Starting ASC 340-40 analysis for {customer_name}")
+        logger.info(f"Starting ASC 340-40 analysis for {company_name}")
         
         # Add large contract warning
         word_count = len(contract_text.split())
@@ -107,7 +106,7 @@ class ASC340StepAnalyzer:
             logger.warning(f"Large contract ({word_count} words). Consider splitting if analysis fails.")
         
         results = {
-            'customer_name': customer_name,
+            'company_name': company_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y"),
             'steps': {}
@@ -122,7 +121,7 @@ class ASC340StepAnalyzer:
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    company_name=company_name,
                     additional_context=additional_context
                 ): step_num
                 for step_num in range(1, 4)
@@ -188,7 +187,7 @@ class ASC340StepAnalyzer:
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    company_name=company_name,
                     additional_context=additional_context
                 )
             except openai.RateLimitError as e:
@@ -371,6 +370,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Practical expedient: expense the cost as incurred if the amortization period would be one year or less. Application can be by portfolio; document the policy.',
                     'Changes in estimates: adjust amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
                     'At each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.']
+            }
         }
         
         step = step_info[step_num]
@@ -514,9 +514,9 @@ CRITICAL FORMATTING REQUIREMENTS:
         
         return conclusions_text
     
-    def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
+    def generate_executive_summary(self, conclusions_text: str, company_name: str) -> str:
         """Generate executive summary using clean LLM call."""
-        prompt = f"""Generate a professional executive summary for an ASC 340-40 analysis for {customer_name}.
+        prompt = f"""Generate a professional executive summary for an ASC 340-40 analysis for {company_name}.
 
 Step Conclusions:
 {conclusions_text}
@@ -559,11 +559,11 @@ Requirements:
             logger.error(f"Error generating executive summary: {str(e)}")
             return "Executive summary generation failed. Please review individual step analyses below."
     
-    def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
+    def generate_background_section(self, conclusions_text: str, company_name: str) -> str:
         """Generate background section using clean LLM call."""
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
-Customer: {customer_name}
+Company: {company_name}
 Contract Summary: {conclusions_text}
 
 Instructions:
@@ -593,11 +593,11 @@ Instructions:
                 return content
             else:
                 logger.error("Empty background response")
-                return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
+                return f"We have reviewed the contract cost documents provided by {company_name} to determine the appropriate accounting treatment under ASC 340-40."
             
         except Exception as e:
             logger.error(f"Error generating background: {str(e)}")
-            return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
+            return f"We have reviewed the contract cost documents provided by {company_name} to determine the appropriate accounting treatment under ASC 340-40."
     
     def generate_conclusion_section(self, conclusions_text: str) -> str:
         """Generate conclusion section using clean LLM call."""
@@ -708,7 +708,7 @@ Instructions:
         
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
-Customer: {customer_name}
+Company: {company_name}
 Contract Summary: {conclusions_text}
 
 Instructions:

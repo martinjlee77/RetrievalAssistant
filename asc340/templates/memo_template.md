@@ -1,9 +1,9 @@
-# ASC 606 REVENUE RECOGNITION MEMORANDUM
+# ASC 340-40 CONTRACT COSTS MEMORANDUM
 
 **TO:** Chief Accounting Officer  
 **FROM:** Technical Accounting Team - AI  
 **DATE:** {current_date}  
-**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis
+**RE:** {analysis_title} - ASC 340-40 Contract Cost Analysis
 
 ---
 
@@ -19,7 +19,7 @@
 
 ---
 
-## ASC 606 ANALYSIS
+## ASC 340-40 ANALYSIS
 
 {analysis_section}
 

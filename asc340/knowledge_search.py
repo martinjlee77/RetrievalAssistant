@@ -89,11 +89,9 @@ class ASC340KnowledgeSearch:
         """
         # Base step queries
         step_queries = {
-            1: "contract existence criteria ASC 606-10-25-1 approval commitment rights payment commercial substance collectibility",
-            2: "performance obligations distinct goods services ASC 606-10-25-19 ASC 606-10-25-21 separately identifiable",
-            3: "transaction price consideration ASC 606-10-32-2 variable consideration financing component",
-            4: "allocation standalone selling price ASC 606-10-32-28 ASC 606-10-32-33 discount allocation",
-            5: "revenue recognition timing over time point in time ASC 606-10-25-27 ASC 606-10-25-30 control transfer"
+            1: "ASC 340-40 scope contract costs incremental costs obtaining contract commissions compensation ASC 340-40-15-2",
+            2: "incremental costs obtaining contract capitalize expense ASC 340-40-25-1 recovery expected solely because",
+            3: "amortization practical expedient impairment systematic basis ASC 340-40-35-1 one year or less"
         }
         
         base_query = step_queries.get(step_number, "ASC 340-40 contract costs")
