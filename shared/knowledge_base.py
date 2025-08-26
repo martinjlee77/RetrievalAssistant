@@ -45,14 +45,21 @@ class SharedKnowledgeBase:
             self.client = chromadb.PersistentClient(path=self.database_path)
             logger.info(f"ChromaDB client initialized for {self.database_path}")
             
-            # Initialize embedding function - use default ChromaDB embedding to avoid dimension issues
-            # This ensures compatibility with existing knowledge bases
-            self.embedding_function = embedding_functions.DefaultEmbeddingFunction()
+            # Initialize embedding function - use OpenAI model to match existing knowledge bases
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+            if not openai_api_key:
+                raise ValueError("OPENAI_API_KEY environment variable not set")
+                
+            self.embedding_function = embedding_functions.OpenAIEmbeddingFunction(
+                api_key=openai_api_key,
+                model_name="text-embedding-3-small"
+            )
             logger.info("Embedding function initialized successfully")
             
-            # Get the collection
+            # Get the collection with the correct embedding function
             self.collection = self.client.get_collection(
-                name=self.collection_name
+                name=self.collection_name,
+                embedding_function=self.embedding_function
             )
             logger.info(f"Collection '{self.collection_name}' loaded successfully")
             
