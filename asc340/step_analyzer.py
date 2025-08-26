@@ -1,7 +1,7 @@
 """
-ASC 606 Step Analyzer
+ASC 340-40 Commission Analyzer
 
-This module handles the 5-step ASC 606 revenue recognition analysis.
+This module handles the ASC 340-40 sales commission analysis.
 Simplified, natural language approach with clear reasoning chains.
 """
 
@@ -17,9 +17,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
-class ASC606StepAnalyzer:
+class ASC340StepAnalyzer:
     """
-    Simplified ASC 606 step-by-step analyzer using natural language output.
+    Simplified ASC 340-40 step-by-step analyzer using natural language output.
     No complex JSON schemas - just clear, professional analysis.
     """
     
@@ -87,11 +87,11 @@ class ASC606StepAnalyzer:
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
-        Perform complete 5-step ASC 606 analysis.
+        Perform complete 5-step ASC 340-40 analysis.
         
         Args:
             contract_text: The contract document text
-            authoritative_context: Retrieved ASC 606 guidance
+            authoritative_context: Retrieved ASC 340-40 guidance
             customer_name: Customer name
             analysis_title: Analysis title
             additional_context: Optional user-provided context
@@ -99,7 +99,7 @@ class ASC606StepAnalyzer:
         Returns:
             Dictionary containing analysis results for each step
         """
-        logger.info(f"Starting ASC 606 analysis for {customer_name}")
+        logger.info(f"Starting ASC 340-40 analysis for {customer_name}")
         
         # Add large contract warning
         word_count = len(contract_text.split())
@@ -125,7 +125,7 @@ class ASC606StepAnalyzer:
                     customer_name=customer_name,
                     additional_context=additional_context
                 ): step_num
-                for step_num in range(1, 6)
+                for step_num in range(1, 4)
             }
             
             # Collect results as they complete
@@ -168,7 +168,7 @@ class ASC606StepAnalyzer:
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
         logger.info("DEBUG: All additional sections generated successfully")
         
-        logger.info("ASC 606 analysis completed successfully")
+        logger.info("ASC 340-40 analysis completed successfully")
         return results
     
     def _analyze_step_with_retry(self,
@@ -251,7 +251,7 @@ class ASC606StepAnalyzer:
                      authoritative_context: str,
                      customer_name: str,
                      additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single ASC 606 step - returns clean markdown."""
+        """Analyze a single ASC 340-40 step - returns clean markdown."""
         
         # Get step-specific prompt for markdown output
         prompt = self._get_step_markdown_prompt(
@@ -315,7 +315,7 @@ class ASC606StepAnalyzer:
     
     def _get_markdown_system_prompt(self) -> str:
         """Get the system prompt for markdown generation."""
-        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 606 revenue recognition. 
+        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 340-40 Contract Costs. 
 
 Generate professional accounting analysis in clean markdown format. Your output will be displayed directly using markdown rendering.
 
@@ -327,7 +327,7 @@ Your analysis must be:
 - Include explicit reasoning with "because" statements
 - Support your analysis with specific contract text and authoritative citations
 - Use direct quotes from the contract document only when the exact wording is outcome-determinative
-- Paraphrase ASC 606 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
+- Paraphrase ASC 340-40 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -343,66 +343,34 @@ Follow ALL formatting instructions in the user prompt precisely."""
         
         step_info = {
             1: {
-                'title': 'Step 1: Identify the Contract',
-                'focus': 'Determine if a valid contract exists under ASC 606-10-25-1 criteria',
+                'title': 'Step 1: Scope',
+                'focus': 'Determine whether each plan element (commissions or compensation) is within the scope of ASC 340-40',
                 'key_points': [
-                    'Verify that the parties have approved the contract and are committed to perform (ASC 606-10-25-1(a))',
-                    'Identify each party\'s rights regarding the goods or services to be transferred (ASC 606-10-25-1(b))',
-                    'Identify each party\'s payment terms for the transferred goods or services (ASC 606-10-25-1(c))',
-                    'Assess whether the contract has commercial substance (ASC 606-10-25-1(d))',
-                    'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e))'
+                    'Verify that the commissions costs are related to the incremental costs of obtaining a contract with a customer within the scope of ASC 606 on revenue from contracts with customers (ASC 340-40-15-2)',
+                    'Note that this analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-2 to 15-8)',
+                    'Note that this analysis does not cover consideration payable to a customer (ASC 606-10-32-25 through 32-27): rebates, credits, referral or marketing fees paid to a customer or the customer’s customer; treat as contra revenue unless a distinct good/service is received at fair value.',
+                    'Note that this analysis does not cover share-based compensation (ASC 718): equity or equity-classified awards and associated accounting are under ASC 718; not 340-40',
+                    'If plan terms clearly indicate recoverability is not expected (rare for commissions), flag for expense'
                 ]
             },
             2: {
-                'title': 'Step 2: Identify Performance Obligations', 
-                'focus': 'Identify distinct goods or services using ASC 606-10-25-14 and 25-22',
+                'title': 'Step 2: Incremental Costs of Obtaining a Contract', 
+                'focus': 'Determine whether the cost should be recognized as an asset or expense (ASC 340-40-25-1 to 25-4',
                 'key_points': [
-                    'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
-                    'Evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
-                    'Evaluate whether each promised good or service is distinct within the context of the contract per ASC 606-10-25-21(a-c):',
-                    '   a. The good or service is regularly sold separately',
-                    '   b. The customer can benefit from the good or service on its own or with other readily available resources',
-                    '   c. The good or service is not highly interdependent with other promises in the contract',
-                    'Combine non-distinct goods/services into single performance obligations (ASC 606-10-25-22)',
-                    'Determine final list of performance obligations',
-                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-25-75 to 25-79)',
-                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-25-20)'
+                    'Capitalize (i.e., recognize an asset) if and only if incremental: the cost is incurred solely because a specific contract is obtained, and recovery is expected (ASC 340-40-25-1 to 25-3).',
+                    'Expense if not incremental or recovery not expected (ASC 340-40-25-3).',
+                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution/booking/activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract, recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions if entity policy elects to include.',
+                    'Common expense (typically not incremental): base salary, contests based on aggregate metrics not tied to specific contracts, nonrecoverable draws/guarantees, training, recruiting, enablement stipends, SPIFFs not contingent on a specific contract or that can be earned absent a specific contract.'
                 ]
             },
             3: {
-                'title': 'Step 3: Determine the Transaction Price',
-                'focus': 'Establish the transaction price per ASC 606-10-32-2',
+                'title': 'Step 3: Guidance for Amortization, Practical Expedient, and Impairment',
+                'focus': 'Provide policy boilerplate and guidance only; no calculations or anlaysis.',
                 'key_points': [
-                    'Fixed consideration amounts',
-                    'Variable consideration amounts (ASC 606-10-32-5 to 32-10)',
-                    'Constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-14',
-                    'Total transaction price calculation',
-                    'Significant financing components (if present)',
-                    'Noncash consideration (if present)',
-                    'Consideration paid or payable to a customer (if present)'
-                ]
-            },
-            4: {
-                'title': 'Step 4: Allocate the Transaction Price',
-                'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
-                'key_points': [
-                    'Summarize Identify the performance obligations determined in Step 2',
-                    'State that standalone selling prices (SSPs) should be determined separately based on observable data (ASC 606-10-32-31 to 32-34)',
-                    'Describe the allocation methodology to be used (proportional to SSPs)',
-                    'Note any discount allocation considerations (ASC 606-10-32-36)',
-                    'Provide the final allocation approach (subject to SSP determination)'
-                ]
-            },
-            5: {
-                'title': 'Step 5: Recognize Revenue',
-                'focus': 'Determine when revenue should be recognized for each performance obligation',
-                'key_points': [
-                    'Determine over-time vs. point-in-time recognition for each performance obligation',
-                    'Analyze when control transfers to the customer',
-                    'Specify revenue recognition timing for each obligation',
-                    'Identify any measurement methods for over-time recognition'
-                ]
-            }
+                    'Capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. If renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. The period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
+                    'Practical expedient: expense the cost as incurred if the amortization period would be one year or less. Application can be by portfolio; document the policy.',
+                    'Changes in estimates: adjust amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
+                    'At each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.']
         }
         
         step = step_info[step_num]
@@ -412,10 +380,10 @@ STEP {step_num}: {step['title'].upper()}
 
 OBJECTIVE: {step['focus']}
 
-CONTRACT INFORMATION:
-Contract Analysis: Analyze the contract with the customer {customer_name} to determine the appropriate revenue recognition treatment under ASC 606 for the company.
+COST INFORMATION:
+Cost Analysis: Analyze the documents to determine the appropriate accounting for the sales commission under ASC 340-40 for the company.
 
-Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving goods or services.
+Instructions: Analyze the user-provided documents from the company's perspective. 
 
 CONTRACT TEXT:
 {contract_text}"""
@@ -432,21 +400,21 @@ AUTHORITATIVE GUIDANCE:
 {authoritative_context}
 
 ANALYSIS REQUIRED:
-Analyze the contract for Step {step_num} focusing on:
+Analyze the contract cost documents for Step {step_num} focusing on:
 {chr(10).join([f"• {point}" for point in step['key_points']])}
 
 REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 606 with pinpoint citations and use only brief decisive phrases when directly supportive.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific evidence from user-provided documents and ASC 340-40 citations. Quote language from user-provided documents only when the exact wording is outcome‑determinative; paraphrase ASC 340-40 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Analysis:** [Detailed analysis with supporting evidence. Include:
-- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Contract §X.Y, p. N])
-- ASC 606 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 606-10-25-19])
+- Evidence from user-provided documents with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Document §X.Y, p. N])
+- ASC 340-40 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 340-40-25-1])
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
 
-**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 606 citation.]
+**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 340-40 citation.]
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
@@ -466,11 +434,9 @@ CRITICAL FORMATTING REQUIREMENTS:
     def _get_step_title(self, step_num: int) -> str:
         """Get the title for a step."""
         titles = {
-            1: "Step 1: Identify the Contract",
-            2: "Step 2: Identify Performance Obligations", 
-            3: "Step 3: Determine the Transaction Price",
-            4: "Step 4: Allocate the Transaction Price",
-            5: "Step 5: Recognize Revenue"
+            1: "Step 1: Scope",
+            2: "Step 2: Incremental Costs of Obtaining a Contract", 
+            3: "Step 3: Guidance for Amortization, Practical Expedient, and Impairment"
         }
         return titles.get(step_num, f"Step {step_num}")
     
@@ -482,7 +448,7 @@ CRITICAL FORMATTING REQUIREMENTS:
         logger.info(f"Extracting conclusions from {len(steps_data)} steps")
         logger.info(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
         
-        for step_num in range(1, 6):
+        for step_num in range(1, 4):
             step_key = f'step_{step_num}'
             if step_key in steps_data:
                 step_data = steps_data[step_key]
@@ -534,7 +500,7 @@ CRITICAL FORMATTING REQUIREMENTS:
         # If still no conclusions, generate fallback from step summaries
         if len(conclusions) == 0:
             logger.warning("No conclusions extracted - using fallback summary generation")
-            for step_num in range(1, 6):
+            for step_num in range(1, 4):
                 step_key = f'step_{step_num}'
                 if step_key in steps_data:
                     step_data = steps_data[step_key]
@@ -543,14 +509,14 @@ CRITICAL FORMATTING REQUIREMENTS:
                         # Extract the title and create a simple summary
                         if '### Step' in content and '**Analysis:**' in content:
                             # Get a brief summary from the content
-                            summary = f"Step {step_num} completed - analysis of contract provisions under ASC 606."
+                            summary = f"Step {step_num} completed - analysis of the provided documents under ASC 340-40."
                             conclusions.append(summary)
         
         return conclusions_text
     
     def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
         """Generate executive summary using clean LLM call."""
-        prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
+        prompt = f"""Generate a professional executive summary for an ASC 340-40 analysis for {customer_name}.
 
 Step Conclusions:
 {conclusions_text}
@@ -571,7 +537,7 @@ Requirements:
             params = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": "You are a senior accounting analyst preparing executive summaries for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
+                    {"role": "system", "content": "You are a senior accounting analyst preparing executive summaries for ASC 340-40 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": self._get_temperature()
@@ -595,15 +561,15 @@ Requirements:
     
     def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
         """Generate background section using clean LLM call."""
-        prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
+        prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
 Customer: {customer_name}
 Contract Summary: {conclusions_text}
 
 Instructions:
 1. Describe what type of arrangement was reviewed (high-level)
-2. Mention key contract elements (SaaS, hardware, services, etc.) if evident
-3. State the purpose of the ASC 606 analysis
+2. Mention key cost elements if evident
+3. State the purpose of the ASC 340-40 analysis
 4. Professional accounting language
 5. Keep it high-level, no specific amounts or detailed terms"""
 
@@ -611,7 +577,7 @@ Instructions:
             params = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": "You are a senior accounting analyst preparing background sections for ASC 606 memos. Provide clean, professional content."},
+                    {"role": "system", "content": "You are a senior accounting analyst preparing background sections for ASC 340-40 memos. Provide clean, professional content."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": self._get_temperature()
@@ -627,21 +593,21 @@ Instructions:
                 return content
             else:
                 logger.error("Empty background response")
-                return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606."
+                return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
             
         except Exception as e:
             logger.error(f"Error generating background: {str(e)}")
-            return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606."
+            return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
     
     def generate_conclusion_section(self, conclusions_text: str) -> str:
         """Generate conclusion section using clean LLM call."""
-        prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
+        prompt = f"""Generate a professional final conclusion for an ASC 340-40 analysis.
 
 Step Conclusions:
 {conclusions_text}
 
 Instructions:
-1. Write 2-3 sentences assessing ASC 606 compliance
+1. Write 2-3 sentences assessing ASC 340-40 compliance
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Be direct - if there are concerns, state them clearly
 4. Focus on compliance assessment
@@ -652,7 +618,7 @@ Instructions:
             params = {
                 "model": self.model,
                 "messages": [
-                    {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 606 analyses. Provide clean, professional content with proper currency formatting."},
+                    {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 340-40 analyses. Provide clean, professional content with proper currency formatting."},
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": self._get_temperature()
@@ -668,11 +634,11 @@ Instructions:
                 return content
             else:
                 logger.error("Empty conclusion response")
-                return "The analysis indicates compliance with ASC 606 revenue recognition requirements. Implementation should proceed as outlined in the step-by-step analysis above."
+                return "The analysis indicates compliance with ASC 340-40 requirements. Implementation should proceed as outlined in the step-by-step analysis above."
             
         except Exception as e:
             logger.error(f"Error generating conclusion: {str(e)}")
-            return "The analysis indicates compliance with ASC 606 revenue recognition requirements. Implementation should proceed as outlined in the step-by-step analysis above."
+            return "The analysis indicates compliance with ASC 340-40 requirements. Implementation should proceed as outlined in the step-by-step analysis above."
     
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
@@ -686,13 +652,13 @@ Instructions:
         
         # Build prompt
         conclusions_text = "\n".join(conclusions)
-        prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
+        prompt = f"""Generate a professional final conclusion for an ASC 340-40 analysis.
 
 Step Conclusions:
 {conclusions_text}
 
 Instructions:
-1. Write 2-3 sentences in narrative paragraph format assessing ASC 606 compliance
+1. Write 2-3 sentences in narrative paragraph format assessing ASC 340-40 compliance
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Be direct - if there are concerns, state them clearly
 4. Focus on compliance assessment
@@ -708,7 +674,7 @@ Instructions:
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
+                        "content": "You are an expert technical accountant specializing in ASC 340-40 contract costs."
                     },
                     {
                         "role": "user", 
@@ -725,7 +691,7 @@ Instructions:
         except Exception as e:
             logger.error(f"Final conclusion generation failed: {str(e)}")
             # Fallback to simple conclusion
-            return "Based on our comprehensive analysis under ASC 606, the proposed revenue recognition treatment is appropriate and complies with the authoritative guidance."
+            return "Based on our comprehensive analysis under ASC 340-40, the proposed accounting treatment is appropriate and complies with the authoritative guidance."
     
     def generate_background_section_old(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
         """Generate LLM-powered background section from analysis results."""
@@ -740,15 +706,15 @@ Instructions:
         # Build prompt
         conclusions_text = "\n".join(conclusions[:2])  # Use first 2 steps for contract overview
         
-        prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
+        prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
 Customer: {customer_name}
 Contract Summary: {conclusions_text}
 
 Instructions:
 1. Describe what type of arrangement was reviewed (high-level)
-2. Mention key contract elements (SaaS, hardware, services, etc.) if evident
-3. State the purpose of the ASC 606 analysis
+2. Mention key cost elements if evident
+3. State the purpose of the ASC 340-40 analysis
 4. Professional accounting language
 5. Keep it high-level, no specific amounts or detailed terms"""
 
@@ -759,7 +725,7 @@ Instructions:
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert technical accountant specializing in ASC 606 revenue recognition."
+                        "content": "You are an expert technical accountant specializing in ASC 340-40 contract costs."
                     },
                     {
                         "role": "user", 
@@ -777,7 +743,7 @@ Instructions:
             logger.error(f"Background section generation failed: {str(e)}")
             # Fallback to simple background
             clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
-            return f"We have reviewed the contract documents provided by {clean_customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology and provides recommendations for implementation."
+            return f"We have reviewed the contract cost documents provided by {clean_customer_name} to determine the appropriate accounting treatment under ASC 340-40. This memorandum presents our analysis following the ASC 340-40 methodology.."
     
 
     

@@ -20,7 +20,7 @@ st.logo("assets/images/nobkg.png", size = "large")
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home"),
     st.Page("asc606/asc606_page.py", title="ASC 606 Revenue Recognition"),
-    st.Page("pages/asc340.py", title="ASC 340-40 Contract Costs"),
+    st.Page("asc340/asc340_page.py", title="ASC 340-40 Sales Commissions"),
     st.Page("pages/asc842.py", title="ASC 842 Leases"),
 ])
 
