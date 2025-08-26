@@ -276,7 +276,8 @@ Generate professional accounting analysis in clean markdown format. Your output 
 
 Your analysis must be:
 - Audit-ready and professional
-- Clear and understandable 
+- Clear and understandable
+- Based on the evidence provided in the contract text
 - Based on authoritative guidance
 - Include explicit reasoning with "because" statements
 - Acknowledge any limitations or gaps in information
@@ -390,9 +391,9 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Include direct quotes from the contract and ASC 606 where applicable.]
 
-**Analysis:** [Detailed analysis with supporting evidence from the contract and citations to relevant ASC 606 guidance. Use explicit reasoning with "because" statements to connect evidence to conclusions.]
+**Analysis:** [Detailed analysis with supporting evidence from the contract and citations to relevant ASC 606 guidance. Add direct quotes from the contract and ASC 606 where applicable. Use explicit reasoning with "because" statements to connect evidence to conclusions.]
 
 **Conclusion:** [Clear 2-3 sentence conclusion summarizing the findings for this step.]
 

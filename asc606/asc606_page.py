@@ -188,7 +188,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         progress_placeholder.empty()  # Clears the step headers
         progress_indicator_placeholder.empty()  # Clears the persistent success boxes
         
-        st.success(
+        # Create clearable completion message
+        completion_message_placeholder = st.empty()
+        completion_message_placeholder.success(
             f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
         )
         
@@ -218,7 +220,8 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         memo_generator_display.display_clean_memo(memo_content)
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-            # Clear file uploader and analysis state for fresh start
+            # Clear completion message and analysis state for fresh start
+            completion_message_placeholder.empty()
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
             if 'asc606_memo_data' in st.session_state:
                 del st.session_state.asc606_memo_data
