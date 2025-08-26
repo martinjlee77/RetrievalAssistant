@@ -27,8 +27,6 @@ class SharedUIComponents:
             placeholder: Optional st.empty() placeholder to render progress in (for clearable progress)
         """
         def _render_progress():
-            st.subheader("🔄 Analysis Progress")
-            
             # Create progress columns (handle different numbers of steps)
             cols = st.columns(min(len(steps), 6))  # Max 6 columns for readability
             
