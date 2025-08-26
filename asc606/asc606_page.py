@@ -130,9 +130,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         
         # Run 5 ASC 606 steps with progress
         for step_num in range(1, 6):
-            with progress_placeholder:
-                st.subheader(f"🔄 Analyzing Step {step_num}")
-                
             # Show progress indicators in clearable placeholder
             ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
 
@@ -153,9 +150,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
                 logger.info(f"DEBUG: Completed step {step_num}")
 
         # Generate additional sections (Executive Summary, Background, Conclusion)
-        with progress_placeholder:
-            st.subheader("📋 Generating additional sections...")
-            
         # Show final progress indicators in clearable placeholder
         ui.analysis_progress(steps, 6, progress_indicator_placeholder)
 
@@ -219,9 +213,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
         
+        # Clear completion message immediately after memo displays
+        completion_message_placeholder.empty()
+        
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-            # Clear completion message and analysis state for fresh start
-            completion_message_placeholder.empty()
+            # Clear analysis state for fresh start
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
             if 'asc606_memo_data' in st.session_state:
                 del st.session_state.asc606_memo_data

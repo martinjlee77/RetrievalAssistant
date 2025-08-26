@@ -280,6 +280,9 @@ Your analysis must be:
 - Based on the evidence provided in the contract text
 - Based on authoritative guidance
 - Include explicit reasoning with "because" statements
+- Support your analysis with specific contract text and authoritative citations
+- Use direct quotes from the contract document when referencing specific terms, amounts, or provisions
+- Include relevant quotes from ASC 606 guidance when citing authoritative support
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -393,7 +396,10 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Include direct quotes from the contract and ASC 606 where applicable.]
 
-**Analysis:** [Detailed analysis with supporting evidence from the contract and citations to relevant ASC 606 guidance. Add direct quotes from the contract and ASC 606 where applicable. Use explicit reasoning with "because" statements to connect evidence to conclusions.]
+**Analysis:** [Detailed analysis with supporting evidence. MUST include:
+- Direct quotes from the contract for specific terms, amounts, and key provisions (use "quotation marks")
+- Direct quotes from ASC 606 guidance for authoritative support (cite as: ASC 606-10-XX-X: "quoted text")
+- Explicit reasoning with "because" statements connecting evidence to conclusions]
 
 **Conclusion:** [Clear 2-3 sentence conclusion summarizing the findings for this step.]
 
@@ -410,6 +416,11 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
 - Keep all text readable and properly spaced
 - Double-check ALL currency amounts for proper formatting
 - Use professional accounting language with proper spacing
+
+QUOTING EXAMPLES - FOLLOW THIS FORMAT:
+Contract Evidence: The contract states "The Customer shall pay $240,000 annually." (Section 3.2)
+ASC 606 Citation: ASC 606-10-25-1 requires "The parties to the contract have approved the contract."
+
 """
         
         return prompt
