@@ -142,14 +142,17 @@ class CleanMemoGenerator:
         # Add blank line for spacing
         st.markdown("")
         
-        # Download button - only show if content exists
-        if memo_content and len(memo_content.strip()) > 50:
+        # Download button - only show if content exists and session state is preserved
+        if memo_content and len(memo_content.strip()) > 50 and 'asc606_memo_data' in st.session_state:
+            # Ensure session state persistence during download
+            st.session_state.asc606_analysis_complete = True
+            
             st.download_button(
                 label="📥 Download Memo (Markdown)",
                 data=memo_content,
                 file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                 mime="text/markdown",
-                key="memo_download_btn"
+                key=f"memo_download_{hash(memo_content[:100])}"  # Unique key prevents conflicts
             )
         else:
             st.warning("Memo content too short for download. Please regenerate the analysis.")
