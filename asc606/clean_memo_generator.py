@@ -143,9 +143,14 @@ class CleanMemoGenerator:
         st.markdown("")
         
         # Download button - only show if content exists and session state is preserved
-        if memo_content and len(memo_content.strip()) > 50 and 'asc606_memo_data' in st.session_state:
+        # Check for session-isolated memo data
+        session_id = st.session_state.get('user_session_id', '')
+        memo_key = f'asc606_memo_data_{session_id}' if session_id else 'asc606_memo_data'
+        analysis_key = f'asc606_analysis_complete_{session_id}' if session_id else 'asc606_analysis_complete'
+        
+        if memo_content and len(memo_content.strip()) > 50 and memo_key in st.session_state:
             # Ensure session state persistence during download
-            st.session_state.asc606_analysis_complete = True
+            st.session_state[analysis_key] = True
             
             st.download_button(
                 label="📥 Download Memo (Markdown)",

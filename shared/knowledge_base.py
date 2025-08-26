@@ -58,8 +58,7 @@ class SharedKnowledgeBase:
             
             # Get the collection
             self.collection = self.client.get_collection(
-                name=self.collection_name,
-                embedding_function=self.embedding_function
+                name=self.collection_name
             )
             logger.info(f"Collection '{self.collection_name}' loaded successfully")
             
@@ -88,21 +87,21 @@ class SharedKnowledgeBase:
                 n_results=max_results
             )
             
-            if not results or not results.get('documents') or not results['documents'][0]:
+            if not results or not results.get('documents') or not results['documents'] or not results['documents'][0]:
                 logger.warning(f"No results found for query: {query[:100]}...")
                 return "No relevant guidance found in the knowledge base."
             
             # Format results for LLM consumption
             formatted_context = self._format_search_results(results)
             
-            logger.info(f"Retrieved {len(results['documents'][0])} relevant guidance chunks")
+            logger.info(f"Retrieved {len(results['documents'][0]) if results.get('documents') and results['documents'][0] else 0} relevant guidance chunks")
             return formatted_context
             
         except Exception as e:
             logger.error(f"Knowledge base search error: {str(e)}")
             return f"Error searching knowledge base: {str(e)}"
     
-    def _format_search_results(self, results: Dict[str, Any]) -> str:
+    def _format_search_results(self, results: Any) -> str:
         """
         Format search results into clean, readable context for the LLM.
         

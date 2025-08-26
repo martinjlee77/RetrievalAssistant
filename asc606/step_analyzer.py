@@ -10,6 +10,7 @@ import os
 import logging
 import time
 import re
+import random
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -176,8 +177,9 @@ class ASC606StepAnalyzer:
                                authoritative_context: str,
                                customer_name: str,
                                additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single step with retry logic for transient errors."""
-        max_retries = 2
+        """Analyze a single step with enhanced retry logic for production scalability."""
+        max_retries = 4  # Increased from 2
+        base_delay = 1
         
         for attempt in range(max_retries):
             try:
@@ -189,15 +191,58 @@ class ASC606StepAnalyzer:
                     customer_name=customer_name,
                     additional_context=additional_context
                 )
-            except Exception as e:
-                if attempt == max_retries - 1:  # Final attempt
-                    logger.error(f"Failed Step {step_num} after {max_retries} attempts: {str(e)}")
-                    raise  # Re-raise the exception to be handled by caller
+            except openai.RateLimitError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Rate limit exceeded for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"OpenAI API rate limit exceeded. Please try again in a few minutes or contact support if this persists.")
+                
+                # Exponential backoff with jitter for rate limits
+                delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                logger.warning(f"Rate limit hit for Step {step_num}. Waiting {delay:.1f}s before retry {attempt + 2}")
+                time.sleep(delay)
+                
+            except openai.APITimeoutError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"API timeout for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"OpenAI API timeout. Please check your connection and try again.")
+                
+                delay = base_delay * (1.5 ** attempt)
+                logger.warning(f"API timeout for Step {step_num}. Retrying in {delay:.1f}s")
+                time.sleep(delay)
+                
+            except openai.APIConnectionError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"API connection error for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"Unable to connect to OpenAI API. Please check your internet connection.")
+                
+                delay = base_delay * (1.5 ** attempt)
+                logger.warning(f"Connection error for Step {step_num}. Retrying in {delay:.1f}s")
+                time.sleep(delay)
+                
+            except openai.APIError as e:
+                # Handle other API errors
+                error_msg = str(e).lower()
+                if "rate" in error_msg or "quota" in error_msg:
+                    # Treat as rate limit even if not caught above
+                    if attempt == max_retries - 1:
+                        raise RuntimeError(f"OpenAI API quota/rate limit issue. Please try again later.")
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    logger.warning(f"API quota issue for Step {step_num}. Waiting {delay:.1f}s")
+                    time.sleep(delay)
                 else:
-                    logger.warning(f"Retrying Step {step_num} (attempt {attempt + 2}) after error: {str(e)}")
-                    time.sleep(2)  # Wait before retry
+                    logger.error(f"OpenAI API error for Step {step_num}: {str(e)}")
+                    raise RuntimeError(f"OpenAI API error: {str(e)}")
+                    
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Unexpected error for Step {step_num} after {max_retries} attempts: {str(e)}")
+                    raise RuntimeError(f"Analysis failed for Step {step_num}: {str(e)}")
+                else:
+                    delay = base_delay * (1.2 ** attempt)
+                    logger.warning(f"Unexpected error for Step {step_num}. Retrying in {delay:.1f}s: {str(e)}")
+                    time.sleep(delay)
         
-        # This should never be reached due to the raise in the final attempt
+        # This should never be reached
         raise RuntimeError(f"Unexpected error: Step {step_num} analysis failed without proper error handling")
     
     def _analyze_step(self, 

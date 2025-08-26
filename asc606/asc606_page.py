@@ -4,6 +4,7 @@ ASC 606 Contract Analysis Page
 
 import streamlit as st
 import logging
+import uuid
 from datetime import datetime
 from typing import Dict, Any, List
 
@@ -80,7 +81,14 @@ def get_asc606_inputs():
 
 
 def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
-    """Perform the complete ASC 606 analysis and display results."""
+    """Perform the complete ASC 606 analysis and display results with session isolation."""
+    
+    # Session isolation - create unique session ID for this user
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
+    session_id = st.session_state.user_session_id
     
     # Create placeholder for the in-progress message
     progress_message_placeholder = st.empty()
@@ -90,9 +98,10 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
     )
     
-    # Initialize analysis complete status in session state (if not already present)
-    if 'asc606_analysis_complete' not in st.session_state:
-        st.session_state.asc606_analysis_complete = False
+    # Initialize analysis complete status with session isolation
+    analysis_key = f'asc606_analysis_complete_{session_id}'
+    if analysis_key not in st.session_state:
+        st.session_state[analysis_key] = False
     
     # Auto-extract customer name and generate analysis title
     customer_name = _extract_customer_name(contract_text)
@@ -188,11 +197,12 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
             f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
         )
         
-        # Signal completion
-        st.session_state.asc606_analysis_complete = True
+        # Signal completion with session isolation
+        st.session_state[analysis_key] = True
         
-        # Store memo data for the memo page
-        st.session_state.asc606_memo_data = {
+        # Store memo data with session isolation
+        memo_key = f'asc606_memo_data_{session_id}'
+        st.session_state[memo_key] = {
             'memo_content': memo_content,
             'customer_name': customer_name,
             'analysis_title': analysis_title,
@@ -217,19 +227,25 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         completion_message_placeholder.empty()
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-            # Clear analysis state for fresh start
+            # Clear analysis state for fresh start with session isolation
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-            if 'asc606_memo_data' in st.session_state:
-                del st.session_state.asc606_memo_data
-
+            
+            # Clean up session-specific data
+            memo_key = f'asc606_memo_data_{session_id}'
+            if memo_key in st.session_state:
+                del st.session_state[memo_key]
+            if analysis_key in st.session_state:
+                del st.session_state[analysis_key]
+            
+            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
             st.rerun()
 
     except Exception as e:
         # Clear the progress message even on error
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 606 analysis error: {str(e)}")
-        st.session_state.asc606_analysis_complete = True  # Signal completion (even on error)
+        logger.error(f"ASC 606 analysis error for session {session_id[:8]}...: {str(e)}")
+        st.session_state[analysis_key] = True  # Signal completion (even on error)
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
 
