@@ -27,7 +27,10 @@ class SharedDocumentProcessor:
     def __init__(self):
         self.extractor = DocumentExtractor()
     
-    def upload_and_process(self, label: str = "Upload Contract Document") -> Tuple[Optional[str], Optional[str]]:
+    # File upload method removed - now handled individually in each ASC page
+    # with standard-specific help text
+    
+    def _removed_upload_and_process(self, label: str = "Upload Contract Document") -> Tuple[Optional[str], Optional[str]]:
         """
         Handle multiple file upload and extract combined text content.
         

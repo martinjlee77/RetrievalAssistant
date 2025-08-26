@@ -10,7 +10,9 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 # CleanMemoGenerator import moved to initialization section
-from shared.document_processor import SharedDocumentProcessor
+import tempfile
+import os
+from utils.document_extractor import DocumentExtractor
 from asc340.step_analyzer import ASC340StepAnalyzer
 from asc340.knowledge_search import ASC340KnowledgeSearch
 
@@ -60,10 +62,8 @@ def render_asc340_page():
 def get_asc340_inputs():
     """Get ASC 340-40 specific inputs."""
 
-    # Document upload
-    processor = SharedDocumentProcessor()
-    contract_text, filename = processor.upload_and_process(
-        "1️⃣ Upload a **sales commission plans and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets)")
+    # Document upload with ASC 340-40 specific help text
+    contract_text, filename = _upload_and_process_asc340()
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -75,6 +75,71 @@ def get_asc340_inputs():
     is_ready = bool(contract_text)
 
     return contract_text, filename, additional_context, is_ready
+
+
+def _upload_and_process_asc340():
+    """Handle file upload and processing specifically for ASC 340-40 analysis."""
+    # Use session state to control file uploader key for clearing
+    if 'file_uploader_key' not in st.session_state:
+        st.session_state.file_uploader_key = 0
+        
+    uploaded_files = st.file_uploader(
+        "1️⃣ Upload a **sales commission plan and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets)",
+        type=['pdf', 'docx'],
+        help="Upload up to 5 relevant commission and contract cost documents (PDF or DOCX) for ASC 340-40 analysis. Include commission plans, compensation policies, sales agreements, and related cost documentation. Complete documentation ensures accurate capitalization and amortization analysis.",
+        accept_multiple_files=True,
+        key=f"contract_files_{st.session_state.file_uploader_key}"
+    )
+    
+    if not uploaded_files:
+        return None, None
+        
+    # Limit to 5 files for practical processing
+    if len(uploaded_files) > 5:
+        st.warning("⚠️ Maximum 5 files allowed. Using first 5 files only.")
+        uploaded_files = uploaded_files[:5]
+        
+    try:
+        combined_text = ""
+        processed_filenames = []
+        extractor = DocumentExtractor()
+        
+        # Show processing status to users
+        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
+            for uploaded_file in uploaded_files:
+                # Extract text using existing extractor
+                extraction_result = extractor.extract_text(uploaded_file)
+                
+                # Check for extraction errors
+                if extraction_result.get('error'):
+                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                    continue
+                
+                # Get the text from the extraction result
+                extracted_text = extraction_result.get('text', '')
+                if extracted_text and extracted_text.strip():
+                    combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
+                    processed_filenames.append(uploaded_file.name)
+                    st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
+                else:
+                    st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
+        
+        if not combined_text.strip():
+            st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
+            return None, None
+        
+        # Create comma-separated filename string
+        filename_string = ", ".join(processed_filenames)
+        
+        st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
+        st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
+        
+        return combined_text.strip(), filename_string
+        
+    except Exception as e:
+        logger.error(f"Error processing uploaded files: {str(e)}")
+        st.error(f"❌ Error processing files: {str(e)}")
+        return None, None
 
 
 # Old validation function removed - using progressive disclosure approach instead
@@ -104,7 +169,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
         st.session_state[analysis_key] = False
     
     # Auto-extract customer name and generate analysis title
-    company_name = _extract_company_name(contract_text)
+    customer_name = _extract_customer_name(contract_text)
     analysis_title = _generate_analysis_title()
 
     try:
@@ -151,7 +216,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    company_name=company_name,
+                    customer_name=customer_name,
                     additional_context=additional_context)
 
                 analysis_results[f'step_{step_num}'] = step_result
@@ -166,13 +231,13 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
             conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
             
             # Generate the three additional sections
-            executive_summary = analyzer.generate_executive_summary(conclusions_text, company_name)
-            background = analyzer.generate_background_section(conclusions_text, company_name)
+            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
+            background = analyzer.generate_background_section(conclusions_text, customer_name)
             conclusion = analyzer.generate_conclusion_section(conclusions_text)
             
             # Combine into the expected structure for memo generator
             final_results = {
-                'company_name': company_name,
+                'customer_name': customer_name,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
                 'filename': filename,
@@ -204,7 +269,7 @@ def perform_asc340_analysis(contract_text: str, additional_context: str = ""):
         memo_key = f'asc340_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
-            'company_name': company_name,
+            'customer_name': customer_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
@@ -271,7 +336,7 @@ def main():
 
 
 
-def _extract_company_name(contract_text: str) -> str:
+def _extract_customer_name(contract_text: str) -> str:
     """Extract the customer/recipient party name from typical contract preambles or headings."""
     try:
         import re

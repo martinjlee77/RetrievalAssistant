@@ -10,9 +10,11 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 # CleanMemoGenerator import moved to initialization section
-from shared.document_processor import SharedDocumentProcessor
+import tempfile
+import os
 from asc606.step_analyzer import ASC606StepAnalyzer
 from asc606.knowledge_search import ASC606KnowledgeSearch
+from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -60,10 +62,8 @@ def render_asc606_page():
 def get_asc606_inputs():
     """Get ASC 606 specific inputs."""
 
-    # Document upload
-    processor = SharedDocumentProcessor()
-    contract_text, filename = processor.upload_and_process(
-        "1️⃣ Upload a **complete contract and related documents**, e.g., executed agreement, standard T&Cs, MSA, SOW, purchase order, invoice (required)")
+    # Document upload with ASC 606 specific help text
+    contract_text, filename = _upload_and_process_asc606()
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -75,6 +75,71 @@ def get_asc606_inputs():
     is_ready = bool(contract_text)
 
     return contract_text, filename, additional_context, is_ready
+
+
+def _upload_and_process_asc606():
+    """Handle file upload and processing specifically for ASC 606 analysis."""
+    # Use session state to control file uploader key for clearing
+    if 'file_uploader_key' not in st.session_state:
+        st.session_state.file_uploader_key = 0
+        
+    uploaded_files = st.file_uploader(
+        "1️⃣ Upload a **complete contract and related documents**, e.g., executed agreement, standard T&Cs, MSA, SOW, purchase order, invoice (required)",
+        type=['pdf', 'docx'],
+        help="Upload up to 5 relevant contract documents (PDF or DOCX) for ASC 606 revenue recognition analysis. Include the main contract and any amendments, statements of work, master agreements, or related documentation. Incomplete documentation may lead to inaccurate revenue recognition analysis.",
+        accept_multiple_files=True,
+        key=f"contract_files_{st.session_state.file_uploader_key}"
+    )
+    
+    if not uploaded_files:
+        return None, None
+        
+    # Limit to 5 files for practical processing
+    if len(uploaded_files) > 5:
+        st.warning("⚠️ Maximum 5 files allowed. Using first 5 files only.")
+        uploaded_files = uploaded_files[:5]
+        
+    try:
+        combined_text = ""
+        processed_filenames = []
+        extractor = DocumentExtractor()
+        
+        # Show processing status to users
+        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
+            for uploaded_file in uploaded_files:
+                # Extract text using existing extractor
+                extraction_result = extractor.extract_text(uploaded_file)
+                
+                # Check for extraction errors
+                if extraction_result.get('error'):
+                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                    continue
+                
+                # Get the text from the extraction result
+                extracted_text = extraction_result.get('text', '')
+                if extracted_text and extracted_text.strip():
+                    combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
+                    processed_filenames.append(uploaded_file.name)
+                    st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
+                else:
+                    st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
+        
+        if not combined_text.strip():
+            st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
+            return None, None
+        
+        # Create comma-separated filename string
+        filename_string = ", ".join(processed_filenames)
+        
+        st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
+        st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
+        
+        return combined_text.strip(), filename_string
+        
+    except Exception as e:
+        logger.error(f"Error processing uploaded files: {str(e)}")
+        st.error(f"❌ Error processing files: {str(e)}")
+        return None, None
 
 
 # Old validation function removed - using progressive disclosure approach instead
