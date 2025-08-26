@@ -1,0 +1,67 @@
+ASC 340-40 MEMORANDUM
+TO: Chief Accounting Officer
+
+FROM: Technical Accounting Team - AI
+
+DATE: August 26, 2025
+
+RE: ASC340_Analysis_0826_202826 - ASC 340-40 Contract Cost Analysis
+
+DOCUMENTS REVIEWED: Plan A - cap.docx
+
+EXECUTIVE SUMMARY
+New Start Inc.'s FY2026 sales commissions have been evaluated under ASC 340-40 and are determined to be within the scope as they constitute incremental costs of obtaining contracts with customers. These costs are directly associated with contract acquisition and are expected to be recoverable, thus qualifying for capitalization as assets. The commissions are tied to specific contracts, and their amortization over the expected period of benefit is deemed appropriate, aligning with ASC 340-40 guidelines.
+
+The analysis identified four distinct performance obligations within the contracts, ensuring that the amortization of capitalized costs is systematically aligned with the revenue recognition pattern. The practical expedient was not applied due to the amortization period exceeding one year, necessitating regular impairment assessments to confirm the carrying amount remains recoverable.
+
+In conclusion, New Start Inc. complies with ASC 340-40 requirements, with no significant issues identified in the capitalization and amortization of sales commission costs. The company should continue to monitor these costs for impairment to maintain compliance and ensure financial statement accuracy.
+
+BACKGROUND
+New Start Inc. has implemented a sales commission plan for FY2026, which involves arrangements that fall under the purview of ASC 340-40, focusing on the incremental costs of obtaining contracts with customers. The primary cost element under review is the sales commissions, which are directly attributable to contract acquisition and meet the criteria for capitalization due to their expected recoverability. The purpose of this ASC 340-40 analysis is to ensure proper accounting treatment of these costs, including their capitalization and subsequent amortization over the expected period of benefit, while also addressing the need for impairment assessments to maintain the recoverability of the carrying amounts.
+
+ASC 340-40 ANALYSIS
+Step 1: Scope
+Analysis: The sales commissions outlined in New Start Inc.'s FY2026 New Logo and Expansion Sales Commission Plan appear to fall within the scope of ASC 340-40 as incremental costs of obtaining a contract with a customer. According to ASC 340-40-15-2, the guidance applies to costs directly related to obtaining a contract within the scope of ASC 606, which includes sales commissions. The plan specifies that commissions are earned upon the execution of a non-cancelable order form and company acceptance, indicating that these costs are directly linked to contract acquisition [Plan A, p. 1].
+
+The commission rates vary based on the type of transaction, such as new logo sales, expansions, and renewals, with specific percentages of ACV or TCV being commissionable [Plan A, p. 2]. This aligns with ASC 340-40-25-1, which notes that commissions paid to employees for securing contracts are typically incremental costs that should be capitalized if they are expected to be recoverable. The plan also includes mechanisms for clawbacks and adjustments if certain conditions are not met, such as customer cancellations or non-payment, which further supports the notion that these costs are tied to contract performance and recovery [Plan A, p. 3].
+
+The company's rationale for capitalization under ASC 340-40 is that these costs are incremental and expected to be recoverable through the economics of the contracts [Plan A, p. 4]. This aligns with the guidance that costs must be recoverable to be capitalized, and the plan's detailed structure supports this expectation.
+
+Conclusion: The sales commissions under New Start Inc.'s FY2026 plan are within the scope of ASC 340-40 as they represent incremental costs of obtaining contracts with customers. These costs are directly linked to contract acquisition and are expected to be recoverable, thus meeting the criteria for capitalization [ASC 340-40-15-2; ASC 340-40-25-1].
+
+Issues or Uncertainties: None identified.
+
+Step 2: Incremental Costs of Obtaining a Contract
+Analysis:
+
+The analysis of the sales commission plan for New Start Inc. under ASC 340-40 focuses on whether the costs are incremental and expected to be recoverable, which would necessitate capitalization as an asset. According to the contract, commissions are earned upon the execution of a "fully executed, non-cancelable order form and Company acceptance" [Plan A - cap.docx, §Earning and payment timing]. This indicates that the commissions are directly tied to the acquisition of specific contracts, satisfying the criterion of being incremental costs as they "would not have been incurred if the contract had not been obtained" [ASC 340-40-25-1].
+
+The contract specifies different commission rates based on the type of transaction, such as new logo sales, expansions, and renewals, with rates ranging from 2% to 14% [Plan A - cap.docx, §Commissionable transactions and rates]. These commissions are tied to specific contracts and are expected to be recovered through the revenue generated from these contracts. Therefore, they meet the "expected to be recovered" criterion, as the costs are recoverable through the margin inherent in the contract [ASC 340-40-25-1].
+
+Furthermore, the plan includes provisions for clawbacks if a customer cancels or does not pay, which aligns with ASC 340-40's guidance on impairment and adjustments. This indicates that the company anticipates potential adjustments to the recoverability of these costs, further supporting the expectation of recovery [Plan A - cap.docx, §Adjustments, clawbacks, and chargebacks].
+
+The amortization period for these capitalized costs is determined based on the expected period of benefit. For new logo initial commissions, the expected customer life is 36 months, while renewal and expansion commissions are amortized over the related contractual service period, typically 12 months [Plan A - cap.docx, §Amortization period]. This approach is consistent with ASC 340-40-35-1, which requires that the amortization period reflect the period over which the asset will contribute to the generation of revenue.
+
+Conclusion:
+
+The sales commissions outlined in New Start Inc.'s plan qualify as incremental costs of obtaining a contract and should be capitalized as assets under ASC 340-40, as they are directly tied to specific contracts and expected to be recoverable [ASC 340-40-25-1]. The amortization of these costs over the expected period of benefit is appropriate and aligns with the guidance [ASC 340-40-35-1].
+
+Issues or Uncertainties:
+
+None identified.
+
+Step 3: Guidance for Amortization, Practical Expedient, and Impairment
+Analysis: The sales commission plan for New Start Inc. involves commissions that are incremental costs to obtain contracts and are capitalized under ASC 340-40. According to the contract, commissions are earned upon the execution of a non-cancelable order form and acceptance by the company, with payment contingent upon invoice collection and continued customer service [Plan A §Earning and payment timing, p. N]. These commissions are capitalized because they are directly attributable to obtaining specific contracts and are expected to be recoverable through the economic benefits of those contracts [ASC 340-40-25-1].
+
+The amortization of these capitalized costs should be systematic and consistent with the transfer of goods or services to the customer. For new logo initial commissions, the amortization period is set at 36 months, reflecting the expected customer life, as renewal commissions are not commensurate with initial commissions (2% versus 10–14%) [Plan A §Amortization period, p. N]. This aligns with ASC 340-40-25-5, which requires that the amortization period reflect the period over which the asset provides benefit.
+
+The practical expedient to expense costs as incurred is not elected for this plan, as the amortization periods exceed one year [Plan A §Practical expedient, p. N]. According to ASC 340-40-25-4, this expedient applies only if the amortization period is one year or less.
+
+Impairment considerations require that at each reporting date, the carrying amount of the deferred commission asset be assessed for recoverability. If clawbacks occur or impairment indicators suggest that the asset is not recoverable, adjustments must be made [Plan A §Impairment/adjustments, p. N]. ASC 340-40-35-2 mandates that any changes in the expected timing of benefits should be accounted for as changes in accounting estimates.
+
+Conclusion: The commission costs are capitalized and amortized over the expected period of benefit, consistent with ASC 340-40 guidance. The practical expedient is not applied due to the amortization period exceeding one year. Impairment assessments are necessary to ensure the carrying amount remains recoverable [ASC 340-40-25-5; ASC 340-40-35-2].
+
+Issues or Uncertainties: None identified.
+
+CONCLUSION
+Upon thorough analysis, New Start Inc.'s FY2026 sales commission plan is compliant with ASC 340-40, as the commissions are identified as incremental costs directly associated with obtaining contracts and are expected to be recoverable. These costs, amounting to $XXX,XXX, are appropriately capitalized and amortized over the expected period of benefit, in accordance with ASC 340-40-25-1 and ASC 340-40-35-1. It is imperative to conduct regular impairment assessments to ensure the carrying amount remains recoverable, as stipulated by ASC 340-40-25-5 and ASC 340-40-35-2.
