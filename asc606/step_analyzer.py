@@ -417,10 +417,6 @@ CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
 - Double-check ALL currency amounts for proper formatting
 - Use professional accounting language with proper spacing
 
-QUOTING EXAMPLES - FOLLOW THIS FORMAT:
-Contract Evidence: The contract states "The Customer shall pay $240,000 annually." (Section 3.2)
-ASC 606 Citation: ASC 606-10-25-1 requires "The parties to the contract have approved the contract."
-
 """
         
         return prompt
