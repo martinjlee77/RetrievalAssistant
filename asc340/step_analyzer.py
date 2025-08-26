@@ -525,7 +525,7 @@ Requirements:
 1. Write 3-5 sentences with proper paragraph breaks
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Use professional accounting language
-4. Include specific number of performance obligations identified
+4. State whether costs are incremental and quality for capitalization
 5. State compliance conclusion clearly
 6. Highlight any significant findings or issues
 7. Use double line breaks between paragraphs for readability
