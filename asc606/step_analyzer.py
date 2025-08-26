@@ -326,8 +326,8 @@ Your analysis must be:
 - Based on authoritative guidance
 - Include explicit reasoning with "because" statements
 - Support your analysis with specific contract text and authoritative citations
-- Use direct quotes from the contract document when referencing specific terms, amounts, or provisions
-- Include relevant quotes from ASC 606 guidance when citing authoritative support
+- Use direct quotes from the contract document only when the exact wording is outcome-determinative
+- Paraphrase ASC 606 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -439,28 +439,22 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Include direct quotes from the contract and ASC 606 where applicable.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 606 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
-**Analysis:** [Detailed analysis with supporting evidence. MUST include:
-- Direct quotes from the contract for specific terms, amounts, and key provisions (use "quotation marks")
-- Direct quotes from ASC 606 guidance for authoritative support (cite as: ASC 606-10-XX-X: "quoted text")
-- Explicit reasoning with "because" statements connecting evidence to conclusions]
+**Analysis:** [Detailed analysis with supporting evidence. Include:
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Contract §X.Y, p. N])
+- ASC 606 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 606-10-25-19])
+- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
 
-**Conclusion:** [Clear 2-3 sentence conclusion summarizing the findings for this step.]
+**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 606 citation.]
 
-**Issues or Uncertainties:** [If any significant issues exist, list them clearly. Otherwise, state "None identified."]
+**Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL FORMATTING REQUIREMENTS - FOLLOW EXACTLY:
-- Format currency as: $240,000 (with comma, NO SPACES between numbers)
-- NEVER write: $$240,000 or $240, 000 or 240,000 or $240000
-- ALWAYS put spaces after periods and commas in sentences
-- NEVER concatenate words: Write "professional services" NOT "professionalservices"
-- NEVER split words: Write "fees" NOT "f ees"
-- Write complete words: "the" NOT "T he", "and" NOT "and−"
-- Use normal dashes (-) NOT special characters (−)
-- Keep all text readable and properly spaced
-- Double-check ALL currency amounts for proper formatting
-- Use professional accounting language with proper spacing
+CRITICAL FORMATTING REQUIREMENTS:
+- Format currency as: $240,000 (with comma, no spaces)
+- Use proper spacing after periods and commas
+- Use professional accounting language
+- Double-check all currency amounts for correct formatting
 
 """
         
