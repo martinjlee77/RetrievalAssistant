@@ -29,7 +29,11 @@ def render_asc340_page():
     # Page header
     st.title(":primary[ASC 340-40 Commission Cost Analyzer]")
     with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze commission and related documents and generate a professional policy memo. Simply upload your documents to begin. Note that this tool only analyzes the cost of obtaining a contract, not the costs to fulfill a contract. ")
+        st.markdown("""
+        :primary[**Purpose:**] Automatically analyze commission and related documents and generate a professional policy memo. Simply upload your documents to begin. 
+
+:primary[**Note:**] This tool only analyzes the cost of obtaining a contract, not the costs to fulfill a contract. 
+        """)
     
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc340_inputs()
@@ -84,7 +88,7 @@ def _upload_and_process_asc340():
         st.session_state.file_uploader_key = 0
         
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload a **sales commission plan and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets)",
+        "1️⃣ Upload a **sales commission plan and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets (required))",
         type=['pdf', 'docx'],
         help="Upload up to 5 relevant commission and contract cost documents (PDF or DOCX) for ASC 340-40 analysis. Complete documentation supports accurate capitalization and amortization analysis.",
         accept_multiple_files=True,
