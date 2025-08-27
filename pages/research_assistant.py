@@ -3,6 +3,8 @@ ASC Research Assistant - Interactive Chat Interface
 
 Provides conversational access to ASC guidance across all standards.
 Users can ask questions and get authoritative answers with citations.
+
+Using GPT-4o for main research answers and GPT4o-mini for follow-up suggestions.
 """
 
 import streamlit as st
