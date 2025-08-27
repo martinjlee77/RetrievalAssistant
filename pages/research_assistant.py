@@ -32,7 +32,7 @@ STANDARDS_CONFIG = {
     # Ready for future standards
     "ASC 842 - Leases": {
         "database_path": "asc842_knowledge_base",
-        "collection_name": "asc842_guidance", 
+        "collection_name": "asc842_leases", 
         "description": "Lease Accounting"
     }
 }
