@@ -27,13 +27,13 @@ STANDARDS_CONFIG = {
     "ASC 340-40 - Contract Costs": {
         "database_path": "asc340_knowledge_base", 
         "collection_name": "asc340_contract_costs",
-        "description": "Incremental Costs of Obtaining Contracts"
+        "description": "Contract Costs"
     },
     # Ready for future standards
     "ASC 842 - Leases": {
         "database_path": "asc842_knowledge_base",
         "collection_name": "asc842_leases", 
-        "description": "Lease Accounting"
+        "description": "Lease Accounting (Lesee)"
     }
 }
 
@@ -45,6 +45,18 @@ class ASCResearchAssistant:
         self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         if not os.getenv("OPENAI_API_KEY"):
             raise ValueError("OPENAI_API_KEY environment variable not set")
+        
+        # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
+        # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
+        self.use_premium_models = False
+        
+        # Model selection based on configuration
+        if self.use_premium_models:
+            self.main_model = "gpt-5"           # For main research answers
+            self.light_model = "gpt-5-mini"     # For follow-up suggestions
+        else:
+            self.main_model = "gpt-4o"          # For main research answers  
+            self.light_model = "gpt-4o-mini"    # For follow-up suggestions
     
     def get_response(self, question: str, selected_standard: str) -> Tuple[str, List[str]]:
         """
@@ -84,6 +96,32 @@ class ASCResearchAssistant:
             logger.error(f"Error generating response: {str(e)}")
             return f"Error generating response: {str(e)}", []
     
+    def _get_temperature(self, model_name=None):
+        """Get appropriate temperature based on model."""
+        target_model = model_name or self.main_model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            return 1  # GPT-5 models only support default temperature of 1
+        else:
+            return 0.1  # GPT-4o models can use 0.1 for research consistency
+    
+    def _get_max_tokens_param(self, request_type="main", model_name=None):
+        """Get appropriate max tokens parameter based on model and request type."""
+        target_model = model_name or self.main_model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # GPT-5 models need higher token counts due to reasoning overhead
+            token_limits = {
+                "main": 2000,        # Main research answers
+                "suggestions": 500   # Follow-up suggestions
+            }
+            return {"max_completion_tokens": token_limits.get(request_type, 2000)}
+        else:
+            # GPT-4o models use standard limits
+            token_limits = {
+                "main": 1000,        # Main research answers
+                "suggestions": 200   # Follow-up suggestions
+            }
+            return {"max_tokens": token_limits.get(request_type, 1000)}
+
     def _generate_answer(self, question: str, guidance: str, standard: str) -> str:
         """Generate a comprehensive answer with citations."""
         
@@ -95,7 +133,7 @@ Relevant ASC Guidance:
 {guidance}
 
 Instructions:
-1. Provide a concise but comprehensive answer (2-4 paragraphs)
+1. Provide a concise but comprehensive answer (2-10 paragraphs)
 2. Focus specifically on {standard} requirements
 3. Include specific ASC paragraph citations in brackets [ASC XXX-XX-XX-XX]
 4. Use professional accounting language
@@ -105,12 +143,19 @@ Instructions:
 Answer:"""
 
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
-                max_tokens=1000
-            )
+            # Build request parameters
+            request_params = {
+                "model": self.main_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": self._get_temperature(self.main_model),
+                **self._get_max_tokens_param("main", self.main_model)
+            }
+            
+            # Add response_format only for GPT-5
+            if self.main_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
             
             return response.choices[0].message.content.strip()
             
@@ -135,12 +180,19 @@ Generate follow-up questions that are:
 Return only the questions, one per line, without numbering or bullets."""
 
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",  # Use faster model for suggestions
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=200
-            )
+            # Build request parameters
+            request_params = {
+                "model": self.light_model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("suggestions", self.light_model)
+            }
+            
+            # Add response_format only for GPT-5
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
             
             suggestions = response.choices[0].message.content.strip().split('\n')
             return [s.strip() for s in suggestions if s.strip()][:4]  # Max 4 suggestions
@@ -182,9 +234,6 @@ def render_research_assistant():
             description = STANDARDS_CONFIG[selected_standard]["description"]
             st.info(f"**{selected_standard}**: {description}")
     
-    # Chat interface
-    st.markdown("---")
-    
     # Question input (always visible for easy follow-ups)
     st.markdown("---")
     
@@ -198,10 +247,10 @@ def render_research_assistant():
         question_label = "💬 Ask a follow-up question:"
         placeholder_text = "e.g., Can you explain that in more detail?"
     else:
-        question_label = "❓ Ask your first question:"
+        question_label = "❓ Ask your question:"
         placeholder_text = "e.g., What are the key criteria for revenue recognition under ASC 606?"
     
-    question = st.text_input(
+    question = st.text_area(
         question_label,
         value=default_question,
         placeholder=placeholder_text,
