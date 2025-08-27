@@ -48,7 +48,7 @@ class ASCResearchAssistant:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -155,9 +155,21 @@ Answer:"""
             if self.main_model in ["gpt-5", "gpt-5-mini"]:
                 request_params["response_format"] = {"type": "text"}
             
+            logger.info(f"DEBUG: Making Research Assistant call to {self.main_model}")
             response = self.client.chat.completions.create(**request_params)
             
-            return response.choices[0].message.content.strip()
+            content = response.choices[0].message.content
+            logger.info(f"DEBUG: GPT response content type: {type(content)}")
+            logger.info(f"DEBUG: GPT response content length: {len(content) if content else 0}")
+            logger.info(f"DEBUG: GPT response content preview: {content[:200] if content else 'NONE/EMPTY'}...")
+            
+            if content is None:
+                logger.error(f"ERROR: {self.main_model} returned None content")
+                content = f"Error: {self.main_model} returned empty response. Please try switching models or rephrasing your question."
+            else:
+                content = content.strip()
+            
+            return content
             
         except Exception as e:
             logger.error(f"Error generating answer: {str(e)}")
