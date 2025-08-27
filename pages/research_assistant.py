@@ -33,7 +33,7 @@ STANDARDS_CONFIG = {
     "ASC 842 - Leases": {
         "database_path": "asc842_knowledge_base",
         "collection_name": "asc842_leases", 
-        "description": "Lease Accounting (Lesee)"
+        "description": "Lease Accounting (Lessee)"
     }
 }
 
@@ -155,21 +155,9 @@ Answer:"""
             if self.main_model in ["gpt-5", "gpt-5-mini"]:
                 request_params["response_format"] = {"type": "text"}
             
-            logger.info(f"DEBUG: Making Research Assistant call to {self.main_model}")
             response = self.client.chat.completions.create(**request_params)
             
-            content = response.choices[0].message.content
-            logger.info(f"DEBUG: GPT response content type: {type(content)}")
-            logger.info(f"DEBUG: GPT response content length: {len(content) if content else 0}")
-            logger.info(f"DEBUG: GPT response content preview: {content[:200] if content else 'NONE/EMPTY'}...")
-            
-            if content is None:
-                logger.error(f"ERROR: {self.main_model} returned None content")
-                content = f"Error: {self.main_model} returned empty response. Please try switching models or rephrasing your question."
-            else:
-                content = content.strip()
-            
-            return content
+            return response.choices[0].message.content.strip()
             
         except Exception as e:
             logger.error(f"Error generating answer: {str(e)}")
