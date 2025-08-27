@@ -117,10 +117,10 @@ class ASCResearchAssistant:
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need much higher token counts for complex research tasks
             token_limits = {
-                "main": 4000,        # Main research answers - increased for complex prompts
+                "main": 8000,        # Main research answers - increased for complex prompts
                 "suggestions": 800   # Follow-up suggestions
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 4000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -165,10 +165,20 @@ Answer:"""
             response = self.client.chat.completions.create(**request_params)
             
             content = response.choices[0].message.content
+            finish_reason = response.choices[0].finish_reason
             
-            # Handle GPT-5 length limit issue
-            if not content or (content.strip() == '' and response.choices[0].finish_reason == 'length'):
-                return f"⚠️ **Token Limit Reached**: The response was too long for the current settings. Try asking a more focused question or switch to GPT-4o for this query."
+            # Debug: Show what's actually happening
+            print(f"🐛 API Response Debug:")
+            print(f"   - Content length: {len(content) if content else 0}")
+            print(f"   - Finish reason: {finish_reason}")
+            print(f"   - Token limit used: {request_params.get('max_completion_tokens', request_params.get('max_tokens', 'unknown'))}")
+            
+            # Handle various error conditions
+            if finish_reason == 'length':
+                return f"⚠️ **Token Limit Reached**: The response was cut off. Current limit: {request_params.get('max_completion_tokens', request_params.get('max_tokens', 'unknown'))} tokens."
+            
+            if not content or content.strip() == '':
+                return f"⚠️ **Empty Response**: Got empty response with finish_reason='{finish_reason}'. This might be a model issue."
             
             return content.strip()
             
