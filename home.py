@@ -19,6 +19,7 @@ st.logo("assets/images/nobkg.png", size = "large")
 # 4. Define all pages in your app.
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home"),
+    st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
     st.Page("asc606/asc606_page.py", title="ASC 606 Revenue Recognition"),
     st.Page("asc340/asc340_page.py", title="ASC 340-40 Sales Commissions"),
     st.Page("pages/asc842.py", title="ASC 842 Leases"),
