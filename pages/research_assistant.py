@@ -245,9 +245,6 @@ def render_research_assistant():
                     question, answer, suggestions, timestamp
                 ))
                 
-                # Clear the input
-                st.session_state.question_input = ""
-                
                 # Rerun to show the new response
                 st.rerun()
     
