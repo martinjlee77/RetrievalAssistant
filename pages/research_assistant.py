@@ -58,7 +58,7 @@ class ASCResearchAssistant:
             self.main_model = "gpt-4o"          # For main research answers  
             self.light_model = "gpt-4o-mini"    # For follow-up suggestions
     
-    def get_response(self, question: str, selected_standard: str) -> Tuple[str, List[str]]:
+    def get_response(self, question: str, selected_standard: str, debug_container=None) -> Tuple[str, List[str]]:
         """
         Get response to user question from selected ASC standard.
         
@@ -88,8 +88,9 @@ class ASCResearchAssistant:
             guidance_tokens = len(relevant_guidance)//4
             chunk_count = len(relevant_guidance.split('Source:')) - 1
             
-            # Show debug info in app
-            debug_container.info(f"🔍 **RAG Debug**: Retrieved {chunk_count} relevant chunks ({len(relevant_guidance):,} chars ≈ {guidance_tokens:,} tokens)")
+            # Show debug info in app if container provided
+            if debug_container:
+                debug_container.info(f"🔍 **RAG Debug**: Retrieved {chunk_count} relevant chunks ({len(relevant_guidance):,} chars ≈ {guidance_tokens:,} tokens)")
             
             answer = self._generate_answer(question, relevant_guidance, selected_standard)
             
@@ -278,9 +279,9 @@ def render_research_assistant():
             with st.spinner(f"Searching {selected_standard} guidance..."):
                 # Create debug info container
                 debug_container = st.empty()
-                # Get response
+                # Get response with debug container
                 answer, suggestions = st.session_state.research_assistant.get_response(
-                    question, selected_standard
+                    question, selected_standard, debug_container
                 )
                 
                 # Clear debug info
