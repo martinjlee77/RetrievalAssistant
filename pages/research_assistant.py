@@ -108,12 +108,12 @@ class ASCResearchAssistant:
         """Get appropriate max tokens parameter based on model and request type."""
         target_model = model_name or self.main_model
         if target_model in ["gpt-5", "gpt-5-mini"]:
-            # GPT-5 models need higher token counts due to reasoning overhead
+            # GPT-5 models need much higher token counts for complex research tasks
             token_limits = {
-                "main": 2000,        # Main research answers
-                "suggestions": 500   # Follow-up suggestions
+                "main": 4000,        # Main research answers - increased for complex prompts
+                "suggestions": 800   # Follow-up suggestions
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 2000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 4000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -157,7 +157,13 @@ Answer:"""
             
             response = self.client.chat.completions.create(**request_params)
             
-            return response.choices[0].message.content.strip()
+            content = response.choices[0].message.content
+            
+            # Handle GPT-5 length limit issue
+            if not content or (content.strip() == '' and response.choices[0].finish_reason == 'length'):
+                return f"⚠️ **Token Limit Reached**: The response was too long for the current settings. Try asking a more focused question or switch to GPT-4o for this query."
+            
+            return content.strip()
             
         except Exception as e:
             logger.error(f"Error generating answer: {str(e)}")
