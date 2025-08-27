@@ -185,6 +185,50 @@ def render_research_assistant():
     # Chat interface
     st.markdown("---")
     
+    # Question input (always visible for easy follow-ups)
+    st.markdown("---")
+    
+    # Check for auto-filled question from suggestion click
+    default_question = st.session_state.get('auto_question', '')
+    if default_question:
+        del st.session_state.auto_question  # Clear after use
+    
+    # Question input without repetitive header
+    if st.session_state.chat_history:
+        question_label = "💬 Ask a follow-up question:"
+        placeholder_text = "e.g., Can you explain that in more detail?"
+    else:
+        question_label = "❓ Ask your first question:"
+        placeholder_text = "e.g., What are the key criteria for revenue recognition under ASC 606?"
+    
+    question = st.text_input(
+        question_label,
+        value=default_question,
+        placeholder=placeholder_text,
+        key="question_input"
+    )
+    
+    # Submit button
+    if st.button("🔍 Get Answer", type="primary", disabled=not question.strip()):
+        if not question.strip():
+            st.warning("Please enter a question.")
+        else:
+            # Show loading spinner
+            with st.spinner(f"Searching {selected_standard} guidance..."):
+                # Get response
+                answer, suggestions = st.session_state.research_assistant.get_response(
+                    question, selected_standard
+                )
+                
+                # Add to chat history
+                timestamp = time.strftime("%I:%M %p")
+                st.session_state.chat_history.append((
+                    question, answer, suggestions, timestamp
+                ))
+                
+                # Rerun to show the new response
+                st.rerun()
+    
     # Display chat history
     if st.session_state.chat_history:
         st.markdown("## 💬 Conversation")
@@ -211,42 +255,6 @@ def render_research_assistant():
                                 st.rerun()
             
             st.markdown("")  # Spacing
-    
-    # Question input
-    st.markdown("## ❓ Ask a Question")
-    
-    # Check for auto-filled question from suggestion click
-    default_question = st.session_state.get('auto_question', '')
-    if default_question:
-        del st.session_state.auto_question  # Clear after use
-    
-    question = st.text_input(
-        "Type your question about the selected ASC standard:",
-        value=default_question,
-        placeholder="e.g., What are the key criteria for revenue recognition under ASC 606?",
-        key="question_input"
-    )
-    
-    # Submit button
-    if st.button("🔍 Get Answer", type="primary", disabled=not question.strip()):
-        if not question.strip():
-            st.warning("Please enter a question.")
-        else:
-            # Show loading spinner
-            with st.spinner(f"Searching {selected_standard} guidance..."):
-                # Get response
-                answer, suggestions = st.session_state.research_assistant.get_response(
-                    question, selected_standard
-                )
-                
-                # Add to chat history
-                timestamp = time.strftime("%I:%M %p")
-                st.session_state.chat_history.append((
-                    question, answer, suggestions, timestamp
-                ))
-                
-                # Rerun to show the new response
-                st.rerun()
     
     # Clear chat button
     if st.session_state.chat_history:
