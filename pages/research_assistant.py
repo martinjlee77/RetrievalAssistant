@@ -85,6 +85,12 @@ class ASCResearchAssistant:
             relevant_guidance = knowledge_base.search(question, max_results=10)
             
             # Generate response with citations
+            guidance_tokens = len(relevant_guidance)//4
+            chunk_count = len(relevant_guidance.split('Source:')) - 1
+            
+            # Show debug info in app
+            debug_container.info(f"🔍 **RAG Debug**: Retrieved {chunk_count} relevant chunks ({len(relevant_guidance):,} chars ≈ {guidance_tokens:,} tokens)")
+            
             answer = self._generate_answer(question, relevant_guidance, selected_standard)
             
             # Generate follow-up suggestions
@@ -268,12 +274,17 @@ def render_research_assistant():
         if not question.strip():
             st.warning("Please enter a question.")
         else:
-            # Show loading spinner
+            # Show loading spinner with debug info
             with st.spinner(f"Searching {selected_standard} guidance..."):
+                # Create debug info container
+                debug_container = st.empty()
                 # Get response
                 answer, suggestions = st.session_state.research_assistant.get_response(
                     question, selected_standard
                 )
+                
+                # Clear debug info
+                debug_container.empty()
                 
                 # Add to chat history
                 timestamp = time.strftime("%I:%M %p")
