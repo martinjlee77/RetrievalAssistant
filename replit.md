@@ -1,4 +1,4 @@
-# ASC 606 PDF Processing PoC
+# Multi-Standard Accounting Analysis Platform
 
 ## Overview
 This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 340-40, ASC 842). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform with high accuracy and efficiency.
@@ -6,12 +6,6 @@ This project is a multi-standard accounting analysis platform designed to genera
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes
-- **Enhanced Quote and Citation Logic** (August 26, 2025): Implemented refined prompt approach for better audit traceability and readability. Contract quotes now appear only when exact wording is outcome-determinative. ASC 606 guidance is paraphrased with pinpoint citations (e.g., [ASC 606-10-25-19]). Added "Because..." reasoning requirements to connect evidence to conclusions. Simplified formatting requirements removing legacy parsing-era rules while maintaining professional currency and spacing standards.
-- **Executive Summary Bug Fixed** (August 22, 2025): Fixed critical data structure issue causing executive summary hallucinations. Problem was double-nested structure `{'steps': analysis_results}` instead of direct `analysis_results` in conclusion extraction. Executive summaries now correctly use actual step conclusions with real financial data instead of generating fallback content with wrong amounts. System generates accurate, audit-ready executive summaries based on actual contract analysis.
-- **Markdown-Based 5-Call Architecture Implemented** (August 21, 2025): Successfully replaced complex parsing pipeline with direct markdown rendering approach. Each of the 5 ASC 606 steps now generates clean markdown content that's combined into complete professional memos. Eliminated the parsing corruption that caused formatting issues while maintaining the 5-call architecture for analysis quality. System now generates properly formatted memos with all step analysis included, using natural LLM markdown output without post-processing complexity.
-- **Simplified Architecture Implementation Complete** (August 20, 2025): Completely rebuilt the system with simplified, modular architecture. Removed complex JSON schemas in favor of natural language template-based memo generation. Implemented shared components (document processor, knowledge base, memo generator, UI components) that work across all standards. Created new simplified ASC 606 module with step analyzer and knowledge search. Added "Issues for Further Investigation" section to memos. Cleaned up unused legacy files (old analyzers, complex core modules). The system now has clear separation between standards while sharing common functionality.
-- **Knowledge Base Architecture Separation Complete** (August 14, 2025): Implemented clean separation with dedicated databases per standard. Fixed critical ASC 340-40 chunking issue (was only 9 chunks, now properly 126 chunks). Final architecture: ASC 606 (1,557 pure revenue chunks, 32MB), ASC 340-40 (126 contract cost chunks - 48 authoritative + 78 interpretative), ASC 842 (563 lease chunks, 14MB). The ASC 340-40 RAG system is now functional - previously was relying only on LLM general knowledge. Updated KnowledgeBaseManager with automatic standard-to-database routing.
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
 2. ALWAYS ask permission before changing any prompt text or templates.
@@ -24,64 +18,22 @@ Critical Development Rules - Prompt Protection:
 6. Violation consequences: User has to re-review entire codebase, causing significant frustration and lost work.
 7. MANDATORY ALERT PROTOCOL: If the AI agent cannot make a necessary change due to these prompt protection rules, it MUST explicitly alert the user with: "⚠️ PROMPT PROTECTION ALERT: I cannot modify [specific file/content] due to the prompt protection rules in replit.md. You will need to make this change manually. Here's exactly what needs to be changed: [specific instructions]".
 
-## ASC 606 Fine-Tuning Roadmap
-
-### Priority Files for Review/Editing (in order of importance):
-
-**1. asc606/step_analyzer.py** - CRITICAL
-- Contains all step-by-step analysis logic and prompts
-- Key areas to review: step_prompts, system_prompt, prompt generation logic
-- Fine-tune the 5-step methodology prompts for better analysis quality
-
-**2. asc606/knowledge_search.py** - HIGH PRIORITY  
-- Optimizes knowledge base search queries for each step
-- Review: step-specific query building, search term extraction
-- Note: Currently knowledge base collection doesn't exist (needs ASC 606 guidance loaded)
-
-**3. asc606/templates/memo_template.md** - HIGH PRIORITY
-- Controls final memo formatting and structure
-- Review: Professional language, section organization, Big 4 style formatting
-
-**4. shared/memo_generator.py** - MEDIUM PRIORITY
-- Template processing and section extraction logic
-- Review: How analysis results are formatted into memo sections
-
-**5. asc606/asc606_page.py** - MEDIUM PRIORITY
-- UI workflow and user experience
-- Review: Progress display, error handling, result presentation
-
-**6. shared/ui_components.py** - LOW PRIORITY
-- Shared UI elements and validation
-- Review: Input validation, user feedback, consistent styling
-
-**7. shared/knowledge_base.py** - LOW PRIORITY (infrastructure)
-- Knowledge base interface (works but needs ASC 606 collection created)
-
-**8. shared/document_processor.py** - LOW PRIORITY (working)
-- Document upload and processing (currently working well)
-
-### Implementation Status:
-- ✅ ASC 606 knowledge base collection active and working
-- ✅ 5-call markdown architecture successfully implemented
-- ✅ Direct markdown rendering eliminates parsing corruption
-- ✅ Professional memo generation with proper formatting
-- ✅ Step analysis prompts include specific formatting instructions
-
 ## System Architecture
 
 ### Multi-Standard Platform Architecture
 - **Frontend**: Streamlit multi-page application with a Home dashboard.
 - **Core System**: Modular components for analyzers, data models, knowledge base management, and UI helpers.
 - **Standard-Specific Pages**: Dedicated interfaces for different accounting standards (ASC 606, ASC 340-40, ASC 842).
-- **Knowledge Base**: Separated database architecture with dedicated ChromaDB instances per standard (asc606_knowledge_base/, asc340_knowledge_base/, asc842_knowledge_base/), using paragraph-aware chunking and topic classification.
+- **Research Assistant**: Integrated RAG-powered chat interface for methodology development, supporting standard-specific knowledge base selection and comprehensive guidance with authoritative citations.
+- **Knowledge Base**: Separated database architecture with dedicated ChromaDB instances per standard, using paragraph-aware chunking and topic classification.
 - **Document Processing**: Unified document extractor for various formats, including multi-document processing.
 - **Source Documents**: Standard-specific authoritative sources stored locally.
 
 ### Core Components and Design Decisions
+- **Standard Development Architecture**: Follows a "Copy-Tweak-Go" methodology for rapid deployment of new accounting standards, based on proven architectural patterns from ASC 606. This involves defining core methodology frameworks, contract term extraction matrices, knowledge search queries, decision point frameworks, and professional memo structures.
 - **Hybrid RAG System**: Combines metadata filtering with semantic search, enhanced by contract-specific term extraction, and a two-stage citation process for audit-ready evidence.
-- **Knowledge Base**: Contains comprehensive authoritative and interpretative guidance for ASC 606, ASC 340-40, and ASC 842.
 - **Map-Reduce Contract Processing**: Analyzes full documents using overlapping chunks to prevent truncation.
-- **Professional Memo Generation**: Produces Big 4 quality accounting memos (Technical Accounting Memos, Accounting Policy Memos) with narrative-driven analysis, professional formatting, dynamic table handling, and robust DOCX/HTML generation.
+- **Professional Memo Generation**: Produces Big 4 quality accounting memos with narrative-driven analysis, professional formatting, dynamic table handling, and robust DOCX/HTML generation.
 - **System Integrity Monitoring**: Comprehensive logging and validation for data quality.
 - **Performance Optimization**: Utilizes caching, persistent vector databases, and concurrent execution.
 - **Data Flow**: Ensures all user inputs flow systematically to the LLM for targeted analysis.
@@ -92,7 +44,7 @@ Critical Development Rules - Prompt Protection:
 - **Knowledge Hierarchy System**: Enhanced prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretive Guidance) and IAC framework.
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern for financial amounts, ensuring accuracy by using Python for calculations after AI extraction.
 - **Unified Financial Data Flow**: Ensures journal entries and financial impacts derive amounts exclusively from the hybrid calculation system.
-- **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards (ASC 606, ASC 340-40, ASC 842).
+- **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards.
 
 ## External Dependencies
 
@@ -102,7 +54,7 @@ Critical Development Rules - Prompt Protection:
 - **pdfplumber**: PDF text extraction.
 - **PyPDF2**: Basic PDF handling.
 - **ChromaDB**: Vector database for knowledge base.
-- **OpenAI API**: Large language model interactions (`gpt-4o`, `gpt-4o-mini`).
+- **OpenAI API**: Large language model interactions (`gpt-4o`, `gpt-4o-mini`, `gpt-5` for complex research).
 - **FPDF**: PDF generation.
 - **WeasyPrint**: HTML-to-PDF conversion.
 - **python-docx**: Word document generation.
