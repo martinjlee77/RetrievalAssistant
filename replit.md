@@ -65,21 +65,21 @@ Critical Development Rules - Prompt Protection:
 
 This section provides the systematic template for rapidly deploying new accounting standards using the proven ASC 606 architecture as foundation. To build a new standard tool, simply provide the methodology details below and the AI agent will generate all required components.
 
-### Standard Development Template: ASC 842
+### Standard Development Template: [ASC XXX]
 
 **🎯 Core Methodology Framework:**
 ```
 Step 1: [METHODOLOGY_STEP_1_TITLE]
 ├── Focus: [KEY_ACCOUNTING_CONCEPT]  
-├── Key Points: [DECISION_CRITERIA_LIST]
+├── Key Points: [DECISION_CRITERIA_LIST - includes embedded decision logic]
 ├── Citations: [ASC_PARAGRAPH_REFERENCES]
-└── Decision: [OUTPUT_DETERMINATION]
+└── Expected Output: [ANALYSIS_CONCLUSION_TYPE]
 
 Step 2: [METHODOLOGY_STEP_2_TITLE]  
 ├── Focus: [KEY_ACCOUNTING_CONCEPT]
-├── Key Points: [DECISION_CRITERIA_LIST] 
+├── Key Points: [DECISION_CRITERIA_LIST - includes embedded decision logic] 
 ├── Citations: [ASC_PARAGRAPH_REFERENCES]
-└── Decision: [OUTPUT_DETERMINATION]
+└── Expected Output: [ANALYSIS_CONCLUSION_TYPE]
 
 [Continue for all steps...]
 ```
@@ -105,9 +105,8 @@ step_queries = {
 ```
 Each step must provide:
 - Authoritative citations (specific ASC paragraphs)
-- Key analysis checklist (evaluation criteria)  
-- Decision logic (clear outcomes)
-- Financial impacts (quantitative conclusions)
+- Key analysis checklist (evaluation criteria with embedded decision logic)  
+- Clear analytical conclusions (integrated into step analysis)
 ```
 
 **📝 Professional Memo Structure:**
@@ -124,16 +123,16 @@ Required sections:
 Once methodology is provided, AI agent will automatically:
 
 1. **Create Core Components:**
-   - `[standard]/step_analyzer.py` - Main analysis orchestration
-   - `[standard]/knowledge_search.py` - Step-specific RAG queries
-   - `[standard]/[standard]_page.py` - Streamlit UI interface
-   - `[standard]/templates/memo_template.md` - Professional memo template
+   - `asc[XXX]/step_analyzer.py` - Main analysis orchestration (ASC[XXX]StepAnalyzer class)
+   - `asc[XXX]/knowledge_search.py` - Step-specific RAG queries (ASC[XXX]KnowledgeSearch class)
+   - `asc[XXX]/asc[XXX]_page.py` - Streamlit UI interface (render_asc[XXX]_page function)
+   - `asc[XXX]/templates/memo_template.md` - Professional memo template
 
 2. **Configure Technical Architecture:**
-   - 5-call markdown generation system
-   - Step-specific prompt engineering
-   - Contract term extraction logic
-   - Knowledge base integration (existing [standard]_knowledge_base/)
+   - Multi-call markdown generation system (adapted to standard's step count)
+   - Step-specific prompt engineering with key_points containing decision logic
+   - Contract term extraction logic for enhanced RAG queries
+   - Knowledge base integration (existing asc[XXX]_knowledge_base/)
 
 3. **Test Integration:**
    - RAG query optimization using Research Assistant
