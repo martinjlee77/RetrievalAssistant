@@ -1,0 +1,693 @@
+"""
+ASC 842 Step Analyzer
+
+This module handles the 5-step ASC 842 lease accounting analysis.
+Simplified, natural language approach with clear reasoning chains.
+"""
+
+import openai
+import os
+import logging
+import time
+import re
+import random
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+
+logger = logging.getLogger(__name__)
+
+class ASC842StepAnalyzer:
+    """
+    Simplified ASC 842 step-by-step analyzer using natural language output.
+    No complex JSON schemas - just clear, professional analysis.
+    """
+    
+    def __init__(self):
+        """Initialize the analyzer."""
+        # Set up OpenAI client  
+        self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY environment variable not set")
+        
+        # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
+        # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
+        self.use_premium_models = False
+        
+        # Model selection based on configuration
+        if self.use_premium_models:
+            self.main_model = "gpt-5"           # For 5-step analysis
+            self.light_model = "gpt-5-mini"     # For summaries/background
+        else:
+            self.main_model = "gpt-4o"          # For 5-step analysis  
+            self.light_model = "gpt-4o-mini"    # For summaries/background
+            
+        # Backward compatibility
+        self.model = self.main_model
+        
+        # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
+        self.step_prompts = self._load_step_prompts()
+    
+    def _get_temperature(self, model_name=None):
+        """Get appropriate temperature based on model."""
+        target_model = model_name or self.model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            return 1  # GPT-5 models only support default temperature of 1
+        else:
+            return 0.3  # GPT-4o models can use 0.3
+    
+    def _get_max_tokens_param(self, request_type="default", model_name=None):
+        """Get appropriate max tokens parameter based on model and request type."""
+        target_model = model_name or self.model
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # GPT-5 models need high token counts due to reasoning overhead
+            token_limits = {
+                "step_analysis": 8000,
+                "executive_summary": 8000,
+                "background": 8000,
+                "conclusion": 8000,
+                "default": 8000
+            }
+            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+        else:
+            # GPT-4o models use standard limits
+            token_limits = {
+                "step_analysis": 2000,
+                "executive_summary": 1000,
+                "background": 500,
+                "conclusion": 800,
+                "default": 2000
+            }
+            return {"max_tokens": token_limits.get(request_type, 2000)}
+    
+    def analyze_lease_contract(self, 
+                        contract_text: str,
+                        authoritative_context: str,
+                        entity_name: str,
+                        analysis_title: str,
+                        user_inputs: Dict[str, Any],
+                        additional_context: str = "") -> Dict[str, Any]:
+        """
+        Perform complete 5-step ASC 842 analysis.
+        
+        Args:
+            contract_text: The lease contract document text
+            authoritative_context: Retrieved ASC 842 guidance
+            entity_name: Entity name
+            analysis_title: Analysis title
+            user_inputs: User-provided lease data (discount rate, dates, assessments, etc.)
+            additional_context: Optional user-provided context
+            
+        Returns:
+            Dictionary containing analysis results for each step
+        """
+        logger.info(f"Starting ASC 842 analysis for {entity_name}")
+        
+        # Add large contract warning
+        word_count = len(contract_text.split())
+        if word_count > 50000:
+            logger.warning(f"Large contract ({word_count} words). Consider splitting if analysis fails.")
+        
+        results = {
+            'customer_name': entity_name,
+            'analysis_title': analysis_title,
+            'analysis_date': datetime.now().strftime("%B %d, %Y"),
+            'user_inputs': user_inputs,
+            'steps': {}
+        }
+        
+        # Analyze steps in parallel with error recovery
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Submit all step analyses
+            futures = {
+                executor.submit(
+                    self._analyze_step_with_retry,
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    entity_name=entity_name,
+                    user_inputs=user_inputs,
+                    additional_context=additional_context
+                ): step_num
+                for step_num in range(1, 6)
+            }
+            
+            # Collect results as they complete
+            for future in futures:
+                step_num = futures[future]
+                try:
+                    results['steps'][f'step_{step_num}'] = future.result()
+                    logger.info(f"Completed Step {step_num}")
+                except Exception as e:
+                    logger.error(f"Final error in Step {step_num}: {str(e)}")
+                    results['steps'][f'step_{step_num}'] = {
+                        'title': self._get_step_title(step_num),
+                        'analysis': f"Error analyzing this step: {str(e)}",
+                        'conclusion': "Analysis incomplete due to error"
+                    }
+        
+        # Generate additional sections using clean LLM calls
+        logger.info("DEBUG: Starting additional section generation...")
+        logger.info(f"DEBUG: Results structure keys: {results.keys()}")
+        logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
+        
+        # DEBUG: Log step data before extraction
+        logger.info(f"DEBUG: About to extract conclusions from steps: {list(results['steps'].keys())}")
+        for step_key, step_data in results['steps'].items():
+            if isinstance(step_data, dict):
+                logger.info(f"DEBUG: {step_key} structure: {list(step_data.keys())}")
+                if 'markdown_content' in step_data:
+                    content = step_data['markdown_content']
+                    logger.info(f"DEBUG: {step_key} content length: {len(content)}")
+        
+        conclusions_text = self._extract_conclusions_from_steps(results['steps'])
+        logger.info(f"DEBUG: Extracted conclusions text length: {len(conclusions_text)} chars")
+        
+        # Generate executive summary, background, and conclusion
+        logger.info("Generating executive summary...")
+        results['executive_summary'] = self.generate_executive_summary(conclusions_text, entity_name, user_inputs)
+        logger.info("Generating background...")
+        results['background'] = self.generate_background_section(conclusions_text, entity_name, user_inputs)
+        logger.info("Generating conclusion...")
+        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        logger.info("DEBUG: All additional sections generated successfully")
+        
+        logger.info("ASC 842 analysis completed successfully")
+        return results
+    
+    def _analyze_step_with_retry(self,
+                               step_num: int,
+                               contract_text: str,
+                               authoritative_context: str,
+                               entity_name: str,
+                               user_inputs: Dict[str, Any],
+                               additional_context: str = "") -> Dict[str, str]:
+        """Analyze a single step with enhanced retry logic for production scalability."""
+        max_retries = 4  # Increased from 2
+        base_delay = 1
+        
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Analyzing Step {step_num} (attempt {attempt + 1})")
+                return self._analyze_step(
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    entity_name=entity_name,
+                    user_inputs=user_inputs,
+                    additional_context=additional_context
+                )
+            except openai.RateLimitError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Rate limit exceeded for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"OpenAI API rate limit exceeded. Please try again in a few minutes or contact support if this persists.")
+                
+                # Exponential backoff with jitter for rate limits
+                delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                logger.warning(f"Rate limit hit for Step {step_num}. Waiting {delay:.1f}s before retry {attempt + 2}")
+                time.sleep(delay)
+                
+            except openai.APITimeoutError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"API timeout for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"OpenAI API timeout. Please check your connection and try again.")
+                
+                delay = base_delay * (1.5 ** attempt)
+                logger.warning(f"API timeout for Step {step_num}. Retrying in {delay:.1f}s")
+                time.sleep(delay)
+                
+            except openai.APIConnectionError as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"API connection error for Step {step_num} after {max_retries} attempts")
+                    raise RuntimeError(f"Unable to connect to OpenAI API. Please check your internet connection.")
+                
+                delay = base_delay * (1.5 ** attempt)
+                logger.warning(f"Connection error for Step {step_num}. Retrying in {delay:.1f}s")
+                time.sleep(delay)
+                
+            except openai.APIError as e:
+                # Handle other API errors
+                error_msg = str(e).lower()
+                if "rate" in error_msg or "quota" in error_msg:
+                    # Treat as rate limit even if not caught above
+                    if attempt == max_retries - 1:
+                        raise RuntimeError(f"OpenAI API quota/rate limit issue. Please try again later.")
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    logger.warning(f"API quota issue for Step {step_num}. Waiting {delay:.1f}s")
+                    time.sleep(delay)
+                else:
+                    logger.error(f"OpenAI API error for Step {step_num}: {str(e)}")
+                    raise RuntimeError(f"OpenAI API error: {str(e)}")
+                    
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Unexpected error for Step {step_num} after {max_retries} attempts: {str(e)}")
+                    raise RuntimeError(f"Analysis failed for Step {step_num}: {str(e)}")
+                else:
+                    delay = base_delay * (1.2 ** attempt)
+                    logger.warning(f"Unexpected error for Step {step_num}. Retrying in {delay:.1f}s: {str(e)}")
+                    time.sleep(delay)
+        
+        # This should never be reached
+        raise RuntimeError(f"Unexpected error: Step {step_num} analysis failed without proper error handling")
+    
+    def _analyze_step(self, 
+                     step_num: int,
+                     contract_text: str,
+                     authoritative_context: str,
+                     entity_name: str,
+                     user_inputs: Dict[str, Any],
+                     additional_context: str = "") -> Dict[str, str]:
+        """Analyze a single ASC 842 step - returns clean markdown."""
+        
+        # Get step-specific prompt for markdown output
+        prompt = self._get_step_markdown_prompt(
+            step_num=step_num,
+            contract_text=contract_text,
+            authoritative_context=authoritative_context,
+            entity_name=entity_name,
+            user_inputs=user_inputs,
+            additional_context=additional_context
+        )
+        
+        # Make API call
+        try:
+            logger.info(f"DEBUG: Making API call to {self.model} for Step {step_num}")
+            # Build request parameters
+            request_params = {
+                "model": self.model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": self._get_markdown_system_prompt()
+                    },
+                    {
+                        "role": "user", 
+                        "content": prompt
+                    }
+                ],
+                **self._get_max_tokens_param("step_analysis"),
+                "temperature": self._get_temperature()
+            }
+            
+            # Add response_format only for GPT-5
+            if self.model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            markdown_content = response.choices[0].message.content
+            
+            if markdown_content is None:
+                logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
+                markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
+            else:
+                # Content received successfully
+                
+                # ONLY strip whitespace - NO OTHER PROCESSING
+                markdown_content = markdown_content.strip()
+                
+                # Log sample of clean content for verification
+                logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
+            
+            # Return clean markdown content - NO PROCESSING
+            return {
+                'title': self._get_step_title(step_num),
+                'markdown_content': markdown_content,
+                'step_num': str(step_num)
+            }
+            
+        except Exception as e:
+            logger.error(f"API error in step {step_num}: {str(e)}")
+            raise
+    
+    def _get_markdown_system_prompt(self) -> str:
+        """Get the system prompt for markdown generation."""
+        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 842 lease accounting. 
+
+Generate professional accounting analysis in clean markdown format. Your output will be displayed directly using markdown rendering.
+
+Your analysis must be:
+- Audit-ready and professional
+- Clear and understandable
+- Based on the evidence provided in the lease contract text
+- Based on authoritative guidance
+- Include explicit reasoning with "because" statements
+- Support your analysis with specific contract text and authoritative citations
+- Use direct quotes from the lease contract only when the exact wording is outcome-determinative
+- Paraphrase ASC 842 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
+- Incorporate user-provided inputs (discount rate, assessments, policy elections) appropriately
+- Acknowledge any limitations or gaps in information
+- Formatted as clean, ready-to-display markdown
+
+Follow ALL formatting instructions in the user prompt precisely."""
+    
+    def _get_step_markdown_prompt(self, 
+                        step_num: int,
+                        contract_text: str, 
+                        authoritative_context: str,
+                        entity_name: str,
+                        user_inputs: Dict[str, Any],
+                        additional_context: str = "") -> str:
+        """Generate markdown prompt for a specific step."""
+        
+        # Define step information based on ASC 842 methodology provided
+        step_info = {
+            1: {
+                'title': 'Step 1: Scope, identify a lease, and determine the enforceable period and lease term',
+                'focus': 'Confirm the arrangement is (or contains) a lease and establish the enforceable period and lease term',
+                'key_points': [
+                    'A contract contains a lease if it conveys the right to control the use of an identified asset for a period of time in exchange for consideration [ASC 842-10-15-3; 842-10-15-9 through 15-16]',
+                    'Scope exclusions include leases of certain intangible assets, biological assets, and inventory [ASC 842-10-15-2]',
+                    'Enforceable period: a contract is no longer enforceable when both parties can terminate without more than an insignificant penalty; assess lease term only within the enforceable period [Master Glossary: Enforceable; Lease Term; Noncancellable]',
+                    'Substitution rights: if the supplier\'s substitution right is substantive, the asset is not identified [ASC 842-10-15-9 through 15-14]',
+                    'Embedded derivatives may require bifurcation under ASC 815; the lease itself is not a derivative [ASC 815-10-15; 815-15]',
+                    'Lease term: noncancellable period plus periods covered by options to extend (if reasonably certain to exercise), options to terminate (if reasonably certain not to exercise), and specified lessor-controlled periods [Master Glossary: Lease Term; ASC 842-10-35-1 through 35-3; 842-10-55-23 through 55-26]',
+                    'Reassess lease term upon specified events (e.g., significant event/change in circumstances within the lessee\'s control affecting option assessments) [ASC 842-10-35-1 through 35-3]',
+                    'Both‑party termination rights generally cap the enforceable period at the earliest date either party can terminate without more than an insignificant penalty [Master Glossary: Enforceable]',
+                    'If only the lessee has a termination right, treat it as a lessee termination option when determining the lease term [ASC 842-10-55-24]'
+                ]
+            },
+            2: {
+                'title': 'Step 2: Identify components and determine lease payments',
+                'focus': 'Separate lease vs nonlease components (or elect not to separate) and determine payments included in the lease liability',
+                'key_points': [
+                    'Identify lease components (right to use each underlying asset) and nonlease components (e.g., services, CAM); administrative tasks are not components [ASC 842-10-15-28 through 15-31]',
+                    'Allocation: If not electing the practical expedient, allocate consideration to components based on relative standalone prices [ASC 842-10-15-32 through 15-36]',
+                    'Practical expedient: By class of underlying asset, you may elect to not separate nonlease components; account for combined consideration as a single lease component [ASC 842-10-15-37 through 15-38]',
+                    'Ownership-level costs paid by the lessor (e.g., property taxes/insurance) that are reimbursed by the lessee are typically nonlease components unless in‑substance fixed lease payments [ASC 842-10-15-30]',
+                    'Include in lease payments: fixed payments (including in‑substance fixed), variable payments that depend on an index or a rate (measured using the index/rate at commencement), amounts probable under residual value guarantees, purchase option price if reasonably certain to exercise, and termination penalties consistent with lease‑term assessment; reduce for lease incentives receivable [ASC 842-20-30-5]',
+                    'Exclude usage/performance‑based variable payments that are not in‑substance fixed; expense as incurred [ASC 842-20-25]'
+                ]
+            },
+            3: {
+                'title': 'Step 3: Classify the lease and measure at commencement',
+                'focus': 'Decide finance vs operating classification and measure the lease liability and ROU asset on the commencement date (using the user‑provided discount rate)',
+                'key_points': [
+                    'Classification: Finance if any of the five criteria are met (transfer of ownership, reasonably certain purchase option, lease term is a major part of remaining economic life, PV of payments is substantially all of fair value, or no alternative use); otherwise operating [ASC 842-10-25-2]',
+                    'Classification is not reassessed after commencement unless certain modifications/remeasurements occur [ASC 842-10-25-8]',
+                    'Commencement date is when the asset is made available for use; measure and recognize at that date [ASC 842-10-55]',
+                    'Recognize a lease liability at the present value of lease payments (use the user‑provided rate) and an ROU asset measured as: lease liability + prepaid lease payments + initial direct costs – lease incentives received/receivable [ASC 842-20-25-1; 842-20-30-1; 842-20-30-5]',
+                    'Initial direct costs are narrowly defined as incremental costs that would not have been incurred if the lease had not been obtained [Master Glossary; ASC 842-10-30]',
+                    'Include asset retirement obligations (if any) in the ROU asset per ASC 410 (not in the lease liability) [ASC 410; ASC 842-20-30-1]',
+                    'Short‑term lease policy: if elected and criteria met (12 months or less and no purchase option), do not recognize ROU asset/liability; recognize lease cost generally straight‑line [ASC 842-20-25-2]'
+                ]
+            },
+            4: {
+                'title': 'Step 4: Produce initial accounting outputs',
+                'focus': 'Document and output the initial recognition, classification, calculations, and required notes',
+                'key_points': [
+                    'Provide classification conclusion and rationale with citations [ASC 842-10-25-2]',
+                    'Show the lease payments included in the liability by category and the present value calculation [ASC 842-20-30-5]',
+                    'Provide commencement‑date journal entries (ROU asset, lease liability, and any prepaid/incentive/initial direct cost effects) [ASC 842-20-25-1; 842-20-30-1]',
+                    'Identify initial presentation and disclosure data points (policy elections such as short‑term and non‑separation expedient; significant judgments such as "reasonably certain") [ASC 842-20-45-1; 842-20-50-1]'
+                ]
+            },
+            5: {
+                'title': 'Step 5: Reminders beyond initial recognition (no computations)',
+                'focus': 'Keep in view subsequent accounting, remeasurement triggers, modifications, subleases, and disclosures for later periods',
+                'key_points': [
+                    'Subsequent accounting: finance leases recognize interest on the liability and amortization of the ROU asset; operating leases recognize a single lease cost generally straight‑line; variable payments excluded from the liability are expensed when incurred [ASC 842-20-25; ASC 842-10-55-229]',
+                    'Remeasurement triggers: change in lease term or purchase option assessment; change in expected RVG amounts; resolution of contingencies that make payments fixed; modifications not accounted for as separate. Do not remeasure solely for changes in an index or a rate; under ASC 842 such changes are expensed as variable lease cost unless remeasurement is required for another reason [ASC 842-10-35-1 through 35-3; 842-10-25-8 through 25-10]',
+                    'Modifications: assess whether separate contract; if not separate, remeasure, reallocate, and reassess classification [ASC 842-10-25-8 through 25-10]',
+                    'Subleases/assignments: a sublease creates an intermediate lessor; classify the sublease by reference to the head‑lease ROU asset; derecognize the head lease only upon legal release/novation (termination) [ASC 842-10 (Subleases); ASC 842-20-40]',
+                    'Presentation/disclosures: separate presentation (or disclosure) of operating vs finance ROU assets and lease liabilities, maturity analysis, lease cost components, and significant judgments [ASC 842-20-45-1; 842-20-50-1]'
+                ]
+            }
+        }
+        
+        step = step_info[step_num]
+        
+        prompt = f"""
+STEP {step_num}: {step['title'].upper()}
+
+OBJECTIVE: {step['focus']}
+
+LEASE CONTRACT INFORMATION:
+Contract Analysis: Analyze the lease contract from the lessee perspective for the entity {entity_name} to determine the appropriate lease accounting treatment under ASC 842.
+
+Instructions: Analyze this lease contract from the lessee's perspective. The entity is the lessee receiving the right to use the underlying asset.
+
+LEASE CONTRACT TEXT:
+{contract_text}"""
+
+        if additional_context.strip():
+            prompt += f"""
+
+ADDITIONAL CONTEXT:
+{additional_context}"""
+
+        # Add user inputs section
+        prompt += f"""
+
+USER-PROVIDED INPUTS:
+- Discount Rate: {user_inputs.get('discount_rate', 'Not provided')}%
+- Commencement Date: {user_inputs.get('commencement_date', 'Not provided')}
+- Related-Party Lease: {'Yes' if user_inputs.get('related_party_flag') else 'No'}"""
+
+        # Add reasonably certain assessments if provided
+        if any(key in user_inputs for key in ['extend_reasonably_certain', 'terminate_reasonably_not_exercised', 'purchase_option_reasonably_certain']):
+            prompt += f"""
+- Extension Option Assessment: {user_inputs.get('extend_reasonably_certain', 'N/A')}
+- Termination Option Assessment: {user_inputs.get('terminate_reasonably_not_exercised', 'N/A')}  
+- Purchase Option Assessment: {user_inputs.get('purchase_option_reasonably_certain', 'N/A')}"""
+
+        # Add policy elections if provided
+        if 'expedient_nonlease_not_separated' in user_inputs:
+            prompt += f"""
+- Nonlease Components Policy: {'Elect not to separate' if user_inputs.get('expedient_nonlease_not_separated') else 'Separate components'}"""
+
+        if 'policy_short_term' in user_inputs:
+            prompt += f"""
+- Short-term Lease Policy: {'Elected' if user_inputs.get('policy_short_term') else 'Not elected'}"""
+
+        prompt += f"""
+
+AUTHORITATIVE GUIDANCE:
+{authoritative_context}
+
+ANALYSIS REQUIRED:
+Analyze the lease contract for Step {step_num} focusing on:
+{chr(10).join([f"• {point}" for point in step['key_points']])}
+
+REQUIRED OUTPUT FORMAT (Clean Markdown):
+
+### {step['title']}
+
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 842 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 842 with pinpoint citations and use only brief decisive phrases when directly supportive. Incorporate the user-provided inputs where relevant to the analysis.]
+
+**Analysis:** [Detailed analysis with supporting evidence. Include:
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Lease Agreement §X.Y, p. N])
+- ASC 842 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 842-10-25-2])
+- User-provided inputs incorporated where relevant (discount rate, assessments, policy elections)
+- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+
+**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 842 citation.]
+
+**Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Format currency as: $240,000 (with comma, no spaces)
+- Use proper spacing after periods and commas
+- Use professional accounting language
+- Double-check all currency amounts for correct formatting
+
+"""
+        
+        return prompt
+    
+    def _get_step_title(self, step_num: int) -> str:
+        """Get the title for a step."""
+        titles = {
+            1: "Step 1: Scope, identify a lease, and determine the enforceable period and lease term",
+            2: "Step 2: Identify components and determine lease payments", 
+            3: "Step 3: Classify the lease and measure at commencement",
+            4: "Step 4: Produce initial accounting outputs",
+            5: "Step 5: Reminders beyond initial recognition"
+        }
+        return titles.get(step_num, f"Step {step_num}")
+    
+    def _extract_conclusions_from_steps(self, steps_data: Dict[str, Any]) -> str:
+        """Extract conclusion text from all completed steps."""
+        conclusions = []
+        logger.info(f"Extracting conclusions from {len(steps_data)} steps")
+        logger.info(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
+        
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in steps_data:
+                step_data = steps_data[step_key]
+                if isinstance(step_data, dict) and 'markdown_content' in step_data:
+                    # Extract conclusion from markdown content
+                    markdown_content = step_data['markdown_content']
+                    
+                    # Look for conclusion section in markdown
+                    conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*([^*]+)', markdown_content, re.IGNORECASE | re.DOTALL)
+                    if conclusion_match:
+                        conclusion_text = conclusion_match.group(1).strip()
+                        conclusions.append(f"Step {step_num}: {conclusion_text}")
+                        logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
+                    else:
+                        logger.warning(f"DEBUG: No conclusion found in step {step_num} markdown")
+                else:
+                    logger.warning(f"DEBUG: Step {step_num} missing markdown_content")
+        
+        combined_conclusions = "\n\n".join(conclusions)
+        logger.info(f"DEBUG: Combined conclusions length: {len(combined_conclusions)}")
+        return combined_conclusions
+    
+    def generate_executive_summary(self, conclusions_text: str, entity_name: str, user_inputs: Dict[str, Any]) -> str:
+        """Generate executive summary based on step conclusions."""
+        logger.info(f"DEBUG: Generating executive summary. Model: {self.model}")
+        
+        try:
+            request_params = {
+                "model": self.light_model,  # Use light model for summary
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are generating an executive summary for an ASC 842 lease accounting memorandum. Create a concise, professional summary that captures the key findings and conclusions from the 5-step analysis."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Based on the following step-by-step analysis conclusions, generate a professional executive summary for an ASC 842 lease accounting memorandum for {entity_name}.
+
+User-provided inputs:
+- Discount Rate: {user_inputs.get('discount_rate', 'Not specified')}%
+- Commencement Date: {user_inputs.get('commencement_date', 'Not specified')}
+- Related-Party: {'Yes' if user_inputs.get('related_party_flag') else 'No'}
+
+Step Conclusions:
+{conclusions_text}
+
+Write a concise executive summary (2-3 paragraphs) that:
+1. States the overall conclusion about the lease arrangement
+2. Highlights the key classification and measurement determinations
+3. Notes any significant judgments or policy elections
+4. Is suitable for senior management review
+
+Format as clean markdown."""
+                    }
+                ],
+                **self._get_max_tokens_param("executive_summary", self.light_model),
+                "temperature": self._get_temperature(self.light_model)
+            }
+            
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            summary = response.choices[0].message.content
+            if summary is None:
+                summary = "Executive summary could not be generated."
+                
+            logger.info(f"DEBUG: Generated executive summary ({len(summary)} chars)")
+            return summary.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating executive summary: {str(e)}")
+            return f"Error generating executive summary: {str(e)}"
+    
+    def generate_background_section(self, conclusions_text: str, entity_name: str, user_inputs: Dict[str, Any]) -> str:
+        """Generate background section for the memo."""
+        logger.info(f"DEBUG: Generating background section. Model: {self.light_model}")
+        
+        try:
+            request_params = {
+                "model": self.light_model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are generating a background section for an ASC 842 lease accounting memorandum. Create a professional background that sets the context for the analysis."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Generate a professional background section for an ASC 842 lease accounting memorandum for {entity_name}.
+
+Context:
+- Entity: {entity_name}
+- Analysis Date: {datetime.now().strftime('%B %Y')}
+- Discount Rate Used: {user_inputs.get('discount_rate', 'User-specified')}%
+- Commencement Date: {user_inputs.get('commencement_date', 'As specified in contract')}
+
+Write a brief background section (1 paragraph) that:
+1. States the purpose of the memorandum
+2. Describes the lease arrangement being analyzed
+3. References the ASC 842 methodology being applied
+4. Notes any significant user inputs or policy elections
+
+Format as clean markdown."""
+                    }
+                ],
+                **self._get_max_tokens_param("background", self.light_model),
+                "temperature": self._get_temperature(self.light_model)
+            }
+            
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            background = response.choices[0].message.content
+            if background is None:
+                background = f"We have reviewed the lease agreement for {entity_name} to determine the appropriate accounting treatment under ASC 842."
+                
+            logger.info(f"DEBUG: Generated background section ({len(background)} chars)")
+            return background.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating background section: {str(e)}")
+            return f"We have reviewed the lease agreement for {entity_name} to determine the appropriate accounting treatment under ASC 842. This memorandum presents our analysis following the five-step ASC 842 methodology."
+    
+    def generate_conclusion_section(self, conclusions_text: str) -> str:
+        """Generate overall conclusion section for the memo."""
+        logger.info(f"DEBUG: Generating conclusion section. Model: {self.light_model}")
+        
+        try:
+            request_params = {
+                "model": self.light_model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are generating a conclusion section for an ASC 842 lease accounting memorandum. Create a professional conclusion that synthesizes the analysis findings."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Based on the following step conclusions, generate a professional conclusion section for an ASC 842 lease accounting memorandum.
+
+Step Conclusions:
+{conclusions_text}
+
+Write a conclusion section (2-3 paragraphs) that:
+1. Synthesizes the key findings from all steps
+2. States the final accounting treatment determination
+3. Notes any areas requiring management judgment or future monitoring
+4. Provides clear direction for implementation
+
+Format as clean markdown."""
+                    }
+                ],
+                **self._get_max_tokens_param("conclusion", self.light_model),
+                "temperature": self._get_temperature(self.light_model)
+            }
+            
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            conclusion = response.choices[0].message.content
+            if conclusion is None:
+                conclusion = "Based on our analysis, the arrangement should be accounted for under ASC 842."
+                
+            logger.info(f"DEBUG: Generated conclusion section ({len(conclusion)} chars)")
+            return conclusion.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating conclusion section: {str(e)}")
+            return f"Based on our analysis of the lease agreement under ASC 842, we have determined the appropriate accounting treatment and classification."
+    
+    def _load_step_prompts(self):
+        """Load step prompts - placeholder for future use."""
+        return {}
