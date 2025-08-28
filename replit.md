@@ -10,8 +10,8 @@ Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
 2. ALWAYS ask permission before changing any prompt text or templates.
 3. Protected files requiring user approval for content changes:
-   - `utils/step_prompts.py` (all prompt methods)
-   - `pages/asc606.py` (form labels, help text, user-facing content)
+   - `asc606/asc606_page.py` (form labels, help text, user-facing content)
+   - `asc606/step_analyzer.py` (all prompt methods and analysis instructions)
    - Any file containing user-facing text or analysis instructions.
 4. Safe technical changes (no approval needed): Bug fixes to code logic/structure, adding missing methods/functions, performance improvements, import statements and technical infrastructure.
 5. When in doubt: Always ask the user before making ANY content changes.
@@ -60,3 +60,96 @@ Critical Development Rules - Prompt Protection:
 - **python-docx**: Word document generation.
 - **Camelot & Tabula-py**: Table extraction from PDFs.
 - **PyMuPDF**: Coordinate-based layout analysis in PDF processing.
+
+## Copy-Tweak-Go Standard Development Architecture
+
+This section provides the systematic template for rapidly deploying new accounting standards using the proven ASC 606 architecture as foundation. To build a new standard tool, simply provide the methodology details below and the AI agent will generate all required components.
+
+### Standard Development Template: ASC 842
+
+**🎯 Core Methodology Framework:**
+```
+Step 1: [METHODOLOGY_STEP_1_TITLE]
+├── Focus: [KEY_ACCOUNTING_CONCEPT]  
+├── Key Points: [DECISION_CRITERIA_LIST]
+├── Citations: [ASC_PARAGRAPH_REFERENCES]
+└── Decision: [OUTPUT_DETERMINATION]
+
+Step 2: [METHODOLOGY_STEP_2_TITLE]  
+├── Focus: [KEY_ACCOUNTING_CONCEPT]
+├── Key Points: [DECISION_CRITERIA_LIST] 
+├── Citations: [ASC_PARAGRAPH_REFERENCES]
+└── Decision: [OUTPUT_DETERMINATION]
+
+[Continue for all steps...]
+```
+
+**🔍 Contract Term Extraction Matrix:**
+```
+Step 1 Terms: [contract_terms, legal_terms, threshold_terms]
+Step 2 Terms: [classification_terms, measurement_terms, option_terms]  
+Step 3 Terms: [payment_terms, variable_terms, calculation_terms]
+[Continue for all steps...]
+```
+
+**💡 Knowledge Search Queries:**
+```
+step_queries = {
+    1: "[authoritative_guidance_keywords] [standard_citation] [decision_keywords]",
+    2: "[classification_keywords] [measurement_keywords] [standard_citation]", 
+    [Continue for all steps...]
+}
+```
+
+**✅ Decision Point Framework:**
+```
+Each step must provide:
+- Authoritative citations (specific ASC paragraphs)
+- Key analysis checklist (evaluation criteria)  
+- Decision logic (clear outcomes)
+- Financial impacts (quantitative conclusions)
+```
+
+**📝 Professional Memo Structure:**
+```
+Required sections:
+- Executive Summary
+- Background  
+- [STANDARD_NAME] Analysis (contains all step results)
+- Conclusion
+- Issues for Further Investigation (if applicable)
+```
+
+**🚀 Deployment Instructions:**
+Once methodology is provided, AI agent will automatically:
+
+1. **Create Core Components:**
+   - `[standard]/step_analyzer.py` - Main analysis orchestration
+   - `[standard]/knowledge_search.py` - Step-specific RAG queries
+   - `[standard]/[standard]_page.py` - Streamlit UI interface
+   - `[standard]/templates/memo_template.md` - Professional memo template
+
+2. **Configure Technical Architecture:**
+   - 5-call markdown generation system
+   - Step-specific prompt engineering
+   - Contract term extraction logic
+   - Knowledge base integration (existing [standard]_knowledge_base/)
+
+3. **Test Integration:**
+   - RAG query optimization using Research Assistant
+   - Citation validation against authoritative guidance  
+   - End-to-end memo generation workflow
+   - UI/UX consistency with existing standards
+
+**⚠️ DEVELOPMENT PROTOCOL:**
+- AI agent will build complete working tool based on methodology provided
+- No user coding required - just provide accounting methodology details
+- Follows same architectural patterns as proven ASC 606 system
+- Maintains prompt protection rules for all user-provided content
+- Leverages existing shared components (document processing, knowledge base, memo generation)
+
+### Standard Development Status Tracker:
+- ✅ ASC 606: Complete production system
+- ✅ ASC 340-40: Complete production system  
+- 🔄 ASC 842: Ready for methodology input and automated deployment
+- 📋 Future standards: Template ready for rapid deployment
