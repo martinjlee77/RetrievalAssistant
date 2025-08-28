@@ -10,8 +10,8 @@ Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
 2. ALWAYS ask permission before changing any prompt text or templates.
 3. Protected files requiring user approval for content changes:
-   - `asc606/asc606_page.py` (form labels, help text, user-facing content)
-   - `asc606/step_analyzer.py` (all prompt methods and analysis instructions)
+   - `asc[XXX]/asc[XXX]_page.py` (form labels, help text, user-facing content)
+   - `asc[XXX]/step_analyzer.py` (all prompt methods and analysis instructions)
    - Any file containing user-facing text or analysis instructions.
 4. Safe technical changes (no approval needed): Bug fixes to code logic/structure, adding missing methods/functions, performance improvements, import statements and technical infrastructure.
 5. When in doubt: Always ask the user before making ANY content changes.
@@ -84,30 +84,33 @@ Step 2: [METHODOLOGY_STEP_2_TITLE]
 [Continue for all steps...]
 ```
 
-**🔍 Contract Term Extraction Matrix:**
+
+**📋 What You Need to Provide for New ASC Standard:**
+
+**ONLY provide the core methodology - I'll generate everything else automatically:**
+
 ```
-Step 1 Terms: [contract_terms, legal_terms, threshold_terms]
-Step 2 Terms: [classification_terms, measurement_terms, option_terms]  
-Step 3 Terms: [payment_terms, variable_terms, calculation_terms]
-[Continue for all steps...]
+🎯 METHODOLOGY REQUIREMENTS:
+
+Step 1: [Step Title]
+├── Focus: [What this step analyzes]  
+├── Key Points: [Bullet list of evaluation criteria with embedded decision logic]
+├── Citations: [Specific ASC paragraph references]
+
+Step 2: [Step Title]  
+├── Focus: [What this step analyzes]
+├── Key Points: [Bullet list of evaluation criteria with embedded decision logic]
+├── Citations: [Specific ASC paragraph references]
+
+[Continue for all steps in your standard...]
 ```
 
-**💡 Knowledge Search Queries:**
-```
-step_queries = {
-    1: "[authoritative_guidance_keywords] [standard_citation] [decision_keywords]",
-    2: "[classification_keywords] [measurement_keywords] [standard_citation]", 
-    [Continue for all steps...]
-}
-```
-
-**✅ Decision Point Framework:**
-```
-Each step must provide:
-- Authoritative citations (specific ASC paragraphs)
-- Key analysis checklist (evaluation criteria with embedded decision logic)  
-- Clear analytical conclusions (integrated into step analysis)
-```
+**✅ What I'll Generate Automatically:**
+- Knowledge search queries (based on your methodology concepts)
+- Contract term extraction logic (derived from your key points and focus areas)  
+- All technical components (step_analyzer.py, page.py, etc.)
+- Professional memo template
+- UI integration
 
 **📝 Professional Memo Structure:**
 ```
