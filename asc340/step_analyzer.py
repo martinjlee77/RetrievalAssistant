@@ -346,12 +346,11 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scoping and Incremental Test',
                 'focus': 'Determine whether the commission plan is within the scope and capitalizable under ASC 340-40',
                 'key_points': [
-                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer',
-                    'All other costs to obtain a contract regardless of whether they are incremental or not are within the scope of ASC 34-40',
-                    'This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-2 to 15-8)',
+                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is the company's employee or agent (third party) or the company's customer.',
+                    'This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-5 to 25-8)',
                     'Capitalize (i.e., recognize an asset) if and only if incremental: the cost is incurred solely because a specific contract is obtained, and recovery is expected (ASC 340-40-25-1 to 25-3).',
                     'Expense if not incremental or recovery not expected (ASC 340-40-25-3).',
-                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution, booking or activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract, recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions if entity policy elects to include.',
+                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution, booking or activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract), recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions.',
                     'Common expense (typically not incremental): base salary, contests based on aggregate metrics not tied to specific contracts, nonrecoverable draws/guarantees, training, recruiting, enablement stipends, SPIFFs not contingent on a specific contract or that can be earned absent a specific contract.'
                 ]
             },
@@ -362,7 +361,9 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. If renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. The period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
                     'Practical expedient: expense the cost as incurred if the amortization period would be one year or less. Application can be by portfolio; document the policy.',
                     'Changes in estimates: adjust amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
-                    'At each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.']
+                    'At each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.',
+                'Note that a portfolio approach can be applied if it would not materially differ from a contract-by-contract approach (e.g., for determining amortization periods and impairment).'
+                ]
             }
         }
         

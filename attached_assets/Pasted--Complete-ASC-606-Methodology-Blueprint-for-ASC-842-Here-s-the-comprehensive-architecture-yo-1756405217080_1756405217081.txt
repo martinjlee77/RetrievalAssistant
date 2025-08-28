@@ -1,0 +1,139 @@
+**🏗️ Complete ASC 606 Methodology Blueprint for ASC 842**
+
+Here's the comprehensive architecture you'll need to replicate for ASC 842, organized by component:
+
+---
+
+**📋 1. STEP METHODOLOGY FRAMEWORK**
+
+**ASC 606's 5-Step Structure:**
+
+`   Step 1: Identify the Contract  
+├── Focus: Contract existence under ASC 606-10-25-1  
+├── Key Points: Approval, rights, payment terms, collectibility  
+└── Decision: Valid contract exists? 
+
+Step 2: Identify Performance Obligations   
+├── Focus: Distinct goods/services per ASC 606-10-25-14/25-22  
+├── Key Points: Capable of being distinct, distinct in context  
+└── Decision: What are the separate performance obligations?  
+
+Step 3: Determine Transaction Price  
+├── Focus: Total consideration per ASC 606-10-32-2  
+├── Key Points: Fixed, variable, financing components  
+└── Decision: What's the total transaction price?  
+
+Step 4: Allocate Transaction Price  
+├── Focus: Standalone selling prices (SSPs)  
+├── Key Points: Relative SSP method, discount allocation  
+└── Decision: How much to each performance obligation?  
+
+Step 5: Recognize Revenue  
+├── Focus: When control transfers  
+├── Key Points: Over-time vs point-in-time, progress measurement  
+└── Decision: When to recognize revenue?   `
+
+**For ASC 842, you'll need similar systematic steps** (likely lease identification, classification, measurement, etc.)
+
+---
+
+**🔍 2. KNOWLEDGE SEARCH ARCHITECTURE**
+
+**Step-Specific Query Building:**
+
+`   # ASC 606 example structure you'll replicate:  
+
+step_queries = {      
+1: "contract existence criteria ASC 606-10-25-1 approval commitment",      
+2: "performance obligations distinct goods services ASC 606-10-25-19",       
+3: "transaction price consideration ASC 606-10-32-2 variable",      
+4: "allocation standalone selling price ASC 606-10-32-28",      
+5: "revenue recognition timing over time ASC 606-10-25-27"  }   `
+
+**Contract Term Extraction:**
+
+Each step extracts relevant terms from contracts:
+
+- **Step 1**: approval, commitment, payment terms, collectibility
+- **Step 2**: software, services, distinct, bundled, options
+- **Step 3**: fees, variable, bonuses, financing, discounts
+- **Step 4**: allocation, standalone prices, proportional
+- **Step 5**: delivery, control transfer, over-time, milestones
+
+**For ASC 842**: You'll need lease-specific terms (premises, lease term, payments, options, etc.)
+
+---
+
+**🎯 3. DECISION POINT FRAMEWORK**
+
+**Each Step Requires:**
+
+1. **Authoritative Citations** - Specific ASC paragraph references
+2. **Key Analysis Points** - Checklist of evaluation criteria
+3. **Decision Logic** - Clear yes/no or classification outcomes
+4. **Financial Impacts** - Quantitative conclusions where applicable
+
+**Example Decision Points (ASC 606 Step 2):**
+
+`   ✅ Evaluation Criteria:  
+- Can customer benefit from service independently?  
+- Is promise separately identifiable from other promises?  
+- Are services highly interdependent/interrelated?  
+🎯Decision Output:  
+- List of distinct performance obligations  
+- Bundling recommendations  
+- Material rights identification   `
+
+---
+
+**💻 4. TECHNICAL ARCHITECTURE REQUIREMENTS**
+
+**Core Components You'll Need:**
+
+1. **`asc842/step_analyzer.py`**
+    
+    - Class: `ASC842StepAnalyzer`
+    - Method: `analyze_contract()` - main 5-call orchestration
+    - Method: `_analyze_step()` - individual step analysis
+    - Method: `_get_step_title()` - step naming
+    - **Model Configuration**: gpt-4o/gpt-4o-mini strategy
+2. **`asc842/knowledge_search.py`**
+    
+    - Class: `ASC842KnowledgeSearch`
+    - Method: `search_for_step()` - step-specific guidance
+    - Method: `_build_step_query()` - query optimization
+    - Method: `_extract_relevant_terms()` - contract term extraction
+3. **`asc842/asc842_page.py`**
+    
+    - Function: `render_asc842_page()` - main UI
+    - Function: `get_asc842_inputs()` - document upload workflow
+    - Function: `perform_asc842_analysis()` - analysis orchestration
+4. **`asc842/templates/memo_template.md`**
+    
+    - Professional memo structure
+    - ASC 842-specific language and sections
+
+---
+
+**📝 5. MEMO GENERATION STRUCTURE**
+
+**Required Sections:**
+
+`   # ASC 842 LEASE ACCOUNTING MEMORANDUM  ## EXECUTIVE SUMMARY  {executive_summary}  ## BACKGROUND    {background_section}  ## ASC 842 ANALYSIS  {analysis_section}  # Contains all step results  ## CONCLUSION  {conclusion_section}   `
+
+---
+
+**🚀 6. RAG TESTING STRATEGY**
+
+**Research Assistant Integration:**
+
+1. **Develop step methodology** using Research Assistant Q&A
+2. **Test each decision point** with specific lease scenarios
+3. **Validate citations** against authoritative guidance
+4. **Refine prompts** based on RAG feedback quality
+
+**Example Research Questions for ASC 842:**
+
+- _"What are the key criteria for lease identification under ASC 842?"_
+- _"How do I classify leases as operating vs finance under ASC 842?"_
+- _"What components are included in lease payment calculations?"_
