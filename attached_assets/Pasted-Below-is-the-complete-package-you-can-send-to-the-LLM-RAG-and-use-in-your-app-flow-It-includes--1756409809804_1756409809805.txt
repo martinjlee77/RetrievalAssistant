@@ -1,0 +1,128 @@
+Below is the complete package you can send to the LLM (RAG) and use in your app flow. It includes: (1) the 5-step ASC 842 instruction set with Focus and Key Points/citations, (2) a contract-data checklist by step to validate uploaded documents, and (3) a single consolidated user-input checklist.
+
+5-step ASC 842 instruction set (for initial accounting)
+
+Step 1: Scope, identify a lease, and determine the enforceable period and lease term Focus: Confirm the arrangement is (or contains) a lease and establish the enforceable period and lease term. Key points:
+
+- A contract contains a lease if it conveys the right to control the use of an identified asset for a period of time in exchange for consideration [ASC 842-10-15-3; 842-10-15-9 through 15-16].
+- Scope exclusions include leases of certain intangible assets, biological assets, and inventory [ASC 842-10-15-2].
+- Enforceable period: a contract is no longer enforceable when both parties can terminate without more than an insignificant penalty; assess lease term only within the enforceable period [Master Glossary: Enforceable; Lease Term; Noncancellable].
+- Substitution rights: if the supplier’s substitution right is substantive, the asset is not identified [ASC 842-10-15-9 through 15-14].
+- Embedded derivatives may require bifurcation under ASC 815; the lease itself is not a derivative [ASC 815-10-15; 815-15].
+- Lease term: noncancellable period plus periods covered by options to extend (if reasonably certain to exercise), options to terminate (if reasonably certain not to exercise), and specified lessor-controlled periods [Master Glossary: Lease Term; ASC 842-10-35-1 through 35-3; 842-10-55-23 through 55-26].
+- Reassess lease term upon specified events (e.g., significant event/change in circumstances within the lessee’s control affecting option assessments) [ASC 842-10-35-1 through 35-3].
+- Both‑party termination rights generally cap the enforceable period at the earliest date either party can terminate without more than an insignificant penalty [Master Glossary: Enforceable].
+- If only the lessee has a termination right, treat it as a lessee termination option when determining the lease term [ASC 842-10-55-24].
+
+Step 2: Identify components and determine lease payments Focus: Separate lease vs nonlease components (or elect not to separate) and determine payments included in the lease liability. Key points:
+
+- Identify lease components (right to use each underlying asset) and nonlease components (e.g., services, CAM); administrative tasks are not components [ASC 842-10-15-28 through 15-31].
+- Allocation: If not electing the practical expedient, allocate consideration to components based on relative standalone prices [ASC 842-10-15-32 through 15-36].
+- Practical expedient: By class of underlying asset, you may elect to not separate nonlease components; account for combined consideration as a single lease component [ASC 842-10-15-37 through 15-38].
+- Ownership-level costs paid by the lessor (e.g., property taxes/insurance) that are reimbursed by the lessee are typically nonlease components unless in‑substance fixed lease payments [ASC 842-10-15-30].
+- Include in lease payments: fixed payments (including in‑substance fixed), variable payments that depend on an index or a rate (measured using the index/rate at commencement), amounts probable under residual value guarantees, purchase option price if reasonably certain to exercise, and termination penalties consistent with lease‑term assessment; reduce for lease incentives receivable [ASC 842-20-30-5].
+- Exclude usage/performance‑based variable payments that are not in‑substance fixed; expense as incurred [ASC 842-20-25].
+
+Step 3: Classify the lease and measure at commencement Focus: Decide finance vs operating classification and measure the lease liability and ROU asset on the commencement date (using the user‑provided discount rate). Key points:
+
+- Classification: Finance if any of the five criteria are met (transfer of ownership, reasonably certain purchase option, lease term is a major part of remaining economic life, PV of payments is substantially all of fair value, or no alternative use); otherwise operating [ASC 842-10-25-2].
+- Classification is not reassessed after commencement unless certain modifications/remeasurements occur [ASC 842-10-25-8].
+- Commencement date is when the asset is made available for use; measure and recognize at that date [ASC 842-10-55].
+- Recognize a lease liability at the present value of lease payments (use the user‑provided rate) and an ROU asset measured as: lease liability + prepaid lease payments + initial direct costs – lease incentives received/receivable [ASC 842-20-25-1; 842-20-30-1; 842-20-30-5].
+- Initial direct costs are narrowly defined as incremental costs that would not have been incurred if the lease had not been obtained [Master Glossary; ASC 842-10-30].
+- Include asset retirement obligations (if any) in the ROU asset per ASC 410 (not in the lease liability) [ASC 410; ASC 842-20-30-1].
+- Short‑term lease policy: if elected and criteria met (12 months or less and no purchase option), do not recognize ROU asset/liability; recognize lease cost generally straight‑line [ASC 842-20-25-2].
+
+Step 4: Produce initial accounting outputs Focus: Document and output the initial recognition, classification, calculations, and required notes. Key points:
+
+- Provide classification conclusion and rationale with citations [ASC 842-10-25-2].
+- Show the lease payments included in the liability by category and the present value calculation [ASC 842-20-30-5].
+- Provide commencement‑date journal entries (ROU asset, lease liability, and any prepaid/incentive/initial direct cost effects) [ASC 842-20-25-1; 842-20-30-1].
+- Identify initial presentation and disclosure data points (policy elections such as short‑term and non‑separation expedient; significant judgments such as “reasonably certain”) [ASC 842-20-45-1; 842-20-50-1].
+
+Step 5: Reminders beyond initial recognition (no computations) Focus: Keep in view subsequent accounting, remeasurement triggers, modifications, subleases, and disclosures for later periods. Key points:
+
+- Subsequent accounting: finance leases recognize interest on the liability and amortization of the ROU asset; operating leases recognize a single lease cost generally straight‑line; variable payments excluded from the liability are expensed when incurred [ASC 842-20-25; ASC 842-10-55-229].
+- Remeasurement triggers: change in lease term or purchase option assessment; change in expected RVG amounts; resolution of contingencies that make payments fixed; modifications not accounted for as separate. Do not remeasure solely for changes in an index or a rate; under ASC 842 such changes are expensed as variable lease cost unless remeasurement is required for another reason [ASC 842-10-35-1 through 35-3; 842-10-25-8 through 25-10].
+- Modifications: assess whether separate contract; if not separate, remeasure, reallocate, and reassess classification [ASC 842-10-25-8 through 25-10].
+- Subleases/assignments: a sublease creates an intermediate lessor; classify the sublease by reference to the head‑lease ROU asset; derecognize the head lease only upon legal release/novation (termination) [ASC 842-10 (Subleases); ASC 842-20-40].
+- Presentation/disclosures: separate presentation (or disclosure) of operating vs finance ROU assets and lease liabilities, maturity analysis, lease cost components, and significant judgments [ASC 842-20-45-1; 842-20-50-1].
+
+Contract data checklist by step (to validate a “real lease” before analysis)
+
+Step 1 — Scope/lease identification/term
+
+- Parties and contract title (lease, master lease, schedule)
+- Asset description and location (identified asset: VIN/serial, suite/premises)
+- Lessor substitution rights and conditions (practical ability, economic benefit)
+- Control indicators (who directs use; restrictions)
+- Commencement/availability date
+- Enforceable period language (month‑to‑month, auto‑renew, penalties for termination)
+- Options: renewal/extension, early termination, purchase options and conditions
+- Termination rights (both‑party vs lessee‑only) and any penalties/make‑whole
+- Embedded features (indexed rent, CPI/SOFR, FX)
+- Scope flags (asset type tangible vs intangible/biological/inventory)
+
+Step 2 — Components and payments
+
+- Itemization: base rent; CAM/services; maintenance; utilities; admin fees
+- Allocation or rate sheets (standalone prices)
+- Taxes/insurance responsibilities and reimbursements
+- Fixed payment schedule (amounts, frequency, step rent/escalators)
+- Variable payment clauses (index/rate references, reset frequency, floors/caps; usage/sales‑based)
+- Lease incentives (TI allowance, free rent, credits)
+- Residual value guarantee terms
+- Purchase/termination option cash effects; penalties
+- Billing/settlement mechanics; deposits; prepaid rent
+
+Step 3 — Classification and initial measurement
+
+- Transfer of ownership clause
+- Purchase option terms (price/conditions)
+- Asset economic life and specialized/no‑alternative‑use indicators
+- Asset fair value at commencement (or method to estimate)
+- Commencement date confirmation
+- Initial direct costs (incremental only)
+- Restoration/return conditions and decommissioning/ARO language
+- Policy elections applicable to this asset class (short‑term policy; non‑separation expedient)
+- Discount rate to use (implicit if determinable; otherwise user‑provided)
+
+Step 4 — Outputs support
+
+- GL identifiers (entity, cost center), asset class
+- Documentation anchors (citations for judgments, lease term conclusions)
+- No additional terms required beyond Steps 1–3
+
+Step 5 — Subsequent accounting reminders
+
+- Index/rate reset mechanics (timing, formula, caps/floors)
+- RVG measurement/settlement provisions
+- Modification clauses (add/remove assets, rent resets, concessions)
+- Sublease/assignment/novation rights and consents
+- Disclosure‑relevant terms (options, restrictions, guarantees)
+
+Minimal user-input checklist for the UI
+
+Always required (blocking at submit)
+
+- Discount rate to apply
+    - Field: discount_rate (percent)
+    - Optional basis tag: implicit/IBR/risk_free
+- Commencement (availability) date
+    - Field: commencement_date
+    - Note: If this differs from the agreement, the LLM will flag the difference in the memo.
+- Related-party lease? Yes/No
+    - Field: related_party_flag (boolean)
+    - If Yes: brief note on any nonmarket or unenforceable terms (free text; not blocking length).
+- “Reasonably certain” option assessments (brief rationale allowed but not required to be long) (give an option for N/A)
+    - Field: extend_reasonably_certain (Yes/No)
+    - Field: terminate_reasonably_not_exercised (Yes/No)
+    - Field: purchase_option_reasonably_certain (Yes/No)
+- Nonlease components policy (per asset class): elect to not separate? Yes/No/not applicable
+    - Field: expedient_nonlease_not_separated (boolean)
+    - Cache per asset class; don’t re-ask if already set.
+- Short-term lease policy election (per asset class): Yes/No/not applicable
+    - Field: policy_short_term (boolean)
+    - Cache per asset class; don’t re-ask if already set.
+
+Additional information (optional)
