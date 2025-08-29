@@ -6,7 +6,7 @@ import streamlit as st
 import logging
 import uuid
 from datetime import datetime, date
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from shared.ui_components import SharedUIComponents
 # CleanMemoGenerator import moved to initialization section
