@@ -161,9 +161,9 @@ class ASC842StepAnalyzer:
         
         # Generate executive summary, background, and conclusion
         logger.info("Generating executive summary...")
-        results['executive_summary'] = self.generate_executive_summary(conclusions_text, entity_name, user_inputs)
+        results['executive_summary'] = self.generate_executive_summary(conclusions_text, entity_name)
         logger.info("Generating background...")
-        results['background'] = self.generate_background_section(conclusions_text, entity_name, user_inputs)
+        results['background'] = self.generate_background_section(conclusions_text, entity_name)
         logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
         logger.info("DEBUG: All additional sections generated successfully")
@@ -329,7 +329,7 @@ Your analysis must be:
 - Support your analysis with specific contract text and authoritative citations
 - Use direct quotes from the lease contract only when the exact wording is outcome-determinative
 - Paraphrase ASC 842 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
-- Incorporate user-provided inputs (discount rate, assessments, policy elections) appropriately
+- Make reasonable assumptions for missing data (e.g., market discount rates) and clearly identify these assumptions
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -340,7 +340,6 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         contract_text: str, 
                         authoritative_context: str,
                         entity_name: str,
-   
                         additional_context: str = "") -> str:
         """Generate markdown prompt for a specific step."""
         
@@ -430,29 +429,15 @@ LEASE CONTRACT TEXT:
 ADDITIONAL CONTEXT:
 {additional_context}"""
 
-        # Add user inputs section
+        # Add analysis instructions for document-only approach
         prompt += f"""
 
-USER-PROVIDED INPUTS:
-- Discount Rate: {user_inputs.get('discount_rate', 'Not provided')}%
-- Commencement Date: {user_inputs.get('commencement_date', 'Not provided')}
-- Related-Party Lease: {'Yes' if user_inputs.get('related_party_flag') else 'No'}"""
-
-        # Add reasonably certain assessments if provided
-        if any(key in user_inputs for key in ['extend_reasonably_certain', 'terminate_reasonably_not_exercised', 'purchase_option_reasonably_certain']):
-            prompt += f"""
-- Extension Option Assessment: {user_inputs.get('extend_reasonably_certain', 'N/A')}
-- Termination Option Assessment: {user_inputs.get('terminate_reasonably_not_exercised', 'N/A')}  
-- Purchase Option Assessment: {user_inputs.get('purchase_option_reasonably_certain', 'N/A')}"""
-
-        # Add policy elections if provided
-        if 'expedient_nonlease_not_separated' in user_inputs:
-            prompt += f"""
-- Nonlease Components Policy: {'Elect not to separate' if user_inputs.get('expedient_nonlease_not_separated') else 'Separate components'}"""
-
-        if 'policy_short_term' in user_inputs:
-            prompt += f"""
-- Short-term Lease Policy: {'Elected' if user_inputs.get('policy_short_term') else 'Not elected'}"""
+ANALYSIS INSTRUCTIONS:
+- Make reasonable assumptions where specific data is missing (e.g., assume 6-8% discount rate for market transactions)
+- Extract dates, rates, and terms directly from the contract when available
+- For missing information, state assumptions clearly (e.g., "Assuming a market discount rate of 7%...")
+- Use the "Issues or Uncertainties" section to highlight assumptions and missing information requiring confirmation
+- This is a preliminary analysis - emphasize areas needing follow-up"""
 
         prompt += f"""
 
@@ -467,13 +452,14 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 842 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 842 with pinpoint citations and use only brief decisive phrases when directly supportive. Incorporate the user-provided inputs where relevant to the analysis.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 842 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 842 with pinpoint citations and use only brief decisive phrases when directly supportive. Make reasonable assumptions for missing data and clearly identify these assumptions.]
 
 **Analysis:** [Detailed analysis with supporting evidence. Include:
 - Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Lease Agreement §X.Y, p. N])
 - ASC 842 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 842-10-25-2])
-- User-provided inputs incorporated where relevant (discount rate, assessments, policy elections)
-- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+- Reasonable assumptions for missing data clearly stated (e.g., discount rates, assessment dates)
+- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion
+- Clear identification of assumptions made due to missing information]
 
 **Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 842 citation.]
 
@@ -529,7 +515,7 @@ CRITICAL FORMATTING REQUIREMENTS:
         logger.info(f"DEBUG: Combined conclusions length: {len(combined_conclusions)}")
         return combined_conclusions
     
-    def generate_executive_summary(self, conclusions_text: str, entity_name: str, user_inputs: Dict[str, Any]) -> str:
+    def generate_executive_summary(self, conclusions_text: str, entity_name: str) -> str:
         """Generate executive summary based on step conclusions."""
         logger.info(f"DEBUG: Generating executive summary. Model: {self.model}")
         
@@ -545,10 +531,7 @@ CRITICAL FORMATTING REQUIREMENTS:
                         "role": "user",
                         "content": f"""Based on the following step-by-step analysis conclusions, generate a professional executive summary for an ASC 842 lease accounting memorandum for {entity_name}.
 
-User-provided inputs:
-- Discount Rate: {user_inputs.get('discount_rate', 'Not specified')}%
-- Commencement Date: {user_inputs.get('commencement_date', 'Not specified')}
-- Related-Party: {'Yes' if user_inputs.get('related_party_flag') else 'No'}
+This is a document-only analysis where reasonable assumptions were made for missing data.
 
 Step Conclusions:
 {conclusions_text}
@@ -582,7 +565,7 @@ Format as clean markdown."""
             logger.error(f"Error generating executive summary: {str(e)}")
             return f"Error generating executive summary: {str(e)}"
     
-    def generate_background_section(self, conclusions_text: str, entity_name: str, user_inputs: Dict[str, Any]) -> str:
+    def generate_background_section(self, conclusions_text: str, entity_name: str) -> str:
         """Generate background section for the memo."""
         logger.info(f"DEBUG: Generating background section. Model: {self.light_model}")
         
@@ -601,14 +584,14 @@ Format as clean markdown."""
 Context:
 - Entity: {entity_name}
 - Analysis Date: {datetime.now().strftime('%B %Y')}
-- Discount Rate Used: {user_inputs.get('discount_rate', 'User-specified')}%
-- Commencement Date: {user_inputs.get('commencement_date', 'As specified in contract')}
+- Analysis Type: Document-only preliminary analysis
+- Approach: Reasonable assumptions made for missing data
 
 Write a brief background section (1 paragraph) that:
 1. States the purpose of the memorandum
 2. Describes the lease arrangement being analyzed
 3. References the ASC 842 methodology being applied
-4. Notes any significant user inputs or policy elections
+4. Notes that this is a preliminary analysis with reasonable assumptions
 
 Format as clean markdown."""
                     }
