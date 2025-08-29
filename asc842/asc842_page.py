@@ -290,8 +290,8 @@ def _generate_and_display_memo(analysis_results: Dict[str, Any], filename: Optio
             # Generate clean memo
             memo_content = memo_generator.combine_clean_steps(analysis_results)
             
-            # if memo_content and len(memo_content.strip()) > 100:
-                # st.success("✅ Memorandum generated successfully!")
+            if memo_content and len(memo_content.strip()) > 100:
+                st.success("✅ Memorandum generated successfully!")
                 
                 # Store memo in session state
                 memo_key = f'asc842_memo_{analysis_id}'
