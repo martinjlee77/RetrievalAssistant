@@ -346,7 +346,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scoping and Incremental Test',
                 'focus': 'Determine whether the commission plan is within the scope and capitalizable under ASC 340-40',
                 'key_points': [
-                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is the company's employee or agent (third party) or the company's customer.',
+                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is an employee or agent (third party) or a customer.',
                     'This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-5 to 25-8)',
                     'Capitalize (i.e., recognize an asset) if and only if incremental: the cost is incurred solely because a specific contract is obtained, and recovery is expected (ASC 340-40-25-1 to 25-3).',
                     'Expense if not incremental or recovery not expected (ASC 340-40-25-3).',

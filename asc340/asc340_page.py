@@ -88,7 +88,7 @@ def _upload_and_process_asc340():
         st.session_state.file_uploader_key = 0
         
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload a **sales commission plan and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets (required))",
+        "1️⃣ Upload a **sales commission plan and related documents**, e.g., plan documents, compensation policy handbooks, SPIFF/contest announcements, channel/partner agreements, quota sheets (required)",
         type=['pdf', 'docx'],
         help="Upload up to 5 relevant commission and contract cost documents (PDF or DOCX) for ASC 340-40 analysis. Complete documentation supports accurate capitalization and amortization analysis.",
         accept_multiple_files=True,

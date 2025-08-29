@@ -18,7 +18,6 @@ from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
-
 def render_asc842_page():
     """Render the ASC 842 analysis page."""
     
@@ -27,9 +26,9 @@ def render_asc842_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 842 Analyzer & Memo Generator]")
+    st.title(":primary[ASC 842 Analyzer & Memo Generator (Lessee Only)]")
     with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze lease contracts and generate a professional ASC 842 memo. Simply upload your lease documents to begin.")
+        st.markdown(":primary[**Purpose:**] Automatically analyze lease contracts and generate a professional ASC 842 memo. Upload your lease documents and answer a few questions to analyze.")
     
     # Get user inputs with progressive disclosure
     contract_text, filename, user_inputs, additional_context, is_ready = get_asc842_inputs()
@@ -134,7 +133,7 @@ def _upload_and_process_asc842() -> Tuple[Optional[str], Optional[str]]:
                 if extracted_text and extracted_text.strip():
                     combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
                     processed_filenames.append(uploaded_file.name)
-                    st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
+                    # st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
                 else:
                     st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
 
@@ -142,13 +141,13 @@ def _upload_and_process_asc842() -> Tuple[Optional[str], Optional[str]]:
         if processed_filenames:
             filename_display = f"{len(processed_filenames)} document(s): {', '.join(processed_filenames)}"
             total_chars = len(combined_text)
-            st.success(f"📄 **Document processing complete:** {total_chars:,} total characters extracted")
+            # st.success(f"📄 **Document processing complete:** {total_chars:,} total characters extracted")
             
             # Show preview option
-            if st.checkbox("🔍 Preview extracted text", key="preview_asc842_text"):
-                with st.expander("📄 Document Preview", expanded=False):
-                    preview_text = combined_text[:3000] + "..." if len(combined_text) > 3000 else combined_text
-                    st.text(preview_text)
+#            if st.checkbox("🔍 Preview extracted text", key="preview_asc842_text"):
+#                with st.expander("📄 Document Preview", expanded=False):
+#                    preview_text = combined_text[:3000] + "..." if len(combined_text) > 3000 else combined_text
+#                    st.text(preview_text)
             
             return combined_text, filename_display
         else:
@@ -163,7 +162,7 @@ def _upload_and_process_asc842() -> Tuple[Optional[str], Optional[str]]:
 
 def _get_asc842_specific_fields() -> Dict[str, Any]:
     """Get ASC 842 specific user input fields."""
-    st.markdown("### 2️⃣ Required ASC 842 Analysis Inputs")
+    st.markdown("2️⃣ Required ASC 842 Analysis Inputs")
     
     user_inputs = {}
     
@@ -191,15 +190,7 @@ def _get_asc842_specific_fields() -> Dict[str, Any]:
         )
         if discount_basis != "Not specified":
             user_inputs['discount_rate_basis'] = discount_basis
-        
-        # Commencement date (required)
-        commencement_date = st.date_input(
-            "Commencement (availability) date",
-            value=date.today(),
-            help="Date when the asset is made available for use by the lessee"
-        )
-        user_inputs['commencement_date'] = commencement_date.strftime("%Y-%m-%d")
-        
+             
     with col2:
         # Related-party lease (required)
         related_party = st.selectbox(
@@ -219,8 +210,16 @@ def _get_asc842_specific_fields() -> Dict[str, Any]:
             )
             if related_party_note.strip():
                 user_inputs['related_party_note'] = related_party_note
+
+        # Commencement date (required)
+        commencement_date = st.date_input(
+            "Commencement (availability) date",
+            value=date.today(),
+            help="Date when the asset is made available for use by the lessee"
+        )
+        user_inputs['commencement_date'] = commencement_date.strftime("%Y-%m-%d")
     
-    st.markdown("---")
+    
     st.markdown("### Option Assessments")
     
     col3, col4, col5 = st.columns(3)
@@ -252,7 +251,6 @@ def _get_asc842_specific_fields() -> Dict[str, Any]:
         if purchase_assessment != "N/A":
             user_inputs['purchase_option_reasonably_certain'] = purchase_assessment
     
-    st.markdown("---")
     st.markdown("### Policy Elections")
     
     col6, col7 = st.columns(2)
