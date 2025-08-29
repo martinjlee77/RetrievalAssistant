@@ -85,7 +85,6 @@ class ASC842StepAnalyzer:
                         authoritative_context: str,
                         entity_name: str,
                         analysis_title: str,
-                        user_inputs: Dict[str, Any],
                         additional_context: str = "") -> Dict[str, Any]:
         """
         Perform complete 5-step ASC 842 analysis.
@@ -95,7 +94,6 @@ class ASC842StepAnalyzer:
             authoritative_context: Retrieved ASC 842 guidance
             entity_name: Entity name
             analysis_title: Analysis title
-            user_inputs: User-provided lease data (discount rate, dates, assessments, etc.)
             additional_context: Optional user-provided context
             
         Returns:
@@ -112,7 +110,6 @@ class ASC842StepAnalyzer:
             'customer_name': entity_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y"),
-            'user_inputs': user_inputs,
             'steps': {}
         }
         
@@ -126,7 +123,6 @@ class ASC842StepAnalyzer:
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     entity_name=entity_name,
-                    user_inputs=user_inputs,
                     additional_context=additional_context
                 ): step_num
                 for step_num in range(1, 6)
@@ -180,7 +176,6 @@ class ASC842StepAnalyzer:
                                contract_text: str,
                                authoritative_context: str,
                                entity_name: str,
-                               user_inputs: Dict[str, Any],
                                additional_context: str = "") -> Dict[str, str]:
         """Analyze a single step with enhanced retry logic for production scalability."""
         max_retries = 4  # Increased from 2
@@ -194,7 +189,6 @@ class ASC842StepAnalyzer:
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     entity_name=entity_name,
-                    user_inputs=user_inputs,
                     additional_context=additional_context
                 )
             except openai.RateLimitError as e:
@@ -256,7 +250,7 @@ class ASC842StepAnalyzer:
                      contract_text: str,
                      authoritative_context: str,
                      entity_name: str,
-                     user_inputs: Dict[str, Any],
+
                      additional_context: str = "") -> Dict[str, str]:
         """Analyze a single ASC 842 step - returns clean markdown."""
         
@@ -266,7 +260,6 @@ class ASC842StepAnalyzer:
             contract_text=contract_text,
             authoritative_context=authoritative_context,
             entity_name=entity_name,
-            user_inputs=user_inputs,
             additional_context=additional_context
         )
         
@@ -347,7 +340,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         contract_text: str, 
                         authoritative_context: str,
                         entity_name: str,
-                        user_inputs: Dict[str, Any],
+   
                         additional_context: str = "") -> str:
         """Generate markdown prompt for a specific step."""
         
