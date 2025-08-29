@@ -189,5 +189,5 @@ class ASC842KnowledgeBase(SharedKnowledgeBase):
     def __init__(self):
         super().__init__(
             database_path="asc842_knowledge_base",
-            collection_name="asc842_guidance"
+            collection_name="asc842_leases"
         )
