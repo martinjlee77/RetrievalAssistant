@@ -44,7 +44,6 @@ class CleanMemoGenerator:
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
             memo_lines.extend([
-                "## EXECUTIVE SUMMARY",
                 "",
                 analysis_results['executive_summary'],
                 "",
@@ -53,7 +52,6 @@ class CleanMemoGenerator:
         
         # Add Background
         memo_lines.extend([
-            "## BACKGROUND",
             ""
         ])
         
@@ -101,8 +99,6 @@ class CleanMemoGenerator:
         # Add Conclusion Section
         if 'conclusion' in analysis_results:
             memo_lines.extend([
-                "",
-                "## CONCLUSION",
                 "",
                 analysis_results['conclusion'],
                 "",

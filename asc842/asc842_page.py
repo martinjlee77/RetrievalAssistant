@@ -159,7 +159,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 if kb_info.get("status") != "Active":
                     st.warning("📚 ASC 842 knowledge base not fully available. Analysis will proceed with general guidance.")
                 else:
-                    st.success(f"📚 {kb_info.get('standard')}: {kb_info.get('documents')} loaded successfully")
+                    # st.success(f"📚 {kb_info.get('standard')}: {kb_info.get('documents')} loaded successfully")
                     
             except Exception as e:
                 logger.error(f"Error initializing ASC 842 analysis: {str(e)}")
@@ -213,7 +213,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 st.warning("⚠️ Using general ASC 842 guidance due to knowledge base issues.")
 
         # Perform 5-step analysis
-        with st.spinner("🔬 Performing 5-step ASC 842 analysis... This may take 3-5 minutes."):
+        with st.spinner("Performing 5-step ASC 842 analysis... This may take 3-5 minutes."):
             progress_bar = st.progress(0)
             status_placeholder = st.empty()
             
@@ -289,8 +289,8 @@ def _generate_and_display_memo(analysis_results: Dict[str, Any], filename: Optio
             # Generate clean memo
             memo_content = memo_generator.combine_clean_steps(analysis_results)
             
-            if memo_content and len(memo_content.strip()) > 100:
-                st.success("✅ Memorandum generated successfully!")
+            # if memo_content and len(memo_content.strip()) > 100:
+                # st.success("✅ Memorandum generated successfully!")
                 
                 # Store memo in session state
                 memo_key = f'asc842_memo_{analysis_id}'
@@ -299,8 +299,7 @@ def _generate_and_display_memo(analysis_results: Dict[str, Any], filename: Optio
                 # Display the memo
                 memo_generator.display_clean_memo(memo_content)
                 
-                # Show analysis summary
-                _display_analysis_summary(analysis_results)
+                # Analysis complete - no summary needed
                 
             else:
                 st.error("❌ Memo generation failed - content too short or empty")
@@ -314,55 +313,41 @@ def _generate_and_display_memo(analysis_results: Dict[str, Any], filename: Optio
         st.error(f"❌ Memo generation failed: {str(e)}")
 
 
-def _display_analysis_summary(analysis_results: Dict[str, Any]):
-    """Display a summary of the analysis results."""
-    
-    with st.expander("📊 Analysis Summary", expanded=False):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("**Analysis Details:**")
-            st.markdown(f"• Entity: {analysis_results.get('customer_name', 'Not specified')}")
-            st.markdown(f"• Analysis Date: {analysis_results.get('analysis_date', 'Not specified')}")
-            
-            st.markdown(f"• Analysis Type: Document-based ASC 842 lease accounting")
-            st.markdown(f"• Methodology: 5-step ASC 842 framework")
-        
-        with col2:
-            st.markdown("**Steps Completed:**")
-            steps = analysis_results.get('steps', {})
-            for i in range(1, 6):
-                step_key = f'step_{i}'
-                if step_key in steps:
-                    st.markdown(f"✅ Step {i}: Complete")
-                else:
-                    st.markdown(f"❌ Step {i}: Missing")
-        
-        # Document-based analysis note
-        st.markdown("**Analysis Approach:**")
-        st.markdown("• Document-only analysis following ASC 606/340-40 model")
-        st.markdown("• AI makes reasonable assumptions and identifies uncertainties")
-
 
 def _extract_entity_name(contract_text: str) -> str:
     """Extract entity name from contract or use default."""
     
-    # Try to extract from contract text (simple approach)
-    contract_lower = contract_text.lower()
+    import re
     
-    # Common patterns for lessee identification
-    patterns = [
-        r'lessee[:\s]+([^,\n\.]+)',
-        r'tenant[:\s]+([^,\n\.]+)',
-        r'company[:\s]+([^,\n\.]+)',
+    # Look for company names with common suffixes
+    company_patterns = [
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+(?:Inc\.?|LLC|Corp\.?|Corporation|Company|Ltd\.?|Limited))',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Solutions(?:\s+Inc\.?)?)',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Technologies(?:\s+Inc\.?)?)',
+        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Enterprises(?:\s+Inc\.?)?)'
     ]
     
-    import re
-    for pattern in patterns:
-        match = re.search(pattern, contract_lower)
+    # Try to find proper company names first
+    for pattern in company_patterns:
+        matches = re.findall(pattern, contract_text)
+        if matches:
+            # Return the first found company name
+            entity_name = matches[0].strip()
+            if len(entity_name) > 5 and len(entity_name) < 80:
+                return entity_name
+    
+    # Fallback: look for tenant/lessee patterns but be more selective
+    contract_lower = contract_text.lower()
+    fallback_patterns = [
+        r'(?:lessee|tenant)[:\s]+"([^"]+)"',  # Quoted names
+        r'(?:lessee|tenant)[:\s]+([A-Z][a-zA-Z\s]+(?:Inc\.?|LLC|Corp\.?))',  # Company-like names
+    ]
+    
+    for pattern in fallback_patterns:
+        match = re.search(pattern, contract_text)  # Use original case for fallback
         if match:
-            entity_name = match.group(1).strip().title()
-            if len(entity_name) > 3 and len(entity_name) < 50:
+            entity_name = match.group(1).strip()
+            if len(entity_name) > 5 and len(entity_name) < 80 and not entity_name.lower().startswith('hereby'):
                 return entity_name
     
     # Default fallback
@@ -399,9 +384,6 @@ def display_current_analysis():
             memo_content = st.session_state[memo_key]
             
             memo_generator.display_clean_memo(memo_content)
-            
-            # Show analysis summary
-            _display_analysis_summary(analysis_data.get('results', {}))
 
 
 # Call display function if results exist
