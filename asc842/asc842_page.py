@@ -159,6 +159,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 if kb_info.get("status") != "Active":
                     st.warning("📚 ASC 842 knowledge base not fully available. Analysis will proceed with general guidance.")
                 else:
+                    pass  # Knowledge base is available
                     # st.success(f"📚 {kb_info.get('standard')}: {kb_info.get('documents')} loaded successfully")
                     
             except Exception as e:
