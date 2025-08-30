@@ -164,8 +164,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
-    # Auto-extract entity name and generate analysis title
-    entity_name = _extract_entity_name(contract_text)
+    # Generate analysis title
     analysis_title = _generate_analysis_title()
 
     try:
@@ -184,6 +183,16 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 st.error("ASC 842 knowledge base is not available. Try again and contact support if this persists.")
                 st.stop()
                 return
+
+        # Extract entity name using LLM (with regex fallback)
+        with st.spinner("🏢 Extracting entity name..."):
+            try:
+                entity_name = analyzer.extract_entity_name_llm(contract_text)
+                logger.info(f"LLM extracted entity name: {entity_name}")
+            except Exception as e:
+                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
+                entity_name = _extract_entity_name(contract_text)
+                logger.info(f"Regex fallback entity name: {entity_name}")
 
         # Display progress
         steps = [
