@@ -5,8 +5,8 @@ ASC 842 Lease Accounting Analysis Page
 import streamlit as st
 import logging
 import uuid
-from datetime import datetime, date
-from typing import Dict, Any, List, Optional
+from datetime import datetime
+from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 # CleanMemoGenerator import moved to initialization section
@@ -67,7 +67,7 @@ def get_asc842_inputs():
     # Additional info (optional)
     additional_context = st.text_area(
         "2️⃣ Additional information or concerns (optional)",
-        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement details) or specify your areas of focus or concerns.",
+        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
         height=100)
 
     # Check completion status - only contract text required
@@ -122,7 +122,7 @@ def _upload_and_process_asc842():
                     # st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
                 else:
                     st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
-
+        
         if not combined_text.strip():
             st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
             return None, None
@@ -136,257 +136,339 @@ def _upload_and_process_asc842():
         return combined_text.strip(), filename_string
             
     except Exception as e:
-        st.error(f"❌ Error processing documents: {str(e)}")
-        logger.error(f"Document processing error: {str(e)}")
+        logger.error(f"Error processing uploaded files: {str(e)}")
+        st.error(f"❌ Error processing files: {str(e)}")
         return None, None
 
 
-def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename=None):
-    """Perform the complete ASC 842 analysis."""
+def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = None):
+    """Perform the complete ASC 842 analysis and display results with session isolation."""
     
-    # Generate unique analysis ID
-    analysis_id = str(uuid.uuid4())[:8]
+    # Session isolation - create unique session ID for this user
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
     
+    session_id = st.session_state.user_session_id
+    
+    # Create placeholder for the in-progress message
+    progress_message_placeholder = st.empty()
+    progress_message_placeholder.error(
+        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+        "Your analysis is running and will take up to 3-5 minutes. "
+        "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
+    )
+    
+    # Initialize analysis complete status with session isolation
+    analysis_key = f'asc842_analysis_complete_{session_id}'
+    if analysis_key not in st.session_state:
+        st.session_state[analysis_key] = False
+    
+    # Auto-extract entity name and generate analysis title
+    entity_name = _extract_entity_name(contract_text)
+    analysis_title = _generate_analysis_title()
+
     try:
-        # Initialize analyzer and knowledge search
-        with st.spinner("🔧 Initializing ASC 842 analysis system..."):
+        # Initialize components
+        with st.spinner("Initializing analysis components..."):
             try:
                 analyzer = ASC842StepAnalyzer()
                 knowledge_search = ASC842KnowledgeSearch()
-                
-                # Check knowledge base availability
-                kb_info = knowledge_search.get_user_kb_info()
-                if kb_info.get("status") != "Active":
-                    st.warning("📚 ASC 842 knowledge base not fully available. Analysis will proceed with general guidance.")
-                else:
-                    pass  # Knowledge base is available
-                    # st.success(f"📚 {kb_info.get('standard')}: {kb_info.get('documents')} loaded successfully")
-                    
-            except Exception as e:
-                logger.error(f"Error initializing ASC 842 analysis: {str(e)}")
-                st.error(f"❌ Failed to initialize analysis system: {str(e)}")
+                from asc842.clean_memo_generator import CleanMemoGenerator
+                memo_generator = CleanMemoGenerator(
+                    template_path="asc842/templates/memo_template.md")
+                from shared.ui_components import SharedUIComponents
+                ui = SharedUIComponents()
+            except RuntimeError as e:
+                st.error(f"❌ Critical Error: {str(e)}")
+                st.error("ASC 842 knowledge base is not available. Try again and contact support if this persists.")
+                st.stop()
                 return
 
-        # Session isolation - create unique session ID for this user
-        if 'user_session_id' not in st.session_state:
-            st.session_state.user_session_id = str(uuid.uuid4())
-            logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
-        
-        session_id = st.session_state.user_session_id
-        
-        # Create placeholder for the in-progress message
-        progress_message_placeholder = st.empty()
-        progress_message_placeholder.error(
-            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
-            "Your analysis is running and will take up to 3-5 minutes. "
-            "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
-        )
-        
-        # Initialize analysis complete status with session isolation
-        analysis_key = f'asc842_analysis_complete_{session_id}'
-        if analysis_key not in st.session_state:
-            st.session_state[analysis_key] = False
+        # Display progress
+        steps = [
+            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
+            "Step 5", "Memo Generation"
+        ]
+        progress_placeholder = st.empty()
 
-        # Extract entity name for analysis
-        entity_name = _extract_entity_name(contract_text)
+        # Step-by-step analysis with progress indicators
+        analysis_results = {}
         
-        # Create analysis title
-        analysis_title = f"ASC 842 Lease Analysis - {entity_name} - {analysis_id}"
+        # Create a separate placeholder for progress indicators that can be cleared
+        progress_indicator_placeholder = st.empty()
         
-        # Search for authoritative guidance
-        with st.spinner("🔍 Retrieving ASC 842 authoritative guidance..."):
-            try:
-                # Create comprehensive search query
-                search_terms = [
-                    "lease accounting", "ASC 842", "lease classification",
-                    "lease measurement", "ROU asset", "lease liability"
-                ]
-                    
-                search_query = " ".join(search_terms)
-                authoritative_context = knowledge_search.search_general(search_query)
-                
-                logger.info("ASC 842 authoritative guidance retrieved successfully")
-                
-            except Exception as e:
-                logger.error(f"Error retrieving guidance: {str(e)}")
-                # Use fallback guidance
-                authoritative_context = "ASC 842 lease accounting guidance - using general knowledge."
-                st.warning("⚠️ Using general ASC 842 guidance due to knowledge base issues.")
+        # Run 5 ASC 842 steps with progress
+        for step_num in range(1, 6):
+            # Show progress indicators in clearable placeholder
+            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
 
-        # Perform 5-step analysis
-        with st.spinner("Performing 5-step ASC 842 analysis... This may take 3-5 minutes."):
-            progress_bar = st.progress(0)
-            status_placeholder = st.empty()
-            
-            try:
-                # Show step-by-step progress
-                status_placeholder.text("Starting comprehensive lease analysis...")
-                progress_bar.progress(10)
-                
-                # Perform the analysis
-                analysis_results = analyzer.analyze_lease_contract(
+            with st.spinner(f"Analyzing Step {step_num}..."):
+                # Get relevant guidance from knowledge base
+                authoritative_context = knowledge_search.search_for_step(
+                    step_num, contract_text)
+
+                # Analyze the step with additional context
+                step_result = analyzer._analyze_step(
+                    step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     entity_name=entity_name,
-                    analysis_title=analysis_title,
-                    additional_context=additional_context
-                )
-                
-                progress_bar.progress(100)
-                status_placeholder.text("Analysis complete!")
-                
-                # Store results in session state
-                session_key = f'asc842_analysis_{analysis_id}'
-                st.session_state[session_key] = {
-                    'results': analysis_results,
-                    'filename': filename,
-                    'analysis_id': analysis_id,
-                    'timestamp': datetime.now().isoformat()
-                }
-                st.session_state['current_asc842_analysis'] = session_key
-                
-                logger.info("ASC 842 analysis completed successfully")
-                
-                # Clear progress indicators
-                progress_bar.empty()
-                status_placeholder.empty()
-                
-                # Generate memo
-                _generate_and_display_memo(analysis_results, filename, analysis_id)
-                
-            except Exception as e:
-                progress_bar.empty()
-                status_placeholder.empty()
-                
-                logger.error(f"ASC 842 analysis failed: {str(e)}")
-                st.error(f"❌ Analysis failed: {str(e)}")
-                
-                # Show detailed error for debugging
-                if st.checkbox("🔧 Show technical details", key=f"error_details_{analysis_id}"):
-                    st.code(f"Error: {str(e)}")
-                    
-                return
+                    additional_context=additional_context)
+
+                analysis_results[f'step_{step_num}'] = step_result
+                logger.info(f"DEBUG: Completed step {step_num}")
+
+        # Generate additional sections (Executive Summary, Background, Conclusion)
+        # Show final progress indicators in clearable placeholder
+        ui.analysis_progress(steps, 6, progress_indicator_placeholder)
+
+        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
+            # Extract conclusions from the 5 steps
+            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
+            
+            # Generate the three additional sections
+            executive_summary = analyzer.generate_executive_summary(conclusions_text, entity_name)
+            background = analyzer.generate_background_section(conclusions_text, entity_name)
+            conclusion = analyzer.generate_conclusion_section(conclusions_text)
+            
+            # Combine into the expected structure for memo generator
+            final_results = {
+                'entity_name': entity_name,
+                'analysis_title': analysis_title,
+                'analysis_date': datetime.now().strftime("%B %d, %Y"),
+                'filename': filename,
+                'steps': analysis_results,
+                'executive_summary': executive_summary,
+                'background': background,
+                'conclusion': conclusion
+            }
+            
+            
+            # Generate memo directly from complete analysis results
+            memo_content = memo_generator.combine_clean_steps(final_results)
+
+        # Store memo data in session state and clear progress messages
+        progress_message_placeholder.empty()  # Clears the in-progress message
+        progress_placeholder.empty()  # Clears the step headers
+        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
+        
+        # Create clearable completion message
+        completion_message_placeholder = st.empty()
+        completion_message_placeholder.success(
+            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 842 memo is ready. Scroll down to view the results."
+        )
+        
+        # Signal completion with session isolation
+        st.session_state[analysis_key] = True
+        
+        # Store memo data with session isolation
+        memo_key = f'asc842_memo_data_{session_id}'
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'entity_name': entity_name,
+            'analysis_title': analysis_title,
+            'analysis_date': datetime.now().strftime("%B %d, %Y")
+        }
+             
+        # Display memo inline instead of switching pages
+        st.markdown("---")
+
+        with st.container(border=True):
+            st.markdown("""Your ASC 842 memo is displayed below. To save the results, you can either:
+            
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
+- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
+                """)
+        
+        # Display the memo using CleanMemoGenerator
+        memo_generator_display = CleanMemoGenerator()
+        memo_generator_display.display_clean_memo(memo_content)
+        
+        # Clear completion message immediately after memo displays
+        completion_message_placeholder.empty()
+        
+        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+            # Clear analysis state for fresh start with session isolation
+            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+            
+            # Clean up session-specific data
+            memo_key = f'asc842_memo_data_{session_id}'
+            if memo_key in st.session_state:
+                del st.session_state[memo_key]
+            if analysis_key in st.session_state:
+                del st.session_state[analysis_key]
+            
+            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
+            st.rerun()
 
     except Exception as e:
-        logger.error(f"Unexpected error in ASC 842 analysis: {str(e)}")
-        st.error(f"❌ Unexpected error: {str(e)}")
+        # Clear the progress message even on error
+        progress_message_placeholder.empty()
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
+        logger.error(f"ASC 842 analysis error for session {session_id[:8]}...: {str(e)}")
+        st.session_state[analysis_key] = True  # Signal completion (even on error)
 
 
-def _generate_and_display_memo(analysis_results: Dict[str, Any], filename: Optional[str], analysis_id: str):
-    """Generate and display the professional memo."""
-    
-    st.markdown("---")
-    st.markdown("## 📋 Professional ASC 842 Memorandum")
-    
-    try:
-        with st.spinner("📝 Generating professional memorandum..."):
-            # Import memo generator
-            from asc842.clean_memo_generator import CleanMemoGenerator
-            memo_generator = CleanMemoGenerator()
-            
-            # Add filename to results
-            analysis_results['filename'] = filename or "Lease Documents"
-            
-            # Generate clean memo
-            memo_content = memo_generator.combine_clean_steps(analysis_results)
-            
-            if memo_content and len(memo_content.strip()) > 100:
-                st.success("✅ Memorandum generated successfully!")
-                
-                # Store memo in session state
-                memo_key = f'asc842_memo_{analysis_id}'
-                st.session_state[memo_key] = memo_content
-                
-                # Display the memo
-                memo_generator.display_clean_memo(memo_content)
-                
-                # Analysis complete - no summary needed
-                
-            else:
-                st.error("❌ Memo generation failed - content too short or empty")
-                if st.checkbox("🔧 Show technical details", key=f"memo_error_{analysis_id}"):
-                    st.text(f"Memo content length: {len(memo_content) if memo_content else 0}")
-                    if memo_content:
-                        st.text(memo_content[:500])
-                
-    except Exception as e:
-        logger.error(f"Memo generation failed: {str(e)}")
-        st.error(f"❌ Memo generation failed: {str(e)}")
+# OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
+
+
+# Executive summary generation moved to ASC842StepAnalyzer class
+
+
+# Final conclusion generation moved to ASC842StepAnalyzer class
+
+
+# Issues collection removed - issues are already included in individual step analyses
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+
+# Main function for Streamlit navigation
+def main():
+    """Main function called by Streamlit navigation."""
+    render_asc842_page()
 
 
 
 def _extract_entity_name(contract_text: str) -> str:
-    """Extract entity name from contract or use default."""
-    
-    import re
-    
-    # Look for company names with common suffixes
-    company_patterns = [
-        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+(?:Inc\.?|LLC|Corp\.?|Corporation|Company|Ltd\.?|Limited))',
-        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Solutions(?:\s+Inc\.?)?)',
-        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Technologies(?:\s+Inc\.?)?)',
-        r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+Enterprises(?:\s+Inc\.?)?)'
-    ]
-    
-    # Try to find proper company names first
-    for pattern in company_patterns:
-        matches = re.findall(pattern, contract_text)
+    """Extract the lessee/tenant entity name from typical lease contract preambles or headings."""
+    try:
+        import re
+        
+        if not contract_text:
+            return "Entity"
+
+        # Preprocess: examine the first part of the document (preamble/definitions often appear early)
+        sample = contract_text[:6000]
+
+        # Normalize quotes and whitespace
+        sample = sample.replace(""", '"').replace(""", '"').replace("'", "'")
+        sample = re.sub(r'[ \t]+', ' ', sample)
+
+        # Role vocabularies (lowercase) - adapted for lease contexts
+        lessee_roles = {
+            "lessee", "tenant", "renter", "occupant", "subtenant", "sublessee",
+            "licensee", "grantee", "user", "end user", "end-user"
+        }
+        lessor_roles = {
+            "lessor", "landlord", "owner", "licensor", "grantor", "property owner",
+            "building owner", "landlord entity", "property manager"
+        }
+
+        def clean_name(name: str) -> str:
+            # Trim, remove enclosing quotes/parentheses, compress spaces, strip trailing punctuation
+            n = name.strip().strip(' "').strip()
+            n = re.sub(r'\s+', ' ', n)
+            # Remove common trailing descriptors like .,;:)
+            n = re.sub(r'[\s\.,;:)\]]+$', '', n)
+            # Avoid obvious non-names
+            if len(n) < 3 or len(n) > 120:
+                return ""
+            return n
+
+        def plausible_company(name: str) -> bool:
+            if not name:
+                return False
+            # Avoid address-like strings
+            addr_tokens = {"street", "st.", "road", "rd.", "avenue", "ave.", "suite", "ste.", "floor", "fl.", "drive", "dr.", "blvd", "boulevard", "lane", "ln.", "way", "p.o.", "po box", "box"}
+            lname = name.lower()
+            if any(t in lname for t in addr_tokens):
+                return False
+            # Contains at least one letter and not mostly numbers
+            if not re.search(r'[A-Za-z]', name):
+                return False
+            # Reasonable length already checked in clean_name
+            return True
+
+        # PRIORITY 1: Preamble with both parties defined by role, e.g.:
+        # "between Acme Properties, LLC (\"Lessor\") and Beta Corp (\"Lessee\")"
+        preamble_pair = re.compile(
+            r'\bbetween\s+(?P<p1>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r1>[^"\')]+)["\']?\s*\)\s*(?:,|and)?\s*and\s+(?P<p2>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r2>[^"\')]+)["\']?\s*\)',
+            re.IGNORECASE | re.DOTALL
+        )
+        for m in preamble_pair.finditer(sample):
+            p1, r1, p2, r2 = m.group('p1', 'r1', 'p2', 'r2')
+            name_role_pairs = [
+                (clean_name(p1), r1.strip().lower()),
+                (clean_name(p2), r2.strip().lower())
+            ]
+            for name, role in name_role_pairs:
+                if name and any(lr == role or role in lr for lr in lessee_roles):
+                    return name
+            # If one is clearly lessor and the other not, pick the non-lessor
+            roles = [r1.strip().lower(), r2.strip().lower()]
+            names = [clean_name(p1), clean_name(p2)]
+            if any(rv in lessor_roles for rv in roles):
+                # choose the one whose role is not lessor-like
+                for name, role in zip(names, roles):
+                    if name and (role not in lessor_roles):
+                        return name
+            # If ambiguous, try r2 if it looks like a lessee role
+            if clean_name(p2) and plausible_company(clean_name(p2)):
+                # Heuristic: often the second party is the lessee
+                return clean_name(p2)
+
+        # PRIORITY 2: Single party labeled as lessee-like in the preamble or headings:
+        # e.g., 'and Global Dynamics Corp. ("Lessee")'
+        labeled_single = re.compile(
+            r'\b(?:and\s+)?(?P<name>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<role>Lessee|Tenant|Renter|Occupant|Subtenant|Sublessee|Licensee)["\']?\s*\)',
+            re.IGNORECASE
+        )
+        for m in labeled_single.finditer(sample):
+            name = clean_name(m.group('name'))
+            if name and plausible_company(name):
+                return name
+
+        # PRIORITY 3: Header fields like "Lessee: Acme, Inc." or "Tenant: Orion LLC"
+        labeled_field = re.compile(
+            r'\b(?P<label>Lessee|Tenant|Renter|Occupant|Subtenant|Sublessee|Licensee)\s*[:\-]\s*(?P<name>[A-Za-z0-9\.\,&\-\s]{3,120})',
+            re.IGNORECASE
+        )
+        for m in labeled_field.finditer(sample):
+            name = clean_name(m.group('name'))
+            if name and plausible_company(name):
+                return name
+
+        # PRIORITY 4: If there is a preamble "between X and Y" without roles, try to pick the second party
+        between_two = re.compile(
+            r'\bbetween\s+(?P<p1>[^,\n;]+?)\s+and\s+(?P<p2>[^,\n;]+)',
+            re.IGNORECASE
+        )
+        m = between_two.search(sample)
+        if m:
+            p2 = clean_name(m.group('p2'))
+            if p2 and plausible_company(p2):
+                return p2
+
+        # LAST RESORT: Any plausible company name with common corporate suffixes
+        company_suffix = re.compile(
+            r'([A-Z][A-Za-z0-9&\.\- ]{2,80}?\s(?:Inc\.?|Incorporated|LLC|L\.L\.C\.|Ltd\.?|Limited|Corp\.?|Corporation|PLC|LP|LLP|GmbH|S\.?A\.?R\.?L\.?|S\.?A\.?|SAS|BV|NV|Pty\.?\s?Ltd\.?|Co\.?))\b'
+        )
+        matches = company_suffix.findall(sample)
         if matches:
-            # Return the first found company name
-            entity_name = matches[0].strip()
-            if len(entity_name) > 5 and len(entity_name) < 80:
-                return entity_name
-    
-    # Fallback: look for tenant/lessee patterns but be more selective
-    contract_lower = contract_text.lower()
-    fallback_patterns = [
-        r'(?:lessee|tenant)[:\s]+"([^"]+)"',  # Quoted names
-        r'(?:lessee|tenant)[:\s]+([A-Z][a-zA-Z\s]+(?:Inc\.?|LLC|Corp\.?))',  # Company-like names
-    ]
-    
-    for pattern in fallback_patterns:
-        match = re.search(pattern, contract_text)  # Use original case for fallback
-        if match:
-            entity_name = match.group(1).strip()
-            if len(entity_name) > 5 and len(entity_name) < 80 and not entity_name.lower().startswith('hereby'):
-                return entity_name
-    
-    # Default fallback
-    return "Entity"
+            # Prefer a name that is near lessee-like labels elsewhere
+            for name in matches:
+                if plausible_company(clean_name(name)):
+                    return clean_name(name)
+
+        return "Entity"
+
+    except Exception as e:
+        # Keep existing logging if present
+        if 'logger' in globals():
+            logger.error(f"Error extracting entity name: {str(e)}")
+        return "Entity"
 
 
-# Display current analysis results if available
-def display_current_analysis():
-    """Display current analysis results if available."""
-    
-    current_analysis_key = st.session_state.get('current_asc842_analysis')
-    if current_analysis_key and current_analysis_key in st.session_state:
-        analysis_data = st.session_state[current_analysis_key]
-        
-        st.markdown("---")
-        st.markdown("## 📋 Current Analysis Results")
-        
-        # Show timestamp
-        timestamp = analysis_data.get('timestamp', '')
-        if timestamp:
-            try:
-                ts = datetime.fromisoformat(timestamp)
-                st.markdown(f"*Generated: {ts.strftime('%B %d, %Y at %I:%M %p')}*")
-            except:
-                pass
-        
-        # Check for memo
-        analysis_id = analysis_data.get('analysis_id', '')
-        memo_key = f'asc842_memo_{analysis_id}'
-        
-        if memo_key in st.session_state:
-            from asc842.clean_memo_generator import CleanMemoGenerator
-            memo_generator = CleanMemoGenerator()
-            memo_content = st.session_state[memo_key]
-            
-            memo_generator.display_clean_memo(memo_content)
+
+def _generate_analysis_title() -> str:
+    """Generate analysis title with timestamp."""
+    return f"ASC842_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
 
 
-# Call display function if results exist
-if st.session_state.get('current_asc842_analysis'):
-    display_current_analysis()
+# For direct execution/testing
+if __name__ == "__main__":
+    render_asc842_page()
