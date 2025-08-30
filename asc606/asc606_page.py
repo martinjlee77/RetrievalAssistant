@@ -18,7 +18,6 @@ from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
-
 def render_asc606_page():
     """Render the ASC 606 analysis page."""
     
@@ -120,7 +119,7 @@ def _upload_and_process_asc606():
                 if extracted_text and extracted_text.strip():
                     combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
                     processed_filenames.append(uploaded_file.name)
-                    st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
+                    # st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
                 else:
                     st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
         
@@ -131,8 +130,8 @@ def _upload_and_process_asc606():
         # Create comma-separated filename string
         filename_string = ", ".join(processed_filenames)
         
-        st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
-        st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
+        # st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
+        # st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
         
         return combined_text.strip(), filename_string
         
@@ -140,10 +139,6 @@ def _upload_and_process_asc606():
         logger.error(f"Error processing uploaded files: {str(e)}")
         st.error(f"❌ Error processing files: {str(e)}")
         return None, None
-
-
-# Old validation function removed - using progressive disclosure approach instead
-
 
 def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
     """Perform the complete ASC 606 analysis and display results with session isolation."""
