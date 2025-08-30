@@ -67,7 +67,7 @@ def get_asc842_inputs():
     # Additional info (optional)
     additional_context = st.text_area(
         "2️⃣ Additional information or concerns (optional)",
-        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
+        placeholder="Provide any guidance to the AI that is not included in the uploaded documents or specify your areas of focus or concerns.",
         height=100)
 
     # Check completion status - only contract text required

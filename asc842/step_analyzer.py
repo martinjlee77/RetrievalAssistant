@@ -49,7 +49,7 @@ class ASC842StepAnalyzer:
         self.step_prompts = self._load_step_prompts()
     
     def extract_entity_name_llm(self, contract_text: str) -> str:
-        """Extract the lessee/tenant entity name using LLM analysis."""
+        """Extract the lessee or tenant name using LLM analysis."""
         try:
             logger.info("DEBUG: Extracting entity name using LLM")
             
@@ -58,21 +58,21 @@ class ASC842StepAnalyzer:
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert at identifying company names in lease agreements. Your task is to identify the exact legal name of the lessee/tenant company from the lease document."
+                        "content": "You are an expert at identifying entity names in lease agreements. Your task is to identify the name of the lessee or tenant from the lease document."
                     },
                     {
                         "role": "user",
-                        "content": f"""Based on this lease agreement, what is the exact legal name of the lessee/tenant company?
+                        "content": f"""Based on this lease agreement, what is the name of the lessee or tenant?
 
 Please identify:
-- The company that is leasing/renting the space (not the landlord/lessor)
-- The full legal name including suffixes like Inc., LLC, Corp., etc.
-- Ignore addresses, reference numbers, or other non-company identifiers
+- The entity that is leasing or renting the space and NOT THE LANDLORD OR LESSOR
+- The full name including suffixes like Inc., LLC, Corp., etc.
+- Ignore addresses, reference numbers, or other non-entity identifiers
 
 Lease Agreement Text:
 {contract_text[:4000]}
 
-Respond with ONLY the company name, nothing else."""
+Respond with ONLY the entity name, nothing else."""
                     }
                 ],
                 **self._get_max_tokens_param("default", self.light_model),
