@@ -58,21 +58,21 @@ class ASC606StepAnalyzer:
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the exact legal name of the customer company from the contract document."
+                        "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the name of the customer company from the contract document."
                     },
                     {
                         "role": "user",
-                        "content": f"""Based on this revenue contract, what is the exact legal name of the customer company?
+                        "content": f"""Based on this revenue contract, what is the name of the customer company?
 
 Please identify:
-- The company that is purchasing goods/services (the customer, not the vendor)
-- The full legal name including suffixes like Inc., LLC, Corp., etc.
+- The company that is purchasing goods or services (the customer, not the vendor)
+- The name including suffixes like Inc., LLC, Corp., etc.
 - Ignore addresses, reference numbers, or other non-company identifiers
 
 Contract Text:
 {contract_text[:4000]}
 
-Respond with ONLY the customer company name, nothing else."""
+Respond with ONLY the customer name, nothing else."""
                     }
                 ],
                 **self._get_max_tokens_param("default", self.light_model),
@@ -86,7 +86,7 @@ Respond with ONLY the customer company name, nothing else."""
             
             entity_name = response.choices[0].message.content
             if entity_name is None:
-                logger.warning("LLM returned None for customer entity name")
+                logger.warning("LLM returned None for customer name")
                 return "Customer"
                 
             # Clean the response (remove quotes, extra whitespace)
@@ -94,14 +94,14 @@ Respond with ONLY the customer company name, nothing else."""
             
             # Validate the result
             if len(entity_name) < 2 or len(entity_name) > 120:
-                logger.warning(f"LLM returned suspicious customer entity name: {entity_name}")
+                logger.warning(f"LLM returned suspicious customer name: {entity_name}")
                 return "Customer"
                 
-            logger.info(f"DEBUG: LLM extracted customer entity name: {entity_name}")
+            logger.info(f"DEBUG: LLM extracted customer name: {entity_name}")
             return entity_name
             
         except Exception as e:
-            logger.error(f"Error extracting customer entity name with LLM: {str(e)}")
+            logger.error(f"Error extracting customer name with LLM: {str(e)}")
             return "Customer"
     
     def _get_temperature(self, model_name=None):

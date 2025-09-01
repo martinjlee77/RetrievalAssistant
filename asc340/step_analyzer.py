@@ -49,30 +49,30 @@ class ASC340StepAnalyzer:
         # Initialize component
     
     def extract_entity_name_llm(self, contract_text: str) -> str:
-        """Extract the company entity name using LLM analysis."""
+        """Extract the company name using LLM analysis."""
         try:
-            logger.info("DEBUG: Extracting company entity name using LLM")
+            logger.info("DEBUG: Extracting company name using LLM")
             
             request_params = {
                 "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert at identifying company names in service contracts. Your task is to identify the exact legal name of the service provider company from the contract document."
+                        "content": "You are an expert at identifying the company name in sales commissions or service contracts. Your task is to identify the name of the company that is paying the costs to botain a contract from the user-uploaded documents."
                     },
                     {
                         "role": "user",
-                        "content": f"""Based on this service contract, what is the exact legal name of the company providing the services?
+                        "content": f"""Based on the user-provided documents, what is the name of the company paying the costs to obtain a contract (e.g., commissions)?
 
 Please identify:
-- The company that is providing services (the service provider, not the client)
-- The full legal name including suffixes like Inc., LLC, Corp., etc.
+- The company that is responsible for the costs to obtain a contract
+- The name including suffixes like Inc., LLC, Corp., etc.
 - Ignore addresses, reference numbers, or other non-company identifiers
 
 Contract Text:
 {contract_text[:4000]}
 
-Respond with ONLY the service provider company name, nothing else."""
+Respond with ONLY the company name, nothing else."""
                     }
                 ],
                 **self._get_max_tokens_param("default", self.light_model),

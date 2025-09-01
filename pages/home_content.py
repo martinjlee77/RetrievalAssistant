@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 # st.write(f"Running Streamlit Version: {st.__version__}")
 
 # --- Header Section ---
-st.title("VeritasLogic.ai Platform")
+st.title("VeritasLogic.ai Technical Accounting Solutions (VTAS)")
 st.subheader("Welcome back. Please select an analysis tool below to begin.")
 st.markdown("This application uses the FASB's Accounting Standards Codification for contract analysis, unlike general-purpose LLMs that rely on general knowledge.")
 

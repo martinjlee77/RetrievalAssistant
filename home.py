@@ -8,7 +8,7 @@ import streamlit as st
 
 # 1. Set the page configuration
 st.set_page_config(
-    page_title="VeritasLogic.ai | Multi-Standard Accounting Platform",
+    page_title="Welcome to VeritasLogic.ai",
     layout="wide",
     initial_sidebar_state="expanded")
 
@@ -20,9 +20,9 @@ st.logo("assets/images/nobkg.png", size = "large")
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home"),
     st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
-    st.Page("asc606/asc606_page.py", title="ASC 606 Revenue Recognition"),
-    st.Page("asc340/asc340_page.py", title="ASC 340-40 Sales Commissions"),
-    st.Page("pages/asc842.py", title="ASC 842 Leases"),
+    st.Page("asc606/asc606_page.py", title="ASC 606: 5 Steps", icon="➡️"),
+    st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
+    st.Page("pages/asc842.py", title="ASC 842: Lessee Accounting", icon="➡️")
 ])
 
 # 5. Run the app.

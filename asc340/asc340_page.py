@@ -189,14 +189,14 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
                 return
 
         # Extract entity name using LLM (with regex fallback) 
-        with st.spinner("🏢 Extracting company entity name..."):
+        with st.spinner("🏢 Extracting the company name..."):
             try:
                 customer_name = analyzer.extract_entity_name_llm(contract_text)
-                logger.info(f"LLM extracted company entity name: {customer_name}")
+                logger.info(f"LLM extracted company name: {customer_name}")
             except Exception as e:
                 logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
                 customer_name = _extract_customer_name(contract_text)
-                logger.info(f"Regex fallback company entity name: {customer_name}")
+                logger.info(f"Regex fallback company name: {customer_name}")
 
         # Display progress (match ASC 606 - no memo generation step shown)
         steps = [

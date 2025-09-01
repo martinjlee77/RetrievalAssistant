@@ -26,9 +26,9 @@ def render_asc606_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 606 Analyzer & Memo Generator]")
+    st.title(":primary[ASC 606 5-Step Memo Generator]")
     with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a professional ASC 606 memo. Simply upload your documents to begin.")
+        st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
     
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
@@ -184,14 +184,14 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
                 return
 
         # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🏢 Extracting customer entity name..."):
+        with st.spinner("🏢 Extracting customer name..."):
             try:
                 customer_name = analyzer.extract_entity_name_llm(contract_text)
-                logger.info(f"LLM extracted customer entity name: {customer_name}")
+                logger.info(f"LLM extracted customer : {customer_name}")
             except Exception as e:
                 logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
                 customer_name = _extract_customer_name(contract_text)
-                logger.info(f"Regex fallback customer entity name: {customer_name}")
+                logger.info(f"Regex fallback customer name: {customer_name}")
 
         # Display progress
         steps = [
