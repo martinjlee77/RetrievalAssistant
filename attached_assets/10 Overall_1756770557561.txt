@@ -1,0 +1,724 @@
+805 Business Combinations
+10 Overall
+
+05 Overview and Background
+
+General
+805-10-05-1
+The Business Combinations Topic provides guidance on the accounting and reporting for transactions that represent business combinations to be accounted for under the acquisition method (as described in paragraph 805-10-05-4). In addition, the Topic includes Subtopic 805-50, which provides guidance on transactions sometimes associated with business combinations but that do not meet the requirements to be accounted for as business combinations under the acquisition method. The Business Combinations Topic includes the following Subtopics:
+aOverall
+bIdentifiable Assets and Liabilities, and Any Noncontrolling Interest
+cGoodwill or Gain from Bargain Purchase, Including Consideration Transferred
+dReverse Acquisitions
+eRelated Issues
+fIncome Taxes.
+
+805-10-05-2
+To accomplish the objective identified in paragraph 805-10-10-1, this Topic establishes principles and requirements for how the acquirer does each of the following:
+aRecognizes and measures in its financial statements the identifiable assets acquired, the liabilities assumed, and any noncontrolling interest in the acquiree
+bRecognizes and measures the goodwill acquired in the business combination or a gain from a bargain purchase
+cDetermines what information to disclose to enable users of the financial statements to evaluate the nature and financial effects of the business combination.
+805-10-05-3
+This Subtopic and Subtopics 805-20 and 805-30 address specific aspects of the acquisition method. Subtopic 805-20 addresses the recognition and measurement of identifiable assets acquired, the liabilities assumed, and any noncontrolling interest in the acquiree. Subtopic 805-30 addresses the recognition and measurement of goodwill or a gain from a bargain purchase. This Subtopic addresses requirements of the acquisition method, as outlined in the following paragraph, not addressed by those two Subtopics, including the following:
+aWhether a particular transaction or event is a business combination
+bThe identification of the acquirer and the acquisition date
+cThe period of time that an acquirer has to adjust provisional amounts, referred to as the measurement period
+dThe determination of what is part of a business combination transaction.
+805-10-05-4
+Paragraph 805-10-25-1 requires that a business combination be accounted for by applying what is referred to as the acquisition method. The acquisition method requires all of the following steps:
+aIdentifying the acquirer
+bDetermining the acquisition date
+cRecognizing and measuring the identifiable assets acquired, the liabilities assumed, and any noncontrolling interest in the acquiree
+dRecognizing and measuring goodwill or a gain from a bargain purchase.
+805-10-05-5
+This Subtopic addresses steps (a) and (b) of the acquisition method as listed in the preceding paragraph. Subtopic 805-20 addresses step (c) and Subtopic 805-30 addresses step (d).
+805-10-05-6
+Paragraphs presented in bold type in this Topic state the main principles. All paragraphs have equal authority.
+
+10 Objectives
+General
+805-10-10-1
+The objective of the Subtopics in this Topic that address business combinations is to improve the relevance, representational faithfulness, and comparability of the information that a reporting entity provides in its financial reports about a business combination and its effects.
+
+15 Scope and Scope Exceptions
+
+General
+> Overall Guidance
+805-10-15-1
+The Scope Section of the Overall Subtopic establishes the pervasive scope for all Subtopics of the Business Combinations Topic. Unless explicitly addressed within specific Subtopics, the following scope guidance applies to all Subtopics of the Business Combinations Topic, with the exception of Subtopic 805-50, which has its own discrete scope.
+
+> Entities
+805-10-15-2
+The guidance in the Business Combinations Topic applies to all entities, with specific qualifications and exceptions in paragraph 805-10-15-4.
+> Transactions
+805-10-15-3
+The guidance in the Business Combinations Topic applies to all transactions or other events that meet the definition of a business combination or an acquisition by a not-for-profit entity.
+805-10-15-4
+The guidance in the Business Combinations Topic does not apply to any of the following:
+aThe formation of a joint venture
+bThe acquisition of an asset or a group of assets that does not constitute a business or a nonprofit activity
+cA combination between entities, businesses, or nonprofit activities under common control (see paragraph 805-50-15-6 for examples)
+dAn acquisition by a not-for-profit entity for which the acquisition date is before December 15, 2009 or a merger of not-for-profit entities (NFPs)
+eA transaction or other event in which an NFP obtains control of a not-for-profit entity but does not consolidate that entity, as described in paragraph 958-810-25-4. The Business Combinations Topic also does not apply if an NFP that obtained control in a transaction or other event in which consolidation was permitted but not required decides in a subsequent annual reporting period to begin consolidating a controlled entity that it initially chose not to consolidate.
+fFinancial assets and financial liabilities of a consolidated variable interest entity that is a collateralized financing entity within the scope of the guidance on collateralized financing entities in Subtopic 810-10.
+
+20 Glossary
+topic info
+General Note:The Master Glossary contains all terms identified as glossary terms throughout the Codification. Clicking on any term in the Master Glossary will display where the term is used. The Master Glossary may contain identical terms with different definitions, some of which may not be appropriate for a particular Subtopic. For any particular Subtopic, users should only use the glossary terms included in the particular Subtopic Glossary Section (Section 20).
+Acquiree
+The business or businesses that the acquirer obtains control of in a business combination. This term also includes a nonprofit activity or business that a not-for-profit acquirer obtains control of in an acquisition by a not-for-profit entity.
+Acquirer
+The entity that obtains control of the acquiree. However, in a business combination in which a variable interest entity (VIE) is acquired, the primary beneficiary of that entity always is the acquirer.
+Acquisition by a Not-for-Profit Entity
+A transaction or other event in which a not-for-profit acquirer obtains control of one or more nonprofit activities or businesses and initially recognizes their assets and liabilities in the acquirer's financial statements. When applicable guidance in Topic 805 is applied by a not-for-profit entity, the term business combination has the same meaning as this term has for a for-profit entity. Likewise, a reference to business combinations in guidance that links to Topic 805 has the same meaning as a reference to acquisitions by not-for-profit entities.
+Acquisition Date
+The date on which the acquirer obtains control of the acquiree.
+Beneficial Interests
+Rights to receive all or portions of specified cash inflows received by a trust or other entity, including, but not limited to, all of the following:
+aSenior and subordinated shares of interest, principal, or other cash inflows to be passed-through or paid-through
+bPremiums due to guarantors
+cCommercial paper obligations
+dResidual interests, whether in the form of debt or equity.
+Business
+Paragraphs 805-10-55-3A through 55-6 and 805-10-55-8 through 55-9 define what is considered a business.
+Business Combination
+A transaction or other event in which an acquirer obtains control of one or more businesses. Transactions sometimes referred to as true mergers or mergers of equals also are business combinations. See also Acquisition by a Not-for-Profit Entity.
+Collateralized Financing Entity
+A variable interest entity that holds financial assets, issues beneficial interests in those financial assets, and has no more than nominal equity. The beneficial interests have contractual recourse only to the related assets of the collateralized financing entity and are classified as financial liabilities. A collateralized financing entity may hold nonfinancial assets temporarily as a result of default by the debtor on the underlying debt instruments held as assets by the collateralized financing entity or in an effort to restructure the debt instruments held as assets by the collateralized financing entity. A collateralized financing entity also may hold other financial assets and financial liabilities that are incidental to the operations of the collateralized financing entity and have carrying values that approximate fair value (for example, cash, broker receivables, or broker payables).
+Conduit Debt Securities
+Certain limited-obligation revenue bonds, certificates of participation, or similar debt instruments issued by a state or local governmental entity for the express purpose of providing financing for a specific third party (the conduit bond obligor) that is not a part of the state or local government's financial reporting entity. Although conduit debt securities bear the name of the governmental entity that issues them, the governmental entity often has no obligation for such debt beyond the resources provided by a lease or loan agreement with the third party on whose behalf the securities are issued. Further, the conduit bond obligor is responsible for any future financial reporting requirements.
+Contingent Consideration
+Usually an obligation of the acquirer to transfer additional assets or equity interests to the former owners of an acquiree as part of the exchange for control of the acquiree if specified future events occur or conditions are met. However, contingent consideration also may give the acquirer the right to the return of previously transferred consideration if specified conditions are met.
+Contract
+An agreement between two or more parties that creates enforceable rights and obligations.
+Control
+The direct or indirect ability to determine the direction of management and policies through ownership, contract, or otherwise.
+Control
+The same as the meaning of controlling financial interest in paragraph 810-10-15-8.
+Control of a Not-for-Profit Entity
+See Control.
+Corporate Joint Venture
+A corporation owned and operated by a small group of entities (the joint venturers) as a separate and specific business or project for the mutual benefit of the members of the group. A government may also be a member of the group. The purpose of a corporate joint venture frequently is to share risks and rewards in developing a new market, product or technology; to combine complementary technological knowledge; or to pool resources in developing production or other facilities. A corporate joint venture also usually provides an arrangement under which each joint venturer may participate, directly or indirectly, in the overall management of the joint venture. Joint venturers thus have an interest or relationship other than as passive investors. An entity that is a subsidiary of one of the joint venturers is not a corporate joint venture. The ownership of a corporate joint venture seldom changes, and its stock is usually not traded publicly. A noncontrolling interest held by public ownership, however, does not preclude a corporation from being a corporate joint venture.
+Direct Financing Lease
+From the perspective of a lessor, a lease that meets none of the criteria in paragraph 842-10-25-2 but meets the criteria in paragraph 842-10-25-3(b)and is not an operating lease in accordance with paragraph 842-10-25-3A.
+Equity Interests
+Used broadly to mean ownership interests of investor-owned entities; owner, member, or participant interests of mutual entities; and owner or member interests in the net assets of not-for-profit entities.
+Fair Value
+The price that would be received to sell an asset or paid to transfer a liability in an orderly transaction between market participants at the measurement date.
+Financial Asset
+Cash, evidence of an ownership interest in an entity, or a contract that conveys to one entity a right to do either of the following:
+aReceive cash or another financial instrument from a second entity
+bExchange other financial instruments on potentially favorable terms with the second entity.
+Foreign Entity
+An operation (for example, subsidiary, division, branch, joint venture, and so forth) whose financial statements are both:
+aPrepared in a currency other than the reporting currency of the reporting entity
+bCombined or consolidated with or accounted for on the equity basis in the financial statements of the reporting entity.
+Goodwill
+An asset representing the future economic benefits arising from other assets acquired in a business combination or an acquisition by a not-for-profit entity that are not individually identified and separately recognized. For ease of reference, this term also includes the immediate charge recognized by not-for-profit entities in accordance with paragraph 958-805-25-29.
+Identifiable
+An asset is identifiable if it meets either of the following criteria:
+aIt is separable, that is, capable of being separated or divided from the entity and sold, transferred, licensed, rented, or exchanged, either individually or together with a related contract, identifiable asset, or liability, regardless of whether the entity intends to do so.
+bIt arises from contractual or other legal rights, regardless of whether those rights are transferable or separable from the entity or from other rights and obligations.
+Intangible Asset Class
+A group of intangible assets that are similar, either by their nature or by their use in the operations of an entity.
+Intangible Assets
+Assets (not including financial assets) that lack physical substance. (The term intangible assets is used to refer to intangible assets other than goodwill.)
+Joint Venture
+An entity owned and operated by a small group of businesses (the joint venturers) as a separate and specific business or project for the mutual benefit of the members of the group. A government may also be a member of the group. The purpose of a joint venture frequently is to share risks and rewards in developing a new market, product, or technology; to combine complementary technological knowledge; or to pool resources in developing production or other facilities. A joint venture also usually provides an arrangement under which each joint venturer may participate, directly or indirectly, in the overall management of the joint venture. Joint venturers thus have an interest or relationship other than as passive investors. An entity that is a subsidiary of one of the joint venturers is not a joint venture. The ownership of a joint venture seldom changes, and its equity interests usually are not traded publicly. A minority public ownership, however, does not preclude an entity from being a joint venture. As distinguished from a corporate joint venture, a joint venture is not limited to corporate entities.
+Lease
+A contract, or part of a contract, that conveys the right to control the use of identified property, plant, or equipment (an identified asset) for a period of time in exchange for consideration.
+Legal Entity
+Any legal structure used to conduct activities or to hold assets. Some examples of such structures are corporations, partnerships, limited liability companies, grantor trusts, and other trusts.
+Lessee
+An entity that enters into a contract to obtain the right to use an underlying asset for a period of time in exchange for consideration.
+Lessor
+An entity that enters into a contract to provide the right to use an underlying asset for a period of time in exchange for consideration.
+Market Participants
+Buyers and sellers in the principal (or most advantageous) market for the asset or liability that have all of the following characteristics:
+aThey are independent of each other, that is, they are not related parties, although the price in a related-party transaction may be used as an input to a fair value measurement if the reporting entity has evidence that the transaction was entered into at market terms
+bThey are knowledgeable, having a reasonable understanding about the asset or liability and the transaction using all available information, including information that might be obtained through due diligence efforts that are usual and customary
+cThey are able to enter into a transaction for the asset or liability
+dThey are willing to enter into a transaction for the asset or liability, that is, they are motivated but not forced or otherwise compelled to do so.
+Merger of Not-for-Profit Entities
+A transaction or other event in which the governing bodies of two or more not-for-profit entities cede control of those entities to create a new not-for-profit entity.
+Noncontrolling Interest
+The portion of equity (net assets) in a subsidiary not attributable, directly or indirectly, to a parent. A noncontrolling interest is sometimes called a minority interest.
+Nonfinancial Asset
+An asset that is not a financial asset. Nonfinancial assets include land, buildings, use of facilities or utilities, materials and supplies, intangible assets, or services.
+Nonprofit Activity
+An integrated set of activities and assets that is capable of being conducted and managed for the purpose of providing benefits, other than goods or services at a profit or profit equivalent, as a fulfillment of an entity's purpose or mission (for example, goods or services to beneficiaries, customers, or members). As with a not-for-profit entity, a nonprofit activity possesses characteristics that distinguish it from a business or a for-profit business entity.
+Not-for-Profit Entity
+An entity that possesses the following characteristics, in varying degrees, that distinguish it from a business entity:
+aContributions of significant amounts of resources from resource providers who do not expect commensurate or proportionate pecuniary return
+bOperating purposes other than to provide goods or services at a profit
+cAbsence of ownership interests like those of business entities.
+Entities that clearly fall outside this definition include the following:
+aAll investor-owned entities
+bEntities that provide dividends, lower costs, or other economic benefits directly and proportionately to their owners, members, or participants, such as mutual insurance entities, credit unions, farm and rural electric cooperatives, and employee benefit plans.
+Orderly Transaction
+A transaction that assumes exposure to the market for a period before the measurement date to allow for marketing activities that are usual and customary for transactions involving such assets or liabilities; it is not a forced transaction (for example, a forced liquidation or distress sale).
+Owners
+Used broadly to include holders of ownership interests (equity interests) of investor-owned entities, mutual entities, or not-for-profit entities. Owners include shareholders, partners, proprietors, or members or participants of mutual entities. Owners also include owner and member interests in the net assets of not-for-profit entities.
+Primary Beneficiary
+An entity that consolidates a variable interest entity (VIE). See paragraphs 810-10-25-38 through 25-38J for guidance on determining the primary beneficiary.
+Public Business Entity
+A public business entity is a business entity meeting any one of the criteria below. Neither a not-for-profit entity nor an employee benefit plan is a business entity.
+aIt is required by the U.S. Securities and Exchange Commission (SEC) to file or furnish financial statements, or does file or furnish financial statements (including voluntary filers), with the SEC (including other entities whose financial statements or financial information are required to be or are included in a filing).
+bIt is required by the Securities Exchange Act of 1934 (the Act), as amended, or rules or regulations promulgated under the Act, to file or furnish financial statements with a regulatory agency other than the SEC.
+cIt is required to file or furnish financial statements with a foreign or domestic regulatory agency in preparation for the sale of or for purposes of issuing securities that are not subject to contractual restrictions on transfer.
+dIt has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market.
+eIt has one or more securities that are not subject to contractual restrictions on transfer, and it is required by law, contract, or regulation to prepare U.S. GAAP financial statements (including notes) and make them publicly available on a periodic basis (for example, interim or annual periods). An entity must meet both of these conditions to meet this criterion.
+An entity may meet the definition of a public business entity solely because its financial statements or financial information is included in another entity's filing with the SEC. In that case, the entity is only a public business entity for purposes of financial statements that are filed or furnished with the SEC.
+Public Entity
+A business entity or a not-for-profit entity that meets any of the following conditions:
+aIt has issued debt or equity securities or is a conduit bond obligor for conduit debt securities that are traded in a public market (a domestic or foreign stock exchange or an over-the-counter market, including local or regional markets).
+bIt is required to file financial statements with the Securities and Exchange Commission (SEC).
+cIt provides financial statements for the purpose of issuing any class of securities in a public market.
+Related Parties
+Related parties include:
+aAffiliates of the entity
+bEntities for which investments in their equity securities would be required, absent the election of the fair value option under the Fair Value Option Subsection of Section 825-10-15, to be accounted for by the equity method by the investing entity
+cTrusts for the benefit of employees, such as pension and profit-sharing trusts that are managed by or under the trusteeship of management
+dPrincipal owners of the entity and members of their immediate families
+eManagement of the entity and members of their immediate families
+fOther parties with which the entity may deal if one party controls or can significantly influence the management or operating policies of the other to an extent that one of the transacting parties might be prevented from fully pursuing its own separate interests
+gOther parties that can significantly influence the management or operating policies of the transacting parties or that have an ownership interest in one of the transacting parties and can significantly influence the other to an extent that one or more of the transacting parties might be prevented from fully pursuing its own separate interests.
+Reverse Acquisition
+An acquisition in which the entity that issues securities (the legal acquirer) is identified as the acquiree for accounting purposes based on the guidance in paragraphs 805-10-55-11 through 55-15. The entity whose equity interests are acquired (the legal acquiree) must be the acquirer for accounting purposes for the transaction to be considered a reverse acquisition.
+Sales-Type Lease
+From the perspective of a lessor, a lease that meets one or more of the criteria in paragraph 842-10-25-2 and is not an operating lease in accordance with paragraph 842-10-25-3A.
+Security
+A share, participation, or other interest in property or in an entity of the issuer or an obligation of the issuer that has all of the following characteristics:
+aIt is either represented by an instrument issued in bearer or registered form or, if not represented by an instrument, is registered in books maintained to record transfers by or on behalf of the issuer.
+bIt is of a type commonly dealt in on securities exchanges or markets or, when represented by an instrument, is commonly recognized in any area in which it is issued or dealt in as a medium for investment.
+cIt either is one of a class or series or by its terms is divisible into a class or series of shares, participations, interests, or obligations.
+Underlying Asset
+An asset that is the subject of a lease for which a right to use that asset has been conveyed to a lessee. The underlying asset could be a physically distinct portion of a single asset.
+Variable Interest Entity
+A legal entity subject to consolidation according to the provisions of the Variable Interest Entities Subsections of Subtopic 810-10.
+
+25 Recognition
+
+General
+
+805-10-25-1
+An entity shall determine whether a transaction or other event is a business combination by applying the definition in this Subtopic, which requires that the assets acquired and liabilities assumed constitute a business. If the assets acquired are not a business, the reporting entity shall account for the transaction or other event as an asset acquisition.An entity shall account for each business combination by applying the acquisition method.
+805-10-25-2
+Paragraph 805-10-05-4 summarizes the four steps in the acquisition method. This Section establishes the requirements for the following two of the four steps:
+aIdentifying the acquirer
+bIdentifying the acquisition date.
+805-10-25-3
+This Section also provides guidance on all of the following:
+aParticular types of business combinations
+bThe measurement period
+cDetermining what is part of the business combination transaction.
+> Identifying the Acquirer
+805-10-25-4
+For each business combination, one of the combining entities shall be identified as the acquirer.
+805-10-25-5
+The guidance in the General Subsections of Subtopic 810-10 related to determining the existence of a controlling financial interest shall be used to identify the acquirer—the entity that obtains control of the acquiree. If a business combination has occurred but applying that guidance does not clearly indicate which of the combining entities is the acquirer, the factors in paragraphs 805-10-55-11 through 55-15 shall be considered in making that determination. However, in a business combination in which a variable interest entity (VIE) is acquired, the primary beneficiary of that entity always is the acquirer. The determination of which party, if any, is the primary beneficiary of a VIE shall be made in accordance with the guidance in the Variable Interest Entities Subsections of Subtopic 810-10, not by applying either the guidance in the General Subsections of that Subtopic, relating to a controlling financial interest, or in paragraphs 805-10-55-11 through 55-15.
+
+> Identifying the Acquisition Date
+805-10-25-6
+The acquirer shall identify the acquisition date, which is the date on which it obtains control of the acquiree.
+805-10-25-7
+The date on which the acquirer obtains control of the acquiree generally is the date on which the acquirer legally transfers the consideration, acquires the assets, and assumes the liabilities of the acquiree—the closing date. However, the acquirer might obtain control on a date that is either earlier or later than the closing date. For example, the acquisition date precedes the closing date if a written agreement provides that the acquirer obtains control of the acquiree on a date before the closing date. An acquirer shall consider all pertinent facts and circumstances in identifying the acquisition date.
+> Particular Types of Business Combinations
+805-10-25-8
+The following guidance describes the accounting for a business combination achieved in stages and a business combination achieved without the transfer of consideration.
+· > A Business Combination Achieved in Stages
+805-10-25-9
+An acquirer sometimes obtains control of an acquiree in which it held an equity interest immediately before the acquisition date. For example, on December 31, 20X1, Entity A holds a 35 percent noncontrolling equity interest in Entity B. On that date, Entity A purchases an additional 40 percent interest in Entity B, which gives it control of Entity B. This Topic refers to such a transaction as a business combination achieved in stages, sometimes also referred to as a step acquisition.
+805-10-25-10
+In a business combination achieved in stages, the acquirer shall remeasure its previously held equity interest in the acquiree at its acquisition-date fair value and recognize the resulting gain or loss, if any, in earnings. In prior reporting periods, with respect to its previously held equity method investment, the acquirer may have recognized amounts in other comprehensive income in accordance with paragraph 323-10-35-18. If so, the amount that was recognized in other comprehensive income shall be reclassified and included in the calculation of gain or loss as of the acquisition date. If the business combination achieved in stages relates to a previously held equity method investment that is a foreign entity, the amount of accumulated other comprehensive income that is reclassified and included in the calculation of gain or loss shall include any foreign currency translation adjustment related to that previously held investment. For guidance on derecognizing foreign currency translation adjustments recorded in accumulated other comprehensive income, see Section 830-30-40.
+· > A Business Combination Achieved Without the Transfer of Consideration
+805-10-25-11
+An acquirer sometimes obtains control of an acquiree without transferring consideration. The acquisition method of accounting for a business combination applies to those combinations. Such circumstances include any of the following:
+aThe acquiree repurchases a sufficient number of its own shares for an existing investor (the acquirer) to obtain control.
+bMinority veto rights lapse that previously kept the acquirer from controlling an acquiree in which the acquirer held the majority voting interest.
+cThe acquirer and acquiree agree to combine their businesses by contract alone. The acquirer transfers no consideration in exchange for control of an acquiree and holds no equity interests in the acquiree, either on the acquisition date or previously. Examples of business combinations achieved by contract alone include bringing two businesses together in a stapling arrangement or forming a dual-listed corporation.
+805-10-25-12
+In a business combination achieved by contract alone, the acquirer shall attribute to the equity holders of the acquiree the amount of the acquiree's net assets recognized in accordance with the requirements of this Topic. In other words, the equity interests in the acquiree held by parties other than the acquirer are a noncontrolling interest in the acquirer's postcombination financial statements even if the result is that all of the equity interests in the acquiree are attributed to the noncontrolling interest.
+> The Measurement Period
+805-10-25-13
+If the initial accounting for a business combination is incomplete by the end of the reporting period in which the combination occurs, the acquirer shall report in its financial statements provisional amounts for the items for which the accounting is incomplete. During the measurement period, in accordance with paragraph 805-10-25-17, the acquirer shall adjust the provisional amounts recognized at the acquisition date to reflect new information obtained about facts and circumstances that existed as of the acquisition date that, if known, would have affected the measurement of the amounts recognized as of that date.
+805-10-25-14
+During the measurement period, the acquirer also shall recognize additional assets or liabilities if new information is obtained about facts and circumstances that existed as of the acquisition date that, if known, would have resulted in the recognition of those assets and liabilities as of that date. The measurement period ends as soon as the acquirer receives the information it was seeking about facts and circumstances that existed as of the acquisition date or learns that more information is not obtainable. However, the measurement period shall not exceed one year from the acquisition date.
+805-10-25-15
+The measurement period is the period after the acquisition date during which the acquirer may adjust the provisional amounts recognized for a business combination. The measurement period provides the acquirer with a reasonable time to obtain the information necessary to identify and measure any of the following as of the acquisition date in accordance with the requirements of this Topic:
+aThe identifiable assets acquired, liabilities assumed, and any noncontrolling interest in the acquiree (see Subtopic 805-20)
+bThe consideration transferred for the acquiree (or the other amount used in measuring goodwill in accordance with paragraphs 805-30-30-1 through 30-3)
+cIn a business combination achieved in stages, the equity interest in the acquiree previously held by the acquirer (see paragraph 805-30-30-1(a)(3))
+dThe resulting goodwill recognized in accordance with paragraph 805-30-30-1 or the gain on a bargain purchase recognized in accordance with paragraph 805-30-25-2.
+805-10-25-16
+The acquirer recognizes an increase (decrease) in the provisional amount recognized for an identifiable asset (liability) by means of a decrease (increase) in goodwill. However, new information obtained during the measurement period sometimes may result in an adjustment to the provisional amount of more than one asset or liability. For example, the acquirer might have assumed a liability to pay damages related to an accident in one of the acquiree's facilities, part or all of which are covered by the acquiree's liability insurance policy. If the acquirer obtains new information during the measurement period about the acquisition-date fair value of that liability, the adjustment to goodwill resulting from a change to the provisional amount recognized for the liability would be offset (in whole or in part) by a corresponding adjustment to goodwill resulting from a change to the provisional amount recognized for the claim receivable from the insurer.
+805-10-25-17
+During the measurement period, the acquirer shall recognize adjustments to the provisional amounts with a corresponding adjustment to goodwill in the reporting period in which the adjustments to the provisional amounts are determined. Thus, the acquirer shall adjust its financial statements as needed, including recognizing in its current-period earnings the full effect of changes in depreciation, amortization, or other income effects, by line item, if any, as a result of the change to the provisional amounts calculated as if the accounting had been completed at the acquisition date. Paragraph 805-10-55-16 and Example 1 (see paragraph 805-10-55-27) provide additional guidance.
+805-10-25-18
+Paragraphs 805-10-30-2 through 30-3 require consideration of all pertinent factors in determining whether information obtained after the acquisition date should result in an adjustment to the provisional amounts recognized or whether that information results from events that occurred after the acquisition date.
+805-10-25-19
+After the measurement period ends, the acquirer shall revise the accounting for a business combination only to correct an error in accordance with Topic 250.
+> Determining What Is Part of the Business Combination Transaction
+805-10-25-20
+The acquirer and the acquiree may have a preexisting relationship or other arrangement before negotiations for the business combination began, or they may enter into an arrangement during the negotiations that is separate from the business combination. In either situation, the acquirer shall identify any amounts that are not part of what the acquirer and the acquiree (or its former owners) exchanged in the business combination, that is, amounts that are not part of the exchange for the acquiree. The acquirer shall recognize as part of applying the acquisition method only the consideration transferred for the acquiree and the assets acquired and liabilities assumed in the exchange for the acquiree. Separate transactions shall be accounted for in accordance with the relevant generally accepted accounting principles (GAAP).
+805-10-25-21
+A transaction entered into by or on behalf of the acquirer or primarily for the benefit of the acquirer or the combined entity, rather than primarily for the benefit of the acquiree (or its former owners) before the combination, is likely to be a separate transaction. The following are examples of separate transactions that are not to be included in applying the acquisition method:
+aA transaction that in effect settles preexisting relationships between the acquirer and acquiree (see paragraphs 805-10-55-20 through 55-23)
+bA transaction that compensates employees or former owners of the acquiree for future services (see paragraphs 805-10-55-24 through 55-26)
+cA transaction that reimburses the acquiree or its former owners for paying the acquirer's acquisition-related costs (see paragraph 805-10-25-23).
+805-10-25-22
+Paragraphs 805-10-55-18 through 55-26, 805-30-55-6 through 55-13, 805-740-25-10 through 25-11, 805-740-45-5 through 45-6, and Example 2 (see paragraph 805-10-55-30) provide additional guidance for determining whether a transaction is separate from the business combination transaction.
+> Acquisition-Related Costs
+805-10-25-23
+Acquisition-related costs are costs the acquirer incurs to effect a business combination. Those costs include finder's fees; advisory, legal, accounting, valuation, and other professional or consulting fees; general administrative costs, including the costs of maintaining an internal acquisitions department; and costs of registering and issuing debt and equity securities. The acquirer shall account for acquisition-related costs as expenses in the periods in which the costs are incurred and the services are received, with one exception. The costs to issue debt or equity securities shall be recognized in accordance with other applicable GAAP.
+
+30 Initial Measurement
+
+General Note: The Initial Measurement Section provides guidance on the criteria and amounts used to measure a particular item at the date of initial recognition.
+General
+805-10-30-1
+Paragraph 805-10-25-15 establishes that the measurement period provides the acquirer with a reasonable time to obtain the information necessary to identify and measure various items in a business combination.
+805-10-30-2
+The acquirer shall consider all pertinent factors in determining whether information obtained after the acquisition date should result in an adjustment to the provisional amounts recognized or whether that information results from events that occurred after the acquisition date. Pertinent factors include the time at which additional information is obtained and whether the acquirer can identify a reason for a change to provisional amounts.
+805-10-30-3
+Information that is obtained shortly after the acquisition date is more likely to reflect circumstances that existed at the acquisition date than is information obtained several months later. For example, unless an intervening event that changed its fair value can be identified, the sale of an asset to a third party shortly after the acquisition date for an amount that differs significantly from its provisional fair value determined at that date is likely to indicate an error in the provisional amount.
+
+35 Subsequent Measurement
+
+General Note: The Subsequent Measurement Section provides guidance on an entity's subsequent measurement and subsequent recognition of an item. Situations that may result in subsequent changes to carrying amount include impairment, credit losses, fair value adjustments, depreciation and amortization, and so forth.
+General
+805-10-35-1
+In general, an acquirer shall subsequently measure and account for assets acquired, liabilities assumed or incurred, and equity instruments issued in a business combination in accordance with other applicable generally accepted accounting principles (GAAP) for those items, depending on their nature. However, this Topic provides guidance on subsequently measuring and accounting for any of the following assets acquired, liabilities assumed or incurred, and equity instruments issued in a business combination:
+aReacquired rights (see paragraph 805-20-35-2)
+bAssets and liabilities arising from contingencies recognized as of the acquisition date (see paragraph 805-20-35-3)
+cIndemnification assets (see paragraph 805-20-35-4)
+dContingent consideration (see paragraph 805-30-35-1)
+eContingent consideration arrangements of an acquiree assumed by the acquirer (see paragraph 805-30-35-1A).
+805-10-35-2
+Other Subtopics in this Topic provide examples of guidance elsewhere in GAAP on subsequently measuring and accounting for assets acquired, liabilities assumed or incurred, and any noncontrolling interests in a business combination.
+
+50 Disclosure
+
+General Note: The Disclosure Section provides guidance regarding the disclosure in the notes to financial statements. In some cases, disclosure may relate to disclosure on the face of the financial statements.
+General
+ShowProposedASURelated Proposed ASUs
+> Business Combinations Occurring during a Current Reporting Period or after the Reporting Date but before the Financial Statements Are Issued
+805-10-50-1
+The acquirer shall disclose information that enables users of its financial statements to evaluate the nature and financial effect of a business combination that occurs either:
+aDuring the current reporting period
+bAfter the reporting date but before the financial statements are issued or are available to be issued (as discussed in Section 855-10-25).
+805-10-50-2
+To meet the objective in paragraph 805-10-50-1, the acquirer shall disclose the following information for each business combination that occurs during the reporting period:
+aThe name and a description of the acquiree
+bThe acquisition date
+cThe percentage of voting equity interests acquired
+dThe primary reasons for the business combination and a description of how the acquirer obtained control of the acquiree
+eFor transactions that are recognized separately from the acquisition of assets and assumptions of liabilities in the business combination (see paragraph 805-10-25-20), all of the following:
+1A description of each transaction
+2How the acquirer accounted for each transaction
+3The amounts recognized for each transaction and the line item in the financial statements in which each amount is recognized
+4If the transaction is the effective settlement of a preexisting relationship, the method used to determine the settlement amount.
+fThe disclosure of separately recognized transactions required in (e) shall include the amount of acquisition-related costs, the amount recognized as an expense, and the line item or items in the income statement in which those expenses are recognized. The amount of any issuance costs not recognized as an expense and how they were recognized also shall be disclosed.
+gIn a business combination achieved in stages, all of the following:
+1The acquisition-date fair value of the equity interest in the acquiree held by the acquirer immediately before the acquisition date
+2The amount of any gain or loss recognized as a result of remeasuring to fair value the equity interest in the acquiree held by the acquirer immediately before the business combination (see paragraph 805-10-25-10) and the line item in the income statement in which that gain or loss is recognized
+3The valuation technique(s) used to measure the acquisition-date fair value of the equity interest in the acquiree held by the acquirer immediately before the business combination
+4Information that enables users of the acquirer's financial statements to assess the inputs used to develop the fair value measurement of the equity interest in the acquiree held by the acquirer immediately before the business combination.
+hIf the acquirer is a public entity, all of the following:
+1The amounts of revenue and earnings of the acquiree since the acquisition date included in the consolidated income statement for the reporting period.
+2If comparative financial statements are not presented, the revenue and earnings of the combined entity for the current reporting period as though the acquisition date for all business combinations that occurred during the year had been as of the beginning of the annual reporting period (supplemental pro forma information).
+3If comparative financial statements are presented, the revenue and earnings of the combined entity as though the business combination(s) that occurred during the current year had occurred as of the beginning of the comparable prior annual reporting period (supplemental pro forma information). For example, for a calendar year-end entity, disclosures would be provided for a business combination that occurs in 20X2, as if it occurred on January 1, 20X1. Such disclosures would not be revised if 20X2 is presented for comparative purposes with the 20X3 financial statements (even if 20X2 is the earliest period presented).
+4The nature and amount of any material, nonrecurring pro forma adjustments directly attributable to the business combination(s) included in the reported pro forma revenue and earnings (supplemental pro forma information).
+If disclosure of any of the information required by (h) is impracticable, the acquirer shall disclose that fact and explain why the disclosure is impracticable. In this context, the term impracticable has the same meaning as in paragraph 250-10-45-9.
+805-10-50-3
+For individually immaterial business combinations occurring during the reporting period that are material collectively, the acquirer shall disclose the information required by (e) through (h) in paragraph 805-10-50-2 in the aggregate.
+805-10-50-4
+If the acquisition date of a business combination is after the reporting date but before the financial statements are issued or are available to be issued (as discussed in Section 855-10-25), the acquirer shall disclose the information required by paragraph 805-10-50-2 unless the initial accounting for the business combination is incomplete at the time the financial statements are issued or are available to be issued. In that situation, the acquirer shall describe which disclosures could not be made and the reason why they could not be made.
+> The Financial Effects of Adjustments That Relate to Business Combinations That Occurred in the Current or Previous Reporting Periods
+805-10-50-5
+The acquirer shall disclose information that enables users of its financial statements to evaluate the financial effects of adjustments recognized in the current reporting period that relate to business combinations that occurred in the current or previous reporting periods.
+805-10-50-6
+Paragraph superseded by Accounting Standards Update No. 2015-10.
+> Other Disclosures
+805-10-50-7
+If the specific disclosures required by this Subtopic and other generally accepted accounting principles (GAAP) do not meet the objectives set out in paragraphs 805-10-50-1 and 805-10-50-5, the acquirer shall disclose whatever additional information is necessary to meet those objectives.
+805-10-50-8
+Example 5 (see paragraph 805-10-55-37 through 55-50) illustrates the disclosure requirements applicable to business combinations.
+
+55 Implementation Guidance and Illustrations
+
+General
+
+805-10-55-1
+This Section is an integral part of the requirements of this Subtopic. This Section provides additional guidance and illustrations that address the general application of accounting requirements for business combinations.
+> Implementation Guidance
+· > Identifying a Business Combination
+805-10-55-2
+Paragraph 805-10-25-1 requires an entity to determine whether a transaction or event is a business combination. In a business combination, an acquirer might obtain control of an acquiree in a variety of ways, including any of the following:
+aBy transferring cash, cash equivalents, or other assets (including net assets that constitute a business)
+bBy incurring liabilities
+cBy issuing equity interests
+dBy providing more than one type of consideration
+eWithout transferring consideration, including by contract alone (see paragraph 805-10-25-11).
+805-10-55-3
+A business combination may be structured in a variety of ways for legal, taxation, or other reasons, which include but are not limited to, the following:
+aOne or more businesses become subsidiaries of an acquirer or the net assets of one or more businesses are legally merged into the acquirer.
+bOne combining entity transfers its net assets or its owners transfer their equity interests to another combining entity or its owners.
+cAll of the combining entities transfer their net assets or the owners of those entities transfer their equity interests to a newly formed entity (sometimes referred to as a roll-up or put-together transaction).
+dA group of former owners of one of the combining entities obtains control of the combined entity.
+· > Definition of a Business
+805-10-55-3A
+A business is an integrated set of activities and assets that is capable of being conducted and managed for the purpose of providing a return in the form of dividends, lower costs, or other economic benefits directly to investors or other owners, members, or participants. To be considered a business, an integrated set must meet the requirements in paragraphs 805-10-55-4 through 55-6 and 805-10-55-8 through 55-9.
+805-10-55-4
+A business consists of inputs and processes applied to those inputs that have the ability to contribute to the creation of outputs. Although businesses usually have outputs, outputs are not required for an integrated set to qualify as a business. The three elements of a business are defined as follows:
+aInput. Any economic resource that creates, or has the ability to contribute to the creation of, outputs when one or more processes are applied to it. Examples include long-lived assets (including intangible assets or rights to use long-lived assets), intellectual property, the ability to obtain access to necessary materials or rights, and employees.
+bProcess. Any system, standard, protocol, convention, or rule that when applied to an input or inputs, creates or has the ability to contribute to the creation of outputs. Examples include strategic management processes, operational processes, and resource management processes. These processes typically are documented, but the intellectual capacity of an organized workforce having the necessary skills and experience following rules and conventions may provide the necessary processes that are capable of being applied to inputs to create outputs. Accounting, billing, payroll, and other administrative systems typically are not processes used to create outputs.
+cOutput. The result of inputs and processes applied to those inputs that provide goods or services to customers, investment income (such as dividends or interest), or other revenues.
+805-10-55-5
+To be capable of being conducted and managed for the purposes described in paragraph 805-10-55-3A, an integrated set of activities and assets requires two essential elements—inputs and processes applied to those inputs. A business need not include all the inputs or processes that the seller used in operating that business. However, to be considered a business, the set must include, at a minimum, an input and a substantive process that together significantly contribute to the ability to create output. Paragraphs 805-10-55-5A through 55-5C provide a practical screen to determine when a set would not be considered a business. If the screen is not met, further assessment is necessary to determine whether the set is a business. Paragraphs 805-10-55-5D through 55-6 and 805-10-55-8 through 55-9 provide a framework to assist an entity in evaluating whether the set includes both an input and a substantive process.
+· · > Single or Similar Asset Threshold
+805-10-55-5A
+If substantially all of the fair value of the gross assets acquired is concentrated in a single identifiable asset or group of similar identifiable assets, the set is not considered a business. Gross assets acquired should exclude cash and cash equivalents, deferred tax assets, and goodwill resulting from the effects of deferred tax liabilities. However, the gross assets acquired should include any consideration transferred (plus the fair value of any noncontrolling interest and previously held interest, if any) in excess of the fair value of net identifiable assets acquired.
+· · > Single Identifiable Asset
+805-10-55-5B
+A single identifiable asset includes any individual asset or group of assets that could be recognized and measured as a single identifiable asset in a business combination. However, for purposes of this evaluation, the following should be considered a single asset:
+aA tangible asset that is attached to and cannot be physically removed and used separately from another tangible asset (or an intangible asset representing the right to use a tangible asset) without incurring significant cost or significant diminution in utility or fair value to either asset (for example, land and building)
+bIn-place lease intangibles, including favorable and unfavorable intangible assets or liabilities, and the related leased assets.
+· · > Similar Assets
+805-10-55-5C
+A group of similar assets includes multiple assets identified in accordance with paragraph 805-10-55-5B. When evaluating whether assets are similar, an entity should consider the nature of each single identifiable asset and the risks associated with managing and creating outputs from the assets (that is, the risk characteristics). However, the following should not be considered similar assets:
+aA tangible asset and an intangible asset
+bIdentifiable intangible assets in different major intangible asset classes (for example, customer-related intangibles, trademarks, and in-process research and development)
+cA financial asset and a nonfinancial asset
+dDifferent major classes of financial assets (for example, accounts receivable and marketable securities)
+eDifferent major classes of tangible assets (for example, inventory, manufacturing equipment, and automobiles)
+fIdentifiable assets within the same major asset class that have significantly different risk characteristics.
+· · > Framework—Inputs, Substantive Processes, and Other Considerations
+805-10-55-5D
+When a set does not have outputs (for example, an early stage company that has not generated revenues), the set will have both an input and a substantive process that together significantly contribute to the ability to create outputs only if it includes employees that form an organized workforce and an input that the workforce could develop or convert into output. The organized workforce must have the necessary skills, knowledge, or experience to perform an acquired process (or group of processes) that when applied to another acquired input or inputs is critical to the ability to develop or convert that acquired input or inputs into outputs. An entity should consider the following in evaluating whether the acquired workforce is performing a substantive process:
+aA process (or group of processes) is not critical if, for example, it is considered ancillary or minor in the context of all the processes required to create outputs.
+bInputs that employees who form an organized workforce could develop (or are developing) or convert into outputs could include the following:
+1Intellectual property that could be used to develop a good or service
+2Resources that could be developed to create outputs
+3Access to necessary materials or rights that enable the creation of future outputs.
+Examples of inputs that could be developed include technology, mineral interests, real estate, and in-process research and development.
+805-10-55-5E
+When the set has outputs (that is, there is a continuation of revenue before and after the transaction), the set will have both an input and a substantive process that together significantly contribute to the ability to create outputs when any of the following are present:
+aEmployees that form an organized workforce that has the necessary skills, knowledge, or experience to perform an acquired process (or group of processes) that when applied to an acquired input or inputs is critical to the ability to continue producing outputs. A process (or group of processes) is not critical if, for example, it is considered ancillary or minor in the context of all of the processes required to continue producing outputs.
+bAn acquired contract that provides access to an organized workforce that has the necessary skills, knowledge, or experience to perform an acquired process (or group of processes) that when applied to an acquired input or inputs is critical to the ability to continue producing outputs. An entity should assess the substance of an acquired contract and whether it has effectively acquired an organized workforce that performs a substantive process (for example, considering the duration and the renewal terms of the contract).
+cThe acquired process (or group of processes) when applied to an acquired input or inputs significantly contributes to the ability to continue producing outputs and cannot be replaced without significant cost, effort, or delay in the ability to continue producing outputs.
+dThe acquired process (or group of processes) when applied to an acquired input or inputs significantly contributes to the ability to continue producing outputs and is considered unique or scarce.
+805-10-55-5F
+If a set has outputs, continuation of revenues does not on its own indicate that both an input and a substantive process have been acquired. Accordingly, assumed contractual arrangements that provide for the continuation of revenues (for example, customer contracts, customer lists, and leases [when the set is the lessor]) should be excluded from the analysis in paragraph 805-10-55-5E of whether a process has been acquired.
+805-10-55-6
+The nature of the elements of a business varies by industry and by the structure of an entity's operations (activities), including the entity's stage of development. Established businesses often have many different types of inputs, processes, and outputs, whereas new businesses often have few inputs and processes and sometimes only a single output (product). Nearly all businesses also have liabilities, but a business need not have liabilities. In addition, some transferred sets of assets and activities that are not a business may have liabilities.
+805-10-55-7
+Paragraph superseded by Accounting Standards Update No. 2017-01.
+805-10-55-8
+Determining whether a particular set of assets and activities is a business should be based on whether the integrated set is capable of being conducted and managed as a business by a market participant. Thus, in evaluating whether a particular set is a business, it is not relevant whether a seller operated the set as a business or whether the acquirer intends to operate the set as a business.
+805-10-55-9
+When evaluating whether a set meets the criteria in paragraphs 805-10-55-5D through 55-5E, the presence of more than an insignificant amount of goodwill may be an indicator that the acquired process is substantive and, therefore, the acquired set is a business. However, a business need not have goodwill.
+· > Identifying the Acquirer
+805-10-55-10
+Paragraph 805-10-25-5 provides that the guidance in the General Subsections of Subtopic 810-10 related to determining the existence of a controlling financial interest should be used to identify the acquirer in a business combination, except when a variable interest entity (VIE) is acquired. If a business combination has occurred but applying that guidance does not clearly indicate which of the combining entities is the acquirer, paragraph 805-10-25-5 requires the factors in paragraphs 805-10-55-11 through 55-15 to be considered in making that determination.
+
+805-10-55-11
+In a business combination effected primarily by transferring cash or other assets or by incurring liabilities, the acquirer usually is the entity that transfers the cash or other assets or incurs the liabilities.
+805-10-55-12
+In a business combination effected primarily by exchanging equity interests, the acquirer usually is the entity that issues its equity interests. However, in some business combinations, commonly called reverse acquisitions, the issuing entity is the acquiree. Subtopic 805-40 provides guidance on accounting for reverse acquisitions. Other pertinent facts and circumstances also shall be considered in identifying the acquirer in a business combination effected by exchanging equity interests, including the following:
+aThe relative voting rights in the combined entity after the business combination. The acquirer usually is the combining entity whose owners as a group retain or receive the largest portion of the voting rights in the combined entity. In determining which group of owners retains or receives the largest portion of the voting rights, an entity shall consider the existence of any unusual or special voting arrangements and options, warrants, or convertible securities.
+bThe existence of a large minority voting interest in the combined entity if no other owner or organized group of owners has a significant voting interest. The acquirer usually is the combining entity whose single owner or organized group of owners holds the largest minority voting interest in the combined entity.
+cThe composition of the governing body of the combined entity. The acquirer usually is the combining entity whose owners have the ability to elect or appoint or to remove a majority of the members of the governing body of the combined entity.
+dThe composition of the senior management of the combined entity. The acquirer usually is the combining entity whose former management dominates the management of the combined entity.
+eThe terms of the exchange of equity interests. The acquirer usually is the combining entity that pays a premium over the precombination fair value of the equity interests of the other combining entity or entities.
+805-10-55-13
+The acquirer usually is the combining entity whose relative size (measured in, for example, assets, revenues, or earnings) is significantly larger than that of the other combining entity or entities.
+805-10-55-14
+In a business combination involving more than two entities, determining the acquirer shall include a consideration of, among other things, which of the combining entities initiated the combination, as well as the relative size of the combining entities, as discussed in paragraph 805-10-55-13.
+805-10-55-15
+A new entity formed to effect a business combination is not necessarily the acquirer. If a new entity is formed to issue equity interests to effect a business combination, one of the combining entities that existed before the business combination shall be identified as the acquirer by applying the guidance in paragraphs 805-10-55-10 through 55-14. In contrast, a new entity that transfers cash or other assets or incurs liabilities as consideration may be the acquirer.
+· > The Measurement Period
+805-10-55-16
+Paragraphs 805-10-25-14 through 25-19 and 805-10-30-2 through 30-3 discuss requirements related to the measurement period in a business combination. If the initial accounting for a business combination is incomplete at the end of the financial reporting period in which the combination occurs, paragraph 805-10-25-13 requires that the acquirer recognize in its financial statements provisional amounts for the items for which the accounting is incomplete. During the measurement period, the acquirer recognizes adjustments to the provisional amounts needed to reflect new information obtained about facts and circumstances that existed as of the acquisition date that, if known, would have affected the measurement of the amounts recognized as of that date. Paragraph 805-10-25-17 requires the acquirer to recognize such adjustments with a corresponding adjustment to goodwill in the reporting period the adjustments are determined. The effects of adjustments to provisional amounts to periods after the acquisition date are included in the earnings of the adjustment period.
+805-10-55-17
+Example 1 (see paragraph 805-10-55-27) illustrates measurement period guidance.
+· > Determining What Is Part of the Business Combination Transaction
+805-10-55-18
+Paragraphs 805-10-25-20 through 25-22 establish the requirements to identify amounts that are not part of the business combination. The acquirer should consider the following factors, which are neither mutually exclusive nor individually conclusive, to determine whether a transaction is part of the exchange for the acquiree or whether the transaction is separate from the business combination:
+aThe reasons for the transaction. Understanding the reasons why the parties to the combination (the acquirer, the acquiree, and their owners, directors, managers, and their agents) entered into a particular transaction or arrangement may provide insight into whether it is part of the consideration transferred and the assets acquired or liabilities assumed. For example, if a transaction is arranged primarily for the benefit of the acquirer or the combined entity rather than primarily for the benefit of the acquiree or its former owners before the combination, that portion of the transaction price paid (and any related assets or liabilities) is less likely to be part of the exchange for the acquiree. Accordingly, the acquirer would account for that portion separately from the business combination.
+bWho initiated the transaction. Understanding who initiated the transaction may also provide insight into whether it is part of the exchange for the acquiree. For example, a transaction or other event that is initiated by the acquirer may be entered into for the purpose of providing future economic benefits to the acquirer or combined entity with little or no benefit received by the acquiree or its former owners before the combination. On the other hand, a transaction or arrangement initiated by the acquiree or its former owners is less likely to be for the benefit of the acquirer or the combined entity and more likely to be part of the business combination transaction.
+cThe timing of the transaction. The timing of the transaction may also provide insight into whether it is part of the exchange for the acquiree. For example, a transaction between the acquirer and the acquiree that takes place during the negotiations of the terms of a business combination may have been entered into in contemplation of the business combination to provide future economic benefits to the acquirer or the combined entity. If so, the acquiree or its former owners before the business combination are likely to receive little or no benefit from the transaction except for benefits they receive as part of the combined entity.
+805-10-55-19
+The following guidance addresses specific transactions referred to in paragraph 805-10-25-21 that are not to be included in applying the acquisition method:
+aEffective settlement of a preexisting relationship between the acquirer and acquiree in a business combination
+bArrangements for contingent payments to employees or selling shareholders.
+· · > Effective Settlement of a Preexisting Relationship Between the Acquirer and Acquiree in a Business Combination
+805-10-55-20
+The acquirer and acquiree may have a relationship that existed before they contemplated the business combination, referred to here as a preexisting relationship. A preexisting relationship between the acquirer and acquiree may be contractual (for example, vendor and customer or licensor and licensee) or noncontractual (for example, plaintiff and defendant).
+805-10-55-21
+If the business combination in effect settles a preexisting relationship, the acquirer recognizes a gain or loss, measured as follows:
+aFor a preexisting noncontractual relationship, such as a lawsuit, fair value
+bFor a preexisting contractual relationship, the lesser of the following:
+1The amount by which the contract is favorable or unfavorable from the perspective of the acquirer when compared with pricing for current market transactions for the same or similar items. An unfavorable contract is a contract that is unfavorable in terms of current market terms. It is not necessarily a loss contract in which the unavoidable costs of meeting the obligations under the contract exceed the economic benefits expected to be received under it.
+2The amount of any stated settlement provisions in the contract available to the counterparty to whom the contract is unfavorable. If this amount is less than the amount in (b)(1), the difference is included as part of the business combination accounting.
+805-10-55-22
+Examples 2 and 3 (see paragraphs 805-10-55-30 through 55-33) illustrate the accounting for the effective settlement of a preexisting relationship as a result of a business combination. As indicated in Example 3 (see paragraph 805-10-55-33), the amount of gain or loss recognized may depend in part on whether the acquirer had previously recognized a related asset or liability, and the reported gain or loss therefore may differ from the amount calculated by applying paragraph 805-10-55-21.
+805-10-55-23
+A preexisting relationship may be a contract that the acquirer recognizes as a reacquired right in accordance with paragraph 805-20-25-14. If the contract includes terms that are favorable or unfavorable when compared with pricing for current market transactions for the same or similar items, the acquirer recognizes, separately from the business combination, a gain or loss for the effective settlement of the contract, measured in accordance with paragraph 805-10-55-21.
+· · > Arrangements for Contingent Payments to Employees or Selling Shareholders
+805-10-55-24
+Whether arrangements for contingent payments to employees or selling shareholders are contingent consideration in the business combination or are separate transactions depends on the nature of the arrangements. Understanding the reasons why the acquisition agreement includes a provision for contingent payments, who initiated the arrangement, and when the parties entered into the arrangement may be helpful in assessing the nature of the arrangement.
+805-10-55-25
+If it is not clear whether an arrangement for payments to employees or selling shareholders is part of the exchange for the acquiree or is a transaction separate from the business combination, the acquirer should consider the following indicators:
+aContinuing employment. The terms of continuing employment by the selling shareholders who become key employees may be an indicator of the substance of a contingent consideration arrangement. The relevant terms of continuing employment may be included in an employment agreement, acquisition agreement, or some other document. A contingent consideration arrangement in which the payments are automatically forfeited if employment terminates is compensation for postcombination services. Arrangements in which the contingent payments are not affected by employment termination may indicate that the contingent payments are additional consideration rather than compensation.
+bDuration of continuing employment. If the period of required employment coincides with or is longer than the contingent payment period, that fact may indicate that the contingent payments are, in substance, compensation.
+cLevel of compensation. Situations in which employee compensation other than the contingent payments is at a reasonable level in comparison to that of other key employees in the combined entity may indicate that the contingent payments are additional consideration rather than compensation.
+dIncremental payments to employees. If selling shareholders who do not become employees receive lower contingent payments on a per-share basis than the selling shareholders who become employees of the combined entity, that fact may indicate that the incremental amount of contingent payments to the selling shareholders who become employees is compensation.
+eNumber of shares owned. The relative number of shares owned by the selling shareholders who remain as key employees may be an indicator of the substance of the contingent consideration arrangement. For example, if the selling shareholders who owned substantially all of the shares in the acquiree continue as key employees, that fact may indicate that the arrangement is, in substance, a profit-sharing arrangement intended to provide compensation for postcombination services. Alternatively, if selling shareholders who continue as key employees owned only a small number of shares of the acquiree and all selling shareholders receive the same amount of contingent consideration on a per-share basis, that fact may indicate that the contingent payments are additional consideration. The preacquisition ownership interests held by parties related to selling shareholders who continue as key employees, such as family members, also should be considered.
+fLinkage to the valuation. If the initial consideration transferred at the acquisition date is based on the low end of a range established in the valuation of the acquiree and the contingent formula relates to that valuation approach, that fact may suggest that the contingent payments are additional consideration. Alternatively, if the contingent payment formula is consistent with prior profit-sharing arrangements, that fact may suggest that the substance of the arrangement is to provide compensation.
+gFormula for determining consideration. The formula used to determine the contingent payment may be helpful in assessing the substance of the arrangement. For example, if a contingent payment is determined on the basis of a multiple of earnings, that might suggest that the obligation is contingent consideration in the business combination and that the formula is intended to establish or verify the fair value of the acquiree. In contrast, a contingent payment that is a specified percentage of earnings might suggest that the obligation to employees is a profit-sharing arrangement to compensate employees for services rendered.
+hOther agreements and issues. The terms of other arrangements with selling shareholders (such as noncompete agreements, executory contracts, consulting contracts, and property lease agreements) and the income tax treatment of contingent payments may indicate that contingent payments are attributable to something other than consideration for the acquiree. For example, in connection with the acquisition, the acquirer might enter into a property lease arrangement with a significant selling shareholder. If the lease payments specified in the lease contract are significantly below market, some or all of the contingent payments to the lessor (the selling shareholder) required by a separate arrangement for contingent payments might be, in substance, payments for the use of the leased property that the acquirer should recognize separately in its postcombination financial statements. In contrast, if the lease contract specifies lease payments that are consistent with market terms for the leased property, the arrangement for contingent payments to the selling shareholder may be contingent consideration in the business combination.
+805-10-55-26
+Example 4 (see paragraph 805-10-55-34) illustrates guidance relating to contingent payments made to an employee in a business combination.
+> Illustrations
+· > Example 1: Appraisal That Is Incomplete at the Reporting Date
+805-10-55-27
+This Example illustrates the measurement period guidance in paragraph 805-10-55-16. Acquirer acquires Target on September 30, 20X7. Acquirer seeks an independent appraisal for an item of property, plant, and equipment acquired in the combination, and the appraisal was not complete by the time Acquirer issued its financial statements for the year ended December 31, 20X7. In its 20X7 annual financial statements, Acquirer recognized a provisional fair value for the asset of $30,000. At the acquisition date, the item of property, plant, and equipment had a remaining useful life of five years. Six months after the acquisition date, Acquirer received the independent appraisal, which estimated the asset's acquisition-date fair value as $40,000.
+805-10-55-28
+In its interim financial statements for the quarter ended March 31, 20X8, Acquirer adjusts the provisional amounts recorded and the related effects on that period's earnings as follows:
+aThe carrying amount of property, plant, and equipment as of March 31, 20X8, is increased by $9,000. That adjustment is measured as the fair value adjustment at the acquisition date of $10,000 less the additional depreciation that would have been recognized had the asset's fair value at the acquisition date been recognized from that date ($1,000 for 6 months' depreciation).
+bThe carrying amount of goodwill as of March 31, 20X8, is decreased by $10,000.
+cDepreciation expense for the period ended March 31, 20X8, is increased by $1,000 to reflect the effect on earnings as a result of the change to the provisional amount recognized.
+805-10-55-29
+In accordance with paragraph 805-20-50-4A, Acquirer discloses both of the following:
+aIn its 20X7 financial statements, that the initial accounting for the business combination has not been completed because the appraisal of property, plant, and equipment has not yet been received
+bIn its March 31, 20X8 financial statements, the amounts and explanations of the adjustments to the provisional values recognized during the current reporting period. Therefore, Acquirer discloses that the increase to the fair value of the item of property, plant, and equipment was $10,000, with a corresponding decrease to goodwill. Additionally, the change to the provisional amount resulted in an increase in depreciation expense and accumulated depreciation of $1,000, of which $500 relates to the previous quarter.
+· > Example 2: Effective Settlement of a Supply Contract as a Result of a Business Combination
+805-10-55-30
+This Example illustrates the guidance in paragraphs 805-10-55-20 through 55-21. Acquirer purchases electronic components from Target under a five-year supply contract at fixed rates. Currently, the fixed rates are higher than rates at which Acquirer could purchase similar electronic components from another supplier. The supply contract allows Acquirer to terminate the contract before the end of the initial 5-year term only by paying a $6 million penalty. With 3 years remaining under the supply contract, Acquirer pays $50 million to acquire Target, which is the fair value of Target based on what other market participants would be willing to pay.
+805-10-55-31
+Included in the total fair value of Target is $8 million related to the fair value of the supply contract with Acquirer. The $8 million represents a $3 million component that is at-market because the pricing is comparable to pricing for current market transactions for the same or similar items (selling effort, customer relationships, and so forth) and a $5 million component for pricing that is unfavorable to Acquirer because it exceeds the price of current market transactions for similar items. Target has no other identifiable assets or liabilities related to the supply contract, and Acquirer has not recognized any assets or liabilities related to the supply contract before the business combination.
+805-10-55-32
+In this Example, Acquirer recognizes a loss of $5 million (the lesser of the $6 million stated settlement amount and the amount by which the contract is unfavorable to the acquirer) separately from the business combination. The $3 million at-market component of the contract is part of goodwill.
+· > Example 3: Effective Settlement of a Contract Between the Acquirer and Acquiree in Which the Acquirer Had Recognized a Liability Before the Business Combination
+805-10-55-33
+This Example illustrates the guidance in paragraphs 805-10-55-20 through 55-21. Whether Acquirer had previously recognized an amount in its financial statements related to a preexisting relationship will affect the amount recognized as a gain or loss for the effective settlement of the relationship. In Example 2 (see paragraph 805-10-55-30), generally accepted accounting principles (GAAP) might have required Acquirer to recognize a $6 million liability for the supply contract before the business combination. In that situation, Acquirer recognizes a $1 million settlement gain on the contract in earnings at the acquisition date (the $5 million measured loss on the contract less the $6 million loss previously recognized). In other words, Acquirer has in effect settled a recognized liability of $6 million for $5 million, resulting in a gain of $1 million.
+· > Example 4: Arrangement for Contingent Payment to an Employee
+805-10-55-34
+This Example illustrates the guidance in paragraphs 805-10-55-24 through 55-25 relating to contingent payments to employees in a business combination. Target hired a candidate as its new chief executive officer under a 10-year contract. The contract required Target to pay the candidate $5 million if Target is acquired before the contract expires. Acquirer acquires Target eight years later. The chief executive officer was still employed at the acquisition date and will receive the additional payment under the existing contract.
+805-10-55-35
+In this Example, Target entered into the employment agreement before the negotiations of the combination began, and the purpose of the agreement was to obtain the services of the chief executive officer. Thus, there is no evidence that the agreement was arranged primarily to provide benefits to Acquirer or the combined entity. Therefore, the liability to pay $5 million is included in the application of the acquisition method.
+805-10-55-36
+In other circumstances, Target might enter into a similar agreement with the chief executive officer at the suggestion of Acquirer during the negotiations for the business combination. If so, the primary purpose of the agreement might be to provide severance pay to the chief executive officer, and the agreement may primarily benefit Acquirer or the combined entity rather than Target or its former owners. In that situation, Acquirer accounts for the liability to pay the chief executive officer in its postcombination financial statements separately from application of the acquisition method.
+· > Example 5: Illustration of Disclosure Requirements
+805-10-55-37
+This Example illustrates some of the disclosure requirements established in the several Subtopics of this Topic; it is not based on an actual transaction. The Example assumes that Acquirer is a public entity and that Target is a private entity. The illustration presents the disclosures in a tabular format that refers to the specific disclosure requirements illustrated. An actual note to financial statements might present many of the disclosures illustrated in a simple narrative format.
+805-10-55-38
+Paragraph 805-10-50-2(a) through (d)
+On June 30, 20X0, Acquirer acquired 15 percent of the outstanding common shares of Target. On June 30, 20X2, Acquirer acquired 60 percent of the outstanding common shares of Target. Target is a provider of data networking products and services in Canada and Mexico. As a result of the acquisition, Acquirer is expected to be the leading provider of data networking products and services in those markets. It also expects to reduce costs through economies of scale.
+805-10-55-39
+Paragraph 805-30-50-1(a) and 805-30-50-1(e)
+The goodwill of $2,500 arising from the acquisition consists largely of the synergies and economies of scale expected from combining the operations of Acquirer and Target. All of the goodwill was assigned to Acquirer's network segment.
+805-10-55-40
+Paragraph 805-30-50-1(d)
+None of the goodwill recognized is expected to be deductible for income tax purposes.
+805-10-55-41
+Paragraphs 805-10-50-2, 805-20-50-1, and 805-30-50-1
+The following table summarizes the consideration paid for Target and the amounts of the assets acquired and liabilities assumed recognized at the acquisition date, as well as the fair value at the acquisition date of the noncontrolling interest in Target.
+At June 30, 20X2
+
+Refer to Paragraph(s),Consideration,$
+805-30-50-1(b),Cash,5000
+805-30-50-1(b)(4),Equity instruments (100,000 common shares of Acquirer),4000
+805-30-50-1(b)(3), 805-30-50-1(c)(1),Contingent consideration arrangement,1000
+,Fair value of total consideration transferred,10000
+805-10-50-2(g)(1),Fair value of Acquirer’s equity interest in Target held before the business combination,2000
+805-10-50-2(e), 805-10-50-2(f),Acquisition-related costs (including in selling, general, and administrative expenses in Acquirer’s income statement for the year ending December 31, 20X2),12000
+,,1250
+805-20-50-1(c),Recognized amounts of identifiable assets acquired and liabilities assumed,
+,Financial assets,3500
+,Inventory,1000
+,Property, plant, and equipment,10000
+,Identifiable intangible assets,3300
+,Financial liabilities,(4000)
+,Liability arising from a contingency,(1000)
+,Total identifiable net assets,12800
+805-20-50-1(e)(1),Noncontrolling interest in Target,3300
+,Goodwill,2500
+,,12000
+
+
+805-10-55-42
+Paragraph 805-30-50-1(b)(4)
+The fair value of the 100,000 common shares issued as part of the consideration paid for Target ($4,000) was determined on the basis of the closing market price of Acquirer's common shares on the acquisition date.
+805-10-55-43
+Paragraph 805-30-50-1(b)(3) and 805-30-50-1(c), and paragraph 805-30-50-4(a)
+The contingent consideration arrangement requires Acquirer to pay the former owners of Target 5 percent of the revenues of an unconsolidated equity investment, referred to as Investee, owned by Target, in excess of $7,500 for 20X3, up to a maximum amount of $2,500 (undiscounted). The potential undiscounted amount of all future payments that Acquirer could be required to make under the contingent consideration arrangement is between $0 and $2,500. The fair value of the contingent consideration arrangement of $1,000 was estimated by applying the income approach. That measure is based on significant inputs that are not observable in the market, which Section 820-10-35 refers to as Level 3 inputs. Key assumptions include a discount rate range of 20 percent to 25 percent and a probability-adjusted level of revenues in Investee between $10,000 and $20,000. As of December 31, 20X2, the amount recognized for the contingent consideration arrangement, the range of outcomes, and the assumptions used to develop the estimates had not changed.
+805-10-55-44
+Paragraph 805-20-50-1(b)
+The fair value of the financial assets acquired includes receivables under sales-type leases or direct financing leases of data networking equipment with a fair value of $2,000. The gross amount due under the contracts is $3,100, of which $450 is expected to be uncollectible.
+805-10-55-45
+Paragraph 805-20-50-4A
+The fair value of the acquired identifiable intangible assets of $3,300 is provisional pending receipt of the final valuations for those assets.
+805-10-55-46
+Paragraph 805-20-50-1(d)
+A liability of $1,000 has been recognized at fair value for expected warranty claims on products sold by Target during the last 3 years. Acquirer expects that the majority of this expenditure will be incurred in 20X3 and that all will be incurred by the end of 20X4.
+805-10-55-47
+Paragraph 805-20-50-1(e)
+The fair value of the noncontrolling interest in Target, a private entity, was estimated by applying the income approach and a market approach. This fair value measurement is based on significant inputs that are not observable in the market and thus represents a fair value measurement categorized within Level 3 of the fair value hierarchy as described in Section 820-10-35. Key assumptions include a discount rate range of 20 percent to 25 percent, a terminal value based on a range of terminal earnings before interest, taxes, depreciation, and amortization multiples between 3 and 5 (or, if appropriate, based on long-term sustainable growth rates ranging between 3 percent and 6 percent), financial multiples of entities deemed to be similar to Target, and adjustments because of the lack of control or lack of marketability that market participants would consider when measuring the fair value of the noncontrolling interest in Target.
+805-10-55-48
+Paragraph 805-10-50-2(g)(2)
+Acquirer recognized a gain of $500 as a result of remeasuring to fair value its 15 percent equity interest in Target held before the business combination. The gain is included in other income in Acquirer's income statement for the year ending December 31, 20X2.
+805-10-55-49
+Paragraph 805-10-50-2(h)(1) through (h)(3)
+The amounts of Target's revenue and earnings included in Acquirer's consolidated income statement for the year ended December 31, 20X2, and the revenue and earnings of the combined entity had the acquisition date been January 1, 20X2 (if comparative financial statements are not presented), and January 1, 20X1 (if comparative financial statements are presented), are as follows.
+
+Refer to Paragraph(s),Description,Revenue,Earnings
+805-10-50-2(h)(1),Actual from 6/30/20X2–12/31/20X2,$4090,$1710
+805-10-50-2(h)(2),20X2 supplemental pro forma from 1/1/20X2–12/31/20X2,$27670,$12870
+805-10-50-2(h)(3),20X2 supplemental pro forma from 1/1/20X2–12/31/20X2,$27670,$14770
+,20X1 supplemental pro forma from 1/1/20X1–12/31/20X1,$26985,$12325
+
+805-10-55-50
+Paragraph 805-10-50-2(h)(4)
+20X2 supplemental pro forma earnings were adjusted to exclude $1,250 of acquisition-related costs incurred in 20X2 and $650 of nonrecurring expense related to the fair value adjustment to acquisition-date inventory. 20X1 supplemental pro forma earnings were adjusted to include these charges.
+· > Example 6: Illustrations of the Definition of a Business
+805-10-55-51
+The Examples in paragraphs 805-10-55-52 through 55-96 illustrate the guidance in paragraphs 805-10-55-4 through 55-6 and 805-10-55-8 through 55-9 on the definition of a business. In each of the Examples, the first step of the analysis is the evaluation of the threshold in paragraphs 805-10-55-5A through 55-5C. If substantially all of the fair value of the gross assets acquired is concentrated in a single identifiable asset or group of similar identifiable assets, the set is not a business. If that threshold is not met, an entity should evaluate whether the set includes an input and a substantive process that together significantly contribute to the ability to create outputs. To determine whether both an input and a substantive process are included in the set, an entity should complete its evaluation using the framework (guidance in paragraphs 805-10-55-5D through 55-6 and 805-10-55-8 through 55-9).
+· · > Case A: Acquisition of Real Estate
+· · · > Scenario 1
+805-10-55-52
+ABC acquires, renovates, leases, sells, and manages real estate properties. ABC acquires a portfolio of 10 single-family homes that each have in-place leases. The only elements included in the acquired set are the 10 single-family homes and the 10 in-place leases. Each single-family home includes the land, building, and property improvements. Each home has a different floor plan, square footage, lot, and interior design. No employees or other assets are acquired.
+805-10-55-53
+ABC first considers the threshold guidance in paragraphs 805-10-55-5A through 55-5C. ABC concludes that the land, building, property improvements, and in-place leases at each property can be considered a single asset in accordance with paragraph 805-10-55-5B. That is, the building and property improvements are attached to the land and cannot be removed without incurring significant cost. Additionally, the in-place lease is an intangible asset that should be combined with the related real estate and considered a single asset.
+805-10-55-54
+ABC also concludes that the 10 single assets (the combined land, building, in-place lease intangible, and property improvements) are similar. Each home has a different floor plan; however, the nature of the assets (all single-family homes) are similar. ABC also concludes that the risks associated with managing and creating outputs are not significantly different. That is, the risks associated with operating the properties and tenant acquisition and management are not significantly different because the types of homes and class of customers are not significantly different. Similarly, the risks associated with operating in the real estate market of the homes acquired are not significantly different. Consequently, ABC concludes that substantially all of the fair value of the gross assets acquired is concentrated in the group of similar identifiable assets; thus, the set is not a business.
+· · · > Scenario 2
+805-10-55-55
+Assume the same facts as in Scenario 1 except that ABC also acquires an office park with six 10-story office buildings leased to maximum occupancy of which all have significant fair value. ABC also acquires the vendor contracts for outsourced cleaning, security, and maintenance. Seller's employees that perform leasing (sales, underwriting, and so forth), tenant management, financing, and other strategic management processes are not included in the set. ABC plans to replace the property management and employees with its own internal resources.
+805-10-55-56
+ABC concludes that the single-family homes and office park are not similar assets. ABC considers the risks associated with operating the assets, obtaining tenants, and tenant management between the single-family homes and office park to be significantly different because the scale of operations and risks associated with the class of customers are significantly different. Therefore, substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets. Thus, ABC must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-57
+The set has continuing revenues through the in-place leases and, therefore, has outputs. ABC must consider the criteria in paragraph 805-10-55-5E to determine whether the set includes both an input and a substantive process that together significantly contribute to the ability to create outputs.
+805-10-55-58
+ABC concludes that the criteria in paragraph 805-10-55-5E(a) through (b) are not met because the set does not include employees and the processes performed through the cleaning and security contracts (the only processes acquired) will be considered ancillary or minor in the context of all the processes required to create outputs in the real estate industry. That is, while those outsourcing agreements may be considered to provide an organized workforce that performs cleaning and security processes when applied to the building, the processes performed by the cleaning, security, and maintenance personnel are not considered critical in the context of all the processes required to create outputs.
+805-10-55-59
+ABC also concludes that the criterion in paragraph 805-10-55-5E(c) is not met because the cleaning and security processes could be easily replaced with little cost, effort, or delay in the ability to continue producing outputs. While the cleaning and security processes are necessary for continued operations of the buildings, these contracts can be replaced quickly with little effect on the ability to continue producing outputs.
+805-10-55-60
+ABC concludes that the criterion in paragraph 805-10-55-5E(d) is not met because the cleaning and security contracts are not considered unique or scarce. That is, these types of arrangements are readily accessible in the marketplace.
+805-10-55-61
+Because none of the criteria were met, ABC concludes that the set does not include both an input and substantive processes that together significantly contribute to the ability to create outputs and, therefore, is not considered a business.
+· · · > Scenario 3
+805-10-55-62
+Assume the same facts as in Scenario 2, except that the set includes the employees responsible for leasing, tenant management, and managing and supervising all operational processes.
+805-10-55-63
+The set has continuing revenues through the in-place leases and, therefore, has outputs. ABC must consider the criteria in paragraph 805-10-55-5E to determine whether the set includes both an input and a substantive process that together significantly contribute to the ability to create outputs.
+805-10-55-64
+ABC determines that the criterion in paragraph 805-10-55-5E(a) is met because the set includes an organized workforce that performs processes that when applied to the acquired inputs in the set (the land, building, and in-place leases) are critical to the ability to continue producing outputs. That is, ABC concludes that the leasing, tenant management, and supervision of the operational processes are critical to the creation of outputs. Because it includes both an input and a substantive process, the set is considered a business.
+· · > Case B: Acquisition of a Drug Candidate
+· · · > Scenario 1
+805-10-55-65
+Pharma Co. purchases from Biotech a legal entity that contains the rights to a Phase 3 (in the clinical research phase) compound being developed to treat diabetes (the in-process research and development project). Included in the in-process research and development project is the historical know-how, formula protocols, designs, and procedures expected to be needed to complete the related phase of testing. The legal entity also holds an at-market clinical research organization contract and an at-market clinical manufacturing organization contract. No employees, other assets, or other activities are transferred.
+805-10-55-66
+Pharma Co. first considers the guidance in paragraphs 805-10-55-5A through 55-5C. Pharma Co. concludes that the in-process research and development project is an identifiable intangible asset that would be accounted for as a single asset in a business combination. Pharma Co. also qualitatively concludes that there is no fair value associated with the clinical research organization contract and the clinical manufacturing organization contract because the services are being provided at market rates and could be provided by multiple vendors in the marketplace. Therefore, all of the consideration in the transaction will be allocated to the in-process research and development project. As such, Pharma Co. concludes that substantially all of the fair value of the gross assets acquired is concentrated in the single in-process research and development asset and the set is not a business.
+· · · > Scenario 2
+805-10-55-67
+Pharma Co. purchases from Biotech a legal entity that contains the rights to a Phase 3 compound being developed to treat diabetes (Project 1) and a Phase 3 compound being developed to treat Alzheimer's disease (Project 2). Included with each project are the historical know-how, formula protocols, designs, and procedures expected to be needed to complete the related phase of testing. The legal entity also holds at-market clinical research organization contracts and at-market clinical manufacturing organization contracts associated with each project. Assume that Project 1 and Project 2 have equal fair value. No employees, other assets, or other activities are transferred.
+805-10-55-68
+Pharma Co. concludes that Project 1 and Project 2 are each separately identifiable intangible assets, both of which would be accounted for as a single asset in a business combination. Pharma Co. then considers whether Project 1 and Project 2 are similar assets. Pharma Co. notes that the nature of the assets is similar in that both Project 1 and Project 2 are in-process research and development assets in the same major asset class. However, Pharma Co. concludes that Project 1 and Project 2 have significantly different risks associated with creating outputs from each asset because each project has different risks associated with developing and marketing the compound to customers. The projects are intended to treat significantly different medical conditions, and each project has a significantly different potential customer base and expected market and regulatory risks associated with the assets. Thus, Pharma Co. concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets and that it must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-69
+Because the set does not have outputs, Pharma Co. evaluates the criteria in paragraph 805-10-55-5D to determine whether the set has both an input and a substantive process that together significantly contribute to the ability to create outputs. Pharma Co. concludes that the criteria are not met because the set does not have employees. As such, Pharma Co. concludes that the set is not a business.
+· · > Case C: Acquisition of Biotech
+805-10-55-70
+Pharma Co. buys all of the outstanding shares of Biotech. Biotech's operations include research and development activities on several drug compounds that it is developing (in-process research and development projects). The in-process research and development projects are in different phases of the U.S. Food and Drug Administration approval process and would treat significantly different diseases. The set includes senior management and scientists that have the necessary skills, knowledge, or experience to perform research and development activities. In addition, Biotech has long-lived tangible assets such as a corporate headquarters, a research lab, and lab equipment. Biotech does not yet have a marketable product and, therefore, has not generated revenues. Assume that each research and development project has a significant amount of fair value.
+805-10-55-71
+Pharma Co. first considers the guidance in paragraphs 805-10-55-5A through 55-5C. The identifiable assets in the set include multiple in-process research and development projects and tangible assets (the corporate headquarters, the research lab, and the lab equipment). Pharma Co. concludes that the in-process research and development projects are not similar assets because the projects have significantly different risks associated with managing the assets and creating the outputs (that is, because there are significantly different development risks in the different phases of development, market risks related to the different customer base, and potential markets for the compounds). In addition, Pharma Co. concludes that there is fair value associated with the acquired workforce because of the proprietary knowledge of and experience with Biotech's ongoing development projects and the potential for creation of new development projects that the workforce embodies. As such, Pharma Co. concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets and that it must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-72
+Because the set does not have outputs, Pharma Co. evaluates the criteria in paragraph 805-10-55-5D to determine whether the set has both an input and a substantive process that together significantly contribute to the ability to create outputs. Pharma Co. concludes that the criteria are met because the scientists make up an organized workforce that has the necessary skills, knowledge, or experience to perform processes that when applied to the in-process research and development inputs is critical to the ability to develop those inputs into a product that can be provided to a customer. Pharma Co. also determines that there is a more-than-insignificant amount of goodwill (including the fair value associated with the workforce), which is another indicator that the workforce is performing a critical process. Thus, the set includes both inputs and substantive processes and is a business.
+· · > Case D: Acquisition of a Television Station
+805-10-55-73
+Company A is a television broadcaster whose principal business is the ownership and operation of a television station group in the United States through which it broadcasts its proprietary health-care-related programming. Company B owns and operates several television stations in the western United States. Because of a recent merger, Company B must divest itself of a station in Portland, Oregon (KPOR), and agrees to sell the station to Company A.
+805-10-55-74
+Company A plans to change KPOR's programming format to its proprietary health-care-related programming. Therefore, Company A will receive only the U.S. Federal Communications Commission license, the broadcasting equipment, and the office building. KPOR will be integrated into Company A's operations, with most of the station processes centralized at Company A's corporate headquarters. Company A will not extend offers of employment to any of KPOR's employees or assume any of KPOR's contractual relationships.
+805-10-55-75
+Company A first considers the guidance in paragraphs 805-10-55-5A through 55-5C. The U.S. Federal Communications Commission license is an intangible asset that is recognized and measured separately in a business combination, while the broadcast equipment and building are tangible nonfinancial assets in different major classes. Company A concludes that the broadcast equipment and building are not considered a single asset because the equipment is not attached to the building and can be removed without significant cost or diminution in fair value. Furthermore, none of the assets will be considered similar in accordance with paragraph 805-10-55-5C because the U.S. Federal Communications Commission license cannot be considered similar to tangible assets and the tangible assets are in different major asset classes. Each of the separate identifiable assets has significant fair value. Thus, Company A concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets and that it must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-76
+The set does not have outputs; therefore, Company A considers the criteria in paragraph 805-10-55-5D to determine whether the set includes both an input and a substantive process that together significantly contribute to the ability to create outputs. The set does not include an organized workforce, so it does not meet the criteria in paragraph 805-10-55-5D. Therefore, the set does not include both an input and a substantive process and is not considered a business.
+· · > Case E: Acquisition of a Manufacturing Facility
+805-10-55-77
+Widget Co. manufactures complex equipment and has manufacturing facilities throughout the world. Widget Co. decided to idle a facility in a foreign jurisdiction in a reorganization of its manufacturing footprint and furloughed the assembly line employees.
+805-10-55-78
+Acquirer enters into an agreement to purchase a manufacturing facility and related equipment from Widget Co. To comply with the local labor laws, Acquirer also must assume the furloughed employees.
+805-10-55-79
+The assets acquired include the equipment and facility (land and building) but no intellectual property, inventory, customer relationships, or any other inputs.
+805-10-55-80
+Acquirer first considers the guidance in paragraphs 805-10-55-5A through 55-5C. Acquirer concludes that the equipment in the facility can be removed without significant cost or diminution in utility or fair value because the equipment is not attached to the building and can be used in many types of manufacturing facilities. Therefore, the equipment and building are not a single asset. Furthermore, the equipment and facility are not considered similar assets because they are different major classes of tangible assets. Acquirer determines that there is significant fair value in both the equipment and the facility and, thus, concludes that it must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-81
+The set is not currently producing outputs because there is no continuation of revenue before and after the transaction; therefore, Acquirer considers the criteria in paragraph 805-10-55-5D and whether the set includes both employees that form an organized workforce and an input that the workforce could develop or convert into output. The set includes employees that have the necessary skills, knowledge, or experience to use the equipment; however, without intellectual property or other inputs that could be converted into outputs using the equipment, the set does not include both an organized workforce and an input that will meet the criteria in paragraph 805-10-55-5D. That is, the equipment itself cannot be developed or converted into an output by those employees. Therefore, the set is not a business.
+· · > Case F: License of Distribution Rights
+805-10-55-82
+Company A is a distributor of food and beverages. Company A enters into an agreement to sublicense the Latin American distribution rights of Yogurt Brand F to Company B, whereby Company B will distribute Yogurt Brand F in Latin America. As part of the agreement, Company A transfers the existing customer contracts in Latin America to Company B and an at-market supply contract with the producer of Yogurt Brand F. Company A retains all of its employees and distribution capabilities.
+805-10-55-83
+Company B first considers the guidance in paragraphs 805-10-55-5A through 55-5C. The identifiable assets that could be recognized in a business combination include the license to distribute Yogurt Brand F, customer contracts, and the supply agreement. Company B concludes that the license and customer contracts will have fair value assigned to them. Company B concludes that neither asset represents substantially all of the fair value of the gross assets. Company B then considers whether the license and customer contracts are a group of similar intangible assets. Because the license and customer contracts are in different major classes of identifiable intangible assets, they are not considered similar assets. Therefore, substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets, and Company B must evaluate whether the set has both an input and a substantive process.
+805-10-55-84
+The set has outputs through the continuation of revenues with customers in Latin America. As such, Company B must evaluate the criteria in paragraph 805-10-55-5E to determine whether the set includes an input and a substantive process that together significantly contribute to the ability to create outputs. Company B considers whether the acquired contracts are providing access to an organized workforce that performs a substantive process. However, because the contracts are not providing a service that applies a process to another acquired input, Company B concludes that the substance of the contracts are only that of acquiring inputs. The set is not a business because:
+aIt does not include an organized workforce that could meet the criteria in paragraph 805-10-55-5E(a) through (b).
+bThere are no acquired processes that could meet the criteria in paragraph 805-10-55-5E(c) through (d).
+cIt does not include both an input and a substantive process.
+· · > Case G: Acquisition of Brands
+805-10-55-85
+Company A is a global producer of food and beverages. Company A sells the worldwide rights of Yogurt Brand F, including all related intellectual property, to Company B. Company B also acquires all customer contracts and relationships, finished goods inventory, marketing materials, customer incentive programs, raw material supply contracts, specialized equipment specific to manufacturing Yogurt Brand F, and documented processes and protocols to produce Yogurt Brand F. Company B does not receive employees, manufacturing facilities, all of the manufacturing equipment and processes required to produce the product, and distribution facilities and processes.
+805-10-55-86
+Company B first considers the guidance in paragraphs 805-10-55-5A through 55-5C. The gross assets include intellectual property (the trademark, the related trade name, and recipes) associated with Yogurt Brand F (the intellectual property associated with the brand is determined to be a single intangible asset in accordance with the guidance in paragraph 805-20-55-18), customer contracts and related relationships, equipment, finished goods inventory, and the excess of the consideration transferred over the fair value of the net assets acquired. Company B concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets even though, for purposes of the analysis, the intellectual property is considered to be a single identifiable asset. In addition, because there is significant fair value in both tangible assets and intangible assets, Company B concludes that there is not a group of similar assets that meets this threshold.
+805-10-55-87
+The set has outputs through the continuation of revenues, and Company B must consider the criteria in paragraph 805-10-55-5E to determine whether the set includes both inputs and a substantive process that together significantly contribute to the ability to create outputs. The set does not include an organized workforce and, therefore, does not meet the criteria in paragraph 805-10-55-5E(a) through (b). However, the acquired manufacturing processes are unique to Yogurt Brand F, and when those processes are applied to acquired inputs such as the intellectual property, raw material supply contracts, and the equipment, they significantly contribute to the ability to continue producing outputs. As such, the criterion in paragraph 805-10-55-5E(c) is met, and the set includes both inputs and substantive processes. Because the set includes inputs and substantive processes that together significantly contribute to the ability to create outputs, it is considered a business.
+· · > Case H: Acquisition of Loan Portfolio
+· · · > Scenario 1
+805-10-55-88
+Bank A purchases a loan portfolio from Bank Z. The portfolio of loans consists of residential mortgages with terms, size, and risk ratings that are not significantly different. Bank A does not take over the employees of Bank Z that managed the credit risk of the portfolio and the relationship with the borrowers (such as brokers, vendors, and risk managers).
+805-10-55-89
+Bank A first considers the guidance in paragraphs 805-10-55-5A through 55-5C. Bank A concludes that the nature of the assets (residential mortgage loans) is similar. Bank A also concludes that the risks associated with managing and creating outputs are not significantly different because the terms, size, and risk ratings of the loans are not significantly different. Because all of the fair value of the gross assets acquired is in a group of similar identifiable assets, the set is not a business.
+· · · > Scenario 2
+805-10-55-90
+Assume the same facts as in Scenario 1 except that the portfolio of loans consists of commercial loans with term, size, and risk ratings that are significantly different.
+805-10-55-91
+Bank A first considers the guidance in paragraphs 805-10-55-5A through 55-5C. Bank A must consider whether the loans are similar. Bank A concludes that the nature of the assets (commercial loans) is similar; however, because the term, size, and risk ratings of the loans are significantly different, Bank A concludes that the risks associated with managing and creating outputs are significantly different. Thus, Bank A concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets and that it must further evaluate whether the set has the minimum requirements to be considered a business.
+805-10-55-92
+The set has outputs through the continuation of revenues (interest income). Consequently, Bank A considers the criteria in paragraph 805-10-55-5E to determine whether the set includes both inputs and a substantive process that together significantly contribute to the ability to create outputs. Because the set does not include an organized workforce or acquired processes, the criteria in paragraph 805-10-55-5E are not met and the set is not a business.
+· · · > Scenario 3
+805-10-55-93
+Assume the same facts as in Scenario 2 except that Bank A takes over the employees of Bank Z that managed the credit risk of the portfolio and the relationship with the borrowers (such as brokers and risk managers). Additionally, consideration transferred is significantly higher than Bank A's estimate of the fair value of the loan portfolio.
+805-10-55-94
+Bank A first considers the guidance in paragraphs 805-10-55-5A through 55-5C. Bank A concludes that the loan portfolio does not consist of similar identifiable assets. Bank A also concludes that there is significant fair value associated with different groups of financial assets and the acquired workforce. As such, Bank A concludes that substantially all of the fair value of the gross assets acquired is not concentrated in a single identifiable asset or group of similar identifiable assets and that it must further evaluate whether the set has met the minimum requirements to be considered a business.
+805-10-55-95
+The set has outputs through the continuation of revenues (interest income). Consequently, Bank A considers the criteria in paragraph 805-10-55-5E to determine whether the set includes both an input and a substantive process that together significantly contribute to the ability to create outputs.
+805-10-55-96
+Bank A evaluates the criteria in paragraph 805-10-55-5E and concludes that the criterion in paragraph 805-10-55-5E(a) is met because the set includes an organized workforce that performs processes (customer relationship management and credit risk management) critical to the ability to continue producing outputs; therefore, the set is a business.
+
+65 Transition and Open Effective Date Information
+
+General
+805-10-65-1
+Paragraph superseded on 07/01/2010 after the end of the transition period stated in FASB Statement No. 141 (Revised 2007), Business Combinations, and No. 164, Not-for-Profit Entities: Mergers and Acquisitions.
+805-10-65-2
+Paragraph superseded on 06/18/2012 after the end of the transition period stated in Accounting Standards Update No. 2010-29, Business Combinations (Topic 805): Disclosure of Supplementary Pro Forma Information for Business Combinations.
+805-10-65-3
+Paragraph superseded on 06/20/2018 after the end of the transition period stated in Accounting Standards Update No. 2015-16, Business Combinations (Topic 805): Simplifying the Accounting for Measurement-Period Adjustments.
+> Transition Related to Accounting Standards Update No. 2017-01, Business Combinations (Topic 805): Clarifying the Definition of a Business
+805-10-65-4
+The following represents the transition and effective date information related to Accounting Standards Update No. 2017-01, Business Combinations (Topic 805): Clarifying the Definition of a Business:
+aThe pending content that links to this paragraph shall be effective for public business entities for annual periods beginning after December 15, 2017, including interim periods within those periods.
+bThe pending content that links to this paragraph shall be effective for all other entities for annual periods beginning after December 15, 2018, and interim periods within annual periods beginning after December 15, 2019.
+cEarlier application of the pending content that links to this paragraph is permitted for transactions for which the acquisition date occurs before the issuance date or the effective date of the pending content that links to this paragraph only when the transaction has not been reported in financial statements that have been issued or made available for issuance.
+dEarlier application of the pending content that links to this paragraph is permitted for transactions in which a subsidiary is deconsolidated or a group of assets is derecognized that occur before the issuance date or the effective date of the pending content that links to this paragraph only when the transaction has not been reported in financial statements issued or made available for issuance.
+eAn entity shall apply the pending content that links to this paragraph prospectively as of the beginning of the period of adoption.
+> Transition Related to Accounting Standards Update No. 2025-03, Business Combinations (Topic 805) and Consolidation (Topic 810): Determining the Accounting Acquirer in the Acquisition of a Variable Interest Entity
+805-10-65-5
+The following represents the transition and effective date information related to Accounting Standards Update No. 2025-03, Business Combinations (Topic 805) and Consolidation (Topic 810): Determining the Accounting Acquirer in the Acquisition of a Variable Interest Entity:
+Effective date and early adoption
+aAll entities shall apply the pending content that links to this paragraph for annual reporting periods beginning after December 15, 2026, and interim reporting periods within those annual reporting periods.
+bEarly adoption of the pending content that links to this paragraph is permitted in an interim or annual reporting period in which financial statements have not yet been issued (or made available for issuance). If an entity adopts the pending content that links to this paragraph in an interim reporting period, it shall adopt the pending content as of the beginning of that interim reporting period or the beginning of the annual reporting period that includes that interim reporting period.
+Transition method
+cAn entity shall apply the pending content that links to this paragraph on a prospective basis to all business combinations that have an acquisition date that occurs on or after the date of initial application of the pending content.
+Transition disclosures
+dAn entity applying the pending content that links to this paragraph shall disclose in both the interim reporting period (if applicable) and the annual reporting period of the change the nature of and reason for the change in accounting principle.

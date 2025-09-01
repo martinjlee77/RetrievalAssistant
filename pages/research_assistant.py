@@ -29,7 +29,11 @@ STANDARDS_CONFIG = {
         "collection_name": "asc340_contract_costs",
         "description": "Contract Costs"
     },
-    # Ready for future standards
+    "ASC 805 - Business Combinations": {
+        "database_path": "asc805_knowledge_base",
+        "collection_name": "asc805_guidance",
+        "description": "Business Combinations"
+    },
     "ASC 842 - Leases": {
         "database_path": "asc842_knowledge_base",
         "collection_name": "asc842_leases", 

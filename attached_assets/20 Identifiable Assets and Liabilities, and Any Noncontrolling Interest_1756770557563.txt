@@ -1,0 +1,763 @@
+General
+05 Overview and Background
+
+General
+805-20-05-1
+This Subtopic provides guidance on one aspect of the acquisition method (as described in paragraph 805-10-05-4)—the recognition and measurement of all of the following:
+aIdentifiable assets acquired
+bLiabilities assumed
+cNoncontrolling interests, if any, in the acquiree.
+805-20-05-2
+The remaining aspects of the acquisition method are addressed in Subtopics 805-10 and 805-30. Subtopic 805-30 addresses the recognition and measurement of goodwill or a gain from a bargain purchase. Subtopic 805-10 addresses all of the following:
+aIdentification of the acquirer
+bDetermination of the acquisition date
+cParticular types of business combinations
+dMeasurement period
+eDetermination of what is part of a business combination.
+805-20-05-3
+The guidance in this Subtopic is presented in the following two Subsections:
+aGeneral
+bAccounting Alternative.
+Accounting Alternative
+805-20-05-4
+The Accounting Alternative Subsections of this Subtopic provide guidance for an entity within the scope of paragraph 805-20-15-2 that elects the accounting alternative for the recognition of identifiable intangible assets acquired in a business combination.
+
+15 Scope and Scope Exceptions
+
+General
+> Overall Guidance
+805-20-15-1
+This Subtopic follows the same Scope and Scope Exceptions as outlined in the Overall Subtopic, see Section 805-10-15.
+Accounting Alternatives
+805-20-15-1A
+Paragraphs 805-20-15-2 through 15-4 and 805-20-25-29 through 25-33 provide guidance for an entity electing the accounting alternative in this Subtopic. See paragraph 805-20-65-2 for transition guidance for private companies and not-for-profit entities on applying the accounting alternative in this Subtopic.
+805-20-15-2
+A private company or not-for-profit entity may make an accounting policy election to apply the accounting alternative in this Subtopic. The guidance in the Accounting Alternative Subsections of this Subtopic applies when a private company or not-for-profit entity is required to recognize or otherwise consider the fair value of intangible assets as a result of any one of the following transactions:
+aApplying the acquisition method (as described in paragraph 805-10-05-4 for all entities and Subtopic 958-805 for additional guidance for not-for-profit entities)
+bAssessing the nature of the difference between the carrying amount of an investment and the amount of underlying equity in net assets of an investee when applying the equity method of accounting in accordance with Topic 323 on investments—equity method and joint ventures
+cAdopting fresh-start reporting in accordance with Topic 852 on reorganizations.
+
+805-20-15-3
+An entity that elects the accounting alternative shall apply all of the related recognition requirements upon election. The accounting alternative, once elected, shall be applied to all future transactions that are identified in paragraph 805-20-15-2.
+805-20-15-4
+An entity that elects this accounting alternative must adopt the accounting alternative for amortizing goodwill in the Accounting Alternatives Subsections of Topic 350-20 on intangibles—goodwill and other. If the accounting alternative for amortizing goodwill was not adopted previously, it should be adopted on a prospective basis as of the adoption of the accounting alternative in this Subtopic. For example, upon adoption, existing goodwill should be amortized on a straight-line basis over 10 years, or less than 10 years if the entity demonstrates that another useful life is more appropriate. However, an entity that elects the accounting alternative for amortizing goodwill is not required to adopt the accounting alternative in this Subtopic.
+
+20 Glossary
+
+Acquiree
+The business or businesses that the acquirer obtains control of in a business combination. This term also includes a nonprofit activity or business that a not-for-profit acquirer obtains control of in an acquisition by a not-for-profit entity.
+Acquirer
+The entity that obtains control of the acquiree. However, in a business combination in which a variable interest entity (VIE) is acquired, the primary beneficiary of that entity always is the acquirer.
+Acquisition by a Not-for-Profit Entity
+A transaction or other event in which a not-for-profit acquirer obtains control of one or more nonprofit activities or businesses and initially recognizes their assets and liabilities in the acquirer's financial statements. When applicable guidance in Topic 805 is applied by a not-for-profit entity, the term business combination has the same meaning as this term has for a for-profit entity. Likewise, a reference to business combinations in guidance that links to Topic 805 has the same meaning as a reference to acquisitions by not-for-profit entities.
+Acquisition Date
+The date on which the acquirer obtains control of the acquiree.
+Business
+Paragraphs 805-10-55-3A through 55-6 and 805-10-55-8 through 55-9 define what is considered a business.
+Business Combination
+A transaction or other event in which an acquirer obtains control of one or more businesses. Transactions sometimes referred to as true mergers or mergers of equals also are business combinations. See also Acquisition by a Not-for-Profit Entity.
+Contingency
+An existing condition, situation, or set of circumstances involving uncertainty as to possible gain (gain contingency) or loss (loss contingency) to an entity that will ultimately be resolved when one or more future events occur or fail to occur.
+Contract
+An agreement between two or more parties that creates enforceable rights and obligations.
+Contract Asset
+An entity's right to consideration in exchange for goods or services that the entity has transferred to a customer when that right is conditioned on something other than the passage of time (for example, the entity's future performance).
+Contract Liability
+An entity's obligation to transfer goods or services to a customer for which the entity has received consideration (or the amount is due) from the customer.
+Control
+The same as the meaning of controlling financial interest in paragraph 810-10-15-8.
+Corporate Joint Venture
+A corporation owned and operated by a small group of entities (the joint venturers) as a separate and specific business or project for the mutual benefit of the members of the group. A government may also be a member of the group. The purpose of a corporate joint venture frequently is to share risks and rewards in developing a new market, product or technology; to combine complementary technological knowledge; or to pool resources in developing production or other facilities. A corporate joint venture also usually provides an arrangement under which each joint venturer may participate, directly or indirectly, in the overall management of the joint venture. Joint venturers thus have an interest or relationship other than as passive investors. An entity that is a subsidiary of one of the joint venturers is not a corporate joint venture. The ownership of a corporate joint venture seldom changes, and its stock is usually not traded publicly. A noncontrolling interest held by public ownership, however, does not preclude a corporation from being a corporate joint venture.
+Customer
+A party that has contracted with an entity to obtain goods or services that are an output of the entity's ordinary activities in exchange for consideration.
+Defensive Intangible Asset
+An acquired intangible asset in a situation in which an entity does not intend to actively use the asset but intends to hold (lock up) the asset to prevent others from obtaining access to the asset.
+Direct Financing Lease
+From the perspective of a lessor, a lease that meets none of the criteria in paragraph 842-10-25-2 but meets the criteria in paragraph 842-10-25-3(b)and is not an operating lease in accordance with paragraph 842-10-25-3A.
+Fair Value
+The price that would be received to sell an asset or paid to transfer a liability in an orderly transaction between market participants at the measurement date.
+Finance Lease
+From the perspective of a lessee, a lease that meets one or more of the criteria in paragraph 842-10-25-2.
+Financial Asset
+Cash, evidence of an ownership interest in an entity, or a contract that conveys to one entity a right to do either of the following:
+aReceive cash or another financial instrument from a second entity
+bExchange other financial instruments on potentially favorable terms with the second entity.
+Financial Statements Are Available to Be Issued
+Financial statements are considered available to be issued when they are complete in a form and format that complies with GAAP and all approvals necessary for issuance have been obtained, for example, from management, the board of directors, and/or significant shareholders. The process involved in creating and distributing the financial statements will vary depending on an entity's management and corporate governance structure as well as statutory and regulatory requirements.
+Gain Contingency
+An existing condition, situation, or set of circumstances involving uncertainty as to possible gain to an entity that will ultimately be resolved when one or more future events occur or fail to occur.
+Goodwill
+An asset representing the future economic benefits arising from other assets acquired in a business combination or an acquisition by a not-for-profit entity that are not individually identified and separately recognized. For ease of reference, this term also includes the immediate charge recognized by not-for-profit entities in accordance with paragraph 958-805-25-29.
+Identifiable
+An asset is identifiable if it meets either of the following criteria:
+aIt is separable, that is, capable of being separated or divided from the entity and sold, transferred, licensed, rented, or exchanged, either individually or together with a related contract, identifiable asset, or liability, regardless of whether the entity intends to do so.
+bIt arises from contractual or other legal rights, regardless of whether those rights are transferable or separable from the entity or from other rights and obligations.
+Intangible Assets
+Assets (not including financial assets) that lack physical substance. (The term intangible assets is used to refer to intangible assets other than goodwill.)
+Joint Venture
+An entity owned and operated by a small group of businesses (the joint venturers) as a separate and specific business or project for the mutual benefit of the members of the group. A government may also be a member of the group. The purpose of a joint venture frequently is to share risks and rewards in developing a new market, product, or technology; to combine complementary technological knowledge; or to pool resources in developing production or other facilities. A joint venture also usually provides an arrangement under which each joint venturer may participate, directly or indirectly, in the overall management of the joint venture. Joint venturers thus have an interest or relationship other than as passive investors. An entity that is a subsidiary of one of the joint venturers is not a joint venture. The ownership of a joint venture seldom changes, and its equity interests usually are not traded publicly. A minority public ownership, however, does not preclude an entity from being a joint venture. As distinguished from a corporate joint venture, a joint venture is not limited to corporate entities.
+Lease
+A contract, or part of a contract, that conveys the right to control the use of identified property, plant, or equipment (an identified asset) for a period of time in exchange for consideration.
+Lease Liability
+A lessee's obligation to make the lease payments arising from a lease, measured on a discounted basis.
+Lease Payments
+See paragraph 842-10-30-5 for what constitutes lease payments from the perspective of a lessee and a lessor.
+Lease Receivable
+A lessor's right to receive lease payments arising from a sales-type lease or a direct financing lease plus any amount that a lessor expects to derive from the underlying asset following the end of the lease term to the extent that it is guaranteed by the lessee or any other third party unrelated to the lessor, measured on a discounted basis.
+Lease Term
+The noncancellable period for which a lessee has the right to use an underlying asset, together with all of the following:
+aPeriods covered by an option to extend the lease if the lessee is reasonably certain to exercise that option
+bPeriods covered by an option to terminate the lease if the lessee is reasonably certain not to exercise that option
+cPeriods covered by an option to extend (or not to terminate) the lease in which exercise of the option is controlled by the lessor.
+Legal Entity
+Any legal structure used to conduct activities or to hold assets. Some examples of such structures are corporations, partnerships, limited liability companies, grantor trusts, and other trusts.
+Lessee
+An entity that enters into a contract to obtain the right to use an underlying asset for a period of time in exchange for consideration.
+Lessor
+An entity that enters into a contract to provide the right to use an underlying asset for a period of time in exchange for consideration.
+Loss Contingency
+An existing condition, situation, or set of circumstances involving uncertainty as to possible loss to an entity that will ultimately be resolved when one or more future events occur or fail to occur. The term loss is used for convenience to include many charges against income that are commonly referred to as expenses and others that are commonly referred to as losses.
+Market Participants
+Buyers and sellers in the principal (or most advantageous) market for the asset or liability that have all of the following characteristics:
+aThey are independent of each other, that is, they are not related parties, although the price in a related-party transaction may be used as an input to a fair value measurement if the reporting entity has evidence that the transaction was entered into at market terms
+bThey are knowledgeable, having a reasonable understanding about the asset or liability and the transaction using all available information, including information that might be obtained through due diligence efforts that are usual and customary
+cThey are able to enter into a transaction for the asset or liability
+dThey are willing to enter into a transaction for the asset or liability, that is, they are motivated but not forced or otherwise compelled to do so.
+Mineral Rights
+The legal right to explore, extract, and retain at least a portion of the benefits from mineral deposits.
+Net Investment in the Lease
+For a sales-type lease, the sum of the lease receivable and the unguaranteed residual asset.
+For a direct financing lease, the sum of the lease receivable and the unguaranteed residual asset, net of any deferred selling profit.
+Noncontrolling Interest
+The portion of equity (net assets) in a subsidiary not attributable, directly or indirectly, to a parent. A noncontrolling interest is sometimes called a minority interest.
+Not-for-Profit Entity
+An entity that possesses the following characteristics, in varying degrees, that distinguish it from a business entity:
+aContributions of significant amounts of resources from resource providers who do not expect commensurate or proportionate pecuniary return
+bOperating purposes other than to provide goods or services at a profit
+cAbsence of ownership interests like those of business entities.
+Entities that clearly fall outside this definition include the following:
+aAll investor-owned entities
+bEntities that provide dividends, lower costs, or other economic benefits directly and proportionately to their owners, members, or participants, such as mutual insurance entities, credit unions, farm and rural electric cooperatives, and employee benefit plans.
+Operating Lease
+From the perspective of a lessee, any lease other than a finance lease.
+From the perspective of a lessor, any lease other than a sales-type lease or a direct financing lease.
+Orderly Transaction
+A transaction that assumes exposure to the market for a period before the measurement date to allow for marketing activities that are usual and customary for transactions involving such assets or liabilities; it is not a forced transaction (for example, a forced liquidation or distress sale).
+Performance Obligation
+A promise in a contract with a customer to transfer to the customer either:
+aA good or service (or a bundle of goods or services) that is distinct
+bA series of distinct goods or services that are substantially the same and that have the same pattern of transfer to the customer.
+Private Company
+An entity other than a public business entity, a not-for-profit entity, or an employee benefit plan within the scope of Topics 960 through 965 on plan accounting.
+Public Business Entity
+A public business entity is a business entity meeting any one of the criteria below. Neither a not-for-profit entity nor an employee benefit plan is a business entity.
+aIt is required by the U.S. Securities and Exchange Commission (SEC) to file or furnish financial statements, or does file or furnish financial statements (including voluntary filers), with the SEC (including other entities whose financial statements or financial information are required to be or are included in a filing).
+bIt is required by the Securities Exchange Act of 1934 (the Act), as amended, or rules or regulations promulgated under the Act, to file or furnish financial statements with a regulatory agency other than the SEC.
+cIt is required to file or furnish financial statements with a foreign or domestic regulatory agency in preparation for the sale of or for purposes of issuing securities that are not subject to contractual restrictions on transfer.
+dIt has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market.
+eIt has one or more securities that are not subject to contractual restrictions on transfer, and it is required by law, contract, or regulation to prepare U.S. GAAP financial statements (including notes) and make them publicly available on a periodic basis (for example, interim or annual periods). An entity must meet both of these conditions to meet this criterion.
+An entity may meet the definition of a public business entity solely because its financial statements or financial information is included in another entity's filing with the SEC. In that case, the entity is only a public business entity for purposes of financial statements that are filed or furnished with the SEC.
+Purchased Financial Assets with Credit Deterioration
+Acquired individual financial assets (or acquired groups of financial assets with similar risk characteristics) that as of the date of acquisition have experienced a more-than-insignificant deterioration in credit quality since origination, as determined by an acquirer's assessment. See paragraph 326-20-55-5 for more information on the meaning of similar risk characteristics for assets measured on an amortized cost basis.
+Reinsurance
+A transaction in which a reinsurer (assuming entity), for a consideration (premium), assumes all or part of a risk undertaken originally by another insurer (ceding entity). For indemnity reinsurance, the legal rights of the insured are not affected by the reinsurance transaction and the insurance entity issuing the insurance contract remains liable to the insured for payment of policy benefits. Assumption or novation reinsurance contracts that are legal replacements of one insurer by another extinguish the ceding entity's liability to the policyholder.
+Related Parties
+Related parties include:
+aAffiliates of the entity
+bEntities for which investments in their equity securities would be required, absent the election of the fair value option under the Fair Value Option Subsection of Section 825-10-15, to be accounted for by the equity method by the investing entity
+cTrusts for the benefit of employees, such as pension and profit-sharing trusts that are managed by or under the trusteeship of management
+dPrincipal owners of the entity and members of their immediate families
+eManagement of the entity and members of their immediate families
+fOther parties with which the entity may deal if one party controls or can significantly influence the management or operating policies of the other to an extent that one of the transacting parties might be prevented from fully pursuing its own separate interests
+gOther parties that can significantly influence the management or operating policies of the transacting parties or that have an ownership interest in one of the transacting parties and can significantly influence the other to an extent that one or more of the transacting parties might be prevented from fully pursuing its own separate interests.
+Right-of-Use Asset
+An asset that represents a lessee's right to use an underlying asset for the lease term.
+Sales-Type Lease
+From the perspective of a lessor, a lease that meets one or more of the criteria in paragraph 842-10-25-2 and is not an operating lease in accordance with paragraph 842-10-25-3A.
+Security
+A share, participation, or other interest in property or in an entity of the issuer or an obligation of the issuer that has all of the following characteristics:
+aIt is either represented by an instrument issued in bearer or registered form or, if not represented by an instrument, is registered in books maintained to record transfers by or on behalf of the issuer.
+bIt is of a type commonly dealt in on securities exchanges or markets or, when represented by an instrument, is commonly recognized in any area in which it is issued or dealt in as a medium for investment.
+cIt either is one of a class or series or by its terms is divisible into a class or series of shares, participations, interests, or obligations.
+Standalone Selling Price
+The price at which an entity would sell a promised good or service separately to a customer.
+Sublease
+A transaction in which an underlying asset is re-leased by the lessee (or intermediate lessor) to a third party (the sublessee) and the original (or head) lease between the lessor and the lessee remains in effect.
+Transaction Price
+The amount of consideration to which an entity expects to be entitled in exchange for transferring promised goods or services to a customer, excluding amounts collected on behalf of third parties.
+Underlying Asset
+An asset that is the subject of a lease for which a right to use that asset has been conveyed to a lessee. The underlying asset could be a physically distinct portion of a single asset.
+Unguaranteed Residual Asset
+The amount that a lessor expects to derive from the underlying asset following the end of the lease term that is not guaranteed by the lessee or any other third party unrelated to the lessor, measured on a discounted basis.
+Variable Interest Entity
+A legal entity subject to consolidation according to the provisions of the Variable Interest Entities Subsections of Subtopic 810-10.
+
+25 Recognition
+General
+> Recognition Principle
+805-20-25-1
+As of the acquisition date, the acquirer shall recognize, separately from goodwill, the identifiable assets acquired, the liabilities assumed, and any noncontrolling interest in the acquiree. Recognition of identifiable assets acquired and liabilities assumed is subject to the conditions specified in paragraphs 805-20-25-2 through 25-3. However, an entity (the acquirer) within the scope of paragraph 805-20-15-2 may elect to apply the accounting alternative for the recognition of identifiable intangible assets acquired in a business combination as described in paragraphs 805-20-25-29 through 25-33.
+· > Recognition Conditions
+805-20-25-2
+To qualify for recognition as part of applying the acquisition method, the identifiable assets acquired and liabilities assumed must meet the definitions of assets and liabilities in FASB Concepts Statement No. 6, Elements of Financial Statements, at the acquisition date. For example, costs the acquirer expects but is not obligated to incur in the future to effect its plan to exit an activity of an acquiree or to terminate the employment of or relocate an acquiree's employees are not liabilities at the acquisition date. Therefore, the acquirer does not recognize those costs as part of applying the acquisition method. Instead, the acquirer recognizes those costs in its postcombination financial statements in accordance with other applicable generally accepted accounting principles (GAAP).
+
+805-20-25-3
+In addition, to qualify for recognition as part of applying the acquisition method, the identifiable assets acquired and liabilities assumed must be part of what the acquirer and the acquiree (or its former owners) exchanged in the business combination transaction rather than the result of separate transactions. The acquirer shall apply the guidance in paragraphs 805-10-25-20 through 25-23 to determine which assets acquired or liabilities assumed are part of the exchange for the acquiree and which, if any, are the result of separate transactions to be accounted for in accordance with their nature and the applicable GAAP.
+805-20-25-4
+The acquirer's application of the recognition principle and conditions may result in recognizing some assets and liabilities that the acquiree had not previously recognized as assets and liabilities in its financial statements. For example, the acquirer recognizes the acquired identifiable intangible assets, such as a brand name, a patent, or a customer relationship, that the acquiree did not recognize as assets in its financial statements because it developed them internally and charged the related costs to expense.
+805-20-25-5
+Paragraphs 805-20-25-11 through 25-12 provide guidance on recognizing operating leases and paragraphs 805-20-55-2 through 55-45 provide guidance on recognizing intangible assets. Paragraphs 805-20-25-17 through 25-28B specify the types of identifiable assets and liabilities that include items for which this Subtopic and Subtopic 805-740 provide limited exceptions to the recognition principle and conditions in paragraphs 805-20-25-1 through 25-3.
+· > Classifying or Designating Identifiable Assets Acquired and Liabilities Assumed in a Business Combination
+805-20-25-6
+At the acquisition date, the acquirer shall classify or designate the identifiable assets acquired and liabilities assumed as necessary to subsequently apply other GAAP. The acquirer shall make those classifications or designations on the basis of the contractual terms, economic conditions, its operating or accounting policies, and other pertinent conditions as they exist at the acquisition date.
+805-20-25-7
+In some situations, GAAP provides for different accounting depending on how an entity classifies or designates a particular asset or liability. Examples of classifications or designations that the acquirer shall make on the basis of the pertinent conditions as they exist at the acquisition date include but are not limited to the following:
+aClassification of particular investments in securities as trading, available for sale, or held to maturity in accordance with Section 320-10-25
+bDesignation of a derivative instrument as a hedging instrument in accordance with paragraph 815-10-05-4
+cAssessment of whether an embedded derivative should be separated from the host contract in accordance with Section 815-15-25 (which is a matter of classification as this Subtopic uses that term).
+805-20-25-8
+This Section provides the following two exceptions to the principle in paragraph 805-20-25-6:
+aClassification of a lease of an acquiree shall be in accordance with the guidance in paragraph 842-10-55-11
+bClassification of a contract written by an entity that is in the scope of Subtopic 944-10 as an insurance or reinsurance contract or a deposit contract. The acquirer shall classify that contract on the basis of the contractual terms and other factors at the inception of the contract (or, if the terms of the contract have been modified in a manner that would change its classification, at the date of that modification, which might be the acquisition date).
+> Recognizing Particular Assets Acquired and Liabilities Assumed
+805-20-25-9
+Guidance on recognizing identifiable intangible assets, including reacquired rights, follows.
+· > Identifiable Intangible Assets
+805-20-25-10
+The acquirer shall recognize separately from goodwill the identifiable intangible assets acquired in a business combination. An intangible asset is identifiable if it meets either the separability criterion or the contractual-legal criterion described in the definition of identifiable. Additional guidance on applying that definition is provided in paragraphs 805-20-25-14 through 25-15, 805-20-55-2 through 55-45, and Example 1 (see paragraph 805-20-55-52). For guidance on the recognition and subsequent measurement of a defensive intangible asset, see Subtopic 350-30.
+805-20-25-10A
+An identifiable intangible asset may be associated with a lease, which may be evidenced by market participants' willingness to pay a price for the lease even if it is at market terms. For example, a lease of gates at an airport or of retail space in a prime shopping area might provide entry into a market or other future economic benefits that qualify as identifiable intangible assets, such as a customer relationship. In that situation, the acquirer shall recognize the associated identifiable intangible asset(s) in accordance with paragraph 805-20-25-10.
+· > Operating Leases
+805-20-25-11
+The acquirer shall recognize assets or liabilities related to an operating lease in which the acquiree is the lessee as required by paragraphs 805-20-25-10A and 805-20-25-28A.
+805-20-25-12
+Regardless of whether the acquiree is the lessee or the lessor, the acquirer shall determine whether the terms of each of an acquiree's operating leases are favorable or unfavorable compared with the market terms of leases of the same or similar items at the acquisition date. If the acquiree is a lessor, the acquirer shall recognize an intangible asset if the terms of an operating lease are favorable relative to market terms and a liability if the terms are unfavorable relative to market terms. If the acquiree is a lessee, the acquirer shall adjust the measurement of the acquired right-of-use asset for any favorable or unfavorable terms in accordance with paragraph 805-20-30-24.
+805-20-25-13
+Paragraph superseded by Accounting Standards Update No. 2016-02
+· > Reacquired Rights
+805-20-25-14
+As part of a business combination, an acquirer may reacquire a right that it had previously granted to the acquiree to use one or more of the acquirer's recognized or unrecognized assets. Examples of such rights include a right to use the acquirer's trade name under a franchise agreement or a right to use the acquirer's technology under a technology licensing agreement. A reacquired right is an identifiable intangible asset that the acquirer recognizes separately from goodwill. Paragraph 805-20-30-20 provides guidance on measuring a reacquired right, and paragraph 805-20-35-2 provides guidance on the subsequent accounting for a reacquired right.
+805-20-25-15
+If the terms of the contract giving rise to a reacquired right are favorable or unfavorable relative to the terms of current market transactions for the same or similar items, the acquirer shall recognize a settlement gain or loss. Paragraph 805-10-55-21 provides guidance for measuring that settlement gain or loss.
+· > Contingent Consideration Arrangements of an Acquiree Assumed by the Acquirer
+805-20-25-15A
+Contingent consideration arrangements of an acquiree assumed by the acquirer in a business combination shall be recognized initially at fair value in accordance with the guidance for contingent consideration arrangements in paragraph 805-30-25-5.
+> Exceptions to the Recognition Principle
+805-20-25-16
+This Topic provides limited exceptions to the recognition and measurement principles applicable to business combinations. Paragraphs 805-20-25-17 through 25-28C specify the types of identifiable assets and liabilities that include items for which this Subtopic provides limited exceptions to the recognition principle in paragraph 805-20-25-1. The acquirer shall apply the specified GAAP or the specified requirements rather than that recognition principle to determine when to recognize the assets or liabilities identified in paragraphs 805-20-25-17 through 25-28C. That will result in some items being recognized either by applying recognition conditions in addition to those in paragraphs 805-20-25-2 through 25-3 or by applying the requirements of other GAAP, with results that differ from applying the recognition principle and conditions in paragraphs 805-20-25-1 through 25-3.
+805-20-25-17
+Guidance is presented on all of the following exceptions to the recognition principle:
+aAssets and liabilities arising from contingencies
+bIncome taxes
+cEmployee benefits
+dIndemnification assets
+eLeases
+fContract assets and contract liabilities.
+805-20-25-18
+Paragraph not used.
+· > Assets and Liabilities Arising from Contingencies
+805-20-25-18A
+The following recognition guidance in paragraphs 805-20-25-19 through 25-20B applies to assets and liabilities meeting both of the following conditions:
+aAssets acquired and liabilities assumed that would be within the scope of Topic 450 if not acquired or assumed in a business combination
+bAssets or liabilities arising from contingencies that are not otherwise subject to specific guidance in this Subtopic.
+· · > Acquisition Date Fair Value Determinable during Measurement Period
+805-20-25-19
+If the acquisition-date fair value of the asset or liability arising from a contingency can be determined during the measurement period, that asset or liability shall be recognized at the acquisition date. For example, the acquisition-date fair value of a warranty obligation often can be determined.
+· · > Acquisition Date Fair Value Not Determinable during Measurement Period
+805-20-25-20
+If the acquisition-date fair value of the asset or liability arising from a contingency cannot be determined during the measurement period, an asset or a liability shall be recognized at the acquisition date if both of the following criteria are met:
+aInformation available before the end of the measurement period indicates that it is probable that an asset existed or that a liability had been incurred at the acquisition date. It is implicit in this condition that it must be probable at the acquisition date that one or more future events confirming the existence of the asset or liability will occur.
+bThe amount of the asset or liability can be reasonably estimated.
+805-20-25-20A
+The criteria in paragraph 805-20-25-20 shall be applied using the guidance in Topic 450 for application of similar criteria in paragraph 450-20-25-2.
+· · > Recognition Criteria Not Met during Measurement Period
+805-20-25-20B
+If the recognition criteria in paragraphs 805-20-25-19 through 25-20A are not met at the acquisition date using information that is available during the measurement period about facts and circumstances that existed as of the acquisition date, the acquirer shall not recognize an asset or liability as of the acquisition date. In periods after the acquisition date, the acquirer shall account for an asset or a liability arising from a contingency that does not meet the recognition criteria at the acquisition date in accordance with other applicable GAAP, including Topic 450, as appropriate.
+· > Income Taxes
+805-20-25-21
+Section 805-740-25 establishes the recognition guidance for accounting for income taxes in a business combination.
+· > Employee Benefits
+805-20-25-22
+The acquirer shall recognize a liability (or asset, if any) related to the acquiree's employee benefit arrangements in accordance with other GAAP. For example, employee benefits in the scope of the guidance identified in paragraphs 805-20-25-23 through 25-26 would be recognized in accordance with that guidance and as specified in those paragraphs.
+· · > Pension and Postretirement Benefits Other than Pensions
+805-20-25-23
+Guidance on defined benefit pension plans is presented in Subtopic 715-30. If an acquiree sponsors a single-employer defined benefit pension plan, the acquirer shall recognize as part of the business combination an asset or a liability representing the funded status of the plan (see paragraph 715-30-25-1). Paragraph 805-20-30-15 provides guidance on determining that funded status. If an acquiree participates in a multiemployer plan, and it is probable as of the acquisition date that the acquirer will withdraw from that plan, the acquirer shall recognize as part of the business combination a withdrawal liability in accordance with Subtopic 450-20.
+805-20-25-24
+The Settlements, Curtailments, and Certain Termination Benefits Subsections of Sections 715-30-25 and 715-30-35 establish the recognition guidance related to accounting for settlements and curtailments of defined benefit pension plans and certain termination benefits.
+805-20-25-25
+Guidance on defined benefit other postretirement plans is presented in Subtopic 715-60. If an acquiree sponsors a single-employer defined benefit postretirement plan, the acquirer shall recognize as part of the business combination an asset or a liability representing the funded status of the plan (see paragraph 715-60-25-1). Paragraph 805-20-30-15 provides guidance on determining that funded status. If an acquiree participates in a multiemployer plan and it is probable as of the acquisition date that the acquirer will withdraw from that plan, the acquirer shall recognize as part of the business combination a withdrawal liability in accordance with Subtopic 450-20.
+· · > Other Employee Benefit Arrangements
+805-20-25-26
+See also the recognition-related guidance for the following other employee benefit arrangements:
+aOne-time termination benefits in connection with exit or disposal activities. See Section 420-10-25.
+bCompensated absences. See Section 710-10-25.
+cDeferred compensation contracts. See Section 710-10-25.
+dNonretirement postemployment benefits. See Section 712-10-25.
+· > Indemnification Assets
+805-20-25-27
+The seller in a business combination may contractually indemnify the acquirer for the outcome of a contingency or uncertainty related to all or part of a specific asset or liability. For example, the seller may indemnify the acquirer against losses above a specified amount on a liability arising from a particular contingency; in other words, the seller will guarantee that the acquirer's liability will not exceed a specified amount. As a result, the acquirer obtains an indemnification asset. The acquirer shall recognize an indemnification asset at the same time that it recognizes the indemnified item, measured on the same basis as the indemnified item, subject to the need for a valuation allowance for uncollectible amounts. Therefore, if the indemnification relates to an asset or a liability that is recognized at the acquisition date and measured at its acquisition-date fair value, the acquirer shall recognize the indemnification asset at the acquisition date measured at its acquisition-date fair value.
+805-20-25-28
+In some circumstances, the indemnification may relate to an asset or a liability that is an exception to the recognition or measurement principles. For example, an indemnification may relate to a contingency that is not recognized at the acquisition date because it does not satisfy the criteria for recognition in paragraphs 805-20-25-18A through 25-19 at that date. In those circumstances, the indemnification asset shall be recognized and measured using assumptions consistent with those used to measure the indemnified item, subject to management's assessment of the collectibility of the indemnification asset and any contractual limitations on the indemnified amount.
+· > Leases
+805-20-25-28A
+The acquirer shall recognize assets and liabilities arising from leases of an acquiree in accordance with Topic 842 on leases (taking into account the requirements in paragraph 805-20-25-8(a)).
+805-20-25-28B
+For leases for which the acquiree is a lessee, the acquirer may elect, as an accounting policy election by class of underlying asset and applicable to all of the entity's acquisitions, not to recognize assets or liabilities at the acquisition date for leases that, at the acquisition date, have a remaining lease term of 12 months or less. This includes not recognizing an intangible asset if the terms of an operating lease are favorable relative to market terms or a liability if the terms are unfavorable relative to market terms.
+· > Contract Assets and Contract Liabilities
+805-20-25-28C
+The acquirer shall recognize a contract asset or contract liability in accordance with Topic 606 on revenue from contracts with customers. This includes a contract asset or contract liability from the following:
+aContracts with customers
+bOther contracts to which the provisions of Topic 606 apply.
+Accounting Alternatives
+
+805-20-25-29
+The guidance in this Subsection applies to entities within the scope of paragraph 805-20-15-2 that elect the accounting alternative for the recognition of identifiable intangible assets acquired in a business combination.
+> Identifiable Intangible Assets
+805-20-25-30
+An intangible asset is identifiable if it meets either the separability criterion or the contractual-legal criterion described in the definition of identifiable. However, under the accounting alternative, an acquirer shall not recognize separately from goodwill the following intangible assets:
+aCustomer-related intangible assets unless they are capable of being sold or licensed independently from other assets of a business
+bNoncompetition agreements.
+805-20-25-31
+Customer-related intangible assets often would not meet criterion (a) in paragraph 805-20-25-30 for recognition. Customer-related intangible assets that would meet that criterion for recognition under this accounting alternative are those that are capable of being sold or licensed independently from the other assets of a business. Examples of customer-related intangible assets are listed in paragraph 805-20-55-20. Many of the customer-related intangible assets that would meet criterion (a) for recognition also would be considered contract-based intangible assets as described in paragraph 805-20-55-31. Customer-related intangible assets that may meet that criterion for recognition include but are not limited to:
+aMortgage servicing rights
+bCommodity supply contracts
+cCore deposits
+dCustomer information (for example, names and contact information).
+805-20-25-32
+Contract assets, as used in Topic 606 on revenue from contracts with customers, are not considered to be customer-related intangible assets for purposes of applying this accounting alternative. Therefore, contract assets are not eligible to be subsumed into goodwill and shall be recognized separately.
+805-20-25-33
+A lease is not considered to be a customer-related intangible asset for purposes of applying this accounting alternative. Therefore, favorable and unfavorable leases are not eligible to be subsumed into goodwill and shall be recognized separately.
+
+30 Initial Measurement
+
+General
+
+> Measurement Principle
+805-20-30-1
+The acquirer shall measure the identifiable assets acquired, the liabilities assumed, and any noncontrolling interest in the acquiree at their acquisition-datefair values.
+805-20-30-2
+Exceptions to the measurement principle are identified and their accounting treatment is addressed in paragraphs 805-20-30-10 through 30-26.
+> Measuring the Fair Values of Particular Identifiable Assets and a Noncontrolling Interest in an Acquiree
+805-20-30-3
+The following guidance demonstrates the application of the measurement principle in paragraph 805-20-30-1 to specific situations in a business combination including guidance on measuring the fair values of particular identifiable assets and a noncontrolling interest in an acquiree.
+· > Assets with Uncertain Cash Flows (Valuation Allowances)
+805-20-30-4
+The acquirer shall not recognize a separate valuation allowance as of the acquisition date for assets acquired in a business combination that are measured at their acquisition-date fair values because the effects of uncertainty about future cash flows are included in the fair value measure, unless the assets acquired are financial assets for which the acquirer shall refer to the guidance in paragraphs 805-20-30-4A through 30-4B.
+805-20-30-4A
+For acquired financial assets that are not purchased financial assets with credit deterioration, the acquirer shall record the purchased financial assets at the acquisition-date fair value. Additionally, for these financial assets within the scope of Topic 326, an allowance shall be recorded with a corresponding charge to credit loss expense as of the reporting date.
+805-20-30-4B
+For assets accounted for as purchased financial assets with credit deterioration (which includes beneficial interests that meet the criteria in paragraph 325-40-30-1A), an acquirer shall recognize an allowance in accordance with Topic 326 with a corresponding increase to the amortized cost basis of the financial asset(s) as of the acquisition date.
+· > Assets Subject to Operating Leases in Which the Acquiree Is the Lessor
+805-20-30-5
+The acquirer shall measure the acquisition-date fair value of an asset, such as a building or a patent or other intangible asset, that is subject to an operating lease in which the acquiree is the lessor separately from the lease contract. In other words, the fair value of the asset shall be the same regardless of whether it is subject to an operating lease. In accordance with paragraph 805-20-25-12, the acquirer separately recognizes an asset or a liability if the terms of the lease are favorable or unfavorable relative to market terms.
+· > Assets that the Acquirer Intends Not to Use or to Use in a Way Other Than Their Highest and Best Use
+805-20-30-6
+To protect its competitive position, or for other reasons, the acquirer may intend not to use an acquired nonfinancial asset actively, or it may not intend to use the asset according to its highest and best use. For example, that might be the case for an acquired research and development intangible asset that the acquirer plans to use defensively by preventing others from using it. Nevertheless, the acquirer shall measure the fair value of the nonfinancial asset in accordance with Subtopic 820-10 assuming its highest and best use by market participants in accordance with the appropriate valuation premise, both initially and for purposes of subsequent impairment testing.
+· > Measuring the Fair Value of a Noncontrolling Interest in an Acquiree
+805-20-30-7
+Paragraph 805-20-30-1 requires the acquirer to measure a noncontrolling interest in the acquiree at its fair value at the acquisition date. An acquirer sometimes will be able to measure the acquisition-date fair value of a noncontrolling interest on the basis of a quoted price in an active market for the equity shares (that is, those not held by the acquirer). In other situations, however, a quoted price in an active market for the equity shares will not be available. In those situations, the acquirer would measure the fair value of the noncontrolling interest using another valuation technique.
+805-20-30-8
+The fair values of the acquirer's interest in the acquiree and the noncontrolling interest on a per-share basis might differ. The main difference is likely to be the inclusion of a control premium in the per-share fair value of the acquirer's interest in the acquiree or, conversely, the inclusion of a discount for lack of control (also referred to as a noncontrolling interest discount) in the per-share fair value of the noncontrolling interest if market participants would take into account such a premium or discount when pricing the noncontrolling interest.
+> Measurement of Assets and Liabilities Arising from Contingencies
+805-20-30-9
+Paragraphs 805-20-25-18A through 25-20B establish the requirements related to recognition of certain assets and liabilities arising from contingencies. Initial measurement of assets and liabilities meeting the recognition criteria in paragraph 805-20-25-19 shall be at acquisition-date fair value. Guidance on the initial measurement of other assets and liabilities from contingencies not meeting the recognition criteria of that paragraph, but meeting the criteria in paragraph 805-20-25-20 is at paragraph 805-20-30-23.
+· > Contingent Consideration Arrangements of an Acquiree Assumed by the Acquirer
+805-20-30-9A
+Contingent consideration arrangements of an acquiree assumed by the acquirer in a business combination shall be measured initially at fair value in accordance with the guidance for contingent consideration arrangements in paragraph 805-30-25-5.
+> Exceptions to the Measurement Principle
+805-20-30-10
+Paragraph 805-20-25-16 notes that the Business Combinations Topic provides limited exceptions to the recognition and measurement principles applicable to business combinations. Paragraphs 805-20-30-12 through 30-30 specify the types of identifiable assets and liabilities that include items for which this Subtopic provides limited exceptions to the paragraph 805-20-30-1 measurement principle. The acquirer shall apply the specified GAAP or the specified requirements rather than that measurement principle to determine how to measure the assets or liabilities identified in paragraphs 805-20-30-12 through 30-30. That will result in some items being measured at an amount other than their acquisition-date fair values.
+805-20-30-11
+As noted in paragraph 805-20-25-17, income taxes, employee benefits, indemnification assets, leases, and contract assets and contract liabilities are also exceptions to the recognition principle in paragraph 805-20-25-1.
+805-20-30-12
+Guidance is presented on all of the following exceptions to the measurement principle:
+aIncome taxes
+bEmployee benefits
+cIndemnification assets
+dReacquired rights
+eShare-based payment awards
+fAssets held for sale
+gCertain assets and liabilities arising from contingencies
+hLeases
+iPurchased financial assets with credit deterioration
+jContract assets and contract liabilities.
+· > Income Taxes
+805-20-30-13
+Section 805-740-30 establishes the measurement guidance related to accounting for income taxes in a business combination.
+· > Employee Benefits
+805-20-30-14
+The acquirer shall measure a liability (or asset, if any) related to the acquiree's employee benefit arrangements in accordance with other GAAP. For example, employee benefits in the scope of the guidance identified in paragraphs 805-20-30-15 through 30-17 would be measured in accordance with that guidance and as specified in those paragraphs.
+· · > Pension and Postretirement Benefits Other Than Pensions
+805-20-30-15
+Guidance on defined benefit pension plans is presented in Subtopic 715-30. Guidance on defined benefit other postretirement plans is presented in Subtopic 715-60. Paragraphs 805-20-25-23 and 805-20-25-25 require an acquirer to recognize as part of a business combination an asset or a liability representing the funded status of a single-employer defined benefit pension or postretirement plan. In determining that funded status, the acquirer shall exclude the effects of expected plan amendments, terminations, or curtailments that at the acquisition date it has no obligation to make. The projected benefit obligation assumed shall reflect any other necessary changes in assumptions based on the acquirer's assessment of relevant future events.
+805-20-30-16
+The Settlements, Curtailments, and Certain Termination Benefits Subsection of Section 715-30-35 establishes the measurement guidance related to accounting for settlements and curtailments of defined benefit pension plans and certain termination benefits.
+· · > Other Employee Benefit Arrangements
+805-20-30-17
+See also measurement-related guidance for the following other employee benefit arrangements:
+aOne-time termination benefits in connection with exit or disposal activities. See Section 420-10-30.
+bCompensated absences. See Section 710-10-25.
+cDeferred compensation contracts. See Section 710-10-30.
+dNonretirement postemployment benefits. See Section 712-10-25.
+· > Indemnification Assets
+805-20-30-18
+Paragraph 805-20-25-27 requires that the acquirer recognize an indemnification asset at the same time that it recognizes the indemnified item, measured on the same basis as the indemnified item, subject to the need for a valuation allowance for uncollectible amounts. That paragraph also requires that, if the indemnification relates to an asset or a liability that is recognized at the acquisition date and measured at its acquisition-date fair value, the acquirer recognize the indemnification asset at the acquisition date measured at its acquisition-date fair value. For an indemnification asset measured at fair value, the effects of uncertainty about future cash flows because of collectibility considerations are included in the fair value measure and a separate valuation allowance is not necessary, as noted in paragraph 805-20-30-4.
+805-20-30-19
+Paragraph 805-20-25-28 states that in some circumstances, the indemnification may relate to an asset or a liability that is an exception to the recognition or measurement principles, and provides an example of an indemnification that may relate to a contingency that is not recognized at the acquisition date because it does not satisfy the criteria for recognition in paragraphs 805-20-25-18A through 25-19 at that date. Alternatively, an indemnification may relate to an asset or a liability, for example, one that results from an uncertain tax position that is measured on a basis other than acquisition-date fair value. (Paragraph 805-20-30-13 identifies the business-combination-related measurement requirements for income taxes.) Paragraph 805-20-25-28 establishes that in those circumstances, the indemnification asset shall be recognized and measured using assumptions consistent with those used to measure the indemnified item, subject to management's assessment of the collectibility of the indemnification asset and any contractual limitations on the indemnified amount.
+· > Reacquired Rights
+805-20-30-20
+The acquirer shall measure the value of a reacquired right recognized as an intangible asset in accordance with paragraph 805-20-25-14 on the basis of the remaining contractual term of the related contract regardless of whether market participants would consider potential contractual renewals in determining its fair value.
+· > Share-Based Payment Awards
+805-20-30-21
+The acquirer shall measure a liability or an equity instrument related to the replacement of an acquiree's share-based payment awards with share-based payment awards of the acquirer in accordance with the method in Topic 718. The Business Combinations Topic refers to the result of that method as the fair-value-based measure of the award. Paragraphs 805-30-30-9 through 30-13 and 805-30-55-6 through 55-13 provide additional guidance.
+· > Assets Held for Sale
+805-20-30-22
+The acquirer shall measure an acquired long-lived asset (or disposal group) that is classified as held for sale at the acquisition date in accordance with Subtopic 360-10, at fair value less cost to sell in accordance with paragraphs 360-10-35-38 and 360-10-35-43.
+· > Certain Assets and Liabilities Arising from Contingencies
+805-20-30-23
+Initial measurement of assets and liabilities meeting the recognition criteria in paragraph 805-20-25-20 shall be at the amount that can be reasonably estimated by applying the guidance in Topic 450 for application of similar criteria in paragraph 450-20-25-2.
+· > Measurement of Lease Assets and Lease Liabilities Arising from Leases in Which the Acquiree Is the Lessee
+805-20-30-24
+For leases in which the acquiree is a lessee, the acquirer shall measure the lease liability at the present value of the remaining lease payments, as if the acquired lease were a new lease of the acquirer at the acquisition date. The acquirer shall measure the right-of-use asset at the same amount as the lease liability as adjusted to reflect favorable or unfavorable terms of the lease when compared with market terms.
+· > Measurement of Assets and Liabilities Arising from Leases in Which the Acquiree Is the Lessor
+805-20-30-25
+For leases in which the acquiree is a lessor of a sales-type lease or a direct financing lease, the acquirer shall measure its net investment in the lease as the sum of both of the following (which will equal the fair value of the underlying asset at the acquisition date):
+aThe lease receivable at the present value, discounted using the rate implicit in the lease, of the following, as if the acquired lease were a new lease at the acquisition date:
+1The remaining lease payments
+2The amount the lessor expects to derive from the underlying asset following the end of the lease term that is guaranteed by the lessee or any other third party unrelated to the lessor.
+bThe unguaranteed residual asset as the difference between the fair value of the underlying asset at the acquisition date and the carrying amount of the lease receivable, as determined in accordance with (a), at that date.
+The acquirer shall take into account the terms and conditions of the lease in calculating the acquisition-date fair value of an underlying asset that is subject to a sales-type lease or a direct financing lease by the acquiree-lessor.
+· > Purchased Financial Assets with Credit Deterioration
+805-20-30-26
+An acquirer shall recognize purchased financial assets with credit deterioration (including beneficial interests meeting the conditions in paragraph 325-40-30-1A) in accordance with Section 326-20-30 for financial instruments measured at amortized cost or Section 326-30-30 for available-for-sale debt securities. Paragraphs 326-20-55-57 through 55-78 illustrate how the guidance is applied for purchased financial assets with credit deterioration measured at amortized cost. Paragraphs 326-30-55-5 through 55-7 illustrate how the guidance is applied to available-for-sale debt securities. An acquirer shall not accrete into interest income the credit losses embedded in the purchase price for purchased financial assets with credit deterioration.
+· > Contract Assets and Contract Liabilities
+805-20-30-27
+An acquirer shall measure a contract asset or contract liability in accordance with Topic 606 on revenue from contracts with customers. This includes a contract asset or contract liability from the following:
+aContracts with customers
+bOther contracts to which the provisions of Topic 606 apply.
+805-20-30-28
+An acquirer shall measure the contract assets and contract liabilities of the acquired contract as if the acquirer had originated the acquired contract. Topic 606 specifies when certain assessments and estimates should be made, for example, as of contract inception or on a recurring basis. At the acquisition date, the acquirer shall make those assessments as of the dates required by Topic 606.
+805-20-30-29
+An acquirer may use one or more of the following practical expedients when applying paragraphs 805-20-30-27 through 30-28 at the acquisition date:
+aFor contracts that were modified before the acquisition date, an acquirer may reflect the aggregate effect of all modifications that occur before the acquisition date when:
+1Identifying the satisfied and unsatisfied performance obligations
+2Determining the transaction price
+3Allocating the transaction price to the satisfied and unsatisfied performance obligations.
+bFor all contracts, for purposes of allocating the transaction price, an acquirer may determine the standalone selling price at the acquisition date (instead of the contract inception date) of each performance obligation in the contract.
+805-20-30-30
+For any of the practical expedients in paragraph 805-20-30-29 that an acquirer uses, the acquirer shall apply that expedient on an acquisition-by-acquisition basis. Each practical expedient that is elected shall be applied consistently to all contracts acquired in the same business combination. In addition, the acquirer shall provide the disclosures in paragraph 805-20-50-5.
+
+35 Subsequent Measurement
+
+General
+
+> Guidance on Specific Business-Combination-Related Items
+805-20-35-1
+This Topic directly establishes generally accepted accounting principles (GAAP) for business combinations related to recognition and initial measurement. Paragraph 805-10-35-1 cites the general requirement for an acquirer to subsequently measure and account for assets acquired, liabilities assumed or incurred, and equity instruments issued in a business combination in accordance with other applicable generally accepted accounting principles (GAAP). However, that paragraph also identifies specific items for which this Topic provides guidance. This Subtopic provides guidance on several of those specific items as follows.
+· > Reacquired Rights
+805-20-35-2
+A reacquired right recognized as an intangible asset in accordance with paragraph 805-20-25-14 shall be amortized over the remaining contractual period of the contract in which the right was granted. An acquirer that subsequently sells a reacquired right to a third party shall include the carrying amount of the intangible asset in determining the gain or loss on the sale.
+· > Assets and Liabilities Arising from Contingencies Recognized as of the Acquisition Date
+805-20-35-3
+An acquirer shall develop a systematic and rational basis for subsequently measuring and accounting for assets and liabilities arising from contingencies depending on their nature.
+· > Indemnification Assets
+805-20-35-4
+At each subsequent reporting date, the acquirer shall measure an indemnification asset that was recognized in accordance with paragraphs 805-20-25-27 through 25-28 at the acquisition date on the same basis as the indemnified liability or asset, subject to any contractual limitations on its amount, except as noted in paragraph 805-20-35-4B, and, for an indemnification asset that is not subsequently measured at its fair value, management's assessment of the collectibility of the indemnification asset.
+805-20-35-4A
+Paragraph superseded by Accounting Standards Update No. 2012-06.
+· · > Indemnification Assets Arising from Government-Assisted Acquisitions of a Financial Institution
+805-20-35-4B
+An indemnification asset recognized at the acquisition date in accordance with paragraphs 805-20-25-27 through 25-28 as a result of a government-assisted acquisition of a financial institution involving an indemnification agreement shall be subsequently measured on the same basis as the indemnified item. For example, if the expected cash flows on indemnified assets increase such that a previously recorded valuation allowance is reversed, an entity shall account for the associated decrease in the indemnification assets immediately in earnings.
+· > Contingent Consideration Arrangements of an Acquiree Assumed by the Acquirer
+805-20-35-4C
+Contingent consideration arrangements of an acquiree assumed by the acquirer in a business combination shall be measured subsequently in accordance with the guidance for contingent consideration arrangements in paragraph 805-30-35-1.
+> Additional Guidance on Subsequent Measurement of Assets Acquired, Liabilities Assumed or Incurred, and Any Noncontrolling Interests in a Business Combination
+805-20-35-5
+Additional guidance on subsequently measuring and accounting for assets acquired in a business combination is addressed in Subtopic 350-30, which prescribes the accounting for identifiableintangible assets acquired in a business combination, including recognition of intangible assets used in research and development activities, regardless of whether those assets have an alternative future use, and their classification as indefinite-lived until the completion or abandonment of the associated research and development efforts.
+805-20-35-6
+Leasehold improvements acquired in a business combination shall be amortized over the shorter of the useful life of the assets and the remaining lease term at the date of acquisition. However, if the lease transfers ownership of the underlying asset to the lessee, or the lessee is reasonably certain to exercise an option to purchase the underlying asset, the lessee shall amortize the leasehold improvements to the end of their useful life.
+805-20-35-7
+Topic 944on insurance provides guidance on the subsequent accounting for an insurance or reinsurance contract acquired in a business combination.
+805-20-35-8
+Additional guidance on accounting for changes in a parent's ownership interest in a subsidiary after control is obtained is provided in paragraphs 810-10-45-22 through 45-24 and Example 1 (see paragraph 810-10-55-4B).
+
+40 Derecognition
+
+General
+805-20-40-1
+The Business Combinations Topic directly establishes generally accepted accounting principles (GAAP) for business combinations related to recognition and initial measurement. Paragraph 805-10-35-1 cites the general requirement for an acquirer to subsequently measure and account for assets acquired, liabilities assumed or incurred, and equity instruments issued in a business combination in accordance with other applicable GAAP. However, that paragraph also identifies specific items for which the Business Combinations Topic provides guidance. This Section provides guidance on one of those specific items as follows.
+805-20-40-2
+Paragraph not used.
+> Indemnification Assets
+805-20-40-3
+The acquirer shall derecognize an indemnification asset recognized in accordance with paragraphs 805-20-25-27 through 25-28 only when it collects the asset, sells it, or otherwise loses the right to it.
+
+50 Disclosure
+
+General
+
+> Business Combinations Occurring during a Current Reporting Period or after the Reporting Date but before the Financial Statements Are Issued
+805-20-50-1
+Paragraph 805-10-50-1 identifies one of the objectives of disclosures about a business combination. To meet that objective, the acquirer shall disclose all of the following information for each business combination that occurs during the reporting period:
+aFor indemnification assets, all of the following:
+1The amount recognized as of the acquisition date
+2A description of the arrangement and the basis for determining the amount of the payment
+3An estimate of the range of outcomes (undiscounted) or, if a range cannot be estimated, that fact and the reasons why a range cannot be estimated. If the maximum amount of the payment is unlimited, the acquirer shall disclose that fact.
+bFor acquired receivables not subject to the requirements of Subtopic 326-20 relating to purchased financial assets with credit deterioration,all of the following:
+1The fair value of the receivables (unless those receivables arise from sales-type leases or direct financing leases by the lessor for which the acquirer shall disclose the amounts recognized as of the acquisition date)
+2The gross contractual amounts receivable
+3The best estimate at the acquisition date of the contractual cash flows not expected to be collected.
+The disclosures shall be provided by major class of receivable, such as loans, net investment in sales-type or direct financing leases in accordance with Subtopic 842-30 on leases—lessor, and any other class of receivables.
+cThe amounts recognized as of the acquisition date for each major class of assets acquired and liabilities assumed (see Example 5 [paragraph 805-10-55-37]).
+dFor contingencies, the following disclosures shall be included in the note that describes the business combination:
+1For assets and liabilities arising from contingencies recognized at the acquisition date:
+iThe amounts recognized at the acquisition date and the measurement basis applied (that is, at fair value or at an amount recognized in accordance with Topic 450 and Section 450-20-25)
+iiThe nature of the contingencies.
+An acquirer may aggregate disclosures for assets or liabilities arising from contingencies that are similar in nature.
+2For contingencies that are not recognized at the acquisition date, the disclosures required by Topic 450 if the criteria for disclosures in that Topic are met.
+An acquirer may aggregate disclosures for assets and liabilities arising from contingencies that are similar in nature.
+eFor each business combination in which the acquirer holds less than 100 percent of the equity interests in the acquiree at the acquisition date, both of the following:
+1The fair value of the noncontrolling interest in the acquiree at the acquisition date
+2The valuation technique(s) and significant inputs used to measure the fair value of the noncontrolling interest.
+805-20-50-2
+For individually immaterial business combinations occurring during the reporting period that are material collectively, the acquirer shall disclose the information required by paragraph 805-20-50-1 in the aggregate.
+805-20-50-3
+If the acquisition date of a business combination is after the reporting date but before the financial statements are issued or are available to be issued (as discussed in Section 855-10-25), the acquirer shall disclose the information required by paragraph 805-20-50-1 unless the initial accounting for the business combination is incomplete at the time the financial statements are issued or are available to be issued. In that situation, the acquirer shall describe which disclosures could not be made and the reason why they could not be made.
+> The Financial Effects of Adjustments That Relate to Business Combinations That Occurred in the Current or Previous Reporting Periods
+805-20-50-4
+Paragraph 805-10-50-5 identifies the second objective of disclosures about the effects of business combinations that occurred in the current or previous reporting periods. To meet the objective in that paragraph, the acquirer shall disclose the information in paragraph 805-20-50-4A for each material business combination or in the aggregate for individually immaterial business combinations that are material collectively.
+805-20-50-4A
+If the initial accounting for a business combination is incomplete (see paragraphs 805-10-25-13 through 25-14) for particular assets, liabilities, noncontrolling interests, or items of consideration and the amounts recognized in the financial statements for the business combination thus have been determined only provisionally, the acquirer shall disclose the following information for each material business combination or in the aggregate for individually immaterial business combinations that are material collectively to meet the objective in paragraph 805-10-50-5:
+aThe reasons why the initial accounting is incomplete
+bThe assets, liabilities, equity interests, or items of consideration for which the initial accounting is incomplete
+cThe nature and amount of any measurement period adjustments recognized during the reporting period in accordance with paragraph 805-10-25-17, including separately the amount of adjustment to current-period income statement line items relating to the income effects that would have been recognized in previous periods if the adjustment to provisional amounts were recognized as of the acquisition date. Alternatively, an acquirer may present those amounts separately on the face of the income statement.
+> Exceptions to the Measurement Principle
+805-20-50-5
+For any of the practical expedients in paragraph 805-20-30-29 that an acquirer uses, the acquirer shall disclose all of the following information:
+aThe expedients that have been used
+bTo the extent reasonably possible, a qualitative assessment of the estimated effect of applying each of those expedients.
+
+55 Implementation Guidance and Illustrations
+
+General
+805-20-55-1
+This Section is an integral part of the requirements of this Subtopic. This Section provides additional guidance and illustrations that address the application of accounting requirements for business combinations to identifiable assets and liabilities and to noncontrolling interests.
+> Implementation Guidance
+· > Recognition of Intangible Assets Separately from Goodwill
+805-20-55-2
+Paragraph 805-20-25-10 establishes that an intangible asset is identifiable if it meets either the separability criterion or the contractual-legal criterion described in the definition of identifiable. An intangible asset that meets the contractual-legal criterion is identifiable even if the asset is not transferable or separable from the acquiree or from other rights and obligations. For example:
+aAn acquiree leases a manufacturing facility to a lessee under an operating lease that has terms that are favorable relative to market terms. The lease terms explicitly prohibit transfer of the lease (through either sale or sublease). The amount by which the lease terms are favorable compared with the pricing of current market transactions for the same or similar items is an intangible asset that meets the contractual-legal criterion for recognition separately from goodwill, even though the acquirer cannot sell or otherwise transfer the lease contract. See also paragraph 805-20-25-12.
+bAn acquiree owns and operates a nuclear power plant. The license to operate that power plant is an intangible asset that meets the contractual-legal criterion for recognition separately from goodwill, even if the acquirer cannot sell or transfer it separately from the acquired power plant. An acquirer may recognize the fair value of the operating license and the fair value of the power plant as a single asset for financial reporting purposes if the useful lives of those assets are similar.
+cAn acquiree owns a technology patent. It has licensed that patent to others for their exclusive use outside the domestic market, receiving a specified percentage of future foreign revenue in exchange. Both the technology patent and the related license agreement meet the contractual-legal criterion for recognition separately from goodwill even if selling or exchanging the patent and the related license agreement separately from one another would not be practical.
+805-20-55-3
+The separability criterion means that an acquired intangible asset is capable of being separated or divided from the acquiree and sold, transferred, licensed, rented, or exchanged, either individually or together with a related contract, identifiable asset, or liability. An intangible asset that the acquirer would be able to sell, license, or otherwise exchange for something else of value meets the separability criterion even if the acquirer does not intend to sell, license, or otherwise exchange it.
+805-20-55-4
+An acquired intangible asset meets the separability criterion if there is evidence of exchange transactions for that type of asset or an asset of a similar type, even if those transactions are infrequent and regardless of whether the acquirer is involved in them. For example, customer and subscriber lists are frequently licensed and thus meet the separability criterion. Even if an acquiree believes its customer lists have characteristics different from other customer lists, the fact that customer lists are frequently licensed generally means that the acquired customer list meets the separability criterion. However, a customer list acquired in a business combination would not meet the separability criterion if the terms of confidentiality or other agreements prohibit an entity from selling, leasing, or otherwise exchanging information about its customers.
+805-20-55-5
+An intangible asset that is not individually separable from the acquiree or combined entity meets the separability criterion if it is separable in combination with a related contract, identifiable asset, or liability. For example:
+aMarket participants exchange deposit liabilities and related depositor relationship intangible assets in observable exchange transactions. Therefore, the acquirer should recognize the depositor relationship intangible asset separately from goodwill.
+bAn acquiree owns a registered trademark and documented but unpatented technical expertise used to manufacture the trademarked product. To transfer ownership of a trademark, the owner is also required to transfer everything else necessary for the new owner to produce a product or service indistinguishable from that produced by the former owner. Because the unpatented technical expertise must be separated from the acquiree or combined entity and sold if the related trademark is sold, it meets the separability criterion.
+· · > Assembled Workforce and Other Items that Are not Identifiable
+805-20-55-6
+The acquirer subsumes into goodwill the value of an acquired intangible asset that is not identifiable as of the acquisition date. For example, an acquirer may attribute value to the existence of an assembled workforce, which is an existing collection of employees that permits the acquirer to continue to operate an acquired business from the acquisition date. An assembled workforce does not represent the intellectual capital of the skilled workforce―the (often specialized) knowledge and experience that employees of an acquiree bring to their jobs. Because the assembled workforce is not an identifiable asset to be recognized separately from goodwill, any value attributed to it is subsumed into goodwill.
+805-20-55-7
+The acquirer also subsumes into goodwill any value attributed to items that do not qualify as assets at the acquisition date. For example, the acquirer might attribute value to potential contracts the acquiree is negotiating with prospective new customers at the acquisition date. Because those potential contracts are not themselves assets at the acquisition date, the acquirer does not recognize them separately from goodwill. The acquirer should not subsequently reclassify the value of those contracts from goodwill for events that occur after the acquisition date. However, the acquirer should assess the facts and circumstances surrounding events occurring shortly after the acquisition to determine whether a separately recognizable intangible asset existed at the acquisition date.
+805-20-55-8
+After initial recognition, an acquirer accounts for intangible assets acquired in a business combination in accordance with the provisions of Subtopics 350-30and 360-10. However, as described in paragraph 350-10-15-4, the accounting for some acquired intangible assets after initial recognition is prescribed in other standards.
+805-20-55-9
+The identifiability criteria determine whether an intangible asset is recognized separately from goodwill. However, the criteria neither provide guidance for measuring the fair value of an intangible asset nor restrict the assumptions used in measuring the fair value of an intangible asset. For example, the acquirer would take into account the assumptions that market participants would use when pricing the intangible asset, such as expectations of future contract renewals, in measuring fair value. It is not necessary for the renewals themselves to meet the identifiability criteria. (However, see paragraph 805-20-30-20, which establishes an exception to the fair value measurement principle for reacquired rights recognized in a business combination.)
+805-20-55-10
+Paragraphs 350-30-35-21 through 35-28 provide guidance for determining whether indefinite-lived intangible assets should be combined into a single unit of account to test for impairment if they are operated as a single asset and essentially are inseparable from one another.
+· > Examples of Intangible Assets That Are Identifiable
+805-20-55-11
+The following guidance presents examples of identifiable intangible assets acquired in a business combination. Some of the examples may have characteristics of assets other than intangible assets. The acquirer should account for those assets in accordance with their substance. The examples are not intended to be all-inclusive.
+805-20-55-12
+Intangible assets designated with the symbol # are those that arise from contractual or other legal rights. Those designated with the symbol * do not arise from contractual or other legal rights but are separable. Intangible assets designated with the symbol # might also be separable, but separability is not a necessary condition for an asset to meet the contractual-legal criterion.
+805-20-55-13
+The guidance is organized as follows:
+aMarketing-related intangible assets
+bCustomer-related intangible assets
+cArtistic-related intangible assets
+dContract-based intangible assets
+eTechnology-based intangible assets.
+· · > Marketing-Related Intangible Assets
+805-20-55-14
+Marketing-related intangible assets are primarily used in the marketing or promotion of products or services. Examples of marketing-related intangible assets are:
+aTrademarks, trade names, service marks, collective marks, certification marks #
+bTrade dress (unique color, shape, package design) #
+cNewspaper mastheads #
+dInternet domain names #
+eNoncompetition agreements. #
+805-20-55-15
+Guidance on trademarks, trade names, service marks, collective marks, certification marks, and internet domain names follows.
+· · · > Trademarks, Trade Names, Service Marks, Collective Marks, Certification Marks #
+805-20-55-16
+Trademarks are words, names, symbols, or other devices used in trade to indicate the source of a product and to distinguish it from the products of others. A service mark identifies and distinguishes the source of a service rather than a product. Collective marks identify the goods or services of members of a group. Certification marks certify the geographical origin or other characteristics of a good or service.
+805-20-55-17
+Trademarks, trade names, service marks, collective marks, and certification marks may be protected legally through registration with governmental agencies, continuous use in commerce, or by other means. If it is protected legally through registration or other means, a trademark or other mark acquired in a business combination is an intangible asset that meets the contractual-legal criterion. Otherwise, a trademark or other mark acquired in a business combination can be recognized separately from goodwill if the separability criterion is met, which normally it would be.
+805-20-55-18
+The terms brand and brand name, often used as synonyms for trademarks and other marks, are general marketing terms that typically refer to a group of complementary assets such as a trademark (or service mark) and its related trade name, formulas, recipes, and technological expertise. This Subtopic does not preclude an entity from recognizing, as a single asset separately from goodwill, a group of complementary intangible assets commonly referred to as a brand if the assets that make up that group have similar useful lives.
+· · · > Internet Domain Names #
+805-20-55-19
+An internet domain name is a unique alphanumeric name that is used to identify a particular numeric internet address. Registration of a domain name creates an association between that name and a designated computer on the internet for the period of the registration. Those registrations are renewable. A registered domain name acquired in a business combination meets the contractual-legal criterion.
+· · > Customer-Related Intangible Assets
+805-20-55-20
+Examples of customer-related intangible assets are:
+aCustomer lists *
+bOrder or production backlog #
+cCustomer contracts and related customer relationships #
+dNoncontractual customer relationships. *
+· · · > Customer Lists *
+805-20-55-21
+A customer list consists of information about customers, such as their names and contact information. A customer list also may be in the form of a database that includes other information about the customers, such as their order histories and demographic information. A customer list generally does not arise from contractual or other legal rights. However, customer lists are frequently leased or exchanged. Therefore, a customer list acquired in a business combination normally meets the separability criterion.
+· · · > Order or Production Backlog #
+805-20-55-22
+An order or production backlog arises from contracts such as purchase or sales orders. An order or production backlog acquired in a business combination meets the contractual-legal criterion even if the purchase or sales orders are cancelable.
+· · · > Customer Contracts and the Related Customer Relationships #
+805-20-55-23
+If an entity establishes relationships with its customers through contracts, those customer relationships arise from contractual rights. Therefore, customer contracts and the related customer relationships acquired in a business combination meet the contractual-legal criterion, even if confidentiality or other contractual terms prohibit the sale or transfer of a contract separately from the acquiree.
+805-20-55-24
+A customer contract and the related customer relationship may represent two distinct intangible assets. Both the useful lives and the pattern in which the economic benefits of the two assets are consumed may differ.
+805-20-55-25
+A customer relationship exists between an entity and its customer if the entity has information about the customer and has regular contact with the customer, and the customer has the ability to make direct contact with the entity. Customer relationships meet the contractual-legal criterion if an entity has a practice of establishing contracts with its customers, regardless of whether a contract exists at the acquisition date. Customer relationships also may arise through means other than contracts, such as through regular contact by sales or service representatives. As noted in paragraph 805-20-55-22, an order or a production backlog arises from contracts such as purchase or sales orders and therefore is considered a contractual right. Consequently, if an entity has relationships with its customers through these types of contracts, the customer relationships also arise from contractual rights and therefore meet the contractual-legal criterion.
+805-20-55-26
+See Example 1 (paragraph 805-20-55-52) for illustrations of customer contract and customer relationship intangible assets acquired in a business combination.
+· · · > Noncontractual Customer Relationships *
+805-20-55-27
+A customer relationship acquired in a business combination that does not arise from a contract may nevertheless be identifiable because the relationship is separable. Exchange transactions for the same asset or a similar asset that indicate that other entities have sold or otherwise transferred a particular type of noncontractual customer relationship would provide evidence that the noncontractual customer relationship is separable. For example, relationships with depositors are frequently exchanged with the related deposits and therefore meet the criteria for recognition as an intangible asset separately from goodwill.
+805-20-55-28
+See Example 1 (paragraph 805-20-55-52) for illustrations of customer contract and customer relationship intangible assets acquired in a business combination.
+· · > Artistic-Related Intangible Assets
+805-20-55-29
+Examples of artistic-related intangible assets are:
+aPlays, operas, ballets #
+bBooks, magazines, newspapers, other literary works #
+cMusical works such as compositions, song lyrics, advertising jingles #
+dPictures, photographs #
+eVideo and audiovisual material, including motion pictures or films, music videos, television programs. #
+805-20-55-30
+Artistic-related assets acquired in a business combination are identifiable if they arise from contractual or legal rights such as those provided by copyright. The holder can transfer a copyright, either in whole through an assignment or in part through a licensing agreement. An acquirer is not precluded from recognizing a copyright intangible asset and any related assignments or license agreements as a single asset, provided they have similar useful lives.
+· · > Contract-Based Intangible Assets
+805-20-55-31
+Contract-based intangible assets represent the value of rights that arise from contractual arrangements. Customer contracts are one type of contract-based intangible asset. If the terms of a contract give rise to a liability (for example, if the terms of a customer contract are unfavorable relative to market terms), the acquirer recognizes it as a liability assumed in the business combination. Examples of contract-based intangible assets are:
+aLicensing, royalty, standstill agreements #
+bAdvertising, construction, management, service or supply contracts #
+cOperating lease agreements of a lessor #
+dConstruction permits #
+eFranchise agreements #
+fOperating and broadcast rights #
+gServicing contracts such as mortgage servicing contracts #
+hEmployment contracts #
+iUse rights such as drilling, water, air, timber cutting, and route authorities. #
+805-20-55-32
+Guidance on servicing contracts, employment contracts, and use rights follows.
+· · · > Servicing Contracts Such as Mortgage Servicing Contracts #
+805-20-55-33
+Contracts to service financial assets are one type of contract-based intangible asset. Although servicing is inherent in all financial assets, it becomes a distinct asset or liability by either of the following:
+aIf the transfer of the servicer's financial assets met the requirements for sale accounting
+bThrough the separate acquisition or assumption of a servicing obligation that does not relate to financial assets of the combined entity.
+805-20-55-34
+Topic 860 provides guidance on accounting for servicing contracts.
+805-20-55-35
+If mortgage loans, credit card receivables, or other financial assets are acquired in a business combination with the servicing obligation, the inherent servicing rights are not a separate intangible asset because the fair value of those servicing rights is included in the measurement of the fair value of the acquired financial asset.
+· · · > Employment Contracts #
+805-20-55-36
+Employment contracts that are beneficial contracts from the perspective of the employer because the pricing of those contracts is favorable relative to market terms are one type of contract-based intangible asset.
+· · · > Use Rights #
+805-20-55-37
+Use rights such as drilling, water, air, timber cutting, and route authorities are contract-based intangible assets to be accounted for separately from goodwill. Particular use rights may have characteristics of tangible, rather than intangible, assets. For example, mineral rights are tangible assets. An acquirer should account for use rights based on their nature.
+· · > Technology-Based Intangible Assets
+805-20-55-38
+Examples of technology-based intangible assets are:
+aPatented technology #
+bComputer software and mask works #
+cUnpatented technology *
+dDatabases, including title plants *
+eTrade secrets, such as secret formulas, processes, recipes. #
+805-20-55-39
+Guidance on computer software and mask works, databases, including title plants, and trade secrets such as secret formulas, processes, and recipes follows.
+· · · > Computer Software and Mask Works #
+805-20-55-40
+Computer software and program formats acquired in a business combination that are protected legally, such as by patent or copyright, meet the contractual-legal criterion for identification as intangible assets.
+805-20-55-41
+Mask works are software permanently stored on a read-only memory chip as a series of stencils or integrated circuitry. Mask works may have legal protection. Mask works with legal protection that are acquired in a business combination meet the contractual-legal criterion for identification as intangible assets.
+· · · > Databases, Including Title Plants
+805-20-55-42
+Databases are collections of information, often stored in electronic form, such as on computer disks or files. A database that includes original works of authorship may be entitled to copyright protection. A database acquired in a business combination that is protected by copyright meets the contractual-legal criterion. However, a database typically includes information created as a consequence of an entity's normal operations, such as customer lists, or specialized information, such as scientific data or credit information. Databases that are not protected by copyright can be, and often are, exchanged, licensed, or leased to others in their entirety or in part. Therefore, even if the future economic benefits from a database do not arise from legal rights, a database acquired in a business combination meets the separability criterion.
+805-20-55-43
+Title plants constitute a historical record of all matters affecting title to parcels of land in a particular geographical area. Title plant assets are bought and sold, either in whole or in part, in exchange transactions or are licensed. Therefore, title plant assets acquired in a business combination meet the separability criterion.
+· · · > Trade Secrets Such as Secret Formulas, Processes, Recipes #
+805-20-55-44
+A trade secret is “information, including a formula, pattern, recipe, compilation, program, device, method, technique, or process that (1) derives independent economic value, actual or potential, from not being generally known and (2) is the subject of efforts that are reasonable under the circumstances to maintain its secrecy," according to The New Role of Intellectual Property in Commercial Transactions (Simensky and Breyer 1998).
+805-20-55-45
+If the future economic benefits from a trade secret acquired in a business combination are legally protected, that asset meets the contractual-legal criterion. Otherwise, trade secrets acquired in a business combination are identifiable only if the separability criterion is met, which is likely to be the case.
+805-20-55-46
+Paragraph not used.
+805-20-55-47
+Paragraph not used.
+805-20-55-48
+Paragraph not used.
+805-20-55-49
+Paragraph not used.
+· > Contractual Termination Benefits and Curtailment Losses
+805-20-55-50
+An entity that has agreed to a business combination may develop a plan to terminate certain employees. The plan will be implemented only if the combination is consummated, but the entity assesses the likelihood of the combination to be probable. In this circumstance, when terminated, the employees will be entitled to termination benefits under a preexisting plan or contractual relationship. The termination of the employees also may affect the entity's assumptions in estimating its obligations for pension benefits, other postretirement benefits, and postemployment benefits; that is, the termination of the employees may trigger curtailment losses or the recording of a contractual termination benefit.
+805-20-55-51
+The liability for the contractual termination benefits and the curtailment losses under employee benefit plans that will be triggered by the consummation of the business combination shall not be recognized when it is probable that the business combination will be consummated; rather it shall be recognized when the business combination is consummated.
+> Illustrations
+· > Example 1: Customer Contract and Customer Relationship Intangible Assets Acquired in a Business Combination
+805-20-55-52
+The following Cases illustrate the guidance in paragraphs 805-20-55-23 through 55-27 on recognition of customer contract and customer relationship intangible assets acquired in a business combination:
+aFive-year supply agreement (Case A)
+bOne customer, contract in one of two lines of business (Case B)
+cPurchase and sales orders (Case C)
+dCancelable contracts (Case D).
+805-20-55-53
+In each of the Cases, the Acquirer acquires Target in a business combination on December 31, 20X5.
+· · > Case A: Five-Year Supply Agreement
+805-20-55-54
+Target has a five-year agreement to supply goods to Customer. Both Target and Acquirer believe that Customer will renew the agreement at the end of the current contract. The agreement is not separable. The agreement, whether cancelable or not, meets the contractual-legal criterion. Additionally, because Target establishes its relationship with Customer through a contract, not only the agreement itself but also Target's customer relationship with Customer meet the contractual-legal criterion.
+· · > Case B: One Customer, Contract in One of Two Lines of Business
+805-20-55-55
+Target manufactures goods in two distinct lines of business: sporting goods and electronics. Customer purchases both sporting goods and electronics from Target. Target has a contract with Customer to be its exclusive provider of sporting goods but has no contract for the supply of electronics to Customer. Both Target and Acquirer believe that only one overall customer relationship exists between Target and Customer. The contract to be Customer's exclusive supplier of sporting goods, whether cancelable or not, meets the contractual-legal criterion. Additionally, because Target establishes its relationship with Customer through a contract, the customer relationship with Customer meets the contractual-legal criterion. Because Target has only one customer relationship with Customer, the fair value of that relationship incorporates assumptions about Target's relationship with Customer related to both sporting goods and electronics. However, if Acquirer determines that the customer relationships with Customer for sporting goods and for electronics are separate from each other, Acquirer would assess whether the customer relationship for electronics meets the separability criterion for identification as an intangible asset.
+· · > Case C: Purchase and Sales Orders
+805-20-55-56
+Target does business with its customers solely through purchase and sales orders. At December 31, 20X5, Target has a backlog of customer purchase orders from 60 percent of its customers, all of whom are recurring customers. The other 40 percent of Target's customers also are recurring customers. However, as of December 31, 20X5, Target has no open purchase orders or other contracts with those customers. Regardless of whether they are cancelable or not, the purchase orders from 60 percent of Target's customers meet the contractual-legal criterion. Additionally, because Target has established its relationship with 60 percent of its customers through contracts, not only the purchase orders but also Target's customer relationships meet the contractual-legal criterion. Because Target has a practice of establishing contracts with the remaining 40 percent of its customers, its relationship with those customers also arises through contractual rights and therefore meets the contractual-legal criterion even though Target does not have contracts with those customers at December 31, 20X5.
+· · > Case D: Cancelable Contracts
+805-20-55-57
+Target has a portfolio of one-year motor insurance contracts that are cancelable by policyholders. Because Target establishes its relationships with policyholders through insurance contracts, the customer relationship with policyholders meets the contractual-legal criterion. The guidance in Subtopic 350-30 applies to the customer relationship intangible asset.
+805-20-55-58
+Paragraph not used.
+805-20-55-59
+Paragraph not used.
+805-20-55-60
+Paragraph not used.
+
+65 Transition and Open Effective Date Information
+
+General
+
+805-20-65-1
+Paragraph superseded on 07/02/2014 after the end of the transition period stated in Accounting Standards Update No. 2012-06, Business Combinations (Topic 805): Subsequent Accounting for an Indemnification Asset Recognized at the Acquisition Date as a Result of a Government-Assisted Acquisition of a Financial Institution.
+> Transition Related to Accounting Standards Updates No. 2014-18, Business Combinations (Topic 805): Accounting for Identifiable Intangible Assets in a Business Combination, and No. 2019-06, Intangibles—Goodwill and Other (Topic 350), Business Combinations (Topic 805), and Not-for-Profit Entities (Topic 958): Extending the Private Company Accounting Alternatives on Goodwill and Certain Identifiable Intangible Assets to Not-for-Profit Entities
+805-20-65-2
+The following represents the transition information related to Accounting Standards Updates No. 2014-18, Business Combinations (Topic 805): Accounting for Identifiable Intangible Assets in a Business Combination,and No. 2019-06, Intangibles—Goodwill and Other (Topic 350), Business Combinations (Topic 805), and Not-for-Profit Entities (Topic 958): Extending the Private Company Accounting Alternatives on Goodwill and Certain Identifiable Intangible Assets to Not-for-Profit Entities,referenced in paragraph 805-20-15-1A:
+aUpon adoption of the Accounting Alternative Subsections of this Subtopic, that guidance shall be effective prospectively to the first transaction that is identified in paragraph 805-20-15-2 after the adoption of the accounting alternative.
+bCustomer-related intangible assets and noncompetition agreements that exist as of the beginning of the period of adoption shall continue to be subsequently measured in accordance with Topic 350 on intangibles—goodwill and other. That is, existing customer-related intangible assets and noncompetition agreements should not be subsumed into goodwill upon adoption of the Accounting Alternative Subsections of this Subtopic.
+cSubparagraph superseded by Accounting Standards Update No. 2016-03.
+dA private company or not-for-profit entity that makes an accounting policy election to apply the guidance in the Accounting Alternative Subsections of this Subtopic for the first time need not justify that the use of the accounting alternative is preferable as described in paragraph 250-10-45-2.
+805-20-65-3
+Paragraph superseded on 06/30/2025 after the end of the transition period stated in Accounting Standards Update No. 2021-08, Business Combinations (Topic 805): Accounting for Contract Assets and Contract Liabilities from Contracts with Customers.
+
+
+
+> SEC Staff Guidance
+· > Announcements Made by SEC Staff at Emerging Issues Task Force (EITF) Meetings
+· · > SEC Staff Announcement: Use of Residual Method to Value Acquired Assets Other than Goodwill
+805-20-S99-3
+The following is the text of SEC Staff Announcement: Use of Residual Method to Value Acquired Assets Other than Goodwill.
+Paragraph 805-20-25-10 discusses the recognition of identifiable intangible assets acquired in a business combination. The SEC staff is aware of instances in which registrants have asserted that certain intangible assets that arise from legal or contractual rights cannot be separately and directly valued (hereinafter referred to as a "direct value method") because the nature of the particular asset makes it fundamentally indistinguishable from goodwill in a business combination (for example, cellular/spectrum licenses, cable franchise agreements, and so forth). Accordingly, some have applied a policy of assigning purchase price to all other identifiable assets and liabilities as provided in Topic 805, with the remaining residual amount being allocated to the "indistinguishable" intangible asset. In those instances, there is either no goodwill recognized or the amount of goodwill recognized uses a technique other than the one specified in paragraph 805-30-30-1. These methods have been referred to as "the residual method" of valuing intangible assets and have been used in the telecommunications, broadcasting, and cable industries.
+Some have asserted that the residual method provides an acceptable approach for determining the fair value of the intangible asset to which the residual is assigned, either because it approximates the value that would be attained from a direct value method or because they believe that other methods of valuation are not practicable under the circumstances. Others have indicated that the residual method should be used as a proxy for fair value of the intangible asset in these situations, since the fair value of the intangible asset in question is not determinable. When it is or has been used in assigning purchase price, the residual method is also often used in impairment tests.
+The SEC staff believes that the residual method does not comply with the requirements of Topic 805. Except for certain exceptions noted in paragraphs 805-20-30-10 through 30-12, identifiable intangible assets that meet the recognition criteria shall be recorded at fair value. Paragraph 805-30-30-1 discusses the initial measurement of goodwill.
+The SEC staff notes that a fundamental distinction between other recognized intangible assets and goodwill is that goodwill is both defined and measured as an excess or residual asset, while other recognized intangible assets are required to be measured at fair value. The SEC staff does not believe that the application of the residual method to the valuation of intangible assets can be assumed to produce amounts representing the fair values of those assets. The SEC staff also notes that valuation difficulty does not provide relief from the requirements in paragraphs 805-20-25-1 and 805-20-30-1 to separately recognize intangible assets at fair value apart from goodwill. Furthermore, the SEC staff notes that the same types of assets being valued using the residual method by some entities are being valued using a direct value method by other entities. Accordingly, the SEC staff believes the residual method should no longer be used to value intangible assets other than goodwill. Rather, a direct value method should be used to determine the fair value of all intangible assets required to be recognized at fair value under Topic 805.
+Impairment testing of intangible assets similarly should not rely on a residual method and should, instead, comply with the provisions of Topic 350.
