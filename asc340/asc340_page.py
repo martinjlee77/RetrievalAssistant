@@ -168,8 +168,7 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
-    # Auto-extract customer name and generate analysis title
-    customer_name = _extract_customer_name(contract_text)
+    # Generate analysis title
     analysis_title = _generate_analysis_title()
 
     try:
@@ -188,6 +187,16 @@ def perform_asc340_analysis(contract_text: str, filename: str, additional_contex
                 st.error("ASC 340-40 knowledge base is not available. Try again and contact support if this persists.")
                 st.stop()
                 return
+
+        # Extract entity name using LLM (with regex fallback) 
+        with st.spinner("🏢 Extracting company entity name..."):
+            try:
+                customer_name = analyzer.extract_entity_name_llm(contract_text)
+                logger.info(f"LLM extracted company entity name: {customer_name}")
+            except Exception as e:
+                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
+                customer_name = _extract_customer_name(contract_text)
+                logger.info(f"Regex fallback company entity name: {customer_name}")
 
         # Display progress (match ASC 606 - no memo generation step shown)
         steps = [

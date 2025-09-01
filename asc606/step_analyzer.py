@@ -48,6 +48,62 @@ class ASC606StepAnalyzer:
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
     
+    def extract_entity_name_llm(self, contract_text: str) -> str:
+        """Extract the customer entity name using LLM analysis."""
+        try:
+            logger.info("DEBUG: Extracting customer entity name using LLM")
+            
+            request_params = {
+                "model": self.light_model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the exact legal name of the customer company from the contract document."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Based on this revenue contract, what is the exact legal name of the customer company?
+
+Please identify:
+- The company that is purchasing goods/services (the customer, not the vendor)
+- The full legal name including suffixes like Inc., LLC, Corp., etc.
+- Ignore addresses, reference numbers, or other non-company identifiers
+
+Contract Text:
+{contract_text[:4000]}
+
+Respond with ONLY the customer company name, nothing else."""
+                    }
+                ],
+                **self._get_max_tokens_param("default", self.light_model),
+                "temperature": self._get_temperature(self.light_model)
+            }
+            
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            entity_name = response.choices[0].message.content
+            if entity_name is None:
+                logger.warning("LLM returned None for customer entity name")
+                return "Customer"
+                
+            # Clean the response (remove quotes, extra whitespace)
+            entity_name = entity_name.strip().strip('"').strip("'").strip()
+            
+            # Validate the result
+            if len(entity_name) < 2 or len(entity_name) > 120:
+                logger.warning(f"LLM returned suspicious customer entity name: {entity_name}")
+                return "Customer"
+                
+            logger.info(f"DEBUG: LLM extracted customer entity name: {entity_name}")
+            return entity_name
+            
+        except Exception as e:
+            logger.error(f"Error extracting customer entity name with LLM: {str(e)}")
+            return "Customer"
+    
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
         target_model = model_name or self.model

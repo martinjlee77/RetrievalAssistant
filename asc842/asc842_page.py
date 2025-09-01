@@ -300,6 +300,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
             # Clear analysis state for fresh start with session isolation
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+            st.cache_data.clear()  # Clear Streamlit cache to reset file uploader
             
             # Clean up session-specific data
             memo_key = f'asc842_memo_data_{session_id}'

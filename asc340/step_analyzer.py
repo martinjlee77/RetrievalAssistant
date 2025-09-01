@@ -48,6 +48,62 @@ class ASC340StepAnalyzer:
         
         # Initialize component
     
+    def extract_entity_name_llm(self, contract_text: str) -> str:
+        """Extract the company entity name using LLM analysis."""
+        try:
+            logger.info("DEBUG: Extracting company entity name using LLM")
+            
+            request_params = {
+                "model": self.light_model,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are an expert at identifying company names in service contracts. Your task is to identify the exact legal name of the service provider company from the contract document."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"""Based on this service contract, what is the exact legal name of the company providing the services?
+
+Please identify:
+- The company that is providing services (the service provider, not the client)
+- The full legal name including suffixes like Inc., LLC, Corp., etc.
+- Ignore addresses, reference numbers, or other non-company identifiers
+
+Contract Text:
+{contract_text[:4000]}
+
+Respond with ONLY the service provider company name, nothing else."""
+                    }
+                ],
+                **self._get_max_tokens_param("default", self.light_model),
+                "temperature": self._get_temperature(self.light_model)
+            }
+            
+            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+                request_params["response_format"] = {"type": "text"}
+            
+            response = self.client.chat.completions.create(**request_params)
+            
+            entity_name = response.choices[0].message.content
+            if entity_name is None:
+                logger.warning("LLM returned None for company entity name")
+                return "Company"
+                
+            # Clean the response (remove quotes, extra whitespace)
+            entity_name = entity_name.strip().strip('"').strip("'").strip()
+            
+            # Validate the result
+            if len(entity_name) < 2 or len(entity_name) > 120:
+                logger.warning(f"LLM returned suspicious company entity name: {entity_name}")
+                return "Company"
+                
+            logger.info(f"DEBUG: LLM extracted company entity name: {entity_name}")
+            return entity_name
+            
+        except Exception as e:
+            logger.error(f"Error extracting company entity name with LLM: {str(e)}")
+            return "Company"
+    
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
         target_model = model_name or self.model
