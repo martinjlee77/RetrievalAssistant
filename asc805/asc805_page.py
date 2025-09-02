@@ -18,20 +18,20 @@ from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
-def render_asc606_page():
-    """Render the ASC 606 analysis page."""
+def render_asc805_page():
+    """Render the ASC 805 analysis page."""
     
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 606 5-Step Memo Generator]")
+    st.title(":primary[ASC 805 5-Step Memo Generator]")
     with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
+        st.markdown(":primary[**Purpose:**] Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
     
     # Get user inputs with progressive disclosure
-    contract_text, filename, additional_context, is_ready = get_asc606_inputs()
+    contract_text, filename, additional_context, is_ready = get_asc805_inputs()
 
     # Critical user warning before analysis
     if is_ready:
@@ -46,23 +46,23 @@ def render_asc606_page():
         if st.button("3️⃣ Analyze Contract & Generate Memo",
                    type="primary",
                    use_container_width=True,
-                   key="asc606_analyze"):
+                   key="asc805_analyze"):
             warning_placeholder.empty()  # Clear the warning after the button is pressed
             if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc606_analysis(contract_text, additional_context)
+                perform_asc805_analysis(contract_text, additional_context)
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Contract & Generate Memo", 
                  disabled=True, 
                  use_container_width=True,
-                 key="asc606_analyze_disabled")
+                 key="asc805_analyze_disabled")
 
 
-def get_asc606_inputs():
-    """Get ASC 606 specific inputs."""
+def get_asc805_inputs():
+    """Get ASC 805 specific inputs."""
 
-    # Document upload with ASC 606 specific help text
-    contract_text, filename = _upload_and_process_asc606()
+    # Document upload with ASC 805 specific help text
+    contract_text, filename = _upload_and_process_asc805()
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -76,16 +76,16 @@ def get_asc606_inputs():
     return contract_text, filename, additional_context, is_ready
 
 
-def _upload_and_process_asc606():
-    """Handle file upload and processing specifically for ASC 606 analysis."""
+def _upload_and_process_asc805():
+    """Handle file upload and processing specifically for ASC 805 analysis."""
     # Use session state to control file uploader key for clearing
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
         
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload a **complete contract and related documents**, e.g., executed agreement, standard T&Cs, MSA, SOW, purchase order, invoice (required)",
+        "1️⃣ Upload a **complete purchase agreement and related documents**, e.g., executed purchase agreement, asset purchase agreement, merger agreement, LOI, due diligence reports (required)",
         type=['pdf', 'docx'],
-        help="Upload up to 5 relevant contract documents (PDF or DOCX) for ASC 606 revenue recognition analysis. Include the main contract and any amendments, statements of work, master agreements, or related documentation. Incomplete documentation may lead to inaccurate revenue recognition analysis.",
+        help="Upload up to 5 relevant transaction documents (PDF or DOCX) for ASC 805 business combinations analysis. Include the main purchase agreement and any amendments, letters of intent, due diligence reports, or related documentation. Incomplete documentation may lead to inaccurate acquisition accounting analysis.",
         accept_multiple_files=True,
         key=f"contract_files_{st.session_state.file_uploader_key}"
     )
@@ -140,8 +140,8 @@ def _upload_and_process_asc606():
         st.error(f"❌ Error processing files: {str(e)}")
         return None, None
 
-def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
-    """Perform the complete ASC 606 analysis and display results with session isolation."""
+def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
+    """Perform the complete ASC 805 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:

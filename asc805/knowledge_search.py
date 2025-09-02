@@ -15,33 +15,33 @@ logger = logging.getLogger(__name__)
 
 class ASC805KnowledgeSearch:
     """
-    ASC 606 specific knowledge search functionality.
-    Provides relevant authoritative guidance for contract analysis.
+    ASC 805 specific knowledge search functionality.
+    Provides relevant authoritative guidance for business combination analysis.
     """
     
     def __init__(self):
-        """Initialize ASC 606 knowledge search."""
+        """Initialize ASC 805 knowledge search."""
         try:
             self.knowledge_base = ASC805KnowledgeBase()
-            logger.info("ASC 606 knowledge search initialized successfully")
+            logger.info("ASC 805 knowledge search initialized successfully")
         except Exception as e:
-            logger.error(f"Failed to initialize ASC 606 knowledge search: {str(e)}")
-            # Don't continue without knowledge base - this is critical for ASC 606 analysis
-            raise RuntimeError(f"ASC 606 knowledge base is required but not available: {str(e)}. Please process the ASC 606 guidance documents first.")
+            logger.error(f"Failed to initialize ASC 805 knowledge search: {str(e)}")
+            # Don't continue without knowledge base - this is critical for ASC 805 analysis
+            raise RuntimeError(f"ASC 805 knowledge base is required but not available: {str(e)}. Please process the ASC 805 guidance documents first.")
     
     def search_for_step(self, step_number: int, contract_text: str) -> str:
         """
-        Search for relevant ASC 606 guidance for a specific step.
+        Search for relevant ASC 805 guidance for a specific step.
         
         Args:
-            step_number: ASC 606 step number (1-5)
-            contract_text: Contract text to help focus the search
+            step_number: ASC 805 step number (1-5)
+            contract_text: Transaction document text to help focus the search
             
         Returns:
             Formatted authoritative guidance context
         """
         if not self.knowledge_base:
-            raise RuntimeError("ASC 606 knowledge base not available. Cannot perform authoritative analysis.")
+            raise RuntimeError("ASC 805 knowledge base not available. Cannot perform authoritative analysis.")
         
         try:
             # Create step-specific search query
@@ -59,7 +59,7 @@ class ASC805KnowledgeSearch:
     
     def search_general(self, query: str) -> str:
         """
-        Perform a general search of ASC 606 guidance.
+        Perform a general search of ASC 805 guidance.
         
         Args:
             query: Search query string
@@ -78,27 +78,27 @@ class ASC805KnowledgeSearch:
     
     def _build_step_query(self, step_number: int, contract_text: str) -> str:
         """
-        Build a targeted search query for a specific ASC 606 step.
+        Build a targeted search query for a specific ASC 805 step.
         
         Args:
             step_number: Step number (1-5)
-            contract_text: Contract text to extract relevant terms
+            contract_text: Transaction document text to extract relevant terms
             
         Returns:
             Optimized search query string
         """
         # Base step queries
         step_queries = {
-            1: "contract existence criteria ASC 606-10-25-1 approval commitment rights payment commercial substance collectibility",
-            2: "performance obligations distinct goods services ASC 606-10-25-19 ASC 606-10-25-21 separately identifiable",
-            3: "transaction price consideration ASC 606-10-32-2 variable consideration financing component",
-            4: "allocation standalone selling price ASC 606-10-32-28 ASC 606-10-32-33 discount allocation",
-            5: "revenue recognition timing over time point in time ASC 606-10-25-27 ASC 606-10-25-30 control transfer"
+            1: "business combination scope asset acquisition ASC 805-10 business definition acquirer acquisition date control transfer",
+            2: "consideration transferred fair value contingent consideration ASC 805-30 noncontrolling interest step acquisition",
+            3: "identifiable assets liabilities fair value measurement ASC 805-20 goodwill bargain purchase intangible assets",
+            4: "acquisition recording measurement period ASC 805-10 provisional amounts subsequent measurement contingent consideration",
+            5: "business combination disclosures ASC 805-10-50 ASC 805-30-50 pro forma information technical memo"
         }
         
-        base_query = step_queries.get(step_number, "ASC 606 revenue recognition")
+        base_query = step_queries.get(step_number, "ASC 805 business combinations")
         
-        # Extract relevant terms from contract to enhance search
+        # Extract relevant terms from transaction documents to enhance search
         contract_terms = self._extract_relevant_terms(contract_text, step_number)
         
         if contract_terms:
@@ -110,11 +110,11 @@ class ASC805KnowledgeSearch:
     
     def _extract_relevant_terms(self, contract_text: str, step_number: int) -> List[str]:
         """
-        Extract relevant terms from contract text to enhance search.
+        Extract relevant terms from transaction document text to enhance search.
         
         Args:
-            contract_text: Contract text
-            step_number: ASC 606 step number
+            contract_text: Transaction document text
+            step_number: ASC 805 step number
             
         Returns:
             List of relevant search terms
@@ -127,112 +127,106 @@ class ASC805KnowledgeSearch:
         
         # Step-specific term extraction
         if step_number == 1:
-            # Contract formation terms
+            # Business combination scope and acquirer identification terms
             terms = [
-                # Approval and commitment (25-1a)
-                'approve', 'approval', 'commit', 'commitment', 'agreement', 'contract', 'accept', 'acceptance',
-                'signature', 'signed', 'execute', 'execution', 'effective', 'binding', 'enforceable',
+                # Business combination scope
+                'acquisition', 'acquire', 'purchase', 'merger', 'business combination', 'transaction',
+                'asset acquisition', 'stock purchase', 'asset purchase', 'common control',
 
-                # Rights and obligations (25-1b)
-                'rights', 'obligations', 'responsibilities', 'duties', 'promise', 'promises', 'obligate',
+                # Business definition
+                'business', 'inputs', 'processes', 'outputs', 'workforce', 'employees', 'operations',
+                'revenue', 'customers', 'intellectual property', 'substantive processes',
 
-                # Payment terms (25-1c)
-                'payment', 'pay', 'fee', 'fees', 'consideration', 'price', 'payment terms', 'payment schedule',
-                'invoice', 'billing', 'remittance',
+                # Acquirer identification
+                'acquirer', 'acquiree', 'target', 'buyer', 'seller', 'control', 'controlling interest',
+                'voting rights', 'board control', 'primary beneficiary', 'VIE',
 
-                # Commercial substance (25-1d)
-                'commercial', 'substance', 'economic', 'business purpose', 'arm\'s length',
-
-                # Collectibility (25-1e)
-                'collect', 'collectibility', 'ability to pay', 'credit', 'payment ability', 'financial ability',
-                'creditworthiness', 'solvency' 
+                # Acquisition date
+                'closing', 'closing date', 'effective date', 'acquisition date', 'control transfer',
+                'completion', 'consummation', 'regulatory approval'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 2:
-            # Performance obligation terms
+            # Consideration and transaction terms
             terms = [
-                # Promised goods and services
-                'software', 'hardware', 'services', 'service', 'license', 'licensing', 'implementation',
-                'support', 'maintenance', 'training', 'consulting', 'development', 'customization',
-                'installation', 'configuration', 'updates', 'upgrades', 'warranty',
+                # Consideration transferred
+                'purchase price', 'consideration', 'cash', 'stock', 'shares', 'equity', 'debt',
+                'promissory note', 'liabilities', 'assets transferred',
 
-                # Distinctness criteria (25-19, 25-21)
-                'distinct', 'separate', 'separately', 'independent', 'standalone', 'bundled', 'package',
-                'capable', 'benefit', 'identifiable', 'interdependent', 'interrelated', 'dependent',
+                # Contingent consideration
+                'contingent', 'earnout', 'milestone', 'performance-based', 'escrow',
+                'holdback', 'adjustment', 'working capital adjustment',
 
-                # Customer options/material rights (25-20)
-                'option', 'options', 'renewal', 'extension', 'upgrade', 'discount', 'future services',
-                'material right', 'additional goods', 'additional services'              
+                # Step acquisition
+                'previously held', 'existing interest', 'step acquisition', 'incremental',
+                'fair value remeasurement',
+
+                # Items not part of exchange
+                'preexisting relationship', 'settlement', 'consulting agreement',
+                'employment agreement', 'acquisition costs', 'transaction costs'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 3:
-            # Transaction price terms
+            # Asset and liability recognition terms
             terms = [
-                # Fixed consideration
-                'fee', 'fees', 'price', 'fixed price', 'fixed fee', 'base price', 'base fee',
+                # Identifiable assets
+                'assets', 'identifiable assets', 'tangible assets', 'intangible assets',
+                'property', 'equipment', 'inventory', 'receivables', 'investments',
 
-                # Variable consideration (32-5 to 32-14)
-                'variable', 'bonus', 'penalty', 'discount', 'rebate', 'credit', 'incentive',
-                'contingent', 'performance-based', 'usage-based', 'milestone', 'threshold',
+                # Intangible assets
+                'intangible', 'intellectual property', 'patents', 'trademarks', 'customer relationships',
+                'trade names', 'technology', 'software', 'developed technology', 'IPR&D',
 
-                # Financing components (32-15 to 32-20)
-                'financing', 'interest', 'payment terms', 'payment schedule', 'installment',
-                'deferred payment', 'time value', 'present value',
+                # Liabilities
+                'liabilities', 'debt', 'obligations', 'accrued', 'payables', 'contingencies',
+                'warranties', 'restructuring', 'environmental',
 
-                # Noncash consideration (32-21 to 32-25)
-                'noncash', 'non-cash', 'goods', 'services', 'equity', 'stock', 'shares', 'barter',
-
-                # Consideration to customer (32-26 to 32-27)
-                'refund', 'credit', 'reimbursement', 'cash back', 'customer credit'     
+                # Fair value measurement
+                'fair value', 'valuation', 'appraisal', 'market approach', 'income approach',
+                'cost approach', 'goodwill', 'bargain purchase'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 4:
-            # Allocation terms
+            # Recording and measurement period terms
             terms = [
-                # Allocation concepts
-                'allocation', 'allocate', 'distribution', 'proportion', 'proportional', 'split',
+                # Journal entries and recording
+                'journal entry', 'recording', 'entry', 'debit', 'credit', 'consolidated',
+                'consolidation', 'elimination',
 
-                # Standalone selling price (32-31 to 32-34)
-                'standalone', 'selling price', 'market price', 'list price', 'historical price',
-                'observed price', 'estimated price', 'cost-plus', 'margin',
+                # Measurement period
+                'measurement period', 'provisional', 'provisional amounts', 'one year',
+                'additional information', 'facts and circumstances', 'retrospective',
 
-                # Allocation methodology
-                'relative', 'proportionate', 'percentage', 'ratio', 'weighted',
+                # Subsequent measurement
+                'subsequent', 'remeasurement', 'fair value changes', 'contingent consideration',
+                'indemnification', 'amortization', 'impairment',
 
-                # Discount allocation (32-36)
-                'discount', 'discount allocation', 'bundle discount', 'package discount',
-
-                # Performance obligations
-                'obligation', 'obligations', 'deliverable', 'deliverables', 'component', 'elements'
-
-                
+                # Pushdown accounting
+                'pushdown', 'pushdown accounting', 'acquiree', 'separate financial statements'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
             
         elif step_number == 5:
-            # Recognition terms
+            # Disclosure and documentation terms
             terms = [
+                # Required disclosures
+                'disclosure', 'disclosures', 'footnote', 'financial statements', 'pro forma',
+                'unaudited', 'supplemental', 'material',
 
-                # Timing concepts
-                'delivery', 'completion', 'shipment', 'shipping', 'installation', 'acceptance',
-                'go-live', 'live', 'deployment', 'implementation',
+                # Business combination disclosures
+                'acquisition date', 'primary reasons', 'qualitative factors', 'goodwill',
+                'consideration by class', 'assets acquired', 'liabilities assumed',
 
-                # Over time vs. point in time (25-27)
-                'over time', 'point in time', 'time-based', 'event-based', 'milestone', 'phases',
-                'progress', 'percentage of completion',
+                # Pro forma information
+                'pro forma', 'revenue', 'net income', 'earnings', 'combined entity',
+                'as if', 'comparable periods',
 
-                # Control transfer (25-30)
-                'control', 'transfer', 'customer control', 'risk of loss', 'benefits', 'direct',
-                'obligation', 'performance obligation',
-
-                # Progress measurement (25-31 to 25-33)
-                'progress', 'completion', 'input method', 'output method', 'cost-to-cost',
-                'efforts-expended', 'units-of-delivery', 'units-of-production'
-
-                
+                # Technical memo
+                'memo', 'memorandum', 'documentation', 'supporting', 'analysis',
+                'conclusion', 'judgment', 'assumptions'
             ]
             relevant_terms.extend([term for term in terms if term in contract_lower])
         
@@ -241,7 +235,7 @@ class ASC805KnowledgeSearch:
     
     def get_knowledge_base_stats(self) -> Dict[str, Any]:
         """
-        Get technical statistics about the ASC 606 knowledge base for internal monitoring.
+        Get technical statistics about the ASC 805 knowledge base for internal monitoring.
         
         Returns:
             Dictionary with knowledge base statistics
@@ -250,13 +244,13 @@ class ASC805KnowledgeSearch:
             return {
                 "status": "unavailable",
                 "error": "Knowledge base not initialized",
-                "recommendation": "Process ASC 606 guidance documents first"
+                "recommendation": "Process ASC 805 guidance documents first"
             }
         
         try:
             stats = self.knowledge_base.get_stats()
             # Add metadata for internal monitoring
-            stats["type"] = "ASC 606 Revenue Recognition Knowledge Base"
+            stats["type"] = "ASC 805 Business Combinations Knowledge Base"
             stats["timestamp"] = datetime.now().isoformat()
             return stats
         except Exception as e:
@@ -279,15 +273,15 @@ class ASC805KnowledgeSearch:
         if stats.get("status") not in ["active", "available"] or stats.get("error"):
             return {
                 "status": "Knowledge base information unavailable",
-                "note": "Analysis proceeding with general ASC 606 knowledge"
+                "note": "Analysis proceeding with general ASC 805 knowledge"
             }
         
         doc_count = stats.get("document_count", 0)
         return {
-            "standard": "ASC 606 Revenue Recognition",
+            "standard": "ASC 805 Business Combinations",
             "documents": f"{doc_count:,} guidance documents" if doc_count else "guidance documents",
             "status": "Active",
-            "note": "Analysis based on current FASB's ASC 606 authoritative guidance"
+            "note": "Analysis based on current FASB's ASC 805 authoritative guidance"
         }
     
     def is_available(self) -> bool:
@@ -295,54 +289,57 @@ class ASC805KnowledgeSearch:
         return self.knowledge_base is not None
     
     def _get_fallback_guidance(self, step_number: int) -> str:
-        """Provide fallback ASC 606 guidance when knowledge base is unavailable."""
+        """Provide fallback ASC 805 guidance when knowledge base is unavailable."""
         step_guidance = {
-            1: """Step 1: Identify the Contract with a Customer
+            1: """Step 1: Scope, Business Assessment, Acquirer, and Acquisition Date
 Key considerations:
-- Legal enforceability under relevant law  
-- Commercial substance (parties are committed to perform)
-- Approved contract and commitment of parties to perform obligations
-- Payment terms are identified
-- Collection is probable (customer has ability and intention to pay)
+- ASC 805 acquisition method vs asset acquisition
+- Business definition using inputs, processes, and outputs framework
+- Acquirer identification and control determination
+- Acquisition date when control transfers
+- Step acquisition considerations
 
-Assess whether the arrangement meets the definition of a contract under ASC 606-10-25-1.""",
+Apply ASC 805-10 scope and business definition criteria.""",
             
-            2: """Step 2: Identify the Performance Obligations in the Contract  
+            2: """Step 2: Consideration and Items Not Part of the Exchange
 Key considerations:
-- Promise to transfer goods or services that are distinct
-- Distinct = capable of being distinct AND distinct within context of contract
-- Capable of being distinct: customer can benefit from good/service on its own
-- Distinct within context: promise is separately identifiable from other promises
+- Measure consideration transferred at fair value
+- Classify contingent consideration as liability or equity
+- Separate items not part of the business combination
+- Handle step acquisitions and NCI measurement
+- Account for acquisition costs separately
 
-Apply ASC 606-10-25-14 through 25-22 to identify distinct performance obligations.""",
+Apply ASC 805-30 consideration measurement principles.""",
             
-            3: """Step 3: Determine the Transaction Price
-Key considerations:  
-- Amount of consideration expected to be entitled to in exchange for goods/services
-- Variable consideration and constraint (ASC 606-10-32-11)
-- Significant financing component (ASC 606-10-32-15)
-- Noncash consideration (ASC 606-10-32-21)
-- Consideration payable to customer (ASC 606-10-32-25)
-
-Calculate total transaction price per ASC 606-10-32-2 through 32-27.""",
-            
-            4: """Step 4: Allocate the Transaction Price to Performance Obligations
+            3: """Step 3: Recognize and Measure Assets and Liabilities; Compute Goodwill
 Key considerations:
-- Relative standalone selling price approach (ASC 606-10-32-31)
-- Standalone selling price estimation methods when not observable
-- Allocation of discounts and variable consideration
-- Contract modifications affecting allocation
+- Recognize identifiable assets and liabilities at fair value
+- Apply measurement exceptions (revenue contracts, leases, CECL)
+- Identify and measure intangible assets separately
+- Recognize contingencies meeting asset/liability definition
+- Compute goodwill or bargain purchase gain
 
-Allocate transaction price per ASC 606-10-32-28 through 32-41.""",
+Apply ASC 805-20 recognition and measurement principles.""",
             
-            5: """Step 5: Recognize Revenue When Performance Obligations are Satisfied
+            4: """Step 4: Record Acquisition, Measurement Period, and Subsequent Measurement
 Key considerations:
-- Control transfer to customer (ASC 606-10-25-23)
-- Over time vs. point in time recognition (ASC 606-10-25-27)
-- Over time criteria: customer benefits, customer controls, no alternative use + enforceable payment right
-- Measure progress for over time recognition (output vs. input methods)
- 
-Recognize revenue per ASC 606-10-25-23 through 25-37."""
+- Record acquisition-date journal entries
+- Use provisional amounts during measurement period
+- Handle measurement period adjustments retrospectively
+- Apply subsequent measurement for contingent consideration
+- Consider pushdown accounting elections
+
+Apply ASC 805-10 recording and measurement period guidance.""",
+            
+            5: """Step 5: Prepare Required Disclosures and Technical Memo
+Key considerations:
+- Prepare comprehensive ASC 805 disclosures
+- Include pro forma information requirements
+- Document all judgments and measurements
+- Address SEC requirements if applicable
+- Complete technical memo with supporting analysis
+
+Apply ASC 805-10-50 and ASC 805-30-50 disclosure requirements."""
         }
         
-        return step_guidance.get(step_number, "Step guidance not available.")
+        return step_guidance.get(step_number, "ASC 805 step guidance not available.")

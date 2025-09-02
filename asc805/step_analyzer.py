@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ASC805StepAnalyzer:
     """
-    Simplified ASC 606 step-by-step analyzer using natural language output.
+    Simplified ASC 805 step-by-step analyzer using natural language output.
     No complex JSON schemas - just clear, professional analysis.
     """
     
@@ -49,30 +49,30 @@ class ASC805StepAnalyzer:
         self.step_prompts = self._load_step_prompts()
     
     def extract_entity_name_llm(self, contract_text: str) -> str:
-        """Extract the customer entity name using LLM analysis."""
+        """Extract the target company/acquiree entity name using LLM analysis."""
         try:
-            logger.info("DEBUG: Extracting customer entity name using LLM")
+            logger.info("DEBUG: Extracting target company entity name using LLM")
             
             request_params = {
                 "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the name of the customer company from the contract document."
+                        "content": "You are an expert at identifying target company names in business combination transactions. Your task is to identify the name of the target company being acquired from the transaction documents."
                     },
                     {
                         "role": "user",
-                        "content": f"""Based on this revenue contract, what is the name of the customer company?
+                        "content": f"""Based on this business combination transaction, what is the name of the target company being acquired?
 
 Please identify:
-- The company that is purchasing goods or services (the customer, not the vendor)
+- The company that is being acquired/purchased (the target, not the acquirer)
 - The name including suffixes like Inc., LLC, Corp., etc.
 - Ignore addresses, reference numbers, or other non-company identifiers
 
-Contract Text:
+Transaction Documents:
 {contract_text[:4000]}
 
-Respond with ONLY the customer name, nothing else."""
+Respond with ONLY the target company name, nothing else."""
                     }
                 ],
                 **self._get_max_tokens_param("default", self.light_model),
@@ -94,15 +94,15 @@ Respond with ONLY the customer name, nothing else."""
             
             # Validate the result
             if len(entity_name) < 2 or len(entity_name) > 120:
-                logger.warning(f"LLM returned suspicious customer name: {entity_name}")
-                return "Customer"
+                logger.warning(f"LLM returned suspicious target company name: {entity_name}")
+                return "Target Company"
                 
-            logger.info(f"DEBUG: LLM extracted customer name: {entity_name}")
+            logger.info(f"DEBUG: LLM extracted target company name: {entity_name}")
             return entity_name
             
         except Exception as e:
-            logger.error(f"Error extracting customer name with LLM: {str(e)}")
-            return "Customer"
+            logger.error(f"Error extracting target company name with LLM: {str(e)}")
+            return "Target Company"
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
@@ -143,19 +143,19 @@ Respond with ONLY the customer name, nothing else."""
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
-        Perform complete 5-step ASC 606 analysis.
+        Perform complete 5-step ASC 805 analysis.
         
         Args:
-            contract_text: The contract document text
-            authoritative_context: Retrieved ASC 606 guidance
-            customer_name: Customer name
+            contract_text: The transaction document text
+            authoritative_context: Retrieved ASC 805 guidance
+            customer_name: Target company name
             analysis_title: Analysis title
             additional_context: Optional user-provided context
             
         Returns:
             Dictionary containing analysis results for each step
         """
-        logger.info(f"Starting ASC 606 analysis for {customer_name}")
+        logger.info(f"Starting ASC 805 analysis for {customer_name}")
         
         # Add large contract warning
         word_count = len(contract_text.split())
@@ -371,19 +371,19 @@ Respond with ONLY the customer name, nothing else."""
     
     def _get_markdown_system_prompt(self) -> str:
         """Get the system prompt for markdown generation."""
-        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 606 revenue recognition. 
+        return """You are an expert technical accountant from a Big 4 firm, specializing in ASC 805 business combinations. 
 
 Generate professional accounting analysis in clean markdown format. Your output will be displayed directly using markdown rendering.
 
 Your analysis must be:
 - Audit-ready and professional
 - Clear and understandable
-- Based on the evidence provided in the contract text
+- Based on the evidence provided in the transaction documents
 - Based on authoritative guidance
 - Include explicit reasoning with "because" statements
-- Support your analysis with specific contract text and authoritative citations
-- Use direct quotes from the contract document only when the exact wording is outcome-determinative
-- Paraphrase ASC 606 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
+- Support your analysis with specific transaction evidence and authoritative citations
+- Use direct quotes from the transaction documents only when the exact wording is outcome-determinative
+- Paraphrase ASC 805 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -399,64 +399,69 @@ Follow ALL formatting instructions in the user prompt precisely."""
         
         step_info = {
             1: {
-                'title': 'Step 1: Identify the Contract',
-                'focus': 'Determine if a valid contract exists under ASC 606-10-25-1 criteria',
+                'title': 'Step 1: Scope, "business" assessment, acquirer, and acquisition date',
+                'focus': 'Confirm ASC 805 acquisition method applies, determine if the acquired set is a business, identify the acquirer, and establish the acquisition date',
                 'key_points': [
-                    'Verify that the parties have approved the contract and are committed to perform (ASC 606-10-25-1(a))',
-                    'Identify each party\'s rights regarding the goods or services to be transferred (ASC 606-10-25-1(b))',
-                    'Identify each party\'s payment terms for the transferred goods or services (ASC 606-10-25-1(c))',
-                    'Assess whether the contract has commercial substance (ASC 606-10-25-1(d))',
-                    'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e))'
+                    'Determine scope: ASC 805 acquisition method vs (a) asset acquisition or common control under ASC 805-50, (b) joint venture formation under ASC 805-60, (c) not-for-profit combinations under ASC 958-805.',
+                    'Assess whether the acquired set is a business using the optional screen test and the full "substantive processes" framework; document judgment using implementation examples (ASC 805-10-55).',
+                    'Identify the acquirer (including VIE primary-beneficiary considerations) and assess whether there is a reverse acquisition (ASC 805-10; ASC 810 cross-reference).',
+                    'Determine the acquisition date (when control transfers) and document the specific control-transfer event(s) (ASC 805-10).',
+                    'If achieved in stages, identify a step acquisition and plan to remeasure the previously held interest at fair value on the acquisition date (ASC 805-10).',
+                    'If preparing separate acquiree financial statements, evaluate optional pushdown accounting and related disclosures (ASC 805-50).'
                 ]
             },
             2: {
-                'title': 'Step 2: Identify Performance Obligations', 
-                'focus': 'Identify distinct goods or services using ASC 606-10-25-14 and 25-22',
+                'title': 'Step 2: Consideration and items not part of the exchange',
+                'focus': 'Measure consideration at fair value, classify contingent consideration, and separate transactions that are not part of the business combination exchange',
                 'key_points': [
-                    'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
-                    'Evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
-                    'Evaluate whether each promised good or service is distinct within the context of the contract per ASC 606-10-25-21(a-c):',
-                    '   a. The good or service is regularly sold separately',
-                    '   b. The customer can benefit from the good or service on its own or with other readily available resources',
-                    '   c. The good or service is not highly interdependent with other promises in the contract',
-                    'Combine non-distinct goods/services into single performance obligations (ASC 606-10-25-22)',
-                    'Determine final list of performance obligations',
-                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-25-75 to 25-79)',
-                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-25-20)'
+                    'Compile and measure consideration transferred at fair value: cash, liabilities incurred, assets transferred, equity instruments issued, and contingent consideration (ASC 805-30).',
+                    'Measure any noncontrolling interest at acquisition-date fair value (full goodwill method) (ASC 805-30).',
+                    'For step acquisitions, remeasure the previously held interest to fair value, recognize the gain or loss in earnings, and recycle related AOCI amounts as if the interest were disposed (ASC 805-10; ASC 220/815/320 cross-references).',
+                    'Identify and account separately for items not part of the exchange: settlement of preexisting relationships, compensation for future services, and other side arrangements (ASC 805-10).',
+                    'Expense acquisition-related costs as incurred; apply other guidance only for debt/equity issuance costs (ASC 805-10; ASC 340/470 and equity guidance).',
+                    'Evaluate replacement share-based payment awards and allocate between precombination consideration and postcombination compensation cost (ASC 718; ASC 805-30).',
+                    'Identify indemnification arrangements and recognize indemnification assets on the same basis as the related indemnified items (ASC 805-20).',
+                    'Classify contingent consideration under ASC 480/815 (equity vs liability/derivative) and apply the corresponding subsequent measurement model (ASC 805-30-35; ASC 480/815).'
                 ]
             },
             3: {
-                'title': 'Step 3: Determine the Transaction Price',
-                'focus': 'Establish the transaction price per ASC 606-10-32-2',
+                'title': 'Step 3: Recognize and measure identifiable assets and liabilities; compute goodwill or bargain purchase',
+                'focus': 'Recognize identifiable assets and liabilities as of the acquisition date, apply ASC 805 measurement principles and exceptions, then compute goodwill or a bargain purchase gain',
                 'key_points': [
-                    'Fixed consideration amounts',
-                    'Variable consideration amounts (ASC 606-10-32-5 to 32-10)',
-                    'Constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-14',
-                    'Total transaction price calculation',
-                    'Significant financing components (if present)',
-                    'Noncash consideration (if present)',
-                    'Consideration paid or payable to a customer (if present)'
+                    'Recognize 100% of identifiable assets acquired, liabilities assumed, and any NCI as of the acquisition date (ASC 805-20).',
+                    'Measure recognized items at acquisition-date fair value, documenting valuation approaches and key assumptions (ASC 805-20; ASC 820 cross-reference).',
+                    'Apply key measurement exceptions to fair value: a. Revenue contracts: measure contract assets and contract liabilities under ASC 606 as if the acquirer originated the contracts at the acquisition date (ASU 2021-08; ASC 805-20/606). b. Leases: apply ASC 842 classification and measurement for lessee and lessor arrangements; do not create separate lessee favorable/unfavorable lease intangibles (ASC 842; ASC 805-20 cross-reference). c. Financial assets: identify purchased financial assets with credit deterioration and apply CECL measurement (ASC 326; ASC 805-20).',
+                    'Identify intangible assets that meet separability or contractual-legal criteria and recognize them separately from goodwill; explicitly exclude assembled workforce (ASC 805-20-25/-55).',
+                    'Address special intangibles: recognize reacquired rights and amortize over the remaining contractual term (ignore renewals), and capitalize in-process R&D as an indefinite-lived intangible subject to impairment (ASC 805-20; ASC 350).',
+                    'Recognize and measure contingencies at acquisition-date fair value when they meet the asset/liability definition; apply ASC 450/460 or other relevant Topics thereafter (ASC 805-20; ASC 450/460).',
+                    'Record income tax effects: recognize DTAs/DTLs for basis differences, evaluate uncertain tax positions, and assess valuation allowances (ASC 740).',
+                    'Compute goodwill or bargain purchase: Goodwill = FV of consideration transferred + FV of NCI + FV of previously held interest − FV of identifiable net assets; if negative, reassess measurements and recognize a bargain purchase gain with required disclosures if still negative (ASC 805-30).'
                 ]
             },
             4: {
-                'title': 'Step 4: Allocate the Transaction Price',
-                'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
+                'title': 'Step 4: Record the acquisition, apply the measurement period, and handle subsequent measurement',
+                'focus': 'Post acquisition-date entries, manage provisional amounts within the measurement period, and perform required remeasurements',
                 'key_points': [
-                    'Summarize Identify the performance obligations determined in Step 2',
-                    'State that standalone selling prices (SSPs) should be determined separately based on observable data (ASC 606-10-32-31 to 32-34)',
-                    'Describe the allocation methodology to be used (proportional to SSPs)',
-                    'Note any discount allocation considerations (ASC 606-10-32-36)',
-                    'Provide the final allocation approach (subject to SSP determination)'
+                    'Record acquisition-date journal entries for all recognized items, including goodwill or bargain purchase gain (ASC 805-30).',
+                    'Use provisional amounts where initial accounting is incomplete; during the measurement period (up to one year), record retrospective adjustments for acquisition-date facts with corresponding goodwill adjustments and revise comparative periods as required; disclose (ASC 805-10).',
+                    'Distinguish measurement period adjustments from normal subsequent changes in estimates or events; retain evidence supporting acquisition-date assumptions (ASC 805-10).',
+                    'Remeasure contingent consideration through earnings each period if liability-/derivative-classified; do not remeasure equity-classified arrangements; account for settlements (ASC 805-30-35; ASC 480/815).',
+                    'Remeasure indemnification assets consistent with the related indemnified items and assess collectibility (ASC 805-20).',
+                    'Apply postcombination accounting under other Topics: amortize finite-lived intangibles and test goodwill/indefinite-lived intangibles for impairment (ASC 350); apply CECL to acquired financial assets (ASC 326); continue lease accounting (ASC 842); address hedge relationships (ASC 815); and account for exit/disposal activities (ASC 420).',
+                    'If applicable for acquiree standalone reporting, assess and elect pushdown accounting and provide required disclosures (ASC 805-50).'
                 ]
             },
             5: {
-                'title': 'Step 5: Recognize Revenue',
-                'focus': 'Determine when revenue should be recognized for each performance obligation',
+                'title': 'Step 5: Prepare required disclosures and the technical memo',
+                'focus': 'Provide complete ASC 805 disclosures and document judgments, measurements, and conclusions supporting the acquisition method',
                 'key_points': [
-                    'Determine over-time vs. point-in-time recognition for each performance obligation',
-                    'Analyze when control transfers to the customer',
-                    'Specify revenue recognition timing for each obligation',
-                    'Identify any measurement methods for over-time recognition'
+                    'Prepare required ASC 805 disclosures: acquisition date and primary reasons; qualitative factors giving rise to goodwill; fair value of consideration by major class; recognized amounts for each major class of assets acquired and liabilities assumed; contingent consideration and indemnification details; acquiree revenue and earnings since acquisition; and pro forma information as if the acquisition occurred at the beginning of the periods presented (ASC 805-10-50; ASC 805-30-50).',
+                    'Disclose individually immaterial business combinations that are material in the aggregate (ASC 805-10-50).',
+                    'For step acquisitions, disclose the fair value of the previously held interest, the resulting gain or loss recognized, and any related AOCI reclassifications (ASC 805-10; ASC 220).',
+                    'For bargain purchases, disclose the amount of the gain and the reasons why the transaction resulted in a gain (ASC 805-30-50).',
+                    'Disclose the nature and amounts of measurement period adjustments and, if applicable, that initial accounting is incomplete (ASC 805-10-50).',
+                    'For SEC registrants, consider Article 11 pro forma requirements and Regulation S-X Rule 3-05 significance testing (outside ASC 805).',
+                    'Draft the technical memo: scope and "business" assessment; acquirer and acquisition date; consideration and items not part of the exchange (including contingent consideration classification and OCI recycling); identification and measurement of assets and liabilities (including exceptions for revenue contracts, leases, CECL PCD, and held-for-sale); intangible assets (including IPR&D and reacquired rights); goodwill/bargain purchase; measurement period plan; and a disclosure checklist (ASC 805-10-50).'
                 ]
             }
         }
@@ -468,12 +473,12 @@ STEP {step_num}: {step['title'].upper()}
 
 OBJECTIVE: {step['focus']}
 
-CONTRACT INFORMATION:
-Contract Analysis: Analyze the contract with the customer {customer_name} to determine the appropriate revenue recognition treatment under ASC 606 for the company.
+TRANSACTION INFORMATION:
+Business Combination Analysis: Analyze the transaction involving {customer_name} to determine the appropriate business combination accounting treatment under ASC 805 for the acquirer.
 
-Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving goods or services.
+Instructions: Analyze this transaction from the acquirer's perspective. {customer_name} is the target company being acquired.
 
-CONTRACT TEXT:
+TRANSACTION DOCUMENTS:
 {contract_text}"""
 
         if additional_context.strip():
@@ -488,14 +493,14 @@ AUTHORITATIVE GUIDANCE:
 {authoritative_context}
 
 ANALYSIS REQUIRED:
-Analyze the contract for Step {step_num} focusing on:
+Analyze the transaction for Step {step_num} focusing on:
 {chr(10).join([f"• {point}" for point in step['key_points']])}
 
 REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 606 with pinpoint citations and use only brief decisive phrases when directly supportive.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific transaction evidence and ASC 805 citations. Quote transaction language only when the exact wording is outcome‑determinative; paraphrase ASC 805 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Conclusion:** [Write single paragraph conclusion stating the specific outcome for this step]
 
@@ -506,11 +511,11 @@ END OUTPUT"""
     def _get_step_title(self, step_num: int) -> str:
         """Get the title for a specific step."""
         titles = {
-            1: "Step 1: Identify the Contract",
-            2: "Step 2: Identify Performance Obligations", 
-            3: "Step 3: Determine the Transaction Price",
-            4: "Step 4: Allocate the Transaction Price",
-            5: "Step 5: Recognize Revenue"
+            1: "Step 1: Scope, Business Assessment, Acquirer, and Acquisition Date",
+            2: "Step 2: Consideration and Items Not Part of the Exchange", 
+            3: "Step 3: Recognize and Measure Assets and Liabilities; Compute Goodwill",
+            4: "Step 4: Record Acquisition, Measurement Period, and Subsequent Measurement",
+            5: "Step 5: Prepare Required Disclosures and Technical Memo"
         }
         return titles.get(step_num, f"Step {step_num}")
     

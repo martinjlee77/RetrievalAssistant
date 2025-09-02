@@ -22,7 +22,8 @@ pg = st.navigation([
     st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
     st.Page("asc606/asc606_page.py", title="ASC 606: 5 Steps", icon="➡️"),
     st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
-    st.Page("pages/asc842.py", title="ASC 842: Lessee Accounting", icon="➡️")
+    st.Page("pages/asc842.py", title="ASC 842: Lessee Accounting", icon="➡️"),
+    st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon="➡️")
 ])
 
 # 5. Run the app.
