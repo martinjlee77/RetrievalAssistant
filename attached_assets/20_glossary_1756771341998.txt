@@ -1,0 +1,89 @@
+20 Glossary
+General Note: The Master Glossary contains all terms identified as glossary terms throughout the Codification. Clicking on any term in the Master Glossary will display where the term is used. The Master Glossary may contain identical terms with different definitions, some of which may not be appropriate for a particular Subtopic. For any particular Subtopic, users should only use the glossary terms included in the particular Subtopic Glossary Section (Section 20).
+Award
+The collective noun for multiple instruments with the same terms and conditions granted at the same time either to a single grantee or to a group of grantees. An award may specify multiple vesting dates, referred to as graded vesting, and different parts of an award may have different expected terms. References to an award also apply to a portion of an award.
+Contract
+An agreement between two or more parties that creates enforceable rights and obligations.
+Contract Asset
+An entity's right to consideration in exchange for goods or services that the entity has transferred to a customer when that right is conditioned on something other than the passage of time (for example, the entity's future performance).
+Contract Liability
+An entity's obligation to transfer goods or services to a customer for which the entity has received consideration (or the amount is due) from the customer.
+Customer
+A party that has contracted with an entity to obtain goods or services that are an output of the entity's ordinary activities in exchange for consideration.
+Grant Date
+The date at which a grantor and a grantee reach a mutual understanding of the key terms and conditions of a share-based payment award. The grantor becomes contingently obligated on the grant date to issue equity instruments or transfer assets to a grantee who delivers goods or renders services or purchases goods or services as a customer. Awards made under an arrangement that is subject to shareholder approval are not deemed to be granted until that approval is obtained unless approval is essentially a formality (or perfunctory), for example, if management and the members of the board of directors control enough votes to approve the arrangement. Similarly, individual awards that are subject to approval by the board of directors, management, or both are not deemed to be granted until all such approvals are obtained. The grant date for an award of equity instruments is the date that a grantee begins to benefit from, or be adversely affected by, subsequent changes in the price of the grantor's equity shares. Paragraph 718-10-25-5 provides guidance on determining the grant date. See Service Inception Date.
+Lease
+A contract, or part of a contract, that conveys the right to control the use of identified property, plant, or equipment (an identified asset) for a period of time in exchange for consideration.
+Not-for-Profit Entity
+An entity that possesses the following characteristics, in varying degrees, that distinguish it from a business entity:
+aContributions of significant amounts of resources from resource providers who do not expect commensurate or proportionate pecuniary return
+bOperating purposes other than to provide goods or services at a profit
+cAbsence of ownership interests like those of business entities.
+Entities that clearly fall outside this definition include the following:
+aAll investor-owned entities
+bEntities that provide dividends, lower costs, or other economic benefits directly and proportionately to their owners, members, or participants, such as mutual insurance entities, credit unions, farm and rural electric cooperatives, and employee benefit plans.
+Performance Condition
+A condition affecting the vesting, exercisability, exercise price, or other pertinent factors used in determining the fair value of an award that relates to both of the following:
+aRendering service or delivering goods for a specified (either explicitly or implicitly) period of time
+bAchieving a specified performance target that is defined solely by reference to the grantor's own operations (or activities) or by reference to the grantee's performance related to the grantor's own operations (or activities).
+Attaining a specified growth rate in return on assets, obtaining regulatory approval to market a specified product, selling shares in an initial public offering or other financing event, and a change in control are examples of performance conditions. A performance target also may be defined by reference to the same performance measure of another entity or group of entities. For example, attaining a growth rate in earnings per share (EPS) that exceeds the average growth rate in EPS of other entities in the same industry is a performance condition. A performance target might pertain to the performance of the entity as a whole or to some part of the entity, such as a division, or to the performance of the grantee if such performance is in accordance with the terms of the award and solely relates to the grantor's own operations (or activities).
+Performance Obligation
+A promise in a contract with a customer to transfer to the customer either:
+aA good or service (or a bundle of goods or services) that is distinct
+bA series of distinct goods or services that are substantially the same and that have the same pattern of transfer to the customer.
+Probable
+The future event or events are likely to occur.
+Public Business Entity
+A public business entity is a business entity meeting any one of the criteria below. Neither a not-for-profit entity nor an employee benefit plan is a business entity.
+aIt is required by the U.S. Securities and Exchange Commission (SEC) to file or furnish financial statements, or does file or furnish financial statements (including voluntary filers), with the SEC (including other entities whose financial statements or financial information are required to be or are included in a filing).
+bIt is required by the Securities Exchange Act of 1934 (the Act), as amended, or rules or regulations promulgated under the Act, to file or furnish financial statements with a regulatory agency other than the SEC.
+cIt is required to file or furnish financial statements with a foreign or domestic regulatory agency in preparation for the sale of or for purposes of issuing securities that are not subject to contractual restrictions on transfer.
+dIt has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market.
+eIt has one or more securities that are not subject to contractual restrictions on transfer, and it is required by law, contract, or regulation to prepare U.S. GAAP financial statements (including notes) and make them publicly available on a periodic basis (for example, interim or annual periods). An entity must meet both of these conditions to meet this criterion.
+An entity may meet the definition of a public business entity solely because its financial statements or financial information is included in another entity's filing with the SEC. In that case, the entity is only a public business entity for purposes of financial statements that are filed or furnished with the SEC.
+Revenue
+Inflows or other enhancements of assets of an entity or settlements of its liabilities (or a combination of both) from delivering or producing goods, rendering services, or other activities that constitute the entity's ongoing major or central operations.
+Security
+A share, participation, or other interest in property or in an entity of the issuer or an obligation of the issuer that has all of the following characteristics:
+aIt is either represented by an instrument issued in bearer or registered form or, if not represented by an instrument, is registered in books maintained to record transfers by or on behalf of the issuer.
+bIt is of a type commonly dealt in on securities exchanges or markets or, when represented by an instrument, is commonly recognized in any area in which it is issued or dealt in as a medium for investment.
+cIt either is one of a class or series or by its terms is divisible into a class or series of shares, participations, interests, or obligations.
+Service Condition
+A condition affecting the vesting, exercisability, exercise price, or other pertinent factors used in determining the fair value of an award that depends solely on an employee rendering service to the employer for the requisite service period or a nonemployee delivering goods or rendering services to the grantor over a vesting period. A condition that results in the acceleration of vesting in the event of a grantee's death, disability, or termination without cause is a service condition.
+Service Inception Date
+The date at which the employee's requisite service period or the nonemployee's vesting period begins. The service inception date usually is the grant date, but the service inception date may differ from the grant date (see Example 6 [see paragraph 718-10-55-107] for an illustration of the application of this term to an employee award).
+Share-Based Payment Arrangements
+An arrangement under which either of the following conditions is met:
+aOne or more suppliers of goods or services (including employees) receive awards of equity shares, equity share options, or other equity instruments.
+bThe entity incurs liabilities to suppliers that meet either of the following conditions:
+1The amounts are based, at least in part, on the price of the entity's shares or other equity instruments. (The phrase at least in part is used because an award may be indexed to both the price of the entity's shares and something other than either the price of the entity's shares or a market, performance, or service condition.)
+2The awards require or may require settlement by issuance of the entity's shares.
+The term shares includes various forms of ownership interest that may not take the legal form of securities (for example, partnership interests), as well as other interests, including those that are liabilities in substance but not in form. Equity shares refers only to shares that are accounted for as equity.
+Also called share-based compensation arrangements.
+Standalone Selling Price
+The price at which an entity would sell a promised good or service separately to a customer.
+Transaction Price
+The amount of consideration to which an entity expects to be entitled in exchange for transferring promised goods or services to a customer, excluding amounts collected on behalf of third parties.
+Securities and Exchange Commission (SEC)
+General Note: The Master Glossary contains all terms identified as glossary terms throughout the Codification. Clicking on any term in the Master Glossary will display where the term is used. The Master Glossary may contain identical terms with different definitions, some of which may not be appropriate for a particular Subtopic. For any particular Subtopic, users should only use the glossary terms included in the particular Subtopic Glossary Section (Section 20).
+Not-for-Profit Entity
+An entity that possesses the following characteristics, in varying degrees, that distinguish it from a business entity:
+aContributions of significant amounts of resources from resource providers who do not expect commensurate or proportionate pecuniary return
+bOperating purposes other than to provide goods or services at a profit
+cAbsence of ownership interests like those of business entities.
+Entities that clearly fall outside this definition include the following:
+aAll investor-owned entities
+bEntities that provide dividends, lower costs, or other economic benefits directly and proportionately to their owners, members, or participants, such as mutual insurance entities, credit unions, farm and rural electric cooperatives, and employee benefit plans.
+Public Business Entity
+A public business entity is a business entity meeting any one of the criteria below. Neither a not-for-profit entity nor an employee benefit plan is a business entity.
+aIt is required by the U.S. Securities and Exchange Commission (SEC) to file or furnish financial statements, or does file or furnish financial statements (including voluntary filers), with the SEC (including other entities whose financial statements or financial information are required to be or are included in a filing).
+bIt is required by the Securities Exchange Act of 1934 (the Act), as amended, or rules or regulations promulgated under the Act, to file or furnish financial statements with a regulatory agency other than the SEC.
+cIt is required to file or furnish financial statements with a foreign or domestic regulatory agency in preparation for the sale of or for purposes of issuing securities that are not subject to contractual restrictions on transfer.
+dIt has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market.
+eIt has one or more securities that are not subject to contractual restrictions on transfer, and it is required by law, contract, or regulation to prepare U.S. GAAP financial statements (including notes) and make them publicly available on a periodic basis (for example, interim or annual periods). An entity must meet both of these conditions to meet this criterion.
+An entity may meet the definition of a public business entity solely because its financial statements or financial information is included in another entity's filing with the SEC. In that case, the entity is only a public business entity for purposes of financial statements that are filed or furnished with the SEC.
+Security
+A share, participation, or other interest in property or in an entity of the issuer or an obligation of the issuer that has all of the following characteristics:
+aIt is either represented by an instrument issued in bearer or registered form or, if not represented by an instrument, is registered in books maintained to record transfers by or on behalf of the issuer.
+bIt is of a type commonly dealt in on securities exchanges or markets or, when represented by an instrument, is commonly recognized in any area in which it is issued or dealt in as a medium for investment.
+cIt either is one of a class or series or by its terms is divisible into a class or series of shares, participations, interests, or obligations.

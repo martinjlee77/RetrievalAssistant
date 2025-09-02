@@ -308,15 +308,15 @@ def seed_asc606_knowledge_base():
     
     # ASC 606 source files (authoritative)
     asc606_files = [
-        "attached_assets/05_overview_background_1755741832788.txt",
-        "attached_assets/10_objectives_1755741832788.txt", 
-        "attached_assets/15_scope_1755741832789.txt",
-        "attached_assets/20_glossary_1755741832790.txt",
-        "attached_assets/25_recognition_1755741832790.txt",
-        "attached_assets/32_measurement_1755741832791.txt",
-        "attached_assets/45_other_presentation_matters_1755741832791.txt",
-        "attached_assets/50_disclosure_1755741832792.txt",
-        "attached_assets/55_implementation_guidance_1755741832793.txt"
+        "attached_assets/05_overview_background_1756771341995.txt",
+        "attached_assets/10_objectives_1756771341996.txt", 
+        "attached_assets/15_scope_1756771341997.txt",
+        "attached_assets/20_glossary_1756771341998.txt",
+        "attached_assets/25_recognition_1756771341999.txt",
+        "attached_assets/32_measurement_1756771341999.txt",
+        "attached_assets/45_other_presentation_matters_1756771342000.txt",
+        "attached_assets/50_disclosure_1756771342000.txt",
+        "attached_assets/55_implementation_guidance_1756771342001.txt"
     ]
     
     # Process ASC 606 authoritative files
