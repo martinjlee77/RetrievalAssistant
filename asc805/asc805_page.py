@@ -475,9 +475,9 @@ def _extract_customer_name(contract_text: str) -> str:
 
 def _generate_analysis_title() -> str:
     """Generate analysis title with timestamp."""
-    return f"ASC606_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
+    return f"ASC805_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
 
 
 # For direct execution/testing
 if __name__ == "__main__":
-    render_asc606_page()
+    render_asc805_page()
