@@ -1,0 +1,914 @@
+05 Overview and Background
+General
+718-20-05-1
+Share-based payment awards may be classified as either equity or liabilities. This Subtopic deals with instruments classified as equity. It is interrelated with Subtopic 718-10, which contains guidance applicable to instruments classified as either equity or liabilities issued in share-based payment transactions. It may also be necessary in some cases to refer to the guidance contained in Subtopic 718-30.
+
+15 Scope and Scope Exceptions
+General
+> Overall Guidance
+718-20-15-1
+This Subtopic follows the same Scope and Scope Exceptions as outlined in the Overall Subtopic, see Section 718-10-15, with specific transaction qualifications noted below.
+> Transactions
+718-20-15-2
+The guidance in this Subtopic applies to share-based payment awards that are classified as equity (see paragraphs 718-10-25-6 through 25-19A for a description of what is classified as equity).
+718-20-15-3
+The guidance in this Subtopic does not apply to equity instruments held by an employee stock ownership plan.
+
+
+35 Subsequent Measurement
+General
+> Fair Value Not Reasonably Estimable
+718-20-35-1
+An equity instrument for which it is not possible to reasonably estimate fair value at the grant date shall be remeasured at each reporting date through the date of exercise or other settlement. The final measure of compensation cost shall be the intrinsic value of the instrument at the date it is settled. Compensation cost for each period until settlement shall be based on the change (or a portion of the change, depending on the percentage of the requisite service that has been rendered for an employee award or the percentage that would have been recognized had the grantor paid cash for the goods or services instead of paying with a nonemployee award at the reporting date) in the intrinsic value of the instrument in each reporting period. The entity shall continue to use the intrinsic value method for those instruments even if it subsequently concludes that it is possible to reasonably estimate their fair value.
+> Contingent Features
+718-20-35-2
+A contingent feature of an award that might cause a grantee to return to the entity either equity instruments earned or realized gains from the sale of equity instruments earned for consideration that is less than fair value on the date of transfer (including no consideration), such as a clawback feature (see paragraph 718-10-55-8), shall be accounted for if and when the contingent event occurs. Example 10 (see paragraph 718-20-55-84) provides an illustration of an employee award with a clawback feature.
+> Modification of an Award
+718-20-35-2A
+An entity shall account for the effects of a modification as described in paragraphs 718-20-35-3 through 35-9, unless all the following are met:
+aThe fair value (or calculated value or intrinsic value, if such an alternative measurement method is used) of the modified award is the same as the fair value (or calculated value or intrinsic value, if such an alternative measurement method is used) of the original award immediately before the original award is modified. If the modification does not affect any of the inputs to the valuation technique that the entity uses to value the award, the entity is not required to estimate the value immediately before and after the modification.
+bThe vesting conditions of the modified award are the same as the vesting conditions of the original award immediately before the original award is modified.
+cThe classification of the modified award as an equity instrument or a liability instrument is the same as the classification of the original award immediately before the original award is modified.
+The disclosure requirements in paragraphs 718-10-50-1 through 50-2A and 718-10-50-4 apply regardless of whether an entity is required to apply modification accounting.
+718-20-35-3
+Except as described in paragraph 718-20-35-2A, a modification of the terms or conditions of an equity award shall be treated as an exchange of the original award for a new award. In substance, the entity repurchases the original instrument by issuing a new instrument of equal or greater value, incurring additional compensation cost for any incremental value. The effects of a modification shall be measured as follows:
+aIncremental compensation cost shall be measured as the excess, if any, of the fair value of the modified award determined in accordance with the provisions of this Topic over the fair value of the original award immediately before its terms are modified, measured based on the share price and other pertinent factors at that date. As indicated in paragraph 718-10-30-20, references to fair value throughout this Topic shall be read also to encompass calculated value. The effect of the modification on the number of instruments expected to vest also shall be reflected in determining incremental compensation cost. The estimate at the modification date of the portion of the award expected to vest shall be subsequently adjusted, if necessary, in accordance with paragraph 718-10-35-1D or 718-10-35-3 and other guidance in Examples 14 through 15 (see paragraphs 718-20-55-107 through 55-121).
+bTotal recognized compensation cost for an equity award shall at least equal the fair value of the award at the grant date unless at the date of the modification the performance or service conditions of the original award are not expected to be satisfied. Thus, the total compensation cost measured at the date of a modification shall be the sum of the following:
+1The portion of the grant-date fair value of the original award for which the promised good is expected to be delivered (or has already been delivered) or the service is expected to be rendered (or has already been rendered) at that date
+2The incremental cost resulting from the modification.
+Compensation cost shall be subsequently adjusted, if necessary, in accordance with paragraph 718-10-35-1D or 718-10-35-3 and other guidance in Examples 14 through 15 (see paragraphs 718-20-55-107 through 55-121).
+cA change in compensation cost for an equity award measured at intrinsic value in accordance with paragraph 718-20-35-1 shall be measured by comparing the intrinsic value of the modified award, if any, with the intrinsic value of the original award, if any, immediately before the modification.
+718-20-35-3A
+An entity that has an accounting policy to account for forfeitures when they occur in accordance with paragraph 718-10-35-1D or 718-10-35-3 shall assess at the date of the modification whether the performance or service conditions of the original award are expected to be satisfied when measuring the effects of the modification in accordance with paragraph 718-20-35-3. However, the entity shall apply its accounting policy to account for forfeitures when they occur when subsequently accounting for the modified award.
+718-20-35-4
+Examples 12 through 16 (see paragraphs 718-20-55-93 through 55-144) provide additional guidance on, and illustrate the accounting for, modifications of both vested and nonvested awards, including a modification that changes the classification of the related financial instruments from equity to liability or vice versa, and modifications of vesting conditions. Paragraphs 718-10-35-9 through 35-14 provide additional guidance on accounting for modifications of certain freestanding financial instruments that initially were subject to this Topic but subsequently became subject to other applicable generally accepted accounting principles (GAAP).
+· > Short-Term Inducements
+718-20-35-5
+Except as described in paragraph 718-20-35-2A, a short-term inducement shall be accounted for as a modification of the terms of only the awards of grantees who accept the inducement, and other inducements shall be accounted for as modifications of the terms of all awards subject to them.
+· > Equity Restructuring or Business Combination
+718-20-35-6
+Exchanges of share options or other equity instruments or changes to their terms in conjunction with an equity restructuring or a business combination are modifications for purposes of this Subtopic. An entity shall apply the guidance in paragraph 718-20-35-2A to those exchanges or changes to determine whether it shall account for the effects of those modifications. Example 13 (see paragraph 718-20-55-103) provides further guidance on applying the provisions of this paragraph. See paragraph 718-10-35-10 for an exception.
+· > Repurchase or Cancellation
+718-20-35-7
+The amount of cash or other assets transferred (or liabilities incurred) to repurchase an equity award shall be charged to equity, to the extent that the amount paid does not exceed the fair value of the equity instruments repurchased at the repurchase date. Any excess of the repurchase price over the fair value of the instruments repurchased shall be recognized as additional compensation cost. An entity that repurchases an award for which the promised goods have not been delivered or the service has not been rendered has, in effect, modified the employee's requisite service period or nonemployee's vesting period to the period for which goods have already been delivered or service already has been rendered, and thus the amount of compensation cost measured at the grant date but not yet recognized shall be recognized at the repurchase date.
+· > Cancellation and Replacement
+718-20-35-8
+Except as described in paragraph 718-20-35-2A, cancellation of an award accompanied by the concurrent grant of (or offer to grant) a replacement award or other valuable consideration shall be accounted for as a modification of the terms of the cancelled award. (The phrase offer to grant is intended to cover situations in which the service inception date precedes the grant date.) Therefore, incremental compensation cost shall be measured as the excess of the fair value of the replacement award or other valuable consideration over the fair value of the cancelled award at the cancellation date in accordance with paragraph 718-20-35-3. Thus, the total compensation cost measured at the date of a cancellation and replacement shall be the portion of the grant-date fair value of the original award for which the promised good is expected to be delivered (or has already been delivered) or the service is expected to be rendered (or has already been rendered) at that date plus the incremental cost resulting from the cancellation and replacement.
+718-20-35-9
+A cancellation of an award that is not accompanied by the concurrent grant of (or offer to grant) a replacement award or other valuable consideration shall be accounted for as a repurchase for no consideration. Accordingly, any previously unrecognized compensation cost shall be recognized at the cancellation date.
+
+55 Implementation Guidance and Illustrations
+General
+718-20-55-1
+This Section may contain summaries or references to specific tax code or other regulations that existed at the time that the standard was issued. The Financial Accounting Standards Board (FASB) does not monitor such code or regulations and assumes no responsibility for the current accuracy of the summaries or references. Users must evaluate such code or regulations to determine consistency of the current code or regulation with that presented.
+> Implementation Guidance
+· > Equity Restructuring
+718-20-55-2
+In accordance with paragraph 718-20-35-6, an entity shall apply the guidance in paragraph 718-20-35-2A to exchanges of share options or other equity instruments or changes to their terms in conjunction with an equity restructuring to determine whether it shall account for the effects of those modifications as described in paragraphs 718-20-35-3 through 35-9. Example 13 (see paragraph 718-20-55-103) provides additional guidance on accounting for modifications of awards in the context of equity restructurings.
+> Illustrations
+718-20-55-3
+The following Examples are included in this Subtopic because they assume equity classification. However, these Examples would also apply to awards classified as liabilities except that the amounts in the Examples would likely change due to the requirement under Subtopic 718-30 to remeasure share-based liability awards at fair value each reporting period until settlement.
+718-20-55-3A
+The following Examples describe awards to employees. However, where specifically identified, guidance for certain aspects of the Examples (for example, changes in total compensation cost to be recognized, forfeiture treatment, taxes, and modifications) also is applicable to nonemployee awards. Therefore, the guidance in those identified instances may serve as implementation guidance for nonemployee awards. Specific valuation amounts used in the Examples could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions. An entity should consider the facts and circumstances of its nonemployee awards and use judgment in applying the guidance.
+· > Example 1: Accounting for Share Options with Service Conditions
+718-20-55-4
+The following Cases illustrate the guidance in paragraphs 718-10-35-1D through 35-1E for nonemployee awards, paragraphs 718-10-35-2 through 35-7 for employee awards, and paragraphs 718-740-25-2 through 25-3 for both nonemployee and employee awards, except for the vesting provisions:
+aShare options with cliff vesting and forfeitures estimated in initial accruals of compensation cost (Case A)
+bShare options with graded vesting and forfeitures estimated in initial accruals of compensation cost (Case B)
+cShare options with cliff vesting and forfeitures recognized when they occur (Case C).
+718-20-55-4A
+Cases A through C (see paragraphs 718-20-55-10 through 55-34G) describe employee awards. However, the principles on accounting for employee awards, except for the compensation cost attribution, are the same for nonemployee awards. Consequently, all of the following in Case A are equally applicable to nonemployee awards with the same features as the awards in Cases A through C (that is, awards with a specified time period for vesting):
+aThe assumptions in paragraphs 718-20-55-6 through 55-9
+bTotal compensation cost considerations (including estimates of forfeitures) in paragraphs 718-20-55-10 through 55-12
+cChanges in the estimation of forfeitures in paragraphs 718-20-55-14 through 55-15
+dExercise or expiration considerations in paragraphs 718-20-55-18 through 55-21 and 718-20-55-23.
+Therefore, the guidance in those paragraphs may serve as implementation guidance for nonemployee awards. Similarly, an entity also may elect to account for nonemployee award forfeitures as they occur as illustrated in Case C (see paragraph 718-20-55-34A).
+718-20-55-4B
+Nonemployee awards may be similar to employee awards (that is, cliff vesting or graded vesting). However, the compensation cost attribution for awards to nonemployees may be the same as or different from employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in the Cases could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-4C
+Because of the differences in compensation cost attribution, the accounting policy election illustrated in Case B (see paragraph 718-20-55-25) does not apply to nonemployee awards.
+718-20-55-5
+Cases A, B, and C share all of the assumptions in paragraphs 718-20-55-6 through 55-34G, with the following exceptions:
+aIn Case C, Entity T has an accounting policy to account for forfeitures when they occur in accordance with paragraph 718-10-35-3.
+bIn Cases A and B, Entity T has an accounting policy to estimate the number of forfeitures expected to occur, also in accordance with paragraph 718-10-35-3.
+cIn Case B, the share options have graded vesting.
+dIn Cases A and C, the share options have cliff vesting.
+718-20-55-6
+Entity T, a public entity, grants at-the-money employee share options with a contractual term of 10 years. All share options vest at the end of three years (cliff vesting), which is an explicit service (and requisite service) period of three years. The share options do not qualify as incentive stock options for U.S. tax purposes. The enacted tax rate is 35 percent. In each Case, Entity T concludes that it will have sufficient future taxable income to realize the deferred tax benefits from its share-based payment transactions.
+718-20-55-7
+The following table shows assumptions and information about the share options granted on January 1, 20X5 applicable to all Cases, except for expected forfeitures per year, which does not apply in Case C.
+
+Description,Value
+Share options granted,900000
+Employees granted options,3000 employees
+Expected forfeitures per year,3.0%
+Share price at the grant date,$30
+Exercise price,$30
+Contractual term of options,10 years
+Risk-free interest rate over contractual term,1.5% to 4.3%
+Expected volatility over contractual term,40% to 60%
+Expected dividend yield over contractual term,1.0%
+Suboptimal exercise factor,2
+
+                 
+718-20-55-8
+A suboptimal exercise factor of two means that exercise is generally expected to occur when the share price reaches two times the share option's exercise price. Option-pricing theory generally holds that the optimal (or profit-maximizing) time to exercise an option is at the end of the option's term; therefore, if an option is exercised before the end of its term, that exercise is referred to as suboptimal. Suboptimal exercise also is referred to as early exercise. Suboptimal or early exercise affects the expected term of an option. Early exercise can be incorporated into option-pricing models through various means. In this Case, Entity T has sufficient information to reasonably estimate early exercise and has incorporated it as a function of Entity T's future stock price changes (or the option's intrinsic value). In this Case, the factor of 2 indicates that early exercise would be expected to occur, on average, if the stock price reaches $60 per share ($30 × 2). Rather than use its weighted average suboptimal exercise factor, Entity T also may use multiple factors based on a distribution of early exercise data in relation to its stock price.
+718-20-55-9
+This Case assumes that each employee receives an equal grant of 300 options. Using as inputs the last 7 items from the table in paragraph 718-20-55-7, Entity T's lattice-based valuation model produces a fair value of $14.69 per option. A lattice model uses a suboptimal exercise factor to calculate the expected term (that is, the expected term is an output) rather than the expected term being a separate input. If an entity uses a Black-Scholes-Merton option-pricing formula, the expected term would be used as an input instead of a suboptimal exercise factor.
+· · > Case A: Share Options with Cliff Vesting and Forfeitures Estimated in Initial Accruals of Compensation Cost
+718-20-55-10
+Total compensation cost recognized over the requisite service period (which is the vesting period in this Case) shall be the grant-date fair value of all share options that actually vest (that is, all options for which the requisite service is rendered). This Case assumes that Entity T's accounting policy is to estimate the number of forfeitures expected to occur in accordance with paragraph 718-10-35-3. As a result, Entity T is required to estimate at the grant date the number of share options for which the requisite service is expected to be rendered (which, in this Case, is the number of share options for which vesting is deemed probable). If that estimate changes, it shall be accounted for as a change in estimate and its cumulative effect (from applying the change retrospectively) recognized in the period of change. Entity T estimates at the grant date the number of share options expected to vest and subsequently adjusts compensation cost for changes in the estimated rate of forfeitures and differences between expectations and actual experience. This Case also assumes that none of the compensation cost is capitalized as part of the cost of an asset.
+718-20-55-11
+The estimate of the number of forfeitures considers historical employee turnover rates and expectations about the future. Entity T has experienced historical turnover rates of approximately 3 percent per year for employees at the grantees' level, and it expects that rate to continue over the requisite service period of the awards. Therefore, at the grant date Entity T estimates the total compensation cost to be recognized over the requisite service period based on an expected forfeiture rate of 3 percent per year. Actual forfeitures are 5 percent in 20X5, but no adjustments to cumulative compensation cost are recognized in 20X5 because Entity T still expects actual forfeitures to average 3 percent per year over the 3-year vesting period. As of December 31, 20X6, management decides that the forfeiture rate will likely increase through 20X7 and changes its estimated forfeiture rate for the entire award to 6 percent per year. Adjustments to cumulative compensation cost to reflect the higher forfeiture rate are made at the end of 20X6. At the end of 20X7 when the award becomes vested, actual forfeitures have averaged 6 percent per year, and no further adjustment is necessary.
+718-20-55-12
+The first set of calculations illustrates the accounting for the award of share options on January 1, 20X5, assuming that the share options granted vest at the end of three years. (Case B illustrates the accounting for an award assuming graded vesting in which a specified portion of the share options granted vest at the end of each year.) The number of share options expected to vest is estimated at the grant date to be 821,406 (900,000 ×.97 3). Thus, the compensation cost to be recognized over the requisite service period at January 1, 20X5, is $12,066,454 (821,406 × $14.69), and the compensation cost to be recognized during each year of the 3-year vesting period is $4,022,151 ($12,066,454 ÷ 3). The journal entries to recognize compensation cost and related deferred tax benefit at the enacted tax rate of 35 percent are as follows for 20X5.
+
+Description,Amount
+Compensation cost,4022151
+Additional paid-in capital,4022151
+
+To recognize compensation cost.
+
+Description,Amount
+Deferred tax asset,1407753
+Deferred tax benefit,1407753
+
+                        
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($4,022,151 ×.35 = $1,407,753).
+718-20-55-13
+The net after-tax effect on income of recognizing compensation cost for 20X5 is $2,614,398 ($4,022,151 - $1,407,753).
+718-20-55-14
+Absent a change in estimated forfeitures, the same journal entries would be made to recognize compensation cost and related tax effects for 20X6 and 20X7, resulting in a net after-tax cost for each year of $2,614,398. However, at the end of 20X6, management changes its estimated employee forfeiture rate from 3 percent to 6 percent per year. The revised number of share options expected to vest is 747,526 (900,000 ×.94 3). Accordingly, the revised cumulative compensation cost to be recognized by the end of 20X7 is $10,981,157 (747,526 × $14.69). The cumulative adjustment to reflect the effect of adjusting the forfeiture rate is the difference between two-thirds of the revised cost of the award and the cost already recognized for 20X5 and 20X6. The related journal entries and the computations follow.
+At December 31, 20X6, to adjust for new forfeiture rate.
+
+Description,Amount
+Revised total compensation cost,10981157
+Revised cumulative cost as of December 31 20X6 (10981157%),7320771
+Cost already recognized in 20X5 and 20X6 (4022151 x 2),8044302
+Adjustment to cost at December 31 20X6,-723531
+
+
+
+718-20-55-15
+The related journal entries are as follows.
+                        
+To adjust previously recognized compensation cost and equity to reflect a higher estimated forfeiture rate.
+                        
+To adjust the deferred tax accounts to reflect the tax effect of increasing the estimated forfeiture rate ($723,531 ×.35 = $253,236).
+718-20-55-16
+Journal entries for 20X7 are as follows.
+
+Description,Amount
+Compensation cost (debit), 3660386
+Additional paid-in capital (credit), 3660386
+                   
+To recognize compensation cost ($10,981,157 ÷ 3 = $3,660,386).
+                        
+To recognize the deferred tax asset for additional compensation cost ($3,660,386 ×.35 = $1,281,135).
+718-20-55-17
+As of December 31, 20X7, the entity would examine its actual forfeitures and make any necessary adjustments to reflect cumulative compensation cost for the number of shares that actually vested.
+
+Year,Total Value of Award,Pretax Cost for Year,Cumulative Pretax Cost
+20X5,"$12066454 (821406 x $14.69)",4022151,4022151
+20X6,"$10981157 (747526 x $14.69)",3298620,7320771
+20X7,"$10981157 (747526 x $14.69)","3660386 ($10981157 / 3)",10981157
+
+
+                  
+718-20-55-18
+All 747,526 vested share options are exercised on the last day of 20Y2. Entity T has already recognized its income tax expense for the year without regard to the effects of the exercise of the employee share options. In other words, current tax expense and current taxes payable were recognized based on income and deductions before consideration of additional deductions from exercise of the employee share options. Upon exercise, the amount credited to common stock (or other appropriate equity accounts) is the sum of the cash proceeds received and the amounts previously credited to additional paid-in capital in the periods the services were received (20X5 through 20X7). In this Case, Entity T has no-par common stock and at exercise, the share price is assumed to be $60.
+718-20-55-19
+At exercise the journal entries are as follows.
+
+Description, Amount
+Cash (747526 x $30) (debit), 22425780
+Additional paid-in capital (debit), 10981157
+Common stock (credit), 33406937
+        
+To recognize the issuance of common stock upon exercise of share options and to reclassify previously recorded paid-in capital.
+718-20-55-20
+In this Case, the difference between the market price of the shares and the exercise price on the date of exercise is deductible for tax purposes pursuant to U.S. tax law in effect in 2004 (the share options do not qualify as incentive stock options). Paragraph 718-740-35-2 requires that the tax effect be recognized as income tax expense or benefit in the income statement for the difference between the deduction for an award for tax purposes and the cumulative compensation cost of that award recognized for financial reporting purposes. With the share price of $60 at exercise, the deductible amount is $22,425,780 [747,526 × ($60 - $30)], and the tax benefit is $7,849,023 ($22,425,780 ×.35).
+718-20-55-21
+At exercise the journal entries are as follows.
+
+Description, Amount
+Deferred tax expense (debit), 3843405
+Deferred tax asset (credit), 3843405
+                        
+To write off the deferred tax asset related to deductible share options at exercise ($10,981,157 ×.35 = $3,843,405).
+
+Description, Amount
+Current taxes payable (debit), 7849023
+Current tax expense (credit), 7849023
+                        
+To adjust current tax expense and current taxes payable to recognize the current tax benefit from deductible compensation cost upon exercise of share options.
+718-20-55-22
+Paragraph superseded by Accounting Standards Update No. 2016-09.
+718-20-55-23
+If instead the share options expired unexercised, previously recognized compensation cost would not be reversed. There would be no deduction on the tax return and, therefore, the entire deferred tax asset of $3,843,405 would be charged to income tax expense.
+718-20-55-23A
+If employees terminated with out-of-the-money vested share options, the deferred tax asset related to those share options would be written off when those options expire.
+718-20-55-24
+Paragraph superseded by Accounting Standards Update No. 2016-09.
+· · > Case B: Share Options with Graded Vesting
+718-20-55-25
+Paragraph 718-10-35-8 provides for the following two methods to recognize compensation cost for awards with graded vesting:
+aOn a straight-line basis over the requisite service period for each separately vesting portion of the award as if the award was, in-substance, multiple awards (graded vesting attribution method)
+bOn a straight-line basis over the requisite service period for the entire award (that is, over the requisite service period of the last separately vesting portion of the award), subject to the limitation noted in paragraph 718-10-35-8.
+718-20-55-26
+The choice of attribution method for awards with graded vesting schedules is a policy decision that is not dependent on an entity's choice of valuation technique. In addition, the choice of attribution method applies to awards with only service conditions.
+718-20-55-27
+The accounting is illustrated below for both methods and uses the same assumptions as those noted in Case A except for the vesting provisions.
+718-20-55-28
+Entity T awards 900,000 share options on January 1, 20X5, that vest according to a graded schedule of 25 percent for the first year of service, 25 percent for the second year, and the remaining 50 percent for the third year. Each employee is granted 300 share options. The following table shows the calculation as of January 1, 20X5, of the number of employees and the related number of share options expected to vest. Using the expected 3 percent annual forfeiture rate, 90 employees are expected to terminate during 20X5 without having vested in any portion of the award, leaving 2,910 employees to vest in 25 percent of the award (75 options). During 20X6, 87 employees are expected to terminate, leaving 2,823 to vest in the second 25 percent of the award. During 20X7, 85 employees are expected to terminate, leaving 2,738 employees to vest in the last 50 percent of the award. That results in a total of 840,675 share options expected to vest from the award of 900,000 share options with graded vesting.
+
+Year,Number of Employees,Total Number of Vested Share Options
+20X5,"3000 - 90 (3000 x 0.03) = 2910","2910 x 75 (300 x 25%) = 218250"
+20X6,"2910 - 87 (2910 x 0.03) = 2823","2823 x 75 (300 x 25%) = 211725"
+20X7,"2823 - 85 (2823 x 0.03) = 2738","2738 x 150 (300 X 50%) = 410700"
+Total,"",840675
+
+
+                 
+718-20-55-29
+The value of the share options that vest over the three-year period is estimated by separating the total award into three groups (or tranches) according to the year in which they vest (because the expected life for each tranche differs). The following table shows the estimated compensation cost for the share options expected to vest. The estimates of expected volatility, expected dividends, and risk-free interest rates are incorporated into the lattice, and the graded vesting conditions affect only the earliest date at which suboptimal exercise can occur (see paragraph 718-20-55-8 for information on suboptimal exercise). Thus, the fair value of each of the 3 groups of options is based on the same lattice inputs for expected volatility, expected dividend yield, and risk-free interest rates used to determine the value of $14.69 for the cliff-vesting share options (see paragraphs 718-20-55-7 through 55-9). The different vesting terms affect the ability of the suboptimal exercise to occur sooner (and affect other factors as well, such as volatility), and therefore there is a different expected term for each tranche.
+
+Year,Vested Options,Value per Option,Compensation Cost
+20X5,218250,13.44,2933280
+20X6,211725,14.17,3000143
+20X7,410700,14.69,6033183
+Total,840675,,11966606
+
+                
+718-20-55-30
+Compensation cost is recognized over the periods of requisite service during which each tranche of share options is earned. Thus, the $2,933,280 cost attributable to the 218,250 share options that vest in 20X5 is recognized in 20X5. The $3,000,143 cost attributable to the 211,725 share options that vest at the end of 20X6 is recognized over the 2-year vesting period (20X5 and 20X6). The $6,033,183 cost attributable to the 410,700 share options that vest at the end of 20X7 is recognized over the 3-year vesting period (20X5, 20X6, and 20X7).
+718-20-55-31
+The following table shows how the $11,966,606 expected amount of compensation cost determined at the grant date is attributed to the years 20X5, 20X6, and 20X7.
+
+
+Description,20X5,20X6,20X7
+Share options vesting in 20X5,2933280,,
+Share options vesting in 20X6,1500072,2011061,
+Share options vesting in 20X7,2011061,2011061,2011061
+Cost for the year,6444412,3511133,2011061
+Cumulative cost,6444412,9955545,11966606
+
+
+            
+718-20-55-32
+Entity T could use the same computation of estimated cost, as in the preceding table, but could elect to recognize compensation cost on a straight-line basis for all graded vesting awards. In that case, total compensation cost to be attributed on a straight-line basis over each year in the 3-year vesting period is approximately $3,988,868 ($11,966,606 ÷ 3). Entity T also could use a single weighted-average expected life to value the entire award and arrive at a different amount of total compensation cost. Total compensation cost could then be attributed on a straight-line basis over the three-year vesting period. However, this Topic requires that compensation cost recognized at any date must be at least equal to the amount attributable to options that are vested at that date. For example, if 50 percent of this same option award vested in the first year of the 3-year vesting period, 436,500 options [2,910 × 150 (300 × 50%)] would be vested at the end of 20X5. Compensation cost amounting to $5,866,560 (436,500 × $13.44) attributable to the vested awards would be recognized in the first year.
+718-20-55-33
+Compensation cost is adjusted for awards with graded vesting to reflect differences between estimated and actual forfeitures as illustrated for the cliff-vesting options, regardless of which method is used to estimate value and attribute cost.
+718-20-55-34
+Accounting for the tax effects of awards with graded vesting follows the same pattern illustrated in paragraphs 718-20-55-20 through 55-23. However, unless Entity T identifies and tracks the specific tranche from which share options are exercised, it would not know the recognized compensation cost that corresponds to exercised share options for purposes of calculating the tax effects resulting from that exercise. If an entity does not know the specific tranche from which share options are exercised, it should assume that options are exercised on a first-vested, first-exercised basis (which works in the same manner as the first-in, first-out [FIFO] basis for inventory costing).
+· · > Case C: Share Options with Cliff Vesting and Forfeitures Recognized When They Occur
+718-20-55-34A
+This Case uses the same assumptions as Case A except that Entity T's accounting policy is to account for forfeitures when they occur in accordance with paragraph 718-10-35-3. Consequently, compensation cost previously recognized for an employee share option is reversed in the period in which forfeiture of the award occurs. Previously recognized compensation cost is not reversed if an employee share option for which the requisite service has been rendered expires unexercised. This Case also assumes that none of the compensation cost is capitalized as part of the cost of an asset.
+718-20-55-34B
+In 20X5, 20X6, and 20X7, share option forfeitures are 45,000, 47,344, and 60,130, respectively.
+718-20-55-34C
+The compensation cost to be recognized over the requisite service period at January 1, 20X5, is $13,221,000 (900,000 × $14.69), and the compensation cost to be recognized (excluding the effect of forfeitures) during each year of the 3-year vesting period is $4,407,000 ($13,221,000 ÷ 3). The journal entries for 20X5 to recognize compensation cost and related deferred tax benefit at the enacted tax rate of 35 percent are as follows.
+
+Description, Amount
+Compensation cost (debit), 4407000
+Additional paid-in capital (credit), 4407000
+     
+To recognize compensation cost excluding the effect of forfeitures for 20X5.
+
+Description, Amount
+Deferred tax asset (debit), 1542450
+Deferred tax benefit (credit), 1542450
+
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($4,407,000 × .35).
+718-20-55-34D
+During 20X5, 45,000 share options are forfeited; accordingly, Entity T remeasures compensation cost to reflect the effect of forfeitures when they occur and recognizes compensation costs for 855,000 (900,000 - 45,000) share options (net of forfeitures) at an amount of $12,559,950 (855,000 × $14.69) over the 3-year vesting period, or $4,186,650 each year ($12,559,950 ÷ 3). Therefore, Entity T reverses recognized compensation cost of $220,350 (45,000 share options × $14.69 ÷ 3) to account for forfeitures that occurred during 20X5. The journal entries to recognize the effect of forfeitures during 20X5 and the related reduction in the deferred tax benefit are as follows.
+
+Description, Amount
+Additional paid-in capital (debit), 220350
+Compensation cost (credit), 220350
+                        
+To recognize the effect of forfeitures on compensation cost when they occur for 20X5.
+
+Description, Amount
+Deferred tax benefit (debit), 77123
+Deferred tax asset (credit), 77123
+
+To reverse the deferred tax asset related to the forfeited awards ($220,350 × .35).
+718-20-55-34E
+As of January 1, 20X6, Entity T determines the compensation cost and related tax effects to recognize during 20X6. The journal entries for 20X6 to recognize compensation cost and related deferred tax benefit at the enacted tax rate of 35 percent are as follows (excluding the effect of forfeitures in 20X6).
+
+Description, Amount
+Compensation cost (debit), 4186650
+Additional paid-in capital (credit), 4186650
+                      
+To recognize compensation cost excluding the effect of awards that forfeited during 20X6.
+
+Description, Amount
+Deferred tax asset (debit), 1465328
+Deferred tax benefit (credit), 1465328
+
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($4,186,650 × .35).
+718-20-55-34F
+In 20X6, 47,344 share options are forfeited (that is, 92,344 share options in total have been forfeited by December 31, 20X6); accordingly, Entity T would recognize compensation cost for 807,656 share options over the 3-year vesting period. On the basis of actual forfeitures in 20X5 and 20X6, Entity T should recognize a cumulative compensation cost of $11,864,467 (807,656 × $14.69) for the 3-year vesting period, or $3,954,822 a year ($11,864,467 ÷ 3 years). Therefore, Entity T reverses recognized compensation cost of $231,828 ($4,186,650 - $3,954,822) for 20X5 and 20X6, or $463,656 in total, to account for forfeitures that occurred during 20X6. The journal entries to recognize the effect of forfeitures during 20X6 and the related reduction in the deferred tax benefit are as follows.
+
+Description, Amount
+Additional paid-in capital (debit), 463656
+Compensation cost (credit), 463656
+                        
+To recognize the effect of the forfeitures on compensation cost when they occur for 20X6.
+
+Description, Amount
+Deferred tax benefit (debit), 162280
+Deferred tax asset (credit), 162280
+                
+To reverse the deferred tax asset related to the forfeited awards ($463,656 × .35).
+718-20-55-34G
+Entity T follows the same approach in 20X7 as it applied in 20X6 to recognize compensation cost and related tax effects.
+· > Example 2: Share Option Award under Which the Number of Options to Be Earned Varies
+718-20-55-35
+This Example illustrates the guidance in paragraph 718-10-30-15.
+718-20-55-35A
+This Example (see paragraphs 718-20-55-36 through 55-40) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, all of the following are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, the number of options earned varies on the basis of the achievement of particular performance conditions):
+aCertain valuation assumptions in paragraph 718-20-55-36
+bTotal compensation cost considerations provided in paragraphs 718-20-55-37 through 55-39 (that is, an entity must consider if it is probable that specific performance conditions will be achieved for an award with a specified time period for vesting and performance conditions)
+cForfeiture adjustments in paragraph 718-20-55-40.
+718-20-55-35B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-36
+This Example shows the computation of compensation cost if Entity T grants an award of share options with multiple performance conditions. Under the award, employees vest in differing numbers of options depending on the amount by which the market share of one of Entity T's products increases over a three-year period (the share options cannot vest before the end of the three-year period). The three-year explicit service period represents the requisite service period. On January 1, 20X5, Entity T grants to each of 1,000 employees an award of up to 300 10-year-term share options on its common stock. If market share increases by at least 5 percentage points by December 31, 20X7, each employee vests in at least 100 share options at that date. If market share increases by at least 10 percentage points, another 100 share options vest, for a total of 200. If market share increases by more than 20 percentage points, each employee vests in all 300 share options. Entity T's share price on January 1, 20X5, is $30 and other assumptions are the same as in Example 1 (see paragraph 718-20-55-4). The grant-date fair value per share option is $14.69. While the vesting conditions in this Example and in Example 1 (see paragraph 718-20-55-4) are different, the equity instruments being valued have the same estimate of grant-date fair value. That is a consequence of the modified grant-date method, which accounts for the effects of vesting requirements or other restrictions that apply during the vesting period by recognizing compensation cost only for the instruments that actually vest. (This discussion does not refer to awards with market conditions that affect exercisability or the ability to retain the award as described in paragraphs 718-10-55-60 through 55-63.)
+718-20-55-37
+The compensation cost of the award depends on the estimated number of options that will vest. Entity T must determine whether it is probable that any performance condition will be achieved, that is, whether the growth in market share over the 3-year period will be at least 5 percent. Accruals of compensation cost are initially based on the probable outcome of the performance conditions—in this case, different levels of market share growth over the three-year vesting period—and adjusted for subsequent changes in the estimated or actual outcome. If Entity T determines that no performance condition is probable of achievement (that is, market share growth is expected to be less than 5 percentage points), then no compensation cost is recognized; however, Entity T is required to reassess at each reporting date whether achievement of any performance condition is probable and would begin recognizing compensation cost if and when achievement of the performance condition becomes probable.
+718-20-55-38
+Paragraph 718-10-25-20 requires accruals of cost to be based on the probable outcome of performance conditions. Accordingly, this Topic prohibits Entity T from basing accruals of compensation cost on an amount that is not a possible outcome (and thus cannot be the probable outcome). For instance, if Entity T estimates that there is a 90 percent, 30 percent, and 10 percent likelihood that market share growth will be at least 5 percentage points, at least 10 percentage points, and greater than 20 percentage points, respectively, it would not try to determine a weighted average of the possible outcomes because that number of shares is not a possible outcome under the arrangement.
+718-20-55-39
+The following table shows the compensation cost that would be recognized in 20X5, 20X6, and 20X7 if Entity T estimates at the grant date that it is probable that market share will increase at least 5 but less than 10 percentage points (that is, each employee would receive 100 share options). That estimate remains unchanged until the end of 20X7, when Entity T's market share has increased over the 3-year period by more than 10 percentage points. Thus, each employee vests in 200 share options.
+718-20-55-40
+As in Example 1, Case A (see paragraph 718-20-55-10), Entity T experiences actual forfeiture rates of 5 percent in 20X5, and in 20X6 changes its estimate of forfeitures for the entire award from 3 percent to 6 percent per year. In 20X6, cumulative compensation cost is adjusted to reflect the higher forfeiture rate. By the end of 20X7, a 6 percent forfeiture rate has been experienced, and no further adjustments for forfeitures are necessary. Through 20X5, Entity T estimates that 913 employees (1,000 ×.97 3) will remain in service until the vesting date. At the end of 20X6, the number of employees estimated to remain in service is adjusted for the higher forfeiture rate, and the number of employees estimated to remain in service is 831 (1,000 ×.94 3). The compensation cost of the award is initially estimated based on the number of options expected to vest, which in turn is based on the expected level of performance and the fair value of each option. That amount would be adjusted as needed for changes in the estimated and actual forfeiture rates and for differences between estimated and actual market share growth. The amount of compensation cost recognized (or attributed) when achievement of a performance condition is probable depends on the relative satisfaction of the performance condition based on performance to date. Entity T determines that recognizing compensation cost ratably over the three-year vesting period is appropriate with one-third of the value of the award recognized each year.
+
+Year,Total Value of Award,Pretax Cost for Year,Cumulative Pretax Cost
+20X5,"1341197 (14.69 x 100 x 913)","447066 (1341197 / 3)",447066
+20X6,"1220739 (14.69 x 100 x 831)","366760 [(1220739 x 2/3) - 447066]",813826
+20X7,"2441478 (14.69 x 200 x 831)","1627652 (2411478 - 813826)",2441478
+
+
+
+
+· > Example 3: Share Option Award under Which the Exercise Price Varies
+718-20-55-41
+This Example illustrates the guidance in paragraph 718-10-30-15.
+718-20-55-41A
+This Example (see paragraphs 718-20-55-42 through 55-46) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, both of the following are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, an immediately vested and exercisable award with an exercise price that varies on the basis of the achievement of particular performance conditions):
+aCertain valuation assumptions in paragraphs 718-20-55-42 through 55-43
+bThe total compensation cost considerations provided in paragraphs 718-20-55-44 through 55-46 (that is, an entity must consider if it is probable that specific performance conditions will be achieved).
+Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-41B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-42
+This Example shows the computation of compensation cost if Entity T grants a share option award with a performance condition under which the exercise price, rather than the number of shares, varies depending on the level of performance achieved. On January 1, 20X5, Entity T grants to its chief executive officer 10-year share options on 10,000 shares of its common stock, which are immediately vested and exercisable (an explicit service period of zero). The share price at the grant date is $30, and the initial exercise price also is $30. However, that price decreases to $15 if the market share for Entity T's products increases by at least 10 percentage points by December 31, 20X6, and provided that the chief executive officer continues to be employed by Entity T and has not previously exercised the options (an explicit service period of 2 years, which also is the requisite service period).
+718-20-55-43
+Entity T estimates at the grant date the expected level of market share growth, the exercise price of the options, and the expected term of the options. Other assumptions, including the risk-free interest rate and the service period over which the cost is attributed, are consistent with those estimates. Entity T estimates at the grant date that its market share growth will be at least 10 percentage points over the 2-year performance period, which means that the expected exercise price of the share options is $15, resulting in a fair value of $19.99 per option. Option value is determined using the same assumptions noted in paragraph 718-20-55-7 except the exercise price is $15 and the award is not exercisable at $15 per option for 2 years.
+718-20-55-44
+Total compensation cost to be recognized if the performance condition is satisfied would be $199,900 (10,000 x $19.99). Paragraph 718-10-30-15 requires that the fair value of both awards with service conditions and awards with performance conditions be estimated as of the date of grant. Paragraph 718-10-35-3 also requires recognition of cost for the number of instruments for which the requisite service is provided. For this performance award, Entity T also selects the expected assumptions at the grant date if the performance goal is not met. If market share growth is not at least 10 percentage points over the 2-year period, Entity T estimates a fair value of $13.08 per option. Option value is determined using the same assumptions noted in paragraph 718-20-55-7 except the award is immediately vested.
+718-20-55-45
+Total compensation cost to be recognized if the performance goal is not met would be $130,800 (10,000 × $13.08). Because Entity T estimates that the performance condition would be satisfied, it would recognize compensation cost of $130,800 on the date of grant related to the fair value of the fully vested award and recognize compensation cost of $69,100 ($199,900 - $130,800) over the 2-year requisite service period related to the condition. Because of the nature of the performance condition, the award has multiple requisite service periods that affect the manner in which compensation cost is attributed. Paragraphs 718-10-55-67 through 55-79 provide guidance on estimating the requisite service period.
+718-20-55-46
+During the two-year requisite service period, adjustments to reflect any change in estimate about satisfaction of the performance condition should be made, and, thus, aggregate cost recognized by the end of that period reflects whether the performance goal was met.
+· > Example 4: Share Option Award with Other Performance Conditions
+718-20-55-47
+This Example illustrates the guidance in paragraph 718-10-30-15.
+718-20-55-47A
+This Example (see paragraphs 718-20-55-48 through 55-50) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, the concepts about valuation, expected term, and total compensation cost that should be recognized (that is, the consideration of whether it is probable that performance conditions will be achieved) in paragraphs 718-20-55-48 through 55-50 are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, awards with performance conditions that affect inputs to an award's fair value). Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-47B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-48
+While performance conditions usually affect vesting conditions, they may affect exercise price, contractual term, quantity, or other factors that affect an award's fair value before, at the time of, or after vesting. This Topic requires that all performance conditions be accounted for similarly. A potential grant-date fair value is estimated for each of the possible outcomes that are reasonably determinable at the grant date and associated with the performance condition(s) of the award (as demonstrated in Example 3 [see paragraph 718-20-55-41)]. Compensation cost ultimately recognized is equal to the grant-date fair value of the award that coincides with the actual outcome of the performance condition(s).
+718-20-55-49
+To illustrate the notion described in the preceding paragraph and attribution of compensation cost if performance conditions have different service periods, assume Entity C grants 10,000 at-the-money share options on its common stock to an employee. The options have a 10-year contractual term. The share options vest upon successful completion of phase-two clinical trials to satisfy regulatory testing requirements related to a developmental drug therapy. Phase-two clinical trials are scheduled to be completed (and regulatory approval of that phase obtained) in approximately 18 months; hence, the implicit service period is approximately 18 months. Further, the share options will become fully transferable upon regulatory approval of the drug therapy (which is scheduled to occur in approximately four years). The implicit service period for that performance condition is approximately 30 months (beginning once phase-two clinical trials are successfully completed). Based on the nature of the performance conditions, the award has multiple requisite service periods (one pertaining to each performance condition) that affect the pattern in which compensation cost is attributed. Paragraphs 718-10-55-67 through 55-79 and 718-10-55-86 through 55-88 provide guidance on estimating the requisite service period of an award. The determination of whether compensation cost should be recognized depends on Entity C's assessment of whether the performance conditions are probable of achievement. Entity C expects that all performance conditions will be achieved. That assessment is based on the relevant facts and circumstances, including Entity C's historical success rate of bringing developmental drug therapies to market.
+718-20-55-50
+At the grant date, Entity C estimates that the potential fair value of each share option under the 2 possible outcomes is $10 (Outcome 1, in which the share options vest and do not become transferable) and $16 (Outcome 2, in which the share options vest and do become transferable). The difference in estimated fair values of each outcome is due to the change in estimate of the expected term of the share option. Outcome 1 uses an expected term in estimating fair value that is less than the expected term used for Outcome 2, which is equal to the award's 10-year contractual term. If a share option is transferable, its expected term is equal to its contractual term (see paragraph 718-10-55-29). If Outcome 1 is considered probable of occurring, Entity C would recognize $100,000 (10,000 × $10) of compensation cost ratably over the 18-month requisite service period related to the successful completion of phase-two clinical trials. If Outcome 2 is considered probable of occurring, then Entity C would recognize an additional $60,000 [10,000 × ($16 - $10)] of compensation cost ratably over the 30-month requisite service period (which begins after phase-two clinical trials are successfully completed) related to regulatory approval of the drug therapy. Because Entity C believes that Outcome 2 is probable, it recognizes compensation cost in the pattern described. However, if circumstances change and it is determined at the end of Year 3 that the regulatory approval of the developmental drug therapy is likely to be obtained in six years rather than four, the requisite service period for Outcome 2 is revised, and the remaining unrecognized compensation cost would be recognized prospectively through Year 6. On the other hand, if it becomes probable that Outcome 2 will not occur, compensation cost recognized for Outcome 2, if any, would be reversed.
+· > Example 5: Share Option with a Market Condition—Indexed Exercise Price
+718-20-55-51
+This Example illustrates the guidance in paragraph 718-10-30-15.
+718-20-55-51A
+This Example (see paragraphs 718-20-55-52 through 55-60) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, the concepts about valuation in paragraphs 718-20-55-52 through 55-60 are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, awards with market conditions that affect exercise prices). Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-51B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-52
+Entity T grants share options whose exercise price varies with an index of the share prices of a group of entities in the same industry, that is, a market condition. Assume that on January 1, 20X5, Entity T grants 100 share options on its common stock with an initial exercise price of $30 to each of 1,000 employees. The share options have a maximum term of 10 years. The exercise price of the share options increases or decreases on December 31 of each year by the same percentage that the index has increased or decreased during the year. For example, if the peer group index increases by 10 percent in 20X5, the exercise price of the share options during 20X6 increases to $33 ($30 × 1.10). On January 1, 20X5, the peer group index is assumed to be 400. The dividend yield on the index is assumed to be 1.25 percent.
+718-20-55-53
+Each indexed share option may be analyzed as a share option to exchange 0.0750 (30 ÷ 400) shares of the peer group index for a share of Entity T stock—that is, to exchange one noncash asset for another noncash asset. A share option to purchase stock for cash also can be thought of as a share option to exchange one asset (cash in the amount of the exercise price) for another (the share of stock). The intrinsic value of a cash share option equals the difference between the price of the stock upon exercise and the amount—the price—of the cash exchanged for the stock. The intrinsic value of a share option to exchange 0.0750 shares of the peer group index for a share of Entity T stock also equals the difference between the prices of the two assets exchanged.
+718-20-55-54
+To illustrate the equivalence of an indexed share option and the share option above, assume that an employee exercises the indexed share option when Entity T's share price has increased 100 percent to $60 and the peer group index has increased 75 percent, from 400 to 700. The exercise price of the indexed share option thus is $52.50 ($30 × 1.75).
+
+Description,Amount
+Price of Entity T Share,60
+Less: Exercise price of share option,52.50
+Intrinsic value of indexed share option, 7.50
+                      
+718-20-55-55
+That is the same as the intrinsic value of a share option to exchange 0.0750 shares of the index for 1 share of Entity T stock.
+
+Description,Amount
+Price of Entity T share,60
+Less: Price of a share of the peer group index (.0750 x $700),52.50
+Intrinsic value at exchange, 7.50
+                      
+718-20-55-56
+Option-pricing models can be extended to value a share option to exchange one asset for another. The principal extension is that the volatility of a share option to exchange two noncash assets is based on the relationship between the volatilities of the prices of the assets to be exchanged—their cross-volatility. In a share option with an exercise price payable in cash, the amount of cash to be paid has zero volatility, so only the volatility of the stock needs to be considered in estimating that option's fair value. In contrast, the fair value of a share option to exchange two noncash assets depends on possible movements in the prices of both assets—in this Example, fair value depends on the cross-volatility of a share of the peer group index and a share of Entity T stock. Historical cross-volatility can be computed directly based on measures of Entity T's share price in shares of the peer group index. For example, Entity T's share price was 0.0750 shares at the grant date and 0.0857 (60 ÷ 700) shares at the exercise date. Those share amounts then are used to compute cross-volatility. Cross-volatility also can be computed indirectly based on the respective volatilities of Entity T stock and the peer group index and the correlation between them. The expected cross-volatility between Entity T stock and the peer group index is assumed to be 30 percent.
+718-20-55-57
+In a share option with an exercise price payable in cash, the assumed risk-free interest rate (discount rate) represents the return on the cash that will not be paid until exercise. In this Example, an equivalent share of the index, rather than cash, is what will not be paid until exercise. Therefore, the dividend yield on the peer group index of 1.25 percent is used in place of the risk-free interest rate as an input to the option-pricing model.
+718-20-55-58
+The initial exercise price for the indexed share option is the value of an equivalent share of the peer group index, which is $30 (0.0750 × $400). The fair value of each share option granted is $7.55 based on the following inputs.
+
+Share price,$30
+Exercise price,$30
+Dividend yield,1.00%
+Discount rate,1.25%
+Volatility,30%
+Contractual term,10 years
+Suboptimal exercise factor,1.10
+               
+718-20-55-59
+In this Example, the suboptimal exercise factor is 1.1. In Example 1 (see paragraph 718-20-55-4), the suboptimal exercise factor is 2.0. See paragraph 718-20-55-8 for an explanation of the meaning of a suboptimal exercise factor of 2.0.
+718-20-55-60
+The indexed share options have a three-year explicit service period. The market condition affects the grant-date fair value of the award and its exercisability; however, vesting is based solely on the explicit service period of three years. The at-the-money nature of the award makes the derived service period irrelevant in determining the requisite service period in this Example; therefore, the requisite service period of the award is three years based on the explicit service period. The accrual of compensation cost would be based on the number of options for which the requisite service is rendered or is expected to be rendered depending on an entity's accounting policy in accordance with paragraph 718-10-35-3 (which is not addressed in this Example). That cost would be recognized over the requisite service period as shown in Example 1 (see paragraph 718-20-55-4).
+· > Example 6: Share Unit with Performance and Market Conditions
+718-20-55-61
+This Example illustrates the guidance in paragraphs 718-10-25-20 through 25-21, 718-10-30-27, and 718-10-35-4.
+718-20-55-61A
+This Example (see paragraphs 718-20-55-62 through 55-67) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, both of the following are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, awards with a specified time period for vesting and the recognition of compensation cost based on the achievement of particular performance conditions):
+aThe performance conditions in paragraph 718-20-55-62
+bConcepts about valuation, compensation cost reversal, and total compensation cost that should be recognized (that is, the consideration of whether it is probable that performance conditions will be achieved) in paragraphs 718-20-55-63 and 718-20-55-65 through 55-67.
+Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-61B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-62
+Entity T grants 100,000 share units to each of 10 vice presidents (1 million share units in total) on January 1, 20X5. Each share unit has a contractual term of three years and a vesting condition based on performance. The performance condition is different for each vice president and is based on specified goals to be achieved over three years (an explicit three-year service period). If the specified goals are not achieved at the end of three years, the share units will not vest. Each share unit is convertible into shares of Entity T at contractual maturity as follows:
+aIf Entity T's share price has appreciated by a percentage that exceeds the percentage appreciation of the S&P 500 index by at least 10 percent (that is, the relative percentage increase is at least 10 percent), each share unit converts into 3 shares of Entity T stock.
+bIf the relative percentage increase is less than 10 percent but greater than zero percent, each share unit converts into 2 shares of Entity T stock.
+cIf the relative percentage increase is less than or equal to zero percent, each share unit converts into 1 share of Entity T stock.
+dIf Entity T's share price has depreciated, each share unit converts into zero shares of Entity T stock.
+718-20-55-63
+Appreciation or depreciation for Entity T's share price and the S&P 500 index is measured from the grant date.
+718-20-55-64
+This market condition affects the ability to retain the award because the conversion ratio could be zero; however, vesting is based solely on the explicit service period of three years, which is equal to the contractual maturity of the award. That set of circumstances makes the derived service period irrelevant in determining the requisite service period; therefore, the requisite service period of the award is three years based on the explicit service period.
+718-20-55-65
+The share units' conversion feature is based on a variable target stock price (that is, the target stock price varies based on the S&P 500 index); hence, it is a market condition. That market condition affects the fair value of the share units that vest. Each vice president's share units vest only if the individual's performance condition is achieved; consequently, this award is accounted for as an award with a performance condition (see paragraphs 718-10-55-60 through 55-63). This Example assumes that all share units become fully vested; however, if the share units do not vest because the performance conditions are not achieved, Entity T would reverse any previously recognized compensation cost associated with the nonvested share units.
+718-20-55-66
+The grant-date fair value of each share unit is assumed for purposes of this Example to be $36. Certain option-pricing models, including Monte Carlo simulation techniques, have been adapted to value path-dependent options and other complex instruments. In this case, the entity concludes that a Monte Carlo simulation technique provides a reasonable estimate of fair value. Each simulation represents a potential outcome, which determines whether a share unit would convert into three, two, one, or zero shares of stock. For simplicity, this Example assumes that no forfeitures will occur during the vesting period. The grant-date fair value of the award is $36 million (1 million × $36); management of Entity T expects that all share units will vest because the performance conditions are probable of achievement. Entity T recognizes compensation cost of $12 million ($36 million ÷ 3) in each year of the 3-year service period; the following journal entries are recognized by Entity T in 20X5, 20X6, and 20X7.
+
+Compensation cost (debit),12000000
+Additional paid-in capital (credit),12000000
+           
+To recognize compensation cost.
+
+Deferred tax asset (debit),4200000
+Deferred tax benefit (credit),4200000
+                      
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($12,000,000 ×.35 = $4,200,000).
+718-20-55-67
+Upon contractual maturity of the share units, four outcomes are possible; however, because all possible outcomes of the market condition were incorporated into the share units' grant-date fair value, no other entry related to compensation cost is necessary to account for the actual outcome of the market condition. However, if the share units' conversion ratio was based on achieving a performance condition rather than on satisfying a market condition, compensation cost would be adjusted according to the actual outcome of the performance condition (see Example 4 [paragraph 718-20-55-47]).
+· > Example 7: Share Option with Exercise Price That Increases by a Fixed Amount or Fixed Percentage
+718-20-55-68
+This Example illustrates the guidance in paragraph 718-10-30-15.
+718-20-55-68A
+This Example (see paragraphs 718-20-55-69 through 55-70) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, the concepts about valuation in paragraphs 718-20-55-69 through 55-70 are equally applicable to nonemployee awards with the same features as the awards in this Example (that is, awards with exercise prices that increase by a fixed amount or fixed percentage). Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-68B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-69
+Some entities grant share options with exercise prices that increase by a fixed amount or a constant percentage periodically. For example, the exercise price of the share options in Example 1 (see paragraph 718-20-55-4) might increase by a fixed amount of $2.50 per year. Lattice models and other valuation techniques can be adapted to accommodate exercise prices that change over time by a fixed amount. Such an arrangement has a market condition and may have a derived service period.
+718-20-55-70
+Share options with exercise prices that increase by a constant percentage also can be valued using an option-pricing model that accommodates changes in exercise prices. Alternatively, those share options can be valued by deducting from the discount rate the annual percentage increase in the exercise price. That method works because a decrease in the risk-free interest rate and an increase in the exercise price have a similar effect—both reduce the share option value. For example, the exercise price of the share options in Example 1 (see paragraph 718-20-55-4) might increase at the rate of 1 percent annually. For that example, Entity T's share options would be valued based on a risk-free interest rate less 1 percent. Holding all other assumptions constant from that Example, the value of each share option granted by Entity T would be $14.34.
+· > Example 8: Employee Share Award Granted by a Nonpublic Entity
+718-20-55-71
+The Example illustrates the guidance in paragraphs 718-10-30-17 through 30-19 and 718-740-25-2 through 25-4 for employee awards. The accounting demonstrated in this Example also would be applicable to a public entity that grants share awards to its employees. The same measurement method and basis is used for both nonvested share awards and restricted share awards (which are a subset of nonvested share awards).
+718-20-55-72
+On January 1, 20X6, Entity W, a nonpublic entity, grants 100 shares of stock to each of its 100 employees. The shares cliff vest at the end of three years. Entity W estimates that the grant-date fair value of 1 share of stock is $7. The grant-date fair value of the share award is $70,000 (100 × 100 × $7). The fair value of shares, which is equal to their intrinsic value, is not subsequently remeasured. For simplicity, the example assumes that no forfeitures occur during the vesting period. Because the requisite service period is 3 years, Entity W recognizes $23,333 ($70,000 ÷ 3) of compensation cost for each annual period as follows.
+
+Description,Amount
+Compensation cost (debit),23333
+Additional paid-in capital (credit),23333
+            
+To recognize compensation cost.
+
+Description,Amount
+Deferred tax asset (debit),8167
+Deferred tax benefit (credit),8167
+
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($23,333 ×.35 = $8,167).
+718-20-55-73
+After three years, all shares are vested. For simplicity, this Example assumes that no employees made an Internal Revenue Service (IRS) Code §83(b) election and Entity W has already recognized its income tax expense for the year in which the shares become vested without regard to the effects of the share award. (IRS Code §83(b) permits an employee to elect either the grant date or the vesting date for measuring the fair market value of an award of shares.)
+718-20-55-74
+The fair value per share on the vesting date, assumed to be $20, is deductible for tax purposes. Paragraph 718-740-35-2 requires that the tax effect be recognized as income tax expense or benefit in the income statement for the difference between the deduction for an award for tax purposes and the cumulative compensation cost of that award recognized for financial reporting purposes. With the share price at $20 on the vesting date, the deductible amount is $200,000 (10,000 × $20), and the tax benefit is $70,000 ($200,000 ×.35).
+718-20-55-75
+At vesting the journal entries would be as follows.
+
+Description,Amount
+Deferred tax expense (debit),24500
+Deferred tax asset (credit),24500
+             
+To write off deferred tax asset related to deductible share award at vesting ($70,000 ×.35 = $24,500).
+  
+Description,Amount
+Current taxes payable (debit),70000
+Current tax expense (credit),70000
+                    
+To adjust current tax expense and current taxes payable to recognize the current tax benefit from deductible compensation cost upon vesting of share award.
+· > Example 9: Share Award Granted by a Nonpublic Entity That Uses the Calculated Value Method
+718-20-55-76
+This Example illustrates the guidance in paragraphs 718-10-30-19A through 30-20.
+718-20-55-76A
+This Example (see paragraphs 718-20-55-77 through 55-83) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, an entity should substitute the historical volatility of an appropriate industry sector index for expected volatility in accordance with paragraph 718-10-30-20 when measuring the grant-date fair value of nonemployee awards with similar facts and circumstances (that is, an entity has determined that it is not practicable for it to estimate the expected volatility of its share price), as illustrated in paragraphs 718-20-55-77 through 55-80. Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-76B
+Compensation cost attribution for awards to nonemployees may be the same as or different from that which is illustrated in paragraph 718-20-55-81 for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-77
+On January 1, 20X6, Entity W, a small nonpublic entity that develops, manufactures, and distributes medical equipment, grants 100 share options to each of its 100 employees. The share price at the grant date is $7. The options are granted at-the-money, cliff vest at the end of 3 years, and have a 10-year contractual term. Entity W estimates the expected term of the share options granted as 5 years and the risk-free rate as 3.75 percent. For simplicity, this Example assumes that no forfeitures occur during the vesting period and that no dividends are expected to be paid in the future, and this Example does not reflect the accounting for income tax consequences of the awards.
+718-20-55-78
+Entity W does not maintain an internal market for its shares, which are rarely traded privately. It has not issued any new equity or convertible debt instruments for several years and has been unable to identify any similar entities that are public. Entity W has determined that it is not practicable for it to estimate the expected volatility of its share price and, therefore, it is not possible for it to reasonably estimate the grant-date fair value of the share options. Accordingly, Entity W is required to apply the provisions of paragraph 718-10-30-20 in accounting for the share options under the calculated value method.
+718-20-55-79
+Entity W operates exclusively in the medical equipment industry. It visits the Dow Jones Indexes website and, using the Industry Classification Benchmark, reviews the various industry sector components of the Dow Jones U.S. Total Market Index. It identifies the medical equipment subsector, within the health care equipment and services sector, as the most appropriate industry sector in relation to its operations. It reviews the current components of the medical equipment index and notes that, based on the most recent assessment of its share price and its issued share capital, in terms of size it would rank among entities in the index with a small market capitalization (or small-cap entities). Entity W selects the small-cap version of the medical equipment index as an appropriate industry sector index because it considers that index to be representative of its size and the industry sector in which it operates. Entity W obtains the historical daily closing total return values of the selected index for the five years immediately before January 1, 20X6, from the Dow Jones Indexes website. It calculates the annualized historical volatility of those values to be 24 percent, based on 252 trading days per year.
+718-20-55-80
+Entity W uses the inputs that it has determined above in a Black-Scholes-Merton option-pricing formula, which produces a value of $2.05 per share option. This results in total compensation cost of $20,500 (10,000 × $2.05) to be accounted for over the requisite service period of 3 years.
+718-20-55-81
+For each of the 3 years ending December 31, 20X6, 20X7, and 20X8, Entity W will recognize compensation cost of $6,833 ($20,500 ÷ 3). The journal entry for each year is as follows.
+
+Description,Amount
+Compensation cost (debit),6833
+Additional paid-in capital (credit),6833
+                  
+To recognize compensation cost.
+718-20-55-82
+The share option award granted by a nonpublic entity that used the calculated value method is as follows.
+
+Year,Value of Award,Pretax Cost for Year,Cumulative Pretax Cost
+20X6,"$20500 (10000 x $2.05)","$6833 ($20500 + 3)",$6833
+20X7,"$20500 (10000 x $2.05)","$6834 ($20500 x 2/3 - $6833)",$13667
+20X8,"$20500 (10000 x $2.05)","$6833 ($20500 - 13667)",$20500
+
+718-20-55-83
+Assuming that all 10,000 share options are exercised on the same day in 20Y2, the accounting for the option exercise will follow the same pattern as in Example 1, Case A (see paragraph 718-20-55-10) and will result in the following journal entry.
+At exercise the journal entry is as follows.
+
+Description,Amount
+Cash (10000 x $7) (debit),70000
+Additional paid-in capital (debit),20500
+Common stock (credit),90500
+                      
+To recognize the issuance of shares upon exercise of options and to reclassify previously recognized paid-in capital.
+· > Example 10: Share Award with a Clawback Feature
+718-20-55-84
+This Example illustrates the guidance in paragraph 718-20-35-2.
+718-20-55-84A
+This Example (see paragraphs 718-20-55-85 through 55-86) describes employee awards. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, the accounting for a contingent feature (such as a clawback) of an award that might cause a grantee to return to the entity either equity instruments earned or realized gains from the sale of the equity instruments earned is equally applicable to nonemployee awards with the same feature as the awards in this Example (that is, the clawback feature). Therefore, the guidance in this Example also serves as implementation guidance for similar nonemployee awards.
+718-20-55-84B
+Compensation cost attribution for awards to nonemployees may be the same or different for employee awards. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-85
+On January 1, 20X5, Entity T grants its chief executive officer an award of 100,000 shares of stock that vest upon the completion of 5 years of service. The market price of Entity T's stock is $30 per share on that date. The grant-date fair value of the award is $3,000,000 (100,000 × $30). The shares become freely transferable upon vesting; however, the award provisions specify that, in the event of the employee's termination and subsequent employment by a direct competitor (as defined by the award) within three years after vesting, the shares or their cash equivalent on the date of employment by the direct competitor must be returned to Entity T for no consideration (a clawback feature). The chief executive officer completes five years of service and vests in the award. Approximately two years after vesting in the share award, the chief executive officer terminates employment and is hired as an employee of a direct competitor. Paragraph 718-10-55-8 states that contingent features requiring an employee to transfer equity shares earned or realized gains from the sale of equity instruments earned as a result of share-based payment arrangements to the issuing entity for consideration that is less than fair value on the date of transfer (including no consideration) are not considered in estimating the fair value of an equity instrument on the date it is granted. Those features are accounted for if and when the contingent event occurs by recognizing the consideration received in the corresponding balance sheet account and a credit in the income statement equal to the lesser of the recognized compensation cost of the share-based payment arrangement that contains the contingent feature ($3,000,000) and the fair value of the consideration received. This guidance does not apply to cancellations of awards of equity instruments as discussed in paragraphs 718-20-35-7 through 35-9. The former chief executive officer returns 100,000 shares of Entity T's common stock with a total market value of $4,500,000 as a result of the award's provisions. The following journal entry accounts for that event.
+
+Description,Amount
+Treasury stock (debit),4500000
+Additional paid-in capital (credit),1500000
+Other income (credit),3000000
+                      
+To recognize the receipt of consideration as a result of the clawback feature.
+718-20-55-86
+If instead of delivering shares to Entity T, the former chief executive officer had paid cash equal to the total market value of 100,000 shares of Entity T's common stock, the following journal entry would have been recorded.
+
+Description,Amount
+Cash (debit),4500000
+Additional paid-in capital (credit),1500000
+Other income (credit),3000000
+                  
+To recognize the receipt of consideration as a result of the clawback feature.
+· > Example 11: Certain Noncompete Agreements and Requisite Service for Employee Awards
+718-20-55-87
+Paragraphs 718-10-25-3 through 25-4 require that the accounting for all share-based payment transactions with employees or others reflect the rights conveyed to the holder of the instruments and the obligations imposed on the issuer of the instruments, regardless of how those transactions are structured. Some share-based compensation arrangements with employees may contain noncompete provisions. Those noncompete provisions may be in-substance service conditions because of their nature. Determining whether a noncompete provision or another type of provision represents an in-substance service condition is a matter of judgment based on relevant facts and circumstances. This Example illustrates a situation in which a noncompete provision represents an in-substance service condition.
+718-20-55-88
+Entity K is a professional services firm in which retention of qualified employees is important in sustaining its operations. Entity K's industry expertise and relationship networks are inextricably linked to its employees; if its employees terminate their employment relationship and work for a competitor, the entity's operations may be adversely impacted.
+718-20-55-89
+As part of its compensation structure, Entity K grants 100,000 restricted share units to an employee on January 1, 20X6. The fair value of the restricted share units represents approximately four times the expected future annual total compensation of the employee. The restricted share units are fully vested as of the date of grant, and retention of the restricted share units is not contingent on future service to Entity K. However, the units are transferred to the employee based on a 4-year delayed-transfer schedule (25,000 restricted share units to be transferred beginning on December 31, 20X6, and on December 31 in each of the 3 succeeding years) if and only if specified noncompete conditions are satisfied. The restricted share units are convertible into unrestricted shares any time after transfer.
+718-20-55-90
+The noncompete provisions require that no work in any capacity may be performed for a competitor (which would include any new competitor formed by the employee). Those noncompete provisions lapse with respect to the restricted share units as they are transferred. If the noncompete provisions are not satisfied, the employee loses all rights to any restricted share units not yet transferred. Additionally, the noncompete provisions stipulate that Entity K may seek other available legal remedies, including damages from the employee. Entity K has determined that the noncompete is legally enforceable and has legally enforced similar arrangements in the past.
+718-20-55-91
+The nature of the noncompete provision (being the corollary condition of active employment), the provision's legal enforceability, the employer's intent to enforce and past practice of enforcement, the delayed-transfer schedule mirroring the lapse of noncompete provisions, the magnitude of the award's fair value in relation to the employee's expected future annual total compensation, and the severity of the provision limiting the employee's ability to work in the industry in any capacity are facts that provide a preponderance of evidence suggesting that the arrangement is designed to compensate the employee for future service in spite of the employee's ability to terminate the employment relationship during the service period and retain the award (assuming satisfaction of the noncompete provision). Consequently, Entity K would recognize compensation cost related to the restricted share units over the four-year substantive service period.
+718-20-55-92
+Example 10 (see paragraph 718-20-55-84) provides an illustration of another noncompete agreement. That Example and this one are similar in that both noncompete agreements are not contingent upon employment termination (that is, both agreements may activate and lapse during a period of active employment after the vesting date). A key difference between the two Examples is that the award recipient in that Example must provide five years of service to vest in the award (as opposed to vesting immediately). Another key difference is that the award recipient in that Example receives the shares upon vesting and may sell them immediately without restriction as opposed to the restricted share units, which are transferred according to the delayed-transfer schedule. In that Example, the noncompete provision is not deemed to be an in-substance service condition. In making a determination about whether a noncompete provision may represent an in-substance service condition, the provision's legal enforceability, the entity's intent to enforce the provision and its past practice of enforcement, the employee's rights to the instruments such as the right to sell them, the severity of the provision, the fair value of the award, and the existence or absence of an explicit employee service condition are all factors that shall be considered. Because noncompete provisions can be structured differently, one or more of those factors (such as the entity's intent to enforce the provision) may be more important than others in making that determination. For example, if Entity K did not intend to enforce the provision, then the noncompete provision would not represent an in-substance service condition.
+· > Example 12: Modifications and Settlements
+718-20-55-93
+The following Cases illustrate the accounting for modifications of the terms of an award (see paragraphs 718-20-35-3 through 35-4) and are based on Example 1, Case A (see paragraph 718-20-55-10), in which Entity T granted its employees 900,000 share options with an exercise price of $30 on January 1, 20X5:
+aModification of vested share options (Case A)
+bShare settlement of vested share options (Case B)
+cModification of nonvested share options (Case C)
+dCash settlement of nonvested share options (Case D).
+718-20-55-93A
+Cases A through D (see paragraphs 718-20-55-94 through 55-102) describe employee awards. Specifically, each case is an extension of Case A in Example 1. However, the principles on how to account for the various aspects of employee awards, except for the compensation cost attribution and certain inputs to valuation, are the same for nonemployee awards. Consequently, the methodology for determining the additional compensation cost that an entity should recognize upon modification or settlement in paragraphs 718-20-55-94 through 55-102 is equally applicable to nonemployee awards with the same features as the awards in Cases A through D (that is, awards with a specified period of time for vesting). Therefore, the guidance in those paragraphs may serve as implementation guidance for similar nonemployee awards.
+718-20-55-93B
+All aspects of Case A (see paragraph 718-20-55-94) and Case B (see paragraph 718-20-55-97) that illustrate a modification and share settlement of vested share options, respectively, including the immediate recognition of any additional compensation cost, should be the same for both employee awards and nonemployee awards.
+718-20-55-93C
+The compensation cost attribution for awards to nonemployees may be the same or different for employee awards in Case C (see paragraph 718-20-55-98), which illustrates the modification of a nonvested share option. That is because an entity is required to recognize compensation cost for nonemployee awards in the same manner as if the entity had paid cash in accordance with paragraph 718-10-25-2C.
+718-20-55-93D
+All aspects of Case D (see paragraph 718-20-55-102), which illustrates a cash settlement of a nonvested share option, including the immediate recognition of any additional compensation cost, should be the same for both employee awards and nonemployee awards. That is because the cash settlement of a nonvested share option effectively vests the share option.
+· · > Case A: Modification of Vested Share Options
+718-20-55-94
+On January 1, 20X9, after the share options have vested, the market price of Entity T stock has declined to $20 per share, and Entity T decides to reduce the exercise price of the outstanding share options to $20. In effect, Entity T issues new share options with an exercise price of $20 and a contractual term equal to the remaining contractual term of the original January 1, 20X5, share options, which is 6 years, in exchange for the original vested share options. Entity T incurs additional compensation cost for the excess of the fair value of the modified share options issued over the fair value of the original share options at the date of the exchange, measured as shown in the following paragraph. A nonpublic entity using the calculated value would compare the calculated value of the original award immediately before the modification with the calculated value of the modified award unless an entity has ceased to use the calculated value, in which case it would follow the guidance in paragraph 718-20-35-3(a) through (b) (calculating the effect of the modification based on the fair value). The modified share options are immediately vested, and the additional compensation cost is recognized in the period the modification occurs.
+718-20-55-95
+The January 1, 20X9, fair value of the modified award is $7.14. To determine the amount of additional compensation cost arising from the modification, the fair value of the original vested share options assumed to be repurchased is computed immediately before the modification. The resulting fair value at January 1, 20X9, of the original share options is $3.67 per share option, based on their remaining contractual term of 6 years, suboptimal exercise factor of 2, $20 current share price, $30 exercise price, risk-free interest rates of 1.5 percent to 3.4 percent, expected volatility of 35 percent to 50 percent and a 1.0 percent expected dividend yield. The additional compensation cost stemming from the modification is $3.47 per share option, determined as follows.
+
+Fair value of modified share option at January 1, 20X9: $7.14
+Less: Fair value of original share option at January 1, 20X9: $3.67
+Additional compensation cost to be recognized: $3.47
+                        
+718-20-55-96
+Compensation cost already recognized during the vesting period of the original award is $10,981,157 for 747,526 vested share options (see paragraphs 718-20-55-14 through 55-17). For simplicity, it is assumed that no share options were exercised before the modification. Previously recognized compensation cost is not adjusted. Additional compensation cost of $2,593,915 (747,526 vested share options × $3.47) is recognized on January 1, 20X9, because the modified share options are fully vested; any income tax effects from the additional compensation cost are recognized accordingly.
+· · > Case B: Share Settlement of Vested Share Options
+718-20-55-97
+Rather than modify the option terms, Entity T offers to settle the original January 1, 20X5, share options for fully vested equity shares at January 1, 20X9. The fair value of each share option is estimated the same way as shown in Case A, resulting in a fair value of $3.67 per share option. Entity T recognizes the settlement as the repurchase of an outstanding equity instrument, and no additional compensation cost is recognized at the date of settlement unless the payment in fully vested equity shares exceeds $3.67 per share option. Previously recognized compensation cost for the fair value of the original share options is not adjusted.
+· · > Case C: Modification of Nonvested Share Options
+718-20-55-98
+On January 1, 20X6, 1 year into the 3-year vesting period, the market price of Entity T stock has declined to $20 per share, and Entity T decides to reduce the exercise price of the share options to $20. The three-year cliff-vesting requirement is not changed. In effect, in exchange for the original nonvested share options, Entity T grants new share options with an exercise price of $20 and a contractual term equal to the 9-year remaining contractual term of the original share options granted on January 1, 20X5. Entity T incurs additional compensation cost for the excess of the fair value of the modified share options issued over the fair value of the original share options at the date of the exchange determined in the manner described in paragraphs 718-20-55-95 through 55-96. Entity T adds that additional compensation cost to the remaining unrecognized compensation cost for the original share options at the date of modification and recognizes the total amount ratably over the remaining two years of the three-year vesting period. Because the original vesting provision is not changed, the modification has an explicit service period of two years, which represents the requisite service period as well. Thus, incremental compensation cost resulting from the modification would be recognized ratably over the remaining two years rather than in some other pattern.
+718-20-55-99
+The January 1, 20X6, fair value of the modified award is $8.59 per share option, based on its contractual term of 9 years, suboptimal exercise factor of 2, $20 current share price, $20 exercise price, risk-free interest rates of 1.5 percent to 4.0 percent, expected volatilities of 35 percent to 55 percent, and a 1.0 percent expected dividend yield. The fair value of the original award immediately before the modification is $5.36 per share option, based on its remaining contractual term of 9 years, suboptimal exercise factor of 2, $20 current share price, $30 exercise price, risk-free interest rates of 1.5 percent to 4.0 percent, expected volatilities of 35 percent to 55 percent, and a 1.0 percent expected dividend yield. Thus, the additional compensation cost stemming from the modification is $3.23 per share option, determined as follows.
+
+Fair value of modified share option at January 1, 20X6: $8.59
+Less: Fair value of original share option at January 1, 20X6: $5.36
+Incremental value of modified share option at January 1, 20X6: $3.23
+
+718-20-55-100
+On January 1, 20X6, the remaining balance of unrecognized compensation cost for the original share options is $9.79 per share option. Using a value of $14.69 for the original option as noted in paragraph 718-20-55-9 results in recognition of $4.90 ($14.69 ÷ 3) per year. The unrecognized balance at January 1, 20X6, is $9.79 ($14.69 - $4.90) per option. The total compensation cost for each modified share option that is expected to vest is $13.02, determined as follows.
+
+Incremental value of modified share option: $ 3.23
+Unrecognized compensation cost for original share option: $9.79
+Total compensation cost to be recognized: $13.02
+                        
+718-20-55-101
+That amount is recognized during 20X6 and 20X7, the two remaining years of the requisite service period.
+· · > Case D: Cash Settlement of Nonvested Share Options
+718-20-55-102
+Rather than modify the share option terms, Entity T offers on January 1, 20X6, to settle the original January 1, 20X5, grant of share options for cash. Because the share price decreased from $30 at the grant date to $20 at the date of settlement, the fair value of each share option is $5.36, the same as in Case C. If Entity T pays $5.36 per share option, it would recognize that cash settlement as the repurchase of an outstanding equity instrument and no incremental compensation cost would be recognized. However, the cash settlement of the share options effectively vests them. Therefore, the remaining unrecognized compensation cost of $9.79 per share option would be recognized at the date of settlement.
+· > Example 13: Modifications Due to an Equity Restructuring
+718-20-55-103
+As a reminder, exchanges of share options or other equity instruments or changes to their terms in conjunction with an equity restructuring are considered modifications for purposes of this Topic. The following Cases illustrate the guidance in paragraph 718-20-35-6:
+aOriginal award contains antidilution provisions (Case A).
+bOriginal award does not contain antidilution provisions (Case B).
+cOriginal award does not contain an antidilution provision but is modified on the date of equity restructuring (Case C).
+· · > Case A: Original Award Contains Antidilution Provisions
+718-20-55-104
+In this Case, assume an award contains antidilution provisions. On May 1 there is an announcement of a future equity restructuring. On October 12 the equity restructuring occurs and the terms of the award are modified in accordance with the antidilution provisions. In this Case, the modification occurs on October 12 when the terms of the award are changed. The fair value of the award is compared pre- and postmodification on October 12. The calculation of fair value is necessary to determine whether there is any incremental value transferred as a result of the modification, and if so, that incremental value would be recognized as additional compensation cost. If there is no change in fair value, vesting conditions, or the classification of the award, the entity would not account for the effect of the modification (see paragraph 718-20-35-2A).
+· · > Case B: Original Award Does Not Contain Antidilution Provisions
+718-20-55-105
+In this Case, the original award does not contain antidilution provisions. On May 1 there is an announcement of a future equity restructuring. On July 26 the terms of an award are modified to add antidilution provisions in contemplation of an equity restructuring. On September 30 the equity restructuring occurs. In this Case, there are two modifications to account for. The first modification occurs on July 26, when the terms of the award are changed to add antidilution provisions. There must be a comparison of the fair value of the award pre- and postmodification on July 26 in accordance with paragraph 718-20-35-2A to determine whether the entity should account for the effects of the modifications as described in paragraphs 718-20-35-3 through 35-9. The premodification fair value on July 26 is based on the award without antidilution provisions taking into account the effect of the contemplated restructuring on its value. The postmodification fair value is based on an award with antidilution provisions, taking into account the effect of the contemplated restructuring on its value. Any incremental value transferred would be recognized as additional compensation cost. Once the equity restructuring occurs, there is a second modification event on September 30 when the terms of the award are changed in accordance with the antidilution provisions. A second comparison of pre- and postmodification fair values is then required to determine whether the fair value of the award has changed as a result of the modification. If there is no change in fair value, vesting conditions, or the classification of the award, the entity would not account for the effect of the modification on September 30 (see paragraph 718-20-35-2A). Changes to the terms of an award in accordance with its antidilution provisions typically would not result in additional compensation cost if the antidilution provisions were properly structured. If there is a change in fair value, vesting conditions, or the classification of the award, the incremental value transferred, if any, would be recognized as additional compensation cost.
+· · > Case C: Original Award Does Not Contain an Antidilution Provision but Is Modified on the Date of Equity Restructuring
+718-20-55-106
+Assume the same facts as in Case B except the terms of the awards are modified on the date of the equity restructuring, September 30. In contrast to Case B in which there are two separate modifications, there is one modification that occurs on September 30 and the fair value is compared pre- and postmodification to determine whether any incremental value is transferred as a result of the modification. Any incremental value transferred would be recognized as additional compensation cost.
+· > Example 14: Modifications of Awards with Performance and Service Vesting Conditions
+718-20-55-107
+Paragraphs 718-10-55-60 through 55-63 note that awards may vest based on service conditions, performance conditions, or a combination of the two. Modifications of market conditions that affect exercisability or the ability to retain the award are not addressed by this Example. A modification of vesting conditions is accounted for based on the principles in paragraph 718-20-35-3; that is, total recognized compensation cost for an equity award that is modified shall at least equal the fair value of the award at the grant date unless, at the date of the modification, the performance or service conditions of the original award are not expected to be satisfied. If awards are expected to vest under the original vesting conditions at the date of the modification, an entity shall recognize compensation cost if either of the following criteria is met:
+aThe awards ultimately vest under the modified vesting conditions
+bThe awards ultimately would have vested under the original vesting conditions.
+718-20-55-108
+In contrast, if at the date of modification awards are not expected to vest under the original vesting conditions, an entity should recognize compensation cost only if the awards vest under the modified vesting conditions. Said differently, if the entity believes that the original performance or service vesting condition is not probable of achievement at the date of the modification, the cumulative compensation cost related to the modified award, assuming vesting occurs under the modified performance or service vesting condition, is the modified award's fair value at the date of the modification. The following Cases illustrate the application of those requirements:
+aType I probable to probable modification (Case A)
+bType II probable to improbable modification (Case B)
+cType III improbable to probable modification (Case C)
+dType IV improbable to improbable modification (Case D).
+718-20-55-109
+Cases A through D are all based on the same scenario: Entity T grants 1,000 share options to each of 10 employees in the sales department. The share options have the same terms and conditions as those described in Example 1 (see paragraph 718-20-55-4), except that the share options specify that vesting is conditional upon selling 150,000 units of product A (the original sales target) over the 3-year explicit service period. The grant-date fair value of each option is $14.69 (see paragraph 718-20-55-9). For simplicity, this Example assumes that no forfeitures will occur from employee termination; forfeitures will only occur if the sales target is not achieved. Example 15 (see paragraph 718-20-55-120) provides an additional illustration of a Type III modification.
+718-20-55-109A
+Cases A through D (see paragraphs 718-20-55-111 through 55-119) describe employee awards because the Cases use the terms and conditions of the employee awards presented as part of Example 1 of this Subtopic (see paragraph 718-20-55-4). However, the principles about determining the cumulative amount of compensation cost that an entity should recognize because of a modification to an employee award provided in Cases A through D are the same for nonemployee awards that are modified. Consequently, the guidance in paragraphs 718-20-55-111 through 55-119 should be applied to determine the cumulative amount of compensation cost that an entity should recognize because of a modification to a nonemployee award.
+718-20-55-109B
+Any additional compensation cost should be recognized by applying the guidance in paragraph 718-10-25-2C. That is, an asset or expense must be recognized (or previous recognition reversed) in the same period(s) and in the same manner as if the grantor had paid cash for the goods or services instead of paying with or using the share-based payment awards. Additionally, valuation amounts used in the Cases could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-110
+Cases A through D assume that the options are out-of-the-money when modified; however, that fact is not determinative in the illustrations (that is, options could be in- or out-of-the-money).
+· · > Case A: Type I Probable to Probable Modification
+718-20-55-111
+Based on historical sales patterns and expectations related to the future, management of Entity T believes at the grant date that it is probable that the sales target will be achieved. On January 1, 20X7, 102,000 units of Product A have been sold. During December 20X6, one of Entity T's competitors declared bankruptcy after a fire destroyed a factory and warehouse containing the competitor's inventory. To push the salespeople to take advantage of that situation, the award is modified on January 1, 20X7, to raise the sales target to 154,000 units of Product A (the modified sales target). Notwithstanding the nature of the modification's probability of occurrence, the objective of this Case is to demonstrate the accounting for a Type I modification. Additionally, as of January 1, 20X7, the options are out-of-the-money because of a general stock market decline. No other terms or conditions of the original award are modified, and management of Entity T continues to believe that it is probable that the modified sales target will be achieved. Immediately before the modification, total compensation cost expected to be recognized over the 3-year vesting period is $146,900 or $14.69 multiplied by the number of share options expected to vest (10,000). Because no other terms or conditions of the award were modified, the modification does not affect the per-share-option fair value (assumed to be $8 in this Case at the date of the modification). Moreover, because the modification does not affect the number of share options expected to vest, no incremental compensation cost is associated with the modification.
+718-20-55-112
+This paragraph illustrates the cumulative compensation cost Entity T should recognize for the modified award based on three potential outcomes:
+aOutcome 1—achievement of the modified sales target. In Outcome 1, all 10,000 share options vest because the salespeople sold at least 154,000 units of Product A. In that outcome, Entity T would recognize cumulative compensation cost of $146,900.
+bOutcome 2—achievement of the original sales target. In Outcome 2, no share options vest because the salespeople sold more than 150,000 units of Product A but less than 154,000 units (the modified sales target is not achieved). In that outcome, Entity T would recognize cumulative compensation cost of $146,900 because the share options would have vested under the original terms and conditions of the award.
+cOutcome 3—failure to achieve either sales target. In Outcome 3, no share options vest because the modified sales target is not achieved; additionally, no share options would have vested under the original terms and conditions of the award. In that case, Entity T would recognize cumulative compensation cost of $0.
+· · > Case B: Type II Probable to Improbable Modification
+718-20-55-113
+It is generally believed that Type II modifications will be rare; therefore, this illustration has been provided for the sake of completeness. Based on historical sales patterns and expectations related to the future, management of Entity T believes that at the grant date, it is probable that the sales target (150,000 units of product A) will be achieved. At January 1, 20X7, 102,000 units of product A have been sold and the options are out-of-the-money because of a general stock market decline. Entity T's management implements a cash bonus program based on achieving an annual sales target for 20X7. The options are neither cancelled nor settled as a result of the cash bonus program. The cash bonus program would be accounted for using the same accounting as for other cash bonus arrangements. Concurrently, the sales target for the option awards is revised to 170,000 units of Product A. No other terms or conditions of the original award are modified. Management believes that the modified sales target is not probable of achievement; however, they continue to believe that the original sales target is probable of achievement. Immediately before the modification, total compensation cost expected to be recognized over the 3-year vesting period is $146,900 or $14.69 multiplied by the number of share options expected to vest (10,000). Because no other terms or conditions of the award were modified, the modification does not affect the per-share-option fair value (assumed in this Case to be $8 at the modification date). Moreover, because the modification does not affect the number of share options expected to vest under the original vesting provisions, Entity T would determine incremental compensation cost in the following manner.
+
+Fair value of modified share option: $8
+Share options expected to vest under original sales target: 10,000
+Fair value of modified award: $80,000
+Fair value of original share option: $8
+Share options expected to vest under original sales target: 10,000
+Fair value of original award: $80,000
+Incremental compensation cost of modification: $0
+                        
+718-20-55-114
+In determining the fair value of the modified award for this type of modification, an entity shall use the greater of the options expected to vest under the modified vesting condition or the options that previously had been expected to vest under the original vesting condition.
+718-20-55-115
+This paragraph illustrates the cumulative compensation cost Entity T should recognize for the modified award based on three potential outcomes:
+aOutcome 1—achievement of the modified sales target. In Outcome 1, all 10,000 share options vest because the salespeople sold at least 170,000 units of Product A. In that outcome, Entity T would recognize cumulative compensation cost of $146,900.
+bOutcome 2—achievement of the original sales target. In Outcome 2, no share options vest because the salespeople sold more than 150,000 units of Product A but less than 170,000 units (the modified sales target is not achieved). In that outcome, Entity T would recognize cumulative compensation cost of $146,900 because the share options would have vested under the original terms and conditions of the award.
+cOutcome 3—failure to achieve either sales target. In Outcome 3, no share options vest because the modified sales target is not achieved; additionally, no share options would have vested under the original terms and conditions of the award. In that case, Entity T would recognize cumulative compensation cost of $0.
+· · > Case C: Type III Improbable to Probable Modification
+718-20-55-116
+Based on historical sales patterns and expectations related to the future, management of Entity T believes at the grant date that none of the options will vest because it is not probable that the sales target will be achieved. On January 1, 20X7, 80,000 units of Product A have been sold. To further motivate the salespeople, the sales target (150,000 units of Product A) is lowered to 120,000 units of Product A (the modified sales target). No other terms or conditions of the original award are modified. Management believes that the modified sales target is probable of achievement. Immediately before the modification, total compensation cost expected to be recognized over the 3-year vesting period is $0 or $14.69 multiplied by the number of share options expected to vest (zero). Because no other terms or conditions of the award were modified, the modification does not affect the per-share-option fair value (assumed in this Case to be $8 at the modification date). Since the modification affects the number of share options expected to vest under the original vesting provisions, Entity T will determine incremental compensation cost in the following manner.
+
+Fair value of modified share option: $8
+Share options expected to vest under modified sales target: 10,000
+Fair value of modified award: $80,000
+Fair value of original share option: $8
+Share options expected to vest under original sales target: 0
+Fair value of original award: $0
+Incremental compensation cost of modification: $80,000
+                        
+718-20-55-117
+This paragraph illustrates the cumulative compensation cost Entity T should recognize for the modified award based on three potential outcomes:
+aOutcome 1—achievement of the modified sales target. In Outcome 1, all 10,000 share options vest because the salespeople sold at least 120,000 units of Product A. In that outcome, Entity T would recognize cumulative compensation cost of $80,000.
+bOutcome 2—achievement of the original sales target and the modified sales target. In Outcome 2, Entity T would recognize cumulative compensation cost of $80,000 because in a Type III modification the original vesting condition is generally not relevant (that is, the modified award generally vests at a lower threshold of service or performance).
+cOutcome 3—failure to achieve either sales target. In Outcome 3, no share options vest because the modified sales target is not achieved; in that case, Entity T would recognize cumulative compensation cost of $0.
+· · > Case D: Type IV Improbable to Improbable Modification
+718-20-55-118
+Based on historical sales patterns and expectations related to the future, management of Entity T believes that at the grant date it is not probable that the sales target will be achieved. On January 1, 20X7, 80,000 units of Product A have been sold. To further motivate the salespeople, the sales target is lowered to 130,000 units of Product A (the modified sales target). No other terms or conditions of the original award are modified. Entity T lost a major customer for Product A in December 20X6; hence, management continues to believe that the modified sales target is not probable of achievement. Immediately before the modification, total compensation cost expected to be recognized over the 3-year vesting period is $0 or $14.69 multiplied by the number of share options expected to vest (zero). Because no other terms or conditions of the award were modified, the modification does not affect the per-share-option fair value (assumed in this Case to be $8 at the modification date). Furthermore, the modification does not affect the number of share options expected to vest; hence, there is no incremental compensation cost associated with the modification.
+718-20-55-119
+This paragraph illustrates the cumulative compensation cost Entity T should recognize for the modified award based on three potential outcomes:
+aOutcome 1—achievement of the modified sales target. In Outcome 1, all 10,000 share options vest because the salespeople sold at least 130,000 units of Product A. In that outcome, Entity T would recognize cumulative compensation cost of $80,000 (10,000 × $8).
+bOutcome 2—achievement of the original sales target and the modified sales target. In Outcome 2, Entity T would recognize cumulative compensation cost of $80,000 because in a Type IV modification the original vesting condition is generally not relevant (that is, the modified award generally vests at a lower threshold of service or performance).
+cOutcome 3—failure to achieve either sales target. In Outcome 3, no share options vest because the modified sales target is not achieved; in that case, Entity T would recognize cumulative compensation cost of $0.
+· > Example 15: Illustration of a Type III Improbable to Probable Modification
+718-20-55-120
+This Example illustrates the guidance in paragraph 718-20-35-3.
+718-20-55-120A
+This Example (see paragraph 718-20-55-121) describes employee awards. However, the principle provided in paragraph 718-20-55-121 is the same for nonemployee awards that are modified. Consequently, that guidance should be applied to determine the cumulative amount of compensation cost, if any, that an entity should recognize because of a modification to a nonemployee award.
+718-20-55-120B
+Any additional compensation cost should be recognized by applying the guidance in paragraph 718-10-25-2C. That is, an asset or expense must be recognized (or previous recognition reversed) in the same period(s) and in the same manner as if the grantor had paid cash for the goods or services instead of paying with or using the share-based payment awards. Additionally, valuation amounts used in this Example could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based payment transactions.
+718-20-55-121
+On January 1, 20X7, Entity Z issues 1,000 at-the-money options with a 4-year explicit service condition to each of 50 employees that work in Plant J. On December 12, 20X7, Entity Z decides to close Plant J and notifies the 50 Plant J employees that their employment relationship will be terminated effective June 30, 20X8. On June 30, 20X8, Entity Z accelerates vesting of all options. The grant-date fair value of each option is $20 on January 1, 20X7, and $10 on June 30, 20X8, the modification date. At the date Entity Z decides to close Plant J and terminate the employees, the service condition of the original award is not expected to be satisfied because the employees cannot render the requisite service. Because Entity Z's accounting policy is to estimate the number of forfeitures expected to occur in accordance with paragraph 718-10-35-3, any compensation cost recognized before December 12, 20X7, for the original award would be reversed. At the date of the modification, the fair value of the original award, which is $0 ($10 × 0 options expected to vest under the original terms of the award), is subtracted from the fair value of the modified award $500,000 ($10 × 50,000 options expected to vest under the modified award). The total recognized compensation cost of $500,000 will be less than the fair value of the award at the grant date ($1 million) because at the date of the modification, the original vesting conditions were not expected to be satisfied. If Entity Z's accounting policy was to account for forfeitures when they occur in accordance with paragraph 718-10-35-3, then compensation cost recognized before December 12, 20X7, would not be reversed until the award is forfeited. However, Entity Z would be required to assess at the date of the modification whether the performance or service conditions of the original award are expected to be satisfied.
+· > Example 16: Modifications Regarding an Award's Classification
+718-20-55-122
+A modification may affect the classification of an award (for example, change the award from an equity instrument to a liability instrument). If an entity modifies an award in that manner, the Compensation—Stock Compensation Topic requires that the entity account for that modification in accordance with paragraph 718-20-35-3. The following Cases illustrate modifications regarding an award's classification:
+aEquity to liability modification (share-settled share options to cash-settled share options) (Case A)
+bEquity to equity modification (share options to shares) (Case B)
+cLiability to equity modification (cash-settled to share-settled stock appreciation rights) (Case C)
+dLiability to liability modification (cash-settled to cash-settled stock appreciation rights) (Case D)
+eEquity to liability modification (share options to fixed cash payment) (Case E).
+718-20-55-122A
+Cases A through E (see paragraphs 718-20-55-123 through 55-144) describe employee awards. Specifically, Case A (see paragraph 718-20-55-123), Case B (see paragraph 718-20-55-134), and Case E (see paragraph 718-20-55-144) are extensions of Case A in Example 1 of this Subtopic (see paragraph 718-20-55-10), and Cases C and D (see paragraphs 718-20-55-135 and 718-20-55-139, respectively) are extensions of Example 1 in Subtopic 718-30 on awards classified as liabilities (see paragraph 718-30-55-1). However, the principles of determining the additional compensation cost that an entity should recognize upon modification (if any) and the guidance for reclassification of awards from equity to liabilities or vice versa are the same for nonemployee awards with the same features as the awards in Cases A through E (that is, awards with a specified period of time for vesting). Consequently, the guidance provided in Cases A through E should be applied to determine the cumulative amount of compensation cost that an entity should recognize because of a modification (if any) to a nonemployee award. An entity should consider its specific facts and circumstances for the nonemployee awards it has issued when calculating any additional compensation cost resulting from a modification to the awards. For example, the pattern of recognition of previously recognized compensation cost (that is, compensation cost recognized before the modification) may have been different from that which is illustrated in Cases A through E because of the requirements of paragraph 718-10-25-2C.
+718-20-55-122B
+Any additional compensation cost resulting from a modification of a nonemployee award should be recognized in accordance with paragraph 718-10-25-2C. That is, an asset or expense must be recognized (or previous recognition reversed) in the same period(s) and in the same manner as if the grantor had paid cash for the goods or services rather than if the grantor had paid with or used the equity instruments. Additionally, valuation amounts used in the cases could be different because an entity may elect to use the contractual term as the expected term of share options and similar instruments when valuing nonemployee share-based transactions.
+718-20-55-122C
+Cases A through E should serve as guidance for any reclassification entries required because of a modification of a nonemployee award from equity to liability or vice versa.
+· · > Case A: Equity to Liability Modification (Share-Settled Share Options to Cash-Settled Share Options)
+718-20-55-123
+Entity T grants the same share options described in Example 1, Case A (see paragraph 718-20-55-10). As in Example 1, Case A, Entity T has an accounting policy to estimate the number of forfeitures expected to occur in accordance with paragraph 718-10-35-3. The number of options for which the requisite service is expected to be rendered is estimated at the grant date to be 821,406 (900,000 ×.973). For simplicity, this Case assumes that estimated forfeitures equal actual forfeitures. Thus, as shown in the table in paragraph 718-20-55-130, the fair value of the award at January 1, 20X5, is $12,066,454 (821,406 × $14.69), and the compensation cost to be recognized during each year of the 3-year vesting period is $4,022,151 ($12,066,454 ÷ 3). The journal entries for 20X5 are the same as those in paragraph 718-20-55-12.
+718-20-55-124
+On January 1, 20X6, Entity T modifies the share options granted to allow the employee the choice of share settlement or net cash settlement; the options no longer qualify as equity because the holder can require Entity T to settle the options by delivering cash. Because the modification affects no other terms or conditions of the options, the fair value (assumed to be $7 per share option) of the modified award equals the fair value of the original award immediately before its terms are modified on the date of modification; the modification also does not change the number of share options for which the requisite service is expected to be rendered. On the modification date, Entity T recognizes a liability equal to the portion of the award attributed to past service multiplied by the modified award's fair value. To the extent that the liability equals or is less than the amount recognized in equity for the original award, the offsetting debit is a charge to equity. To the extent that the liability exceeds the amount recognized in equity for the original award, the excess is recognized as compensation cost. In this Case, at the modification date, one-third of the award is attributed to past service (one year of service rendered/three-year requisite service period). The modified award's fair value is $5,749,842 (821,406 × $7), and the liability to be recognized at the modification date is $1,916,614 ($5,749,842 ÷ 3). The related journal entry follows.
+
+Description,Amount
+Additional paid-in capital (debit),1916614
+Share-based compensation liability (credit),1916614
+                        
+To recognize the share-based compensation liability.
+718-20-55-125
+No entry would be made to the deferred tax accounts at the modification date. The amount of remaining additional paid-in capital attributable to compensation cost recognized in 20X5 is $2,105,537 ($4,022,151 - $1,916,614).
+718-20-55-126
+Paragraph 718-20-35-3(b) specifies that total recognized compensation cost for an equity award shall at least equal the fair value of the award at the grant date unless at the date of the modification the service or performance conditions of the original award are not expected to be satisfied. In accordance with that principle, Entity T would ultimately recognize cumulative compensation cost equal to the greater of the following:
+aThe grant-date fair value of the original equity award
+bThe fair value of the modified liability award when it is settled.
+718-20-55-127
+To the extent that the recognized fair value of the modified liability award is less than the recognized compensation cost associated with the grant-date fair value of the original equity award, changes in that liability award's fair value through its settlement do not affect the amount of compensation cost recognized. To the extent that the fair value of the modified liability award exceeds the recognized compensation cost associated with the grant-date fair value of the original equity award, changes in the liability award's fair value are recognized as compensation cost.
+718-20-55-128
+At December 31, 20X6, the fair value of the modified award is assumed to be $25 per share option; hence, the modified award's fair value is $20,535,150 (821,406 × $25), and the corresponding liability at that date is $13,690,100 ($20,535,150 × 2/3) because two-thirds of the requisite service period has been rendered. The increase in the fair value of the liability award is $11,773,486 ($13,690,100 - $1,916,614). Before any adjustments for 20X6, the amount of remaining additional paid-in capital attributable to compensation cost recognized in 20X5 is $2,105,537 ($4,022,151 - $1,916,614). The cumulative compensation cost at December 31, 20X6, associated with the grant-date fair value of the original equity award is $8,044,302 ($4,022,151 × 2). Entity T would record the following journal entries for 20X6.
+
+Description,Amount
+Compensation cost (debit),9667949
+Additional paid-in capital (debit),2105537
+Share-based compensation liability (credit),11773486
+                        
+To increase the share-based compensation liability to $13,690,100 and recognize compensation cost of $9,667,949 ($13,690,100 - $4,022,151).
+                        
+To recognize the deferred tax asset for additional compensation cost ($9,667,949 ×.35 = $3,383,782).
+718-20-55-129
+At December 31, 20X7, the fair value is assumed to be $10 per share option; hence, the modified award's fair value is $8,214,060 (821,406 × $10), and the corresponding liability for the fully vested award at that date is $8,214,060. The decrease in the fair value of the liability award is $5,476,040 ($8,214,060 - $13,690,100). The cumulative compensation cost as of December 31, 20X7, associated with the grant-date fair value of the original equity award is $12,066,454 (see paragraph 718-20-55-123). Entity T would record the following journal entries for 20X7.
+
+Description,Amount
+"Share-based compensation liability","$5,476,040"
+"Compensation cost","$1,623,646"
+"Additional paid-in capital","$3,852,394"
+             
+To recognize a share-based compensation liability of $8,214,060, a reduction of compensation cost of $1,623,646 ($13,690,100 - $12,066,454), and additional paid-in capital of $3,852,394 ($12,066,454 - $8,214,060).
+
+Description,Amount
+"Deferred tax expense","$568,276"
+"Deferred tax asset","$568,276"
+                        
+To reduce the deferred tax asset for the reduction in compensation cost ($1,623,646 ×.35 = $568,276).
+718-20-55-130
+The modified liability award is as follows.
+
+Year,Total Value of Award,Pretax Cost for Year,Cumulative Pretax Cost
+20X5,"$12,066,454 (821,406 × $14.69)","$4,022,151 ($12,066,454 ÷ 3)","$4,022,151"
+20X6,"$20,535,150 (821,406 × $25.00)","$9,667,949 [($20,535,150 × 2/3) − $4,022,151]","$13,690,100"
+20X7,"$12,066,454 (821,406 × $14.69)","$(1,623,646) ($12,066,454 − $13,690,100)","$12,066,454"
+
+718-20-55-131
+For simplicity, this Case assumes that all share option holders elected to be paid in cash on the same day, that the liability award's fair value is $10 per option, and that Entity T has already recognized its income tax expense for the year without regard to the effects of the settlement of the award. In other words, current tax expense and current taxes payable were recognized based on income and deductions before consideration of additional deductions from settlement of the award.
+718-20-55-132
+The $8,214,060 in cash paid to the employees on the date of settlement is deductible for tax purposes. In the period of settlement, tax return deductions that are less than compensation cost recognized result in a charge to income tax expense. The tax benefit is $2,874,921 ($8,214,060 ×.35). Because tax return deductions are less than compensation cost recognized, the entity must write off the deferred tax assets recognized in excess of the tax benefit from the exercise of employee stock options to income tax expense in the income statement. The journal entries to reflect settlement of the share options are as follows.
+
+Description,Amount
+"Share-based compensation liability","$8,214,060"
+"Cash ($10 x 821,406)","$8,214,060"
+                        
+To recognize the cash paid to settle share options.
+
+Description,Amount
+"Deferred tax expense","$4,223,259"
+"Deferred tax asset","$4,223,259"
+                        
+To write off deferred tax asset related to compensation cost ($12,066,454 ×.35 = $4,223,259).
+
+Description,Amount
+"Current taxes payable","$2,874,921"
+"Current tax expense","$2,874,921"
+                        
+To adjust current tax expense and current taxes payable for the tax benefit from deductible compensation cost upon settlement of share options.
+718-20-55-133
+If instead of requesting cash, employees had held their share options and those options had expired worthless, the share-based compensation liability account would have been eliminated over time with a corresponding increase to additional paid-in capital. Previously recognized compensation cost would not be reversed. Similar to the adjustment for the actual tax deduction described in paragraph 718-20-55-132, all of the deferred tax asset of $4,223,259 would be charged to income tax expense when the share options expire.
+· · > Case B: Equity to Equity Modification (Share Options to Shares)
+718-20-55-134
+Equity to equity modifications also are addressed in Examples 12 (see paragraph 718-20-55-93) and 14 (see paragraph 718-20-55-107). This Case is based on Example 1, Case A (see paragraph 718-20-55-10), in which Entity T granted its employees 900,000 options with an exercise price of $30 on January 1, 20X5. At January 1, 20X9, after 747,526 share options have vested, the market price of Entity T stock has declined to $8 per share, and Entity T offers to exchange 4 options with an assumed per-share-option fair value of $2 at the date of exchange for 1 share of nonvested stock, with a market price of $8 per share. The nonvested stock will cliff vest after two years of service. All option holders elect to participate, and at the date of exchange, Entity T grants 186,881 (747,526 ÷ 4) nonvested shares of stock. Entity T considers the guidance in paragraph 718-20-35-2A. Because the change in the terms or conditions of the award changes the vesting conditions of the award, Entity T applies modification accounting. However, because the fair value of the nonvested stock is equal to the fair value of the options, there is no incremental compensation cost. Entity T will not make any additional accounting entries for the shares regardless of whether they vest, other than possibly reclassifying amounts in equity; however, Entity T will need to account for the ultimate income tax effects related to the share-based compensation arrangement.
+· · > Case C: Liability to Equity Modification (Cash-Settled to Share-Settled Stock Appreciation Rights)
+718-20-55-135
+This Case is based on the facts given in Example 1 (see paragraph 718-30-55-1). Entity T grants cash-settled stock appreciation rights to its employees. The fair value of the award on January 1, 20X5, is $12,066,454 (821,406 × $14.69) (see paragraph 718-30-55-2).
+718-20-55-136
+On December 31, 20X5, the assumed fair value is $10 per stock appreciation right; hence, the fair value of the award at that date is $8,214,060 (821,406 × $10). The share-based compensation liability at December 31, 20X5, is $2,738,020 ($8,214,060 ÷ 3), which reflects the portion of the award related to the requisite service provided in 20X5 (1 year of the 3-year requisite service period). For convenience, this Case assumes that journal entries to account for the award are performed at year-end. The journal entries for 20X5 are as follows.
+
+Description,Amount
+"Compensation cost","$2,738,020"
+"Share-based compensation liability","$2,738,020"
+          
+To recognize compensation cost.
+
+Description,Amount
+"Deferred tax asset","$958,307"
+"Deferred tax benefit","$958,307"
+                        
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($2,738,020 ×.35 = $958,307).
+718-20-55-137
+On January 1, 20X6, Entity T modifies the stock appreciation rights by replacing the cash-settlement feature with a net share settlement feature, which converts the award from a liability award to an equity award because Entity T no longer has an obligation to transfer cash to settle the arrangement. Entity T would compare the fair value of the instrument immediately before the modification to the fair value of the modified award and recognize any incremental compensation cost. Because the modification affects no other terms or conditions, the fair value, assumed to be $10 per stock appreciation right, is unchanged by the modification and, therefore, no incremental compensation cost is recognized. The modified award's total fair value is $8,214,060. The modified award would be accounted for as an equity award from the date of modification with a fair value of $10 per share. Therefore, at the modification date, the entity would reclassify the liability of $2,738,020 recognized on December 31, 20X5, as additional paid-in capital. The related journal entry is as follows.
+
+Description,Amount
+"Share-based compensation liability","$2,738,020"
+"Additional paid-in capital","$2,738,020"
+                        
+To reclassify the award as equity.
+718-20-55-138
+Entity T will account for the modified awards as equity going forward following the pattern given in Example 1, Case A (see paragraph 718-20-55-1), recognizing $2,738,020 of compensation cost in each of 20X6 and 20X7, for a cumulative total of $8,214,060.
+· · > Case D: Liability to Liability Modification (Cash-Settled to Cash-Settled Stock Appreciation Rights)
+718-20-55-139
+This Case is based on the facts given in Example 1 (see paragraph 718-30-55-1). Entity T grants stock appreciation rights to its employees. The fair value of the award on January 1, 20X5, is $12,066,454 (821,406 × $14.69).
+718-20-55-140
+On December 31, 20X5, the fair value of each stock appreciation right is assumed to be $5; therefore, the fair value of the award is $4,107,030 (821,406 × $5). The share-based compensation liability at December 31, 20X5, is $1,369,010 ($4,107,030 ÷ 3), which reflects the portion of the award related to the requisite service provided in 20X5 (1 year of the 3-year requisite service period). For convenience, this Case assumes that journal entries to account for the award are performed at year-end. The journal entries to recognize compensation cost for 20X5 are as follows.
+
+Description,Amount
+"Compensation cost","$1,369,010"
+"Share-based compensation liability","$1,369,010"
+                        
+To recognize compensation cost.
+
+Description,Amount
+"Deferred tax asset","$479,154"
+"Deferred tax benefit","$479,154"
+                        
+To recognize the deferred tax asset for the temporary difference related to compensation cost ($1,369,010 ×.35 = $479,154).
+718-20-55-141
+On January 1, 20X6, Entity T reprices the stock appreciation rights, giving each holder the right to receive an amount in cash equal to the increase in value of 1 share of Entity T stock over $10. The modification affects no other terms or conditions of the stock appreciation rights and does not change the number of stock appreciation rights expected to vest. The fair value of each stock appreciation right based on its modified terms is $12. The incremental compensation cost is calculated per the method in Example 12 (see paragraph 718-20-55-93).
+
+Description,Amount
+"Fair value of modified stock appreciation right award (821,406 × $12)","$9,856,872"
+"Less: Fair value of original stock appreciation right (821,406 × $5)","$4,107,030"
+"Incremental value of modified stock appreciation right","$5,749,842"
+"Divide by three to reflect earned portion of the award","÷ 3"
+"Compensation cost to be recognized","$1,916,614"
+                        
+718-20-55-142
+Entity T also could determine the incremental value of the modified stock appreciation right award by multiplying the fair value of the modified stock appreciation right award by the portion of the award that is earned and subtracting the cumulative recognized compensation cost [($9,856,872 ÷ 3) - $1,369,010 = $1,916,614]. As a result, Entity T would record the following journal entries at the date of the modification.
+
+Description,Amount
+"Compensation cost","$1,916,614"
+"Share-based compensation liability","$1,916,614"
+                        
+To recognize incremental compensation cost.
+
+Description,Amount
+"Deferred tax asset","$670,815"
+"Deferred tax benefit","$670,815"
+                        
+To recognize the deferred tax asset for the temporary difference related to additional compensation cost ($1,916,614 ×.35 = $670,815).
+718-20-55-143
+Entity T would continue to remeasure the liability award at each reporting date until the award's settlement.
+· · > Case E: Equity to Liability Modification (Share Options to Fixed Cash Payment)
+718-20-55-144
+Entity T grants the same share options described in Example 1, Case A (see paragraph 718-20-55-10) and records similar journal entries for 20X5 (see paragraphs 718-20-55-12 through 55-16). By January 1, 20X6, Entity T's share price has fallen, and the fair value per share option is assumed to be $2 at that date. Entity T provides its employees with an election to convert each share option into an award of a fixed amount of cash equal to the fair value of each share option on the election date ($2) accrued over the remaining requisite service period, payable upon vesting. The election does not affect vesting; that is, employees must satisfy the original service condition to vest in the award for a fixed amount of cash. Entity T considers the guidance in paragraph 718-20-35-2A. Because the change in the terms or conditions of the award changes the classification of the award from equity to liability, Entity T applies modification accounting. This transaction is considered a modification instead of a settlement because Entity T continues to have an obligation to its employees that is conditional upon the receipt of future employee services. There is no incremental compensation cost because the fair value of the modified award is the same as that of the original award. At the date of the modification, a liability of $547,604 [(821,406 × $2) × (1 year of requisite service rendered ÷ 3-year requisite service period)], which is equal to the portion of the award attributed to past service multiplied by the modified award's fair value, is recognized by reclassifying that amount from additional paid-in capital. The total liability of $1,642,812 (821,406 × $2) should be fully accrued by the end of the requisite service period. Because the possible tax deduction of the modified award is capped at $1,642,812, Entity T also must adjust its deferred tax asset at the date of the modification to the amount that corresponds to the recognized liability of $547,604. That amount is $191,661 ($547,604 ×.35), and the write-off of the deferred tax asset is $1,216,092 ($1,407,753 - $191,661). That write-off would be recognized as income tax expense in the income statement. Compensation cost of $4,022,151 would be recognized in each of 20X6 and 20X7 for a cumulative total of $12,066,454 (as calculated in Case A); of this, $547,604 would be recognized as an increase to the liability balance, with the remaining $3,474,547 recognized as an increase in additional paid-in capital. A deferred tax benefit would be recognized in the income statement, and a corresponding increase to the deferred tax asset would be recognized for the tax effect of the increased liability of $191,661 ($547,604 × .35). The compensation cost recognized in additional paid-in capital in this situation has no associated income tax effect (additional deferred tax assets are recognized based only on subsequent increases in the amount of the liability).
+
+65 Transition and Open Effective Date Information
+General
+718-20-65-1
+Paragraph superseded on 07/17/2019 after the end of the transition period stated in Accounting Standards Update No. 2017-09, Compensation—Stock Compensation (Topic 718): Scope of Modification Accounting.

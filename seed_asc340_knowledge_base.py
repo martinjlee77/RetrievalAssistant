@@ -21,13 +21,18 @@ logger = logging.getLogger(__name__)
 
 def clean_bullet_formatting(text: str) -> str:
     """
-    Fix bullet formatting issues like 'aTopic' -> 'a. Topic' and 'bCosts' -> 'b. Costs'
+    Fix bullet formatting issues like 'aTopic' -> 'a. Topic', 'bCosts' -> 'b. Costs', and 'iTopic' -> 'i. Topic'
     """
     # Fix lettered bullets (a, b, c, etc.) followed immediately by capital letters
     text = re.sub(r'\b([a-z])\b([A-Z])', r'\1. \2', text)
     
     # Fix numbered sub-bullets like '1Topic' -> '1. Topic'  
     text = re.sub(r'\b(\d)([A-Z])', r'\1. \2', text)
+    
+    # Fix roman numeral bullets (i, ii, iii, iv, v, etc.) followed immediately by capital letters
+    # Pattern matches: i, ii, iii, iv, v, vi, vii, viii, ix, x, xi, xii, etc.
+    roman_pattern = r'\b(i{1,3}|iv|v|vi{0,3}|ix|x|xi{0,2})\b([A-Z])'
+    text = re.sub(roman_pattern, r'\1. \2', text)
     
     # Clean up navigation symbols from ASC text
     text = re.sub(r'[>·]', '', text)

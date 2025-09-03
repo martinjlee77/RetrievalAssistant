@@ -1,0 +1,1038 @@
+05 Overview and Background
+The Section does not summarize the accounting and reporting requirements.
+General
+718-40-05-1
+This Subtopic provides guidance to entities that utilize employee stock ownership plans. It includes the following Subsections:
+aGeneral
+bLeveraged employee stock ownership plans
+cNonleveraged employee stock ownership plans.
+718-40-05-2
+Employee stock ownership plans are used for many purposes in addition to furthering employee ownership. These include the following:
+aTo fund a matching program for a sponsor's 401(k) saving plan, formula-based profit-sharing plan, and other employee benefits
+bTo raise new capital or to create a marketplace for the existing stock
+cTo replace lost benefits from the termination of other retirement plans or provide benefits under postretirement benefit plans, particularly medical benefits
+dTo be part of the financing package in leveraged buy-outs
+eTo provide a tax-advantaged means for owners to terminate their ownership
+fTo be part of a long-term program to restructure the equity section of a plan sponsor's balance sheet
+gTo defend the entity against hostile takeovers.
+Leveraged Employee Stock Ownership Plans
+718-40-05-3
+A leveraged employee stock ownership plan borrows money to acquire shares of the employer stock. The money can be borrowed by the employee stock ownership plan from the sponsor, with or without a related outside loan, or directly from an outside lender. Outside loans to the employee stock ownership plan are generally guaranteed by the sponsor. Unlike other kinds of employee benefit plans, an employee stock ownership plan is permitted by Employee Retirement Income Security Act of 1974 to borrow from a related party or with the assistance of a related party. The debt usually is collateralized by the employer's shares.
+Nonleveraged Employee Stock Ownership Plans
+718-40-05-4
+As indicated in paragraph 718-40-25-21, an employer with a nonleveraged employee stock ownership plan periodically contributes its shares or cash to its employee stock ownership plan on behalf of employees. In the case of cash contributions the entity acquires shares. The shares are allocated to participant accounts and held by the employee stock ownership plan until distributed to the employees at a future date, such as on the date of termination or retirement. The shares of employer stock obtained by the nonleveraged employee stock ownership plan shall be allocated to individual participant accounts as of the end of the employee stock ownership plan's fiscal year. Allocating shares by year end is mandated by the tax code in 2008. The Codification does not keep up with changes in the tax code.
+
+15 Scope and Scope Exceptions
+General
+> Overall Guidance
+718-40-15-1
+This Subtopic follows the same Scope and Scope Exceptions as outlined in the Overall Subtopic, see Section 718-10-15, with specific qualifications noted below.
+> Entities
+718-40-15-2
+The guidance in this Subtopic applies to all employers with employee stock ownership plans, both leveraged and nonleveraged.
+> Transactions
+718-40-15-3
+This Subtopic provides guidance on an employer's accounting for employee stock ownership plans. There are two basic forms of employee stock ownership plan: leveraged and nonleveraged. This Subtopic addresses the financial reporting for each separately.
+> Other Considerations
+718-40-15-4
+The guidance in this Subtopic does not address the following:
+aFinancial reporting by employee stock ownership plans.
+Leveraged Employee Stock Ownership Plans
+> Overall Guidance
+718-40-15-5
+The Leveraged Employee Stock Ownership Plans Subsections follow the same Scope and Scope Exceptions as outlined in the General Subsection of this Subtopic, see paragraph 718-40-15-1.
+Nonleveraged Employee Stock Ownership Plans
+> Overall Guidance
+718-40-15-6
+The Nonleveraged Employee Stock Ownership Plans Subsections follow the same Scope and Scope Exceptions as outlined in the General Subsection of this Subtopic, see paragraph 718-40-15-1.
+
+20 Glossary
+Allocated Shares
+Allocated shares are shares in an employee stock ownership plan trust that have been assigned to individual participant accounts based on a known formula. Internal Revenue Service (IRS) rules require allocations to be nondiscriminatory generally based on compensation, length of service, or a combination of both. For any particular participant such shares may be vested, unvested, or partially vested.
+Committed-to-Be-Released Shares
+Committed-to-be-released shares are shares that, although not legally released, will be released by a future scheduled and committed debt service payment and will be allocated to employees for service rendered in the current accounting period. The period of employee service to which shares relate is generally defined in the employee stock ownership plan documents. Shares are legally released from suspense and from serving as collateral for employee stock ownership plan debt as a result of payment of debt service. Those shares are required to be allocated to participant accounts as of the end of the employee stock ownership plan's fiscal year. Formulas used to determine the number of shares released can be based on either of the following:
+aThe ratio of the current principal amount to the total original principal amount (in which case unearned employee stock ownership plan shares and debt balance will move in tandem)
+bThe ratio of the current principal plus interest amount to the total original principal plus interest to be paid.
+Shares are released more rapidly under the second method than under the first. Tax law permits the first method only if the employee stock ownership plan debt meets certain criteria.
+Direct Loan
+A direct loan is a loan made by a lender other than the employer to the employee stock ownership plan. Such loans often include some formal guarantee or commitment by the employer.
+Employee
+An individual over whom the grantor of a share-based compensation award exercises or has the right to exercise sufficient control to establish an employer-employee relationship based on common law as illustrated in case law and currently under U.S. Internal Revenue Service (IRS) Revenue Ruling 87-41. A reporting entity based in a foreign jurisdiction would determine whether an employee-employer relationship exists based on the pertinent laws of that jurisdiction. Accordingly, a grantee meets the definition of an employee if the grantor consistently represents that individual to be an employee under common law. The definition of an employee for payroll tax purposes under the U.S. Internal Revenue Code includes common law employees. Accordingly, a grantor that classifies a grantee potentially subject to U.S. payroll taxes as an employee also must represent that individual as an employee for payroll tax purposes (unless the grantee is a leased employee as described below). A grantee does not meet the definition of an employee solely because the grantor represents that individual as an employee for some, but not all, purposes. For example, a requirement or decision to classify a grantee as an employee for U.S. payroll tax purposes does not, by itself, indicate that the grantee is an employee because the grantee also must be an employee of the grantor under common law.
+A leased individual is deemed to be an employee of the lessee if all of the following requirements are met:
+aThe leased individual qualifies as a common law employee of the lessee, and the lessor is contractually required to remit payroll taxes on the compensation paid to the leased individual for the services provided to the lessee.
+bThe lessor and lessee agree in writing to all of the following conditions related to the leased individual:
+1The lessee has the exclusive right to grant stock compensation to the individual for the employee service to the lessee.
+2The lessee has a right to hire, fire, and control the activities of the individual. (The lessor also may have that right.)
+3The lessee has the exclusive right to determine the economic value of the services performed by the individual (including wages and the number of units and value of stock compensation granted).
+4The individual has the ability to participate in the lessee's employee benefit plans, if any, on the same basis as other comparable employees of the lessee.
+5The lessee agrees to and remits to the lessor funds sufficient to cover the complete compensation, including all payroll taxes, of the individual on or before a contractually agreed upon date or dates.
+A nonemployee director does not satisfy this definition of employee. Nevertheless, nonemployee directors acting in their role as members of a board of directors are treated as employees if those directors were elected by the employer's shareholders or appointed to a board position that will be filled by shareholder election when the existing term expires. However, that requirement applies only to awards granted to nonemployee directors for their services as directors. Awards granted to those individuals for other services shall be accounted for as awards to nonemployees.
+Employee Stock Ownership Plan
+An employee stock ownership plan is an employee benefit plan that is described by the Employee Retirement Income Security Act of 1974 and the Internal Revenue Code of 1986 as a stock bonus plan, or combination stock bonus and money purchase pension plan, designed to invest primarily in employer stock. Also called an employee share ownership plan.
+Employer Loan
+An employer loan is a loan made by the employer to the employee stock ownership plan, with no related outside loan.
+Fair Value
+The price that would be received to sell an asset or paid to transfer a liability in an orderly transaction between market participants at the measurement date.
+Indirect Loan
+An indirect loan is a loan made by the employer to the employee stock ownership plan, with a related outside loan to the employer.
+Market Participants
+Buyers and sellers in the principal (or most advantageous) market for the asset or liability that have all of the following characteristics:
+aThey are independent of each other, that is, they are not related parties, although the price in a related-party transaction may be used as an input to a fair value measurement if the reporting entity has evidence that the transaction was entered into at market terms
+bThey are knowledgeable, having a reasonable understanding about the asset or liability and the transaction using all available information, including information that might be obtained through due diligence efforts that are usual and customary
+cThey are able to enter into a transaction for the asset or liability
+dThey are willing to enter into a transaction for the asset or liability, that is, they are motivated but not forced or otherwise compelled to do so.
+Not-for-Profit Entity
+An entity that possesses the following characteristics, in varying degrees, that distinguish it from a business entity:
+aContributions of significant amounts of resources from resource providers who do not expect commensurate or proportionate pecuniary return
+bOperating purposes other than to provide goods or services at a profit
+cAbsence of ownership interests like those of business entities.
+Entities that clearly fall outside this definition include the following:
+aAll investor-owned entities
+bEntities that provide dividends, lower costs, or other economic benefits directly and proportionately to their owners, members, or participants, such as mutual insurance entities, credit unions, farm and rural electric cooperatives, and employee benefit plans.
+Orderly Transaction
+A transaction that assumes exposure to the market for a period before the measurement date to allow for marketing activities that are usual and customary for transactions involving such assets or liabilities; it is not a forced transaction (for example, a forced liquidation or distress sale).
+Public Business Entity
+A public business entity is a business entity meeting any one of the criteria below. Neither a not-for-profit entity nor an employee benefit plan is a business entity.
+aIt is required by the U.S. Securities and Exchange Commission (SEC) to file or furnish financial statements, or does file or furnish financial statements (including voluntary filers), with the SEC (including other entities whose financial statements or financial information are required to be or are included in a filing).
+bIt is required by the Securities Exchange Act of 1934 (the Act), as amended, or rules or regulations promulgated under the Act, to file or furnish financial statements with a regulatory agency other than the SEC.
+cIt is required to file or furnish financial statements with a foreign or domestic regulatory agency in preparation for the sale of or for purposes of issuing securities that are not subject to contractual restrictions on transfer.
+dIt has issued, or is a conduit bond obligor for, securities that are traded, listed, or quoted on an exchange or an over-the-counter market.
+eIt has one or more securities that are not subject to contractual restrictions on transfer, and it is required by law, contract, or regulation to prepare U.S. GAAP financial statements (including notes) and make them publicly available on a periodic basis (for example, interim or annual periods). An entity must meet both of these conditions to meet this criterion.
+An entity may meet the definition of a public business entity solely because its financial statements or financial information is included in another entity's filing with the SEC. In that case, the entity is only a public business entity for purposes of financial statements that are filed or furnished with the SEC.
+Public Entity
+An entity that meets any of the following criteria:
+aHas equity securities that trade in a public market, either on a stock exchange (domestic or foreign) or in an over-the-counter market, including securities quoted only locally or regionally
+bMakes a filing with a regulatory agency in preparation for the sale of any class of equity securities in a public market
+cIs controlled by an entity covered by the preceding criteria. That is, a subsidiary of a public entity is itself a public entity.
+An entity that has only debt securities trading in a public market (or that has made a filing with a regulatory agency in preparation to trade only debt securities) is not a public entity.
+Related Parties
+Related parties include:
+aAffiliates of the entity
+bEntities for which investments in their equity securities would be required, absent the election of the fair value option under the Fair Value Option Subsection of Section 825-10-15, to be accounted for by the equity method by the investing entity
+cTrusts for the benefit of employees, such as pension and profit-sharing trusts that are managed by or under the trusteeship of management
+dPrincipal owners of the entity and members of their immediate families
+eManagement of the entity and members of their immediate families
+fOther parties with which the entity may deal if one party controls or can significantly influence the management or operating policies of the other to an extent that one of the transacting parties might be prevented from fully pursuing its own separate interests
+gOther parties that can significantly influence the management or operating policies of the transacting parties or that have an ownership interest in one of the transacting parties and can significantly influence the other to an extent that one or more of the transacting parties might be prevented from fully pursuing its own separate interests.
+Security
+A share, participation, or other interest in property or in an entity of the issuer or an obligation of the issuer that has all of the following characteristics:
+aIt is either represented by an instrument issued in bearer or registered form or, if not represented by an instrument, is registered in books maintained to record transfers by or on behalf of the issuer.
+bIt is of a type commonly dealt in on securities exchanges or markets or, when represented by an instrument, is commonly recognized in any area in which it is issued or dealt in as a medium for investment.
+cIt either is one of a class or series or by its terms is divisible into a class or series of shares, participations, interests, or obligations.
+Settlement of an Award
+An action or event that irrevocably extinguishes the issuing entity's obligation under a share-based payment award. Transactions and events that constitute settlements include the following:
+aExercise of a share option or lapse of an option at the end of its contractual term
+bVesting of shares
+cForfeiture of shares or share options due to failure to satisfy a vesting condition
+dAn entity's repurchase of instruments in exchange for assets or for fully vested and transferable equity instruments.
+The vesting of a share option is not a settlement because the entity remains obligated to issue shares upon exercise of the option.
+Suspense Shares
+The shares initially held by the employee stock ownership plan in a suspense account are called suspense shares. Suspense shares are shares that have not been released, committed to be released, or allocated to participant accounts. Suspense shares generally collateralize employee stock ownership plan debt.
+Top-Up Shares
+Top-up shares are shares or cash that an employer contributes to an employee stock ownership plan because the fair value of the shares released is less than the employer's liability for a particular benefit, such as a savings plan match.
+
+25 Recognition
+General
+718-40-25-1
+This Subsection provides guidance on recognition issues applicable to both leveraged and nonleveraged employee stock ownership plans. It covers the following issues:
+aStock with a put option or a guaranteed redemption price (treasury stock recognition)
+bPension reversion employee stock ownership plans (recognition of assets transferred from the pension plan).
+> Stock with a Put Option or a Guaranteed Redemption Price
+718-40-25-2
+Regardless of whether an employee stock ownership plan is leveraged or nonleveraged, employers are required to give a put option to participants holding employee stock ownership plan shares that are not readily tradable, which on exercise requires the employer to repurchase the shares at fair value. Public entity sponsors sometimes offer cash redemption options to participants who are eligible to withdraw traded shares from their accounts, which on exercise requires the employer to repurchase the shares at fair value. Employers shall report the satisfaction of such option exercises as purchases of treasury stock.
+> Pension Reversion Employee Stock Ownership Plans
+718-40-25-3
+An employer that terminates a defined benefit pension plan may avoid part of the excise tax on an asset reversion by transferring the assets to an existing or newly created employee stock ownership plan, which could be either leveraged or nonleveraged. The reverted assets may be used either to purchase shares of the employer stock or to retire existing employee stock ownership plan debt.
+718-40-25-4
+If the assets from the pension plan are used by the employee stock ownership plan to purchase employer shares, the employer shall report the share issuance the same way as other share issuances to an employee stock ownership plan. The issuance of shares or the sale of treasury shares to the employee stock ownership plan shall be recognized when it occurs, and a corresponding charge to unearned employee stock ownership plan shares, a contra-equity account, shall be reported. If the shares are purchased on the market, the employer shall similarly charge unearned employee stock ownership plan shares. (The credit would be to cash.)
+718-40-25-5
+Because the number of shares the employee stock ownership plan acquires in a pension plan reversion is usually more than the Internal Revenue Service (IRS) permits to be allocated to participant accounts in a single year, some of the shares are held in a suspense account until they are committed to be released in future years for allocation to participant accounts. The guidance in this Subtopic, for shares held by leveraged employee stock ownership plans, shall be applied to suspense account shares.
+718-40-25-6
+If the assets from the pension plan reversion are used to repay the debt of an existing employee stock ownership plan, employee stock ownership plan shares are committed to be released from suspense. In such situations, the guidance for leveraged employee stock ownership plans in this Subtopic shall be followed. The employer shall reduce the debt as it is repaid and reduce unearned employee stock ownership plan shares as shares are committed to be released. How the committed-to-be-released shares are used determines what accounts are charged upon release of shares (see paragraphs 718-40-25-11 through 25-15).
+Leveraged Employee Stock Ownership Plans
+718-40-25-7
+This Subsection provides recognition guidance for leveraged employee stock ownership plans. It is organized as follows:
+aDebt financing
+bPurchase of shares by a leveraged employee stock ownership plan
+cRelease of leveraged employee stock ownership plan shares
+dDividends on employee stock ownership plan shares
+> Debt Financing
+718-40-25-8
+Paragraph 718-40-05-3 provides background on debt financing by an employee stock ownership plan.
+718-40-25-9
+For purposes of applying this Subtopic, employee stock ownership plan debt is characterized as follows:
+aEmployers that sponsor an employee stock ownership plan with a direct loan shall report the obligations of the employee stock ownership plan to the outside lender as debt. Furthermore, employers shall accrue interest cost on the debt and shall report cash payments to the employee stock ownership plan that are used by the employee stock ownership plan to service debt, regardless of whether the source of cash is employer contributions or dividends, as reductions of the debt and accrued interest payable when the employee stock ownership plan makes the payments to the outside lender.
+bEmployers that sponsor an employee stock ownership plan with an indirect loan shall report outside loans as debt. Employers shall not report a loan receivable from the employee stock ownership plan as an asset and shall, therefore, not recognize interest income on such receivable. Employers shall accrue interest cost on the outside loan and shall report loan payments as reductions of the principal and accrued interest payable. Contributions to the employee stock ownership plan and the concurrent payments from the employee stock ownership to the employer for debt service would not be recognized in the employer's financial statements.
+cEmployee stock ownership plans with indirect loans and employer loans are often referred to as internally leveraged.
+dEmployers that sponsor an employee stock ownership plan with an employer loan shall not report the employee stock ownership plan's note payable and the employer's note receivable in the employer's balance sheet. Accordingly, employers shall not recognize interest cost or interest income on an employer loan.
+> Purchase of Shares by a Leveraged Employee Stock Ownership Plan
+718-40-25-10
+An employer shall report the issuance of shares or the sale of treasury shares to an employee stock ownership plan when they occur and shall report a corresponding charge to unearned employee stock ownership plan shares, a contra-equity account. Furthermore, even if a leveraged employee stock ownership plan buys outstanding shares of employer stock on the market rather than from the employer, the employer shall charge unearned employee stock ownership plan shares and credit either cash or debt, depending on whether the employee stock ownership plan is internally or externally leveraged (see the preceding paragraph).
+> Release of Leveraged Employee Stock Ownership Plan Shares
+718-40-25-11
+Employee stock ownership plan shares are released for different purposes:
+aTo compensate employees directly
+bTo settle employer liabilities for other employee benefits
+cTo replace dividends on allocated shares that are used for debt service.
+718-40-25-12
+As employee stock ownership plan shares are committed to be released, unearned employee stock ownership plan shares should be credited and, depending on the purpose for which the shares are released shall be charged to one of the following accounts:
+aCompensation cost
+bDividends payable
+cCompensation liabilities.
+718-40-25-13
+Under this Subtopic, when shares are committed to be released, rather than when shares are legally released, is significant for accounting purposes. Employee stock ownership plan shares are legally released from an employee stock ownership plan's suspense account (and from serving as collateral for employee stock ownership plan debt) when debt payments are made, but the employee service to which the shares released relates is continuous. For purposes of reporting compensation cost and satisfaction of liabilities under this Subtopic, accounting recognition shall occur when shares are committed to be released, which may occur before the shares are legally released. Shares that have not been legally released, but that relate to employee services rendered during an accounting period (interim or annual) ending before the related debt service payment is made, shall be considered committed to be released. The periods of employee service to which shares relate are generally specified in the employee stock ownership plan documents.
+718-40-25-14
+Some employers agree to provide a specified or determinable benefit, such as a contribution to a 401(k) plan or to a formula profit-sharing plan, to employees and use the employee stock ownership plan to partially or fully fund the benefit. Employers shall recognize compensation cost and liabilities associated with providing such benefits to employees in the same manner they would had an employee stock ownership plan not been used to fund the benefit. For employee stock ownership plan shares committed to be released to settle liabilities for such benefits, employers shall report satisfaction of the liabilities when the shares are committed to be released to settle the liability. The number of shares released to settle the liability shall be based on the fair value of shares as of dates specified by the employers, which are usually specified in the employee stock ownership plan documents.
+> Dividends on Employee Stock Ownership Plan Shares
+718-40-25-15
+The Internal Revenue Code allows employers to use dividends on employee stock ownership plan shares that have been allocated to participants for debt service if participants are allocated shares of employer stock with a fair value no less than the amount of the dividends used for debt service. If shares released will include shares designated to replace dividends on previously allocated shares used for debt service, employers shall report the settlement of the dividend payable when the shares are committed to be released to replace the dividends on shares used for debt service. (See the following two paragraphs; only dividends on allocated shares shall be charged to retained earnings.) The number of shares committed to be released to replace the dividends on allocated shares used for debt service shall be based on the fair value of shares as of dates specified by the employer, which are usually specified in the employee stock ownership plan documents based on the employer's interpretation of current Internal Revenue Service regulations.
+718-40-25-16
+Because employers control the use of dividends on unallocated shares, dividends on unallocated shares shall not be considered dividends for financial reporting purposes. Dividends on unallocated shares used to pay debt service shall be reported as a reduction of debt or of accrued interest payable. Dividends on unallocated shares paid to participants or added to participant accounts shall be reported as compensation cost.
+718-40-25-17
+Dividends on allocated shares shall be charged to retained earnings. The dividends payable may be satisfied either by contributing cash to the participant accounts, by contributing additional shares to participant accounts, or by releasing shares from the employee stock ownership plans suspense account to participant accounts (see paragraph 718-40-25-15).
+Nonleveraged Employee Stock Ownership Plans
+718-40-25-18
+This Subsection provides recognition guidance for nonleveraged employee stock ownership plans. It is organized as follows:
+aContribution of shares to the employee stock ownership plan
+bDividends on employee stock ownership plan shares
+cShares allocated by year-end
+> Contribution of Shares to the Employee Stock Ownership Plan
+718-40-25-19
+Employers with nonleveraged employee stock ownership plans shall report compensation cost equal to the contribution called for in the period under the plan.
+> Dividends on Employee Stock Ownership Plan Shares
+718-40-25-20
+Employers with nonleveraged employee stock ownership plans shall charge dividends on shares held by the employee stock ownership plans to retained earnings, except that dividends on suspense account shares of a pension reversion employee stock ownership plan shall be accounted for the same way as dividends on suspense account shares of leveraged employee stock ownership plans (see paragraph 718-40-25-15 through 25-17).
+> Shares Allocated by Year-End
+718-40-25-21
+An employer with a nonleveraged employee stock ownership plan periodically contributes its shares or cash to its employee stock ownership plan on behalf of employees. The shares contributed or acquired with the cash contributed, which may be outstanding shares, treasury shares, or newly issued shares, shall be allocated to participant accounts and held by the employee stock ownership plan until distributed to the employees at a future date, such as on the date of termination or retirement. The shares of employer stock obtained by the nonleveraged employee stock ownership plan shall be allocated to individual participant accounts as of the end of the employee stock ownership plan's fiscal year. While this is the accounting treatment of employee stock ownership plan shares, it is mandated by tax law. The Codification does not keep up with changes in the tax law.
+
+30 Initial Measurement
+Leveraged Employee Stock Ownership Plans
+718-40-30-1
+Regardless of the account charged (see paragraphs 718-40-25-11 through 25-12), the amount of the charge shall be based on fair values of committed-to-be-released shares.
+718-40-30-2
+Some employers establish employee stock ownership plans that are not linked to any other employee benefit or compensation promise; therefore, the employee stock ownership plan shares directly compensate the employees. For employee stock ownership plan shares committed to be released to compensate employees directly, the employer shall recognize compensation cost equal to the fair value of the shares committed to be released. The shares generally shall be deemed to be committed to be released ratably during an accounting period as the employees perform services, and, accordingly, average fair values shall be used to determine the amount of compensation cost to recognize each reporting period (interim or annual). The amount of compensation cost recognized in previous interim periods shall not be adjusted for subsequent changes in the fair value of shares.
+718-40-30-3
+Unearned employee stock ownership plan shares shall be credited as shares are committed to be released based on the cost of the shares to the employee stock ownership plan. Employers shall charge or credit the difference between the fair value of shares committed to be released and the cost of those shares to the employee stock ownership plan to shareholders' equity in the same manner as gains and losses on sales of treasury stock (generally to additional paid-in capital).
+718-40-30-4
+The fair value of employee stock ownership plan shares is needed to apply certain provisions of this Subtopic.
+Nonleveraged Employee Stock Ownership Plans
+718-40-30-5
+Compensation cost shall be measured as the fair value of the shares contributed to or committed to be contributed to the employee stock ownership plan or as the cash contributed to or committed to be contributed to the employee stock ownership plan, as appropriate under the terms of the plan.
+
+35 Subsequent Measurement
+Leveraged Employee Stock Ownership Plans
+> Debt Repayment
+718-40-35-1
+Debt is generally repaid by the employee stock ownership plan from employer contributions and dividends on the employer's stock. As the debt is repaid, suspense shares are released from the suspense account, and the released shares must be allocated to individual accounts as of the end of the employee stock ownership plan's fiscal year.
+
+40 Derecognition
+Leveraged Employee Stock Ownership Plans
+> Plan Termination
+718-40-40-1
+This Section may contain summaries or references to specific tax code or other regulations that existed at the time that the standard was issued. The Financial Accounting Standards Board (FASB) does not monitor such code or regulations and assumes no responsibility for the current accuracy of the summaries or references. Users must evaluate such code or regulations to determine consistency of the current code or regulation with that presented.
+718-40-40-2
+Upon termination of a leveraged employee stock ownership plan, either in whole or in part, all outstanding debt related to the shares being terminated shall be repaid or refinanced. An employee stock ownership plan may repay the debt using an employer contribution to the plan, dividends on employee stock ownership plan shares, the proceeds from selling suspense shares to the employer or to another party, or some combination of these. The tax law limits the shares employers may reacquire to the number of shares with a fair value equal to the applicable unpaid debt and requires that the remaining shares, if any, shall be allocated to participants.
+718-40-40-3
+If the employer makes a contribution to the employee stock ownership plan or pays dividends on unallocated shares that are used by the employee stock ownership plan to repay the debt, the employer shall charge the debt and accrued interest payable when the employee stock ownership plan makes the payment to the outside lender. Similarly, an employer sponsoring an employee stock ownership plan with an indirect loan shall report loan repayments as reductions of the debt and accrued interest payable.
+718-40-40-4
+If the employee stock ownership plan sells the suspense shares and uses the proceeds to repay the debt, the employer shall report the release of the suspense shares as a credit to unearned employee stock ownership plan shares based on the cost of the shares to the employee stock ownership plan, charge debt, and accrued interest payable, and recognize the difference in paid-in capital.
+718-40-40-5
+However, if there is a difference between the amount paid to an outside lender and the net carrying amount of the debt, paragraph 470-50-40-2 requires that difference to be included in the employer's income when the debt is extinguished.
+718-40-40-6
+If an employer reacquires the suspense shares from the employee stock ownership plan, the purchase of the shares shall be accounted for as a treasury stock transaction. The treasury stock shall be reported at the fair value of the shares at the reacquisition date. Unearned employee stock ownership plan shares shall be credited for the cost of the shares, and the difference shall be recognized in additional paid-in capital.
+718-40-40-7
+If the fair value of the suspense shares on the termination date is more than the unpaid debt balance, the release of the remaining suspense shares to participants shall be charged to compensation in accordance with paragraphs 718-40-25-11 through 25-15. That is, compensation cost shall equal the fair value of the shares at the date the employee stock ownership plan debt is extinguished, because that is when the shares are committed to be released.
+
+45 Other Presentation Matters
+General
+> EPS
+718-40-45-1
+Dividends on preferred stock held by an employee stock ownership plan shall be deducted from net income net of any applicable income tax benefit when computing both basic and diluted earnings per share (EPS) if that preferred stock is considered outstanding (that is, if the employee stock ownership plan shares are allocated).
+> Issuance of Shares or the Sale of Shares to an Employee Stock Ownership Plan
+718-40-45-2
+Paragraph 718-40-25-10 states that an employer shall report the issuance of shares or the sale of treasury shares to an employee stock ownership plan when they occur and shall report a corresponding charge to unearned employee stock ownership plan shares, a contra-equity account. That account should be presented as a separate item in the balance sheet.
+Leveraged Employee Stock Ownership Plans
+> EPS
+718-40-45-3
+For purposes of computing basic and diluted earnings per share (EPS), employee stock ownership plan shares that have been committed to be released shall be considered outstanding. Employee stock ownership plan shares that have not been committed to be released shall not be considered outstanding.
+718-40-45-4
+Employers that use dividends on allocated employee stock ownership plan shares to pay debt service shall adjust earnings applicable to common shares in the if-converted computation for the difference (net of income taxes) between the amount of compensation cost reported and the amount of compensation cost that would have been reported if the allocated shares had been converted to common stock at the beginning of the period.
+718-40-45-5
+Prior period EPS shall not be restated for changes in the conversion rates.
+· > Convertible Preferred Shares
+718-40-45-6
+The number of common shares that will be issued on conversion of the convertible shares held by an employee stock ownership plan that have been committed to be released shall be deemed outstanding in the if-converted EPS computations for diluted EPS if the effect is dilutive. Convertible preferred shares held by the employee stock ownership plan that have not been committed to be released shall not be considered outstanding and, accordingly, would be excluded from the if-converted computations for diluted EPS.
+718-40-45-7
+When participants withdraw account balances containing convertible preferred shares from an employee stock ownership plan, they may be entitled to receive common shares or cash with a value equal to either the fair value of the convertible preferred shares or a stated minimum value per share. Accordingly, if the value of the common stock issuable is less than the stated minimum value or the fair value of the preferred, participants may receive common shares or cash with a value greater than the value of the common shares issuable at the stated conversion rate. In determining EPS, the employer shall presume that such a shortfall will be made up with shares of common stock. However, that presumption may be overcome if past experience or a stated policy provides a reasonable basis to believe that the shortfall will be paid in cash. In applying the if-converted method, the number of common shares issuable on assumed conversion, which shall be included in the denominator of the EPS calculation, shall be the greater of the following:
+aThe shares issuable at the stated conversion rate
+bThe shares issuable if the participants were to withdraw the shares from their accounts.
+718-40-45-8
+Shares issuable on assumed withdrawal shall be computed based on the ratio of the average fair value of the convertible stock (or, if greater, its stated minimum value) to the average fair value of the common stock.
+Nonleveraged Employee Stock Ownership Plans
+> EPS
+718-40-45-9
+All shares held by a nonleveraged employee stock ownership plan shall be treated as outstanding in computing the employer's earnings per share (EPS), except the suspense account shares of a pension reversion employee stock ownership plan, which are not treated as outstanding until they are committed to be released for allocation to participant accounts. If a nonleveraged employee stock ownership plan holds convertible preferred stock, the guidance in paragraphs 718-40-45-6 through 45-8 for leveraged employee stock ownership plans shall be considered.
+
+50 Disclosure
+General
+718-40-50-1
+An employer sponsoring an employee stock ownership plan shall disclose all of the following information about the plan, if applicable:
+aA description of the plan, the basis for determining contributions, including the employee groups covered, and the nature and effect of significant matters affecting comparability of information for all periods presented. For leveraged employee stock ownership plans and pension reversion employee stock ownership plans, the description shall include the basis for releasing shares and how dividends on allocated and unallocated shares are used.
+bA description of the accounting policies followed for employee stock ownership plan transactions, including the method of measuring compensation, the classification of dividends on employee stock ownership plan shares, and the treatment of employee stock ownership plan shares for earnings per share (EPS) computations. If the employer has both old employee stock ownership plan shares for which it does not adopt the guidance in this Subtopic and new employee stock ownership plan shares for which the guidance in this Subtopic is required, the accounting policies for both blocks of shares shall be described.
+cThe amount of compensation cost recognized during the period.
+dThe number of allocated shares, committed-to-be-released shares, and suspense shares held by the employee stock ownership plan at the balance-sheet date. This disclosure shall be made separately for shares accounted for under this Subtopic and for grandfathered employee stock ownership plan shares.
+eThe fair value of unearned employee stock ownership plan shares at the balance-sheet date for shares accounted for under this Subtopic. (Future tax deductions will be allowed only for the employee stock ownership plan's cost of unearned employee stock ownership plan shares.) This disclosure need not be made for old employee stock ownership plan shares for which the employer does not apply the guidance in this Subtopic.
+fThe existence and nature of any repurchase obligation, including disclosure of the fair value (see paragraph 718-40-30-4) of the shares allocated as of the balance sheet date, which are subject to a repurchase obligation.
+gThe amount and treatment in the EPS computation of the tax benefit related to dividends paid to any employee stock ownership plan, if material.
+
+55 Implementation Guidance and Illustrations
+General
+> Illustrations
+718-40-55-1
+This Section contains illustrations of the requirements of this Subtopic for employers with employee stock ownership plans.
+718-40-55-2
+The Examples do not address all possible circumstances that may arise in applying the guidance in this Subtopic. The Examples are for annual reporting periods and, accordingly, do not demonstrate the application of the Subtopic to interim financial statements. However, depending on the circumstances, many of the journal entries illustrated would be made for interim financial statements.
+Leveraged Employee Stock Ownership Plans
+> Illustrations
+· > Example 1: Employee Stock Ownership Plan Leveraged with a Direct or Indirect Loan
+718-40-55-3
+The following Cases illustrate the guidance in paragraphs 718-40-25-7 through 25-17; 718-40-30-1 through 30-4; 718-40-35-1; 718-40-40-1 through 40-7; and 718-40-45-3 through 45-8:
+aA common-stock leveraged employee stock ownership plan with a direct loan (Case A)
+bA common-stock leveraged employee stock ownership plan used to fund the employer's match of a 401(k) savings plan with an indirect loan (Case B)
+cA convertible-preferred-stock leveraged employee stock ownership plan with a direct loan (Case C).
+· · > Case A: A Common-Stock Leveraged Employee Stock Ownership Plan with a Direct Loan
+718-40-55-4
+This Case illustrates a common stock leveraged employee stock ownership plan with a direct loan. This Case has the following assumptions:
+aOn January 1, Year 1, Entity A establishes a leveraged employee stock ownership plan.
+bThe employee stock ownership plan borrows $1,000,000 from an outside lender at 10 percent for 5 years and uses the proceeds to buy 100,000 shares of newly issued common stock of the sponsor for $10 per share, which is the market price of those shares on the date of issuance.
+cDebt service is funded by cash contributions and dividends on employer stock held by the employee stock ownership plan.
+dDividends on all shares held by the employee stock ownership plan are used for debt service.
+eCash contributions are made at the end of each year.
+fThe year-end and average market values of a share of common stock follow.
+
+Year,Year-End,Average
+1,"$11.50","$10.75"
+2,"$9.00","$10.25"
+3,"$10.00","$9.50"
+4,"$12.00","$11.00"
+5,"$14.40","$13.20"
+      
+gThe common stock pays normal dividends at the end of each quarter of 12.5 cents per share ($50,000 for the employee stock ownership plan's shares each year). Accordingly, in this Case, the average fair value of shares is used to determine the number of shares used to satisfy the employers' obligation to replace dividends on allocated shares used for debt service.
+hPrincipal and interest are payable in equal annual installments at the end of each year. Debt service is as follows.
+
+Year,Principal,Interest,Total Debt Services
+1,"$163,800","$100,000","$263,800"
+2,"$180,200","$83,600","$263,800"
+3,"$198,200","$65,600","$263,800"
+4,"$218,000","$45,800","$263,800"
+5,"$239,800","$24,000","$263,800"
+"Total","$1,000,000","$319,000","$1,319,000"
+                            
+iThe number of shares released each year is as follows.
+
+Year,Dividends,Compensation,Total
+1,"0","20,000","20,000"
+2,"976","19,024","20,000"
+3,"2,105","17,895","20,000"
+4,"2,727","17,273","20,000"
+5,"3,030","16,970","20,000"
+                            
+jThe number of shares released for dividends is determined by dividing the amount of dividends on allocated shares by the average fair value of a share of common stock (for Year 2: $10,000 divided by $10.25 equals 976 shares). In this illustration, the remaining shares are released for compensation (for Year 2: 20,000 less 976 equals 19,024 shares).
+kShares are released from the suspense account for allocation to participants' accounts based on a principal-plus-interest formula. The released shares are allocated to participant accounts the following year. Shares released and allocated follow.
+
+Year,Released,Allocated,Average Shares Released,Year-End Suspense Shares
+1,"20,000","0","10,000","80,000"
+2,"40,000","20,000","30,000","60,000"
+3,"60,000","40,000","50,000","40,000"
+4,"80,000","60,000","70,000","20,000"
+5,"100,000","80,000","90,000","0"
+                            
+lIncome before employee stock ownership plan related charges is as follows.
+
+Year,Income
+1,"$1,800,000"
+2,"$1,900,000"
+3,"$2,000,000"
+4,"$1,900,000"
+5,"$2,200,000"
+                            
+mAll interest cost and compensation cost are charged to expense each year.
+nExcluding employee stock ownership plan shares, 1,000,000 shares are outstanding on average each year.
+oEntity A follows the guidance in Subtopic 740-10.
+pEntity A's combined statutory tax rate is 40 percent each year.
+qEntity A's only book-tax differences are those associated with its employee stock ownership plan.
+rNo valuation allowance is necessary for deferred tax assets.
+718-40-55-5
+The following table sets forth Entity A's employee stock ownership plan-related information. All amounts represent changes (credits in parentheses) in account balances.
+
+Year,Principal,Employee Stock Ownership Plan Shares,Paid-In Capital,Dividends,Interest Expense,Compensation Expense,Cash
+1,"$163,800","(200,000)","($15,000)","$ - ","$100,000","$215,000","($263,800)"
+2,"$180,200","(200,000)","($5,000)","$10,000","$83,600","$195,000","($263,800)"
+3,"$198,200","(200,000)","$10,000","$20,000","$65,600","$170,000","($263,800)"
+4,"$218,000","(200,000)","$25,000","$30,000","$45,800","$190,000","($263,800)"
+5,"$239,800","(200,000)","($64,000)","$40,000","$24,000","$224,000","($263,800)"
+"Total","$1,000,000","(1,000,000)","($94,000)","$100,000","$319,000","$994,000","($1,319,000)"
+                        
+718-40-55-6
+Entity A would record journal entries from inception through Year 5 as follows.
+                        
+Description,Amount
+"Cash","$1,000,000"
+"Debt","$1,000,000"
+"[To record the employee stock ownership plan's loan]",""
+"Unearned employee stock ownership plan shares","$1,000,000"
+"Common stock and paid-in capital","$1,000,000"
+"[To record issuance of 100,000 shares to the employee stock ownership plan at $10 per share]",""
+"Interest expense","$100,000"
+"Accrued interest payable","$100,000"
+"[To record interest expense]",""
+"Accrued interest payable","$100,000"
+"Debt","$163,800"
+"Cash","$263,800"
+"[To record debt payment (cash disbursement of $263,800 consists of $50,000 in dividends and $213,800 supplemental cash contribution to the ESOP)]",""
+"Compensation expense","$215,000"
+"Paid-in capital","$15,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 20,000 shares at average fair value $10.75 per share (shares cost ESOP $10)]",""
+"Deferred tax asset","$14,480"
+"Provision for income taxes","$600,000"
+"Income taxes payable","$614,480"
+"[To record income taxes for Year 1]",""
+
+Description,Amount
+"Interest expense","$83,600"
+"Accrued interest payable","$83,600"
+"[To record interest expense]",""
+"Accrued interest payable","$83,600"
+"Debt","$180,200"
+"Cash","$263,800"
+"[To record debt payment (The cash disbursement of $263,800 consists of $50,000 in dividends, $10,000 of which is charged to retained earnings in Year 2, and $213,800 supplemental cash contribution to the employee stock ownership plan)]",""
+"Retained earnings","$10,000"
+"Dividends payable","$10,000"
+"[To record declaration of $0.50 per share dividend on the 20,000 allocated shares]",""
+"Compensation expense","$195,000"
+"Dividends payable","$10,000"
+"Paid-in capital","$5,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 20,000 shares (19,024 for compensation and 976 for dividends) at an average fair value of $10.25 per share (shares cost employee stock ownership plan $10 per share)]",""
+"Deferred tax asset","$7,920"
+"Provision for income taxes","$646,560"
+"Income taxes payable","$654,480"
+"[To record income taxes for Year 2]",""
+
+Description,Amount
+"Interest expense","$65,600"
+"Accrued interest payable","$65,600"
+"[To record interest expense]",""
+"Accrued interest payable","$65,600"
+"Debt","$198,200"
+"Cash","$263,800"
+"[To record debt payment]",""
+"Retained earnings","$20,000"
+"Dividends payable","$20,000"
+"[To record declaration of $0.50 per share dividend on the 40,000 allocated shares]",""
+"Compensation expense","$170,000"
+"Dividends payable","$20,000"
+"Paid-in capital","$10,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 20,000 shares (17,895 for compensation and 2,105 for dividends) at an average fair value of $9.50 per share (shares cost employee stock ownership plan $10 per share)]",""
+"Deferred tax asset","$720"
+"Provision for income taxes","$693,760"
+"Income taxes payable","$694,480"
+"[To record income taxes for Year 3]",""
+
+Description,Amount
+"Interest expense","$45,800"
+"Accrued interest payable","$45,800"
+"[To record interest expense]",""
+"Accrued interest payable","$45,800"
+"Debt","$218,000"
+"Cash","$263,800"
+"[To record debt payment]",""
+"Retained earnings","$30,000"
+"Dividends payable","$30,000"
+"[To record declaration of $0.50 per share dividend on the 60,000 allocated shares]",""
+"Compensation expense","$190,000"
+"Dividends payable","$30,000"
+"Paid-in capital","$20,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 20,000 shares (17,273 for compensation and 2,727 for dividends) at an average fair value of $11.00 per share (shares cost employee stock ownership plan $10 per share)]",""
+"Provision for income taxes","$741,680"
+"Deferred tax asset","$7,200"
+"Income taxes payable","$734,480"
+"[To record income taxes for Year 4]",""
+
+Description,Amount
+"Interest expense","$24,000"
+"Accrued interest payable","$24,000"
+"[To record interest expense]",""
+"Accrued interest payable","$24,000"
+"Debt","$239,800"
+"Cash","$263,800"
+"[To record debt payment]",""
+"Retained earnings","$40,000"
+"Dividends payable","$40,000"
+"[To record declaration of $0.50 per share dividend on the 80,000 allocated shares]",""
+"Compensation expense","$224,000"
+"Dividends payable","$40,000"
+"Paid-in capital","$64,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 20,000 shares (16,970 for compensation and 3,030 for dividends) at an average fair value of $13.20 per share (shares cost employee stock ownership plan $10 per share)]",""
+"Provision for income taxes","$790,400"
+"Deferred tax asset","$15,920"
+"Income taxes payable","$774,480"
+"[To record income taxes for Year 5]",""              
+                        
+                        
+                        
+718-40-55-7
+Assuming Entity A terminates its employee stock ownership plan at the end of Year 2 (when the fair value of the suspense shares is $540,000 [60,000 shares multiplied by $9 per share], the unearned employee stock ownership plan share balance is $600,000, and the unpaid debt balance is $656,000), and assuming the suspense shares are sold to pay down the debt, Entity A would make the following journal entry.
+
+Description,Amount
+"Debt","$656,000"
+"Additional paid-in capital","$60,000"
+"Unearned employee stock ownership plan shares","$600,000"
+"Cash","$116,000"
+"[To record repayment of the employee stock ownership plan's loan and termination of the plan]",""
+                        
+718-40-55-8
+The following tables set forth Entity A's tax (assuming no termination) and earnings per share (EPS) computations.
+
+Year,Income before employee stock ownership plan,Interest expense,Compensation expense,Pretax income,Provision for income tax - Currently payable,Deferred,Total,Net income,Average shares outstanding,Earnings per share
+1,"$1,800,000","($100,000)","($215,000)","$1,485,000","$614,480","($14,480)","$600,000","$885,000","1,010,000","$0.88"
+2,"$1,900,000","($83,600)","($195,000)","$1,621,400","$654,480","($7,920)","$646,560","$974,840","1,030,000","$0.95"
+3,"$2,000,000","($65,600)","($170,000)","$1,764,400","$694,480","($720)","$693,760","$1,070,640","1,050,000","$1.02"
+4,"$2,100,000","($45,800)","($190,000)","$1,864,200","$734,480","$7,200","$741,680","$1,122,520","1,070,000","$1.05"
+5,"$2,200,000","($24,000)","($224,000)","$1,952,000","$774,480","$15,920","$790,400","$1,161,600","1,090,000","$1.07"
+
+Year,Income before employee stock ownership plan,Employee stock ownership plan contribution,Employee stock ownership plan dividends,Taxable income,Multiplied by 40%,Reduction in unearned ESOP shares for financial reporting,Related tax deduction,Difference,Tax rate,Deferred tax expense (benefit)
+1,"$1,800,000","($213,800)","($50,000)","$1,536,200","$614,480","$200,000","$163,800","($36,200)","40%","($14,480)"
+2,"$1,900,000","($213,800)","($50,000)","$1,636,200","$654,480","$200,000","$180,200","($19,800)","40%","($7,920)"
+3,"$2,000,000","($213,800)","($50,000)","$1,736,200","$694,480","$200,000","$198,200","($1,800)","40%","($720)"
+4,"$2,100,000","($213,800)","($50,000)","$1,836,200","$734,480","$200,000","$218,800","$18,000","40%","$7,200"
+5,"$2,200,000","($213,800)","($50,000)","$1,936,200","$774,480","$200,000","$239,800","$39,800","40%","$15,920"
+
+Year,Pretax income,Tax at 40% (statutory rate),Benefit of employee stock ownership plan dividends,Effect of difference between average fair value and cost of released shares,Provision as reported
+1,"$1,485,000","$594,000","$ - ","$6,000","$600,000"
+2,"$1,621,400","$648,560","($4,000)","$2,000","$646,560"
+3,"$1,764,400","$705,760","($8,000)","($4,000)","$693,760"
+4,"$1,864,200","$745,680","($12,000)","$8,000","$741,680"
+5,"$1,952,000","$780,800","($16,000)","$25,600","$790,400"
+                     
+                        
+                        
+718-40-55-9
+The entity would provide the following disclosures for the end of Year 3.
+The entity sponsors a leveraged employee stock ownership plan that covers all U.S. employees who work 20 or more hours per week. The entity makes annual contributions to the employee stock ownership plan equal to the employee stock ownership plan's debt service less dividends received by the employee stock ownership plan. All dividends received by the employee stock ownership plan are used to pay debt service. The employee stock ownership plan shares initially were pledged as collateral for its debt. As the debt is repaid, shares are released from collateral and allocated to active employees, based on the proportion of debt service paid in the year. The entity accounts for its employee stock ownership plan in accordance with this Subtopic. Accordingly, the debt of the employee stock ownership plan is recorded as debt and the shares pledged as collateral are reported as unearned employee stock ownership plan shares in the statement of financial position. As shares are released from collateral, the entity reports compensation expense equal to the current market price of the shares, and the shares become outstanding for EPS computations. Dividends on allocated employee stock ownership plan shares are recorded as a reduction of retained earnings; dividends on unallocated employee stock ownership plan shares are recorded as a reduction of debt and accrued interest. Employee stock ownership plan compensation expense was $170,000, $195,000, and $215,000 for Years 3, 2, and 1, respectively. The employee stock ownership plan shares as of December 31 were as follows.
+
+Item,Year 3,Year 2
+"Allocated shares","40,000","20,000"
+"Shares released for allocation","20,000","20,000"
+"Unreleased shares","40,000","60,000"
+"Total employee stock ownership plan shares","100,000","100,000"
+"Fair value of unreleased shares at December 31","$400,000","$540,000"
+
+· · > Case B: A Common-Stock Leveraged Employee Stock Ownership Plan Used to Fund the Employer's Match of a 401(k) Savings Plan with an Indirect loan
+718-40-55-10
+This Case illustrates a common stock leveraged employee stock ownership plan used to fund the employer's match of a 401(k) savings plan with an indirect loan. On January 1, Year 1, Entity B established an employee stock ownership plan to fund the employer's match of its savings plan. All of the assumptions are the same as those outlined in Case A for Entity A, except as follows:
+aEntity B loaned its employee stock ownership plan $1,000,000 and concurrently obtained a related loan. The terms of both lending arrangements are the same as for Case A's outside loan.
+bEntity B uses shares released by the employee stock ownership plan to satisfy its matching obligation of 50 percent of voluntary employee contributions to the savings plan. The average fair value of the shares for each year is used to determine the number of shares necessary to satisfy the matching obligation.
+cIf the fair value of the shares released is less than Entity B's matching obligation, Entity B contributes additional newly issued shares to the employee stock ownership plan to satisfy the remaining obligation.
+dShares used to replace dividends on allocated shares used to service debt do not count toward the employer's match.
+eThe employee contributions, required employer match, and the number of shares needed to fund the employee match follow.
+
+Year,Employee Contributions,Employer Match,Number of Shares
+1,"$400,000","$200,000","18,605"
+2,"$410,000","$205,000","20,000"
+3,"$420,000","$210,000","22,105"
+4,"$430,000","$215,000","19,545"
+5,"$440,000","$220,000","16,667"
+                            
+Note that the number of shares needed to satisfy the employer's matching obligation is determined by dividing the matching obligation by the average fair value of a share of common stock (for Year 1: $200,000 divided by $10.75 [see above table for average fair values] equals 18,605 shares).
+718-40-55-11
+The 20,000 shares released each year based on debt service payments follow.
+
+Year,Number of Shares Needed to Settle 401(k) Liability,Total Employee Stock Ownership Plan Shares Released,Employee Stock Ownership Plan Shares Used for Dividends,Employee Stock Ownership Plan Shares Available to Settle 401(k) Liability,Compensation (Additional Shares),Top-Up (Additional Shares)
+1,"18,605","20,000","0","20,000","1,395","0"
+2,"20,000","20,000","976","19,024","0","976"
+3,"22,105","20,000","2,105","17,895","0","4,210"
+4,"19,545","20,000","2,727","17,273","0","2,272"
+5,"16,667","20,000","3,030","16,970","303","0"
+                        
+718-40-55-12
+Cumulative share amounts follow.
+
+Year,Cumulative Number of Shares Released,Allocated,Total Suspense Shares
+1,"20,000","0","80,000"
+2,"40,976","20,000","60,000"
+3,"65,186","40,976","40,000"
+4,"87,458","65,186","20,000"
+5,"107,458","87,458","0"
+                        
+718-40-55-13
+Note that dividends on top-up shares are paid in cash. Cumulative shares released include top-up shares.
+718-40-55-14
+The following table sets forth Entity B's employee stock ownership plan related information. All amounts represent changes (credits in parentheses) in account balances.
+
+Year,Principal,Unearned Employee Stock Ownership Plan Shares,Paid-In Capital,Dividends,Interest Expense,Compensation Expense (ESOP),Compensation Expense (Top-Up),Cash
+1,"$163,800","(200,000)","($15,000)","$ - ","$100,000","$215,000","$ - ","($263,800)"
+2,"$180,200","(200,000)","($15,000)","$10,000","$83,600","$195,000","$10,000","($263,800)"
+3,"$198,200","(200,000)","($30,000)","$20,500","$65,600","$170,000","$40,000","($264,300)"
+4,"$218,000","(200,000)","($45,000)","$32,600","$45,800","$190,000","$25,000","($266,400)"
+5,"$239,800","(200,000)","($64,000)","$43,700","$24,000","$224,000","$ - ","($267,500)"
+"Total","$1,000,000","(1,000,000)","($169,000)","$106,800","$319,000","$994,000","$75,000","($1,325,800)"
+
+718-40-55-15
+Entity B would record journal entries from inception through Year 2 as follows.
+
+Description,Amount
+"Cash","$1,000,000"
+"Debt","$1,000,000"
+"[To record loan]",""
+"Unearned employee stock ownership plan shares (equity)","$1,000,000"
+"Common stock and additional paid-in capital","$1,000,000"
+"[To record issuance of 100,000 shares to the employee stock ownership plan at $10 per share]",""
+
+Description,Amount
+"Interest expense","$100,000"
+"Accrued interest payable","$100,000"
+"[To record interest expense]",""
+"Accrued interest payable","$100,000"
+"Debt","$163,800"
+"Cash","$263,800"
+"[To record debt payment (cash disbursement of $263,800 consists of $50,000 in dividends and $213,800 supplemental cash contribution to the ESOP)]",""
+"Compensation expense","$200,000"
+"401(k) liability","$200,000"
+"[To record cost and liability related to employer's 401(k) match (50% of employee contributions)]",""
+"401(k) liability","$200,000"
+"Compensation expense","$15,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"Paid-in capital","$15,000"
+"[To record release of 20,000 shares at average fair value of $10.75 per share (18,605 used to satisfy 401(k) liability; 1,395 used to compensate participants); shares cost ESOP $10 per share]",""
+"Deferred tax asset","$14,480"
+"Provision for income taxes","$600,000"
+"Income taxes payable","$614,480"
+"[To record income taxes for Year 1]",""
+
+Description,Amount
+"Interest expense","$83,600"
+"Accrued interest payable","$83,600"
+"[To record interest expense]",""
+"Accrued interest payable","$83,600"
+"Debt","$180,200"
+"Cash","$263,800"
+"[To record debt payment (The cash disbursement of $263,800 consists of $50,000 in dividends, $10,000 of which is charged to retained earnings in Year 2, and $213,800 supplemental cash contribution to the employee stock ownership plan)]",""
+"Compensation expense","$205,000"
+"401(k) liability","$205,000"
+"[To record cost and liability related to employer's 401(k) match (50% of employee contributions)]",""
+"Retained earnings","$10,000"
+"Dividends payable","$10,000"
+"[To record declaration of $0.50 per share dividend on the 20,000 allocated shares]",""
+"401(k) liability","$205,000"
+"Dividends payable","$10,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"Common stock/paid-in capital","$15,000"
+"[To record release of 20,000 shares plus contribution of an additional 976 shares to the ESOP at an average fair value of $10.25 per share (20,000 shares used to satisfy 401(k) liability and the remaining 976 shares are used to replace dividends on allocated shares used for debt service); shares cost ESOP $10 per share]",""
+"Deferred tax asset","$7,920"
+"Provision for income taxes","$642,560"
+"Income taxes payable","$650,480"
+"[To record income taxes for Year 2]",""
+               
+                        
+                        
+718-40-55-16
+Note that the journal entry differs from Case A because Entity B receives an additional $10,000 deduction ($4,000 tax benefit) for the 976 top-up shares.
+718-40-55-17
+Assuming Entity B terminated its employee stock ownership plan at the end of Year 4 (when the fair value of the suspense shares is $240,000, the unearned employee stock ownership plan shares balance is $200,000, and the unpaid debt balance is $239,800), and assuming the employer buys back the suspense shares in an amount equal to the debt balance, there will be 17 suspense shares left, which must be allocated to participants. (In this Case the shares are used to partially satisfy the employer's 401(k) matching obligation.) Entity B would make the following journal entry.
+
+Description,Amount
+"Treasury stock","$39,800"
+"401(k) liability","$204"
+"Additional paid-in-capital","$40,004"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record repurchase of employee stock ownership plan suspense shares and termination of the plan]",""
+"Debt","$239,800"
+"Cash","$239,800"
+"[To record repayment of the employee stock ownership plan's loan]",""
+                        
+718-40-55-18
+In this Case, Entity B's taxes would be computed the same way as Case A. For Entity B the average number of employee stock ownership plan shares outstanding would be as follows.
+
+Year,Employee Stock Ownership Plan Shares Outstanding
+1,10,000
+2,30,488
+3,53,081
+4,76,322
+5,95,568
+
+
+718-40-55-19
+This represents the cumulative numbers of shares released at the beginning of the year plus the end of the year (see the table in the preceding paragraph) divided by 2.
+718-40-55-20
+The entity would provide the following disclosures for the end of Year 3.
+The entity sponsors a 401(k) savings plan under which eligible U.S. employees may choose to save up to 6 percent of salary income on a pretax basis, subject to certain Internal Revenue Service (IRS) limits. The entity matches 50 percent of employee contributions with entity common stock. The shares for this purpose are provided principally by the entity's employee stock ownership plan, supplemented as needed by newly issued shares. The entity makes annual contributions to the employee stock ownership plan equal to the employee stock ownership plan's debt service less dividends received by the employee stock ownership plan. All dividends received by the employee stock ownership plan are used to pay debt service. The employee stock ownership plan shares initially were pledged as collateral for its debt. As the debt is repaid, shares are released from collateral and allocated to employees who made 401(k) contributions that year, based on the proportion of debt service paid in the year. The entity accounts for its employee stock ownership plan in accordance with this Subtopic. Accordingly, the shares pledged as collateral are reported as unearned employee stock ownership plan shares in the statement of financial position. As shares are released from collateral, the entity reports compensation expense equal to the current market price of the shares, and the shares become outstanding for EPS computations. Dividends on allocated employee stock ownership plan shares are recorded as a reduction of retained earnings; dividends on unallocated employee stock ownership plan shares are recorded as a reduction of debt and accrued interest.
+Compensation expense for the 401(k) match and the employee stock ownership plan was $210,000, $205,000, and $215,000 for Years 3, 2, and 1, respectively. The employee stock ownership plan shares as of December 31 were as follows.
+
+Item,Year 3,Year 2
+"Allocated shares","40,976","20,000"
+"Shares released for allocation","24,210","20,976"
+"Unreleased shares","40,000","60,000"
+"Total employee stock ownership plan shares","105,186","100,976"
+"Fair value of unreleased shares at December 31","$400,000","$540,000"
+
+· · > Case C: A Convertible-Preferred-Stock Leveraged Employee Stock Ownership Plan with a Direct Loan
+718-40-55-21
+This Case illustrates a convertible preferred stock leveraged employee stock ownership plan with a direct loan. On January 1, Year 1, Entity D established an employee stock ownership plan with convertible preferred stock. The assumptions are as follows:
+aThe borrowing, debt service, earnings, and tax assumptions are the same as those for Entity A outlined in Case A.
+bOn January 1, Year 1, the employee stock ownership plan used the proceeds of the debt to buy 80,000 shares of newly issued convertible preferred stock of Entity D for $12.50 per share.
+cThe preferred stock pays dividends quarterly at an annual rate of $1.25 per share ($100,000 each year for the employee stock ownership plan shares). Accordingly, in this Case the average fair value of the shares is used to determine the number of shares used to satisfy the employer's obligation to replace dividends on allocated shares used for debt service.
+dAll dividends on employee stock ownership plan shares are used for debt service.
+eThe preferred stock is convertible into common stock at 1:1 ratio.
+fParticipants may not withdraw the convertible preferred stock from the employee stock ownership plan. When participants become eligible to withdraw shares from their account, they must either convert to common stock or redeem the preferred shares.
+gThe preferred stock has a guaranteed minimum redemption value of $12.50 per share, to be paid in shares of common stock.
+hThe preferred stock is callable at $13.00 per share.
+iThere is one vote per preferred share.
+jThe year-end and average fair values of a share of preferred stock (fair value is assumed to be greater than or equal to minimum value) follow.
+
+Year,Year-End,Average
+1,"$12.50","$12.50"
+2,"$12.50","$12.50"
+3,"$12.50","$12.50"
+4,"$12.50","$12.50"
+5,"$14.40","$13.20"
+                            
+718-40-55-22
+The shares released each year follow.
+
+Year,Dividends,Compensation,Total Released,Total Allocated
+1,"$0","$16,000","$16,000","$0"
+2,"$1,600","$14,400","$16,000","$16,000"
+3,"$3,200","$12,800","$16,000","$16,000"
+4,"$4,800","$11,200","$16,000","$16,000"
+5,"$6,061","$9,939","$16,000","$16,000"
+                        
+718-40-55-23
+Note that the number of shares released for dividends is determined by dividing the amount of dividends on allocated shares (16,000 multiplied by $1.25 in Year 2; 32,000 multiplied by $1.25 in Year 3; and so forth) by the average fair value of a share of preferred stock ($12.50 in Years 2 and 3). In this illustration the remaining shares are released for compensation (16,000 less 1,600 in Year 2, 16,000 less 3,200 in Year 3, and so forth).
+718-40-55-24
+Additional share information follows.
+
+Year,"Cumulative Number of Shares Released - Released","Cumulative Number of Shares Released - Allocated","Year-End Suspense Shares"
+1,"16,000","0","64,000"
+2,"32,000","16,000","48,000"
+3,"48,000","32,000","32,000"
+4,"64,000","48,000","16,000"
+5,"80,000","64,000","0"
+                        
+718-40-55-25
+The following chart sets forth Entity D's employee stock ownership plan related information. All amounts represent changes (credits in parentheses) in account balances.
+
+Year,Principal,Unearned Employee Stock Ownership Plan Shares,Paid-In Capital,Dividends,Interest Expense,Compensation Expense,Cash
+1,"$163,800","($200,000)","($15,000)","$ - ","$100,000","$200,000","($263,800)"
+2,"$180,200","($200,000)","($15,000)","$20,000","$83,600","$180,000","($263,800)"
+3,"$198,200","($200,000)","($30,000)","$40,000","$65,600","$160,000","($263,800)"
+4,"$218,000","($200,000)","($45,000)","$60,000","$45,800","$140,000","($263,800)"
+5,"$239,800","($200,000)","($11,200)","$80,000","$24,000","$131,200","($263,800)"
+"Total","$1,000,000","($1,000,000)","($11,200)","$200,000","$319,000","$881,200","($1,319,000)"
+                        
+718-40-55-26
+The journal entries to reflect the accounting for Entity D's employee stock ownership plan from inception through Year 2 are as follows.
+
+Description,Amount
+"Cash","$1,000,000"
+"Debt","$1,000,000"
+"[To record the employee stock ownership plan's loan]",""
+"Unearned employee stock ownership plan shares (equity)","$1,000,000"
+"Preferred stock","$1,000,000"
+"[To record the issuance of shares to the employee stock ownership plan]",""
+"Interest expense","$100,000"
+"Accrued interest payable","$100,000"
+"[To record interest expense]",""
+"Accrued interest payable","$100,000"
+"Debt","$163,800"
+"Cash","$263,800"
+"[To record debt payment (the cash disbursement of $263,800 consists of $100,000 in dividends, none of which was charged to retained earnings in Year 1, and $163,800 supplemental cash contribution to the employee stock ownership plan)]",""
+"Compensation expense","$200,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"[To record release of 16,000 shares at an average fair value of $12.50 per share (shares cost employee stock ownership plan $12.50 per share)]",""
+"Deferred tax asset","$14,480"
+"Provision for income taxes","$600,000"
+"Income taxes payable","$614,480"
+"[To record income taxes for Year 1]",""
+"Interest expense","$83,600"
+"Accrued interest payable","$83,600"
+"[To record interest expense]",""
+"Accrued interest payable","$83,600"
+"Debt","$180,200"
+"Cash","$263,800"
+"[To record debt payment (the cash disbursement of $263,800 is made up of $100,000 in dividends, $20,000 of which is charged to retained earnings in Year 2, and $163,800 supplemental cash contribution to the employee stock ownership plan)]",""
+"Retained earnings","$20,000"
+"Dividends payable","$20,000"
+"[To record declaration of $1.25 per share dividend on the 16,000 allocated shares]",""
+"Compensation expense","$180,000"
+"Dividends payable","$20,000"
+"Unearned employee stock ownership plan shares","$200,000"
+"Common stock/paid-in capital","$15,000"
+"[To record release of 16,000 shares at an average fair value of $12.50 per share (shares cost employee stock ownership plan $12.50 per share)]",""
+"Deferred tax asset","$7,920"
+"Provision for income taxes","$646,560"
+"Income taxes payable","$654,480"
+"[To record income taxes for Year 2]",""
+
+                        
+718-40-55-27
+The tax and EPS calculations for Entity D follow.
+
+Year,Income before employee stock ownership plan,Interest expense,Compensation expense,Pretax income,Provision for income tax - Currently payable,Provision for income tax - Deferred,Provision for income tax - Total,Net income,Preferred stock dividends,Earnings applicable to common stock,Common shares outstanding,Basic EPS without conversion,Diluted EPS if converted
+1,"$1,800,000","($100,000)","($200,000)","$1,500,000","$614,480","($14,480)","$600,000","$900,000","$ - ","$900,000","1,000,000","$0.90","$0.89"
+2,"$1,900,000","($83,600)","($180,000)","$1,636,400","$654,480","($7,920)","$646,560","$989,840","$20,000","$969,840","1,000,000","$0.97","$0.95"
+3,"$2,000,000","($65,600)","($160,000)","$1,774,400","$694,480","($720)","$693,760","$1,080,640","$40,000","$1,040,640","1,000,000","$1.04","$1.01"
+4,"$2,100,000","($45,800)","($140,000)","$1,914,200","$734,480","$7,200","$741,680","$1,172,520","$60,000","$1,112,520","1,000,000","$1.11","$1.07"
+5,"$2,200,000","($24,000)","($131,200)","$2,044,800","$774,480","$15,920","$790,400","$1,254,400","$80,000","$1,174,400","1,000,000","$1.17","$1.13"
+                    
+718-40-55-28
+If-converted computation.
+
+
+Year,Earnings applicable to common stock,Preferred dividends net of tax,Tax benefit as if converted common dividend,Additional compensation,Adjusted earnings,Non-employee stock ownership plan shares,Employee stock ownership plan as if converted,Total shares outstanding,If-converted diluted EPS
+1,"$900,000","-","-","$ - ","$900,000",1,000,000,9,302,1,009,302,"$0.89"
+2,"$969,840","$12,000","$3,902","($6,146)","$979,596",1,000,000,29,268,1,029,268,"$0.95"
+3,"$1,040,640","$24,000","$8,421","($11,368)","$1,061,693",1,000,000,52,632,1,052,632,"$1.01"
+4,"$1,112,520","$36,000","$10,909","($19,636)","$1,139,793",1,000,000,63,636,1,063,636,"$1.07"
+5,"$1,174,400","$48,000","$12,800","($28,800)","$1,206,400",1,000,000,72,000,1,072,000,"$1.13"
+                        
+718-40-55-29
+Computations for (1), (2), and (3) follow.
+
+Item,Year 1,Year 2,Year 3,Year 4,Year 5
+"Allocated preferred shares",0,16,000,32,000,48,000,64,000
+"Conversion ratio","1:1","1:1","1:1","1:1","1:1"
+"Redemption ratio","12.50/10.75","12.50/10.25","12.50/9.50","12.50/11.00","1:1"
+"If converted allocated common shares",0,19,512,42,105,54,545,64,000
+"Dividends at $0.50 per common share","$ - ","$9,756","$21,053","$27,273","$32,000"
+"Tax benefit on common dividends","$ - ","$3,902","$8,421","$10,909","$12,800"
+"Preferred dividends at $1.25 per share","$ - ","$20,000","$40,000","$60,000","$80,000"
+"Dividends at $0.50 per common share (sub)","$ - ","($9,756)","($21,053)","($27,273)","($32,000)"
+"Additional compensation, gross","$ - ","$10,244","$18,947","$32,727","$48,000"
+"Additional compensation, net of tax","$ - ","$6,146","$11,368","$19,636","$28,800"
+"Computation — average preferred shares released",8,000,24,000,40,000,56,000,72,000
+"If converted — average released common shares",9,302,29,268,52,632,63,636,72,000
+
+Year,Pretax income,Tax at 40 percent (statutory rate),Benefit of employee stock ownership plan dividends,Effect of difference between fair value and cost of released shares,Provision as reported
+1,"$1,500,000","$600,000","-","-","$600,000"
+2,"$1,636,400","$654,560","($8,000)","-","$646,560"
+3,"$1,774,400","$709,760","($16,000)","-","$693,760"
+4,"$1,914,200","$765,680","($24,000)","-","$741,680"
+5,"$2,044,800","$817,920","($32,000)","$4,480","$790,400"
+      
+                        
+· > Example 2: A Convertible, Preferred-Stock, Leveraged Employee Stock Ownership Plan Used to Fund a 401(k) Savings Plan with an Employer Loan
+718-40-55-30
+This Example illustrates the guidance in paragraphs 718-40-25-7 through 25-17; 718-40-30-1 through 30-4; 718-40-35-1; 718-40-40-1 through 40-7; and 718-40-45-3 through 45-8 for a convertible preferred stock leveraged employee stock ownership plan used to fund a 401(k) savings plan with an employer loan. This Example has the following assumptions:
+aOn January 1, Year 1, Entity E established a leveraged employee stock ownership plan with convertible preferred stock.
+bThe employee stock ownership plan borrowed $1,000,000 from the employer at 10 percent for 5 years and used the proceeds to buy 80,000 shares of newly issued convertible preferred stock of Entity E for $12.50 per share.
+cDebt service is funded by cash contributions and dividends on employer stock held by the employee stock ownership plan.
+dDividends on all of the original 80,000 shares held by the employee stock ownership plan are used for debt service.
+eCash contributions are made at the end of each year.
+fThe preferred stock pays dividends quarterly at an annual rate of $1.25 per share ($100,000 each year for the employee stock ownership plan's shares). Accordingly, in this Example, the average fair value of the shares is used to determine the number of shares used to satisfy the employer's obligation to replace dividends on allocated shares used for debt service.
+gThe preferred stock is convertible at a 1:1 ratio into common stock.
+hParticipants may not withdraw the convertible preferred stock from the employee stock ownership plan. When participants become eligible to withdraw shares from their account, they must either convert to common stock or redeem the preferred shares.
+iThe preferred stock has a guaranteed minimum redemption value of $12.50 per share, to be paid in shares of common stock.
+jThe preferred stock is callable at $13.00 per share.
+kThere is one vote per preferred share.
+lThe year-end and average fair values of a share of preferred stock (fair value is assumed to be greater than or equal to minimum value) follow.
+
+Year,Year-End,Average
+1,"$12.50","$12.50"
+2,"$12.50","$12.50"
+3,"$12.50","$12.50"
+4,"$12.50","$12.50"
+5,"$14.40","$13.20"
+                          
+mEntity E uses shares released by the employee stock ownership plan to satisfy its matching obligation of 50 percent of voluntary employee contributions to the savings plan. The fair value of the shares at the end of each month is used to determine the number of shares necessary to satisfy the matching obligation. (Accordingly, in this Example, average fair values are used to determine the number of shares needed to satisfy the employer's liabilities.)
+nIf the fair value of the shares released is less than Entity E's matching obligation, Entity E contributes additional newly issued shares (top-up shares) to the employee stock ownership plan to satisfy the remaining obligation. The top-up shares are issued at the end of the year. Dividends on the top-up shares are paid in cash.
+oShares that replace dividends on allocated shares used to service debt do not count toward the employer's match.
+pThe employee contributions, required employer match, and the number of shares needed to fund the employee match follow..
+
+Year,Employee Contributions,Employer Match,Number of Shares
+1,"$400,000","$200,000","16,000"
+2,"$410,000","$205,000","16,400"
+3,"$420,000","$210,000","16,800"
+4,"$430,000","$215,000","16,600"
+5,"$440,000","$220,000","16,667"
+                          
+Note that the number of shares needed to satisfy the employer's matching obligation is determined by dividing the matching obligation by the average fair value of a share of common stock (for Year 1: $200,000 divided by $12.50 equals 16,000 shares).
+qPrincipal and interest are payable in annual installments at the end of each year. Debt service is as follows.
+                          
+rShares are released from the suspense account for allocation to participants' accounts based on a principal-plus-interest formula. The released shares are allocated to participants' accounts at the beginning of the following year. Shares are assumed to be released ratably throughout the year.
+sThe shares released each year follow.
+
+Year,Number of Shares Needed to Satisfy 401(k) Liability,Total Released,Shares Released for Dividends,ESOP Shares Available to Satisfy 401(k) Liability,Additional Shares (Top-Up)
+1,16,000,12,481,-,12,481,3,519
+2,16,400,14,205,1,248,12,957,3,443
+3,16,800,16,286,2,669,13,617,3,183
+4,17,200,18,068,4,297,13,771,3,429
+5,16,667,18,960,5,780,13,180,3,487
+                          
+Note that the number of shares released for dividends is determined by dividing the amount of dividends on allocated shares (12,481 multiplied by $1.25 in Year 2; 26,686 multiplied by $1.25 in Year 3, and so forth) by the average fair value of a share of preferred stock ($12.50 in Years 2 and 3). In this example, the remaining shares are released for compensation (14,205 less 1,248 in Year 2; 16,286 less 2,669 in Year 3, and so forth).
+tAdditional share information follows.
+
+Year,Cumulative Released,Cumulative Allocated,Top-Up Cumulative Issuable,Top-Up Cumulative Issued,Average Shares Released or Issuable,Total Shares Allocated,Year-End Suspense Shares
+1,"12,481","0","3,519","0","8,000","0","67,519"
+2,"26,686","12,481","6,962","3,519","24,824","16,000","53,314"
+3,"42,972","26,686","10,145","6,962","43,383","33,648","37,028"
+4,"61,040","42,972","13,574","10,145","63,866","53,117","18,960"
+5,"80,000","61,040","17,061","13,574","85,838","74,614","0"
+                          
+uThe pre-employee stock ownership plan income, shares outstanding, and income tax assumptions are the same as for Example 1 (see paragraph 718-40-55-3).
+718-40-55-31
+The following chart sets forth Entity E's employee stock ownership plan related information. All amounts represent changes (credits are in parentheses) in account balances.
+
+Year,Unearned employee stock ownership plan shares,Paid-In Capital,Dividends—Original Shares,Dividends—Top-Up Shares,Compensation Expense—Employee Stock Ownership Plan,Compensation Expense—Top-Up
+1,"$(156,000)","$(44,000)","-","-","$156,000","$44,000"
+2,"$(177,600)","$(43,000)","$15,600","$4,400","$162,000","$43,000"
+3,"$(203,600)","$(39,800)","$33,400","$8,700","$170,200","$39,800"
+4,"$(225,800)","$(42,900)","$53,700","$12,700","$172,100","$42,900"
+5,"$(237,000)","$(59,300)","$76,300","$17,000","$174,000","$46,000"
+Total,"$(1,000,000)","$(229,000)","$179,000","$42,800","$834,300","$215,700"
+                      
+718-40-55-32
+The journal entries to reflect the accounting for Entity E's employee stock ownership plan from inception through Year 2 are as follows.
+
+Description,Amount
+"Unearned employee stock ownership plan shares (equity)","$1,000,000"
+"Preferred stock","$1,000,000"
+"[To record issuance of shares to the employee stock ownership plan]",""
+"Compensation expense","$200,000"
+"401(k) liability","$200,000"
+"[To record cost and liability related to 401(k) match]",""
+"401(k) liability","$200,000"
+"Preferred stock","$44,000"
+"Unearned employee stock ownership plan shares","$156,000"
+"[To record release of 12,481 shares at an average fair value of $12.50 per share and issuance of 3,519 additional shares at $12.50 per share for top-up]",""
+"Deferred tax asset","$18,400"
+"Provision for income taxes","$600,000"
+"Income taxes payable","$618,400"
+"[To record income taxes for Year 1]",""
+"Retained earnings","$15,600"
+"Dividends payable","$15,600"
+"[To record declaration of $1.25 per share dividend on the 12,481 allocated shares]",""
+"Retained earnings","$4,400"
+"Cash","$4,400"
+"[To record declaration and payment of $1.25 per share dividend on the 3,519 issued top-up shares]",""
+"Compensation expense","$205,000"
+"401(k) liability","$205,000"
+"[To record cost and liability related to 401(k) match]",""
+"401(k) liability","$205,000"
+"Dividends payable","$15,600"
+"Unearned employee stock ownership plan shares","$177,600"
+"Preferred stock","$43,000"
+"[To record release of 14,205 shares at an average fair value of $12.50 per share and issuance of 3,443 additional shares at $12.50 per share for top-up]",""
+"Deferred tax asset","$11,040"
+"Provision for income taxes","$636,160"
+"Income taxes payable","$647,200"
+"[To record income taxes for Year 2]",""
+                      
+718-40-55-33
+The tax and earnings per share (EPS) computations for Entity E follow.
+                      
+Year,Income before employee stock ownership plan,Interest expense,Compensation—ESOP,Compensation—Top-Up,Pretax income,Provision for income tax (Currently payable),Provision for income tax (Deferred),Provision for income tax (Total),Net income,Preferred stock dividends,Earnings applicable to common stock,Common shares outstanding,Basic EPS without conversion,Diluted EPS if converted
+1,"$1,800,000","$100,000","$156,000","$44,000","$1,500,000","$600,000","($18,400)","$600,000","$900,000","$ - ","$900,000","1,000,000","$0.90","$0.89"
+2,"$1,900,000","$89,000","$162,000","$43,000","$1,606,000","$647,200","($11,040)","$636,160","$969,840","$20,000","$949,840","1,000,000","$0.95","$0.93"
+3,"$2,000,000","$74,000","$170,200","$39,800","$1,716,000","$674,480","($1,440)","$673,040","$1,042,960","$42,100","$1,000,860","1,000,000","$1.00","$0.97"
+4,"$2,100,000","$54,000","$172,100","$42,900","$1,831,000","$701,240","$9,680","$710,000","$1,120,080","$66,400","$1,053,680","1,000,000","$1.05","$1.01"
+5,"$2,200,000","$29,000","$174,000","$46,000","$1,951,000","$734,000","$21,200","$755,200","$1,195,800","$93,300","$1,102,500","1,000,000","$1.10","$1.06"
+
+Year,"Earnings applicable to common shares","Preferred dividends net of tax","Tax benefit on as-if converted common dividend (1)","Less—Additional compensation (2)","Adjusted earnings","Shares outstanding (non-ESOP)","Employee stock ownership plan as if converted (3)","Total shares outstanding","If-converted diluted EPS"
+1,"$900,000","$ - ","$ - ","$ - ","$900,000","1,000,000","9,302","1,009,302","$0.89"
+2,"$949,840","$12,000","$3,902","$4,795","$960,947","1,000,000","30,273","1,030,273","$0.93"
+3,"$1,000,860","$25,260","$8,855","$9,481","$1,025,494","1,000,000","57,083","1,057,083","$0.97"
+4,"$1,053,680","$39,840","$12,072","$17,579","$1,088,013","1,000,000","72,575","1,072,575","$1.01"
+5,"$1,102,500","$55,980","$14,923","$27,468","$1,145,935","1,000,000","85,838","1,085,838","$1.06"
+
+Item,Year 1,Year 2,Year 3,Year 4,Year 5
+"Calculation 1 — Allocated and issued preferred shares",0,16,000,33,648,53,117,74,614
+"Calculation 1 — Conversion ratio","1:1","1:1","1:1","1:1","1:1"
+"Calculation 1 — Redemption ratio","12.50/10.75","12.50/10.25","12.50/9.50","12.50/11.00","1:1"
+"If-converted allocated and issued common shares",0,19,512,44,274,60,360,74,614
+"Dividends at $0.50 per common share","$ - ","$9,756","$22,137","$30,180","$37,307"
+"Tax benefit on common dividends","$ - ","$3,902","$8,855","$12,072","$14,923"
+"Calculation 2 — Allocated preferred shares (excluding top-up shares)",0,12,481,26,686,42,972,61,040
+"Calculation 2 — Preferred dividends at $1.25 per share","$ - ","$15,601","$33,358","$53,715","$76,300"
+"If-converted allocated common shares (excl. top-up)",0,15,221,35,113,48,832,61,040
+"Dividends at $0.50 per common share","$ - ","$7,610","$17,557","$24,416","$30,520"
+"Additional compensation gross","$ - ","$7,991","$15,801","$29,299","$45,780"
+"Additional compensation net of tax","$ - ","$4,795","$9,481","$17,579","$27,468"
+"Calculation 3 — Average preferred shares released and issuable",8,000,24,824,43,383,63,866,85,838
+"If-converted average released and issuable common shares",9,302,30,273,57,083,72,575,85,838
+
+Year,Income before employee stock ownership plan,Employee stock ownership plan contribution,Employee stock ownership plan dividends,Top-up contribution,Taxable income,Tax rate,Current tax,Reduction in unearned ESOP shares,Related tax deduction,Difference,Deferred tax rate,Deferred tax expense (benefit),Total provision
+1,"$1,800,000","$110,000","$100,000","$44,000","$1,546,000","40%","$618,400","$156,000","$110,000","($46,000)","40%","($18,400)","$600,000"
+2,"$1,900,000","$139,000","$100,000","$43,000","$1,618,000","40%","$647,200","$177,600","$150,000","($27,600)","40%","($11,040)","$636,160"
+3,"$2,000,000","$174,000","$100,000","$39,800","$1,686,200","40%","$674,480","$203,600","$200,000","($3,600)","40%","($1,440)","$673,040"
+4,"$2,100,000","$204,000","$100,000","$42,900","$1,753,100","40%","$701,240","$225,800","$250,000","$24,200","40%","$9,680","$710,920"
+5,"$2,200,000","$219,000","$100,000","$46,000","$1,835,000","40%","$734,000","$237,000","$290,000","$53,000","40%","$21,200","$755,200"
+
+Year,Pretax income,Tax at 40 percent (statutory rate),Benefit of employee stock ownership plan dividends,Effect of difference between fair value and cost of released shares,Provision as reported
+1,"$1,500,000","$600,000","-","-","$600,000"
+2,"$1,606,000","$642,400","($6,240)","-","$636,160"
+3,"$1,716,000","$686,400","($13,360)","-","$673,040"
+4,"$1,831,000","$732,400","($21,480)","-","$710,920"
+5,"$1,915,000","$780,400","($30,520)","$5,320","$755,200"                                  
+                      
+                      
+Nonleveraged Employee Stock Ownership Plans
+> Illustrations
+· > Example 1: A Common Stock Nonleveraged Employee Stock Ownership Plan
+718-40-55-34
+This Example illustrates the guidance in paragraphs 718-40-25-2; 718-40-25-18 through 25-21; 718-40-30-5; and 718-40-45-9 for a common stock nonleveraged employee stock ownership plan.
+718-40-55-35
+This Example has the following assumptions:
+aOn January 1, Year 1, Entity C established a nonleveraged employee stock ownership plan
+bEntity C contributed 10 percent of pretax profit before employee stock ownership plan related charges to the employee stock ownership plan at the end of each of Years 1 through 5; the employee stock ownership plan bought newly issued employer stock with the contribution.
+cThe number of shares, earnings, tax, and other relevant assumptions are the same as those for Example 1, Case A (see paragraph 718-40-55-4).
+718-40-55-36
+The following chart sets forth Entity C's employee stock ownership plan-related information.
+
+Year,Compensation Expense,Dividends,Number of Employee Stock Ownership Plan Shares Purchased,Cumulative Employee Stock Ownership Plan Shares
+1,"$180,000","$ - ","15,652","15,652"
+2,"$190,000","$7,830","21,111","36,763"
+3,"$200,000","$18,380","20,000","56,763"
+4,"$210,000","$28,380","17,500","74,263"
+5,"$220,000","$37,130","15,278","89,541"
+                      
+718-40-55-37
+The year-end market value is used in this Example to determine the number of employee stock ownership plan shares purchased. [Year 1: $180,000 divided by $11.50 (See the table in the preceding paragraph) equals 15,652]
+718-40-55-38
+Entity C would record journal entries for Years 1 and 2 as follows.
+
+Description,Amount
+"Compensation expense","$180,000"
+"Common stock and/or paid-in capital","$180,000"
+"[To record contribution, sale of shares, and compensation expense]",""
+"Provision for income taxes","$648,000"
+"Income taxes payable","$648,000"
+"[To record income taxes at 40% for Year 1 on earnings of $1,620,000 ($1,800,000 pre‑ESOP income less $180,000 ESOP compensation)]",""
+"Compensation expense","$190,000"
+"Retained earnings","$7,830"
+"Common stock and/or paid-in capital","$190,000"
+"Dividends payable","$7,830"
+"[To record contribution, sale of shares, declaration of dividends, and compensation expense]",""
+"Dividends payable","$7,830"
+"Cash","$7,830"
+"[To record payment of dividends]",""
+"Provision for income taxes","$684,000"
+"Income taxes payable","$684,000"
+"[To record income taxes at 40% for Year 2 on earnings of $1,710,000 ($1,900,000 pre‑ESOP income less $190,000 ESOP compensation)]",""
+                      
+
+60 Relationships
+General
+> Compensation—Stock Compensation
+718-40-60-1
+For guidance on determining the accounting for the effect of income tax factors on employee stock ownership plans, see paragraphs 718-740-25-6 and 718-740-45-5.
+
+65 Transition and Open Effective Date Information
+General
+718-40-65-1
+Paragraph superseded on 07/05/2017 after the end of the transition period stated in Accounting Standards Update No. 2015-10, Technical Corrections and Improvements.

@@ -201,3 +201,13 @@ class ASC805KnowledgeBase(SharedKnowledgeBase):
             database_path="asc805_knowledge_base",
             collection_name="asc805_business_combinations"
         )
+
+
+class ASC718KnowledgeBase(SharedKnowledgeBase):
+    """ASC 718 specific knowledge base interface."""
+    
+    def __init__(self):
+        super().__init__(
+            database_path="asc718_knowledge_base",
+            collection_name="asc718_stock_compensation"
+        )
