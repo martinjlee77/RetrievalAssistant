@@ -12,119 +12,177 @@ LAST_KB_REFRESH = "September 3, 2025"
 # ---------------------------
 # Header
 # ---------------------------
-st.title("VeritasLogic.ai Technical Accounting Solutions")
-st.subheader("Generate strong first-draft memos using AI, based on authoritative guidance.")
+st.title("🎯 VeritasLogic.ai Technical Accounting Solutions")
+st.subheader("Generate **strong first-draft memos** using AI, based on authoritative guidance.")
 
 # ---------------------------
-# What's new (dismissible)
+# What's new (dismissible banner)
 # ---------------------------
 if st.session_state.show_whats_new:
-    with st.container(border=True):
-        c1, c2 = st.columns([0.9, 0.1])
-        with c1:
-            st.markdown("#### What's new")
-            st.markdown(
-                "- ASC 805 tool added to the home page cards.\n"
-                f"- Last KB refresh: {LAST_KB_REFRESH}.\n"
-                "- Faster runs with improved GPT‑5‑mini fallback."
-            )
-        with c2:
-            st.button("Dismiss", key="dismiss_whats_new", 
-                     on_click=lambda: st.session_state.update(show_whats_new=False))
+    st.success("🆕 **What's new** • ASC 805 tool launched • KB refresh: " + LAST_KB_REFRESH + " • Faster GPT-5-mini fallback")
+    if st.button("✖ Dismiss", key="dismiss_whats_new", type="secondary"):
+        st.session_state.show_whats_new = False
+        st.rerun()
 
 st.divider()
 
 # ---------------------------
 # Start an analysis
 # ---------------------------
-st.subheader("Start an analysis")
+st.markdown("### 🚀 Start an Analysis")
 st.caption("Pick a standard to begin. You'll upload your documents on the next screen.")
 
-# Grid of standard cards (keep above the fold)
-row1 = st.columns(3)
-row2 = st.columns(2)
+# Grid of standard cards with fixed heights and consistent styling
+row1 = st.columns(3, gap="medium")
+row2 = st.columns([1, 1, 1], gap="medium")  # Equal spacing for bottom row
 
 # ASC 606
 with row1[0]:
-    with st.container(border=True):
-        st.markdown("##### ASC 606 — Revenue from Contracts with Customers")
-        st.write("Generate a first-draft revenue memo with paragraph-level citations.")
-        st.page_link("asc606/asc606_page.py", label="Start ASC 606 Analysis", icon="➡️")
+    with st.container(border=True, height=180):
+        st.markdown("#### 💰 ASC 606")
+        st.markdown("**Revenue from Contracts**")
+        st.write("First-draft revenue memo with paragraph citations.")
+        st.page_link("asc606/asc606_page.py", label="🚀 Start ASC 606 Analysis", icon="💰", use_container_width=True)
 
 # ASC 340-40
 with row1[1]:
-    with st.container(border=True):
-        st.markdown("##### ASC 340-40 — Costs to Obtain or Fulfill a Contract")
-        st.write("Draft a policy memo on capitalization and amortization of contract costs.")
-        st.page_link("asc340/asc340_page.py", label="Start ASC 340-40 Analysis", icon="➡️")
+    with st.container(border=True, height=180):
+        st.markdown("#### 📄 ASC 340-40")
+        st.markdown("**Contract Costs**")
+        st.write("Policy memo on cost capitalization and amortization.")
+        st.page_link("asc340/asc340_page.py", label="🚀 Start ASC 340-40 Analysis", icon="📄", use_container_width=True)
 
 # ASC 842
 with row1[2]:
-    with st.container(border=True):
-        st.markdown("##### ASC 842 — Leases (Lessee)")
-        st.write("Classify leases and generate a lessee accounting memo with citations.")
-        st.page_link("asc842/asc842_page.py", label="Start ASC 842 Analysis", icon="➡️")
+    with st.container(border=True, height=180):
+        st.markdown("#### 🏢 ASC 842")
+        st.markdown("**Leases (Lessee)**")
+        st.write("Lease classification and lessee accounting memo.")
+        st.page_link("asc842/asc842_page.py", label="🚀 Start ASC 842 Analysis", icon="🏢", use_container_width=True)
+
+# Center the bottom row
+col_spacer, row2_col1, row2_col2, col_spacer2 = st.columns([0.5, 1, 1, 0.5])
 
 # ASC 718
-with row2[0]:
-    with st.container(border=True):
-        st.markdown("##### ASC 718 — Compensation—Stock Compensation")
-        st.write("Analyze equity awards and produce a stock compensation memo.")
-        st.page_link("asc718/asc718_page.py", label="Start ASC 718 Analysis", icon="➡️")
+with row2_col1:
+    with st.container(border=True, height=180):
+        st.markdown("#### 📈 ASC 718")
+        st.markdown("**Stock Compensation**")
+        st.write("Equity awards analysis and compensation memo.")
+        st.page_link("asc718/asc718_page.py", label="🚀 Start ASC 718 Analysis", icon="📈", use_container_width=True)
 
 # ASC 805
-with row2[1]:
-    with st.container(border=True):
-        st.markdown("##### ASC 805 — Business Combinations")
-        st.write("Assess a transaction and draft a business combinations memo.")
-        st.page_link("asc805/asc805_page.py", label="Start ASC 805 Analysis", icon="➡️")
+with row2_col2:
+    with st.container(border=True, height=180):
+        st.markdown("#### 🤝 ASC 805")
+        st.markdown("**Business Combinations**")
+        st.write("Transaction assessment and M&A accounting memo.")
+        st.page_link("asc805/asc805_page.py", label="🚀 Start ASC 805 Analysis", icon="🤝", use_container_width=True)
 
 st.divider()
 
 # ---------------------------
 # Reminders (trust panel)
 # ---------------------------
-st.subheader("Reminders")
-with st.container(border=True):
-    st.markdown(
-        "- **Hybrid RAG**: Uses your contract text plus the FASB Codification. See the FAQ for details.\n"
-        "- **First-draft only**: Always review for completeness and accuracy before use.\n"
-        "- **Scope**: Each standard page explains what's covered and what's out-of-scope.\n"
-        "- **Privacy**: Your files remain in your Streamlit session. We don't store them in a database. "
-        "Content sent to OpenAI via API is not used to train OpenAI models. See FAQ."
+st.markdown("### ⚠️ Key Reminders")
+st.info("""
+🔗 **Hybrid RAG**: Contract text + FASB Codification ([FAQ](pages/faq.py) for details)  
+📝 **First-draft only**: Always review for completeness and accuracy  
+🎯 **Scope**: Each standard page explains coverage and limitations  
+🔒 **Privacy**: Files stay in your session. OpenAI API content not used for training
+""")
+
+st.divider()
+
+# ---------------------------
+# How it works (with visual flow)
+# ---------------------------
+st.markdown("### 🛠️ How It Works")
+
+c1, arrow1, c2, arrow2, c3 = st.columns([1, 0.1, 1, 0.1, 1])
+
+with c1:
+    with st.container(border=True, height=140):
+        st.markdown("#### 1️⃣ Select Standard")
+        st.write("Choose the relevant ASC module for your analysis.")
+
+with arrow1:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### ➡️")
+
+with c2:
+    with st.container(border=True, height=140):
+        st.markdown("#### 2️⃣ Upload Documents")
+        st.write("Multiple PDFs supported; we combine them for analysis.")
+
+with arrow2:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### ➡️")
+
+with c3:
+    with st.container(border=True, height=140):
+        st.markdown("#### 3️⃣ Generate Memo")
+        st.write("Create first-draft memo with paragraph-level citations.")
+
+st.divider()
+
+# ---------------------------
+# Platform snapshot (improved metrics)
+# ---------------------------
+st.markdown("### 📊 Platform Snapshot")
+
+# Use 2x2 grid for better text visibility
+metric_row1 = st.columns(2, gap="large")
+metric_row2 = st.columns(2, gap="large")
+
+with metric_row1[0]:
+    st.metric(
+        label="📋 Standards Available",
+        value="5",
+        help="ASC 606, 340-40, 842, 718, 805"
+    )
+
+with metric_row1[1]:
+    st.metric(
+        label="🔄 Last KB Refresh",
+        value=LAST_KB_REFRESH,
+        help="Knowledge base last updated"
+    )
+
+with metric_row2[0]:
+    st.metric(
+        label="⚡ Analysis Speed",
+        value="~30-60s",
+        delta="per 10 pages",
+        help="Average processing time"
+    )
+
+with metric_row2[1]:
+    st.metric(
+        label="🎯 Citation Level",
+        value="ASC ¶ IDs",
+        help="Paragraph-level FASB citations"
     )
 
 st.divider()
 
 # ---------------------------
-# How it works
+# Footer with help links
 # ---------------------------
-st.subheader("How it works")
-c1, c2, c3 = st.columns(3)
-with c1:
-    with st.container(border=True):
-        st.markdown("###### 1) Select a standard")
-        st.write("Choose the relevant ASC module.")
-with c2:
-    with st.container(border=True):
-        st.markdown("###### 2) Upload your document(s)")
-        st.write("Multiple PDFs are supported; we combine them for analysis.")
-with c3:
-    with st.container(border=True):
-        st.markdown("###### 3) Analyze & generate")
-        st.write("Create a first-draft memo with paragraph-level citations.")
+st.markdown("### 💡 Help & Resources")
+help_cols = st.columns(4)
+
+with help_cols[0]:
+    st.page_link("pages/faq.py", label="❓ FAQ", use_container_width=True)
+
+with help_cols[1]:
+    st.page_link("pages/gethelp.py", label="🆘 Get Help", use_container_width=True)
+
+with help_cols[2]:
+    st.markdown("[📚 Scope Guide](#)", help="What's covered per standard")
+
+with help_cols[3]:
+    st.page_link("pages/research_assistant.py", label="🔍 Research Assistant", use_container_width=True)
 
 st.divider()
-
-# ---------------------------
-# Platform snapshot (metrics — show once)
-# ---------------------------
-st.subheader("Platform snapshot")
-mcols = st.columns(4)
-mcols[0].metric("Standards available", "5")
-mcols[1].metric("Last KB refresh", LAST_KB_REFRESH)
-mcols[2].metric("Avg analysis time", "~30–60s per 10 pages")
-mcols[3].metric("Citation level", "ASC paragraph IDs")
-
-st.divider()
-st.caption("© 2025 VertiasLogic.ai. All Rights Reserved.")
+st.caption("© 2025 Controller.cpa. All Rights Reserved.")
