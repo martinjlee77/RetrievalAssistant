@@ -29,6 +29,11 @@ STANDARDS_CONFIG = {
         "collection_name": "asc340_contract_costs",
         "description": "Contract Costs"
     },
+    "ASC 718 - Stock Compensation": {
+        "database_path": "asc718_knowledge_base",
+        "collection_name": "asc718_stock_compensation",
+        "description": "Share-Based Payment Transactions"
+    },
     "ASC 805 - Business Combinations": {
         "database_path": "asc805_knowledge_base",
         "collection_name": "asc805_guidance",
