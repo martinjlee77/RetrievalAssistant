@@ -27,7 +27,7 @@ pg = st.navigation([
     st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
     st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
     st.Page("pages/faq.py", title="FAQ"),
-    st.Page("pages/gethelp.py", title="Get help",)
+    st.Page("pages/gethelp.py", title="Get help")
 ])
 
 # 5. Run the app.
