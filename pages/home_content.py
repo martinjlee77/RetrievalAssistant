@@ -1,96 +1,130 @@
 import streamlit as st
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
+# ---------------------------
+# Session helpers
+# ---------------------------
+if "show_whats_new" not in st.session_state:
+    st.session_state.show_whats_new = True
 
-# --- Single Line Date/Time Header ---
-# Get the current time, convert it to Eastern Time, and format it.
-# now_est = datetime.now(ZoneInfo("America/New_York"))
+LAST_KB_REFRESH = "September 3, 2025"
 
-# Format string with Time first, then Date.
-# %I:%M %p is 12-hour time, %Z is timezone, %A is Weekday, etc.
-# formatted_time = now_est.strftime("%I:%M %p %Z  |  %A, %B %d, %Y")
+# ---------------------------
+# Header
+# ---------------------------
+st.title("VeritasLogic.ai Technical Accounting Solutions")
+st.subheader("Generate strong first-draft memos using AI, based on authoritative guidance.")
 
-# Display it using st.markdown() to get the standard text color.
-# st.markdown(formatted_time)
+# ---------------------------
+# What's new (dismissible)
+# ---------------------------
+if st.session_state.show_whats_new:
+    with st.container(border=True):
+        c1, c2 = st.columns([0.9, 0.1])
+        with c1:
+            st.markdown("#### What's new")
+            st.markdown(
+                "- ASC 805 tool added to the home page cards.\n"
+                f"- Last KB refresh: {LAST_KB_REFRESH}.\n"
+                "- Faster runs with improved GPT‑5‑mini fallback."
+            )
+        with c2:
+            st.button("Dismiss", key="dismiss_whats_new", 
+                     on_click=lambda: st.session_state.update(show_whats_new=False))
 
-# Streamlit version - DELETE THIS LINE IN PRODUCTION
-# st.write(f"Running Streamlit Version: {st.__version__}")
-
-# --- Header Section ---
-st.title("VeritasLogic.ai Technical Accounting Solutions (VTAS)")
-st.subheader("Welcome back. Please select an analysis tool below to begin.")
-st.markdown("This application uses the FASB's Accounting Standards Codification for contract analysis, unlike general-purpose LLMs that rely on general knowledge.")
-
-# --- Main Content: Call-to-Action Containers ---
 st.divider()
-st.subheader("Available Analysis Tools")
 
-# We use standard columns and containers for a clean, card-like layout
-col1, col2 = st.columns(2)
+# ---------------------------
+# Start an analysis
+# ---------------------------
+st.subheader("Start an analysis")
+st.caption("Pick a standard to begin. You'll upload your documents on the next screen.")
 
-with col1:
+# Grid of standard cards (keep above the fold)
+row1 = st.columns(3)
+row2 = st.columns(2)
+
+# ASC 606
+with row1[0]:
     with st.container(border=True):
-        st.markdown("##### 📄 ASC 606 - Revenue from Contracts with Customers")
-        st.write(
-            "Generate audit-ready memos by analyzing contracts with our Hybrid RAG system, leveraging both authoritative FASB and leading interpretative guidance."
-        )
-        st.page_link(
-            "asc606/asc606_page.py",
-            label="Go to ASC 606 Analyzer",
-            icon="➡️"
-        )
+        st.markdown("##### ASC 606 — Revenue from Contracts with Customers")
+        st.write("Generate a first-draft revenue memo with paragraph-level citations.")
+        st.page_link("asc606/asc606_page.py", label="Start ASC 606 Analysis", icon="➡️")
 
-with col2:
+# ASC 340-40
+with row1[1]:
     with st.container(border=True):
-        st.markdown("##### 🏢 ASC 340-40 - Contract Costs")
-        st.write(
-            "Generate comprehensive accounting policy memorandums for contract costs. Establish consistent capitalization and amortization policies for your organization."
-        )
-        st.page_link(
-            "asc340/asc340_page.py",
-            label="Go to ASC 340-40 Analyzer",
-            icon="➡️"
-        )
+        st.markdown("##### ASC 340-40 — Costs to Obtain or Fulfill a Contract")
+        st.write("Draft a policy memo on capitalization and amortization of contract costs.")
+        st.page_link("asc340/asc340_page.py", label="Start ASC 340-40 Analysis", icon="➡️")
 
-# Second row for future modules
-col3, col4 = st.columns(2)
-
-with col3:
+# ASC 842
+with row1[2]:
     with st.container(border=True):
-        st.markdown("##### 🏢 ASC 842 - Leases")
-        st.write(
-            "Coming Soon: Automatically classify leases as operating or finance, and generate amortization schedules for right-of-use assets and lease liabilities."
-        )
-        st.button(
-            "Coming Soon",
-            disabled=True,
-            use_container_width=True,
-            key="asc842_button"
-        )
+        st.markdown("##### ASC 842 — Leases (Lessee)")
+        st.write("Classify leases and generate a lessee accounting memo with citations.")
+        st.page_link("asc842/asc842_page.py", label="Start ASC 842 Analysis", icon="➡️")
 
-with col4:
+# ASC 718
+with row2[0]:
     with st.container(border=True):
-        st.markdown("##### 📈 More Standards")
-        st.write(
-            "Additional accounting standards coming soon. Our multi-standard platform will continue expanding with more FASB standards."
-        )
-        st.button(
-            "Coming Soon",
-            disabled=True,
-            use_container_width=True,
-            key="more_standards_button"
-        )
+        st.markdown("##### ASC 718 — Compensation—Stock Compensation")
+        st.write("Analyze equity awards and produce a stock compensation memo.")
+        st.page_link("asc718/asc718_page.py", label="Start ASC 718 Analysis", icon="➡️")
 
-# --- Footer and Stats ---
+# ASC 805
+with row2[1]:
+    with st.container(border=True):
+        st.markdown("##### ASC 805 — Business Combinations")
+        st.write("Assess a transaction and draft a business combinations memo.")
+        st.page_link("asc805/asc805_page.py", label="Start ASC 805 Analysis", icon="➡️")
+
 st.divider()
-st.subheader("Platform at a Glance")
 
-stat_cols = st.columns(4)
-stat_cols[0].metric("Available Modules", "2", "ASC 606 & 340-40")
-stat_cols[1].metric("Knowledge Base", "2,033+", "Chunks")
-stat_cols[2].metric("Knowledge Sources", "FASB/ Industry", "Hybrid RAG")
-stat_cols[3].metric("Avg. Analysis Time", "~30s")
+# ---------------------------
+# Reminders (trust panel)
+# ---------------------------
+st.subheader("Reminders")
+with st.container(border=True):
+    st.markdown(
+        "- **Hybrid RAG**: Uses your contract text plus the FASB Codification. See the FAQ for details.\n"
+        "- **First-draft only**: Always review for completeness and accuracy before use.\n"
+        "- **Scope**: Each standard page explains what's covered and what's out-of-scope.\n"
+        "- **Privacy**: Your files remain in your Streamlit session. We don't store them in a database. "
+        "Content sent to OpenAI via API is not used to train OpenAI models. See FAQ."
+    )
+
+st.divider()
+
+# ---------------------------
+# How it works
+# ---------------------------
+st.subheader("How it works")
+c1, c2, c3 = st.columns(3)
+with c1:
+    with st.container(border=True):
+        st.markdown("###### 1) Select a standard")
+        st.write("Choose the relevant ASC module.")
+with c2:
+    with st.container(border=True):
+        st.markdown("###### 2) Upload your document(s)")
+        st.write("Multiple PDFs are supported; we combine them for analysis.")
+with c3:
+    with st.container(border=True):
+        st.markdown("###### 3) Analyze & generate")
+        st.write("Create a first-draft memo with paragraph-level citations.")
+
+st.divider()
+
+# ---------------------------
+# Platform snapshot (metrics — show once)
+# ---------------------------
+st.subheader("Platform snapshot")
+mcols = st.columns(4)
+mcols[0].metric("Standards available", "5")
+mcols[1].metric("Last KB refresh", LAST_KB_REFRESH)
+mcols[2].metric("Avg analysis time", "~30–60s per 10 pages")
+mcols[3].metric("Citation level", "ASC paragraph IDs")
 
 st.divider()
 st.caption("© 2025 Controller.cpa. All Rights Reserved.")
