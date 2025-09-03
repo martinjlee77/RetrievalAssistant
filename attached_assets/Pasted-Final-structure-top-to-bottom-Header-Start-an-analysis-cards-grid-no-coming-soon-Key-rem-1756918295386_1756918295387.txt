@@ -1,0 +1,87 @@
+Final structure (top-to-bottom)
+
+Header
+Start an analysis (cards grid; no “coming soon”)
+Key reminders and notices (trust panel)
+How it works (3 short steps)
+Platform snapshot (metrics incl. Last KB refresh)
+What’s new (dismissible banner, 2–3 items)
+Help and resources links
+Footer
+Proposed user-facing copy Callouts indicate what I’m proposing to change or add.
+
+Header
+
+Title (proposed change): VeritasLogic.ai Technical Accounting Solutions
+Change from: “VeritasLogic.ai Technical Accounting Solutions (VTAS)” to remove the acronym for simplicity.
+Subtitle (proposed change): Generate strong first-draft memos using AI, based on authoritative guidance.
+Uses your preferred phrasing, with a small grammar cleanup (“based on authoritative guidance”).
+Start an analysis
+
+Intro line (new): Pick a standard to begin. You’ll upload your documents on the next screen.
+Card CTA label (confirmed): Start [Standard] Analysis
+Card one-liners (proposed changes; concise and ASC-only)
+
+ASC 606 — Revenue from Contracts with Customers
+One-liner (change): Generate a first-draft revenue memo with paragraph-level citations.
+Replaces old text referencing interpretive guidance.
+ASC 340-40 — Costs to Obtain or Fulfill a Contract
+One-liner (change): Draft a policy memo on capitalization and amortization of contract costs.
+ASC 842 — Leases (Lessee)
+One-liner (change): Classify leases and generate a lessee accounting memo with citations.
+ASC 718 — Compensation—Stock Compensation
+One-liner (new): Analyze equity awards and produce a stock compensation memo.
+ASC 805 — Business Combinations
+One-liner (new): Assess a transaction and draft a business combinations memo.
+Key reminders and notices (trust panel)
+
+Section header (new): Reminders
+Bullets (proposed text):
+Hybrid RAG: Uses your contract text plus the FASB Codification. See FAQ for details.
+First-draft only: Always review for completeness and accuracy before use.
+Scope: Each standard page explains what’s covered and what’s out-of-scope.
+Privacy: Your files remain in your Streamlit session. We don’t store them in a database. Content sent to OpenAI via API is not used to train OpenAI models. See FAQ.
+How it works (3 steps)
+
+Steps (proposed change to order/wording):
+Select a standard
+Upload your document(s)
+Analyze & generate a memo with paragraph-level citations
+Platform snapshot (metrics; show once)
+
+Section header (new): Platform snapshot
+Metrics (proposed items):
+Standards available: 5
+Last KB refresh: [MM/DD/YYYY]
+Avg analysis time: ~30–60s per 10 pages
+Citation level: ASC paragraph IDs
+Note: This replaces the current “Available Modules/KB Chunks/Knowledge Sources/Avg Time” block to avoid redundancy and reflect ASC-only sourcing.
+What’s new (dismissible banner)
+
+Banner label (new): What’s new
+Example items (placeholder text you can edit):
+ASC 805 tool added to the home page cards.
+Last KB refresh: [MM/DD/YYYY].
+Faster runs with improved GPT‑5‑mini fallback.
+Behavior: Small banner at top of page; dismissible for the session.
+Help and resources
+
+Links (proposed layout):
+FAQ
+What’s in scope (per standard)
+Get help
+ASC Research Assistant (de-emphasized; small link here rather than a primary action)
+Footer
+
+Keep your existing copyright.
+No explicit licensing note (as requested).
+Specific proposed changes to your current home_content.py
+
+Remove acronym “(VTAS)” from the title and add the new subtitle line.
+Remove the older 2-card grid and replace with a 5-card grid (606, 340-40, 842, 718, 805).
+Change CTA labels to “Start [Standard] Analysis” and update one-liners to ASC-only language (no interpretive guidance).
+Add a “Reminders” container with the bullets above (link to FAQ).
+Add a “How it works” 3-step section with the corrected order.
+Replace the existing “Platform at a Glance” metrics with the new “Platform snapshot” metrics (including Last KB refresh).
+Add a dismissible “What’s new” banner at the top (session-only).
+Keep Help and resources links at the bottom and add a small link to the Research Assistant there (not as a primary action).

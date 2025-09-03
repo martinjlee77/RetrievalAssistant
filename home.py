@@ -19,12 +19,15 @@ st.logo("assets/images/nobkg.png", size = "large")
 # 4. Define all pages in your app.
 pg = st.navigation([
     st.Page("pages/home_content.py", title="Home"),
-    st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
+
     st.Page("asc606/asc606_page.py", title="ASC 606: 5 Steps", icon="➡️"),
-    st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
-    st.Page("pages/asc842.py", title="ASC 842: Lessee Accounting", icon="➡️"),
+    st.Page("asc842/asc842_page.py", title="ASC 842: Lessee Accounting", icon="➡️"),
     st.Page("asc718/asc718_page.py", title="ASC 718: Stock Compensation", icon="➡️"),
-    st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon="➡️")
+    st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon="➡️"),
+    st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
+    st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
+    st.Page("pages/faq.py", title="FAQ"),
+    st.Page("pages/gethelp.py", title="Get help",)
 ])
 
 # 5. Run the app.

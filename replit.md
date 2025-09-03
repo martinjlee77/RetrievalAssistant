@@ -1,7 +1,7 @@
 # Multi-Standard Accounting Analysis Platform
 
 ## Overview
-This project is a multi-standard accounting analysis platform designed to generate comprehensive contract analyses under various accounting standards (e.g., ASC 606, ASC 340-40, ASC 842). It processes contracts to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance via hybrid RAG. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform with high accuracy and efficiency.
+This is a multi-standard accounting analysis platform designed to generate comprehensive analyses under various accounting standards (e.g., ASC 606, ASC 842, ASC 718, ASC 805 and ASC 340-40). It processes contracts or relevant documents to produce structured professional memos, adhering to specific methodologies and utilizing authoritative FASB guidance via hybrid RAG. The system aims to deliver audit-ready, professional-quality accounting memos, consistent with Big 4 standards for accuracy and presentation, envisioning a complete financial analysis platform with high accuracy and efficiency.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
