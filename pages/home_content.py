@@ -127,4 +127,4 @@ mcols[2].metric("Avg analysis time", "~30–60s per 10 pages")
 mcols[3].metric("Citation level", "ASC paragraph IDs")
 
 st.divider()
-st.caption("© 2025 Controller.cpa. All Rights Reserved.")
+st.caption("© 2025 VertiasLogic.ai. All Rights Reserved.")
