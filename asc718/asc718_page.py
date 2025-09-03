@@ -62,7 +62,7 @@ def get_asc718_inputs():
     """Get ASC 718 specific inputs."""
 
     # Document upload with ASC 718 specific help text
-    contract_text, filename = _upload_and_process_asc718()
+    contract_text, filename = _upload_and_process_asc805()
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -245,7 +245,7 @@ def perform_asc718_analysis(contract_text: str, additional_context: str = ""):
                 'customer_name': customer_name,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
-                'filename': filename,
+                'filename': filename_string,
                 'steps': analysis_results,
                 'executive_summary': executive_summary,
                 'background': background,
@@ -336,7 +336,7 @@ logging.basicConfig(level=logging.INFO)
 # Main function for Streamlit navigation
 def main():
     """Main function called by Streamlit navigation."""
-    render_asc606_page()
+    render_asc718_page()
 
 
 
@@ -480,4 +480,4 @@ def _generate_analysis_title() -> str:
 
 # For direct execution/testing
 if __name__ == "__main__":
-    render_asc805_page()
+    render_asc718_page()

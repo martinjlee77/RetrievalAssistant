@@ -443,7 +443,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Modifications (repricing, acceleration, extension, settlement-method change, performance condition changes): Identify a modification; measure incremental FV and recognize over remaining requisite service (or immediately if vested). Treat equity↔liability classification changes as modifications. [ASC 718-20-35; 718-20-55]',
                     'Cancellations/forfeitures/expirations: Reverse unrecognized cost for unvested awards; vested expirations generally do not create additional expense/benefit. [ASC 718-20-35]',
                     'Settlements/exercises: Record share issuance or cash settlement; handle net share withholding and any cash remitted for taxes appropriately. [ASC 718-20-35; 718-10-25]',
-                    'Business combinations (replacement awards): Allocate the replacement award's FV between pre-combination service (consideration transferred) and post-combination service (compensation expense); then account under the modified terms going forward. [ASC 805-30; ASC 718-20-35]'
+                    'Business combinations (replacement awards): Allocate the replacement award FV between pre-combination service (consideration transferred) and post-combination service (compensation expense); then account under the modified terms going forward. [ASC 805-30; ASC 718-20-35]'
                 ]
             },
             5: {
