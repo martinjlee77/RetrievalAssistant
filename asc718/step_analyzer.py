@@ -400,60 +400,60 @@ Follow ALL formatting instructions in the user prompt precisely."""
         step_info = {
             1: {
                 'title': 'Step 1: Scope, terms, grant date, and classification',
-                'focus': 'Confirm the arrangement is within ASC 718 and determine equity vs liability classification based on settlement features and own‑stock criteria',
+                'focus': 'Confirm the arrangement is within ASC 718 and determine equity vs liability classification based on settlement features and own-stock criteria',
                 'key_points': [
-                    'Scope: Confirm the award is a compensatory share‑based payment within ASC 718 (exclude ESPPs/ESOPs, standalone derivatives under ASC 815, ASC 480 instruments, and customer/vendor incentives under ASC 606). [ASC 718‑10‑15; ASC 815; ASC 480; ASC 606]',
-                    'Parties: Identify employee vs nonemployee; post‑ASU 2018‑07, core recognition/measurement principles are largely aligned (with attribution nuances). [ASC 718‑10‑15; 718‑10‑30; 718‑10‑35]',
-                    'Terms inventory: Capture all substantive terms—award type (option/RSU/PSU/SAR), vesting (service vs performance vs market; cliff vs graded), non‑vesting conditions (e.g., post‑vesting sale restrictions), post‑termination/retirement, clawbacks, repurchase/put/call features, reloads, dividend/dividend‑equivalent features, settlement alternatives (cash vs shares), and tax withholding/net‑share settlement. [ASC 718‑10‑20; 718‑10‑30]',
-                    'Grant date: Establish grant date (mutual understanding and approval of key terms). If service inception precedes grant date, recognize compensation using FV measured at each reporting date until grant date, then true‑up to grant‑date FV. [ASC 718‑10‑20 (definitions); 718‑10‑25; 718‑10‑55]',
-                    'Classification: Determine equity vs liability. Cash‑settled or obligating features → liability (remeasured each period). Share‑settled that qualify as equity → equity (no post–grant‑date remeasurement). Apply own‑stock guidance (indexation and settlement) to confirm equity classification. Net share withholding up to the maximum statutory rate generally retains equity classification. Consider features that could force cash settlement or fail own‑stock criteria (may require liability classification). [ASC 718‑30; 718‑20; 815‑40; 718‑10‑25]'
+                    'Scope: Confirm the award is a compensatory share-based payment within ASC 718 (exclude ESPPs/ESOPs, standalone derivatives under ASC 815, ASC 480 instruments, and customer/vendor incentives under ASC 606). [ASC 718-10-15; ASC 815; ASC 480; ASC 606]',
+                    'Parties: Identify employee vs nonemployee; post-ASU 2018-07, core recognition/measurement principles are largely aligned (with attribution nuances). [ASC 718-10-15; 718-10-30; 718-10-35]',
+                    'Terms inventory: Capture all substantive terms—award type (option/RSU/PSU/SAR), vesting (service vs performance vs market; cliff vs graded), non-vesting conditions (e.g., post-vesting sale restrictions), post-termination/retirement, clawbacks, repurchase/put/call features, reloads, dividend/dividend-equivalent features, settlement alternatives (cash vs shares), and tax withholding/net-share settlement. [ASC 718-10-20; 718-10-30]',
+                    'Grant date: Establish grant date (mutual understanding and approval of key terms). If service inception precedes grant date, recognize compensation using FV measured at each reporting date until grant date, then true-up to grant-date FV. [ASC 718-10-20 (definitions); 718-10-25; 718-10-55]',
+                    'Classification: Determine equity vs liability. Cash-settled or obligating features → liability (remeasured each period). Share-settled that qualify as equity → equity (no post–grant-date remeasurement). Apply own-stock guidance (indexation and settlement) to confirm equity classification. Net share withholding up to the maximum statutory rate generally retains equity classification. Consider features that could force cash settlement or fail own-stock criteria (may require liability classification). [ASC 718-30; 718-20; 815-40; 718-10-25]'
                 ]
             },
             2: {
-                'title': 'Step 2: Grant‑date measurement (valuation by award type)',
-                'focus': 'Measure grant‑date fair value using an appropriate model and well‑supported inputs; apply permitted nonpublic expedients where applicable',
+                'title': 'Step 2: Grant-date measurement (valuation by award type)',
+                'focus': 'Measure grant-date fair value using an appropriate model and well-supported inputs; apply permitted nonpublic expedients where applicable',
                 'key_points': [
-                    'Options and share‑settled SARs (equity): Use a recognized option‑pricing model (e.g., Black‑Scholes, lattice). Document current price, expected term, volatility, risk‑free rate, and dividends; reflect relevant features (e.g., market conditions, restrictions). [ASC 718‑10‑30; 718‑20‑55]',
-                    'RSUs/restricted stock: Measure at grant‑date FV of the underlying equity; incorporate non‑vesting conditions in FV (e.g., post‑vesting sale restrictions). [ASC 718‑10‑30]',
-                    'PSUs: Non‑market performance conditions: exclude from grant‑date FV; recognition based on probable outcome/quantity expected to vest. Market conditions: include in grant‑date FV (e.g., Monte Carlo); subsequent recognition is not adjusted for (non)achievement of the market condition, subject to service requirements. [ASC 718‑10‑20; 718‑10‑35; 718‑20‑55; 718‑10‑30]',
-                    'Liability‑classified awards (e.g., cash‑settled SARs): Measure at FV each reporting date until settlement (remeasure through earnings). [ASC 718‑30‑35]',
-                    'Nonpublic expedients: Consider permitted expedients (e.g., determining current price input; use of peer‑group volatility when appropriate). Document judgments and sources. [ASC 718‑10‑30]'
+                    'Options and share-settled SARs (equity): Use a recognized option-pricing model (e.g., Black-Scholes, lattice). Document current price, expected term, volatility, risk-free rate, and dividends; reflect relevant features (e.g., market conditions, restrictions). [ASC 718-10-30; 718-20-55]',
+                    'RSUs/restricted stock: Measure at grant-date FV of the underlying equity; incorporate non-vesting conditions in FV (e.g., post-vesting sale restrictions). [ASC 718-10-30]',
+                    'PSUs: Non-market performance conditions: exclude from grant-date FV; recognition based on probable outcome/quantity expected to vest. Market conditions: include in grant-date FV (e.g., Monte Carlo); subsequent recognition is not adjusted for (non)achievement of the market condition, subject to service requirements. [ASC 718-10-20; 718-10-35; 718-20-55; 718-10-30]',
+                    'Liability-classified awards (e.g., cash-settled SARs): Measure at FV each reporting date until settlement (remeasure through earnings). [ASC 718-30-35]',
+                    'Nonpublic expedients: Consider permitted expedients (e.g., determining current price input; use of peer-group volatility when appropriate). Document judgments and sources. [ASC 718-10-30]'
                 ]
             },
             3: {
                 'title': 'Step 3: Requisite service period, attribution, forfeitures, and condition assessments',
-                'focus': 'Determine the period/pattern of recognition and apply condition‑specific rules',
+                'focus': 'Determine the period/pattern of recognition and apply condition-specific rules',
                 'key_points': [
-                    'Requisite service period: Evaluate explicit, implicit, and derived service periods (including for market conditions and retirement eligibility). [ASC 718‑10‑20; 718‑10‑35]',
-                    'Attribution: Apply straight‑line or graded attribution consistent with policy and award terms. [ASC 718‑10‑35]',
-                    'Forfeitures: Elect to estimate forfeitures or account for them as they occur; apply consistently and true‑up. [ASC 718‑10‑35]',
-                    'Non‑market performance conditions: Recognize expense only when achievement is probable; update cumulative expense as probabilities change; reverse if no longer probable before vesting. [ASC 718‑10‑35; 718‑20‑55]',
-                    'Market conditions: Recognition driven by service requirements; market effect is incorporated in grant‑date FV. [ASC 718‑10‑30; 718‑20‑55]',
-                    'Non‑vesting conditions: Do not assess for "probable"; reflect in grant‑date FV. [ASC 718‑10‑30]',
-                    'Dividends/dividend equivalents: If forfeitable, recognize as compensation cost over the requisite service; if non‑forfeitable prior to vesting, adjust accounting consistent with guidance. [ASC 718‑10‑35; 718‑20]',
-                    'Employer payroll taxes: Accrue when the taxable event occurs (typically at vesting/settlement). [ASC 718‑10‑25/35]'
+                    'Requisite service period: Evaluate explicit, implicit, and derived service periods (including for market conditions and retirement eligibility). [ASC 718-10-20; 718-10-35]',
+                    'Attribution: Apply straight-line or graded attribution consistent with policy and award terms. [ASC 718-10-35]',
+                    'Forfeitures: Elect to estimate forfeitures or account for them as they occur; apply consistently and true-up. [ASC 718-10-35]',
+                    'Non-market performance conditions: Recognize expense only when achievement is probable; update cumulative expense as probabilities change; reverse if no longer probable before vesting. [ASC 718-10-35; 718-20-55]',
+                    'Market conditions: Recognition driven by service requirements; market effect is incorporated in grant-date FV. [ASC 718-10-30; 718-20-55]',
+                    'Non-vesting conditions: Do not assess for "probable"; reflect in grant-date FV. [ASC 718-10-30]',
+                    'Dividends/dividend equivalents: If forfeitable, recognize as compensation cost over the requisite service; if non-forfeitable prior to vesting, adjust accounting consistent with guidance. [ASC 718-10-35; 718-20]',
+                    'Employer payroll taxes: Accrue when the taxable event occurs (typically at vesting/settlement). [ASC 718-10-25/35]'
                 ]
             },
             4: {
                 'title': 'Step 4: Subsequent measurement, modifications, classification changes, settlements, and special transactions',
-                'focus': 'Remeasure liabilities, account for changes in terms/classification, and record exercises, cancellations, and business‑combination effects',
+                'focus': 'Remeasure liabilities, account for changes in terms/classification, and record exercises, cancellations, and business-combination effects',
                 'key_points': [
-                    'Liability‑classified awards: Remeasure FV at each reporting date through settlement; recognize changes in earnings. [ASC 718‑30‑35]',
-                    'Equity‑classified awards: No remeasurement after grant date except for modifications; continue to apply forfeiture policy and performance‑probability updates. [ASC 718‑20‑35]',
-                    'Modifications (repricing, acceleration, extension, settlement‑method change, performance condition changes): Identify a modification; measure incremental FV and recognize over remaining requisite service (or immediately if vested). Treat equity↔liability classification changes as modifications. [ASC 718‑20‑35; 718‑20‑55]',
-                    'Cancellations/forfeitures/expirations: Reverse unrecognized cost for unvested awards; vested expirations generally do not create additional expense/benefit. [ASC 718‑20‑35]',
-                    'Settlements/exercises: Record share issuance or cash settlement; handle net share withholding and any cash remitted for taxes appropriately. [ASC 718‑20‑35; 718‑10‑25]',
-                    'Business combinations (replacement awards): Allocate the replacement award's FV between pre‑combination service (consideration transferred) and post‑combination service (compensation expense); then account under the modified terms going forward. [ASC 805‑30; ASC 718‑20‑35]'
+                    'Liability-classified awards: Remeasure FV at each reporting date through settlement; recognize changes in earnings. [ASC 718-30-35]',
+                    'Equity-classified awards: No remeasurement after grant date except for modifications; continue to apply forfeiture policy and performance-probability updates. [ASC 718-20-35]',
+                    'Modifications (repricing, acceleration, extension, settlement-method change, performance condition changes): Identify a modification; measure incremental FV and recognize over remaining requisite service (or immediately if vested). Treat equity↔liability classification changes as modifications. [ASC 718-20-35; 718-20-55]',
+                    'Cancellations/forfeitures/expirations: Reverse unrecognized cost for unvested awards; vested expirations generally do not create additional expense/benefit. [ASC 718-20-35]',
+                    'Settlements/exercises: Record share issuance or cash settlement; handle net share withholding and any cash remitted for taxes appropriately. [ASC 718-20-35; 718-10-25]',
+                    'Business combinations (replacement awards): Allocate the replacement award's FV between pre-combination service (consideration transferred) and post-combination service (compensation expense); then account under the modified terms going forward. [ASC 805-30; ASC 718-20-35]'
                 ]
             },
             5: {
                 'title': 'Step 5: Income tax accounting and core journal entries (no disclosures)',
                 'focus': 'Record current/deferred taxes and the core financial statement effects; exclude disclosures',
                 'key_points': [
-                    'Deferred taxes: Recognize DTAs for deductible temporary differences arising from compensation cost; adjust DTAs as expense is recognized and expected tax deductions change. Assess valuation allowance as needed. [ASC 718‑740; ASC 740‑10]',
-                    'Excess tax benefits/shortfalls: Recognize in income tax expense when they occur; adjust DTAs accordingly. Track by jurisdiction. [ASC 718‑740‑25]',
-                    'Tax deduction measurement: For equity awards, the tax deduction typically equals intrinsic value at settlement; for liability awards, follows cash paid. Align with local tax law. [ASC 718‑740]',
-                    'Core entries: Equity‑classified: Dr compensation expense / Cr APIC during vesting; at settlement, record common stock/APIC and any net share withholding cash remittance; record DTA activity and any excess/shortfall to tax expense. Liability‑classified: Dr compensation expense / Cr liability during vesting and remeasurement; settle liability in cash at payment and release related DTA. [ASC 718‑10‑45; 718‑740; 718‑30‑35]'
+                    'Deferred taxes: Recognize DTAs for deductible temporary differences arising from compensation cost; adjust DTAs as expense is recognized and expected tax deductions change. Assess valuation allowance as needed. [ASC 718-740; ASC 740-10]',
+                    'Excess tax benefits/shortfalls: Recognize in income tax expense when they occur; adjust DTAs accordingly. Track by jurisdiction. [ASC 718-740-25]',
+                    'Tax deduction measurement: For equity awards, the tax deduction typically equals intrinsic value at settlement; for liability awards, follows cash paid. Align with local tax law. [ASC 718-740]',
+                    'Core entries: Equity-classified: Dr compensation expense / Cr APIC during vesting; at settlement, record common stock/APIC and any net share withholding cash remittance; record DTA activity and any excess/shortfall to tax expense. Liability-classified: Dr compensation expense / Cr liability during vesting and remeasurement; settle liability in cash at payment and release related DTA. [ASC 718-10-45; 718-740; 718-30-35]'
                 ]
             }
         }
@@ -492,7 +492,7 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific award evidence and ASC 718 citations. Quote award language only when the exact wording is outcome‑determinative; paraphrase ASC 718 with pinpoint citations and use only brief decisive phrases when directly supportive.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific award evidence and ASC 718 citations. Quote award language only when the exact wording is outcome-determinative; paraphrase ASC 718 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Conclusion:** [Write single paragraph conclusion stating the specific outcome for this step]
 
@@ -504,7 +504,7 @@ END OUTPUT"""
         """Get the title for a specific step."""
         titles = {
             1: "Step 1: Scope, Terms, Grant Date, and Classification",
-            2: "Step 2: Grant‑Date Measurement (Valuation by Award Type)", 
+            2: "Step 2: Grant-Date Measurement (Valuation by Award Type)", 
             3: "Step 3: Requisite Service Period, Attribution, Forfeitures, and Condition Assessments",
             4: "Step 4: Subsequent Measurement, Modifications, Classification Changes, Settlements, and Special Transactions",
             5: "Step 5: Income Tax Accounting and Core Journal Entries (No Disclosures)"
