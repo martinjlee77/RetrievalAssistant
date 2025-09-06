@@ -72,6 +72,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pdfminer-six" },
     { name = "pdfplumber" },
+    { name = "postmarker" },
     { name = "psycopg2-binary" },
     { name = "pydantic" },
     { name = "pyjwt" },
@@ -105,6 +106,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "pdfminer-six", specifier = ">=20250506" },
     { name = "pdfplumber", specifier = ">=0.11.7" },
+    { name = "postmarker", specifier = ">=1.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pyjwt", specifier = ">=2.10.1" },
@@ -1831,6 +1833,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/48/20/60ae67bb9d82f00427946218d49e2e7e80fb41c15dc5019482289ec9ce8d/posthog-5.4.0.tar.gz", hash = "sha256:701669261b8d07cdde0276e5bc096b87f9e200e3b9589c5ebff14df658c5893c", size = 88076 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/4f/98/e480cab9a08d1c09b1c59a93dade92c1bb7544826684ff2acbfd10fcfbd4/posthog-5.4.0-py3-none-any.whl", hash = "sha256:284dfa302f64353484420b52d4ad81ff5c2c2d1d607c4e2db602ac72761831bd", size = 105364 },
+]
+
+[[package]]
+name = "postmarker"
+version = "1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/51/79/a527c6e91bc1c6980bc779b83249f59bf1cba8b259147c799934297cc7a8/postmarker-1.0.tar.gz", hash = "sha256:e735303fdf8ede667a1c6e64a95a96e97f0dabbeca726d0ae1f066bdd799fe34", size = 21627 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a1/4b/045369491569fda223d2e0bc821534de14278dd4facdb386405ea17b9d80/postmarker-1.0-py3-none-any.whl", hash = "sha256:0fa49f236c7193650896cbf31bbfac34043e352574c6c7e3e2ad2b954704f064", size = 24134 },
 ]
 
 [[package]]

@@ -13,8 +13,7 @@ import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
-import boto3
-from botocore.exceptions import ClientError
+from postmarker.core import PostmarkClient
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -26,23 +25,16 @@ CORS(app)
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key-change-in-production')
 
-# AWS SES Configuration
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+# Postmark Configuration
+POSTMARK_API_KEY = os.environ.get('POSTMARK_API_KEY', 'e073a56a-79c1-4045-9dd1-c8d82f40ba24')
 FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@veritaslogic.ai')
 
-# Initialize SES client
+# Initialize Postmark client
 try:
-    ses_client = boto3.client(
-        'ses',
-        region_name=AWS_REGION,
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-    )
+    postmark_client = PostmarkClient(server_token=POSTMARK_API_KEY)
 except Exception as e:
-    logger.warning(f"SES client initialization failed: {e}")
-    ses_client = None
+    logger.warning(f"Postmark client initialization failed: {e}")
+    postmark_client = None
 
 # Database connection
 def get_db_connection():
@@ -84,9 +76,9 @@ def verify_token(token):
         return {'error': 'Invalid token'}
 
 def send_verification_email(email, first_name, verification_token):
-    """Send email verification using Amazon SES"""
-    if not ses_client:
-        logger.error("SES client not initialized")
+    """Send email verification using Postmark"""
+    if not postmark_client:
+        logger.error("Postmark client not initialized")
         return False
         
     try:
@@ -138,28 +130,19 @@ def send_verification_email(email, first_name, verification_token):
         © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
         '''
         
-        response = ses_client.send_email(
-            Source=FROM_EMAIL,
-            Destination={'ToAddresses': [email]},
-            Message={
-                'Subject': {'Data': 'Verify Your VeritasLogic Account'},
-                'Body': {
-                    'Text': {'Data': text_body},
-                    'Html': {'Data': html_body}
-                }
-            }
+        response = postmark_client.emails.send(
+            From=FROM_EMAIL,
+            To=email,
+            Subject='Verify Your VeritasLogic Account',
+            HtmlBody=html_body,
+            TextBody=text_body
         )
         
-        logger.info(f"Verification email sent to {email} via SES. MessageId: {response['MessageId']}")
+        logger.info(f"Verification email sent to {email} via Postmark. MessageID: {response['MessageID']}")
         return True
         
-    except ClientError as e:
-        error_code = e.response['Error']['Code']
-        error_message = e.response['Error']['Message']
-        logger.error(f"SES ClientError sending to {email}: {error_code} - {error_message}")
-        return False
     except Exception as e:
-        logger.error(f"Failed to send verification email via SES: {e}")
+        logger.error(f"Failed to send verification email via Postmark: {e}")
         return False
 
 # API Routes

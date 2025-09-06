@@ -24,6 +24,10 @@ args = "Multi-Standard Platform"
 task = "workflow.run"
 args = "Website Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backend API"
+
 [[workflows.workflow]]
 name = "Multi-Standard Platform"
 author = "agent"
@@ -47,6 +51,18 @@ waitForPort = 8000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "Backend API"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python backend_api.py"
+waitForPort = 3000
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 3000

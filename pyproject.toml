@@ -33,6 +33,7 @@ dependencies = [
     "boto3>=1.40.25",
     "sendgrid>=6.12.4",
     "botocore>=1.40.25",
+    "postmarker>=1.0",
 ]
 
 [[tool.uv.index]]
