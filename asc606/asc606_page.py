@@ -10,6 +10,8 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
+from shared.cost_estimator import cost_estimator
+from shared.billing_manager import billing_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
@@ -38,23 +40,67 @@ def render_asc606_page():
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc606_inputs()
 
-    # Critical user warning before analysis
+    # Cost estimation and credit checking
     if is_ready:
-        warning_placeholder = st.empty()  # Create a placeholder for the warning
-        warning_placeholder.info(
-            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-            "- Analysis takes **3-5 minutes** and costs significant API tokens\n"
-            "- Switching tabs or closing the browser will stop the analysis\n"
-            "- Stay on this tab until analysis is complete\n"
-            "- You'll see a completion message when it's done"
+        # Generate cost estimate
+        cost_estimate = cost_estimator.estimate_analysis_cost(
+            'ASC 606', 
+            contract_text or "", 
+            additional_context
         )
-        if st.button("3️⃣ Analyze Contract & Generate Memo",
-                   type="primary",
-                   use_container_width=True,
-                   key="asc606_analyze"):
-            warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc606_analysis(contract_text, additional_context)
+        
+        # Display cost estimate
+        with st.container(border=True):
+            st.markdown("### 💰 Cost Estimate")
+            st.markdown(cost_estimator.format_cost_display(cost_estimate))
+            
+            # Check user credits
+            credits_check = auth_manager.check_credits(cost_estimate['estimated_cost'])
+            
+            if credits_check.get('can_proceed', False):
+                if credits_check.get('is_free_analysis', False):
+                    st.success("🎁 **This analysis will use one of your FREE analyses!**")
+                else:
+                    st.info(f"💳 **This will be charged to your account:** ${cost_estimate['estimated_cost']:.2f}")
+                
+                can_proceed = True
+            else:
+                st.error(f"""
+                **❌ Insufficient Credits**
+                
+                **Required:** ${cost_estimate['estimated_cost']:.2f}
+                **Your Balance:** 
+                - Free analyses: {credits_check.get('free_analyses_remaining', 0)}
+                - Paid credits: ${credits_check.get('credits_balance', 0):.2f}
+                
+                [**Add Credits to Your Account →**](http://localhost:8000/dashboard.html)
+                """)
+                can_proceed = False
+        
+        # Analysis section
+        if can_proceed:
+            st.markdown("---")
+            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder.info(
+                "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+                "- Analysis takes **3-5 minutes**\n"
+                "- Switching tabs or closing the browser will stop the analysis\n"
+                "- Stay on this tab until analysis is complete\n"
+                "- You'll see a completion message when it's done"
+            )
+            
+            if st.button("3️⃣ Confirm & Start Analysis",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc606_analyze"):
+                warning_placeholder.empty()  # Clear the warning after the button is pressed
+                if contract_text:  # Type guard to ensure contract_text is not None
+                    perform_asc606_analysis(contract_text, additional_context, cost_estimate)
+        else:
+            st.button("3️⃣ Insufficient Credits", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc606_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Contract & Generate Memo", 
@@ -145,7 +191,7 @@ def _upload_and_process_asc606():
         st.error(f"❌ Error processing files: {str(e)}")
         return None, None
 
-def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
+def perform_asc606_analysis(contract_text: str, additional_context: str = "", cost_estimate: Dict[str, Any] = None):
     """Perform the complete ASC 606 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
@@ -271,6 +317,36 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = ""):
         completion_message_placeholder.success(
             f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
         )
+        
+        # Handle billing after successful analysis
+        if cost_estimate:
+            try:
+                user_token = auth_manager.get_auth_token()
+                user_data = auth_manager.get_user_data()
+                
+                # Determine if this is a free analysis
+                credits_check = auth_manager.check_credits(cost_estimate['estimated_cost'])
+                is_free_analysis = credits_check.get('is_free_analysis', False)
+                
+                # Record the analysis billing
+                word_count = len(contract_text.split()) if contract_text else 0
+                billing_success = billing_manager.record_analysis_billing(
+                    asc_standard='ASC 606',
+                    cost_estimate=cost_estimate,
+                    user_token=user_token,
+                    words_count=word_count,
+                    is_free_analysis=is_free_analysis
+                )
+                
+                if billing_success:
+                    # Show billing confirmation
+                    billing_manager.show_billing_success_message(cost_estimate, is_free_analysis)
+                else:
+                    st.warning("⚠️ Analysis completed but billing recording failed. Please contact support.")
+                    
+            except Exception as e:
+                logger.error(f"Billing error after analysis: {e}")
+                st.warning("⚠️ Analysis completed but there was a billing issue. Please contact support.")
         
         # Signal completion with session isolation
         st.session_state[analysis_key] = True

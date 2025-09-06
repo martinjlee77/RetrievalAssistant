@@ -468,6 +468,92 @@ def check_user_credits():
         logger.error(f"Check credits error: {e}")
         return jsonify({'error': 'Failed to check credits'}), 500
 
+@app.route('/api/user/record-analysis', methods=['POST'])
+def record_analysis():
+    """Record completed analysis and handle billing"""
+    try:
+        # Get token from Authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'No valid authorization token'}), 401
+        
+        token = auth_header.split(' ')[1]
+        payload = verify_token(token)
+        
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        
+        # Extract billing information
+        asc_standard = data.get('asc_standard')
+        words_count = data.get('words_count', 0)
+        estimate_cap_credits = Decimal(str(data.get('estimate_cap_credits', 0)))
+        actual_credits = Decimal(str(data.get('actual_credits', 0)))
+        billed_credits = Decimal(str(data.get('billed_credits', 0)))
+        is_free_analysis = data.get('is_free_analysis', False)
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Insert analysis record
+        cursor.execute("""
+            INSERT INTO analyses (user_id, asc_standard, words_count, estimate_cap_credits, 
+                                actual_credits, billed_credits, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 'completed')
+            RETURNING id
+        """, (user_id, asc_standard, words_count, estimate_cap_credits, actual_credits, billed_credits))
+        
+        analysis_id = cursor.fetchone()['id']
+        
+        if is_free_analysis:
+            # Deduct from free analyses count
+            cursor.execute("""
+                UPDATE users 
+                SET free_analyses_remaining = GREATEST(free_analyses_remaining - 1, 0)
+                WHERE id = %s
+            """, (user_id,))
+            
+            # Record credit transaction for tracking
+            cursor.execute("""
+                INSERT INTO credit_transactions (user_id, analysis_id, amount, reason)
+                VALUES (%s, %s, %s, 'analysis_charge')
+            """, (user_id, analysis_id, 0))
+            
+        else:
+            # Deduct from credits balance
+            cursor.execute("""
+                UPDATE users 
+                SET credits_balance = GREATEST(credits_balance - %s, 0)
+                WHERE id = %s
+            """, (billed_credits, user_id))
+            
+            # Record credit transaction
+            cursor.execute("""
+                INSERT INTO credit_transactions (user_id, analysis_id, amount, reason)
+                VALUES (%s, %s, %s, 'analysis_charge')
+            """, (user_id, analysis_id, -billed_credits))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Analysis recorded for user {user_id}: {asc_standard}, cost: {billed_credits}")
+        
+        return jsonify({
+            'message': 'Analysis recorded successfully',
+            'analysis_id': analysis_id,
+            'billed_amount': float(billed_credits),
+            'is_free_analysis': is_free_analysis
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Record analysis error: {e}")
+        return jsonify({'error': 'Failed to record analysis'}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
