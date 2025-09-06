@@ -14,6 +14,7 @@ import logging
 import time
 from typing import Dict, List, Optional, Tuple
 from shared.knowledge_base import SharedKnowledgeBase
+from shared.auth_utils import require_authentication, auth_manager
 
 logger = logging.getLogger(__name__)
 
@@ -235,6 +236,10 @@ Return only the questions, one per line, without numbering or bullets."""
 
 def render_research_assistant():
     """Render the ASC Research Assistant page."""
+    
+    # Authentication check - must be logged in to access
+    if not require_authentication():
+        return  # User will see login page
     
     # Page header
     st.title("🔍 ASC Research Assistant")

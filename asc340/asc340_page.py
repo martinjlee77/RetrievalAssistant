@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
+from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
@@ -21,6 +22,10 @@ logger = logging.getLogger(__name__)
 
 def render_asc340_page():
     """Render the ASC 340-40 analysis page."""
+    
+    # Authentication check - must be logged in to access
+    if not require_authentication():
+        return  # User will see login page
     
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
