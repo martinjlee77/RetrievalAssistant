@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - VeritasLogic.ai</title>
+    <meta name="description" content="Create your VeritasLogic account and get 3 free ASC analyses to start transforming your accounting workflow.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-form {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .auth-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .terms-group {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .terms-group label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+        
+        .terms-group input[type="checkbox"] {
+            width: auto;
+            margin-top: 2px;
+        }
+        
+        .auth-button {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .auth-button:hover:not(:disabled) {
+            background: #5a67d8;
+        }
+        
+        .auth-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .auth-links {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e1e8ed;
+        }
+        
+        .auth-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #e53e3e;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #fed7d7;
+        }
+        
+        .success-message {
+            background: #f0fff4;
+            color: #38a169;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #c6f6d5;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-form {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <form class="auth-form" id="signupForm">
+            <div class="auth-header">
+                <h1>Create Your Account</h1>
+                <p>Get 3 free ASC analyses to start transforming your workflow</p>
+            </div>
+            
+            <div id="messageContainer"></div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name <span class="required">*</span></label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name <span class="required">*</span></label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="company">Company Name <span class="required">*</span></label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="jobTitle">Job Title <span class="required">*</span></label>
+                <select id="jobTitle" name="jobTitle" required>
+                    <option value="">Select your role</option>
+                    <option value="Controller">Controller</option>
+                    <option value="Staff Accountant">Staff Accountant</option>
+                    <option value="Senior Accountant">Senior Accountant</option>
+                    <option value="Accounting Manager">Accounting Manager</option>
+                    <option value="Director of Accounting">Director of Accounting</option>
+                    <option value="CFO">CFO</option>
+                    <option value="CPA">CPA</option>
+                    <option value="Financial Analyst">Financial Analyst</option>
+                    <option value="Audit Manager">Audit Manager</option>
+                    <option value="Tax Manager">Tax Manager</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="terms-group">
+                <label for="terms">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <span>I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span>
+                </label>
+            </div>
+            
+            <button type="submit" class="auth-button" id="submitButton">
+                Create Account & Get 3 Free Analyses
+            </button>
+            
+            <div class="auth-links">
+                <p>Already have an account? <a href="login.html">Sign in here</a></p>
+                <p><a href="index.html">← Back to homepage</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitButton = document.getElementById('submitButton');
+            const messageContainer = document.getElementById('messageContainer');
+            
+            // Get form data
+            const formData = {
+                email: document.getElementById('email').value.trim(),
+                first_name: document.getElementById('firstName').value.trim(),
+                last_name: document.getElementById('lastName').value.trim(),
+                company_name: document.getElementById('company').value.trim(),
+                job_title: document.getElementById('jobTitle').value,
+                terms_accepted: document.getElementById('terms').checked
+            };
+            
+            // Basic validation
+            if (!formData.terms_accepted) {
+                showMessage('Please accept the Terms of Service and Privacy Policy', 'error');
+                return;
+            }
+            
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Creating Account...';
+            form.classList.add('loading');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    form.reset();
+                    
+                    // Redirect to check email page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'verify.html';
+                    }, 2000);
+                    
+                } else {
+                    showMessage(result.error || 'Registration failed. Please try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                // Reset loading state
+                submitButton.disabled = false;
+                submitButton.textContent = 'Create Account & Get 3 Free Analyses';
+                form.classList.remove('loading');
+            }
+        });
+        
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            // Scroll to top to show message
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        // Real-time email validation
+        document.getElementById('email').addEventListener('blur', function(e) {
+            const email = e.target.value.trim();
+            if (email && !isValidEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                e.target.focus();
+            }
+        });
+        
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // Auto-focus first field
+        document.getElementById('firstName').focus();
+    </script>
+</body>
+</html>
