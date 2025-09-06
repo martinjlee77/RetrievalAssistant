@@ -199,7 +199,7 @@ class ASC805KnowledgeBase(SharedKnowledgeBase):
     def __init__(self):
         super().__init__(
             database_path="asc805_knowledge_base",
-            collection_name="asc805_business_combinations"
+            collection_name="asc805_guidance"
         )
 
 

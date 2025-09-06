@@ -1,188 +1,212 @@
 import streamlit as st
 from datetime import datetime
 
+# Styling added for card backgrounds
+st.html("""
+<style>
+  .st-key-my_box {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box1 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box2 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box3 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box4 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box5 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box6 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box7 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box8 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-my_box9 {
+    background: #36404A;  /* your color */
+  }
+  .st-key-hoverbox:hover {
+      background: #46505A; /* example hover background */
+      cursor: pointer;
+  }
+</style>
+""")
+
 # ---------------------------
 # Session helpers
 # ---------------------------
 if "show_whats_new" not in st.session_state:
     st.session_state.show_whats_new = True
 
-LAST_KB_REFRESH = "September 3, 2025"
-
 # ---------------------------
 # Header
 # ---------------------------
-st.title("🎯 VeritasLogic.ai Technical Accounting Solutions")
-st.subheader("Generate **strong first-draft memos** using AI, based on authoritative guidance.")
+st.title(":primary[Technical Accounting Solutions (TAS) Platform]")
+st.subheader(
+    "Generate **strong first-draft memos** using AI, based on authoritative guidance."
+)
 
 # ---------------------------
-# What's new (dismissible banner)
+# What's new expander
 # ---------------------------
-if st.session_state.show_whats_new:
-    st.success("🆕 **What's new** • ASC 805 tool launched • KB refresh: " + LAST_KB_REFRESH + " • Faster GPT-5-mini fallback")
-    if st.button("✖ Dismiss", key="dismiss_whats_new", type="secondary"):
-        st.session_state.show_whats_new = False
-        st.rerun()
-
-st.divider()
+with st.expander("**What's New:**", expanded=False):
+    st.markdown("""
+    
+    - **ASC 805 tool launched.** Access it from the menu below.
+    - **LLM** API upgraded to GPT-5.
+    - **Knowledge base refresh:** September 3, 2025.
+    """)
 
 # ---------------------------
 # Start an analysis
 # ---------------------------
-st.markdown("### 🚀 Start an Analysis")
-st.caption("Pick a standard to begin. You'll upload your documents on the next screen.")
+st.markdown("## :primary[Start an Analysis]")
+st.markdown(
+    "Pick a standard to begin. You'll upload your documents on the next screen."
+)
 
 # Grid of standard cards with fixed heights and consistent styling
-row1 = st.columns(3, gap="medium")
-row2 = st.columns([1, 1, 1], gap="medium")  # Equal spacing for bottom row
+row1 = st.columns(3, gap="small")
+row2 = st.columns(3, gap="small")  # Equal spacing for bottom row
 
 # ASC 606
 with row1[0]:
-    with st.container(border=True, height=180):
-        st.markdown("#### 💰 ASC 606")
-        st.markdown("**Revenue from Contracts**")
-        st.write("First-draft revenue memo with paragraph citations.")
-        st.page_link("asc606/asc606_page.py", label="🚀 Start ASC 606 Analysis", icon="💰", use_container_width=True)
+    with st.container(border=True, key="my_box"):
+        st.markdown("##### ASC 606: Rev Rec")
+        st.page_link("asc606/asc606_page.py",
+                     label="Start ASC 606 Analysis",
+                     icon="➡️",
+                     use_container_width=True)
 
 # ASC 340-40
 with row1[1]:
-    with st.container(border=True, height=180):
-        st.markdown("#### 📄 ASC 340-40")
-        st.markdown("**Contract Costs**")
-        st.write("Policy memo on cost capitalization and amortization.")
-        st.page_link("asc340/asc340_page.py", label="🚀 Start ASC 340-40 Analysis", icon="📄", use_container_width=True)
+    with st.container(border=True, key="my_box1"):
+        st.markdown("##### ASC 340-40: Cost to Obtain")
+        st.page_link("asc340/asc340_page.py",
+                     label="Start ASC 340-40 Analysis",
+                     icon="➡️",
+                     use_container_width=True)
 
 # ASC 842
 with row1[2]:
-    with st.container(border=True, height=180):
-        st.markdown("#### 🏢 ASC 842")
-        st.markdown("**Leases (Lessee)**")
-        st.write("Lease classification and lessee accounting memo.")
-        st.page_link("asc842/asc842_page.py", label="🚀 Start ASC 842 Analysis", icon="🏢", use_container_width=True)
-
-# Center the bottom row
-col_spacer, row2_col1, row2_col2, col_spacer2 = st.columns([0.5, 1, 1, 0.5])
+    with st.container(border=True, key="my_box2"):
+        st.markdown("##### ASC 842: Leases (Lessee)")
+        st.page_link("asc842/asc842_page.py",
+                     label="Start ASC 842 Analysis",
+                     icon="➡️",
+                     use_container_width=True)
 
 # ASC 718
-with row2_col1:
-    with st.container(border=True, height=180):
-        st.markdown("#### 📈 ASC 718")
-        st.markdown("**Stock Compensation**")
-        st.write("Equity awards analysis and compensation memo.")
-        st.page_link("asc718/asc718_page.py", label="🚀 Start ASC 718 Analysis", icon="📈", use_container_width=True)
+with row2[0]:
+    with st.container(border=True, key="my_box3"):
+        st.markdown("##### ASC 718: Stock Comp")
+        st.page_link("asc718/asc718_page.py",
+                     label="Start ASC 718 Analysis",
+                     icon="➡️",
+                     use_container_width=True)
 
 # ASC 805
-with row2_col2:
-    with st.container(border=True, height=180):
-        st.markdown("#### 🤝 ASC 805")
-        st.markdown("**Business Combinations**")
-        st.write("Transaction assessment and M&A accounting memo.")
-        st.page_link("asc805/asc805_page.py", label="🚀 Start ASC 805 Analysis", icon="🤝", use_container_width=True)
+with row2[1]:
+    with st.container(border=True, key="my_box4"):
+        st.markdown("##### ASC 805: Bus Com")
+        st.page_link("asc805/asc805_page.py",
+                     label="Start ASC 805 Analysis",
+                     icon="➡️",
+                     use_container_width=True)
+
+# ASC 815
+with row2[2]:
+    with st.container(border=True, key="my_box5"):
+        st.markdown("##### ASC 815: Hedging")
+        st.markdown("🚧 ASC 815 Coming Soon")
 
 st.divider()
 
-# ---------------------------
-# Reminders (trust panel)
-# ---------------------------
-st.markdown("### ⚠️ Key Reminders")
-st.info("""
-🔗 **Hybrid RAG**: Contract text + FASB Codification ([FAQ](pages/faq.py) for details)  
-📝 **First-draft only**: Always review for completeness and accuracy  
-🎯 **Scope**: Each standard page explains coverage and limitations  
-🔒 **Privacy**: Files stay in your session. OpenAI API content not used for training
-""")
 
-st.divider()
 
 # ---------------------------
 # How it works (with visual flow)
 # ---------------------------
-st.markdown("### 🛠️ How It Works")
+st.markdown("## :primary[How It Works]")
 
-c1, arrow1, c2, arrow2, c3 = st.columns([1, 0.1, 1, 0.1, 1])
+with st.container():
+    st.image("assets/images/howitworks.jpeg")
 
-with c1:
-    with st.container(border=True, height=140):
-        st.markdown("#### 1️⃣ Select Standard")
-        st.write("Choose the relevant ASC module for your analysis.")
-
-with arrow1:
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("### ➡️")
-
-with c2:
-    with st.container(border=True, height=140):
-        st.markdown("#### 2️⃣ Upload Documents")
-        st.write("Multiple PDFs supported; we combine them for analysis.")
-
-with arrow2:
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("### ➡️")
-
-with c3:
-    with st.container(border=True, height=140):
-        st.markdown("#### 3️⃣ Generate Memo")
-        st.write("Create first-draft memo with paragraph-level citations.")
 
 st.divider()
 
 # ---------------------------
-# Platform snapshot (improved metrics)
+# About our solutions (trust panel)
 # ---------------------------
-st.markdown("### 📊 Platform Snapshot")
+st.markdown("## :primary[About Our Solutions]")
 
-# Use 2x2 grid for better text visibility
-metric_row1 = st.columns(2, gap="large")
-metric_row2 = st.columns(2, gap="large")
+left, right = st.columns(2, border=True)
 
-with metric_row1[0]:
-    st.metric(
-        label="📋 Standards Available",
-        value="5",
-        help="ASC 606, 340-40, 842, 718, 805"
-    )
+left.markdown("""
 
-with metric_row1[1]:
-    st.metric(
-        label="🔄 Last KB Refresh",
-        value=LAST_KB_REFRESH,
-        help="Knowledge base last updated"
-    )
+1. **LLM models used:**
 
-with metric_row2[0]:
-    st.metric(
-        label="⚡ Analysis Speed",
-        value="~30-60s",
-        delta="per 10 pages",
-        help="Average processing time"
-    )
+- We use the latest GPT-5 models from OpenAI for all analyses and memo generation.
+- Smaller models (e.g., GPT-5-mini) are used for knowledge base searches and other simple tasks to reduce costs.
 
-with metric_row2[1]:
-    st.metric(
-        label="🎯 Citation Level",
-        value="ASC ¶ IDs",
-        help="Paragraph-level FASB citations"
-    )
+2. **Privacy:** 
+
+- Files stay in your session (i.e., your data is session-limited), which means that your data is not retained beyond the duration of your session and promptly and permanently deleted after your session closes. 
+- Your data sent to the LLM in the operation of the analysis and memo generation is encrypted using industry standard enryption protocols. Also, it is never used to train our AI models or OpenAI's models, ensuring confidentiality and compliance with data privacy regulations.
+
+3. **First-draft only:** 
+
+- Memos generated by VeritasLogic.ai serve as a great starting point but they require human review to confirm that the final output meets your specific needs and standards. 
+- We have a strong dedicated team of accounting experts who can assist you with this review process. Please contact us for more information.
+
+""")
+
+right.markdown("""
+
+
+4. **Hybrid RAG:** 
+
+- VertiasLogic.ai employs a hybrid RAG approach by combining your contract text with authoritative FASB guidance for comprehensive analysis. 
+- This uses the power of retrieval augmented generation with direct access to the authoritative FASB guidance and, our opinion, the best way to provide you with the best possible analyses and documentation.
+
+5. **Knowledge base:**
+
+- Includes complete FASB codification for all accounting standards we support (more than 2,300 ASC paragraphs).
+- Is regularly updated to provide you with the most current guidance.
+- Is searchable by paragraph ID, giving you paragraph-level citations for all analyses.
+
+6. **Scope:** 
+
+- Each standard's page clearly outlines what the platform can and cannot analyze, ensuring transparency and managing expectations.
+
+
+""")
 
 st.divider()
 
 # ---------------------------
 # Footer with help links
 # ---------------------------
-st.markdown("### 💡 Help & Resources")
-help_cols = st.columns(4)
+st.markdown("## :primary[Help & Resources]")
+st.page_link("pages/faq.py", label="Frequently Asked Questions", use_container_width=True)
 
-with help_cols[0]:
-    st.page_link("pages/faq.py", label="❓ FAQ", use_container_width=True)
+st.page_link("pages/gethelp.py",
+                 label="Get Help",
+                 use_container_width=True)
 
-with help_cols[1]:
-    st.page_link("pages/gethelp.py", label="🆘 Get Help", use_container_width=True)
-
-with help_cols[2]:
-    st.markdown("[📚 Scope Guide](#)", help="What's covered per standard")
-
-with help_cols[3]:
-    st.page_link("pages/research_assistant.py", label="🔍 Research Assistant", use_container_width=True)
+st.page_link("pages/research_assistant.py",
+                 label="Research Assistant",
+                 use_container_width=True)
 
 st.divider()
-st.caption("© 2025 Controller.cpa. All Rights Reserved.")
+
+st.caption("© 2025 VeritasLogic.ai. All Rights Reserved.")

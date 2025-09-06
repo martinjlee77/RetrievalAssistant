@@ -12,23 +12,34 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded")
 
-
-# 3. Add your logo to the sidebar.
+# 2. Add your logo to the sidebar.
 st.logo("assets/images/nobkg.png", size = "large")
 
-# 4. Define all pages in your app.
-pg = st.navigation([
-    st.Page("pages/home_content.py", title="Home"),
+# 3. Set up the navigation menu organized by sections.
+pages = {
+        
+    
+    "": [
+        st.Page("pages/home_content.py", title="Home", icon=":material/home:", default=True)
+    ],
+    
+    "TAS Platform": [
+        st.Page("asc606/asc606_page.py", title="ASC 606: Rev Rec", icon=":material/expand_circle_right:"),
+        st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon=":material/expand_circle_right:"),
+        st.Page("asc842/asc842_page.py", title="ASC 842: Leases (Lessee)", icon=":material/expand_circle_right:"),
+        st.Page("asc718/asc718_page.py", title="ASC 718: Stock Comp", icon=":material/expand_circle_right:"),
+        st.Page("asc805/asc805_page.py", title="ASC 805: Bus Com", icon=":material/expand_circle_right:"),
+        ],
+    "Tools": [
+        st.Page("pages/research_assistant.py", title="ASC Research Assistant", icon=":material/search:"),
+        ],
+    "Get Help": [
+        st.Page("pages/faq.py", title="FAQ", icon=":material/quick_reference:"),
+        st.Page("pages/gethelp.py", title="Contact Support", icon=":material/contact_support:"),
+    ],
+}
 
-    st.Page("asc606/asc606_page.py", title="ASC 606: 5 Steps", icon="➡️"),
-    st.Page("asc842/asc842_page.py", title="ASC 842: Lessee Accounting", icon="➡️"),
-    st.Page("asc718/asc718_page.py", title="ASC 718: Stock Compensation", icon="➡️"),
-    st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon="➡️"),
-    st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon="➡️"),
-    st.Page("pages/research_assistant.py", title="🔍 ASC Research Assistant"),
-    st.Page("pages/faq.py", title="FAQ"),
-    st.Page("pages/gethelp.py", title="Get help")
-])
+pg = st.navigation(pages)
 
-# 5. Run the app.
+# 4. Run the app.
 pg.run()

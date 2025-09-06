@@ -1,0 +1,134 @@
+Here’s the tightened plan based on final product decisions. Goal: keep it simple, shippable, and auditable with minimal moving parts. Stripe and advanced automation can come later.
+
+Decisions locked
+
+Trial access: Email verification + manual approval by admin. No credit card. Small user volume expected.
+Pricing unit: 1 credit = $1 (public and internal). We deduct actual usage in credits at that ratio.
+Billing rule: Charge actual usage, capped to 115% of the displayed estimate high. No confirmation modals.
+Credits expire monthly (policy). For MVP without Stripe, we’ll store expiry metadata; we can enforce when subscriptions go live or run a simple monthly sweep if needed.
+Run gating: Require balance ≥ cap to start a paid run. Trials can run without balance (see below).
+Files: Not stored persistently (session only). We only keep counts/metrics.
+Simple UX
+
+Show above the Analyze & Generate button:
+“Estimated cost: X–Y credits. Final charge capped at Y × 1.15. You have Z credits.”
+If the user is on trial (approved and has free runs left), show:
+“This run will be free (trial). Estimated cost: X–Y credits.”
+If balance < cap (Y × 1.15) and no free runs remaining: disable button and show “Insufficient credits. Contact admin to add credits.”
+Estimator (words-based, MVP simple)
+
+Count words in parsed text across all uploaded files in the session. Ignore images.
+Base formula:
+base = max(2, floor(words / 2000))
+est_mid = base × asc_multiplier[asc]
+est_low = round_down(est_mid × 0.8)
+est_high = round_up(est_mid × 1.2)
+cap = round_up(est_high × 1.15) // billing upper bound shown to user
+Initial ASC multipliers (tuned to land near target ranges for typical docs):
+ASC 805: 4.0
+ASC 606: 3.0
+ASC 842: 2.3
+ASC 718: 1.8
+ASC 340-40: 1.5
+Fallback if parsing fails:
+Small (≤2k words): 3–8 credits
+Medium (2k–10k): 8–18 credits
+Large (10k–25k): 18–35 credits
+XL (>25k words): 35–50 credits
+cap = round_up(high × 1.15)
+Billing and deduction logic
+
+Trials:
+Each approved user gets 3 free analyses. We still compute estimate and actuals, but billed_credits = 0 while free_analyses_remaining > 0.
+After a free run completes, decrement free_analyses_remaining by 1.
+Paid runs:
+To start: require credits_balance ≥ cap.
+On completion: compute actual_credits (sum model usage converted to credits).
+billed_credits = min(actual_credits, cap).
+Deduct billed_credits from credits_balance in a single transactional update; write a credit transaction row.
+Failures: billed_credits = 0.
+Credits expiration (MVP)
+
+Store expiry metadata per credit addition. Since Stripe isn’t live, we’ll:
+Add fields to support expiry.
+Option A (MVP simplest): do not enforce expiration until billing launches.
+Option B: run a monthly cron to expire any credits with expires_at < now and adjust balances.
+Please advise which option is faster for you; A is fine for initial manual phase.
+Minimal data model (3 tables, but include needed fields)
+
+users
+id, email, status [pending, verified, approved], credits_balance (decimal 2dp), plan [trial, paid], free_analyses_remaining (int), created_at, verified_at, approved_at
+analyses
+id, user_id, asc_standard, status [draft, estimated, running, completed, failed], words_count, estimate_low_credits, estimate_high_credits, estimate_cap_credits, estimate_displayed_at, completed_at, actual_credits, billed_credits, error_message
+credit_transactions
+id, user_id, analysis_id, amount (negative for deductions, positive for grants/top-ups), reason [trial_grant, admin_topup, analysis_charge, expiration], created_at, expires_at (nullable) Notes:
+Storing the displayed estimate per analysis is mandatory to honor the cap the user saw.
+credit_transactions should reference analysis_id for auditability when reason=analysis_charge.
+Admin operations (manual, no Stripe)
+
+Approve user (sets status=approved, free_analyses_remaining=3).
+Add/remove credits (admin top-up; set expires_at if needed).
+View user ledger and analyses history.
+Simple list of pending verifications to approve trials.
+API and flow
+
+POST /signup
+Input: email. Sends magic link. Sets status=pending.
+GET /verify?token=...
+Sets status=verified. Places user in “pending-approval” queue.
+Admin approves user
+Sets status=approved, free_analyses_remaining=3. No credits granted unless manually added.
+POST /estimate
+Input: asc_standard, file handles in session.
+Steps: parse to text in memory, count words, compute estimate_low/high and cap, persist on a new analyses row (status=estimated), return X–Y and cap.
+POST /runs
+Validations:
+user status=approved.
+If free_analyses_remaining > 0 → allow regardless of balance.
+Else require credits_balance ≥ cap.
+Mark analysis running.
+PATCH /runs/:id/complete
+Input: actual usage metrics → compute actual_credits.
+If free run: billed_credits=0, decrement free_analyses_remaining.
+Else billed_credits=min(actual_credits, cap). Deduct in one transaction and create credit_transaction row.
+Mark analysis completed; persist actual_credits and billed_credits.
+Note: Runs should be async; HTTP request returns quickly with analysis id, and the job processes in background.
+Parsing and word count
+
+Parser: your choice (e.g., pdfplumber or unstructured) + a simple text cleanup:
+Remove repeated headers/footers, excessive whitespace, page numbers.
+Skip images; OCR only if necessary (OCR inflates word count; acceptable for MVP).
+Word counting: split on whitespace; words = len(tokens). Keep implementation simple and deterministic.
+Limits and performance
+
+Upload size: product wants up to 200 MB. This is heavy for typical web backends. Please confirm feasibility given memory/time limits.
+If risky, suggest starting with 50 MB hard limit and revisiting after launch.
+Timeouts: long jobs must be background tasks with progress polling.
+Trials: consider stricter limits (e.g., 25 MB, 10k words) to prevent abuse and runaway costs; admin can override via manual approval and top-ups.
+Copy strings
+
+Paid user with enough credits:
+“Estimated cost: X–Y credits. Final charge capped at Y × 1.15. You have Z credits.”
+Trial user:
+“This run will be free (trial). Estimated cost: X–Y credits.”
+Insufficient credits:
+“Estimated cost: X–Y credits (cap Y × 1.15). You have Z. Please contact admin to add credits.”
+Instrumentation
+
+For each analysis, log words_count, asc_standard, estimate_low/high/cap, actual_credits, billed_credits, and ratio actual/estimate_mid for tuning multipliers later.
+Do not store raw text; session only.
+Acceptance criteria
+
+Estimate appears before Analyze & Generate; values persist to the analyses row.
+Starting a paid run requires credits_balance ≥ cap; trial runs bypass this check if free_analyses_remaining > 0.
+On completion, billed_credits = min(actual, cap); ledger entry created exactly once.
+If parsing fails, fallback buckets are used and cap shown; run can still proceed.
+Admin can approve users, grant/revoke credits, and see a basic ledger.
+Open items for you to confirm
+
+Can we support email magic-link verification plus a simple admin approval list in Phase 1?
+Given current hosting limits, is 200 MB feasible for parsing in memory? If not, what initial cap do you recommend?
+Do you prefer to defer credits expiration enforcement until Stripe is integrated (store fields now, enforce later)?
+Background job runner: which mechanism do you want to use for async runs on our current stack?
+Parser choice for PDFs and DOCX, and any libraries you prefer for consistent word counts?
+Once you confirm these, please estimate effort and any dependencies. I’ll finalize the ASC multipliers and copy text in the app with you before we ship.
