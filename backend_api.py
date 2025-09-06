@@ -5,7 +5,6 @@ Handles user registration, authentication, and billing
 
 from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
-from flask_mail import Mail, Message
 import psycopg2
 import psycopg2.extras
 import jwt
@@ -14,6 +13,8 @@ import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
+import boto3
+from botocore.exceptions import ClientError
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,14 +25,24 @@ CORS(app)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key-change-in-production')
-app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY', '')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('FROM_EMAIL', 'noreply@veritaslogic.ai')
 
-mail = Mail(app)
+# AWS SES Configuration
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@veritaslogic.ai')
+
+# Initialize SES client
+try:
+    ses_client = boto3.client(
+        'ses',
+        region_name=AWS_REGION,
+        aws_access_key_id=AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+    )
+except Exception as e:
+    logger.warning(f"SES client initialization failed: {e}")
+    ses_client = None
 
 # Database connection
 def get_db_connection():
@@ -73,51 +84,82 @@ def verify_token(token):
         return {'error': 'Invalid token'}
 
 def send_verification_email(email, first_name, verification_token):
-    """Send email verification"""
+    """Send email verification using Amazon SES"""
+    if not ses_client:
+        logger.error("SES client not initialized")
+        return False
+        
     try:
         verification_url = f"http://localhost:8000/verify.html?token={verification_token}"
         
-        msg = Message(
-            'Verify Your VeritasLogic Account',
-            recipients=[email],
-            html=f'''
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #f8f9fa; padding: 20px; text-align: center;">
-                    <h1 style="color: #2c3e50;">Welcome to VeritasLogic.ai</h1>
-                </div>
-                <div style="padding: 30px;">
-                    <h2>Hi {first_name},</h2>
-                    <p>Thank you for signing up for VeritasLogic! Click the button below to verify your email address and get started with your 3 free analyses.</p>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="{verification_url}" 
-                           style="background: #007bff; color: white; padding: 15px 30px; 
-                                  text-decoration: none; border-radius: 5px; display: inline-block;
-                                  font-weight: bold;">
-                            Verify My Email
-                        </a>
-                    </div>
-                    
-                    <p style="color: #666; font-size: 14px;">
-                        This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
-                    </p>
-                    
-                    <p style="color: #666; font-size: 14px;">
-                        If the button doesn't work, copy and paste this link: {verification_url}
-                    </p>
-                </div>
-                <div style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px;">
-                    © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
-                </div>
+        html_body = f'''
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #f8f9fa; padding: 20px; text-align: center;">
+                <h1 style="color: #2c3e50;">Welcome to VeritasLogic.ai</h1>
             </div>
-            '''
+            <div style="padding: 30px;">
+                <h2>Hi {first_name},</h2>
+                <p>Thank you for signing up for VeritasLogic! Click the button below to verify your email address and get started with your 3 free analyses.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{verification_url}" 
+                       style="background: #007bff; color: white; padding: 15px 30px; 
+                              text-decoration: none; border-radius: 5px; display: inline-block;
+                              font-weight: bold;">
+                        Verify My Email
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 14px;">
+                    This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
+                </p>
+                
+                <p style="color: #666; font-size: 14px;">
+                    If the button doesn't work, copy and paste this link: {verification_url}
+                </p>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px;">
+                © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
+            </div>
+        </div>
+        '''
+        
+        text_body = f'''
+        Welcome to VeritasLogic.ai!
+        
+        Hi {first_name},
+        
+        Thank you for signing up for VeritasLogic! Please verify your email address by clicking the link below:
+        
+        {verification_url}
+        
+        This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
+        
+        © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
+        '''
+        
+        response = ses_client.send_email(
+            Source=FROM_EMAIL,
+            Destination={'ToAddresses': [email]},
+            Message={
+                'Subject': {'Data': 'Verify Your VeritasLogic Account'},
+                'Body': {
+                    'Text': {'Data': text_body},
+                    'Html': {'Data': html_body}
+                }
+            }
         )
         
-        mail.send(msg)
-        logger.info(f"Verification email sent to {email}")
+        logger.info(f"Verification email sent to {email} via SES. MessageId: {response['MessageId']}")
         return True
+        
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        error_message = e.response['Error']['Message']
+        logger.error(f"SES ClientError sending to {email}: {error_code} - {error_message}")
+        return False
     except Exception as e:
-        logger.error(f"Failed to send verification email: {e}")
+        logger.error(f"Failed to send verification email via SES: {e}")
         return False
 
 # API Routes
