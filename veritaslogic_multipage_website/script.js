@@ -1,6 +1,9 @@
 // VeritasLogic.ai Multi-Page Website JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication state and update navigation
+    checkAuthenticationState();
+
     // Mobile Navigation Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
@@ -525,6 +528,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('VeritasLogic.ai website initialized successfully');
 });
+
+// Authentication state management
+async function checkAuthenticationState() {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token || token === 'null' || token === 'undefined') {
+        return; // Not logged in - keep default nav
+    }
+    
+    // Verify token is still valid and get user info
+    try {
+        const response = await fetch('/api/user/profile', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const profileData = await response.json();
+            updateNavigationForLoggedInUser(profileData.user);
+        } else {
+            // Token invalid - clear it
+            localStorage.removeItem('authToken');
+        }
+    } catch (error) {
+        console.log('Auth check failed:', error);
+        // Network error - keep default nav
+    }
+}
+
+function updateNavigationForLoggedInUser(userData) {
+    const authButtons = document.querySelector('.nav-auth-buttons');
+    if (authButtons) {
+        authButtons.innerHTML = `
+            <a href="/dashboard.html" class="nav-cta primary">Dashboard</a>
+            <span class="nav-user-greeting">Hello, ${userData.first_name || 'User'}!</span>
+            <button onclick="logout()" class="nav-cta secondary">Sign Out</button>
+        `;
+    }
+}
+
+function logout() {
+    localStorage.removeItem('authToken');
+    window.location.reload(); // Refresh to show logged-out state
+}
 
 // CSS for dynamic elements
 const dynamicStyles = `
