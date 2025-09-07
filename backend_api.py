@@ -9,11 +9,9 @@ import psycopg2
 import psycopg2.extras
 import jwt
 import os
-import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
-from postmarker.core import PostmarkClient
 from shared.pricing_config import is_business_email
 
 # Set up logging
@@ -26,16 +24,6 @@ CORS(app)
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key-change-in-production')
 
-# Postmark Configuration
-POSTMARK_API_KEY = os.environ.get('POSTMARK_API_KEY', 'e073a56a-79c1-4045-9dd1-c8d82f40ba24')
-FROM_EMAIL = os.environ.get('FROM_EMAIL', 'noreply@veritaslogic.ai')
-
-# Initialize Postmark client
-try:
-    postmark_client = PostmarkClient(server_token=POSTMARK_API_KEY)
-except Exception as e:
-    logger.warning(f"Postmark client initialization failed: {e}")
-    postmark_client = None
 
 # Database connection
 def get_db_connection():
@@ -55,16 +43,6 @@ def get_db_connection():
         return None
 
 # Helper functions
-def generate_verification_token(user_id, email):
-    """Generate JWT token for email verification"""
-    payload = {
-        'user_id': user_id,
-        'email': email,
-        'exp': datetime.utcnow() + timedelta(hours=24),  # 24-hour expiry
-        'iat': datetime.utcnow(),
-        'purpose': 'email_verification'
-    }
-    return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
 def verify_token(token):
     """Verify and decode JWT token"""
@@ -76,75 +54,6 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return {'error': 'Invalid token'}
 
-def send_verification_email(email, first_name, verification_token):
-    """Send email verification using Postmark"""
-    if not postmark_client:
-        logger.error("Postmark client not initialized")
-        return False
-        
-    try:
-        verification_url = f"https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/verify.html?token={verification_token}"
-        
-        html_body = f'''
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: #f8f9fa; padding: 20px; text-align: center;">
-                <h1 style="color: #2c3e50;">Welcome to VeritasLogic.ai</h1>
-            </div>
-            <div style="padding: 30px;">
-                <h2>Hi {first_name},</h2>
-                <p>Thank you for signing up for VeritasLogic! Click the button below to verify your email address and get started with your 3 free analyses.</p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{verification_url}" 
-                       style="background: #007bff; color: white; padding: 15px 30px; 
-                              text-decoration: none; border-radius: 5px; display: inline-block;
-                              font-weight: bold;">
-                        Verify My Email
-                    </a>
-                </div>
-                
-                <p style="color: #666; font-size: 14px;">
-                    This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
-                </p>
-                
-                <p style="color: #666; font-size: 14px;">
-                    If the button doesn't work, copy and paste this link: {verification_url}
-                </p>
-            </div>
-            <div style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px;">
-                © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
-            </div>
-        </div>
-        '''
-        
-        text_body = f'''
-        Welcome to VeritasLogic.ai!
-        
-        Hi {first_name},
-        
-        Thank you for signing up for VeritasLogic! Please verify your email address by clicking the link below:
-        
-        {verification_url}
-        
-        This link expires in 24 hours. If you didn't create this account, you can safely ignore this email.
-        
-        © 2025 VeritasLogic.ai - Professional Accounting Analysis Platform
-        '''
-        
-        response = postmark_client.emails.send(
-            From=FROM_EMAIL,
-            To=email,
-            Subject='Verify Your VeritasLogic Account',
-            HtmlBody=html_body,
-            TextBody=text_body
-        )
-        
-        logger.info(f"Verification email sent to {email} via Postmark. MessageID: {response['MessageID']}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Failed to send verification email via Postmark: {e}")
-        return False
 
 # API Routes
 @app.route('/api/signup', methods=['POST'])
@@ -217,52 +126,6 @@ def signup():
         logger.error(f"Signup error: {e}")
         return jsonify({'error': 'Registration failed'}), 500
 
-@app.route('/api/verify/<token>')
-def verify_email(token):
-    """Handle email verification"""
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-        
-        cursor = conn.cursor()
-        
-        # Find user by verification token
-        cursor.execute("""
-            SELECT id, email, first_name, status 
-            FROM users 
-            WHERE verification_token = %s AND status = 'pending'
-        """, (token,))
-        
-        user = cursor.fetchone()
-        if not user:
-            conn.close()
-            return jsonify({'error': 'Invalid or expired verification token'}), 400
-        
-        # Mark user as verified
-        cursor.execute("""
-            UPDATE users 
-            SET status = 'verified', verified_at = NOW(), verification_token = NULL
-            WHERE id = %s
-        """, (user['id'],))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"User {user['email']} verified successfully")
-        
-        return jsonify({
-            'message': 'Email verified successfully! You can now log in.',
-            'user': {
-                'id': user['id'],
-                'email': user['email'],
-                'first_name': user['first_name']
-            }
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Verification error: {e}")
-        return jsonify({'error': 'Verification failed'}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -292,8 +155,7 @@ def login():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        if user['status'] != 'verified':
-            return jsonify({'error': 'Please verify your email first'}), 403
+        # All business emails are auto-verified, so this check is no longer needed
         
         # Generate login token
         login_token = jwt.encode({
