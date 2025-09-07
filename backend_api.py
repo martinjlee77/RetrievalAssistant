@@ -528,6 +528,7 @@ def record_analysis():
         actual_credits = Decimal(str(data.get('actual_credits', 0)))
         billed_credits = Decimal(str(data.get('billed_credits', 0)))
         is_free_analysis = data.get('is_free_analysis', False)
+        price_tier = data.get('price_tier', 2)  # Default to tier 2 if not provided
         
         conn = get_db_connection()
         if not conn:
@@ -538,10 +539,10 @@ def record_analysis():
         # Insert analysis record
         cursor.execute("""
             INSERT INTO analyses (user_id, asc_standard, words_count, estimate_cap_credits, 
-                                actual_credits, billed_credits, status)
-            VALUES (%s, %s, %s, %s, %s, %s, 'completed')
+                                actual_credits, billed_credits, price_tier, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed')
             RETURNING id
-        """, (user_id, asc_standard, words_count, estimate_cap_credits, actual_credits, billed_credits))
+        """, (user_id, asc_standard, words_count, estimate_cap_credits, actual_credits, billed_credits, price_tier))
         
         analysis_id = cursor.fetchone()['id']
         

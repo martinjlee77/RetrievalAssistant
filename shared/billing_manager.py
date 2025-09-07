@@ -49,7 +49,8 @@ class BillingManager:
                 'estimate_cap_credits': cost_estimate['cost_cap'],
                 'actual_credits': actual_cost,
                 'billed_credits': billed_cost,
-                'is_free_analysis': is_free_analysis
+                'is_free_analysis': is_free_analysis,
+                'price_tier': cost_estimate.get('tier', 2)  # Include tier information
             }
             
             response = requests.post(
