@@ -109,10 +109,7 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    // Show demo data instead of redirecting
-                    populateDashboard(getDemoUserData());
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
+                    showAuthError('Please sign in to access your dashboard.');
                     return;
                 }
 
@@ -126,33 +123,48 @@
                 if (response.ok) {
                     const userData = await response.json();
                     populateDashboard(userData);
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
                 } else {
-                    console.error('Failed to fetch user data, showing demo');
+                    console.error('Failed to fetch user data');
                     localStorage.removeItem('authToken');
-                    populateDashboard(getDemoUserData());
+                    showAuthError('Authentication failed. Please sign in again.');
                 }
             } catch (error) {
-                console.error('Dashboard initialization error, showing demo:', error);
-                populateDashboard(getDemoUserData());
-            } finally {
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
+                console.error('Dashboard initialization error:', error);
+                showAuthError('Connection error. Please try again or contact support.');
             }
         }
 
-        function getDemoUserData() {
-            return {
-                firstName: 'Demo User',
-                email: 'demo@yourcompany.com',
-                company: 'Your Company',
-                createdAt: new Date().toISOString(),
-                freeAnalysesRemaining: 3,
-                credits: 0,
-                totalAnalyses: 0,
-                analysesThisMonth: 0,
-                totalSpent: 0,
-                recentAnalyses: []
-            };
+        function showAuthError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'auth-error-container';
+            errorContainer.innerHTML = `
+                <div class="auth-error">
+                    <h2>🔐 Authentication Required</h2>
+                    <p>${message}</p>
+                    <div class="error-actions">
+                        <a href="login.html" class="btn btn-primary">Sign In</a>
+                        <a href="signup.html" class="btn btn-secondary">Create Account</a>
+                        <button onclick="retryConnection()" class="btn btn-secondary">Try Again</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('dashboardContent').appendChild(errorContainer);
+        }
+
+        function retryConnection() {
+            // Remove any existing error containers
+            const errorContainers = document.querySelectorAll('.auth-error-container');
+            errorContainers.forEach(container => container.remove());
+            
+            // Show loading state and retry
+            document.getElementById('loadingState').style.display = 'flex';
+            initializeDashboard();
         }
 
         function populateDashboard(userData) {

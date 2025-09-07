@@ -2964,6 +2964,76 @@ html {
     color: #666;
 }
 
+/* Dashboard Auth Error */
+.auth-error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 40px 20px;
+}
+
+.auth-error {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    max-width: 500px;
+    width: 100%;
+}
+
+.auth-error h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.auth-error p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-actions .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.error-actions .btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.error-actions .btn-primary:hover {
+    background: #5a67d8;
+}
+
+.error-actions .btn-secondary {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.error-actions .btn-secondary:hover {
+    background: #667eea;
+    color: white;
+}
+
 /* Dashboard responsive styles */
 @media (max-width: 768px) {
     .dashboard-grid {
@@ -2983,6 +3053,15 @@ html {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+    }
+    
+    .error-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .error-actions .btn {
+        width: 200px;
     }
 }
 
