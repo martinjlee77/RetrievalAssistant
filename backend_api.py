@@ -31,7 +31,12 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit():
-    """Serve Streamlit app via iframe - production ready"""
+    """Serve Streamlit app - production ready"""
+    # Get the current host from the request
+    host = request.headers.get('Host', 'localhost:5000')
+    # Replace port 5000 with 8501 for Streamlit
+    streamlit_url = f"http://{host.replace(':5000', ':8501')}"
+    
     return f'''
     <!DOCTYPE html>
     <html>
@@ -47,60 +52,51 @@ def serve_streamlit():
                 transform: translate(-50%, -50%);
                 text-align: center;
                 color: #666;
+                z-index: 1000;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }}
         </style>
+        <script>
+            let loadTimeout;
+            function showAnalysisPlatform() {{
+                const loading = document.getElementById('loading');
+                const iframe = document.getElementById('streamlit-frame');
+                
+                // Show loading initially
+                loading.style.display = 'block';
+                
+                // Try to load Streamlit
+                iframe.src = '{streamlit_url}';
+                
+                // Hide loading when iframe loads
+                iframe.onload = function() {{
+                    setTimeout(() => {{
+                        loading.style.display = 'none';
+                    }}, 1000);
+                }};
+                
+                // Fallback: hide loading after 10 seconds regardless
+                loadTimeout = setTimeout(() => {{
+                    loading.style.display = 'none';
+                }}, 10000);
+            }}
+            
+            // Start loading when page loads
+            window.onload = showAnalysisPlatform;
+        </script>
     </head>
     <body>
-        <div class="loading" id="loading">Loading Analysis Platform...</div>
-        <iframe src="/streamlit-proxy" onload="document.getElementById('loading').style.display='none'"></iframe>
+        <div class="loading" id="loading">
+            <h3>Loading Analysis Platform...</h3>
+            <p>Starting your multi-standard ASC analysis tools...</p>
+        </div>
+        <iframe id="streamlit-frame" width="100%" height="100%" frameborder="0"></iframe>
     </body>
     </html>
     '''
-
-@app.route('/streamlit-proxy')
-@app.route('/streamlit-proxy/<path:path>')
-def proxy_streamlit(path=''):
-    """Proxy requests to Streamlit app - production ready"""
-    import requests
-    try:
-        # Build the target URL
-        target_url = f'http://127.0.0.1:8501/{path}'
-        
-        # Forward query parameters
-        query_string = request.query_string.decode('utf-8')
-        if query_string:
-            target_url += f'?{query_string}'
-        
-        # Forward the request to Streamlit
-        response = requests.get(
-            target_url,
-            headers={k: v for k, v in request.headers if k.lower() != 'host'},
-            timeout=30
-        )
-        
-        # Return the response
-        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-        headers = [(k, v) for k, v in response.headers.items() if k.lower() not in excluded_headers]
-        
-        return response.content, response.status_code, headers
-        
-    except requests.exceptions.ConnectionError:
-        return '''
-        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif;">
-            <h2>Analysis Platform Starting...</h2>
-            <p>The analysis platform is starting up. Please wait a moment and refresh the page.</p>
-            <button onclick="window.location.reload()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Refresh</button>
-        </div>
-        ''', 503
-    except Exception as e:
-        logger.error(f"Streamlit proxy error: {e}")
-        return '''
-        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif;">
-            <h2>Service Temporarily Unavailable</h2>
-            <p>Please try again in a few moments.</p>
-            <button onclick="window.location.reload()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Retry</button>
-        </div>
-        ''', 503
 
 @app.route('/<path:path>')
 def serve_static(path):
