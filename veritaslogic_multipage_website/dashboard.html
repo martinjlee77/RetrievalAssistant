@@ -139,6 +139,44 @@
                         <span class="field-value" id="accountStatus">Active</span>
                     </div>
                 </div>
+                
+                <!-- Change Password Section -->
+                <div class="change-password-section">
+                    <h3>🔐 Change Password</h3>
+                    <div id="changePasswordMessage"></div>
+                    <form id="changePasswordForm" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password (legacy users can leave blank)">
+                            <small>Legacy users (email-only login) can leave this field blank</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" name="newPassword" required placeholder="Enter your new password">
+                            <div class="password-requirements">
+                                <small>Password must contain at least:</small>
+                                <ul>
+                                    <li id="req-length">8 characters</li>
+                                    <li id="req-uppercase">One uppercase letter</li>
+                                    <li id="req-lowercase">One lowercase letter</li>
+                                    <li id="req-number">One number</li>
+                                    <li id="req-special">One special character</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmNewPassword">Confirm New Password</label>
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Confirm your new password">
+                            <div id="password-match" class="password-feedback"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="changePasswordButton">
+                            Update Password
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -356,6 +394,142 @@
             localStorage.removeItem('authToken');
             showLoginForm();
         }
+        
+        // Password strength validation function
+        function validatePasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+            
+            // Update visual indicators
+            const lengthEl = document.getElementById('req-length');
+            const uppercaseEl = document.getElementById('req-uppercase');
+            const lowercaseEl = document.getElementById('req-lowercase');
+            const numberEl = document.getElementById('req-number');
+            const specialEl = document.getElementById('req-special');
+            
+            if (lengthEl) lengthEl.className = requirements.length ? 'valid' : '';
+            if (uppercaseEl) uppercaseEl.className = requirements.uppercase ? 'valid' : '';
+            if (lowercaseEl) lowercaseEl.className = requirements.lowercase ? 'valid' : '';
+            if (numberEl) numberEl.className = requirements.number ? 'valid' : '';
+            if (specialEl) specialEl.className = requirements.special ? 'valid' : '';
+            
+            return Object.values(requirements).every(req => req);
+        }
+        
+        function showChangePasswordMessage(message, type) {
+            const container = document.getElementById('changePasswordMessage');
+            if (container) {
+                container.innerHTML = `<div class="${type}-message">${message}</div>`;
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        
+        // Initialize change password functionality
+        setTimeout(() => {
+            // Real-time password validation
+            const newPasswordInput = document.getElementById('newPassword');
+            if (newPasswordInput) {
+                newPasswordInput.addEventListener('input', function(e) {
+                    validatePasswordStrength(e.target.value);
+                });
+            }
+            
+            // Password confirmation validation
+            const confirmPasswordInput = document.getElementById('confirmNewPassword');
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', function(e) {
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = e.target.value;
+                    const feedback = document.getElementById('password-match');
+                    
+                    if (!feedback) return;
+                    
+                    if (confirmPassword === '') {
+                        feedback.textContent = '';
+                        feedback.className = 'password-feedback';
+                    } else if (newPassword === confirmPassword) {
+                        feedback.textContent = '✓ Passwords match';
+                        feedback.className = 'password-feedback valid';
+                    } else {
+                        feedback.textContent = '✗ Passwords do not match';
+                        feedback.className = 'password-feedback invalid';
+                    }
+                });
+            }
+            
+            // Change password form submission
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            if (changePasswordForm) {
+                changePasswordForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+                    const submitButton = document.getElementById('changePasswordButton');
+                    
+                    // Validate passwords match
+                    if (newPassword !== confirmNewPassword) {
+                        showChangePasswordMessage('Passwords do not match', 'error');
+                        return;
+                    }
+                    
+                    // Validate password strength
+                    if (!validatePasswordStrength(newPassword)) {
+                        showChangePasswordMessage('Password does not meet the requirements', 'error');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Updating Password...';
+                    
+                    try {
+                        const token = localStorage.getItem('authToken');
+                        const response = await fetch('/api/change-password', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                current_password: currentPassword,
+                                new_password: newPassword
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            showChangePasswordMessage('Password has been updated successfully!', 'success');
+                            // Clear form
+                            changePasswordForm.reset();
+                            // Clear password match feedback
+                            const feedback = document.getElementById('password-match');
+                            if (feedback) {
+                                feedback.textContent = '';
+                                feedback.className = 'password-feedback';
+                            }
+                        } else {
+                            showChangePasswordMessage(result.error || 'Password change failed. Please try again.', 'error');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Change password error:', error);
+                        showChangePasswordMessage('Network error. Please check your connection and try again.', 'error');
+                    } finally {
+                        // Reset loading state
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Update Password';
+                    }
+                });
+            }
+        }, 100);
     </script>
 </body>
 </html>
