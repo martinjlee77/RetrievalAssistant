@@ -6,10 +6,32 @@
     <title>Dashboard - VeritasLogic.ai</title>
     <!-- Force cache refresh -->
     <meta name="description" content="Manage your VeritasLogic account, track your usage, and access your ASC analysis tools.">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2025090702">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        // IMMEDIATE: Clear any problematic localStorage data and prevent API calls
+        console.log('=== CACHE BUSTER: Clearing localStorage ===');
+        localStorage.removeItem('authToken');
+        
+        // Force immediate login form display
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== CACHE BUSTER: DOM loaded, forcing login form ===');
+            setTimeout(function() {
+                const loadingState = document.getElementById('loadingState');
+                const loginSection = document.getElementById('loginSection');
+                const mainContent = document.getElementById('mainContent');
+                
+                if (loadingState) loadingState.style.display = 'none';
+                if (mainContent) mainContent.style.display = 'none';
+                if (loginSection) loginSection.style.display = 'block';
+                
+                console.log('=== Login form forced to display ===');
+            }, 100);
+        });
+    </script>
 </head>
 <body>
     <div class="dashboard-container" id="dashboardContent" style="padding-top: 40px;">
@@ -135,15 +157,19 @@
         });
 
         async function initializeDashboard() {
+            console.log('Dashboard initializing...');
             const token = localStorage.getItem('authToken');
+            console.log('Token found:', token ? 'Yes' : 'No');
             
-            if (!token) {
-                // No token - show login form
+            if (!token || token === 'null' || token === 'undefined') {
+                // No valid token - show login form immediately
+                console.log('No valid token, showing login form');
                 showLoginForm();
                 return;
             }
             
-            // Have token - try to fetch user data
+            // Have valid token - try to fetch user data
+            console.log('Valid token found, fetching user data...');
             try {
                 const response = await fetch('https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3000/api/user/profile', {
                     headers: {
@@ -154,14 +180,18 @@
 
                 if (response.ok) {
                     const userData = await response.json();
+                    console.log('User data received, showing dashboard');
                     showDashboard(userData);
                 } else {
                     // Token invalid - clear and show login
+                    console.log('Token invalid, clearing and showing login');
                     localStorage.removeItem('authToken');
                     showLoginForm();
                 }
             } catch (error) {
                 console.error('Network error:', error);
+                // Only show network error if we actually had a token (real network issue)
+                console.log('Network error occurred, showing network error');
                 showNetworkError();
             }
         }
