@@ -16,6 +16,34 @@
         <div class="loading" id="loadingState">
             <p>Loading your dashboard...</p>
         </div>
+
+        <!-- Inline Login Form -->
+        <div id="loginSection" style="display: none;">
+            <div class="login-form-container">
+                <div class="login-form">
+                    <h2>🔐 Sign In to Your Dashboard</h2>
+                    <p>Enter your registered business email address to access your account.</p>
+                    
+                    <div id="loginMessage"></div>
+                    
+                    <form id="dashboardLoginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">Business Email Address</label>
+                            <input type="email" id="loginEmail" name="email" placeholder="your.email@company.com" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="loginButton">
+                            Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="login-links">
+                        <p>Don't have an account? <a href="signup.html">Create account with instant activation</a></p>
+                        <p><a href="index.html">← Back to homepage</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <!-- Main dashboard content -->
         <div id="mainContent" style="display: none;">
@@ -26,7 +54,7 @@
                 </div>
                 <div class="header-actions">
                     <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev/" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
-                    <button onclick="contactSupport()" class="btn btn-secondary">Add Credits</button>
+                    <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
                 </div>
             </div>
             
@@ -106,13 +134,16 @@
         });
 
         async function initializeDashboard() {
+            const token = localStorage.getItem('authToken');
+            
+            if (!token) {
+                // No token - show login form
+                showLoginForm();
+                return;
+            }
+            
+            // Have token - try to fetch user data
             try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    showAuthError('Please sign in to access your dashboard.');
-                    return;
-                }
-
                 const response = await fetch('https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3000/api/user/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -122,49 +153,121 @@
 
                 if (response.ok) {
                     const userData = await response.json();
-                    populateDashboard(userData);
-                    document.getElementById('loadingState').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
+                    showDashboard(userData);
                 } else {
-                    console.error('Failed to fetch user data');
+                    // Token invalid - clear and show login
                     localStorage.removeItem('authToken');
-                    showAuthError('Authentication failed. Please sign in again.');
+                    showLoginForm();
                 }
             } catch (error) {
-                console.error('Dashboard initialization error:', error);
-                showAuthError('Connection error. Please try again or contact support.');
+                console.error('Network error:', error);
+                showNetworkError();
             }
         }
 
-        function showAuthError(message) {
+        function showLoginForm() {
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+        }
+
+        function showDashboard(userData) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            populateDashboard(userData);
+        }
+
+        function showNetworkError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'none';
             
             const errorContainer = document.createElement('div');
-            errorContainer.className = 'auth-error-container';
+            errorContainer.className = 'network-error-container';
             errorContainer.innerHTML = `
-                <div class="auth-error">
-                    <h2>🔐 Authentication Required</h2>
-                    <p>${message}</p>
-                    <div class="error-actions">
-                        <a href="login.html" class="btn btn-primary">Sign In</a>
-                        <a href="signup.html" class="btn btn-secondary">Create Account</a>
-                        <button onclick="retryConnection()" class="btn btn-secondary">Try Again</button>
-                    </div>
+                <div class="network-error">
+                    <h2>⚠️ Connection Error</h2>
+                    <p>Unable to connect to the server. Please check your internet connection and try again.</p>
+                    <button onclick="retryConnection()" class="btn btn-primary">Try Again</button>
                 </div>
             `;
-            
             document.getElementById('dashboardContent').appendChild(errorContainer);
         }
 
         function retryConnection() {
-            // Remove any existing error containers
-            const errorContainers = document.querySelectorAll('.auth-error-container');
+            const errorContainers = document.querySelectorAll('.network-error-container');
             errorContainers.forEach(container => container.remove());
-            
-            // Show loading state and retry
             document.getElementById('loadingState').style.display = 'flex';
             initializeDashboard();
+        }
+
+        // Handle login form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('dashboardLoginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+        });
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const loginButton = document.getElementById('loginButton');
+            const messageContainer = document.getElementById('loginMessage');
+            
+            if (!email) {
+                showLoginMessage('Please enter your email address', 'error');
+                return;
+            }
+            
+            // Show loading state
+            loginButton.disabled = true;
+            loginButton.textContent = 'Signing In...';
+            messageContainer.innerHTML = '';
+            
+            try {
+                const response = await fetch('https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Store auth token
+                    localStorage.setItem('authToken', data.token);
+                    
+                    // Show success message briefly
+                    showLoginMessage('Login successful! Loading dashboard...', 'success');
+                    
+                    // Load dashboard after short delay
+                    setTimeout(() => {
+                        showDashboard(data.user);
+                    }, 1000);
+                    
+                } else {
+                    const errorData = await response.json();
+                    showLoginMessage(errorData.error || 'Login failed. Please try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginMessage('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                // Reset loading state
+                loginButton.disabled = false;
+                loginButton.textContent = 'Sign In';
+            }
+        }
+
+        function showLoginMessage(message, type) {
+            const container = document.getElementById('loginMessage');
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
         }
 
         function populateDashboard(userData) {
@@ -220,13 +323,9 @@
             });
         }
 
-        function contactSupport() {
-            window.location.href = 'mailto:hello@veritaslogic.ai?subject=Add Credits Request&body=I would like to add credits to my account.';
-        }
-
         function logout() {
             localStorage.removeItem('authToken');
-            window.location.href = 'index.html';
+            showLoginForm();
         }
     </script>
 </body>
