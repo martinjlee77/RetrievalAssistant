@@ -179,74 +179,39 @@ def signup():
             conn.close()
             return jsonify({'error': 'Email already registered'}), 409
         
-        # Check if business email for auto-approval
-        is_business = is_business_email(email)
-        
-        if is_business:
-            # Business email - auto-approve without verification
-            cursor.execute("""
-                INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                                 status, verified_at, free_analyses_remaining)
-                VALUES (%s, %s, %s, %s, %s, 'verified', NOW(), 3)
-                RETURNING id
-            """, (email, first_name, last_name, company_name, job_title))
-            
-            user_id = cursor.fetchone()['id']
-            
-            # Add trial credits transaction
-            cursor.execute("""
-                INSERT INTO credit_transactions (user_id, amount, reason)
-                VALUES (%s, 3, 'trial_grant')
-            """, (user_id,))
-            
-            conn.commit()
+        # Validate business email - reject personal emails
+        if not is_business_email(email):
             conn.close()
-            
-            logger.info(f"Business email {email} auto-approved during signup")
-            
             return jsonify({
-                'message': 'Registration successful! Your business email has been automatically verified. You can now log in.',
-                'user_id': user_id,
-                'auto_verified': True
-            }), 201
-            
-        else:
-            # Personal email - require verification
-            verification_token = str(uuid.uuid4())
-            
-            cursor.execute("""
-                INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                                 status, verification_token, free_analyses_remaining)
-                VALUES (%s, %s, %s, %s, %s, 'pending', %s, 3)
-                RETURNING id
-            """, (email, first_name, last_name, company_name, job_title, verification_token))
-            
-            user_id = cursor.fetchone()['id']
-            
-            # Add trial credits transaction
-            cursor.execute("""
-                INSERT INTO credit_transactions (user_id, amount, reason)
-                VALUES (%s, 3, 'trial_grant')
-            """, (user_id,))
-            
-            conn.commit()
-            conn.close()
-            
-            # Send verification email
-            email_sent = send_verification_email(email, first_name, verification_token)
-            
-            if email_sent:
-                return jsonify({
-                    'message': 'Registration successful! Please check your email to verify your account.',
-                    'user_id': user_id,
-                    'verification_required': True
-                }), 201
-            else:
-                return jsonify({
-                    'message': 'Registration successful, but failed to send verification email. Please contact support.',
-                    'user_id': user_id,
-                    'verification_required': True
-                }), 201
+                'error': 'Only business email addresses are accepted. Please use your company email address to register.'
+            }), 400
+        
+        # Business email validated - create verified account immediately
+        cursor.execute("""
+            INSERT INTO users (email, first_name, last_name, company_name, job_title, 
+                             status, verified_at, free_analyses_remaining)
+            VALUES (%s, %s, %s, %s, %s, 'verified', NOW(), 3)
+            RETURNING id
+        """, (email, first_name, last_name, company_name, job_title))
+        
+        user_id = cursor.fetchone()['id']
+        
+        # Add trial credits transaction
+        cursor.execute("""
+            INSERT INTO credit_transactions (user_id, amount, reason)
+            VALUES (%s, 3, 'trial_grant')
+        """, (user_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Business email {email} successfully registered and verified")
+        
+        return jsonify({
+            'message': 'Registration successful! Your account is ready to use. You can now log in.',
+            'user_id': user_id,
+            'auto_verified': True
+        }), 201
             
     except Exception as e:
         logger.error(f"Signup error: {e}")
