@@ -589,6 +589,82 @@ def record_analysis():
         logger.error(f"Record analysis error: {e}")
         return jsonify({'error': 'Failed to record analysis'}), 500
 
+# Credit Purchase Endpoints
+@app.route('/api/credit-packages', methods=['GET'])
+def get_credit_packages():
+    """Get available credit purchase packages"""
+    from shared.pricing_config import get_credit_packages
+    try:
+        packages = get_credit_packages()
+        return jsonify({'packages': packages}), 200
+    except Exception as e:
+        logger.error(f"Error getting credit packages: {e}")
+        return jsonify({'error': 'Failed to get credit packages'}), 500
+
+@app.route('/api/purchase-credits', methods=['POST'])
+def purchase_credits():
+    """Purchase credits (simplified - no payment processing)"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        amount = data.get('amount')
+        
+        if not amount or amount not in [50, 100, 200]:
+            return jsonify({'error': 'Invalid credit amount. Must be 50, 100, or 200'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Add credits to user's balance
+        cursor.execute("""
+            UPDATE users 
+            SET credits_balance = credits_balance + %s
+            WHERE id = %s
+        """, (amount, user_id))
+        
+        # Record credit purchase transaction with expiration
+        from shared.pricing_config import CREDIT_EXPIRATION_MONTHS
+        cursor.execute("""
+            INSERT INTO credit_transactions (user_id, amount, reason, expires_at)
+            VALUES (%s, %s, 'credit_purchase', NOW() + INTERVAL '%s months')
+        """, (user_id, amount, CREDIT_EXPIRATION_MONTHS))
+        
+        # Get updated balance
+        cursor.execute("""
+            SELECT credits_balance FROM users WHERE id = %s
+        """, (user_id,))
+        
+        new_balance = cursor.fetchone()['credits_balance']
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"User {user_id} purchased ${amount} credits. New balance: ${new_balance}")
+        
+        return jsonify({
+            'message': f'Successfully added ${amount} to your account!',
+            'amount_purchased': amount,
+            'new_balance': float(new_balance),
+            'expires_months': CREDIT_EXPIRATION_MONTHS
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Purchase credits error: {e}")
+        return jsonify({'error': 'Failed to purchase credits'}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
