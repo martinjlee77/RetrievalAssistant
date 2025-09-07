@@ -383,7 +383,9 @@
             try {
                 const token = localStorage.getItem('authToken');
                 
-                const response = await fetch('http://localhost:3000/api/user/profile', {
+                // Construct API URL for Replit environment
+                const apiUrl = window.location.protocol + '//' + window.location.hostname + ':3001/api/user/profile';
+                const response = await fetch(apiUrl, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
