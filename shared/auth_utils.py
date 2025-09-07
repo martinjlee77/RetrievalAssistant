@@ -118,48 +118,39 @@ def show_login_page():
     """Show login page when user is not authenticated"""
     st.title("🔐 Authentication Required")
     
-    with st.container(border=True):
-        st.markdown("""
-        ### Welcome to VeritasLogic.ai Professional Analysis Platform
-        
-        To access the ASC analysis tools, please sign in with your business email address.
-        
-        **Note:** Only business email addresses are accepted. Personal emails (gmail, outlook, etc.) are not permitted.
+    with st.container(border=False):
+        st.markdown("""  
+        #### To access the ASC analysis tools, please sign in with your registered email address.
         """)
         
-        col1, col2, col3 = st.columns([1, 2, 1])
+    # Direct login form (simplified)
+    with st.form("streamlit_login"):
+        email = st.text_input("Registered Email Address", placeholder="your.name@yourcompany.com")
         
-        with col2:
-            st.markdown("#### Sign In Options")
+        if st.form_submit_button("Sign In", type="primary", use_container_width=True):
+            if email:
+                login_result = attempt_login(email)
+                if login_result.get('success'):
+                    st.success("Login successful! Refreshing page...")
+                    st.rerun()
+                else:
+                    st.error(login_result.get('error', 'Login failed'))
+            else:
+                st.error("Please enter your email address")
+    
+    st.markdown("---")
             
-            # Direct login form (simplified)
-            with st.form("streamlit_login"):
-                email = st.text_input("Business Email Address", placeholder="your.name@yourcompany.com", help="Must be a business email address (no personal emails)")
-                
-                if st.form_submit_button("Sign In", type="primary", use_container_width=True):
-                    if email:
-                        login_result = attempt_login(email)
-                        if login_result.get('success'):
-                            st.success("Login successful! Refreshing page...")
-                            st.rerun()
-                        else:
-                            st.error(login_result.get('error', 'Login failed'))
-                    else:
-                        st.error("Please enter your email address")
-            
-            st.markdown("---")
-            
-            # Links to full registration site
-            st.markdown("#### New User?")
-            st.markdown(
-                """
-                **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses (business email required)
-                
-                **[Sign In](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/login.html)** - Full login page
-                
-                **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/contact.html)** - Contact support
-                """
-            )
+    # Links to full registration site
+    st.markdown("#### New User?")
+    st.markdown(
+        """
+        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses (business email required)
+        
+        **[Sign In](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/login.html)** - Full login page
+        
+        **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/contact.html)** - Contact support
+        """
+    )
 
 def attempt_login(email: str) -> Dict[str, Any]:
     """Attempt to login user with email"""
