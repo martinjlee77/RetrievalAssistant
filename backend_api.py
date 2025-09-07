@@ -360,6 +360,221 @@ def login():
         logger.error(f"Login error: {e}")
         return jsonify({'error': 'Login failed'}), 500
 
+@app.route('/api/forgot-password', methods=['POST'])
+def forgot_password():
+    """Handle forgot password request"""
+    try:
+        data = request.get_json()
+        email = sanitize_email(data.get('email', ''))
+        
+        if not email:
+            return jsonify({'error': 'Valid email address is required'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Check if user exists and is not a legacy user
+        cursor.execute("""
+            SELECT id, first_name, is_legacy_user 
+            FROM users 
+            WHERE email = %s
+        """, (email,))
+        
+        user = cursor.fetchone()
+        
+        if not user:
+            # Return success even if user doesn't exist for security
+            return jsonify({
+                'message': 'If an account with that email exists, you will receive a password reset email.'
+            }), 200
+        
+        if user['is_legacy_user']:
+            conn.close()
+            return jsonify({
+                'error': 'Legacy users cannot reset passwords. Please contact support for assistance.'
+            }), 400
+        
+        # Generate reset token
+        reset_token = generate_reset_token()
+        expires_at = datetime.utcnow() + timedelta(hours=1)  # Token expires in 1 hour
+        
+        # Store reset token
+        cursor.execute("""
+            INSERT INTO password_reset_tokens (user_id, token, expires_at)
+            VALUES (%s, %s, %s)
+        """, (user['id'], reset_token, expires_at))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Password reset token generated for user {email}")
+        
+        # In a production environment, you would send an email here
+        # For now, we'll return the token in the response (remove in production)
+        return jsonify({
+            'message': 'Password reset instructions have been sent to your email.',
+            'reset_token': reset_token  # Remove this in production
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Forgot password error: {e}")
+        return jsonify({'error': 'Password reset request failed'}), 500
+
+@app.route('/api/reset-password', methods=['POST'])
+def reset_password():
+    """Handle password reset with token"""
+    try:
+        data = request.get_json()
+        token = data.get('token', '')
+        new_password = data.get('new_password', '')
+        
+        if not token or not new_password:
+            return jsonify({'error': 'Token and new password are required'}), 400
+        
+        # Validate new password
+        is_valid, password_message = validate_password(new_password)
+        if not is_valid:
+            return jsonify({'error': password_message}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Find valid reset token
+        cursor.execute("""
+            SELECT prt.user_id, u.email
+            FROM password_reset_tokens prt
+            JOIN users u ON prt.user_id = u.id
+            WHERE prt.token = %s 
+              AND prt.expires_at > NOW()
+              AND prt.used_at IS NULL
+        """, (token,))
+        
+        reset_request = cursor.fetchone()
+        
+        if not reset_request:
+            conn.close()
+            return jsonify({'error': 'Invalid or expired reset token'}), 400
+        
+        user_id = reset_request['user_id']
+        
+        # Hash new password
+        password_hash = hash_password(new_password)
+        
+        # Update user password and mark as non-legacy
+        cursor.execute("""
+            UPDATE users 
+            SET password_hash = %s, is_legacy_user = FALSE
+            WHERE id = %s
+        """, (password_hash, user_id))
+        
+        # Mark token as used
+        cursor.execute("""
+            UPDATE password_reset_tokens 
+            SET used_at = NOW()
+            WHERE token = %s
+        """, (token,))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Password reset successful for user {reset_request['email']}")
+        
+        return jsonify({
+            'message': 'Password has been reset successfully. You can now log in with your new password.'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Reset password error: {e}")
+        return jsonify({'error': 'Password reset failed'}), 500
+
+@app.route('/api/change-password', methods=['POST'])
+def change_password():
+    """Handle password change for authenticated users"""
+    try:
+        # Get token from Authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'No valid authorization token'}), 401
+        
+        token = auth_header.split(' ')[1]
+        payload = verify_token(token)
+        
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        current_password = data.get('current_password', '')
+        new_password = data.get('new_password', '')
+        
+        if not new_password:
+            return jsonify({'error': 'New password is required'}), 400
+        
+        # Validate new password
+        is_valid, password_message = validate_password(new_password)
+        if not is_valid:
+            return jsonify({'error': password_message}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get user data
+        cursor.execute("""
+            SELECT password_hash, is_legacy_user
+            FROM users 
+            WHERE id = %s
+        """, (user_id,))
+        
+        user = cursor.fetchone()
+        
+        if not user:
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Verify current password (unless legacy user)
+        if user['is_legacy_user']:
+            # Legacy users don't need to provide current password
+            pass
+        else:
+            if not current_password:
+                return jsonify({'error': 'Current password is required'}), 400
+            
+            if not user['password_hash'] or not verify_password(current_password, user['password_hash']):
+                conn.close()
+                return jsonify({'error': 'Current password is incorrect'}), 401
+        
+        # Hash new password
+        password_hash = hash_password(new_password)
+        
+        # Update password and mark as non-legacy
+        cursor.execute("""
+            UPDATE users 
+            SET password_hash = %s, is_legacy_user = FALSE
+            WHERE id = %s
+        """, (password_hash, user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Password changed successfully for user ID {user_id}")
+        
+        return jsonify({
+            'message': 'Password has been changed successfully.'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Change password error: {e}")
+        return jsonify({'error': 'Password change failed'}), 500
+
 @app.route('/api/user/profile', methods=['GET'])
 def get_user_profile():
     """Get user profile information"""
