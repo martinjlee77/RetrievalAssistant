@@ -13,7 +13,21 @@
     
 </head>
 <body>
-    <div class="dashboard-container" id="dashboardContent" style="padding-top: 40px;">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="/">VeritasLogic.ai</a>
+            </div>
+            <div class="nav-links">
+                <a href="/analysis" target="_blank">Analysis Platform</a>
+                <a href="/">Home</a>
+                <button onclick="logout()" class="btn btn-secondary btn-sm">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container" id="dashboardContent" style="padding-top: 100px;">
         <!-- Loading state -->
         <div class="loading" id="loadingState">
             <p>Loading your dashboard...</p>
@@ -55,7 +69,7 @@
                     <p id="memberSince">Member since</p>
                 </div>
                 <div class="header-actions">
-                    <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev/" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
+                    <a href="/analysis" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
                     <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
                 </div>
             </div>
@@ -98,7 +112,7 @@
                         <div class="empty-state">
                             <div>📄</div>
                             <p>No analyses yet. Ready to get started?</p>
-                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev/" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
+                            <a href="/analysis" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
                         </div>
                     </div>
                 </div>
@@ -281,18 +295,20 @@
         }
 
         function populateDashboard(userData) {
-            // Update welcome section
-            document.getElementById('userName').textContent = userData.firstName || 'User';
-            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.createdAt).toLocaleDateString()}`;
+            console.log('Populating dashboard with user data:', userData);
+            
+            // Update welcome section (backend returns snake_case fields)
+            document.getElementById('userName').textContent = userData.first_name || 'User';
+            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.created_at || Date.now()).toLocaleDateString()}`;
             
             // Update profile information
             document.getElementById('userEmail').textContent = userData.email || '-';
-            document.getElementById('userCompany').textContent = userData.company || '-';
-            document.getElementById('memberSinceDate').textContent = new Date(userData.createdAt).toLocaleDateString() || '-';
+            document.getElementById('userCompany').textContent = userData.company_name || '-';
+            document.getElementById('memberSinceDate').textContent = new Date(userData.created_at || Date.now()).toLocaleDateString() || '-';
             
-            // Update credits and usage
-            const freeAnalyses = userData.freeAnalysesRemaining || 0;
-            const paidCredits = userData.credits || 0;
+            // Update credits and usage (backend returns snake_case fields)
+            const freeAnalyses = userData.free_analyses_remaining || 3;
+            const paidCredits = userData.credits_balance || 0;
             
             document.getElementById('freeAnalysesCount').textContent = freeAnalyses;
             
@@ -302,9 +318,9 @@
             }
             
             // Update usage statistics
-            document.getElementById('totalAnalyses').textContent = userData.totalAnalyses || 0;
-            document.getElementById('thisMonth').textContent = userData.analysesThisMonth || 0;
-            document.getElementById('totalSpent').textContent = `$${(userData.totalSpent || 0).toFixed(2)}`;
+            document.getElementById('totalAnalyses').textContent = userData.total_analyses || userData.totalAnalyses || 0;
+            document.getElementById('thisMonth').textContent = userData.analyses_this_month || userData.analysesThisMonth || 0;
+            document.getElementById('totalSpent').textContent = `$${(userData.total_spent || userData.totalSpent || 0).toFixed(2)}`;
             
             // Load recent analyses
             loadRecentAnalyses(userData.recentAnalyses || []);
