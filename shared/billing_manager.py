@@ -14,7 +14,7 @@ class BillingManager:
     """Manages billing operations for completed analyses"""
     
     def __init__(self):
-        self.backend_url = "http://localhost:3000/api"
+        self.backend_url = "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/api"
     
     def record_analysis_billing(
         self,

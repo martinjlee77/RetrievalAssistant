@@ -73,7 +73,7 @@ def render_asc606_page():
                 - Free analyses: {credits_check.get('free_analyses_remaining', 0)}
                 - Paid credits: ${credits_check.get('credits_balance', 0):.2f}
                 
-                [**Add Credits to Your Account →**](http://localhost:8000/dashboard.html)
+                [**Add Credits to Your Account →**](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html)
                 """)
                 can_proceed = False
         

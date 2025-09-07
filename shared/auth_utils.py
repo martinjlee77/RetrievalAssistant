@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Backend API configuration
-BACKEND_URL = "http://localhost:3000/api"
+BACKEND_URL = "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/api"
 
 class AuthManager:
     """Manages user authentication and session state"""
@@ -151,11 +151,11 @@ def show_login_page():
             st.markdown("#### New User?")
             st.markdown(
                 """
-                **[Create Account](http://localhost:8000/signup.html)** - Get 3 free analyses
+                **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses
                 
-                **[Sign In](http://localhost:8000/login.html)** - Full login page
+                **[Sign In](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/login.html)** - Full login page
                 
-                **[Need Help?](http://localhost:8000/contact.html)** - Contact support
+                **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/contact.html)** - Contact support
                 """
             )
 
@@ -212,7 +212,7 @@ def show_user_sidebar(auth_manager: AuthManager):
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Dashboard", use_container_width=True):
-                st.link_button("Go to Dashboard", "http://localhost:8000/dashboard.html")
+                st.link_button("Go to Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html")
         
         with col2:
             if st.button("Logout", use_container_width=True):
@@ -234,7 +234,7 @@ def show_credits_warning(required_credits: float, auth_manager: AuthManager):
             - Paid credits: ${credits_info.get('credits_balance', 0):.2f}
             
             **Next steps:**
-            1. [Add credits to your account](http://localhost:8000/dashboard.html)
+            1. [Add credits to your account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html)
             2. Contact support for assistance
             """
         )

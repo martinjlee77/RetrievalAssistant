@@ -83,7 +83,7 @@ def send_verification_email(email, first_name, verification_token):
         return False
         
     try:
-        verification_url = f"http://localhost:8000/verify.html?token={verification_token}"
+        verification_url = f"https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/verify.html?token={verification_token}"
         
         html_body = f'''
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
