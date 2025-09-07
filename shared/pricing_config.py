@@ -56,6 +56,11 @@ PERSONAL_EMAIL_PROVIDERS = [
     'mail.com'
 ]
 
+# Pre-approved business domains (bypass MX validation)
+APPROVED_BUSINESS_DOMAINS = [
+    'veritaslogic.ai'
+]
+
 # Credit Settings
 CREDIT_EXPIRATION_MONTHS = 12
 FREE_ANALYSES_PER_USER = 3
@@ -117,6 +122,11 @@ def is_business_email(email):
     # Auto-approve government and education domains
     if domain.endswith(('.gov', '.edu', '.mil')):
         logger.info(f"Email {email} approved: government/education domain {domain}")
+        return True
+    
+    # Auto-approve pre-approved business domains
+    if domain in APPROVED_BUSINESS_DOMAINS:
+        logger.info(f"Email {email} approved: pre-approved business domain {domain}")
         return True
     
     # Enhanced validation: Check for suspicious patterns
