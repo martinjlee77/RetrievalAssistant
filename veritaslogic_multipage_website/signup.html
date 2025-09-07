@@ -184,6 +184,9 @@
             <div class="auth-header">
                 <h1>Create Your Account</h1>
                 <p>Get 3 free ASC analyses to start transforming your workflow</p>
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2196f3;">
+                    <strong>Business Email Required:</strong> Only corporate email addresses are accepted. Personal emails (gmail, outlook, yahoo, etc.) are not permitted.
+                </div>
             </div>
             
             <div id="messageContainer"></div>
@@ -200,8 +203,9 @@
             </div>
             
             <div class="form-group">
-                <label for="email">Email Address <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required>
+                <label for="email">Business Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="your.name@yourcompany.com" required>
+                <small style="color: #666; font-size: 12px;">Must be a valid business email address (no gmail, outlook, yahoo, etc.)</small>
             </div>
             
             <div class="form-group">

@@ -122,7 +122,9 @@ def show_login_page():
         st.markdown("""
         ### Welcome to VeritasLogic.ai Professional Analysis Platform
         
-        To access the ASC analysis tools, please sign in to your account.
+        To access the ASC analysis tools, please sign in with your business email address.
+        
+        **Note:** Only business email addresses are accepted. Personal emails (gmail, outlook, etc.) are not permitted.
         """)
         
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -132,7 +134,7 @@ def show_login_page():
             
             # Direct login form (simplified)
             with st.form("streamlit_login"):
-                email = st.text_input("Email Address", placeholder="your@company.com")
+                email = st.text_input("Business Email Address", placeholder="your.name@yourcompany.com", help="Must be a business email address (no personal emails)")
                 
                 if st.form_submit_button("Sign In", type="primary", use_container_width=True):
                     if email:
@@ -151,7 +153,7 @@ def show_login_page():
             st.markdown("#### New User?")
             st.markdown(
                 """
-                **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses
+                **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses (business email required)
                 
                 **[Sign In](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/login.html)** - Full login page
                 
