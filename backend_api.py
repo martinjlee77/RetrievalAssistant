@@ -31,11 +31,21 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit():
-    """Serve Streamlit app - production ready"""
-    # Get the current host from the request
+    """Redirect to Analysis Platform - production ready"""
+    # Get current request info to build proper URL
+    scheme = 'https' if request.headers.get('X-Forwarded-Proto') == 'https' else 'http'
     host = request.headers.get('Host', 'localhost:5000')
-    # Replace port 5000 with 8501 for Streamlit
-    streamlit_url = f"http://{host.replace(':5000', ':8501')}"
+    
+    # For development, use localhost
+    if 'localhost' in host or '127.0.0.1' in host:
+        streamlit_url = 'http://localhost:8501'
+    else:
+        # For production, construct the proper URL with port 8501
+        if ':5000' in host:
+            streamlit_host = host.replace(':5000', ':8501')
+        else:
+            streamlit_host = host + ':8501'
+        streamlit_url = f'{scheme}://{streamlit_host}'
     
     return f'''
     <!DOCTYPE html>
@@ -43,57 +53,75 @@ def serve_streamlit():
     <head>
         <title>VeritasLogic Analysis Platform</title>
         <style>
-            body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; }}
-            iframe {{ width: 100%; height: 100vh; border: none; }}
-            .loading {{ 
-                position: absolute; 
-                top: 50%; 
-                left: 50%; 
-                transform: translate(-50%, -50%);
+            body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f5f5f5; }}
+            .container {{
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                align-items: center;
+                justify-content: center;
                 text-align: center;
-                color: #666;
-                z-index: 1000;
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }}
+            .loading {{
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                max-width: 400px;
+            }}
+            .spinner {{
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #007bff;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 20px auto;
+            }}
+            @keyframes spin {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
+            .btn {{
+                background: #007bff;
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                margin-top: 15px;
+            }}
+            .btn:hover {{ background: #0056b3; }}
         </style>
         <script>
-            let loadTimeout;
-            function showAnalysisPlatform() {{
-                const loading = document.getElementById('loading');
-                const iframe = document.getElementById('streamlit-frame');
+            function loadAnalysisPlatform() {{
+                const loading = document.querySelector('.loading');
+                loading.innerHTML = `
+                    <h3>Launching Analysis Platform...</h3>
+                    <div class="spinner"></div>
+                    <p>Opening your multi-standard ASC analysis tools...</p>
+                `;
                 
-                // Show loading initially
-                loading.style.display = 'block';
-                
-                // Try to load Streamlit
-                iframe.src = '{streamlit_url}';
-                
-                // Hide loading when iframe loads
-                iframe.onload = function() {{
-                    setTimeout(() => {{
-                        loading.style.display = 'none';
-                    }}, 1000);
-                }};
-                
-                // Fallback: hide loading after 10 seconds regardless
-                loadTimeout = setTimeout(() => {{
-                    loading.style.display = 'none';
-                }}, 10000);
+                // Redirect to Streamlit
+                setTimeout(() => {{
+                    window.location.href = '{streamlit_url}';
+                }}, 2000);
             }}
             
-            // Start loading when page loads
-            window.onload = showAnalysisPlatform;
+            window.onload = loadAnalysisPlatform;
         </script>
     </head>
     <body>
-        <div class="loading" id="loading">
-            <h3>Loading Analysis Platform...</h3>
-            <p>Starting your multi-standard ASC analysis tools...</p>
+        <div class="container">
+            <div class="loading">
+                <h3>Connecting to Analysis Platform</h3>
+                <div class="spinner"></div>
+                <p>Preparing your analysis environment...</p>
+                <button class="btn" onclick="loadAnalysisPlatform()">Launch Now</button>
+            </div>
         </div>
-        <iframe id="streamlit-frame" width="100%" height="100%" frameborder="0"></iframe>
     </body>
     </html>
     '''
