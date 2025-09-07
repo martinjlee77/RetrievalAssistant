@@ -197,10 +197,10 @@ def login():
     """Handle user login"""
     try:
         data = request.get_json()
-        email = data.get('email', '').lower().strip()
+        email = sanitize_email(data.get('email', ''))
         
         if not email:
-            return jsonify({'error': 'Email is required'}), 400
+            return jsonify({'error': 'Valid email address is required'}), 400
         
         conn = get_db_connection()
         if not conn:
