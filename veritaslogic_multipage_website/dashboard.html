@@ -9,290 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-            background: #f7fafc;
-        }
-        
-        .dashboard-header {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .welcome-section h1 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 2rem;
-        }
-        
-        .welcome-section p {
-            color: #666;
-            margin: 0;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-        
-        .btn-secondary {
-            background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-        
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        
-        .card h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .credits-overview {
-            text-align: center;
-        }
-        
-        .credits-display {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .credits-number {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .credits-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .free-analyses {
-            background: #f0fff4;
-            border: 2px solid #38a169;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .free-analyses .number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #38a169;
-        }
-        
-        .free-analyses .label {
-            color: #2d3748;
-            font-weight: 500;
-        }
-        
-        .usage-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .recent-analyses {
-            margin-top: 20px;
-        }
-        
-        .analysis-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .analysis-info h4 {
-            margin: 0 0 5px 0;
-            color: #2c3e50;
-            font-size: 1rem;
-        }
-        
-        .analysis-info p {
-            margin: 0;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .analysis-cost {
-            background: #667eea;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        .empty-state {
-            text-align: center;
-            color: #666;
-            padding: 40px 20px;
-        }
-        
-        .empty-state .icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        .profile-section {
-            border-top: 1px solid #e1e8ed;
-            padding-top: 20px;
-            margin-top: 20px;
-        }
-        
-        .profile-field {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        
-        .profile-field:last-child {
-            border-bottom: none;
-        }
-        
-        .field-label {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-        
-        .field-value {
-            color: #666;
-        }
-        
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            color: #666;
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .dashboard-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .usage-stats {
-                grid-template-columns: 1fr;
-            }
-            
-            .analysis-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">VeritasLogic.ai</a>
-            <ul class="nav-links">
-                <li><a href="dashboard.html" class="active">Dashboard</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="features.html">Features</a></li>
-                <li><a href="contact.html">Support</a></li>
-            </ul>
-            <button class="mobile-menu-btn">☰</button>
-            <div class="header-actions">
-                <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="dashboard-container" id="dashboardContent">
+    <div class="dashboard-container" id="dashboardContent" style="padding-top: 40px;">
         <!-- Loading state -->
         <div class="loading" id="loadingState">
             <p>Loading your dashboard...</p>
@@ -321,44 +40,59 @@
                         <div class="label">Free Analyses Remaining</div>
                     </div>
                     
-                    <div class="credits-display">
-                        <div class="credits-number" id="creditsBalance">0</div>
-                        <div class="credits-label">Paid Credits Available</div>
+                    <div class="credits-display" id="creditsSection" style="display: none;">
+                        <div class="number" id="creditsBalance">$0</div>
+                        <div class="label">Paid Credits Available</div>
                     </div>
                     
                     <div class="usage-stats">
                         <div class="stat-item">
-                            <div class="stat-number" id="totalAnalyses">0</div>
+                            <div class="stat-value" id="totalAnalyses">0</div>
                             <div class="stat-label">Total Analyses</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number" id="totalSpent">$0</div>
+                            <div class="stat-value" id="thisMonth">0</div>
+                            <div class="stat-label">This Month</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalSpent">$0</div>
                             <div class="stat-label">Total Spent</div>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3>Profile Information</h3>
-                        <div class="profile-field">
-                            <span class="field-label">Email</span>
-                            <span class="field-value" id="userEmail">-</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="field-label">Company</span>
-                            <span class="field-value" id="userCompany">-</span>
-                        </div>
-                        <div class="profile-field">
-                            <span class="field-label">Title</span>
-                            <span class="field-value" id="userTitle">-</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Recent Activity -->
+                <!-- Recent Analyses -->
                 <div class="card">
                     <h2>📊 Recent Analyses</h2>
-                    <div id="recentAnalyses">
-                        <!-- Will be populated by JavaScript -->
+                    <div id="recentAnalysesList" class="recent-analyses">
+                        <div class="empty-state">
+                            <div>📄</div>
+                            <p>No analyses yet. Ready to get started?</p>
+                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev/" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Profile Section -->
+            <div class="card profile-section">
+                <h2>👤 Profile Information</h2>
+                <div class="profile-fields">
+                    <div class="profile-field">
+                        <span class="field-label">Email:</span>
+                        <span class="field-value" id="userEmail">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Company:</span>
+                        <span class="field-value" id="userCompany">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Member Since:</span>
+                        <span class="field-value" id="memberSinceDate">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="field-label">Account Status:</span>
+                        <span class="field-value" id="accountStatus">Active</span>
                     </div>
                 </div>
             </div>
@@ -366,124 +100,104 @@
     </div>
 
     <script>
-        // Check authentication and load dashboard
-        window.addEventListener('load', function() {
-            const token = localStorage.getItem('authToken');
-            
-            if (!token) {
-                // Redirect to login if not authenticated
+        // Dashboard initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+        });
+
+        async function initializeDashboard() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch('https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3000/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    populateDashboard(userData);
+                } else {
+                    console.error('Failed to fetch user data');
+                    localStorage.removeItem('authToken');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
                 window.location.href = 'login.html';
+            } finally {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }
+        }
+
+        function populateDashboard(userData) {
+            // Update welcome section
+            document.getElementById('userName').textContent = userData.firstName || 'User';
+            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.createdAt).toLocaleDateString()}`;
+            
+            // Update profile information
+            document.getElementById('userEmail').textContent = userData.email || '-';
+            document.getElementById('userCompany').textContent = userData.company || '-';
+            document.getElementById('memberSinceDate').textContent = new Date(userData.createdAt).toLocaleDateString() || '-';
+            
+            // Update credits and usage
+            const freeAnalyses = userData.freeAnalysesRemaining || 0;
+            const paidCredits = userData.credits || 0;
+            
+            document.getElementById('freeAnalysesCount').textContent = freeAnalyses;
+            
+            if (paidCredits > 0) {
+                document.getElementById('creditsSection').style.display = 'block';
+                document.getElementById('creditsBalance').textContent = `$${paidCredits.toFixed(2)}`;
+            }
+            
+            // Update usage statistics
+            document.getElementById('totalAnalyses').textContent = userData.totalAnalyses || 0;
+            document.getElementById('thisMonth').textContent = userData.analysesThisMonth || 0;
+            document.getElementById('totalSpent').textContent = `$${(userData.totalSpent || 0).toFixed(2)}`;
+            
+            // Load recent analyses
+            loadRecentAnalyses(userData.recentAnalyses || []);
+        }
+
+        function loadRecentAnalyses(analyses) {
+            const container = document.getElementById('recentAnalysesList');
+            
+            if (analyses.length === 0) {
+                // Keep the empty state
                 return;
             }
             
-            loadDashboard();
-        });
-        
-        async function loadDashboard() {
-            try {
-                const token = localStorage.getItem('authToken');
-                
-                // Construct API URL for Replit environment
-                const apiUrl = window.location.protocol + '//' + window.location.hostname + ':3001/api/user/profile';
-                const response = await fetch(apiUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load profile');
-                }
-                
-                const data = await response.json();
-                populateDashboard(data);
-                
-            } catch (error) {
-                console.error('Dashboard load error:', error);
-                
-                // If authentication fails, redirect to login
-                if (error.message.includes('authentication') || error.message.includes('token')) {
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('userData');
-                    window.location.href = 'login.html?message=Session expired. Please sign in again.&type=error';
-                } else {
-                    alert('Failed to load dashboard. Please refresh the page or contact support.');
-                }
-            }
-        }
-        
-        function populateDashboard(data) {
-            const user = data.user;
-            const analyses = data.recent_analyses || [];
-            const transactions = data.transactions || [];
-            
-            // Update user information
-            document.getElementById('userName').textContent = user.first_name;
-            document.getElementById('memberSince').textContent = `Member since ${new Date(user.member_since).toLocaleDateString()}`;
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('userCompany').textContent = user.company_name;
-            document.getElementById('userTitle').textContent = user.job_title;
-            
-            // Update credits and usage
-            document.getElementById('freeAnalysesCount').textContent = user.free_analyses_remaining;
-            document.getElementById('creditsBalance').textContent = user.credits_balance;
-            document.getElementById('totalAnalyses').textContent = analyses.length;
-            
-            // Calculate total spent
-            const totalSpent = transactions
-                .filter(t => t.reason === 'analysis_charge')
-                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-            document.getElementById('totalSpent').textContent = `$${totalSpent}`;
-            
-            // Hide free analyses section if no free analyses remaining
-            if (user.free_analyses_remaining === 0) {
-                document.getElementById('freeAnalysesSection').style.display = 'none';
-            }
-            
-            // Populate recent analyses
-            const analysesContainer = document.getElementById('recentAnalyses');
-            
-            if (analyses.length === 0) {
-                analysesContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📄</div>
-                        <p>No analyses yet. Ready to get started?</p>
-                        <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev/" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
+            container.innerHTML = '';
+            analyses.forEach(analysis => {
+                const item = document.createElement('div');
+                item.className = 'analysis-item';
+                item.innerHTML = `
+                    <div class="analysis-details">
+                        <h4>${analysis.title}</h4>
+                        <p>${analysis.asc_standard} • ${new Date(analysis.created_at).toLocaleDateString()} • $${analysis.cost}</p>
                     </div>
+                    <a href="${analysis.download_url}" class="btn btn-secondary" target="_blank">Download</a>
                 `;
-            } else {
-                analysesContainer.innerHTML = analyses.map(analysis => `
-                    <div class="analysis-item">
-                        <div class="analysis-info">
-                            <h4>${analysis.asc_standard} Analysis</h4>
-                            <p>${new Date(analysis.completed_at).toLocaleDateString()}</p>
-                        </div>
-                        <div class="analysis-cost">
-                            ${analysis.cost === 0 ? 'FREE' : `$${analysis.cost}`}
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
-            // Show main content and hide loading
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
+                container.appendChild(item);
+            });
         }
-        
+
+        function contactSupport() {
+            window.location.href = 'mailto:hello@veritaslogic.ai?subject=Add Credits Request&body=I would like to add credits to my account.';
+        }
+
         function logout() {
             localStorage.removeItem('authToken');
-            localStorage.removeItem('userData');
-            window.location.href = 'login.html?message=You have been signed out successfully.&type=success';
+            window.location.href = 'index.html';
         }
-        
-        function contactSupport() {
-            alert('To add credits to your account, please contact our support team at support@veritaslogic.ai or use the contact form. We\'ll process your request within 24 hours.');
-        }
-        
-        // Mobile menu functionality
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.nav-links').classList.toggle('active');
-        });
     </script>
 </body>
 </html>
