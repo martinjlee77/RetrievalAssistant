@@ -9,245 +9,103 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .auth-form {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-        }
-        
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .auth-header h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2rem;
-        }
-        
-        .auth-header p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-            box-sizing: border-box;
-            color: black;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .required {
-            color: #e74c3c;
-        }
-        
-        .terms-group {
-            margin: 25px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .terms-group label {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 14px;
-            line-height: 1.5;
-            cursor: pointer;
-        }
-        
-        .terms-group input[type="checkbox"] {
-            width: auto;
-            margin-top: 2px;
-        }
-        
-        .auth-button {
-            width: 100%;
-            background: #667eea;
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 20px;
-        }
-        
-        .auth-button:hover:not(:disabled) {
-            background: #5a67d8;
-        }
-        
-        .auth-button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-        
-        .auth-links {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8ed;
-        }
-        
-        .auth-links a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .auth-links a:hover {
-            text-decoration: underline;
-        }
-        
-        .error-message {
-            background: #fee;
-            color: #e53e3e;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #fed7d7;
-        }
-        
-        .success-message {
-            background: #f0fff4;
-            color: #38a169;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #c6f6d5;
-        }
-        
-        .loading {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-        
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .auth-form {
-                padding: 30px 20px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="auth-container">
-        <form class="auth-form" id="signupForm">
-            <div class="auth-header">
-                <h1>Create Your Account</h1>
-                <p>Get 3 free ASC analyses to start transforming your workflow</p>
-                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2196f3;">
-                    <strong>Business Email Required:</strong> Only corporate email addresses are accepted. Personal emails (gmail, outlook, yahoo, etc.) are not permitted.
-                </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">VeritasLogic.ai</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+            <a href="signup.html" class="nav-cta">Start Free Trial</a>
+        </div>
+    </nav>
+
+    <!-- Signup Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Create Your Account</h1>
+            <p>Get 3 free ASC analyses to start transforming your workflow with instant business account activation</p>
+        </div>
+    </section>
+
+    <!-- Signup Form Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-container">
+                <form class="auth-form" id="signupForm">
+                    <div class="business-notice">
+                        <strong>Business Email Required:</strong> Only corporate email addresses are accepted. Personal emails (gmail, outlook, yahoo, etc.) are not permitted. Business accounts are activated instantly.
+                    </div>
+            
+                    <div id="messageContainer"></div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name <span class="required">*</span></label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name <span class="required">*</span></label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+            
+                    <div class="form-group">
+                        <label for="email">Business Email Address <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="your.name@yourcompany.com" required>
+                        <small>Must be a valid business email address (no gmail, outlook, yahoo, etc.)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company">Company Name <span class="required">*</span></label>
+                        <input type="text" id="company" name="company" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title <span class="required">*</span></label>
+                        <select id="jobTitle" name="jobTitle" required>
+                            <option value="">Select your role</option>
+                            <option value="Controller">Controller</option>
+                            <option value="Staff Accountant">Staff Accountant</option>
+                            <option value="Senior Accountant">Senior Accountant</option>
+                            <option value="Accounting Manager">Accounting Manager</option>
+                            <option value="Director of Accounting">Director of Accounting</option>
+                            <option value="CFO">CFO</option>
+                            <option value="CPA">CPA</option>
+                            <option value="Financial Analyst">Financial Analyst</option>
+                            <option value="Audit Manager">Audit Manager</option>
+                            <option value="Tax Manager">Tax Manager</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="terms-group">
+                        <label for="terms">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <span>I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-button" id="submitButton">
+                        Create Account & Get 3 Free Analyses
+                    </button>
+                    
+                    <div class="auth-links">
+                        <p>Already have an account? <a href="login.html">Sign in here</a></p>
+                        <p><a href="index.html">← Back to homepage</a></p>
+                    </div>
+                </form>
             </div>
-            
-            <div id="messageContainer"></div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="firstName">First Name <span class="required">*</span></label>
-                    <input type="text" id="firstName" name="firstName" required>
-                </div>
-                <div class="form-group">
-                    <label for="lastName">Last Name <span class="required">*</span></label>
-                    <input type="text" id="lastName" name="lastName" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Business Email Address <span class="required">*</span></label>
-                <input type="email" id="email" name="email" placeholder="your.name@yourcompany.com" required>
-                <small style="color: #666; font-size: 12px;">Must be a valid business email address (no gmail, outlook, yahoo, etc.)</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="company">Company Name <span class="required">*</span></label>
-                <input type="text" id="company" name="company" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="jobTitle">Job Title <span class="required">*</span></label>
-                <select id="jobTitle" name="jobTitle" required>
-                    <option value="">Select your role</option>
-                    <option value="Controller">Controller</option>
-                    <option value="Staff Accountant">Staff Accountant</option>
-                    <option value="Senior Accountant">Senior Accountant</option>
-                    <option value="Accounting Manager">Accounting Manager</option>
-                    <option value="Director of Accounting">Director of Accounting</option>
-                    <option value="CFO">CFO</option>
-                    <option value="CPA">CPA</option>
-                    <option value="Financial Analyst">Financial Analyst</option>
-                    <option value="Audit Manager">Audit Manager</option>
-                    <option value="Tax Manager">Tax Manager</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="terms-group">
-                <label for="terms">
-                    <input type="checkbox" id="terms" name="terms" required>
-                    <span>I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span>
-                </label>
-            </div>
-            
-            <button type="submit" class="auth-button" id="submitButton">
-                Create Account & Get 3 Free Analyses
-            </button>
-            
-            <div class="auth-links">
-                <p>Already have an account? <a href="login.html">Sign in here</a></p>
-                <p><a href="index.html">← Back to homepage</a></p>
-            </div>
-        </form>
-    </div>
+        </div>
+    </section>
 
     <script>
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -295,9 +153,9 @@
                     showMessage(result.message, 'success');
                     form.reset();
                     
-                    // Redirect to check email page after 2 seconds
+                    // Redirect to login after 2 seconds for business accounts
                     setTimeout(() => {
-                        window.location.href = 'verify.html';
+                        window.location.href = 'login.html';
                     }, 2000);
                     
                 } else {
