@@ -30,98 +30,121 @@ def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
 @app.route('/analysis')
-def serve_streamlit():
-    """Redirect to Analysis Platform - production ready"""
-    # Get current request info to build proper URL
-    scheme = 'https' if request.headers.get('X-Forwarded-Proto') == 'https' else 'http'
-    host = request.headers.get('Host', 'localhost:5000')
-    
-    # For development, use localhost
-    if 'localhost' in host or '127.0.0.1' in host:
-        streamlit_url = 'http://localhost:8501'
-    else:
-        # For production, construct the proper URL with port 8501
-        if ':5000' in host:
-            streamlit_host = host.replace(':5000', ':8501')
-        else:
-            streamlit_host = host + ':8501'
-        streamlit_url = f'{scheme}://{streamlit_host}'
-    
-    return f'''
+def serve_analysis_app():
+    """Serve the integrated analysis platform"""
+    return '''
     <!DOCTYPE html>
     <html>
     <head>
         <title>VeritasLogic Analysis Platform</title>
         <style>
-            body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f5f5f5; }}
-            .container {{
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f5f5f5; }
+            .container {
                 display: flex;
                 flex-direction: column;
                 height: 100vh;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-            }}
-            .loading {{
+            }
+            .platform {
                 background: white;
-                padding: 30px;
+                padding: 40px;
                 border-radius: 10px;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                max-width: 400px;
-            }}
-            .spinner {{
-                border: 3px solid #f3f3f3;
-                border-top: 3px solid #007bff;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 1s linear infinite;
-                margin: 20px auto;
-            }}
-            @keyframes spin {{
-                0% {{ transform: rotate(0deg); }}
-                100% {{ transform: rotate(360deg); }}
-            }}
-            .btn {{
+                max-width: 800px;
+                width: 90%;
+            }
+            .btn {
                 background: #007bff;
                 color: white;
-                padding: 12px 24px;
+                padding: 15px 30px;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
                 text-decoration: none;
                 display: inline-block;
-                margin-top: 15px;
-            }}
-            .btn:hover {{ background: #0056b3; }}
+                margin: 10px;
+                font-size: 16px;
+            }
+            .btn:hover { background: #0056b3; }
+            .btn-secondary {
+                background: #6c757d;
+            }
+            .btn-secondary:hover { background: #545b62; }
+            h1 { color: #333; margin-bottom: 10px; }
+            h2 { color: #666; margin-bottom: 30px; font-weight: normal; }
+            .standards { 
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                gap: 15px; 
+                margin: 30px 0; 
+            }
+            .standard-card {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #e9ecef;
+            }
+            .standard-card h3 { color: #007bff; margin: 0 0 10px 0; }
+            .standard-card p { color: #666; margin: 0; font-size: 14px; }
         </style>
-        <script>
-            function loadAnalysisPlatform() {{
-                const loading = document.querySelector('.loading');
-                loading.innerHTML = `
-                    <h3>Launching Analysis Platform...</h3>
-                    <div class="spinner"></div>
-                    <p>Opening your multi-standard ASC analysis tools...</p>
-                `;
-                
-                // Redirect to Streamlit
-                setTimeout(() => {{
-                    window.location.href = '{streamlit_url}';
-                }}, 2000);
-            }}
-            
-            window.onload = loadAnalysisPlatform;
-        </script>
     </head>
     <body>
         <div class="container">
-            <div class="loading">
-                <h3>Connecting to Analysis Platform</h3>
-                <div class="spinner"></div>
-                <p>Preparing your analysis environment...</p>
-                <button class="btn" onclick="loadAnalysisPlatform()">Launch Now</button>
+            <div class="platform">
+                <h1>🎯 VeritasLogic Analysis Platform</h1>
+                <h2>Multi-Standard Accounting Analysis with AI & Hybrid RAG</h2>
+                
+                <div class="standards">
+                    <div class="standard-card">
+                        <h3>ASC 606</h3>
+                        <p>Revenue Recognition</p>
+                    </div>
+                    <div class="standard-card">
+                        <h3>ASC 842</h3>
+                        <p>Lease Accounting</p>
+                    </div>
+                    <div class="standard-card">
+                        <h3>ASC 718</h3>
+                        <p>Stock Compensation</p>
+                    </div>
+                    <div class="standard-card">
+                        <h3>ASC 805</h3>
+                        <p>Business Combinations</p>
+                    </div>
+                    <div class="standard-card">
+                        <h3>ASC 340-40</h3>
+                        <p>Contract Costs</p>
+                    </div>
+                    <div class="standard-card">
+                        <h3>Research Assistant</h3>
+                        <p>RAG-powered guidance</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <p style="color: #666; margin-bottom: 20px;">
+                        ⚠️ <strong>Platform Integration Notice:</strong><br>
+                        The full Streamlit analysis platform is being integrated into this interface.<br>
+                        Please contact support for immediate access to analysis tools.
+                    </p>
+                    
+                    <button class="btn" onclick="showContactInfo()">Contact Support</button>
+                    <button class="btn btn-secondary" onclick="goBack()">Return to Dashboard</button>
+                </div>
             </div>
         </div>
+        
+        <script>
+            function showContactInfo() {
+                alert("For immediate access to analysis tools, please email: support@veritaslogic.ai\\n\\nOur team will activate your analysis platform within 24 hours.");
+            }
+            
+            function goBack() {
+                window.location.href = '/dashboard.html';
+            }
+        </script>
     </body>
     </html>
     '''
