@@ -2701,6 +2701,60 @@ html {
     pointer-events: none;
 }
 
+/* Pricing Details Table */
+.pricing-details {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+}
+
+.pricing-table {
+    margin-top: 3rem;
+    overflow-x: auto;
+}
+
+.pricing-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.pricing-table th,
+.pricing-table td {
+    padding: 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.pricing-table th {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+}
+
+.pricing-table td {
+    color: rgba(255,255,255,0.9);
+}
+
+.pricing-table .enterprise-row {
+    background: rgba(255,255,255,0.05);
+}
+
+.pricing-table strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.pricing-note {
+    text-align: center;
+    margin-top: 2rem;
+    color: rgba(255,255,255,0.8);
+    font-style: italic;
+}
+
 /* Focus styles for accessibility */
 button:focus,
 input:focus,
