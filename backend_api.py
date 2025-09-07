@@ -9,6 +9,7 @@ import psycopg2
 import psycopg2.extras
 import jwt
 import os
+import re
 from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
@@ -43,6 +44,61 @@ def get_db_connection():
         return None
 
 # Helper functions
+def sanitize_string(value, max_length=200, allow_chars=None):
+    """
+    Sanitize string input to prevent injection attacks
+    
+    Args:
+        value (str): Input string to sanitize
+        max_length (int): Maximum allowed length
+        allow_chars (str): Additional allowed characters beyond alphanumeric, spaces, and basic punctuation
+        
+    Returns:
+        str: Sanitized string
+    """
+    if not value or not isinstance(value, str):
+        return ""
+    
+    # Remove null bytes and control characters
+    value = value.replace('\x00', '').replace('\r', '').replace('\n', ' ')
+    
+    # Trim whitespace and limit length
+    value = value.strip()[:max_length]
+    
+    # Define base allowed characters (alphanumeric, spaces, basic punctuation)
+    base_pattern = r'[a-zA-Z0-9\s\-_@\.\'"]'
+    if allow_chars:
+        base_pattern = base_pattern[:-1] + re.escape(allow_chars) + ']'
+    
+    # Keep only allowed characters
+    sanitized = ''.join(re.findall(base_pattern, value))
+    
+    return sanitized.strip()
+
+def sanitize_email(email):
+    """
+    Sanitize email address with stricter validation
+    
+    Args:
+        email (str): Email address to sanitize
+        
+    Returns:
+        str: Sanitized email address
+    """
+    if not email or not isinstance(email, str):
+        return ""
+    
+    # Basic email sanitization
+    email = email.strip().lower()
+    
+    # Remove dangerous characters but keep email-valid ones
+    email = sanitize_string(email, max_length=254, allow_chars='+')
+    
+    # Basic email format validation
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+        return ""
+    
+    return email
 
 def verify_token(token):
     """Verify and decode JWT token"""
