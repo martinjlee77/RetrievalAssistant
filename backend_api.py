@@ -127,11 +127,20 @@ def signup():
         if not data.get('terms_accepted'):
             return jsonify({'error': 'Terms and conditions must be accepted'}), 400
         
-        email = data['email'].lower().strip()
-        first_name = data['first_name'].strip()
-        last_name = data['last_name'].strip()
-        company_name = data['company_name'].strip()
-        job_title = data['job_title'].strip()
+        # Sanitize all input fields
+        email = sanitize_email(data.get('email', ''))
+        first_name = sanitize_string(data.get('first_name', ''), max_length=50)
+        last_name = sanitize_string(data.get('last_name', ''), max_length=50)
+        company_name = sanitize_string(data.get('company_name', ''), max_length=100)
+        job_title = sanitize_string(data.get('job_title', ''), max_length=100)
+        
+        # Validate sanitized inputs
+        if not email:
+            return jsonify({'error': 'Valid email address is required'}), 400
+        if not first_name or not last_name:
+            return jsonify({'error': 'First name and last name are required'}), 400
+        if not company_name or not job_title:
+            return jsonify({'error': 'Company name and job title are required'}), 400
         
         # Check if user already exists
         conn = get_db_connection()
