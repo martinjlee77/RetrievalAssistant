@@ -3,7 +3,7 @@ VeritasLogic Backend API
 Handles user registration, authentication, and billing
 """
 
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, send_from_directory, redirect, url_for
 from flask_cors import CORS
 import psycopg2
 import psycopg2.extras
@@ -19,8 +19,17 @@ from shared.pricing_config import is_business_email
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='veritaslogic_multipage_website', static_url_path='')
 CORS(app, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
+
+# Serve static files (HTML, CSS, JS)
+@app.route('/')
+def serve_index():
+    return send_from_directory('veritaslogic_multipage_website', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('veritaslogic_multipage_website', path)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key-change-in-production')

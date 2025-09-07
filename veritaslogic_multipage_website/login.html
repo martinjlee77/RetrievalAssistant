@@ -134,8 +134,8 @@
             form.classList.add('loading');
             
             try {
-                // Construct API URL for Replit environment
-                const apiUrl = window.location.protocol + '//' + window.location.hostname + ':3000/api/login';
+                // Use relative API path (works in both dev and production)
+                const apiUrl = '/api/login';
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {

@@ -95,7 +95,7 @@
         async function verifyEmailToken(token) {
             try {
                 // Construct API URL for Replit environment
-                const apiUrl = window.location.protocol + '//' + window.location.hostname + ':3000/api/verify/' + token;
+                const apiUrl = '/api/verify/' + token;
                 const response = await fetch(apiUrl);
                 const result = await response.json();
                 
