@@ -38,7 +38,7 @@ def serve_streamlit():
     # Start Streamlit if not already running
     try:
         # Use subprocess to start Streamlit on port 8501
-        subprocess.Popen(['streamlit', 'run', 'app.py', '--server.port', '8501', '--server.address', '0.0.0.0'])
+        subprocess.Popen(['streamlit', 'run', 'home.py', '--server.port', '8501', '--server.address', '0.0.0.0'])
     except:
         pass
     
