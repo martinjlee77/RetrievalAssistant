@@ -31,43 +31,8 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit():
-    """Redirect to Streamlit app"""
-    import subprocess
-    import os
-    
-    # Start Streamlit if not already running
-    try:
-        # Use subprocess to start Streamlit on port 8501
-        subprocess.Popen(['streamlit', 'run', 'home.py', '--server.port', '8501', '--server.address', '0.0.0.0'])
-    except:
-        pass
-    
-    # Return iframe that loads Streamlit
-    return f'''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>VeritasLogic Analysis Platform</title>
-        <style>
-            body {{ margin: 0; padding: 0; }}
-            iframe {{ width: 100%; height: 100vh; border: none; }}
-        </style>
-    </head>
-    <body>
-        <iframe src="/streamlit" allow="camera; microphone; fullscreen"></iframe>
-    </body>
-    </html>
-    '''
-
-@app.route('/streamlit')
-def proxy_streamlit():
-    """Proxy requests to Streamlit"""
-    import requests
-    try:
-        response = requests.get('http://localhost:8501')
-        return response.content, response.status_code, response.headers.items()
-    except:
-        return "Streamlit app starting... Please refresh in a moment.", 503
+    """Redirect to Streamlit app running on port 8501"""
+    return redirect('http://localhost:8501', code=302)
 
 @app.route('/<path:path>')
 def serve_static(path):
