@@ -91,7 +91,7 @@ def get_price_tier(word_count):
 
 def is_business_email(email):
     """
-    Determine if email is from a business domain
+    Determine if email is from a business domain with MX record validation
     
     Args:
         email (str): Email address to check
@@ -99,21 +99,43 @@ def is_business_email(email):
     Returns:
         bool: True if business email, False if personal
     """
+    import socket
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
     if not email or '@' not in email:
         return False
         
     domain = email.split('@')[1].lower()
     
-    # Check against known personal providers
+    # Reject known personal providers immediately
     if domain in PERSONAL_EMAIL_PROVIDERS:
+        logger.info(f"Email {email} rejected: personal email provider {domain}")
         return False
     
     # Auto-approve government and education domains
     if domain.endswith(('.gov', '.edu', '.mil')):
+        logger.info(f"Email {email} approved: government/education domain {domain}")
         return True
     
-    # Most other domains are likely business domains
-    return True
+    # Enhanced validation: Check for suspicious patterns
+    if len(domain) < 4 or domain.count('.') == 0:
+        logger.info(f"Email {email} rejected: suspicious domain pattern {domain}")
+        return False
+    
+    # MX record validation
+    try:
+        mx_records = socket.getaddrinfo(domain, None)
+        if mx_records:
+            logger.info(f"Email {email} approved: valid business domain {domain} with MX records")
+            return True
+        else:
+            logger.info(f"Email {email} rejected: no MX records found for {domain}")
+            return False
+    except (socket.gaierror, socket.error) as e:
+        logger.warning(f"Email {email} rejected: MX lookup failed for {domain}: {e}")
+        return False
 
 def format_tier_display(tier_info):
     """
