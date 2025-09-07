@@ -13,6 +13,8 @@ import re
 from datetime import datetime, timedelta
 from decimal import Decimal
 import logging
+import bcrypt
+import secrets
 from shared.pricing_config import is_business_email
 
 # Set up logging
@@ -159,6 +161,40 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return {'error': 'Invalid token'}
 
+# Password management functions
+def hash_password(password):
+    """Hash a password using bcrypt"""
+    salt = bcrypt.gensalt()
+    password_hash = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return password_hash.decode('utf-8')
+
+def verify_password(password, password_hash):
+    """Verify a password against its hash"""
+    return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
+
+def validate_password(password):
+    """Validate password strength"""
+    if not password or len(password) < 8:
+        return False, "Password must be at least 8 characters long"
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "Password must contain at least one uppercase letter"
+    
+    if not re.search(r'[a-z]', password):
+        return False, "Password must contain at least one lowercase letter"
+    
+    if not re.search(r'\d', password):
+        return False, "Password must contain at least one number"
+    
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False, "Password must contain at least one special character"
+    
+    return True, "Password is strong"
+
+def generate_reset_token():
+    """Generate a secure password reset token"""
+    return secrets.token_urlsafe(32)
+
 
 # API Routes
 @app.route('/api/signup', methods=['POST'])
@@ -168,7 +204,7 @@ def signup():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['email', 'first_name', 'last_name', 'company_name', 'job_title', 'terms_accepted']
+        required_fields = ['email', 'first_name', 'last_name', 'company_name', 'job_title', 'terms_accepted', 'password']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
@@ -182,6 +218,7 @@ def signup():
         last_name = sanitize_string(data.get('last_name', ''), max_length=50)
         company_name = sanitize_string(data.get('company_name', ''), max_length=100)
         job_title = sanitize_string(data.get('job_title', ''), max_length=100)
+        password = data.get('password', '')
         
         # Validate sanitized inputs
         if not email:
@@ -190,6 +227,11 @@ def signup():
             return jsonify({'error': 'First name and last name are required'}), 400
         if not company_name or not job_title:
             return jsonify({'error': 'Company name and job title are required'}), 400
+        
+        # Validate password strength
+        is_valid, password_message = validate_password(password)
+        if not is_valid:
+            return jsonify({'error': password_message}), 400
         
         # Check if user already exists
         conn = get_db_connection()
@@ -209,13 +251,16 @@ def signup():
                 'error': 'Only business email addresses are accepted. Please use your company email address to register.'
             }), 400
         
+        # Hash password before storing
+        password_hash = hash_password(password)
+        
         # Business email validated - create verified account immediately
         cursor.execute("""
             INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                             status, verified_at, free_analyses_remaining)
-            VALUES (%s, %s, %s, %s, %s, 'verified', NOW(), 3)
+                             password_hash, is_legacy_user, status, verified_at, free_analyses_remaining)
+            VALUES (%s, %s, %s, %s, %s, %s, FALSE, 'verified', NOW(), 3)
             RETURNING id
-        """, (email, first_name, last_name, company_name, job_title))
+        """, (email, first_name, last_name, company_name, job_title, password_hash))
         
         user_id = cursor.fetchone()['id']
         
@@ -243,10 +288,11 @@ def signup():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    """Handle user login"""
+    """Handle user login with password support and legacy email-only fallback"""
     try:
         data = request.get_json()
         email = sanitize_email(data.get('email', ''))
+        password = data.get('password', '')
         
         if not email:
             return jsonify({'error': 'Valid email address is required'}), 400
@@ -258,7 +304,8 @@ def login():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title, 
-                   status, credits_balance, free_analyses_remaining
+                   status, credits_balance, free_analyses_remaining,
+                   password_hash, is_legacy_user
             FROM users 
             WHERE email = %s
         """, (email,))
@@ -269,7 +316,22 @@ def login():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        # All business emails are auto-verified, so this check is no longer needed
+        # Check authentication based on user type
+        if user['is_legacy_user']:
+            # Legacy user - email-only authentication (no password required)
+            if password:
+                return jsonify({'error': 'Legacy users should not provide a password'}), 400
+        else:
+            # New user - password required
+            if not password:
+                return jsonify({'error': 'Password is required'}), 400
+            
+            if not user['password_hash']:
+                return jsonify({'error': 'User account is corrupted. Please contact support'}), 500
+            
+            # Verify password
+            if not verify_password(password, user['password_hash']):
+                return jsonify({'error': 'Invalid password'}), 401
         
         # Generate login token
         login_token = jwt.encode({
