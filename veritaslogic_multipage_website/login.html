@@ -134,8 +134,19 @@
             form.classList.add('loading');
             
             try {
+                // DEBUG: Log all URL construction details
+                console.log('=== LOGIN DEBUG START ===');
+                console.log('window.location.protocol:', window.location.protocol);
+                console.log('window.location.hostname:', window.location.hostname);
+                console.log('window.location.port:', window.location.port);
+                console.log('window.location.href:', window.location.href);
+                
                 // Construct API URL for Replit environment
                 const apiUrl = window.location.protocol + '//' + window.location.hostname + ':3000/api/login';
+                console.log('Constructed API URL:', apiUrl);
+                console.log('Email being sent:', email);
+                
+                console.log('Making fetch request...');
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
@@ -144,7 +155,13 @@
                     body: JSON.stringify({ email })
                 });
                 
+                console.log('Response received:');
+                console.log('- Status:', response.status);
+                console.log('- OK:', response.ok);
+                console.log('- Headers:', Object.fromEntries(response.headers.entries()));
+                
                 const result = await response.json();
+                console.log('Response data:', result);
                 
                 if (response.ok) {
                     // Store the token and user data
@@ -169,7 +186,12 @@
                 }
                 
             } catch (error) {
-                console.error('Login error:', error);
+                console.error('=== LOGIN ERROR DETAILS ===');
+                console.error('Error type:', error.constructor.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                console.error('Full error object:', error);
+                console.log('=== LOGIN DEBUG END ===');
                 showMessage('Network error. Please check your connection and try again.', 'error');
             } finally {
                 // Reset loading state
