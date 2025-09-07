@@ -30,124 +30,117 @@ def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
 @app.route('/analysis')
-def serve_analysis_app():
-    """Serve the integrated analysis platform"""
+def serve_streamlit():
+    """Embed Streamlit app properly"""
     return '''
     <!DOCTYPE html>
     <html>
     <head>
         <title>VeritasLogic Analysis Platform</title>
         <style>
-            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #f5f5f5; }
-            .container {
-                display: flex;
-                flex-direction: column;
-                height: 100vh;
-                align-items: center;
-                justify-content: center;
+            body { margin: 0; padding: 0; }
+            iframe { width: 100%; height: 100vh; border: none; }
+            .loading { 
+                position: fixed; 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%);
                 text-align: center;
-            }
-            .platform {
+                z-index: 1000;
                 background: white;
-                padding: 40px;
-                border-radius: 10px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                max-width: 800px;
-                width: 90%;
-            }
-            .btn {
-                background: #007bff;
-                color: white;
-                padding: 15px 30px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                text-decoration: none;
-                display: inline-block;
-                margin: 10px;
-                font-size: 16px;
-            }
-            .btn:hover { background: #0056b3; }
-            .btn-secondary {
-                background: #6c757d;
-            }
-            .btn-secondary:hover { background: #545b62; }
-            h1 { color: #333; margin-bottom: 10px; }
-            h2 { color: #666; margin-bottom: 30px; font-weight: normal; }
-            .standards { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-                gap: 15px; 
-                margin: 30px 0; 
-            }
-            .standard-card {
-                background: #f8f9fa;
                 padding: 20px;
                 border-radius: 8px;
-                border: 1px solid #e9ecef;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             }
-            .standard-card h3 { color: #007bff; margin: 0 0 10px 0; }
-            .standard-card p { color: #666; margin: 0; font-size: 14px; }
+            .spinner {
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #007bff;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
+                margin: 10px auto;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="platform">
-                <h1>🎯 VeritasLogic Analysis Platform</h1>
-                <h2>Multi-Standard Accounting Analysis with AI & Hybrid RAG</h2>
-                
-                <div class="standards">
-                    <div class="standard-card">
-                        <h3>ASC 606</h3>
-                        <p>Revenue Recognition</p>
-                    </div>
-                    <div class="standard-card">
-                        <h3>ASC 842</h3>
-                        <p>Lease Accounting</p>
-                    </div>
-                    <div class="standard-card">
-                        <h3>ASC 718</h3>
-                        <p>Stock Compensation</p>
-                    </div>
-                    <div class="standard-card">
-                        <h3>ASC 805</h3>
-                        <p>Business Combinations</p>
-                    </div>
-                    <div class="standard-card">
-                        <h3>ASC 340-40</h3>
-                        <p>Contract Costs</p>
-                    </div>
-                    <div class="standard-card">
-                        <h3>Research Assistant</h3>
-                        <p>RAG-powered guidance</p>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 30px;">
-                    <p style="color: #666; margin-bottom: 20px;">
-                        ⚠️ <strong>Platform Integration Notice:</strong><br>
-                        The full Streamlit analysis platform is being integrated into this interface.<br>
-                        Please contact support for immediate access to analysis tools.
-                    </p>
-                    
-                    <button class="btn" onclick="showContactInfo()">Contact Support</button>
-                    <button class="btn btn-secondary" onclick="goBack()">Return to Dashboard</button>
-                </div>
-            </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading Analysis Platform...</p>
         </div>
+        <iframe id="streamlit-frame" src="/streamlit-app" style="display: none;"></iframe>
         
         <script>
-            function showContactInfo() {
-                alert("For immediate access to analysis tools, please email: support@veritaslogic.ai\\n\\nOur team will activate your analysis platform within 24 hours.");
-            }
+            const iframe = document.getElementById('streamlit-frame');
+            const loading = document.getElementById('loading');
             
-            function goBack() {
-                window.location.href = '/dashboard.html';
-            }
+            // Wait a moment then show iframe
+            setTimeout(() => {
+                iframe.style.display = 'block';
+                loading.style.display = 'none';
+            }, 3000);
+            
+            // Also hide loading when iframe actually loads
+            iframe.onload = () => {
+                setTimeout(() => {
+                    iframe.style.display = 'block';
+                    loading.style.display = 'none';
+                }, 1000);
+            };
         </script>
     </body>
     </html>
     '''
+
+@app.route('/streamlit-app')
+@app.route('/streamlit-app/<path:path>')
+def proxy_streamlit_app(path=''):
+    """Proper Streamlit proxy with WebSocket support"""
+    import requests
+    from flask import Response, stream_template
+    
+    try:
+        # Build target URL
+        target_url = f'http://127.0.0.1:8501/{path}'
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            target_url += f'?{query_string}'
+        
+        # Handle different request methods
+        if request.method == 'GET':
+            resp = requests.get(target_url, headers=dict(request.headers), stream=True)
+        elif request.method == 'POST':
+            resp = requests.post(target_url, headers=dict(request.headers), data=request.get_data())
+        else:
+            resp = requests.request(request.method, target_url, headers=dict(request.headers), data=request.get_data())
+        
+        # Forward response
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+        headers = [(k, v) for k, v in resp.headers.items() if k.lower() not in excluded_headers]
+        
+        return Response(resp.content, resp.status_code, headers)
+        
+    except requests.exceptions.ConnectionError:
+        return '''
+        <div style="text-align: center; margin-top: 200px; font-family: Arial, sans-serif;">
+            <h3>🔄 Analysis Platform Starting...</h3>
+            <p>Please wait while the platform initializes...</p>
+            <script>setTimeout(() => location.reload(), 5000);</script>
+        </div>
+        ''', 503
+    except Exception as e:
+        logger.error(f"Streamlit proxy error: {e}")
+        return f'''
+        <div style="text-align: center; margin-top: 200px; font-family: Arial, sans-serif;">
+            <h3>⚡ Platform Loading...</h3>
+            <p>Connecting to analysis tools...</p>
+            <script>setTimeout(() => location.reload(), 3000);</script>
+        </div>
+        ''', 503
 
 @app.route('/<path:path>')
 def serve_static(path):

@@ -20,6 +20,10 @@ author = "agent"
 task = "workflow.run"
 args = "VeritasLogic App"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Analysis Platform"
+
 [[workflows.workflow]]
 name = "VeritasLogic App"
 author = "agent"
@@ -31,6 +35,18 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "Analysis Platform"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run home.py --server.port 8501 --server.address 0.0.0.0 --server.headless true"
+waitForPort = 8501
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[ports]]
 localPort = 3000
