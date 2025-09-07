@@ -172,9 +172,9 @@
                 });
 
                 if (response.ok) {
-                    const userData = await response.json();
-                    console.log('User data received, showing dashboard');
-                    showDashboard(userData);
+                    const profileData = await response.json();
+                    console.log('Profile data received:', profileData);
+                    showDashboard(profileData.user);
                 } else {
                     // Token invalid - clear and show login
                     console.log('Token invalid, clearing and showing login');
@@ -296,15 +296,18 @@
 
         function populateDashboard(userData) {
             console.log('Populating dashboard with user data:', userData);
+            console.log('Email field:', userData.email);
+            console.log('Company field:', userData.company_name);
+            console.log('All user data keys:', Object.keys(userData));
             
             // Update welcome section (backend returns snake_case fields)
             document.getElementById('userName').textContent = userData.first_name || 'User';
-            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.created_at || Date.now()).toLocaleDateString()}`;
+            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.member_since || Date.now()).toLocaleDateString()}`;
             
             // Update profile information
             document.getElementById('userEmail').textContent = userData.email || '-';
             document.getElementById('userCompany').textContent = userData.company_name || '-';
-            document.getElementById('memberSinceDate').textContent = new Date(userData.created_at || Date.now()).toLocaleDateString() || '-';
+            document.getElementById('memberSinceDate').textContent = new Date(userData.member_since || Date.now()).toLocaleDateString() || '-';
             
             // Update credits and usage (backend returns snake_case fields)
             const freeAnalyses = userData.free_analyses_remaining || 3;
