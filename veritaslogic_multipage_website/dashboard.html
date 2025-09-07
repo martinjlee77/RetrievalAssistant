@@ -11,27 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <script>
-        // IMMEDIATE: Clear any problematic localStorage data and prevent API calls
-        console.log('=== CACHE BUSTER: Clearing localStorage ===');
-        localStorage.removeItem('authToken');
-        
-        // Force immediate login form display
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== CACHE BUSTER: DOM loaded, forcing login form ===');
-            setTimeout(function() {
-                const loadingState = document.getElementById('loadingState');
-                const loginSection = document.getElementById('loginSection');
-                const mainContent = document.getElementById('mainContent');
-                
-                if (loadingState) loadingState.style.display = 'none';
-                if (mainContent) mainContent.style.display = 'none';
-                if (loginSection) loginSection.style.display = 'block';
-                
-                console.log('=== Login form forced to display ===');
-            }, 100);
-        });
-    </script>
 </head>
 <body>
     <div class="dashboard-container" id="dashboardContent" style="padding-top: 40px;">
