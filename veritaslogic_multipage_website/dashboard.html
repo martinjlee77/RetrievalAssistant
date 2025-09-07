@@ -109,7 +109,10 @@
             try {
                 const token = localStorage.getItem('authToken');
                 if (!token) {
-                    window.location.href = 'login.html';
+                    // Show demo data instead of redirecting
+                    populateDashboard(getDemoUserData());
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
                     return;
                 }
 
@@ -124,17 +127,32 @@
                     const userData = await response.json();
                     populateDashboard(userData);
                 } else {
-                    console.error('Failed to fetch user data');
+                    console.error('Failed to fetch user data, showing demo');
                     localStorage.removeItem('authToken');
-                    window.location.href = 'login.html';
+                    populateDashboard(getDemoUserData());
                 }
             } catch (error) {
-                console.error('Dashboard initialization error:', error);
-                window.location.href = 'login.html';
+                console.error('Dashboard initialization error, showing demo:', error);
+                populateDashboard(getDemoUserData());
             } finally {
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
             }
+        }
+
+        function getDemoUserData() {
+            return {
+                firstName: 'Demo User',
+                email: 'demo@yourcompany.com',
+                company: 'Your Company',
+                createdAt: new Date().toISOString(),
+                freeAnalysesRemaining: 3,
+                credits: 0,
+                totalAnalyses: 0,
+                analysesThisMonth: 0,
+                totalSpent: 0,
+                recentAnalyses: []
+            };
         }
 
         function populateDashboard(userData) {
