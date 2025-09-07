@@ -31,8 +31,76 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit():
-    """Redirect to Streamlit app running on port 8501"""
-    return redirect('http://localhost:8501', code=302)
+    """Serve Streamlit app via iframe - production ready"""
+    return f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>VeritasLogic Analysis Platform</title>
+        <style>
+            body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; }}
+            iframe {{ width: 100%; height: 100vh; border: none; }}
+            .loading {{ 
+                position: absolute; 
+                top: 50%; 
+                left: 50%; 
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #666;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="loading" id="loading">Loading Analysis Platform...</div>
+        <iframe src="/streamlit-proxy" onload="document.getElementById('loading').style.display='none'"></iframe>
+    </body>
+    </html>
+    '''
+
+@app.route('/streamlit-proxy')
+@app.route('/streamlit-proxy/<path:path>')
+def proxy_streamlit(path=''):
+    """Proxy requests to Streamlit app - production ready"""
+    import requests
+    try:
+        # Build the target URL
+        target_url = f'http://127.0.0.1:8501/{path}'
+        
+        # Forward query parameters
+        query_string = request.query_string.decode('utf-8')
+        if query_string:
+            target_url += f'?{query_string}'
+        
+        # Forward the request to Streamlit
+        response = requests.get(
+            target_url,
+            headers={k: v for k, v in request.headers if k.lower() != 'host'},
+            timeout=30
+        )
+        
+        # Return the response
+        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+        headers = [(k, v) for k, v in response.headers.items() if k.lower() not in excluded_headers]
+        
+        return response.content, response.status_code, headers
+        
+    except requests.exceptions.ConnectionError:
+        return '''
+        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif;">
+            <h2>Analysis Platform Starting...</h2>
+            <p>The analysis platform is starting up. Please wait a moment and refresh the page.</p>
+            <button onclick="window.location.reload()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Refresh</button>
+        </div>
+        ''', 503
+    except Exception as e:
+        logger.error(f"Streamlit proxy error: {e}")
+        return '''
+        <div style="text-align: center; margin-top: 100px; font-family: Arial, sans-serif;">
+            <h2>Service Temporarily Unavailable</h2>
+            <p>Please try again in a few moments.</p>
+            <button onclick="window.location.reload()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Retry</button>
+        </div>
+        ''', 503
 
 @app.route('/<path:path>')
 def serve_static(path):
