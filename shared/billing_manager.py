@@ -14,7 +14,7 @@ class BillingManager:
     """Manages billing operations for completed analyses"""
     
     def __init__(self):
-        self.backend_url = "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/api"
+        self.backend_url = "http://127.0.0.1:3000/api"
     
     def record_analysis_billing(
         self,
@@ -69,6 +69,44 @@ class BillingManager:
                 
         except Exception as e:
             logger.error(f"Error recording analysis billing: {e}")
+            return False
+    
+    def auto_credit_on_failure(self, user_token: str, cost_amount: float, analysis_id: str = None) -> bool:
+        """
+        Automatically credit user's wallet when analysis fails after payment
+        
+        Args:
+            user_token: User authentication token
+            cost_amount: Amount to credit back to wallet
+            analysis_id: Optional analysis identifier for tracking
+            
+        Returns:
+            True if credit was successful, False otherwise
+        """
+        try:
+            credit_data = {
+                'credit_amount': cost_amount,
+                'reason': 'analysis_failure_refund',
+                'analysis_id': analysis_id or 'unknown',
+                'automatic': True
+            }
+            
+            response = requests.post(
+                f"{self.backend_url}/user/auto-credit",
+                headers={'Authorization': f'Bearer {user_token}'},
+                json=credit_data,
+                timeout=10
+            )
+            
+            if response.ok:
+                logger.info(f"Successfully auto-credited ${cost_amount} for failed analysis")
+                return True
+            else:
+                logger.error(f"Failed to auto-credit: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error auto-crediting on failure: {e}")
             return False
     
     def show_billing_success_message(
