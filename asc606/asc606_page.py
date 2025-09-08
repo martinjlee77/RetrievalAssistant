@@ -134,13 +134,15 @@ def get_asc606_inputs_new():
     """Get ASC 606 specific inputs with new preflight system."""
     
     # Document upload section   
+    st.markdown("### 1️⃣ Upload Contract Documents")
+    st.warning("📏 **File Size Limit: 50MB per file maximum** (Widget shows 200MB but our business limit is 50MB)")
+    
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload revenue contract documents (PDF or DOCX files, max 5 files, 50MB each)",
+        "Choose PDF or DOCX files (max 5 files)",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload revenue contracts, agreements, or amendments for ASC 606 analysis",
-        key=f"asc606_uploader_{st.session_state.get('file_uploader_key', 0)}",
-        label_visibility="visible"
+        key=f"asc606_uploader_{st.session_state.get('file_uploader_key', 0)}"
     )
 
     # Additional info (optional)
