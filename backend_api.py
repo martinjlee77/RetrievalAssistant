@@ -30,116 +30,115 @@ def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
 @app.route('/analysis')
-@app.route('/analysis/<path:path>')
-def serve_streamlit_app(path=''):
-    """Proxy requests to Streamlit app to avoid CORS issues"""
-    import requests
-    from urllib.parse import urlencode
-    
-    try:
-        # Build the URL for the Streamlit app
-        streamlit_base = 'http://127.0.0.1:8501'
-        if path:
-            url = f'{streamlit_base}/{path}'
-        else:
-            url = streamlit_base
+def serve_streamlit_app():
+    """Simple redirect to Streamlit - development approach"""
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Redirecting to Analysis Platform</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+            .redirect-container {
+                text-align: center;
+                background: rgba(255,255,255,0.1);
+                padding: 3rem;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+                max-width: 500px;
+            }
+            .spinner {
+                border: 4px solid rgba(255,255,255,0.3);
+                border-top: 4px solid white;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 2rem;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .btn {
+                background: white;
+                color: #667eea;
+                padding: 1rem 2rem;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                margin: 1rem 0.5rem;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s ease;
+            }
+            .btn:hover { 
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            }
+            .alt-btn {
+                background: transparent;
+                color: white;
+                border: 2px solid white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="redirect-container">
+            <div class="spinner"></div>
+            <h1>🚀 Launching Analysis Platform</h1>
+            <p>Opening your complete ASC analysis platform...</p>
+            <p>ASC 606 • ASC 842 • ASC 718 • ASC 805 • ASC 340-40 • Research Assistant</p>
             
-        # Forward query parameters
-        if request.query_string:
-            url += '?' + request.query_string.decode()
+            <button class="btn" onclick="openStreamlit()">
+                Open Analysis Platform
+            </button>
+            <br>
+            <button class="alt-btn btn" onclick="window.close()">
+                Cancel
+            </button>
             
-        # Forward the request to Streamlit
-        if request.method == 'GET':
-            resp = requests.get(url, headers=dict(request.headers), timeout=30)
-        elif request.method == 'POST':
-            resp = requests.post(url, headers=dict(request.headers), 
-                               data=request.get_data(), timeout=30)
-        else:
-            resp = requests.request(request.method, url, 
-                                  headers=dict(request.headers), 
-                                  data=request.get_data(), timeout=30)
+            <p style="font-size: 14px; margin-top: 2rem; opacity: 0.8;">
+                If the platform doesn't open automatically, click the button above.
+            </p>
+        </div>
         
-        # Return the response from Streamlit
-        response = Response(resp.content, resp.status_code)
-        
-        # Copy important headers (but skip problematic ones)
-        excluded_headers = ['content-length', 'content-encoding', 'connection']
-        for key, value in resp.headers.items():
-            if key.lower() not in excluded_headers:
-                response.headers[key] = value
-        
-        return response
-        
-    except requests.exceptions.RequestException as e:
-        # If Streamlit isn't available, show a user-friendly message
-        return f'''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Analysis Platform Starting</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100vh;
-                    margin: 0;
-                    background: #f5f5f5;
-                }}
-                .startup {{
-                    text-align: center;
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                    max-width: 500px;
-                }}
-                .spinner {{
-                    border: 4px solid #f3f3f3;
-                    border-top: 4px solid #007bff;
-                    border-radius: 50%;
-                    width: 40px;
-                    height: 40px;
-                    animation: spin 2s linear infinite;
-                    margin: 0 auto 1rem;
-                }}
-                @keyframes spin {{
-                    0% {{ transform: rotate(0deg); }}
-                    100% {{ transform: rotate(360deg); }}
-                }}
-                .btn {{
-                    background: #007bff;
-                    color: white;
-                    padding: 0.75rem 1.5rem;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    margin: 0.5rem;
-                    font-size: 16px;
-                }}
-                .btn:hover {{ background: #0056b3; }}
-            </style>
-        </head>
-        <body>
-            <div class="startup">
-                <div class="spinner"></div>
-                <h2>🎯 Analysis Platform Starting...</h2>
-                <p>Your Streamlit application is initializing with all ASC standards.</p>
-                <p>This may take a moment.</p>
-                <button class="btn" onclick="window.location.reload()">
-                    Refresh
-                </button>
-                <p style="color: #666; font-size: 14px; margin-top: 2rem;">
-                    If this continues, the Streamlit app may need to restart.
-                </p>
-            </div>
-            <script>
-                setTimeout(() => window.location.reload(), 15000);
-            </script>
-        </body>
-        </html>
-        ''', 503
+        <script>
+            function openStreamlit() {
+                // Try multiple approaches
+                const urls = [
+                    'https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002',
+                    window.location.origin.replace(':5000', ':3002'),
+                    'http://127.0.0.1:8501'
+                ];
+                
+                // Try first URL immediately
+                window.open(urls[0], '_blank');
+                
+                // If that fails, user can click button for alternatives
+                setTimeout(() => {
+                    document.querySelector('.btn').innerHTML = 'Try Alternative URL';
+                    document.querySelector('.btn').onclick = function() {
+                        window.open(urls[1], '_blank');
+                    };
+                }, 3000);
+            }
+            
+            // Auto-launch after 2 seconds
+            setTimeout(openStreamlit, 2000);
+        </script>
+    </body>
+    </html>
+    '''
 
 @app.route('/<path:path>')
 def serve_static(path):
