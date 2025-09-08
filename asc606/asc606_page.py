@@ -680,11 +680,15 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Initialize analyzer and perform the complete analysis with progress UI
         
         try:
-            # Initialize the ASC 606 analyzer
+            # Initialize the ASC 606 analyzer and memo generator
             from asc606.step_analyzer import ASC606StepAnalyzer
+            from asc606.knowledge_search import ASC606KnowledgeSearch
+            from asc606.clean_memo_generator import CleanMemoGenerator
             
             # Create analyzer with knowledge base
             analyzer = ASC606StepAnalyzer()
+            knowledge_search = ASC606KnowledgeSearch()
+            memo_generator = CleanMemoGenerator(template_path="asc606/templates/memo_template.md")
             
             # Initialize UI components
             from shared.ui_components import SharedUIComponents
@@ -716,15 +720,27 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 
                 with st.spinner(f"🔄 Running Step {step_num}..."):
                     try:
-                        step_result = analyzer.run_step(step_num, combined_text, customer_name, additional_context)
+                        # Get relevant knowledge for this step
+                        authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
+                        
+                        # Analyze the step with knowledge base context
+                        step_result = analyzer._analyze_step(
+                            step_num=step_num,
+                            contract_text=combined_text,
+                            authoritative_context=authoritative_context,
+                            customer_name=customer_name,
+                            additional_context=additional_context
+                        )
+                        
                         analysis_results[f'step_{step_num}'] = step_result
                         logger.info(f"Completed ASC 606 Step {step_num}")
                     except Exception as e:
                         logger.error(f"Error in Step {step_num}: {str(e)}")
                         # Continue with other steps
                         analysis_results[f'step_{step_num}'] = {
-                            'content': f"Error in Step {step_num}: {str(e)}",
-                            'citations': []
+                            'markdown_content': f"Error in Step {step_num}: {str(e)}",
+                            'title': f"Step {step_num}: Error",
+                            'step_num': str(step_num)
                         }
             
             # Show memo generation progress
@@ -733,12 +749,21 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             # Generate memo
             with st.spinner("📄 Generating professional memo..."):
                 try:
-                    memo_result = analyzer.generate_memo(
-                        contract_text=combined_text,
-                        filename=filename,
+                    # Extract conclusions and generate additional sections
+                    conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
+                    executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
+                    background = analyzer.generate_background_section(conclusions_text, customer_name) 
+                    final_conclusion = analyzer.generate_final_conclusion(analysis_results)
+                    
+                    # Generate clean memo using the memo generator
+                    memo_result = memo_generator.combine_clean_steps(
+                        analysis_results=analysis_results,
                         customer_name=customer_name,
-                        additional_context=additional_context,
-                        analysis_results=analysis_results
+                        filename=filename,
+                        executive_summary=executive_summary,
+                        background=background,
+                        conclusion=final_conclusion,
+                        additional_context=additional_context
                     )
                     
                     # Mark analysis as successful
@@ -750,29 +775,14 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     # Display results
                     st.success("✅ **Analysis Complete!**")
                     
+                    # memo_result is a string (markdown content), not a dict
                     if memo_result:
                         st.markdown("### 📄 Generated ASC 606 Memo")
                         
-                        # Display HTML memo
-                        if memo_result.get('html_memo'):
-                            st.components.v1.html(memo_result['html_memo'], height=600, scrolling=True)
-                        
-                        # Download buttons
-                        if memo_result.get('docx_file'):
-                            st.download_button(
-                                "📥 Download DOCX",
-                                memo_result['docx_file'],
-                                f"asc606_memo_{customer_name.replace(' ', '_')}.docx",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                            )
-                        
-                        if memo_result.get('pdf_file'):
-                            st.download_button(
-                                "📥 Download PDF",
-                                memo_result['pdf_file'], 
-                                f"asc606_memo_{customer_name.replace(' ', '_')}.pdf",
-                                "application/pdf"
-                            )
+                        # Use the CleanMemoGenerator's display method
+                        memo_generator.display_clean_memo(memo_result)
+                    else:
+                        st.error("❌ Memo generation produced empty content")
                     
                 except Exception as e:
                     logger.error(f"Memo generation failed: {str(e)}")
