@@ -1,8 +1,0 @@
-[phases.setup]
-nixPkgs = ['python310Full']
-
-[phases.install]
-cmds = ['python -m pip install --break-system-packages -r website-requirements.txt']
-
-[start]
-cmd = 'python start_website.py'

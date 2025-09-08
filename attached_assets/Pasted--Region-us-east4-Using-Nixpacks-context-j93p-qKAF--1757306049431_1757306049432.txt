@@ -1,0 +1,58 @@
+[Region: us-east4]
+==============
+Using Nixpacks
+==============
+
+context: j93p-qKAF
+╔══════════════════════════════ Nixpacks v1.38.0 ══════════════════════════════╗
+║ setup      │ python310Full                                                   ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ install    │ python -m pip install --break-system-packages -r website-       ║
+║            │ requirements.txt                                                ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ start      │ python start_website.py                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+internal
+load build definition from Dockerfile
+0ms
+
+internal
+load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+95ms
+
+internal
+load .dockerignore
+0ms
+
+internal
+load build context
+0ms
+
+stage-0
+COPY .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix
+137ms
+
+stage-0
+RUN nix-env -if .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix && nix-collect-garbage -d
+30s
+29 store paths deleted, 249.93 MiB freed
+
+stage-0
+COPY . /app/.
+551ms
+
+stage-0
+RUN python -m pip install --break-system-packages -r website-requirements.txt
+161ms
+/root/.nix-profile/bin/python: No module named pip
+Dockerfile:20
+-------------------
+18 |     ENV NIXPACKS_PATH=/opt/venv/bin:$NIXPACKS_PATH
+19 |     COPY . /app/.
+20 | >>> RUN --mount=type=cache,id=s/dd3dbc1c-ea16-42dc-bee7-69522205126b-/root/cache/uv,target=/root/.cache/uv python -m pip install --break-system-packages -r website-requirements.txt
+21 |
+22 |
+-------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c python -m pip install --break-system-packages -r website-requirements.txt" did not complete successfully: exit code: 1
+Error: Docker build failed
