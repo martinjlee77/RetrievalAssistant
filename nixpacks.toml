@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['python310Full']
+nixPkgs = ['python310Full', 'python310Packages.pip']
 
 [phases.install]
 cmds = ['chmod +x install.sh', './install.sh']
