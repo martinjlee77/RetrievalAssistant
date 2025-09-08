@@ -6,11 +6,15 @@ Handles PDF and Word document text extraction for contract analysis
 import io
 import logging
 import re
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import PyPDF2
 import pdfplumber
 import docx
 from docx import Document
+try:
+    import fitz  # PyMuPDF - preferred for text extraction
+except ImportError:
+    fitz = None
 
 class DocumentExtractor:
     """Extract text from various document formats"""
@@ -31,11 +35,16 @@ class DocumentExtractor:
         file_extension = uploaded_file.name.lower().split('.')[-1]
         
         try:
-            # Check file size first - reject empty files
+            # Check file size first - enforce 50MB limit
             uploaded_file.seek(0)  # Reset file pointer
             file_content = uploaded_file.read()
+            file_size_mb = len(file_content) / (1024 * 1024)  # Convert to MB
+            
             if len(file_content) < 100:  # Less than 100 bytes is likely empty/corrupted
                 raise ValueError(f"File appears to be empty or corrupted (size: {len(file_content)} bytes)")
+            
+            if file_size_mb > 50:  # 50MB limit
+                raise ValueError(f"File size ({file_size_mb:.1f}MB) exceeds 50MB limit. Please upload a smaller file.")
             
             # Reset file pointer for actual extraction
             uploaded_file.seek(0)
@@ -52,11 +61,15 @@ class DocumentExtractor:
             if len(extracted_text) < 50:  # Less than 50 characters is likely failed extraction
                 raise ValueError("File processed but no meaningful text extracted (may be image-only PDF or corrupted)")
 
-            # --- NEW: Call the validation method here ---
-            validation = self.validate_extraction(extraction_result)
-            extraction_result['validation'] = validation  # Add validation results to the dictionary
+            # Enhanced word counting with proper tokenization
+            word_count = self._count_words(extracted_text)
+            extraction_result['word_count'] = word_count
+            extraction_result['file_size_mb'] = round(file_size_mb, 2)
+            
+            # Add page estimate for user context (≈300 words/page)
+            extraction_result['estimated_pages'] = max(1, round(word_count / 300))
 
-            return extraction_result  # Return the combined result
+            return extraction_result
                 
         except Exception as e:
             self.logger.error(f"Error extracting text from {uploaded_file.name}: {str(e)}")
@@ -65,8 +78,22 @@ class DocumentExtractor:
                 'error': str(e),
                 'pages': 0,
                 'word_count': 0,
-                'extraction_method': 'error'
+                'extraction_method': 'error',
+                'file_size_mb': 0,
+                'estimated_pages': 0
             }
+    
+    def _count_words(self, text: str) -> int:
+        """
+        Enhanced word counting with proper tokenization
+        Numbers count as words, whitespace/punctuation split
+        """
+        if not text or not text.strip():
+            return 0
+        
+        # Split by whitespace and punctuation, filter empty strings
+        words = re.findall(r'\b\w+\b', text)
+        return len(words)
     
     def _extract_pdf_text(self, uploaded_file) -> Dict[str, Any]:
         """Extract text from PDF file using multiple methods"""
@@ -122,8 +149,9 @@ class DocumentExtractor:
         return {
             'text': text,
             'pages': pages,
-            'word_count': len(text.split()) if text else 0,
+            'word_count': self._count_words(text) if text else 0,
             'extraction_method': extraction_method,
+            'is_likely_scanned': False,  # Will enhance this later
             'error': None if text else "No text could be extracted from PDF"
         }
     
@@ -154,8 +182,9 @@ class DocumentExtractor:
             return {
                 'text': text,
                 'pages': len(doc.paragraphs) // 50,  # Rough estimate
-                'word_count': len(text.split()) if text else 0,
+                'word_count': self._count_words(text) if text else 0,
                 'extraction_method': 'python-docx',
+                'is_likely_scanned': False,
                 'error': None
             }
             
