@@ -123,20 +123,21 @@ def show_login_page():
         #### To access the ASC analysis tools, please sign in with your registered email address.
         """)
         
-    # Direct login form (simplified)
+    # Direct login form (with email and password)
     with st.form("streamlit_login"):
         email = st.text_input("Email", placeholder="your.name@yourcompany.com")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
         
         if st.form_submit_button("Sign In", type="primary", use_container_width=True):
-            if email:
-                login_result = attempt_login(email)
+            if email and password:
+                login_result = attempt_login(email, password)
                 if login_result.get('success'):
                     st.success("Login successful! Refreshing page...")
                     st.rerun()
                 else:
                     st.error(login_result.get('error', 'Login failed'))
             else:
-                st.error("Please enter your email address")
+                st.error("Please enter both email and password")
     
     st.markdown("---")
             
@@ -152,12 +153,12 @@ def show_login_page():
         """
     )
 
-def attempt_login(email: str) -> Dict[str, Any]:
-    """Attempt to login user with email"""
+def attempt_login(email: str, password: str) -> Dict[str, Any]:
+    """Attempt to login user with email and password"""
     try:
         response = requests.post(
-            f"{BACKEND_URL}/login",
-            json={'email': email},
+            f"{BACKEND_URL}/api/login",
+            json={'email': email, 'password': password},
             timeout=10
         )
         
