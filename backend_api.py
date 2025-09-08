@@ -31,117 +31,78 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit_app():
-    """Serve your actual Streamlit application"""
-    # Check if Streamlit is running
-    try:
-        import requests
-        response = requests.get('http://127.0.0.1:8501', timeout=2)
-        if response.status_code == 200:
-            # Streamlit is running, embed it
-            return f'''
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>VeritasLogic Analysis Platform</title>
-                <style>
-                    body {{ margin: 0; padding: 0; }}
-                    iframe {{ width: 100%; height: 100vh; border: none; }}
-                    .loading {{
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background: white;
-                        padding: 2rem;
-                        border-radius: 10px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                        text-align: center;
-                        z-index: 1000;
-                    }}
-                    .spinner {{
-                        border: 3px solid #f3f3f3;
-                        border-top: 3px solid #007bff;
-                        border-radius: 50%;
-                        width: 30px;
-                        height: 30px;
-                        animation: spin 1s linear infinite;
-                        margin: 0 auto 1rem;
-                    }}
-                    @keyframes spin {{
-                        0% {{ transform: rotate(0deg); }}
-                        100% {{ transform: rotate(360deg); }}
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <h3>Loading Your Analysis Platform...</h3>
-                    <p>Starting multi-standard ASC analysis tools</p>
-                </div>
-                <iframe id="streamlit" src="http://127.0.0.1:8501" style="display: none;"></iframe>
-                <script>
-                    setTimeout(() => {{
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('streamlit').style.display = 'block';
-                    }}, 3000);
-                </script>
-            </body>
-            </html>
-            '''
-    except:
-        pass
+    """Serve your actual Streamlit application - production ready"""
+    # Get current host to build external Streamlit URL
+    host = request.headers.get('Host', 'localhost:5000')
     
-    # Streamlit not ready, show loading message
-    return '''
+    # Build external Streamlit URL using port 3002 (configured in .replit)
+    if 'localhost' in host or '127.0.0.1' in host:
+        # Development: use localhost with port 3002 
+        streamlit_url = 'http://localhost:3002'
+    else:
+        # Replit environment: use external domain with port 3002
+        if ':5000' in host:
+            streamlit_host = host.replace(':5000', ':3002')
+        elif 'replit.dev' in host:
+            streamlit_host = host.replace('.replit.dev', '-3002.replit.dev') 
+        else:
+            streamlit_host = host + ':3002'
+        streamlit_url = f'https://{streamlit_host}'
+    
+    return f'''
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Analysis Platform Starting</title>
+        <title>VeritasLogic Analysis Platform</title>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-                background: #f5f5f5;
-            }
-            .startup {
-                text-align: center;
+            body {{ margin: 0; padding: 0; }}
+            iframe {{ width: 100%; height: 100vh; border: none; }}
+            .loading {{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 background: white;
                 padding: 2rem;
                 border-radius: 10px;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            }
-            .spinner {
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid #007bff;
+                text-align: center;
+                z-index: 1000;
+            }}
+            .spinner {{
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #007bff;
                 border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 2s linear infinite;
+                width: 30px;
+                height: 30px;
+                animation: spin 1s linear infinite;
                 margin: 0 auto 1rem;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
+            }}
+            @keyframes spin {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
         </style>
     </head>
     <body>
-        <div class="startup">
+        <div class="loading" id="loading">
             <div class="spinner"></div>
-            <h2>🎯 Starting Analysis Platform</h2>
-            <p>Your Streamlit application is initializing...</p>
-            <p>This may take a few moments.</p>
-            <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                Refresh
-            </button>
+            <h3>Loading Your Analysis Platform...</h3>
+            <p>Connecting to multi-standard ASC analysis tools...</p>
         </div>
+        <iframe id="streamlit" src="{streamlit_url}" style="display: none;"></iframe>
         <script>
-            setTimeout(() => window.location.reload(), 10000);
+            // Show iframe after delay
+            setTimeout(() => {{
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('streamlit').style.display = 'block';
+            }}, 2000);
+            
+            // Fallback: hide loading when iframe loads
+            document.getElementById('streamlit').onload = function() {{
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('streamlit').style.display = 'block';
+            }};
         </script>
     </body>
     </html>
