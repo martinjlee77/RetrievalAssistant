@@ -1,0 +1,78 @@
+Billing model
+
+Unit: total extracted words across all uploaded files in one analysis.
+For pricing, convert words to billable pages at 300 words/page: billable_pages = ceil(total_words / 300).
+Each analysis is a separate, billable run (no free regenerations).
+Self‑serve for all tiers, including Enterprise.
+Tiers with built-in volume discount (per analysis)
+
+Short: up to 7 billable pages (≈2,000 words) – $29 list
+Effective rate ≈ $4.14/page
+Medium: up to 17 pages (≈5,000 words) – $59
+≈ $3.47/page
+Large: up to 34 pages (≈10,000 words) – $109
+≈ $3.21/page
+Extensive: up to 67 pages (≈20,000 words) – $199
+≈ $2.97/page
+Enterprise: up to 167 pages (≈50,000 words) – $349
+≈ $2.09/page Notes
+The effective price per page decreases at each tier.
+If billable_pages exceeds the selected tier, require upgrade (no overage fees).
+No output memo cap.
+One active analysis at a time per user (Streamlit constraint).
+Uploads and limits
+
+File types: PDF and DOCX only.
+Per file: ≤50MB; max 5 files per analysis.
+No file splitting in-app; users must upgrade tiers if over cap.
+Preflight word counting (simple and fast)
+
+PDF (text): extract text per page (e.g., PyMuPDF), ignore near-blank pages (<100 chars), count words (numbers count as words).
+PDF (likely scanned): if median characters/page < 100, choose either:
+A) Estimate: billable_pages = total_pdf_pages; total_words = billable_pages × 300, or
+B) OCR then count actual words (slower/costlier, more accurate).
+DOCX: extract text (python-docx), count words.
+Compute total_words across files, then billable_pages = ceil(total_words / 300).
+Map to the smallest tier that fits; show total_words (and optionally ≈ pages) and the price; on confirm, charge and start.
+Checkout and wallet
+
+Prepaid wallet required; deduct at job start.
+Top-up options: fixed increments (
+50
+,
+50,100, 
+250
+,
+250,500) plus custom amount entry.
+No automatic post-run adjustments; refunds/credits handled manually by admin.
+Concurrency, rate limits, ops
+
+Enforce one active analysis per user; show a message if they try to start another.
+Keep basic rate limiting on upload and start endpoints.
+Logging per analysis: file count/types, total_words, billable_pages, scanned/text decision, tier charged, price, processing time, status.
+UI text (examples)
+
+“We detected approximately 12,450 words (≈ 42 billable pages).”
+“Your selection (Medium, up to 17 pages) is insufficient. Upgrade to Large (up to 34 pages) to proceed.”
+If scanned path A: “Scanned PDF detected; billing by page count estimate.”
+Questions for the developer
+
+OCR feasibility: Can we add OCR for scanned PDFs (e.g., Tesseract + rapid OCR, or a managed service)? If yes, is it practical to run OCR during preflight to count words accurately, or should we start with the page-count estimate (Option A) and add OCR later?
+Scanned detection: For PDFs with median chars/page < 100, are we comfortable using the page-count estimate initially and showing a small banner to the user?
+Libraries: OK to use PyMuPDF (fitz) for PDF text extraction and python-docx for DOCX?
+Tokenizer: Implement word counting via whitespace/punctuation split; numbers count as words; pages with <100 characters excluded from word totals—sound good?
+Wallet top-up UX: Can we support both fixed increments (
+50
+,
+50,100, 
+250
+,
+250,500) and a custom amount field in the same checkout flow?
+Error handling: If a file fails text extraction, should we (a) exclude it and warn, or (b) block and ask the user to re-upload? Proposed: block with clear error.
+Confirmation: Are the proposed tier price points acceptable to hardcode for launch (
+29
+,
+29,59, 
+109
+,
+109,199, $349), with feature-flag support for future changes?

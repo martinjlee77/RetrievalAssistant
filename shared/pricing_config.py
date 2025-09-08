@@ -6,34 +6,39 @@ Easy to update pricing without touching code
 # Tiered Pricing Structure - Update prices here only
 PRICING_TIERS = {
     1: {
-        "name": "Simple",
-        "price": 3.00,
+        "name": "Short",
+        "price": 9.00,
         "max_words": 2000,
-        "description": "Basic contracts and simple agreements"
+        "description": "Basic contracts and simple agreements",
+        "per_1k_rate": 4.50
     },
     2: {
-        "name": "Standard", 
-        "price": 6.00,
+        "name": "Medium", 
+        "price": 19.00,
         "max_words": 5000,
-        "description": "Standard business contracts"
+        "description": "Standard business contracts",
+        "per_1k_rate": 3.80
     },
     3: {
-        "name": "Complex",
-        "price": 10.00,
+        "name": "Large",
+        "price": 35.00,
         "max_words": 10000,
-        "description": "Complex agreements with multiple terms"
+        "description": "Complex agreements with multiple terms",
+        "per_1k_rate": 3.50
     },
     4: {
-        "name": "Very Complex",
-        "price": 18.00,
+        "name": "Extensive",
+        "price": 59.00,
         "max_words": 20000,
-        "description": "Large enterprise agreements"
+        "description": "Large enterprise agreements",
+        "per_1k_rate": 2.95
     },
     5: {
         "name": "Enterprise",
-        "price": 30.00,
-        "max_words": float('inf'),
-        "description": "Enterprise-scale document sets"
+        "price": 119.00,
+        "max_words": 50000,
+        "description": "Enterprise-scale document sets",
+        "per_1k_rate": 2.38
     }
 }
 
@@ -41,7 +46,8 @@ PRICING_TIERS = {
 CREDIT_PACKAGES = [
     {"amount": 50, "display": "Add $50 Credits"},
     {"amount": 100, "display": "Add $100 Credits"}, 
-    {"amount": 200, "display": "Add $200 Credits"}
+    {"amount": 250, "display": "Add $250 Credits"},
+    {"amount": 500, "display": "Add $500 Credits"}
 ]
 
 # Business Email Configuration
@@ -63,7 +69,7 @@ APPROVED_BUSINESS_DOMAINS = [
 
 # Credit Settings
 CREDIT_EXPIRATION_MONTHS = 12
-FREE_ANALYSES_PER_USER = 3
+NEW_USER_WELCOME_CREDITS = 100  # $100 free credits instead of 3 free analyses
 
 def get_price_tier(word_count):
     """
@@ -73,7 +79,7 @@ def get_price_tier(word_count):
         word_count (int): Number of words in document
         
     Returns:
-        dict: Tier information with tier number, name, price, description
+        dict: Tier information with tier number, name, price, description, per_1k_rate
     """
     for tier_num, tier_info in PRICING_TIERS.items():
         if word_count <= tier_info['max_words']:
@@ -82,15 +88,19 @@ def get_price_tier(word_count):
                 'name': tier_info['name'],
                 'price': tier_info['price'],
                 'description': tier_info['description'],
+                'max_words': tier_info['max_words'],
+                'per_1k_rate': tier_info['per_1k_rate'],
                 'word_count': word_count
             }
     
-    # Fallback to highest tier
+    # Fallback to highest tier (Enterprise)
     return {
         'tier': 5,
         'name': PRICING_TIERS[5]['name'],
         'price': PRICING_TIERS[5]['price'],
         'description': PRICING_TIERS[5]['description'],
+        'max_words': PRICING_TIERS[5]['max_words'],
+        'per_1k_rate': PRICING_TIERS[5]['per_1k_rate'],
         'word_count': word_count
     }
 

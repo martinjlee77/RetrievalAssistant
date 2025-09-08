@@ -183,30 +183,29 @@ def show_user_sidebar(auth_manager: AuthManager):
         return
     
     with st.sidebar:
-        st.markdown("---")
-        st.markdown("### 👤 Account")
+        st.markdown("### My Account")
         
         # User info
-        st.markdown(f"**{user_data['first_name']} {user_data['last_name']}**")
-        st.markdown(f"*{user_data['company_name']}*")
-        st.markdown(f"📧 {user_data['email']}")
+        st.markdown(f"User: {user_data['first_name']} {user_data['last_name']}")
+        st.markdown(f"Company: {user_data['company_name']}")
+        st.markdown(f"Email: {user_data['email']}")
         
         # Credits info
-        st.markdown("### 💳 Credits")
+        st.markdown("### Credits")
         if user_data.get('free_analyses_remaining', 0) > 0:
-            st.success(f"🎁 {user_data['free_analyses_remaining']} free analyses remaining")
+            st.info(f" {user_data['free_analyses_remaining']} free analyses remaining")
         
         credits_balance = user_data.get('credits_balance', 0)
         if credits_balance > 0:
-            st.info(f"💰 ${credits_balance:.2f} in credits")
+            st.info(f"You have ${credits_balance:.2f} in credits")
         else:
-            st.warning("💰 $0.00 in credits")
+            st.warning("You have $0.00 in credits")
         
         # Action buttons
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Dashboard", use_container_width=True):
-                st.link_button("Go to Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html")
+                st.link_button("Go to Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/dashboard.html")
         
         with col2:
             if st.button("Logout", use_container_width=True):

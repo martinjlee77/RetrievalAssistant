@@ -21,3 +21,5 @@ secondaryBackgroundColor = "#36404A" # Darker gray, also backgroundColor for sid
 # showWidgetBorder = true
 
 [theme.sidebar]
+weight = "600" #100 to 600
+# baseFontSize = "18px"
