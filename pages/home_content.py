@@ -82,44 +82,46 @@ row2 = st.columns(3, gap="small")  # Equal spacing for bottom row
 with row1[0]:
     with st.container(border=True, key="my_box"):
         st.markdown("##### ASC 606: Rev Rec")
-        st.markdown("**Revenue Recognition Analysis**")
-        if st.button("Start ASC 606 Analysis", key="asc606_btn", use_container_width=True):
-            st.info("ℹ️ Navigate to **ASC 606: Rev Rec** in the sidebar to begin your analysis!")
-
-
-
+        st.page_link("asc606/asc606_page.py",
+             label="Start ASC 606 Analysis",
+             icon="➡️",
+             use_container_width=True)
 
 # ASC 340-40
 with row1[1]:
     with st.container(border=True, key="my_box1"):
         st.markdown("##### ASC 340-40: Cost to Obtain")
-        st.markdown("**Contract Costs Analysis**")
-        if st.button("Start ASC 340-40 Analysis", key="asc340_btn", use_container_width=True):
-            st.info("ℹ️ Navigate to **ASC 340-40: Cost to Obtain** in the sidebar to begin your analysis!")
+        st.page_link("asc340/asc340_page.py",
+             label="Start ASC 340-40 Analysis",
+             icon="➡️",
+             use_container_width=True)
 
 # ASC 842
 with row1[2]:
     with st.container(border=True, key="my_box2"):
         st.markdown("##### ASC 842: Leases (Lessee)")
-        st.markdown("**Lease Accounting Analysis**")
-        if st.button("Start ASC 842 Analysis", key="asc842_btn", use_container_width=True):
-            st.info("ℹ️ Navigate to **ASC 842: Leases (Lessee)** in the sidebar to begin your analysis!")
+        st.page_link("asc842/asc842_page.py",
+             label="Start ASC 842 Analysis",
+             icon="➡️",
+             use_container_width=True)
 
 # ASC 718
 with row2[0]:
     with st.container(border=True, key="my_box3"):
         st.markdown("##### ASC 718: Stock Comp")
-        st.markdown("**Stock-Based Compensation**")
-        if st.button("Start ASC 718 Analysis", key="asc718_btn", use_container_width=True):
-            st.info("ℹ️ Navigate to **ASC 718: Stock Comp** in the sidebar to begin your analysis!")
+        st.page_link("asc718/asc718_page.py",
+             label="Start ASC 718 Analysis",
+             icon="➡️",
+             use_container_width=True)
 
 # ASC 805
 with row2[1]:
     with st.container(border=True, key="my_box4"):
         st.markdown("##### ASC 805: Bus Com")
-        st.markdown("**Business Combinations**")
-        if st.button("Start ASC 805 Analysis", key="asc805_btn", use_container_width=True):
-            st.info("ℹ️ Navigate to **ASC 805: Bus Com** in the sidebar to begin your analysis!")
+        st.page_link("asc805/asc805_page.py",
+             label="Start ASC 805 Analysis",
+             icon="➡️",
+             use_container_width=True)
 
 # ASC 815
 with row2[2]:

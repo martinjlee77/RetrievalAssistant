@@ -123,20 +123,21 @@ def show_login_page():
         #### To access the ASC analysis tools, please sign in with your registered email address.
         """)
         
-    # Direct login form (simplified)
+    # Direct login form (with email and password)
     with st.form("streamlit_login"):
         email = st.text_input("Registered Email Address", placeholder="your.name@yourcompany.com")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
         
         if st.form_submit_button("Sign In", type="primary", use_container_width=True):
-            if email:
-                login_result = attempt_login(email)
+            if email and password:
+                login_result = attempt_login(email, password)
                 if login_result.get('success'):
                     st.success("Login successful! Refreshing page...")
                     st.rerun()
                 else:
                     st.error(login_result.get('error', 'Login failed'))
             else:
-                st.error("Please enter your email address")
+                st.error("Please enter both email and password")
     
     st.markdown("---")
             
@@ -144,20 +145,20 @@ def show_login_page():
     st.markdown("#### New User?")
     st.markdown(
         """
-        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/signup.html)** - Get 3 free analyses (business email required)
+        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/signup.html)** - Sign up here
         
-        **[Sign In](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/login.html)** - Full login page
+        **[Your Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/login.html)** - Log in to your account dashboard
         
-        **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/contact.html)** - Contact support
+        **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/contact.html)** - Contact support
         """
     )
 
-def attempt_login(email: str) -> Dict[str, Any]:
-    """Attempt to login user with email"""
+def attempt_login(email: str, password: str) -> Dict[str, Any]:
+    """Attempt to login user with email and password"""
     try:
         response = requests.post(
-            f"{BACKEND_URL}/login",
-            json={'email': email},
+            f"{BACKEND_URL}/api/login",
+            json={'email': email, 'password': password},
             timeout=10
         )
         
