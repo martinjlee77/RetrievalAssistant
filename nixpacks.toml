@@ -2,7 +2,7 @@
 nixPkgs = ['python310Full']
 
 [phases.install]
-cmds = ['pip install --break-system-packages -r website-requirements.txt']
+cmds = ['python -m pip install --break-system-packages -r website-requirements.txt']
 
 [start]
 cmd = 'python start_website.py'
