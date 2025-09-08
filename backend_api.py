@@ -114,23 +114,9 @@ def serve_streamlit_app():
         
         <script>
             function openStreamlit() {
-                // Try multiple approaches
-                const urls = [
-                    'https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002',
-                    window.location.origin.replace(':5000', ':3002'),
-                    'http://127.0.0.1:8501'
-                ];
-                
-                // Try first URL immediately
-                window.open(urls[0], '_blank');
-                
-                // If that fails, user can click button for alternatives
-                setTimeout(() => {
-                    document.querySelector('.btn').innerHTML = 'Try Alternative URL';
-                    document.querySelector('.btn').onclick = function() {
-                        window.open(urls[1], '_blank');
-                    };
-                }, 3000);
+                // Streamlit is now on the main public port!
+                const streamlitUrl = window.location.origin.replace(':8080', '');
+                window.open(streamlitUrl, '_blank');
             }
             
             // Auto-launch after 2 seconds
