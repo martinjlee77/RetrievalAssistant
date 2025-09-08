@@ -219,11 +219,6 @@ def show_credits_warning(required_credits: float, auth_manager: AuthManager):
         )
         return False
     
-    # Show cost estimate
-    if credits_info.get('is_free_analysis', False):
-        st.success("🎁 This analysis will use one of your free analyses!")
-    else:
-        st.info(f"💰 This analysis will cost **${required_credits:.2f}** from your credit balance.")
     
     return True
 

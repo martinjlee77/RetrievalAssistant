@@ -10,7 +10,6 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.cost_estimator import cost_estimator  # Keep for backward compatibility
 from shared.billing_manager import billing_manager
 from shared.preflight_pricing import preflight_pricing
 from shared.wallet_manager import wallet_manager
@@ -37,8 +36,7 @@ def render_asc606_page():
 
     # Page header
     st.title(":primary[ASC 606 5-Step Memo Generator]")
-    with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
+    st.info("**Purpose:** Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():
@@ -85,9 +83,9 @@ def render_asc606_page():
         
         # Display pricing information
         pricing_container = st.empty()
-        with pricing_container.container(border=True):
+        with pricing_container:
             st.markdown("### :primary[Analysis Pricing]")
-            st.markdown(pricing_result['billing_summary'])
+            st.info(pricing_result['billing_summary'])
             
             # Show file processing details
             if pricing_result.get('processing_errors'):
@@ -462,8 +460,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
