@@ -1098,7 +1098,7 @@ def charge_wallet():
         
         # Record charge transaction
         cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, transaction_date)
+            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
             VALUES (%s, %s, %s, NOW())
         """, (user_id, -charge_amount, f"analysis_charge_{data.get('analysis_type', 'unknown')}"))
         
