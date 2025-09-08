@@ -30,120 +30,116 @@ def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
 @app.route('/analysis')
-def serve_streamlit_app():
-    """Serve your actual Streamlit application through direct iframe"""
-    # Since port mapping isn't working, use internal port directly
-    # This works in Replit development environment
-    streamlit_url = 'http://127.0.0.1:8501'
+@app.route('/analysis/<path:path>')
+def serve_streamlit_app(path=''):
+    """Proxy requests to Streamlit app to avoid CORS issues"""
+    import requests
+    from urllib.parse import urlencode
     
-    return f'''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>VeritasLogic Analysis Platform</title>
-        <style>
-            body {{ margin: 0; padding: 0; }}
-            iframe {{ width: 100%; height: 100vh; border: none; }}
-            .error {{
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 2rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                text-align: center;
-                z-index: 1000;
-                max-width: 500px;
-            }}
-            .loading {{
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 2rem;
-                border-radius: 10px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                text-align: center;
-                z-index: 1000;
-            }}
-            .spinner {{
-                border: 3px solid #f3f3f3;
-                border-top: 3px solid #007bff;
-                border-radius: 50%;
-                width: 30px;
-                height: 30px;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 1rem;
-            }}
-            @keyframes spin {{
-                0% {{ transform: rotate(0deg); }}
-                100% {{ transform: rotate(360deg); }}
-            }}
-            .btn {{
-                background: #007bff;
-                color: white;
-                padding: 0.5rem 1rem;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                margin: 0.5rem;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <h3>Loading Your Analysis Platform...</h3>
-            <p>Starting multi-standard ASC analysis tools...</p>
-        </div>
-        <div class="error" id="error" style="display: none;">
-            <h3>⚠️ Connection Issue</h3>
-            <p>Unable to connect to the analysis platform.</p>
-            <p><strong>Alternative access:</strong></p>
-            <button class="btn" onclick="window.open('http://127.0.0.1:8501', '_blank')">
-                Open Analysis Platform in New Tab
-            </button>
-            <button class="btn" onclick="window.location.reload()">
-                Retry
-            </button>
-        </div>
-        <iframe id="streamlit" src="{streamlit_url}" style="display: none;"></iframe>
-        <script>
-            let loadTimeout;
+    try:
+        # Build the URL for the Streamlit app
+        streamlit_base = 'http://127.0.0.1:8501'
+        if path:
+            url = f'{streamlit_base}/{path}'
+        else:
+            url = streamlit_base
             
-            // Show iframe after delay
-            setTimeout(() => {{
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('streamlit').style.display = 'block';
-            }}, 3000);
+        # Forward query parameters
+        if request.query_string:
+            url += '?' + request.query_string.decode()
             
-            // Show error if loading takes too long
-            setTimeout(() => {{
-                if (document.getElementById('loading').style.display !== 'none') {{
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error').style.display = 'block';
+        # Forward the request to Streamlit
+        if request.method == 'GET':
+            resp = requests.get(url, headers=dict(request.headers), timeout=30)
+        elif request.method == 'POST':
+            resp = requests.post(url, headers=dict(request.headers), 
+                               data=request.get_data(), timeout=30)
+        else:
+            resp = requests.request(request.method, url, 
+                                  headers=dict(request.headers), 
+                                  data=request.get_data(), timeout=30)
+        
+        # Return the response from Streamlit
+        response = Response(resp.content, resp.status_code)
+        
+        # Copy important headers (but skip problematic ones)
+        excluded_headers = ['content-length', 'content-encoding', 'connection']
+        for key, value in resp.headers.items():
+            if key.lower() not in excluded_headers:
+                response.headers[key] = value
+        
+        return response
+        
+    except requests.exceptions.RequestException as e:
+        # If Streamlit isn't available, show a user-friendly message
+        return f'''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Analysis Platform Starting</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: #f5f5f5;
                 }}
-            }}, 8000);
-            
-            // Hide loading when iframe loads successfully
-            document.getElementById('streamlit').onload = function() {{
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('streamlit').style.display = 'block';
-            }};
-            
-            // Handle iframe load errors
-            document.getElementById('streamlit').onerror = function() {{
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-            }};
-        </script>
-    </body>
-    </html>
-    '''
+                .startup {{
+                    text-align: center;
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                    max-width: 500px;
+                }}
+                .spinner {{
+                    border: 4px solid #f3f3f3;
+                    border-top: 4px solid #007bff;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    animation: spin 2s linear infinite;
+                    margin: 0 auto 1rem;
+                }}
+                @keyframes spin {{
+                    0% {{ transform: rotate(0deg); }}
+                    100% {{ transform: rotate(360deg); }}
+                }}
+                .btn {{
+                    background: #007bff;
+                    color: white;
+                    padding: 0.75rem 1.5rem;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin: 0.5rem;
+                    font-size: 16px;
+                }}
+                .btn:hover {{ background: #0056b3; }}
+            </style>
+        </head>
+        <body>
+            <div class="startup">
+                <div class="spinner"></div>
+                <h2>🎯 Analysis Platform Starting...</h2>
+                <p>Your Streamlit application is initializing with all ASC standards.</p>
+                <p>This may take a moment.</p>
+                <button class="btn" onclick="window.location.reload()">
+                    Refresh
+                </button>
+                <p style="color: #666; font-size: 14px; margin-top: 2rem;">
+                    If this continues, the Streamlit app may need to restart.
+                </p>
+            </div>
+            <script>
+                setTimeout(() => window.location.reload(), 15000);
+            </script>
+        </body>
+        </html>
+        ''', 503
 
 @app.route('/<path:path>')
 def serve_static(path):
