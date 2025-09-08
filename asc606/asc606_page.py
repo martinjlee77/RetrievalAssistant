@@ -792,8 +792,30 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     if memo_result:
                         st.markdown("### 📄 Generated ASC 606 Memo")
                         
+                        # Store memo in session state for persistence
+                        if 'user_session_id' not in st.session_state:
+                            st.session_state.user_session_id = str(uuid.uuid4())
+                        
+                        session_id = st.session_state.user_session_id
+                        memo_key = f'asc606_memo_data_{session_id}'
+                        analysis_key = f'asc606_analysis_complete_{session_id}'
+                        
+                        # Store memo data and completion state
+                        st.session_state[memo_key] = memo_result
+                        st.session_state[analysis_key] = True
+                        
                         # Use the CleanMemoGenerator's display method
                         memo_generator.display_clean_memo(memo_result)
+                        
+                        # Add "Analyze Another Contract" button
+                        st.markdown("---")
+                        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                            # Reset analysis state for new analysis
+                            keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower()]
+                            for key in keys_to_clear:
+                                del st.session_state[key]
+                            st.rerun()
+                        
                     else:
                         st.error("❌ Memo generation produced empty content")
                     
