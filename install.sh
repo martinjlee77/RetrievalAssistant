@@ -1,3 +1,2 @@
 #!/bin/bash
-python -m ensurepip --upgrade
-python -m pip install -r website-requirements.txt
+python -m pip install --break-system-packages -r website-requirements.txt

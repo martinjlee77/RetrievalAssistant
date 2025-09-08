@@ -1,0 +1,96 @@
+[Region: us-east4]
+==============
+Using Nixpacks
+==============
+
+context: g3sx-jAsj
+╔══════════ Nixpacks v1.38.0 ══════════╗
+║ setup      │ python310Full           ║
+║──────────────────────────────────────║
+║ install    │ chmod +x install.sh     ║
+║            │ ./install.sh            ║
+║──────────────────────────────────────║
+║ start      │ python start_website.py ║
+╚══════════════════════════════════════╝
+
+internal
+load build definition from Dockerfile
+0ms
+
+internal
+load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+93ms
+
+internal
+load .dockerignore
+0ms
+
+stage-0
+FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+8ms
+
+internal
+load build context
+0ms
+
+stage-0
+WORKDIR /app/ cached
+0ms
+
+stage-0
+COPY .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix
+183ms
+
+stage-0
+RUN nix-env -if .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix && nix-collect-garbage -d
+33s
+29 store paths deleted, 249.93 MiB freed
+
+stage-0
+COPY . /app/.
+613ms
+
+stage-0
+RUN chmod +x install.sh
+97ms
+
+stage-0
+RUN ./install.sh
+1s
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> This command has been disabled as it tries to modify the immutable
+    `/nix/store` filesystem.
+    
+    To use Python with Nix and nixpkgs, have a look at the online documentation:
+    <https://nixos.org/manual/nixpkgs/stable/#python>.
+note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+hint: See PEP 668 for the detailed specification.
+Traceback (most recent call last):
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/ensurepip/__main__.py", line 5, in <module>
+    sys.exit(ensurepip._main())
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/ensurepip/__init__.py", line 287, in _main
+    return _bootstrap(
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/ensurepip/__init__.py", line 203, in _bootstrap
+    return _run_pip([*args, *_PACKAGE_NAMES], additional_paths)
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/ensurepip/__init__.py", line 104, in _run_pip
+    return subprocess.run(cmd, check=True).returncode
+  File "/nix/store/ycc4i19n61bwbqaxib5s82q2nvl6cy5h-bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env/lib/python3.10/subprocess.py", line 526, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError
+: Command '['/root/.nix-profile/bin/python', '-W', 'ignore::DeprecationWarning', '-c', '\nimport runpy\nimport sys\nsys.path = [\'/tmp/tmpre1kfms8/setuptools-65.5.0-py3-none-any.whl\', \'/tmp/tmpre1kfms8/pip-23.0.1-py3-none-any.whl\'] + sys.path\nsys.argv[1:] = [\'install\', \'--no-cache-dir\', \'--no-index\', \'--find-links\', \'/tmp/tmpre1kfms8\', \'--upgrade\', \'setuptools\', \'pip\']\nrunpy.run_module("pip", run_name="__main__", alter_sys=True)\n']' returned non-zero exit status 1.
+/root/.nix-profile/bin/python: No module named pip
+Dockerfile:21
+-------------------
+19 |     COPY . /app/.
+20 |     RUN --mount=type=cache,id=s/e7aa6d94-962b-47a4-8822-bdfbb9eb3b00-/root/cache/uv,target=/root/.cache/uv chmod +x install.sh
+21 | >>> RUN --mount=type=cache,id=s/e7aa6d94-962b-47a4-8822-bdfbb9eb3b00-/root/cache/uv,target=/root/.cache/uv ./install.sh
+22 |
+23 |
+-------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c ./install.sh" did not complete successfully: exit code: 1
