@@ -18,35 +18,35 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "VeritasLogic App"
+args = "Auth Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Analysis Platform"
+args = "Main App"
 
 [[workflows.workflow]]
-name = "VeritasLogic App"
+name = "Auth Backend"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python backend_api.py"
+args = "python backend_api.py --port 5001"
+waitForPort = 5001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Main App"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run app.py --server.port 5000 --server.address 0.0.0.0 --server.headless true"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
-
-[[workflows.workflow]]
-name = "Analysis Platform"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "streamlit run home.py --server.port 8501 --server.address 0.0.0.0 --server.headless true"
-waitForPort = 8501
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [[ports]]
 localPort = 3000
