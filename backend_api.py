@@ -31,22 +31,10 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit_app():
-    """Serve your actual Streamlit application - production ready"""
-    # Get current host to build external Streamlit URL
-    host = request.headers.get('Host', 'localhost:5000')
-    
-    # Build external Streamlit URL using port 3002 (configured in .replit)
-    if 'localhost' in host or '127.0.0.1' in host:
-        # Development: use localhost with port 3002 
-        streamlit_url = 'http://localhost:3002'
-    else:
-        # Replit environment: use external domain with port 3002
-        # Remove existing port if present, then add :3002
-        if ':' in host:
-            streamlit_host = host.split(':')[0] + ':3002'
-        else:
-            streamlit_host = host + ':3002'
-        streamlit_url = f'https://{streamlit_host}'
+    """Serve your actual Streamlit application through direct iframe"""
+    # Since port mapping isn't working, use internal port directly
+    # This works in Replit development environment
+    streamlit_url = 'http://127.0.0.1:8501'
     
     return f'''
     <!DOCTYPE html>
@@ -56,6 +44,19 @@ def serve_streamlit_app():
         <style>
             body {{ margin: 0; padding: 0; }}
             iframe {{ width: 100%; height: 100vh; border: none; }}
+            .error {{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                text-align: center;
+                z-index: 1000;
+                max-width: 500px;
+            }}
             .loading {{
                 position: fixed;
                 top: 50%;
@@ -81,26 +82,63 @@ def serve_streamlit_app():
                 0% {{ transform: rotate(0deg); }}
                 100% {{ transform: rotate(360deg); }}
             }}
+            .btn {{
+                background: #007bff;
+                color: white;
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin: 0.5rem;
+            }}
         </style>
     </head>
     <body>
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <h3>Loading Your Analysis Platform...</h3>
-            <p>Connecting to multi-standard ASC analysis tools...</p>
+            <p>Starting multi-standard ASC analysis tools...</p>
+        </div>
+        <div class="error" id="error" style="display: none;">
+            <h3>⚠️ Connection Issue</h3>
+            <p>Unable to connect to the analysis platform.</p>
+            <p><strong>Alternative access:</strong></p>
+            <button class="btn" onclick="window.open('http://127.0.0.1:8501', '_blank')">
+                Open Analysis Platform in New Tab
+            </button>
+            <button class="btn" onclick="window.location.reload()">
+                Retry
+            </button>
         </div>
         <iframe id="streamlit" src="{streamlit_url}" style="display: none;"></iframe>
         <script>
+            let loadTimeout;
+            
             // Show iframe after delay
             setTimeout(() => {{
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('streamlit').style.display = 'block';
-            }}, 2000);
+            }}, 3000);
             
-            // Fallback: hide loading when iframe loads
+            // Show error if loading takes too long
+            setTimeout(() => {{
+                if (document.getElementById('loading').style.display !== 'none') {{
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error').style.display = 'block';
+                }}
+            }}, 8000);
+            
+            // Hide loading when iframe loads successfully
             document.getElementById('streamlit').onload = function() {{
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
                 document.getElementById('streamlit').style.display = 'block';
+            }};
+            
+            // Handle iframe load errors
+            document.getElementById('streamlit').onerror = function() {{
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
             }};
         </script>
     </body>
