@@ -3,7 +3,7 @@ VeritasLogic Backend API
 Handles user registration, authentication, and billing
 """
 
-from flask import Flask, request, jsonify, render_template_string, send_from_directory, redirect, url_for
+from flask import Flask, request, jsonify, render_template_string, send_from_directory, redirect, url_for, Response
 from flask_cors import CORS
 import psycopg2
 import psycopg2.extras
