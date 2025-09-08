@@ -676,7 +676,16 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             st.success("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
             return
         
-        # Step 4: Now proceed with the full ASC 606 analysis workflow
+        # Step 4: Show analysis warning and proceed with full workflow
+        # Add the important warning box that users should not leave the page
+        progress_message_placeholder = st.empty()
+        progress_message_placeholder.error(
+            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+            "Your analysis is running and will take up to 3-5 minutes. "
+            "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
+        )
+        
+        # Step 5: Now proceed with the full ASC 606 analysis workflow
         # Initialize analyzer and perform the complete analysis with progress UI
         
         try:
@@ -755,22 +764,26 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     background = analyzer.generate_background_section(conclusions_text, customer_name) 
                     final_conclusion = analyzer.generate_final_conclusion(analysis_results)
                     
+                    # Prepare analysis_results dict with all components for CleanMemoGenerator
+                    memo_analysis_results = {
+                        **analysis_results,  # Include all step results
+                        'customer_name': customer_name,
+                        'filename': filename,
+                        'executive_summary': executive_summary,
+                        'background': background,
+                        'conclusion': final_conclusion,
+                        'additional_context': additional_context
+                    }
+                    
                     # Generate clean memo using the memo generator
-                    memo_result = memo_generator.combine_clean_steps(
-                        analysis_results=analysis_results,
-                        customer_name=customer_name,
-                        filename=filename,
-                        executive_summary=executive_summary,
-                        background=background,
-                        conclusion=final_conclusion,
-                        additional_context=additional_context
-                    )
+                    memo_result = memo_generator.combine_clean_steps(memo_analysis_results)
                     
                     # Mark analysis as successful
                     analysis_manager.complete_analysis(analysis_id, success=True)
                     
-                    # Clear progress and show results
+                    # Clear progress and warning message, show results
                     progress_indicator_placeholder.empty()
+                    progress_message_placeholder.empty()  # Remove the warning
                     
                     # Display results
                     st.success("✅ **Analysis Complete!**")
