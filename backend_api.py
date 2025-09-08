@@ -1119,6 +1119,70 @@ def charge_wallet():
         logger.error(f"Charge wallet error: {e}")
         return jsonify({'error': 'Failed to charge wallet'}), 500
 
+@app.route('/api/user/auto-credit', methods=['POST'])
+def auto_credit_wallet():
+    """Auto-credit user's wallet for failed analysis"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        credit_amount = data.get('credit_amount')
+        
+        if not credit_amount or credit_amount <= 0:
+            return jsonify({'error': 'Invalid credit amount'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Add credits to user's balance
+        cursor.execute("""
+            UPDATE users 
+            SET credits_balance = credits_balance + %s
+            WHERE id = %s
+        """, (credit_amount, user_id))
+        
+        # Get updated balance
+        cursor.execute("""
+            SELECT credits_balance FROM users WHERE id = %s
+        """, (user_id,))
+        
+        result = cursor.fetchone()
+        new_balance = float(result['credits_balance'])
+        
+        # Record auto-credit transaction
+        cursor.execute("""
+            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
+            VALUES (%s, %s, %s, NOW())
+        """, (user_id, credit_amount, "admin_topup"))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Auto-credited ${credit_amount} to user {user_id}. New balance: ${new_balance}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully credited ${credit_amount:.2f} for failed analysis',
+            'credit_amount': credit_amount,
+            'new_balance': new_balance
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Auto-credit error: {e}")
+        return jsonify({'error': 'Failed to auto-credit wallet'}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""

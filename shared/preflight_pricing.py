@@ -70,7 +70,8 @@ class PreflightPricing:
                     'estimated_pages': extraction_result.get('estimated_pages', 1),
                     'file_size_mb': extraction_result.get('file_size_mb', 0),
                     'extraction_method': extraction_result.get('extraction_method', 'unknown'),
-                    'is_likely_scanned': extraction_result.get('is_likely_scanned', False)
+                    'is_likely_scanned': extraction_result.get('is_likely_scanned', False),
+                    'text_content': extraction_result.get('text_content', '')  # Store extracted text
                 })
                 
                 logger.info(f"Processed file {i}: {uploaded_file.name} - {file_word_count} words")

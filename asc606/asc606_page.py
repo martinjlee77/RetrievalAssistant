@@ -649,18 +649,22 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             return
         
         # Step 3: Reconstruct combined text from file details
-        # In production, we'd cache this from preflight processing
         combined_text = ""
         filename_list = []
         
         for file_detail in pricing_result['file_details']:
-            combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content would be here]"
-            filename_list.append(file_detail['filename'])
+            if 'text_content' in file_detail and file_detail['text_content'].strip():
+                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n{file_detail['text_content']}"
+                filename_list.append(file_detail['filename'])
+            else:
+                # Fallback if text_content is missing
+                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content extraction failed]"
+                filename_list.append(file_detail['filename'])
         
         filename = ", ".join(filename_list)
         
-        # For now, use a temporary solution - this needs proper implementation
-        if not combined_text or "[File content would be here]" in combined_text:
+        # Check if we have valid content
+        if not combined_text.strip() or "[File content extraction failed]" in combined_text:
             st.error("❌ **Technical Implementation Note**: Full file content reconstruction not yet implemented.")
             st.info("🔄 **Temporary Workaround**: This integration is in progress. The preflight pricing system is working, but the analysis part needs the file content to be properly passed through.")
             
