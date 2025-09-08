@@ -30,348 +30,118 @@ def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
 @app.route('/analysis')
-def serve_analysis_platform():
-    """Serve the integrated analysis platform - working version"""
+def serve_streamlit_app():
+    """Serve your actual Streamlit application"""
+    # Check if Streamlit is running
+    try:
+        import requests
+        response = requests.get('http://127.0.0.1:8501', timeout=2)
+        if response.status_code == 200:
+            # Streamlit is running, embed it
+            return f'''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>VeritasLogic Analysis Platform</title>
+                <style>
+                    body {{ margin: 0; padding: 0; }}
+                    iframe {{ width: 100%; height: 100vh; border: none; }}
+                    .loading {{
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: white;
+                        padding: 2rem;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                        text-align: center;
+                        z-index: 1000;
+                    }}
+                    .spinner {{
+                        border: 3px solid #f3f3f3;
+                        border-top: 3px solid #007bff;
+                        border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 1rem;
+                    }}
+                    @keyframes spin {{
+                        0% {{ transform: rotate(0deg); }}
+                        100% {{ transform: rotate(360deg); }}
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <h3>Loading Your Analysis Platform...</h3>
+                    <p>Starting multi-standard ASC analysis tools</p>
+                </div>
+                <iframe id="streamlit" src="http://127.0.0.1:8501" style="display: none;"></iframe>
+                <script>
+                    setTimeout(() => {{
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('streamlit').style.display = 'block';
+                    }}, 3000);
+                </script>
+            </body>
+            </html>
+            '''
+    except:
+        pass
+    
+    # Streamlit not ready, show loading message
     return '''
     <!DOCTYPE html>
     <html>
     <head>
-        <title>VeritasLogic Analysis Platform</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Analysis Platform Starting</title>
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                min-height: 100vh;
-            }
-            .header {
-                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-                color: white;
-                padding: 2rem 0;
-                text-align: center;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            }
-            .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-            .header p { font-size: 1.2rem; opacity: 0.9; }
-            
-            .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-            .platform-grid { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-                gap: 2rem; 
-                margin-top: 2rem; 
-            }
-            
-            .standard-card {
-                background: white;
-                border-radius: 15px;
-                padding: 2rem;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-                border: 1px solid rgba(255,255,255,0.2);
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .standard-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-            }
-            
-            .standard-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, #007bff, #0056b3);
-            }
-            
-            .standard-card h3 {
-                color: #007bff;
-                font-size: 1.5rem;
-                margin-bottom: 0.5rem;
+            body {
+                font-family: Arial, sans-serif;
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background: #f5f5f5;
             }
-            
-            .standard-card p {
-                color: #666;
-                margin-bottom: 1.5rem;
-                line-height: 1.6;
-            }
-            
-            .feature-list {
-                list-style: none;
-                margin-bottom: 1.5rem;
-            }
-            
-            .feature-list li {
-                color: #555;
-                margin-bottom: 0.5rem;
-                padding-left: 1.5rem;
-                position: relative;
-            }
-            
-            .feature-list li::before {
-                content: '✓';
-                position: absolute;
-                left: 0;
-                color: #28a745;
-                font-weight: bold;
-            }
-            
-            .btn {
-                background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-                color: white;
-                padding: 0.75rem 1.5rem;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1rem;
-                font-weight: 600;
-                text-decoration: none;
-                display: inline-block;
-                transition: all 0.3s ease;
-                width: 100%;
+            .startup {
                 text-align: center;
-            }
-            
-            .btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0,123,255,0.3);
-            }
-            
-            .btn-secondary {
-                background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-                margin-top: 1rem;
-            }
-            
-            .upload-section {
                 background: white;
-                border-radius: 15px;
                 padding: 2rem;
-                margin-top: 2rem;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            }
-            
-            .upload-area {
-                border: 3px dashed #ddd;
                 border-radius: 10px;
-                padding: 2rem;
-                text-align: center;
-                background: #f8f9fa;
-                transition: all 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             }
-            
-            .upload-area:hover { border-color: #007bff; background: #e3f2fd; }
-            .upload-area.dragover { border-color: #007bff; background: #e3f2fd; }
-            
-            .status-indicator { 
-                display: inline-block; 
-                width: 10px; 
-                height: 10px; 
-                border-radius: 50%; 
-                margin-right: 0.5rem; 
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #007bff;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 2s linear infinite;
+                margin: 0 auto 1rem;
             }
-            .status-active { background: #28a745; }
-            .status-coming { background: #ffc107; }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>🎯 VeritasLogic Analysis Platform</h1>
-            <p>Multi-Standard Accounting Analysis with AI & Hybrid RAG</p>
+        <div class="startup">
+            <div class="spinner"></div>
+            <h2>🎯 Starting Analysis Platform</h2>
+            <p>Your Streamlit application is initializing...</p>
+            <p>This may take a few moments.</p>
+            <button onclick="window.location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Refresh
+            </button>
         </div>
-        
-        <div class="container">
-            <div class="platform-grid">
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>ASC 606</h3>
-                    <p>Revenue Recognition Analysis</p>
-                    <ul class="feature-list">
-                        <li>5-Step Revenue Model</li>
-                        <li>Performance Obligations</li>
-                        <li>Contract Modifications</li>
-                        <li>Variable Consideration</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('ASC606')">Launch ASC 606 Analysis</button>
-                </div>
-                
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>ASC 842</h3>
-                    <p>Lease Accounting Analysis</p>
-                    <ul class="feature-list">
-                        <li>Lease Classification</li>
-                        <li>ROU Asset Calculation</li>
-                        <li>Lease Liability</li>
-                        <li>Disclosure Requirements</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('ASC842')">Launch ASC 842 Analysis</button>
-                </div>
-                
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>ASC 718</h3>
-                    <p>Stock-Based Compensation</p>
-                    <ul class="feature-list">
-                        <li>Fair Value Measurement</li>
-                        <li>Vesting Conditions</li>
-                        <li>Modification Accounting</li>
-                        <li>Expense Recognition</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('ASC718')">Launch ASC 718 Analysis</button>
-                </div>
-                
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>ASC 805</h3>
-                    <p>Business Combinations</p>
-                    <ul class="feature-list">
-                        <li>Purchase Price Allocation</li>
-                        <li>Goodwill Calculation</li>
-                        <li>Contingent Consideration</li>
-                        <li>Pro Forma Adjustments</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('ASC805')">Launch ASC 805 Analysis</button>
-                </div>
-                
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>ASC 340-40</h3>
-                    <p>Contract Costs</p>
-                    <ul class="feature-list">
-                        <li>Incremental Costs</li>
-                        <li>Fulfillment Costs</li>
-                        <li>Amortization Patterns</li>
-                        <li>Impairment Testing</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('ASC34040')">Launch ASC 340-40 Analysis</button>
-                </div>
-                
-                <div class="standard-card">
-                    <h3><span class="status-indicator status-active"></span>Research Assistant</h3>
-                    <p>RAG-Powered Guidance</p>
-                    <ul class="feature-list">
-                        <li>Authoritative Citations</li>
-                        <li>Implementation Guidance</li>
-                        <li>Technical Research</li>
-                        <li>Cross-Standard Analysis</li>
-                    </ul>
-                    <button class="btn" onclick="launchAnalysis('Research')">Launch Research Assistant</button>
-                </div>
-            </div>
-            
-            <div class="upload-section">
-                <h2 style="margin-bottom: 1rem; color: #333;">📄 Document Analysis</h2>
-                <div class="upload-area" id="uploadArea">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
-                    <h3>Upload Contract or Financial Document</h3>
-                    <p style="color: #666; margin: 1rem 0;">Drag & drop files here or click to browse</p>
-                    <p style="color: #999; font-size: 0.9rem;">Supports PDF, DOCX, TXT files up to 50MB</p>
-                    <input type="file" id="fileInput" style="display: none;" accept=".pdf,.docx,.txt" multiple>
-                    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">
-                        Choose Files
-                    </button>
-                </div>
-                <div id="uploadStatus" style="margin-top: 1rem; display: none;"></div>
-            </div>
-        </div>
-        
         <script>
-            function launchAnalysis(standard) {
-                const loadingOverlay = document.createElement('div');
-                loadingOverlay.innerHTML = `
-                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                                background: rgba(0,0,0,0.8); display: flex; align-items: center; 
-                                justify-content: center; z-index: 10000;">
-                        <div style="background: white; padding: 2rem; border-radius: 15px; text-align: center; max-width: 400px;">
-                            <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; 
-                                        border-top: 5px solid #007bff; border-radius: 50%; 
-                                        animation: spin 1s linear infinite; margin: 0 auto 1rem auto;"></div>
-                            <h3>Launching ${standard} Analysis...</h3>
-                            <p style="color: #666;">Initializing analysis engine and loading knowledge base...</p>
-                        </div>
-                    </div>
-                    <style>
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    </style>
-                `;
-                document.body.appendChild(loadingOverlay);
-                
-                // Simulate loading for demo - in production, redirect to actual analysis tool
-                setTimeout(() => {
-                    document.body.removeChild(loadingOverlay);
-                    alert(`${standard} Analysis Platform\\n\\nThis would launch the full ${standard} analysis interface with:\\n• Document upload and processing\\n• AI-powered analysis\\n• Professional memo generation\\n• Hybrid RAG citations\\n\\nFull integration coming soon!`);
-                }, 2000);
-            }
-            
-            // File upload handling
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const uploadStatus = document.getElementById('uploadStatus');
-            
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                handleFiles(files);
-            });
-            
-            fileInput.addEventListener('change', (e) => {
-                handleFiles(e.target.files);
-            });
-            
-            function handleFiles(files) {
-                if (files.length === 0) return;
-                
-                uploadStatus.style.display = 'block';
-                uploadStatus.innerHTML = `
-                    <div style="padding: 1rem; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #007bff;">
-                        <h4 style="margin-bottom: 0.5rem; color: #007bff;">Files Uploaded Successfully</h4>
-                        ${Array.from(files).map(file => `<p style="margin: 0.25rem 0;">📄 ${file.name} (${Math.round(file.size/1024)}KB)</p>`).join('')}
-                        <button class="btn" onclick="startAnalysis()" style="margin-top: 1rem; width: auto; padding: 0.5rem 1rem;">
-                            🔍 Start Multi-Standard Analysis
-                        </button>
-                    </div>
-                `;
-            }
-            
-            function startAnalysis() {
-                launchAnalysis('Multi-Standard Document');
-            }
-            
-            // Back to dashboard
-            function goToDashboard() {
-                window.location.href = '/dashboard.html';
-            }
-            
-            // Add back button
-            window.addEventListener('load', () => {
-                const backButton = document.createElement('button');
-                backButton.innerHTML = '← Back to Dashboard';
-                backButton.className = 'btn btn-secondary';
-                backButton.style.position = 'fixed';
-                backButton.style.top = '1rem';
-                backButton.style.left = '1rem';
-                backButton.style.width = 'auto';
-                backButton.style.zIndex = '1000';
-                backButton.onclick = goToDashboard;
-                document.body.appendChild(backButton);
-            });
+            setTimeout(() => window.location.reload(), 10000);
         </script>
     </body>
     </html>
