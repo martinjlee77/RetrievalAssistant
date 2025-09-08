@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Backend API configuration
-BACKEND_URL = "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/api"
+BACKEND_URL = "http://127.0.0.1:3000/api"
 
 class AuthManager:
     """Manages user authentication and session state"""
@@ -157,7 +157,7 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
     """Attempt to login user with email and password"""
     try:
         response = requests.post(
-            f"{BACKEND_URL}/api/login",
+            f"{BACKEND_URL}/login",
             json={'email': email, 'password': password},
             timeout=10
         )
