@@ -119,7 +119,7 @@ class BillingManager:
             st.success("🎁 **Analysis completed using one of your free analyses!**")
         else:
             billed_amount = min(cost_estimate['estimated_cost'], cost_estimate['cost_cap'])
-            st.success(f"💳 **Analysis completed - Charged ${billed_amount:.2f} to your account**")
+            st.success(f"💳 **Analysis completed - Charged \\${billed_amount:.2f} to your account**")
             
             # Show cost breakdown
             if billed_amount < cost_estimate['estimated_cost']:

@@ -174,7 +174,7 @@ class AnalysisManager:
         **Current Analysis Details:**
         - Analysis ID: {active_analysis['analysis_id']}
         - Document Words: {active_analysis['total_words']:,}
-        - Cost: ${active_analysis['cost_charged']:.2f}
+        - Cost: \\${active_analysis['cost_charged']:.2f}
         """)
         
         # Provide option to force clear if analysis seems stuck
