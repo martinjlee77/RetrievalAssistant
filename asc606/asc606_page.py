@@ -44,6 +44,33 @@ def render_asc606_page():
     if analysis_manager.show_active_analysis_warning():
         return  # User has active analysis, show warning and exit
     
+    # CRITICAL FIX: Check for existing completed analysis in session state
+    session_id = st.session_state.get('user_session_id', '')
+    if session_id:
+        analysis_key = f'asc606_analysis_complete_{session_id}'
+        memo_key = f'asc606_memo_data_{session_id}'
+        
+        # If analysis is complete and memo exists, show results instead of file upload
+        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            st.success("✅ **Analysis Complete!**")
+            st.markdown("### 📄 Generated ASC 606 Memo")
+            
+            # Display the existing memo
+            from asc606.clean_memo_generator import CleanMemoGenerator
+            memo_generator = CleanMemoGenerator()
+            memo_content = st.session_state[memo_key]
+            memo_generator.display_clean_memo(memo_content)
+            
+            # Add "Analyze Another Contract" button
+            st.markdown("---")
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                # Reset analysis state for new analysis
+                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower()]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+            return  # Exit early, don't show file upload interface
+    
     # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
 
@@ -57,7 +84,8 @@ def render_asc606_page():
             return
         
         # Display pricing information
-        with st.container(border=True):
+        pricing_container = st.empty()
+        with pricing_container.container(border=True):
             st.markdown("### :primary[Analysis Pricing]")
             st.markdown(pricing_result['billing_summary'])
             
@@ -76,29 +104,32 @@ def render_asc606_page():
         # Check if user has sufficient credits
         credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
         
-        with st.container(border=True):
-                       
-            if credit_check['can_proceed']:
-                st.success(credit_check['message'])
-                st.info(f"**After analysis:** \\${credit_check['credits_remaining']:.2f} remaining")
-                can_proceed = True
-            else:
-                st.error(credit_check['message'])
+        # Credit balance display - store in variable so we can clear it
+        credit_container = st.empty()       
+        if credit_check['can_proceed']:
+            msg = (
+                f"{credit_check['message']}\n"
+                f"After this analysis, you will have **\\${credit_check['credits_remaining']:.0f} remaining**."
+            )
+            credit_container.info(msg)
+            can_proceed = True
+        else:
+            credit_container.error(credit_check['message'])
+            
+            # Show wallet top-up options
+            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
+            
+            if selected_amount:
+                # Process credit purchase
+                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
                 
-                # Show wallet top-up options
-                selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
-                
-                if selected_amount:
-                    # Process credit purchase
-                    purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
-                    
-                    if purchase_result['success']:
-                        st.success(purchase_result['message'])
-                        st.rerun()  # Refresh to update balance
-                    else:
-                        st.error(purchase_result['message'])
-                
-                can_proceed = False
+                if purchase_result['success']:
+                    st.success(purchase_result['message'])
+                    st.rerun()  # Refresh to update balance
+                else:
+                    st.error(purchase_result['message'])
+            
+            can_proceed = False
         
         # Analysis section
         if can_proceed:
@@ -115,7 +146,10 @@ def render_asc606_page():
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
-                warning_placeholder.empty()  # Clear the warning after the button is pressed
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
                 perform_asc606_analysis_new(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 

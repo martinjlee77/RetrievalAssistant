@@ -183,27 +183,16 @@ def show_user_sidebar(auth_manager: AuthManager):
         return
     
     with st.sidebar:
-        st.markdown("### My Account")
-        
+     
         # User info
-        st.markdown(f"User: {user_data['first_name']} {user_data['last_name']}")
-        st.markdown(f"Company: {user_data['company_name']}")
-        st.markdown(f"Email: {user_data['email']}")
-        
-        # Credits info
-        st.markdown("### Credits")
-        # Removed free analyses system - now using wallet credits only
-        credits_balance = user_data.get('credits_balance', 0)
-        if credits_balance > 0:
-            st.info(f"💳 Wallet Balance: \\${credits_balance:.2f}")
-        else:
-            st.warning("💳 Wallet Balance: \\$0.00")
-        
+        st.markdown(f"Logged in as {user_data['first_name']} {user_data['last_name']}")
+        st.markdown(f"{user_data['company_name']}")
+        st.text(user_data['email'])
+              
         # Action buttons
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Dashboard", use_container_width=True):
-                st.link_button("Go to Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/dashboard.html")
+            st.link_button("Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/dashboard.html")
         
         with col2:
             if st.button("Logout", use_container_width=True):

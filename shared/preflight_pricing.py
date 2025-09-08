@@ -113,6 +113,7 @@ class PreflightPricing:
         return result
     
     def _format_billing_summary(self, tier_info: Dict[str, Any], total_words: int, estimated_pages: int, file_count: int) -> str:
+        
         """Format billing summary for user display"""
         return f"""
 **This analysis will cost :blue[\\${tier_info['price']:.2f}] based on the following factors:**
@@ -143,7 +144,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'credits_remaining': user_credits - required_price,
-                'message': f"✅ Sufficient credits available (\\${user_credits:.2f} available, \\${required_price:.2f} required)"
+                'message': f"✅ Sufficient credits available - **\\${user_credits:.2f} available, \\${required_price:.2f} needed for this analysis.**"
             }
         else:
             shortfall = required_price - user_credits
@@ -153,7 +154,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'shortfall_amount': shortfall,
-                'message': f"⚠️ Insufficient credits: You have \\${user_credits:.2f}, need \\${required_price:.2f}. Please add \\${shortfall:.2f} to your wallet."
+                'message': f"⚠️ Insufficient credits: You have \\${user_credits:.2f} but need \\${required_price:.2f}. Please add at least \\${shortfall:.2f} to your account using the form below."
             }
 
 # Global instance for use across the application

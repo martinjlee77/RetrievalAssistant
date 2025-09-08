@@ -69,17 +69,17 @@ class WalletManager:
         Returns:
             Selected top-up amount or None if no selection made
         """
-        st.subheader("💳 Add Credits to Your Account")
+        st.subheader(":primary[Add to Your Account Balance]")
         
         # Show current balance and requirement
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Current Balance", f"\${current_balance:.2f}")
+            st.metric("Current Balance", f"${current_balance:.2f}")
         
         if required_amount:
             with col2:
                 needed = max(0, required_amount - current_balance)
-                st.metric("Amount Needed", f"\${needed:.2f}")
+                st.metric("Amount Needed", f"${needed:.2f}")
         
         # Get credit packages
         credit_packages = get_credit_packages()
