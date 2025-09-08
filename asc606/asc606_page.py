@@ -191,7 +191,7 @@ def _upload_and_process_asc606():
         st.error(f"❌ Error processing files: {str(e)}")
         return None, None
 
-def perform_asc606_analysis(contract_text: str, additional_context: str = "", cost_estimate: Dict[str, Any] = None):
+def perform_asc606_analysis(contract_text: str, additional_context: str = "", cost_estimate = None):
     """Perform the complete ASC 606 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
@@ -296,7 +296,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
                 'customer_name': customer_name,
                 'analysis_title': analysis_title,
                 'analysis_date': datetime.now().strftime("%B %d, %Y"),
-                'filename': filename,
+                'filename': st.session_state.get('current_filename', 'Contract Analysis'),
                 'steps': analysis_results,
                 'executive_summary': executive_summary,
                 'background': background,
@@ -330,13 +330,16 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
                 
                 # Record the analysis billing
                 word_count = len(contract_text.split()) if contract_text else 0
-                billing_success = billing_manager.record_analysis_billing(
-                    asc_standard='ASC 606',
-                    cost_estimate=cost_estimate,
-                    user_token=user_token,
-                    words_count=word_count,
-                    is_free_analysis=is_free_analysis
-                )
+                if user_token:  # Only proceed if user_token is not None
+                    billing_success = billing_manager.record_analysis_billing(
+                        asc_standard='ASC 606',
+                        cost_estimate=cost_estimate,
+                        user_token=user_token,
+                        words_count=word_count,
+                        is_free_analysis=is_free_analysis
+                    )
+                else:
+                    billing_success = False
                 
                 if billing_success:
                     # Show billing confirmation

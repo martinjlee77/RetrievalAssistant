@@ -83,7 +83,6 @@ with row1[0]:
     with st.container(border=True, key="my_box"):
         st.markdown("##### ASC 606: Rev Rec")
         st.markdown("**Revenue Recognition Analysis**")
-        st.markdown("📊 5-step revenue model, performance obligations, contract modifications")
         if st.button("Start ASC 606 Analysis", key="asc606_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 606: Rev Rec** in the sidebar to begin your analysis!")
 
@@ -92,7 +91,6 @@ with row1[1]:
     with st.container(border=True, key="my_box1"):
         st.markdown("##### ASC 340-40: Cost to Obtain")
         st.markdown("**Contract Costs Analysis**")
-        st.markdown("💰 Incremental costs, fulfillment costs, amortization patterns")
         if st.button("Start ASC 340-40 Analysis", key="asc340_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 340-40: Cost to Obtain** in the sidebar to begin your analysis!")
 
@@ -101,7 +99,6 @@ with row1[2]:
     with st.container(border=True, key="my_box2"):
         st.markdown("##### ASC 842: Leases (Lessee)")
         st.markdown("**Lease Accounting Analysis**")
-        st.markdown("🏢 Lease classification, ROU assets, lease liability")
         if st.button("Start ASC 842 Analysis", key="asc842_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 842: Leases (Lessee)** in the sidebar to begin your analysis!")
 
@@ -110,7 +107,6 @@ with row2[0]:
     with st.container(border=True, key="my_box3"):
         st.markdown("##### ASC 718: Stock Comp")
         st.markdown("**Stock-Based Compensation**")
-        st.markdown("📈 Fair value measurement, vesting conditions, modifications")
         if st.button("Start ASC 718 Analysis", key="asc718_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 718: Stock Comp** in the sidebar to begin your analysis!")
 
@@ -119,7 +115,6 @@ with row2[1]:
     with st.container(border=True, key="my_box4"):
         st.markdown("##### ASC 805: Bus Com")
         st.markdown("**Business Combinations**")
-        st.markdown("🤝 Purchase price allocation, goodwill, contingent consideration")
         if st.button("Start ASC 805 Analysis", key="asc805_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 805: Bus Com** in the sidebar to begin your analysis!")
 
