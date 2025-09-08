@@ -676,8 +676,115 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             st.success("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
             return
         
-        # The rest would be the same analysis logic as the original function
-        # This is where we'd integrate with the existing analysis workflow
+        # Step 4: Now proceed with the full ASC 606 analysis workflow
+        # Initialize analyzer and perform the complete analysis with progress UI
+        
+        try:
+            # Initialize the ASC 606 analyzer
+            from asc606.step_analyzer import ASC606StepAnalyzer
+            
+            # Create analyzer with knowledge base
+            analyzer = ASC606StepAnalyzer()
+            
+            # Initialize UI components
+            from shared.ui_components import SharedUIComponents
+            ui = SharedUIComponents()
+            
+            # Extract customer name
+            with st.spinner("🏢 Extracting customer name..."):
+                try:
+                    customer_name = analyzer.extract_entity_name_llm(combined_text)
+                    logger.info(f"LLM extracted customer: {customer_name}")
+                except Exception as e:
+                    logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
+                    customer_name = "Unknown Customer"  # Simple fallback
+                    
+            # Setup progress tracking
+            steps = [
+                "Processing", "Step 1", "Step 2", "Step 3", "Step 4", 
+                "Step 5", "Memo Generation"
+            ]
+            progress_placeholder = st.empty()
+            progress_indicator_placeholder = st.empty()
+            
+            # Run 5 ASC 606 steps with progress indicators
+            analysis_results = {}
+            
+            for step_num in range(1, 6):
+                # Show progress
+                ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
+                
+                with st.spinner(f"🔄 Running Step {step_num}..."):
+                    try:
+                        step_result = analyzer.run_step(step_num, combined_text, customer_name, additional_context)
+                        analysis_results[f'step_{step_num}'] = step_result
+                        logger.info(f"Completed ASC 606 Step {step_num}")
+                    except Exception as e:
+                        logger.error(f"Error in Step {step_num}: {str(e)}")
+                        # Continue with other steps
+                        analysis_results[f'step_{step_num}'] = {
+                            'content': f"Error in Step {step_num}: {str(e)}",
+                            'citations': []
+                        }
+            
+            # Show memo generation progress
+            ui.analysis_progress(steps, 6, progress_indicator_placeholder)
+            
+            # Generate memo
+            with st.spinner("📄 Generating professional memo..."):
+                try:
+                    memo_result = analyzer.generate_memo(
+                        contract_text=combined_text,
+                        filename=filename,
+                        customer_name=customer_name,
+                        additional_context=additional_context,
+                        analysis_results=analysis_results
+                    )
+                    
+                    # Mark analysis as successful
+                    analysis_manager.complete_analysis(analysis_id, success=True)
+                    
+                    # Clear progress and show results
+                    progress_indicator_placeholder.empty()
+                    
+                    # Display results
+                    st.success("✅ **Analysis Complete!**")
+                    
+                    if memo_result:
+                        st.markdown("### 📄 Generated ASC 606 Memo")
+                        
+                        # Display HTML memo
+                        if memo_result.get('html_memo'):
+                            st.components.v1.html(memo_result['html_memo'], height=600, scrolling=True)
+                        
+                        # Download buttons
+                        if memo_result.get('docx_file'):
+                            st.download_button(
+                                "📥 Download DOCX",
+                                memo_result['docx_file'],
+                                f"asc606_memo_{customer_name.replace(' ', '_')}.docx",
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            )
+                        
+                        if memo_result.get('pdf_file'):
+                            st.download_button(
+                                "📥 Download PDF",
+                                memo_result['pdf_file'], 
+                                f"asc606_memo_{customer_name.replace(' ', '_')}.pdf",
+                                "application/pdf"
+                            )
+                    
+                except Exception as e:
+                    logger.error(f"Memo generation failed: {str(e)}")
+                    analysis_manager.complete_analysis(analysis_id, success=False, error_message=f"Memo generation failed: {str(e)}")
+                    st.error(f"❌ **Memo Generation Failed**: {str(e)}")
+                    return
+                    
+        except Exception as e:
+            logger.error(f"Analysis workflow error: {str(e)}")
+            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
+            st.error(f"❌ **Analysis Error**: {str(e)}")
+            return
         
     except Exception as e:
         logger.error(f"Critical error in new ASC 606 analysis: {str(e)}")
