@@ -941,6 +941,110 @@ def purchase_credits():
         logger.error(f"Purchase credits error: {e}")
         return jsonify({'error': 'Failed to purchase credits'}), 500
 
+@app.route('/api/user/wallet-balance', methods=['GET'])
+def get_wallet_balance():
+    """Get user's current wallet balance"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get current wallet balance
+        cursor.execute("""
+            SELECT credits_balance FROM users WHERE id = %s
+        """, (user_id,))
+        
+        result = cursor.fetchone()
+        conn.close()
+        
+        if result:
+            return jsonify({
+                'balance': float(result['credits_balance'])
+            }), 200
+        else:
+            return jsonify({'error': 'User not found'}), 404
+            
+    except Exception as e:
+        logger.error(f"Wallet balance error: {e}")
+        return jsonify({'error': 'Failed to get wallet balance'}), 500
+
+@app.route('/api/user/purchase-credits', methods=['POST'])
+def user_purchase_credits():
+    """User credit purchase endpoint (matches wallet manager calls)"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        amount = data.get('credit_amount')
+        
+        if not amount or amount < 10:
+            return jsonify({'error': 'Invalid credit amount. Minimum $10'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Add credits to user's balance
+        cursor.execute("""
+            UPDATE users 
+            SET credits_balance = credits_balance + %s
+            WHERE id = %s
+        """, (amount, user_id))
+        
+        # Record credit purchase transaction
+        cursor.execute("""
+            INSERT INTO credit_transactions (user_id, amount, reason, transaction_date)
+            VALUES (%s, %s, 'wallet_topup', NOW())
+        """, (user_id, amount))
+        
+        # Get updated balance
+        cursor.execute("""
+            SELECT credits_balance FROM users WHERE id = %s
+        """, (user_id,))
+        
+        new_balance = cursor.fetchone()['credits_balance']
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"User {user_id} purchased ${amount} credits. New balance: ${new_balance}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully added ${amount:.2f} to your wallet!',
+            'amount_purchased': amount,
+            'new_balance': float(new_balance)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Purchase credits error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to purchase credits'}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""

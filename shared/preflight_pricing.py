@@ -114,14 +114,12 @@ class PreflightPricing:
     def _format_billing_summary(self, tier_info: Dict[str, Any], total_words: int, estimated_pages: int, file_count: int) -> str:
         """Format billing summary for user display"""
         return f"""
-📊 **Analysis Pricing Summary**
 
-**Document Analysis:** {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
-**Estimated Pages:** ~{estimated_pages} pages (at 300 words/page)
-**Pricing Tier:** {tier_info['name']} (up to {tier_info['max_words']:,} words)
-**Analysis Cost:** ${tier_info['price']:.2f} (${tier_info['per_1k_rate']:.2f} per 1,000 words)
+- **Document Analysis:** {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
+- **Estimated Pages:** ~{estimated_pages} pages (at 300 words/page)
+- **Pricing Tier:** {tier_info['name']} (up to {tier_info['max_words']:,} words)
+- :blue[**Analysis Cost: \\${tier_info['price']:.2f}**]
 
-*Fixed price - no additional charges*
         """.strip()
     
     def check_sufficient_credits(self, required_price: float, user_credits: float) -> Dict[str, Any]:
@@ -142,7 +140,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'credits_remaining': user_credits - required_price,
-                'message': f"✅ Sufficient credits available (${user_credits:.2f} available, ${required_price:.2f} required)"
+                'message': f"✅ Sufficient credits available (\\${user_credits:.2f} available, \\${required_price:.2f} required)"
             }
         else:
             shortfall = required_price - user_credits
@@ -152,7 +150,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'shortfall_amount': shortfall,
-                'message': f"⚠️ Insufficient credits: You have ${user_credits:.2f}, need ${required_price:.2f}. Please add ${shortfall:.2f} to your wallet."
+                'message': f"⚠️ Insufficient credits: You have \\${user_credits:.2f}, need \\${required_price:.2f}. Please add \\${shortfall:.2f} to your wallet."
             }
 
 # Global instance for use across the application

@@ -58,7 +58,7 @@ def render_asc606_page():
         
         # Display pricing information
         with st.container(border=True):
-            st.markdown("### 📊 Analysis Pricing")
+            st.markdown("### :primary[Analysis Pricing]")
             st.markdown(pricing_result['billing_summary'])
             
             # Show file processing details
@@ -77,11 +77,10 @@ def render_asc606_page():
         credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
         
         with st.container(border=True):
-            st.markdown("### 💳 Payment & Credits")
-            
+                       
             if credit_check['can_proceed']:
                 st.success(credit_check['message'])
-                st.info(f"**After analysis:** ${credit_check['credits_remaining']:.2f} remaining")
+                st.info(f"**After analysis:** \\${credit_check['credits_remaining']:.2f} remaining")
                 can_proceed = True
             else:
                 st.error(credit_check['message'])
@@ -135,12 +134,9 @@ def render_asc606_page():
 def get_asc606_inputs_new():
     """Get ASC 606 specific inputs with new preflight system."""
     
-    # Document upload section  
-    st.markdown("### 1️⃣ Upload Contract Documents")
-    st.markdown("Upload PDF or DOCX files containing revenue contracts (max 5 files, 50MB each)")
-    
+    # Document upload section   
     uploaded_files = st.file_uploader(
-        "Choose contract documents",
+        "1️⃣ Upload revenue contract documents (PDF or DOCX files, max 5 files, 50MB each)",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload revenue contracts, agreements, or amendments for ASC 606 analysis",

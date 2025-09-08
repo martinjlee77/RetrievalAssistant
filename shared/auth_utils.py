@@ -192,14 +192,12 @@ def show_user_sidebar(auth_manager: AuthManager):
         
         # Credits info
         st.markdown("### Credits")
-        if user_data.get('free_analyses_remaining', 0) > 0:
-            st.info(f" {user_data['free_analyses_remaining']} free analyses remaining")
-        
+        # Removed free analyses system - now using wallet credits only
         credits_balance = user_data.get('credits_balance', 0)
         if credits_balance > 0:
-            st.info(f"You have ${credits_balance:.2f} in credits")
+            st.info(f"💳 Wallet Balance: \\${credits_balance:.2f}")
         else:
-            st.warning("You have $0.00 in credits")
+            st.warning("💳 Wallet Balance: \\$0.00")
         
         # Action buttons
         col1, col2 = st.columns(2)
@@ -220,11 +218,10 @@ def show_credits_warning(required_credits: float, auth_manager: AuthManager):
             f"""
             **Insufficient Credits for Analysis**
             
-            This analysis requires **${required_credits:.2f}** in credits.
+            This analysis requires **\\${required_credits:.2f}** in credits.
             
             **Your current balance:**
-            - Free analyses: {credits_info.get('free_analyses_remaining', 0)}
-            - Paid credits: ${credits_info.get('credits_balance', 0):.2f}
+            - Wallet credits: \\${credits_info.get('credits_balance', 0):.2f}
             
             **Next steps:**
             1. [Add credits to your account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html)

@@ -69,17 +69,17 @@ class WalletManager:
         Returns:
             Selected top-up amount or None if no selection made
         """
-        st.subheader("💳 Add Credits to Wallet")
+        st.subheader("💳 Add Credits to Your Account")
         
         # Show current balance and requirement
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Current Balance", f"${current_balance:.2f}")
+            st.metric("Current Balance", f"\${current_balance:.2f}")
         
         if required_amount:
             with col2:
                 needed = max(0, required_amount - current_balance)
-                st.metric("Amount Needed", f"${needed:.2f}")
+                st.metric("Amount Needed", f"\${needed:.2f}")
         
         # Get credit packages
         credit_packages = get_credit_packages()
@@ -91,16 +91,16 @@ class WalletManager:
         selected_fixed_amount = None
         for i, package in enumerate(credit_packages):
             with fixed_cols[i]:
-                if st.button(f"${package['amount']}", key=f"credit_{package['amount']}", use_container_width=True):
+                if st.button(f"\${package['amount']}", key=f"credit_{package['amount']}", use_container_width=True):
                     selected_fixed_amount = package['amount']
         
         # Custom amount option
-        st.write("**Or Enter Custom Amount:**")
+        st.write("**Or Enter Custom Amount ($):**")
         col1, col2 = st.columns([3, 1])
         
         with col1:
             custom_amount = st.number_input(
-                "Custom Amount ($)",
+                label="Custom Amount ($)",
                 min_value=10.0,
                 max_value=2000.0,
                 step=5.0,
@@ -149,7 +149,7 @@ class WalletManager:
                     'transaction_id': data.get('transaction_id'),
                     'new_balance': data.get('new_balance', 0.0),
                     'amount_added': amount,
-                    'message': f"✅ Successfully added ${amount:.2f} to your wallet!"
+                    'message': f"✅ Successfully added \${amount:.2f} to your wallet!"
                 }
             else:
                 logger.error(f"Credit purchase failed: {response.status_code} - {response.text}")
