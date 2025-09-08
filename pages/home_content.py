@@ -86,6 +86,9 @@ with row1[0]:
         if st.button("Start ASC 606 Analysis", key="asc606_btn", use_container_width=True):
             st.info("ℹ️ Navigate to **ASC 606: Rev Rec** in the sidebar to begin your analysis!")
 
+
+
+
 # ASC 340-40
 with row1[1]:
     with st.container(border=True, key="my_box1"):
