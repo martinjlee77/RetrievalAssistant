@@ -7,38 +7,33 @@ Easy to update pricing without touching code
 PRICING_TIERS = {
     1: {
         "name": "Short",
-        "price": 9.00,
+        "price": 4.00,
         "max_words": 2000,
-        "description": "Basic contracts and simple agreements",
-        "per_1k_rate": 4.50
+        "description": "Basic contracts and simple agreements"
     },
     2: {
         "name": "Medium", 
-        "price": 19.00,
+        "price": 6.00,
         "max_words": 5000,
-        "description": "Standard business contracts",
-        "per_1k_rate": 3.80
+        "description": "Standard business contracts"
     },
     3: {
         "name": "Large",
-        "price": 35.00,
+        "price": 10.00,
         "max_words": 10000,
-        "description": "Complex agreements with multiple terms",
-        "per_1k_rate": 3.50
+        "description": "Complex agreements with multiple terms"
     },
     4: {
         "name": "Extensive",
-        "price": 59.00,
+        "price": 18.00,
         "max_words": 20000,
-        "description": "Large enterprise agreements",
-        "per_1k_rate": 2.95
+        "description": "Large enterprise agreements"
     },
     5: {
         "name": "Enterprise",
-        "price": 119.00,
-        "max_words": 50000,
-        "description": "Enterprise-scale document sets",
-        "per_1k_rate": 2.38
+        "price": 30.00,
+        "max_words": float('inf'),
+        "description": "Enterprise-scale document sets"
     }
 }
 
