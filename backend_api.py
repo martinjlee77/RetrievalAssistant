@@ -41,10 +41,9 @@ def serve_streamlit_app():
         streamlit_url = 'http://localhost:3002'
     else:
         # Replit environment: use external domain with port 3002
-        if ':5000' in host:
-            streamlit_host = host.replace(':5000', ':3002')
-        elif 'replit.dev' in host:
-            streamlit_host = host.replace('.replit.dev', '-3002.replit.dev') 
+        # Remove existing port if present, then add :3002
+        if ':' in host:
+            streamlit_host = host.split(':')[0] + ':3002'
         else:
             streamlit_host = host + ':3002'
         streamlit_url = f'https://{streamlit_host}'
