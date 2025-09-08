@@ -1045,6 +1045,80 @@ def user_purchase_credits():
         logger.error(f"Purchase credits error: {e}")
         return jsonify({'success': False, 'error': 'Failed to purchase credits'}), 500
 
+@app.route('/api/user/charge-wallet', methods=['POST'])
+def charge_wallet():
+    """Charge user's wallet for analysis"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        charge_amount = data.get('charge_amount')
+        
+        if not charge_amount or charge_amount <= 0:
+            return jsonify({'error': 'Invalid charge amount'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Check if user has sufficient balance
+        cursor.execute("""
+            SELECT credits_balance FROM users WHERE id = %s
+        """, (user_id,))
+        
+        result = cursor.fetchone()
+        if not result:
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+        
+        current_balance = float(result['credits_balance'])
+        
+        if current_balance < charge_amount:
+            conn.close()
+            return jsonify({'error': f'Insufficient balance. You have ${current_balance:.2f}, need ${charge_amount:.2f}'}), 400
+        
+        # Deduct credits from user's balance
+        new_balance = current_balance - charge_amount
+        cursor.execute("""
+            UPDATE users 
+            SET credits_balance = %s
+            WHERE id = %s
+        """, (new_balance, user_id))
+        
+        # Record charge transaction
+        cursor.execute("""
+            INSERT INTO credit_transactions (user_id, amount, reason, transaction_date)
+            VALUES (%s, %s, %s, NOW())
+        """, (user_id, -charge_amount, f"analysis_charge_{data.get('analysis_type', 'unknown')}"))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"User {user_id} charged ${charge_amount}. New balance: ${new_balance}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully charged ${charge_amount:.2f}',
+            'charge_amount': charge_amount,
+            'remaining_balance': new_balance,
+            'transaction_id': f'charge_{user_id}_{int(datetime.now().timestamp())}'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Charge wallet error: {e}")
+        return jsonify({'error': 'Failed to charge wallet'}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""

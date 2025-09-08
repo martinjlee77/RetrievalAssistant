@@ -102,7 +102,6 @@ def render_asc606_page():
         
         # Analysis section
         if can_proceed:
-            st.markdown("---")
             warning_placeholder = st.empty()  # Create a placeholder for the warning
             warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
@@ -140,7 +139,8 @@ def get_asc606_inputs_new():
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload revenue contracts, agreements, or amendments for ASC 606 analysis",
-        key=f"asc606_uploader_{st.session_state.get('file_uploader_key', 0)}"
+        key=f"asc606_uploader_{st.session_state.get('file_uploader_key', 0)}",
+        label_visibility="visible"
     )
 
     # Additional info (optional)
@@ -149,8 +149,26 @@ def get_asc606_inputs_new():
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
         height=100)
 
-    # Check completion status - only files required
-    is_ready = uploaded_files is not None and len(uploaded_files) > 0
+    # Custom file size validation (50MB limit per our business rules)
+    MAX_FILE_SIZE_MB = 50
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if uploaded_files:
+        # Validate file sizes
+        oversized_files = []
+        for file in uploaded_files:
+            if file.size > MAX_FILE_SIZE_BYTES:
+                oversized_files.append(f"{file.name} ({file.size / (1024*1024):.1f}MB)")
+        
+        if oversized_files:
+            st.error(f"❌ **File size limit exceeded (50MB maximum):**\n" + 
+                    "\n".join([f"• {f}" for f in oversized_files]))
+            st.info("💡 **Tip:** The widget shows 200MB (Streamlit's technical limit), but our business limit is 50MB per file.")
+            is_ready = False
+        else:
+            is_ready = True
+    else:
+        is_ready = False
     
     return uploaded_files, additional_context, is_ready
 

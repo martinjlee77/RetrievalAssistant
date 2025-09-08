@@ -114,11 +114,13 @@ class PreflightPricing:
     def _format_billing_summary(self, tier_info: Dict[str, Any], total_words: int, estimated_pages: int, file_count: int) -> str:
         """Format billing summary for user display"""
         return f"""
+**This analysis will cost :blue[\\${tier_info['price']:.2f}] based on the following factors:**
 
-- **Document Analysis:** {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
-- **Estimated Pages:** ~{estimated_pages} pages (at 300 words/page)
-- **Pricing Tier:** {tier_info['name']} (up to {tier_info['max_words']:,} words)
-- :blue[**Analysis Cost: \\${tier_info['price']:.2f}**]
+- Document analysis: {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
+- Pricing tier: {tier_info['name']} (up to {tier_info['max_words']:,} words)
+- Just FYI, estimated pages: ~{estimated_pages} pages (at 300 words/page)
+
+
 
         """.strip()
     
