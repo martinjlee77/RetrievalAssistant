@@ -457,14 +457,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
              
-        # Clear completion message before displaying memo content
-        completion_message_placeholder.empty()
-        
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        # Display instructions directly (not in placeholder to persist across reruns)
-        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        with st.container(border=True):
+            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -473,6 +470,9 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
+        
+        # Clear completion message immediately after memo displays
+        completion_message_placeholder.empty()
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
             # Clear analysis state for fresh start with session isolation
@@ -484,6 +484,11 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
                 del st.session_state[memo_key]
             if analysis_key in st.session_state:
                 del st.session_state[analysis_key]
+            
+            # Clear all file-related session state to force file uploader reset
+            keys_to_remove = [key for key in st.session_state.keys() if 'contract_files' in key or 'upload' in key]
+            for key in keys_to_remove:
+                del st.session_state[key]
             
             logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
             st.rerun()
