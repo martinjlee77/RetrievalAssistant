@@ -8,6 +8,11 @@ import logging
 from datetime import datetime
 from typing import Dict, Any
 from shared.disclaimer_generator import DisclaimerGenerator
+import weasyprint
+from docx import Document
+from docx.shared import Inches
+import tempfile
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -123,8 +128,85 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
+    def _generate_pdf(self, memo_content: str) -> bytes:
+        """Generate PDF from memo content using WeasyPrint."""
+        try:
+            # Convert markdown to HTML
+            html_content = self._convert_markdown_to_html(memo_content)
+            
+            # Add CSS styling for professional look
+            css_styled_html = f"""
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
+                    h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
+                    h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
+                    h3 {{ color: #5d6d7e; }}
+                    p {{ margin: 12px 0; }}
+                    ul {{ margin: 10px 0; padding-left: 25px; }}
+                    li {{ margin: 5px 0; }}
+                    .disclaimer {{ font-size: 10px; color: #7f8c8d; margin-top: 30px; }}
+                </style>
+            </head>
+            <body>
+                {html_content}
+            </body>
+            </html>
+            """
+            
+            # Generate PDF
+            pdf_bytes = weasyprint.HTML(string=css_styled_html).write_pdf()
+            return pdf_bytes
+        except Exception as e:
+            logger.error(f"PDF generation failed: {e}")
+            return None
+
+    def _generate_docx(self, memo_content: str) -> bytes:
+        """Generate DOCX from memo content using python-docx."""
+        try:
+            doc = Document()
+            
+            # Process content line by line
+            lines = memo_content.split('\n')
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                    
+                # Headers
+                if line.startswith('# '):
+                    heading = doc.add_heading(line[2:], level=1)
+                elif line.startswith('## '):
+                    heading = doc.add_heading(line[3:], level=2)
+                elif line.startswith('### '):
+                    heading = doc.add_heading(line[4:], level=3)
+                # Bold text
+                elif line.startswith('**') and line.endswith('**'):
+                    p = doc.add_paragraph()
+                    p.add_run(line[2:-2]).bold = True
+                # Bullet points
+                elif line.startswith('- '):
+                    doc.add_paragraph(line[2:], style='List Bullet')
+                # Regular paragraphs
+                else:
+                    # Remove markdown formatting
+                    clean_line = line.replace('**', '').replace('*', '')
+                    doc.add_paragraph(clean_line)
+            
+            # Save to bytes
+            with tempfile.NamedTemporaryFile() as tmp_file:
+                doc.save(tmp_file.name)
+                tmp_file.seek(0)
+                return tmp_file.read()
+                
+        except Exception as e:
+            logger.error(f"DOCX generation failed: {e}")
+            return None
+
     def display_clean_memo(self, memo_content: str) -> None:
-        """Display clean memo content using HTML to preserve formatting."""
+        """Display clean memo content with enhanced download options."""
         
         # Validate memo content
         if not memo_content or memo_content.strip() == "":
@@ -134,33 +216,93 @@ class CleanMemoGenerator:
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
+        # Enhanced Download Section - BEFORE memo display
+        if memo_content and len(memo_content.strip()) > 10:
+            st.markdown("### 💾 Save Your Memo")
+            st.info("**Important:** Save your memo before navigating away or refreshing the page.")
+            
+            # Create columns for download buttons
+            col1, col2, col3, col4 = st.columns(4)
+            
+            # Generate timestamp for consistent filenames
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            base_filename = f"asc606_memo_{timestamp}"
+            
+            with col1:
+                # Markdown download (existing)
+                st.download_button(
+                    label="📄 Markdown",
+                    data=memo_content,
+                    file_name=f"{base_filename}.md",
+                    mime="text/markdown",
+                    key=f"download_md_{hash(memo_content[:100])}",
+                    use_container_width=True
+                )
+            
+            with col2:
+                # PDF download
+                pdf_data = self._generate_pdf(memo_content)
+                if pdf_data:
+                    st.download_button(
+                        label="📄 PDF",
+                        data=pdf_data,
+                        file_name=f"{base_filename}.pdf",
+                        mime="application/pdf",
+                        key=f"download_pdf_{hash(memo_content[:100])}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("📄 PDF", disabled=True, use_container_width=True, help="PDF generation failed")
+            
+            with col3:
+                # DOCX download
+                docx_data = self._generate_docx(memo_content)
+                if docx_data:
+                    st.download_button(
+                        label="📄 Word",
+                        data=docx_data,
+                        file_name=f"{base_filename}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key=f"download_docx_{hash(memo_content[:100])}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
+            
+            with col4:
+                # One-click copy button with JavaScript
+                copy_key = f"copy_{hash(memo_content[:100])}"
+                if st.button("📋 Copy All", use_container_width=True, key=copy_key):
+                    # Create JavaScript component to copy to clipboard
+                    copy_js = f"""
+                    <script>
+                        function copyToClipboard() {{
+                            const textToCopy = `{memo_content.replace('`', '\\`').replace('$', '\\$')}`;
+                            navigator.clipboard.writeText(textToCopy).then(function() {{
+                                alert('Memo copied to clipboard!');
+                            }}).catch(function(err) {{
+                                // Fallback for older browsers
+                                const textArea = document.createElement("textarea");
+                                textArea.value = textToCopy;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                alert('Memo copied to clipboard!');
+                            }});
+                        }}
+                        copyToClipboard();
+                    </script>
+                    """
+                    st.components.v1.html(copy_js, height=0)
+                    
+            st.markdown("---")
+        
         # Convert markdown to HTML manually to bypass Streamlit's markdown processor
         html_content = self._convert_markdown_to_html(memo_content)
         
         # Use HTML display which preserves formatting
         st.markdown(html_content, unsafe_allow_html=True)
-        
-        # Add blank line for spacing
-        st.markdown("")
-        
-        # Download button - only show if content exists and session state is preserved
-        # Check for session-isolated memo data
-        session_id = st.session_state.get('user_session_id', '')
-        memo_key = f'asc606_memo_data_{session_id}' if session_id else 'asc606_memo_data'
-        analysis_key = f'asc606_analysis_complete_{session_id}' if session_id else 'asc606_analysis_complete'
-        
-        if memo_content and len(memo_content.strip()) > 10:  # Minimal validation - always allow download for any real content
-            # Don't modify session state here to avoid triggering reruns that clear instructions
-            
-            st.download_button(
-                label="📥 Download Memo (Markdown)",
-                data=memo_content,
-                file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                mime="text/markdown",
-                key=f"memo_download_{hash(memo_content[:100])}"  # Unique key prevents conflicts
-            )
-        else:
-            st.warning("Memo content too short for download. Please regenerate the analysis.")
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

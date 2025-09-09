@@ -30,9 +30,6 @@ def render_asc606_page():
     if not require_authentication():
         return  # User will see login page
     
-    # DEBUG: Test if updated code is loading
-    st.write("🔧 DEBUG: Page loaded with updated code v3")
-    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
@@ -44,55 +41,6 @@ def render_asc606_page():
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():
         return  # User has active analysis, show warning and exit
-    
-    # CRITICAL FIX: Check for existing completed analysis in session state
-    session_id = st.session_state.get('user_session_id', '')
-    if session_id:
-        analysis_key = f'asc606_analysis_complete_{session_id}'
-        memo_key = f'asc606_memo_data_{session_id}'
-        
-        # If analysis is complete and memo exists, show results instead of file upload
-        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
-            st.success("✅ **Analysis Complete!**")
-            st.markdown("### 📄 Generated ASC 606 Memo")
-            
-            # Display the existing memo
-            from asc606.clean_memo_generator import CleanMemoGenerator
-            memo_generator = CleanMemoGenerator()
-            memo_content = st.session_state[memo_key]
-            memo_generator.display_clean_memo(memo_content)
-            
-            # DEBUG: Show current session state
-            all_keys = list(st.session_state.keys())
-            file_keys = [k for k in all_keys if 'upload' in k.lower() or 'file' in k.lower() or 'asc606' in k.lower()]
-            st.write(f"🔧 Current file-related keys: {file_keys}")
-            
-            # Add "Analyze Another Contract" button
-            st.markdown("---")
-            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                st.write("🔧 BUTTON CLICKED! Starting cleanup...")
-                
-                # Clear ALL file-related keys more aggressively
-                keys_to_delete = []
-                for key in list(st.session_state.keys()):
-                    if any(word in key.lower() for word in ['upload', 'file', 'asc606', 'contract']):
-                        keys_to_delete.append(key)
-                
-                st.write(f"🔧 Will delete these keys: {keys_to_delete}")
-                
-                # Delete all found keys
-                for key in keys_to_delete:
-                    if key in st.session_state:
-                        del st.session_state[key]
-                        st.write(f"🔧 Deleted: {key}")
-                
-                # Force reset file uploader key
-                st.session_state.file_uploader_key = 8888
-                st.write(f"🔧 Set file_uploader_key to: {st.session_state.file_uploader_key}")
-                
-                st.write("🔧 About to rerun...")
-                st.rerun()
-            return  # Exit early, don't show file upload interface
     
     # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
@@ -898,7 +846,6 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
                             # Reset analysis state for new analysis including file uploaders
                             keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
-                            logger.info(f"DEBUG: Clearing keys: {keys_to_clear}")
                             for key in keys_to_clear:
                                 del st.session_state[key]
                             st.rerun()
