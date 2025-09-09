@@ -40,13 +40,13 @@ waitForPort = 5000
 name = "VeritasLogic Website"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python backend_api.py --port 3000"
 waitForPort = 3000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[ports]]
 localPort = 3000
