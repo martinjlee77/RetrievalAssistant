@@ -134,19 +134,21 @@ class CleanMemoGenerator:
             # Convert markdown to HTML
             html_content = self._convert_markdown_to_html(memo_content)
             
-            # Add CSS styling for professional look
+            # Add CSS styling for professional look with better margins
             css_styled_html = f"""
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
+                    body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
                     h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
                     h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
                     h3 {{ color: #5d6d7e; }}
+                    h4 {{ color: #7f8c8d; font-size: 12px; }} 
                     p {{ margin: 12px 0; }}
                     ul {{ margin: 10px 0; padding-left: 25px; }}
                     li {{ margin: 5px 0; }}
-                    .disclaimer {{ font-size: 10px; color: #7f8c8d; margin-top: 30px; }}
+                    small {{ font-size: 11px; }}
+                    .disclaimer {{ font-size: 11px; color: #7f8c8d; margin-top: 30px; }}
                 </style>
             </head>
             <body>
@@ -162,13 +164,28 @@ class CleanMemoGenerator:
             logger.error(f"PDF generation failed: {e}")
             return None
 
+    def _clean_html_tags(self, text: str) -> str:
+        """Remove HTML tags from text for clean DOCX output."""
+        import re
+        # Remove common HTML tags
+        text = re.sub(r'<small[^>]*>', '', text)
+        text = re.sub(r'</small>', '', text)
+        text = re.sub(r'<em[^>]*>', '', text)
+        text = re.sub(r'</em>', '', text)
+        text = re.sub(r'<br[^>]*>', '\n', text)
+        text = re.sub(r'</br>', '', text)
+        return text.strip()
+
     def _generate_docx(self, memo_content: str) -> bytes:
         """Generate DOCX from memo content using python-docx."""
         try:
             doc = Document()
             
+            # Clean HTML tags from content first
+            clean_content = self._clean_html_tags(memo_content)
+            
             # Process content line by line
-            lines = memo_content.split('\n')
+            lines = clean_content.split('\n')
             
             for line in lines:
                 line = line.strip()

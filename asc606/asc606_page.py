@@ -56,7 +56,9 @@ def render_asc606_page():
             # Display the existing memo with enhanced downloads
             from asc606.clean_memo_generator import CleanMemoGenerator
             memo_generator = CleanMemoGenerator()
-            memo_content = st.session_state[memo_key]
+            memo_data = st.session_state[memo_key]
+            # Extract memo content from stored dictionary
+            memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
             memo_generator.display_clean_memo(memo_content)
             
             # Add "Analyze Another Contract" button
