@@ -580,25 +580,27 @@
             
             console.log('Container found, clearing and adding packages...');
             container.innerHTML = `
-                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
-                    <h4 style="color: #667eea;">$50</h4>
-                    <p>50 Credits</p>
-                    <p class="package-desc">Basic Package</p>
-                </div>
-                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
-                    <h4 style="color: #667eea;">$100</h4>
-                    <p>100 Credits</p>
-                    <p class="package-desc">Standard Package</p>
-                </div>
-                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
-                    <h4 style="color: #667eea;">$250</h4>
-                    <p>250 Credits</p>
-                    <p class="package-desc">Professional Package</p>
-                </div>
-                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
-                    <h4 style="color: #667eea;">$500</h4>
-                    <p>500 Credits</p>
-                    <p class="package-desc">Enterprise Package</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert('$50 package selected')">
+                        <h4 style="color: #667eea; margin: 0 0 10px 0;">$50</h4>
+                        <p style="margin: 0;">50 Credits</p>
+                        <p style="margin: 5px 0 0 0; color: #666;">Basic Package</p>
+                    </div>
+                    <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert('$100 package selected')">
+                        <h4 style="color: #667eea; margin: 0 0 10px 0;">$100</h4>
+                        <p style="margin: 0;">100 Credits</p>
+                        <p style="margin: 5px 0 0 0; color: #666;">Standard Package</p>
+                    </div>
+                    <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert('$250 package selected')">
+                        <h4 style="color: #667eea; margin: 0 0 10px 0;">$250</h4>
+                        <p style="margin: 0;">250 Credits</p>
+                        <p style="margin: 5px 0 0 0; color: #666;">Professional Package</p>
+                    </div>
+                    <div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert('$500 package selected')">
+                        <h4 style="color: #667eea; margin: 0 0 10px 0;">$500</h4>
+                        <p style="margin: 0;">500 Credits</p>
+                        <p style="margin: 5px 0 0 0; color: #666;">Enterprise Package</p>
+                    </div>
                 </div>
             `;
             
