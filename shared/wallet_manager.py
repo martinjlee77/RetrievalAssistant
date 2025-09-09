@@ -58,18 +58,15 @@ class WalletManager:
                 'balance': 0.0
             }
     
-    def show_wallet_top_up_options(self, current_balance: float, required_amount: float = None) -> Optional[float]:
+    def show_wallet_top_up_options(self, current_balance: float, required_amount: float = None) -> None:
         """
-        Display wallet top-up options with both fixed and custom amounts
+        Display wallet top-up redirect to dashboard
         
         Args:
             current_balance: User's current credit balance
             required_amount: Amount needed for pending analysis
-            
-        Returns:
-            Selected top-up amount or None if no selection made
         """
-        st.subheader(":primary[Add to Your Account Balance]")
+        st.subheader(":primary[Add Credits to Your Account]")
         
         # Show current balance and requirement
         col1, col2 = st.columns(2)
@@ -81,91 +78,60 @@ class WalletManager:
                 needed = max(0, required_amount - current_balance)
                 st.metric("Amount Needed", f"${needed:.2f}")
         
-        # Get credit packages
-        credit_packages = get_credit_packages()
+        # Redirect to dashboard for secure payment
+        st.info("💳 **Secure Payment Available**")
+        st.write("For your security and convenience, all credit purchases are processed through our secure dashboard.")
         
-        # Fixed amount options
-        st.write("**Quick Top-Up Options:**")
-        fixed_cols = st.columns(len(credit_packages))
+        # Create redirect button
+        dashboard_url = "http://127.0.0.1:3000/dashboard.html#credits"
         
-        selected_fixed_amount = None
-        for i, package in enumerate(credit_packages):
-            with fixed_cols[i]:
-                if st.button(f"\${package['amount']}", key=f"credit_{package['amount']}", use_container_width=True):
-                    selected_fixed_amount = package['amount']
+        st.markdown(f"""
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="{dashboard_url}" target="_blank">
+                <button style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 30px;
+                    font-size: 16px;
+                    font-weight: bold;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    text-decoration: none;
+                    display: inline-block;
+                    transition: transform 0.2s;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    🔒 Add Credits Securely
+                </button>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
         
-        # Custom amount option
-        st.write("**Or Enter Custom Amount ($):**")
-        col1, col2 = st.columns([3, 1])
+        st.write("**Available payment options in dashboard:**")
+        st.write("• 💳 Credit/Debit Cards (Visa, Mastercard, Amex)")
+        st.write("• 📦 Quick packages: $50, $100, $250, $500")
+        st.write("• ✏️ Custom amounts: $10 - $1,000")
+        st.write("• 🔐 Secure Stripe processing")
         
-        with col1:
-            custom_amount = st.number_input(
-                label="Custom Amount ($)",
-                min_value=10.0,
-                max_value=2000.0,
-                step=5.0,
-                value=max(10.0, required_amount - current_balance) if required_amount else 50.0,
-                key="custom_credit_amount"
-            )
-        
-        with col2:
-            st.write("")  # Spacing
-            st.write("")  # Spacing  
-            if st.button("Add Custom", key="add_custom_credits", use_container_width=True):
-                return custom_amount
-        
-        return selected_fixed_amount
+        return None
     
     def process_credit_purchase(self, user_token: str, amount: float) -> Dict[str, Any]:
         """
-        Process credit purchase transaction
+        DEPRECATED: Credit purchases now handled through dashboard
         
         Args:
             user_token: User authentication token
             amount: Amount of credits to purchase
             
         Returns:
-            Dict containing transaction result
+            Dict containing redirect instruction
         """
-        try:
-            purchase_data = {
-                'credit_amount': amount,
-                'payment_method': 'wallet_topup',  # Simplified for now
-                'source': 'streamlit_app'
-            }
-            
-            response = requests.post(
-                f"{self.backend_url}/user/purchase-credits",
-                headers={'Authorization': f'Bearer {user_token}'},
-                json=purchase_data,
-                timeout=15
-            )
-            
-            if response.ok:
-                data = response.json()
-                logger.info(f"Successfully purchased ${amount} credits")
-                return {
-                    'success': True,
-                    'transaction_id': data.get('transaction_id'),
-                    'new_balance': data.get('new_balance', 0.0),
-                    'amount_added': amount,
-                    'message': f"✅ Successfully added \${amount:.2f} to your wallet!"
-                }
-            else:
-                logger.error(f"Credit purchase failed: {response.status_code} - {response.text}")
-                return {
-                    'success': False,
-                    'error': f'Purchase failed: {response.text}',
-                    'message': f"❌ Failed to add credits. Please try again."
-                }
-                
-        except Exception as e:
-            logger.error(f"Error processing credit purchase: {e}")
-            return {
-                'success': False,
-                'error': str(e),
-                'message': "❌ Network error during purchase. Please try again."
-            }
+        return {
+            'success': False,
+            'redirect_required': True,
+            'message': "Please use the secure dashboard to add credits to your account.",
+            'dashboard_url': "http://127.0.0.1:3000/dashboard.html#credits"
+        }
     
     def charge_for_analysis(self, user_token: str, amount: float, analysis_details: Dict[str, Any]) -> Dict[str, Any]:
         """
