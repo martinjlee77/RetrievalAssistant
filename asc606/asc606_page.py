@@ -460,6 +460,10 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display memo inline instead of switching pages
         st.markdown("---")
 
+        # DEBUG: Log that we're reaching this section
+        logger.info("DEBUG: About to display instruction text")
+        st.write("🔧 DEBUG: Instruction display code reached")
+        
         # Test with simple info first
         st.info("🎉 **Analysis Complete!** Your ASC 606 memo is displayed below. Copy and paste the text or use the download button.")
         
@@ -489,10 +493,23 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
             if analysis_key in st.session_state:
                 del st.session_state[analysis_key]
             
+            # DEBUG: Show all session state keys before clearing
+            all_keys = list(st.session_state.keys())
+            logger.info(f"DEBUG: All session keys before clearing: {all_keys}")
+            st.write(f"🔧 DEBUG: Session keys before: {[k for k in all_keys if 'upload' in k or 'file' in k or 'asc606' in k]}")
+            
             # Clear all file-related session state to force file uploader reset
             keys_to_remove = [key for key in st.session_state.keys() if 'contract_files' in key or 'asc606_uploader' in key or 'upload' in key]
+            logger.info(f"DEBUG: Keys to remove: {keys_to_remove}")
+            st.write(f"🔧 DEBUG: Removing keys: {keys_to_remove}")
+            
             for key in keys_to_remove:
                 del st.session_state[key]
+            
+            # DEBUG: Show remaining keys after clearing
+            remaining_keys = [k for k in st.session_state.keys() if 'upload' in k or 'file' in k or 'asc606' in k]
+            logger.info(f"DEBUG: File-related keys after clearing: {remaining_keys}")
+            st.write(f"🔧 DEBUG: File keys remaining: {remaining_keys}")
             
             logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
             st.rerun()
@@ -845,14 +862,25 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         st.session_state[memo_key] = memo_result
                         st.session_state[analysis_key] = True
                         
+                        # Add instruction text before the memo
+                        st.info("🎉 **Analysis Complete!** Your ASC 606 memo is displayed below. Copy and paste the text or use the download button.")
+                        
+                        with st.container(border=True):
+                            st.markdown("""📋 **Instructions:** Your ASC 606 memo is displayed below. To save the results, you can either:
+                            
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
+- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
+                                """)
+                        
                         # Use the CleanMemoGenerator's display method
                         memo_generator.display_clean_memo(memo_result)
                         
                         # Add "Analyze Another Contract" button
                         st.markdown("---")
                         if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                            # Reset analysis state for new analysis
-                            keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower()]
+                            # Reset analysis state for new analysis including file uploaders
+                            keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
+                            logger.info(f"DEBUG: Clearing keys: {keys_to_clear}")
                             for key in keys_to_clear:
                                 del st.session_state[key]
                             st.rerun()
