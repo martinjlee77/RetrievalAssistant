@@ -30,6 +30,9 @@ def render_asc606_page():
     if not require_authentication():
         return  # User will see login page
     
+    # DEBUG: Test if updated code is loading
+    st.write("🔧 DEBUG: Page loaded with updated code v3")
+    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
@@ -62,18 +65,10 @@ def render_asc606_page():
             # Add "Analyze Another Contract" button
             st.markdown("---")
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                # DEBUG: Show what we're clearing
-                all_keys = list(st.session_state.keys())
-                file_keys = [k for k in all_keys if 'upload' in k.lower() or 'file' in k.lower() or 'asc606' in k.lower()]
-                st.write(f"🔧 CLEARING FROM BUTTON #1: {file_keys}")
-                
-                # Reset analysis state for new analysis - CLEAR ALL FILE KEYS
-                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
+                # Reset analysis state for new analysis
+                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower()]
                 for key in keys_to_clear:
                     del st.session_state[key]
-                
-                # Force reset file uploader key
-                st.session_state.file_uploader_key = 999
                 st.rerun()
             return  # Exit early, don't show file upload interface
     
@@ -853,7 +848,6 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                     # memo_result is a string (markdown content), not a dict
                     if memo_result:
-                        st.markdown("### 📄 Generated ASC 606 Memo")
                         
                         # Store memo in session state for persistence
                         if 'user_session_id' not in st.session_state:
