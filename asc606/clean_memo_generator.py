@@ -273,11 +273,14 @@ class CleanMemoGenerator:
                 # One-click copy button with JavaScript
                 copy_key = f"copy_{hash(memo_content[:100])}"
                 if st.button("📋 Copy All", use_container_width=True, key=copy_key):
+                    # Escape content for JavaScript
+                    escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
+                    
                     # Create JavaScript component to copy to clipboard
                     copy_js = f"""
                     <script>
                         function copyToClipboard() {{
-                            const textToCopy = `{memo_content.replace('`', '\\`').replace('$', '\\$')}`;
+                            const textToCopy = `{escaped_content}`;
                             navigator.clipboard.writeText(textToCopy).then(function() {{
                                 alert('Memo copied to clipboard!');
                             }}).catch(function(err) {{
