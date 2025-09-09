@@ -569,34 +569,65 @@
             }
         }
 
-        function loadCreditPackages() {
-            console.log('=== CREDIT PACKAGES FUNCTION START ===');
+        async function loadCreditPackages() {
+            console.log('Loading credit packages...');
             
-            const container = document.getElementById('creditPackages');
-            if (!container) {
-                console.error('Container not found!');
-                return;
+            try {
+                const response = await fetch('/api/credit-packages');
+                const { packages } = await response.json();
+                
+                const container = document.getElementById('creditPackages');
+                container.innerHTML = '';
+                
+                packages.forEach(pkg => {
+                    const packageEl = document.createElement('div');
+                    packageEl.className = 'credit-package';
+                    packageEl.onclick = () => selectPackage(pkg.amount);
+                    
+                    packageEl.innerHTML = `
+                        <div class="package-amount">$${pkg.amount}</div>
+                        <div class="package-description">${pkg.display}</div>
+                        <button class="btn btn-primary" onclick="selectPackage(${pkg.amount})">
+                            Select $${pkg.amount}
+                        </button>
+                    `;
+                    container.appendChild(packageEl);
+                });
+                
+            } catch (error) {
+                console.error('Failed to load credit packages:', error);
+                // Show fallback packages
+                showFallbackPackages();
             }
-            
-            // Clear container
-            container.innerHTML = '';
-            
-            // Add simple text content without any CSS
-            container.innerHTML = `
-                <h1>CREDIT PACKAGES WORKING!</h1>
-                <p>$50 - Basic Package</p>
-                <p>$100 - Standard Package</p>
-                <p>$250 - Professional Package</p>
-                <p>$500 - Enterprise Package</p>
-                <p>Function completed successfully!</p>
-            `;
-            
-            console.log('=== CREDIT PACKAGES FUNCTION SUCCESS ===');
         }
         
         function showFallbackPackages() {
             const container = document.getElementById('creditPackages');
             if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const packages = [
+                {amount: 50, display: '50 Credits - Basic Package'},
+                {amount: 100, display: '100 Credits - Standard Package'},
+                {amount: 250, display: '250 Credits - Professional Package'},
+                {amount: 500, display: '500 Credits - Enterprise Package'}
+            ];
+            
+            packages.forEach(pkg => {
+                const packageEl = document.createElement('div');
+                packageEl.className = 'credit-package';
+                packageEl.onclick = () => selectPackage(pkg.amount);
+                
+                packageEl.innerHTML = `
+                    <div class="package-amount">$${pkg.amount}</div>
+                    <div class="package-description">${pkg.display}</div>
+                    <button class="btn btn-primary" onclick="selectPackage(${pkg.amount})">
+                        Select $${pkg.amount}
+                    </button>
+                `;
+                container.appendChild(packageEl);
+            });
             
             container.innerHTML = `
                 <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
