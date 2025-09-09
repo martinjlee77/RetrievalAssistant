@@ -858,12 +858,9 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         # Store memo data and completion state
                         st.session_state[memo_key] = memo_result
                         st.session_state[analysis_key] = True
-                        
-                        # Add instruction text before the memo
-                        st.info("🎉 **Analysis Complete!** Your ASC 606 memo is displayed below. Copy and paste the text or use the download button.")
-                        
+                                                
                         with st.container(border=True):
-                            st.markdown("""📋 **Instructions:** Your ASC 606 memo is displayed below. To save the results, you can either:
+                            st.info("""**IMPORTANT:** Your ASC 606 memo is displayed below. To save the results, you can either:
                             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -875,29 +872,11 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         # Add "Analyze Another Contract" button
                         st.markdown("---")
                         if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                            # DEBUG: Show all session state keys
-                            all_keys = list(st.session_state.keys())
-                            st.write(f"🔧 ALL KEYS: {all_keys}")
-                            
                             # Reset analysis state for new analysis including file uploaders
                             keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
-                            st.write(f"🔧 KEYS TO CLEAR: {keys_to_clear}")
                             logger.info(f"DEBUG: Clearing keys: {keys_to_clear}")
-                            
                             for key in keys_to_clear:
                                 del st.session_state[key]
-                            
-                            # Also try clearing the specific file uploader key pattern
-                            file_uploader_key = st.session_state.get('file_uploader_key', 0)
-                            specific_key = f"asc606_uploader_{file_uploader_key}"
-                            if specific_key in st.session_state:
-                                del st.session_state[specific_key]
-                                st.write(f"🔧 ALSO CLEARED: {specific_key}")
-                            
-                            # Increment the file uploader key to force new widget
-                            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-                            st.write(f"🔧 NEW UPLOADER KEY: {st.session_state.file_uploader_key}")
-                            
                             st.rerun()
                         
                     else:
