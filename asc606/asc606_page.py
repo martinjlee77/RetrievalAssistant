@@ -457,59 +457,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
              
-        # Display memo inline instead of switching pages
-        st.markdown("---")
-
-        # DEBUG: Log that we're reaching this section
-        logger.info("DEBUG: About to display instruction text")
-        st.write("🔧 DEBUG: Instruction display code reached")
-              
-        # Original container (keeping for debugging)
-        with st.container(border=True):
-            st.info("""📋 **INSTRUCTIONS:** Your ASC 606 memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
-                """)
-        
-        # Display the memo using CleanMemoGenerator
-        memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
-        
-        # Clear completion message immediately after memo displays
-        completion_message_placeholder.empty()
-        
-        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-            # Clear analysis state for fresh start with session isolation
-            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-            
-            # Clean up session-specific data
-            memo_key = f'asc606_memo_data_{session_id}'
-            if memo_key in st.session_state:
-                del st.session_state[memo_key]
-            if analysis_key in st.session_state:
-                del st.session_state[analysis_key]
-            
-            # DEBUG: Show all session state keys before clearing
-            all_keys = list(st.session_state.keys())
-            logger.info(f"DEBUG: All session keys before clearing: {all_keys}")
-            st.write(f"🔧 DEBUG: Session keys before: {[k for k in all_keys if 'upload' in k or 'file' in k or 'asc606' in k]}")
-            
-            # Clear all file-related session state to force file uploader reset
-            keys_to_remove = [key for key in st.session_state.keys() if 'contract_files' in key or 'asc606_uploader' in key or 'upload' in key]
-            logger.info(f"DEBUG: Keys to remove: {keys_to_remove}")
-            st.write(f"🔧 DEBUG: Removing keys: {keys_to_remove}")
-            
-            for key in keys_to_remove:
-                del st.session_state[key]
-            
-            # DEBUG: Show remaining keys after clearing
-            remaining_keys = [k for k in st.session_state.keys() if 'upload' in k or 'file' in k or 'asc606' in k]
-            logger.info(f"DEBUG: File-related keys after clearing: {remaining_keys}")
-            st.write(f"🔧 DEBUG: File keys remaining: {remaining_keys}")
-            
-            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
-            st.rerun()
 
     except Exception as e:
         # Clear the progress message even on error
