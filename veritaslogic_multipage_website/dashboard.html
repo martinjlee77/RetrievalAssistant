@@ -563,47 +563,74 @@
                 const response = await fetch('/api/credit-packages');
 
                 if (response.ok) {
-                    const packages = await response.json();
+                    const data = await response.json();
+                    const packages = data.packages || data; // Handle both response formats
                     const container = document.getElementById('creditPackages');
                     
+                    if (!container) {
+                        console.error('Credit packages container not found');
+                        return;
+                    }
+                    
                     container.innerHTML = '';
-                    packages.forEach(pkg => {
-                        const packageElement = document.createElement('div');
-                        packageElement.className = 'credit-package';
-                        packageElement.innerHTML = `
-                            <h4>$${pkg.amount}</h4>
-                            <p>${pkg.credits} Credits</p>
-                            <p class="package-desc">${pkg.description || ''}</p>
-                        `;
-                        packageElement.onclick = () => selectCreditPackage(pkg);
-                        container.appendChild(packageElement);
-                    });
+                    
+                    if (Array.isArray(packages) && packages.length > 0) {
+                        packages.forEach(pkg => {
+                            const packageElement = document.createElement('div');
+                            packageElement.className = 'credit-package';
+                            packageElement.innerHTML = `
+                                <h4>$${pkg.amount}</h4>
+                                <p>${pkg.amount} Credits</p>
+                                <p class="package-desc">${pkg.display || ''}</p>
+                            `;
+                            packageElement.onclick = () => selectCreditPackage({
+                                id: `pkg_${pkg.amount}`,
+                                amount: pkg.amount,
+                                credits: pkg.amount,
+                                title: `$${pkg.amount} Package`
+                            });
+                            container.appendChild(packageElement);
+                        });
+                    } else {
+                        // Show fallback packages
+                        showFallbackPackages(container);
+                    }
                 } else {
                     console.error('Failed to load credit packages');
+                    showFallbackPackages();
                 }
             } catch (error) {
                 console.error('Error loading credit packages:', error);
-                // Fallback to basic packages
-                const container = document.getElementById('creditPackages');
-                container.innerHTML = `
-                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
-                        <h4>$50</h4>
-                        <p>50 Credits</p>
-                    </div>
-                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
-                        <h4>$100</h4>
-                        <p>100 Credits</p>
-                    </div>
-                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
-                        <h4>$250</h4>
-                        <p>250 Credits</p>
-                    </div>
-                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
-                        <h4>$500</h4>
-                        <p>500 Credits</p>
-                    </div>
-                `;
+                showFallbackPackages();
             }
+        }
+        
+        function showFallbackPackages() {
+            const container = document.getElementById('creditPackages');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
+                    <h4>$50</h4>
+                    <p>50 Credits</p>
+                    <p class="package-desc">Basic Package</p>
+                </div>
+                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
+                    <h4>$100</h4>
+                    <p>100 Credits</p>
+                    <p class="package-desc">Standard Package</p>
+                </div>
+                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
+                    <h4>$250</h4>
+                    <p>250 Credits</p>
+                    <p class="package-desc">Professional Package</p>
+                </div>
+                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
+                    <h4>$500</h4>
+                    <p>500 Credits</p>
+                    <p class="package-desc">Enterprise Package</p>
+                </div>
+            `;
         }
 
         function loadRecentAnalyses(analyses) {
