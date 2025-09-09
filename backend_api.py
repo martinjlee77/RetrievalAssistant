@@ -952,16 +952,33 @@ def stripe_webhook():
     logger.info(f"Payload size: {len(payload)} bytes")
     logger.info(f"Signature header present: {bool(sig_header)}")
     
-    # For development, skip signature verification (add endpoint_secret in production)
-    try:
-        event = stripe.Event.construct_from(
-            request.get_json(), stripe.api_key
-        )
-        logger.info(f"Event type: {event['type']}")
-        logger.info(f"Event ID: {event.get('id', 'N/A')}")
-    except ValueError as e:
-        logger.error(f"Invalid payload in webhook: {e}")
-        return jsonify({'error': 'Invalid payload'}), 400
+    # Verify webhook signature in production
+    endpoint_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    if endpoint_secret and sig_header:
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+            logger.info("Webhook signature verified successfully")
+        except ValueError as e:
+            logger.error(f"Invalid payload: {e}")
+            return jsonify({'error': 'Invalid payload'}), 400
+        except stripe.SignatureVerificationError as e:
+            logger.error(f"Invalid signature: {e}")
+            return jsonify({'error': 'Invalid signature'}), 400
+    else:
+        # For development without signature verification
+        try:
+            event = stripe.Event.construct_from(
+                request.get_json(), stripe.api_key
+            )
+            logger.info("Using unsigned webhook (development mode)")
+        except ValueError as e:
+            logger.error(f"Invalid payload in webhook: {e}")
+            return jsonify({'error': 'Invalid payload'}), 400
+    
+    logger.info(f"Event type: {event['type']}")
+    logger.info(f"Event ID: {event.get('id', 'N/A')}")
     
     # Handle payment success
     if event['type'] == 'payment_intent.succeeded':
