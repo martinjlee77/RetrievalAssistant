@@ -463,9 +463,8 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        # Create persistent placeholder for instructions
-        instructions_placeholder = st.empty()
-        instructions_placeholder.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        # Display instructions directly (not in placeholder to persist across reruns)
+        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
