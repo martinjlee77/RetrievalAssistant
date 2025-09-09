@@ -943,25 +943,37 @@ def create_payment_intent():
 @app.route('/api/stripe/webhook', methods=['POST'])
 def stripe_webhook():
     """Handle Stripe webhook events"""
+    logger.info("=== WEBHOOK RECEIVED ===")
+    logger.info(f"Headers: {dict(request.headers)}")
+    
     payload = request.get_data()
     sig_header = request.headers.get('Stripe-Signature')
+    
+    logger.info(f"Payload size: {len(payload)} bytes")
+    logger.info(f"Signature header present: {bool(sig_header)}")
     
     # For development, skip signature verification (add endpoint_secret in production)
     try:
         event = stripe.Event.construct_from(
             request.get_json(), stripe.api_key
         )
-    except ValueError:
-        logger.error("Invalid payload in webhook")
+        logger.info(f"Event type: {event['type']}")
+        logger.info(f"Event ID: {event.get('id', 'N/A')}")
+    except ValueError as e:
+        logger.error(f"Invalid payload in webhook: {e}")
         return jsonify({'error': 'Invalid payload'}), 400
     
     # Handle payment success
     if event['type'] == 'payment_intent.succeeded':
+        logger.info("Processing payment_intent.succeeded event")
         payment_intent = event['data']['object']
         
         try:
             user_id = payment_intent['metadata']['user_id']
             credit_amount = Decimal(payment_intent['metadata']['credit_amount'])
+            payment_id = payment_intent['id']
+            
+            logger.info(f"Processing payment for user {user_id}, amount: ${credit_amount}, payment_id: {payment_id}")
             
             conn = get_db_connection()
             if not conn:
@@ -977,23 +989,45 @@ def stripe_webhook():
                 WHERE id = %s
             """, (credit_amount, user_id))
             
+            rows_affected = cursor.rowcount
+            logger.info(f"Updated {rows_affected} user records")
+            
             # Record credit purchase transaction
             from shared.pricing_config import CREDIT_EXPIRATION_MONTHS
             cursor.execute("""
                 INSERT INTO credit_transactions (user_id, amount, reason, expires_at, stripe_payment_id)
                 VALUES (%s, %s, 'stripe_purchase', NOW() + INTERVAL '%s months', %s)
-            """, (user_id, credit_amount, CREDIT_EXPIRATION_MONTHS, payment_intent['id']))
+            """, (user_id, credit_amount, CREDIT_EXPIRATION_MONTHS, payment_id))
             
             conn.commit()
             conn.close()
             
-            logger.info(f"Webhook: Successfully processed payment for user {user_id}, amount: ${credit_amount}")
+            logger.info(f"=== WEBHOOK SUCCESS: User {user_id} credited ${credit_amount} ===")
             
         except Exception as e:
             logger.error(f"Webhook processing error: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return jsonify({'error': 'Processing failed'}), 500
+    else:
+        logger.info(f"Ignoring event type: {event['type']}")
     
+    logger.info("=== WEBHOOK COMPLETE ===")
     return jsonify({'received': True}), 200
+
+@app.route('/api/stripe/webhook/test', methods=['GET', 'POST'])
+def test_webhook():
+    """Test endpoint to verify webhook accessibility"""
+    logger.info(f"=== WEBHOOK TEST CALLED - {request.method} ===")
+    logger.info(f"Headers: {dict(request.headers)}")
+    if request.method == 'POST':
+        logger.info(f"Body: {request.get_data()}")
+    return jsonify({
+        'status': 'webhook_accessible',
+        'method': request.method,
+        'timestamp': datetime.now().isoformat(),
+        'message': 'Webhook endpoint is accessible!'
+    }), 200
 
 # Credit Purchase Endpoints
 @app.route('/api/credit-packages', methods=['GET'])
