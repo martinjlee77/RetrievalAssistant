@@ -30,6 +30,36 @@
     </nav>
 
     <div class="dashboard-container" id="dashboardContent" style="padding-top: 100px;">
+        <!-- Dashboard Sidebar -->
+        <div class="dashboard-sidebar" id="dashboardSidebar" style="display: none;">
+            <div class="sidebar-header">
+                <h3>Dashboard</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" onclick="showSection('overview')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </a>
+                <a href="#credits" class="nav-item" onclick="showSection('credits')">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">Credits</span>
+                </a>
+                <a href="#profile" class="nav-item" onclick="showSection('profile')">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Profile</span>
+                </a>
+                <a href="#history" class="nav-item" onclick="showSection('history')">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">History</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary btn-sm" target="_blank">Launch Analysis</a>
+            </div>
+        </div>
+
+        <!-- Dashboard Main Content -->
+        <div class="dashboard-main" id="dashboardMain" style="display: none;">
         <!-- Loading state -->
         <div class="loading" id="loadingState">
             <p>Loading your dashboard...</p>
@@ -71,114 +101,144 @@
                     <p id="memberSince">Member since</p>
                 </div>
                 <div class="header-actions">
-                    <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
                     <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
                 </div>
             </div>
+
+            <!-- Overview Section -->
+            <div id="overviewSection" class="dashboard-section active">
             
-            <div class="dashboard-grid">
-                <!-- Credits & Usage Overview -->
-                <div class="card">
-                    <h2>💳 Account Overview</h2>
-                    
-                    <div id="freeAnalysesSection" class="free-analyses">
-                        <div class="number" id="freeAnalysesCount">3</div>
-                        <div class="label">Free Analyses Remaining</div>
-                    </div>
-                    
-                    <div class="credits-display" id="creditsSection" style="display: none;">
-                        <div class="number" id="creditsBalance">$0</div>
-                        <div class="label">Paid Credits Available</div>
-                    </div>
-                    
-                    <div class="usage-stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalAnalyses">0</div>
-                            <div class="stat-label">Total Analyses</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="thisMonth">0</div>
-                            <div class="stat-label">This Month</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="totalSpent">$0</div>
-                            <div class="stat-label">Total Spent</div>
-                        </div>
-                    </div>
-                    
-                    <button onclick="showCreditPurchase()" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
-                        💳 Add Credits to Account
-                    </button>
-                </div>
-                
-                <!-- Recent Analyses -->
-                <div class="card">
-                    <h2>📊 Recent Analyses</h2>
-                    <div id="recentAnalysesList" class="recent-analyses">
-                        <div class="empty-state">
-                            <div>📄</div>
-                            <p>No analyses yet. Ready to get started?</p>
-                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Credit Purchase Section -->
-            <div class="card credit-purchase-section" id="creditPurchaseSection" style="display: none;">
-                <h2>💳 Add Credits to Account</h2>
-                <p>Purchase additional credits to continue using our analysis platform.</p>
-                
-                <div class="credit-packages" id="creditPackages">
-                    <!-- Credit packages will be loaded here -->
-                </div>
-                
-                <div class="payment-form-container" id="paymentFormContainer" style="display: none;">
-                    <h3>Payment Details</h3>
-                    <div class="selected-package" id="selectedPackageDisplay"></div>
-                    
-                    <form id="payment-form">
-                        <div id="card-element">
-                            <!-- Stripe card element will be inserted here -->
-                        </div>
-                        <div id="card-errors" role="alert"></div>
+                <div class="dashboard-grid">
+                    <!-- Account Balance Card -->
+                    <div class="card balance-card">
+                        <h2>💳 Account Balance</h2>
                         
-                        <button type="submit" id="submit-payment" class="btn btn-primary payment-btn">
-                            <span id="button-text">Complete Payment</span>
+                        <div id="freeAnalysesSection" class="free-analyses">
+                            <div class="number" id="freeAnalysesCount">3</div>
+                            <div class="label">Free Analyses Remaining</div>
+                        </div>
+                        
+                        <div class="credits-display" id="creditsSection" style="display: none;">
+                            <div class="number" id="creditsBalance">$0</div>
+                            <div class="label">Paid Credits Available</div>
+                        </div>
+                        
+                        <button onclick="showSection('credits')" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
+                            💳 Add Credits
                         </button>
-                    </form>
+                    </div>
                     
-                    <button onclick="cancelPayment()" class="btn btn-secondary">Cancel</button>
+                    <!-- Usage Stats Card -->
+                    <div class="card stats-card">
+                        <h2>📈 Usage Statistics</h2>
+                        <div class="usage-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalAnalyses">0</div>
+                                <div class="stat-label">Total Analyses</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="thisMonth">0</div>
+                                <div class="stat-label">This Month</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalSpent">$0</div>
+                                <div class="stat-label">Total Spent</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions Card -->
+                    <div class="card actions-card">
+                        <h2>🚀 Quick Actions</h2>
+                        <div class="action-buttons">
+                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
+                            <button onclick="showSection('credits')" class="btn btn-secondary">Add Credits</button>
+                            <button onclick="showSection('history')" class="btn btn-secondary">View History</button>
+                        </div>
+                    </div>
                 </div>
-                
-                <div id="payment-messages"></div>
             </div>
-            
-            <!-- User Profile Section -->
-            <div class="card profile-section">
-                <h2>👤 Profile Information</h2>
-                <div class="profile-fields">
-                    <div class="profile-field">
-                        <span class="field-label">Email:</span>
-                        <span class="field-value" id="userEmail">-</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="field-label">Company:</span>
-                        <span class="field-value" id="userCompany">-</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="field-label">Member Since:</span>
-                        <span class="field-value" id="memberSinceDate">-</span>
-                    </div>
-                    <div class="profile-field">
-                        <span class="field-label">Account Status:</span>
-                        <span class="field-value" id="accountStatus">Active</span>
-                    </div>
+
+            <!-- Credits Section -->
+            <div id="creditsSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>💳 Manage Credits</h2>
+                    <p>Add credits to your account to continue using our analysis platform.</p>
                 </div>
+            
+                <div class="card credit-purchase-card">
+                    <h3>💳 Credit Packages</h3>
+                    <div class="credit-packages" id="creditPackages">
+                        <!-- Credit packages will be loaded here -->
+                    </div>
+                    
+                    <h3>✏️ Custom Amount</h3>
+                    <div class="custom-amount-section">
+                        <div class="custom-amount-input">
+                            <label for="customAmount">Enter amount ($10 - $1,000):</label>
+                            <div class="amount-input-group">
+                                <span class="currency-symbol">$</span>
+                                <input type="number" id="customAmount" min="10" max="1000" step="1" placeholder="50">
+                                <button onclick="selectCustomAmount()" class="btn btn-secondary">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-form-container" id="paymentFormContainer" style="display: none;">
+                        <h3>Payment Details</h3>
+                        <div class="selected-package" id="selectedPackageDisplay"></div>
+                        
+                        <form id="payment-form">
+                            <div id="card-element">
+                                <!-- Stripe card element will be inserted here -->
+                            </div>
+                            <div id="card-errors" role="alert"></div>
+                            
+                            <button type="submit" id="submit-payment" class="btn btn-primary payment-btn">
+                                <span id="button-text">Complete Payment</span>
+                            </button>
+                        </form>
+                        
+                        <button onclick="cancelPayment()" class="btn btn-secondary">Cancel</button>
+                    </div>
+                    
+                    <div id="payment-messages"></div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profileSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>👤 Profile Information</h2>
+                    <p>Manage your account settings and security.</p>
+                </div>
+            
+                <div class="profile-grid">
+                    <div class="card profile-info-card">
+                        <h3>📧 Account Information</h3>
+                        <div class="profile-fields">
+                            <div class="profile-field">
+                                <span class="field-label">Email:</span>
+                                <span class="field-value" id="userEmail">-</span>
+                            </div>
+                            <div class="profile-field">
+                                <span class="field-label">Company:</span>
+                                <span class="field-value" id="userCompany">-</span>
+                            </div>
+                            <div class="profile-field">
+                                <span class="field-label">Member Since:</span>
+                                <span class="field-value" id="memberSinceDate">-</span>
+                            </div>
+                            <div class="profile-field">
+                                <span class="field-label">Account Status:</span>
+                                <span class="field-value" id="accountStatus">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card password-card">
                 
-                <!-- Change Password Section -->
-                <div class="change-password-section">
-                    <h3>🔐 Change Password</h3>
+                        <h3>🔐 Change Password</h3>
                     <div id="changePasswordMessage"></div>
                     <form id="changePasswordForm" style="margin-top: 15px;">
                         <div class="form-group">
@@ -211,9 +271,29 @@
                         <button type="submit" class="btn btn-primary" id="changePasswordButton">
                             Update Password
                         </button>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
+
+            <!-- History Section -->
+            <div id="historySection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>📈 Analysis History</h2>
+                    <p>View your recent analyses and download reports.</p>
+                </div>
+                
+                <div class="card history-card">
+                    <div id="recentAnalysesList" class="recent-analyses">
+                        <div class="empty-state">
+                            <div>📄</div>
+                            <p>No analyses yet. Ready to get started?</p>
+                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -273,7 +353,17 @@
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('dashboardSidebar').style.display = 'block';
+            document.getElementById('dashboardMain').style.display = 'block';
             populateDashboard(userData);
+            
+            // Check for hash in URL to show specific section
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['overview', 'credits', 'profile', 'history'].includes(hash)) {
+                showSection(hash);
+            } else {
+                showSection('overview');
+            }
         }
 
         function showNetworkError() {
@@ -424,6 +514,56 @@
                 `;
                 container.appendChild(item);
             });
+        }
+
+        // Sidebar navigation functions
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + 'Section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Add active class to corresponding nav item
+            const targetNav = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+            if (targetNav) {
+                targetNav.classList.add('active');
+            }
+            
+            // Update URL hash
+            window.location.hash = sectionName;
+        }
+
+        // Custom amount functionality
+        function selectCustomAmount() {
+            const customAmount = document.getElementById('customAmount').value;
+            const amount = parseFloat(customAmount);
+            
+            if (!amount || amount < 10 || amount > 1000) {
+                alert('Please enter an amount between $10 and $1,000');
+                return;
+            }
+            
+            selectCreditPackage({
+                id: 'custom',
+                amount: amount,
+                credits: amount,
+                title: `Custom Amount: $${amount}`,
+                description: `$${amount} in credits`
+            });
+        }
+
+        // Update showCreditPurchase to work with new layout
+        function showCreditPurchase() {
+            showSection('credits');
         }
 
         function logout() {
