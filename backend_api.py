@@ -933,7 +933,7 @@ def create_payment_intent():
             'amount': amount
         }), 200
         
-    except stripe.error.StripeError as e:
+    except stripe.StripeError as e:
         logger.error(f"Stripe error: {e}")
         return jsonify({'error': 'Payment processing error'}), 500
     except Exception as e:
