@@ -1078,13 +1078,10 @@
                 if (error) {
                     showPaymentMessage(error.message, 'error');
                 } else {
-                    showPaymentMessage('Payment successful! Credits will be added to your account shortly.', 'success');
+                    showPaymentMessage('Payment successful! Updating your balance...', 'success');
                     
-                    // Hide payment form and refresh dashboard after delay
-                    setTimeout(() => {
-                        cancelPayment();
-                        window.location.reload();
-                    }, 3000);
+                    // Poll for balance update instead of blind reload
+                    pollForBalanceUpdate(selectedAmount);
                 }
                 
             } catch (error) {
@@ -1100,6 +1097,58 @@
             const container = document.getElementById('payment-messages');
             container.innerHTML = `<div class="${type}-message">${message}</div>`;
             container.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function pollForBalanceUpdate(expectedAmount) {
+            const originalBalance = parseInt(document.getElementById('creditsBalance').textContent.replace('$', '')) || 0;
+            const maxAttempts = 20; // Poll for up to 20 seconds
+            let attempts = 0;
+            
+            const checkBalance = async () => {
+                attempts++;
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/user/profile', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const data = await response.json();
+                    
+                    if (data.credits_balance > originalBalance) {
+                        // Balance updated! Show success and refresh
+                        showPaymentMessage(`Success! $${expectedAmount} credits added to your account!`, 'success');
+                        
+                        // Update the displayed balance immediately
+                        document.getElementById('creditsBalance').textContent = `$${data.credits_balance}`;
+                        
+                        // Hide payment form and refresh dashboard
+                        setTimeout(() => {
+                            cancelPayment();
+                            window.location.reload();
+                        }, 2000);
+                        return;
+                    }
+                    
+                    if (attempts < maxAttempts) {
+                        // Continue polling
+                        setTimeout(checkBalance, 1000); // Check every second
+                    } else {
+                        // Timeout - show message but still refresh
+                        showPaymentMessage('Payment processed! Refreshing dashboard...', 'success');
+                        setTimeout(() => {
+                            cancelPayment();
+                            window.location.reload();
+                        }, 2000);
+                    }
+                } catch (error) {
+                    console.error('Error checking balance:', error);
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkBalance, 1000);
+                    }
+                }
+            };
+            
+            // Start polling after 1 second delay
+            setTimeout(checkBalance, 1000);
         }
         
         // Initialize payment form handler
