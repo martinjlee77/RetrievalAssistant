@@ -107,7 +107,7 @@ def render_asc606_page():
         if credit_check['can_proceed']:
             msg = (
                 f"{credit_check['message']}\n"
-                f"After this analysis, you will have **\\${credit_check['credits_remaining']:.0f} remaining**."
+                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
             )
             credit_container.info(msg)
             can_proceed = True
@@ -140,7 +140,7 @@ def render_asc606_page():
                 "- You'll see a completion message when it's done"
             )
             
-            if st.button("3️⃣ Confirm & Start Analysis",
+            if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
@@ -167,7 +167,7 @@ def get_asc606_inputs_new():
     
     # Document upload section       
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload revenue contract documents (PDF or DOCX files, max 5 files) - **FILE SIZE LIMIT:** Widget shows 200MB but our businsss limit is 50MB per file",
+        "1️⃣ Upload revenue contract documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our businsss limit is 50MB per file (required)",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload revenue contracts, agreements, or amendments for ASC 606 analysis",

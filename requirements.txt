@@ -10,3 +10,8 @@ python-multipart==0.0.6
 requests==2.31.0
 sendgrid==6.10.0
 postmarker==1.0
+chromadb
+docx
+streamlit
+flask
+stripe

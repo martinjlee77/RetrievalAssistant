@@ -116,13 +116,11 @@ class PreflightPricing:
         
         """Format billing summary for user display"""
         return f"""
-**This analysis will cost :blue[\\${tier_info['price']:.2f}] based on the following factors:**
+**COST FOR THIS ANALYSIS: \\${int(tier_info['price'])}** based on the following factors:
 
 - Document analysis: {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
 - Pricing tier: {tier_info['name']} (up to {tier_info['max_words']:,} words)
 - Just FYI, estimated pages: ~{estimated_pages} pages (at 300 words/page)
-
-
 
         """.strip()
     
@@ -144,7 +142,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'credits_remaining': user_credits - required_price,
-                'message': f"✅ Sufficient credits available - **\\${user_credits:.2f} available, \\${required_price:.2f} needed for this analysis.**"
+                'message': f"**SUFFICIENT CREDITS AVAILABLE:** \\${user_credits:.0f} available, \\${required_price:.0f} needed for this analysis."
             }
         else:
             shortfall = required_price - user_credits
@@ -154,7 +152,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'shortfall_amount': shortfall,
-                'message': f"⚠️ Insufficient credits: You have \\${user_credits:.2f} but need \\${required_price:.2f}. Please add at least \\${shortfall:.2f} to your account using the form below."
+                'message': f"⚠️ Insufficient credits: You have \\${user_credits:.0f} but need \\${required_price:.0f}. Please add at least \\${shortfall:.0f} to your account using the form below."
             }
 
 # Global instance for use across the application
