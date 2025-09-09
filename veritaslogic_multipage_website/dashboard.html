@@ -581,40 +581,16 @@
             // Clear container
             container.innerHTML = '';
             
-            // Add success banner
-            const banner = document.createElement('div');
-            banner.style.cssText = 'background: green; color: white; padding: 20px; margin: 20px; border-radius: 8px; text-align: center;';
-            banner.textContent = 'CREDIT PACKAGES LOADED SUCCESSFULLY!';
-            container.appendChild(banner);
+            // Add simple text content without any CSS
+            container.innerHTML = `
+                <h1>CREDIT PACKAGES WORKING!</h1>
+                <p>$50 - Basic Package</p>
+                <p>$100 - Standard Package</p>
+                <p>$250 - Professional Package</p>
+                <p>$500 - Enterprise Package</p>
+                <p>Function completed successfully!</p>
+            `;
             
-            // Create grid container
-            const grid = document.createElement('div');
-            grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;';
-            
-            // Package data
-            const packages = [
-                {amount: 50, desc: 'Basic Package'},
-                {amount: 100, desc: 'Standard Package'},
-                {amount: 250, desc: 'Professional Package'},
-                {amount: 500, desc: 'Enterprise Package'}
-            ];
-            
-            // Create package elements with proper CSS classes
-            packages.forEach(pkg => {
-                const packageDiv = document.createElement('div');
-                packageDiv.className = 'credit-package';
-                packageDiv.onclick = () => alert(`$${pkg.amount} package selected`);
-                
-                packageDiv.innerHTML = `
-                    <div class="package-amount">$${pkg.amount}</div>
-                    <div class="package-description">${pkg.amount} Credits - ${pkg.desc}</div>
-                    <button class="btn btn-primary">Select $${pkg.amount}</button>
-                `;
-                
-                grid.appendChild(packageDiv);
-            });
-            
-            container.appendChild(grid);
             console.log('=== CREDIT PACKAGES FUNCTION SUCCESS ===');
         }
         
