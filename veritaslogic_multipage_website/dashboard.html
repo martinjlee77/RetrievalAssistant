@@ -507,7 +507,17 @@
             await loadAnalysisHistory();
             
             // Load credit packages for Credits section
+            console.log('Initial load of credit packages...');
             await loadCreditPackages();
+            
+            // Force fallback packages as backup
+            setTimeout(() => {
+                const container = document.getElementById('creditPackages');
+                if (container && container.innerHTML.trim() === '') {
+                    console.log('Container still empty, forcing fallback packages');
+                    showFallbackPackages();
+                }
+            }, 2000);
         }
 
         async function loadUsageStatistics() {
@@ -694,9 +704,12 @@
             }
             
             // Load section-specific data
+            console.log('Switching to section:', sectionName);
             if (sectionName === 'credits') {
+                console.log('Loading credit packages for credits section...');
                 loadCreditPackages();
             } else if (sectionName === 'history') {
+                console.log('Loading analysis history for history section...');
                 loadAnalysisHistory();
             }
             
