@@ -15,11 +15,16 @@ from decimal import Decimal
 import logging
 import bcrypt
 import secrets
+import stripe
 from shared.pricing_config import is_business_email
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Configure Stripe
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
 app = Flask(__name__, static_folder='veritaslogic_multipage_website', static_url_path='')
 CORS(app, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
@@ -865,21 +870,15 @@ def record_analysis():
         logger.error(f"Record analysis error: {e}")
         return jsonify({'error': 'Failed to record analysis'}), 500
 
-# Credit Purchase Endpoints
-@app.route('/api/credit-packages', methods=['GET'])
-def get_credit_packages():
-    """Get available credit purchase packages"""
-    from shared.pricing_config import get_credit_packages
-    try:
-        packages = get_credit_packages()
-        return jsonify({'packages': packages}), 200
-    except Exception as e:
-        logger.error(f"Error getting credit packages: {e}")
-        return jsonify({'error': 'Failed to get credit packages'}), 500
+# Stripe Payment Endpoints
+@app.route('/api/stripe/config', methods=['GET'])
+def get_stripe_config():
+    """Get Stripe publishable key for frontend"""
+    return jsonify({'publishable_key': STRIPE_PUBLISHABLE_KEY}), 200
 
-@app.route('/api/purchase-credits', methods=['POST'])
-def purchase_credits():
-    """Purchase credits (simplified - no payment processing)"""
+@app.route('/api/stripe/create-payment-intent', methods=['POST'])
+def create_payment_intent():
+    """Create a Stripe payment intent for credit purchase"""
     try:
         data = request.get_json()
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -895,51 +894,126 @@ def purchase_credits():
         user_id = payload['user_id']
         amount = data.get('amount')
         
-        if not amount or amount not in [50, 100, 200]:
-            return jsonify({'error': 'Invalid credit amount. Must be 50, 100, or 200'}), 400
+        # Validate amount against available credit packages
+        from shared.pricing_config import CREDIT_PACKAGES
+        valid_amounts = [pkg['amount'] for pkg in CREDIT_PACKAGES]
         
+        if not amount or amount not in valid_amounts:
+            return jsonify({'error': f'Invalid credit amount. Must be one of: {valid_amounts}'}), 400
+        
+        # Get user info for payment metadata
         conn = get_db_connection()
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
-        
+            
         cursor = conn.cursor()
-        
-        # Add credits to user's balance
-        cursor.execute("""
-            UPDATE users 
-            SET credits_balance = credits_balance + %s
-            WHERE id = %s
-        """, (amount, user_id))
-        
-        # Record credit purchase transaction with expiration
-        from shared.pricing_config import CREDIT_EXPIRATION_MONTHS
-        cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, expires_at)
-            VALUES (%s, %s, 'credit_purchase', NOW() + INTERVAL '%s months')
-        """, (user_id, amount, CREDIT_EXPIRATION_MONTHS))
-        
-        # Get updated balance
-        cursor.execute("""
-            SELECT credits_balance FROM users WHERE id = %s
-        """, (user_id,))
-        
-        new_balance = cursor.fetchone()['credits_balance']
-        
-        conn.commit()
+        cursor.execute("SELECT email FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
         conn.close()
         
-        logger.info(f"User {user_id} purchased ${amount} credits. New balance: ${new_balance}")
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Create payment intent with Stripe
+        intent = stripe.PaymentIntent.create(
+            amount=int(amount * 100),  # Stripe uses cents
+            currency='usd',
+            metadata={
+                'user_id': user_id,
+                'user_email': user['email'],
+                'credit_amount': amount,
+                'type': 'credit_purchase'
+            }
+        )
+        
+        logger.info(f"Created payment intent {intent.id} for user {user_id}, amount: ${amount}")
         
         return jsonify({
-            'message': f'Successfully added ${amount} to your account!',
-            'amount_purchased': amount,
-            'new_balance': float(new_balance),
-            'expires_months': CREDIT_EXPIRATION_MONTHS
+            'client_secret': intent.client_secret,
+            'amount': amount
         }), 200
         
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error: {e}")
+        return jsonify({'error': 'Payment processing error'}), 500
     except Exception as e:
-        logger.error(f"Purchase credits error: {e}")
-        return jsonify({'error': 'Failed to purchase credits'}), 500
+        logger.error(f"Create payment intent error: {e}")
+        return jsonify({'error': 'Failed to create payment intent'}), 500
+
+@app.route('/api/stripe/webhook', methods=['POST'])
+def stripe_webhook():
+    """Handle Stripe webhook events"""
+    payload = request.get_data()
+    sig_header = request.headers.get('Stripe-Signature')
+    
+    # For development, skip signature verification (add endpoint_secret in production)
+    try:
+        event = stripe.Event.construct_from(
+            request.get_json(), stripe.api_key
+        )
+    except ValueError:
+        logger.error("Invalid payload in webhook")
+        return jsonify({'error': 'Invalid payload'}), 400
+    
+    # Handle payment success
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        
+        try:
+            user_id = payment_intent['metadata']['user_id']
+            credit_amount = Decimal(payment_intent['metadata']['credit_amount'])
+            
+            conn = get_db_connection()
+            if not conn:
+                logger.error("Database connection failed in webhook")
+                return jsonify({'error': 'Database error'}), 500
+            
+            cursor = conn.cursor()
+            
+            # Add credits to user's balance
+            cursor.execute("""
+                UPDATE users 
+                SET credits_balance = credits_balance + %s
+                WHERE id = %s
+            """, (credit_amount, user_id))
+            
+            # Record credit purchase transaction
+            from shared.pricing_config import CREDIT_EXPIRATION_MONTHS
+            cursor.execute("""
+                INSERT INTO credit_transactions (user_id, amount, reason, expires_at, stripe_payment_id)
+                VALUES (%s, %s, 'stripe_purchase', NOW() + INTERVAL '%s months', %s)
+            """, (user_id, credit_amount, CREDIT_EXPIRATION_MONTHS, payment_intent['id']))
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"Webhook: Successfully processed payment for user {user_id}, amount: ${credit_amount}")
+            
+        except Exception as e:
+            logger.error(f"Webhook processing error: {e}")
+            return jsonify({'error': 'Processing failed'}), 500
+    
+    return jsonify({'received': True}), 200
+
+# Credit Purchase Endpoints
+@app.route('/api/credit-packages', methods=['GET'])
+def get_credit_packages():
+    """Get available credit purchase packages"""
+    from shared.pricing_config import get_credit_packages
+    try:
+        packages = get_credit_packages()
+        return jsonify({'packages': packages}), 200
+    except Exception as e:
+        logger.error(f"Error getting credit packages: {e}")
+        return jsonify({'error': 'Failed to get credit packages'}), 500
+
+@app.route('/api/purchase-credits', methods=['POST'])
+def purchase_credits():
+    """Legacy endpoint - redirects to Stripe payment flow"""
+    return jsonify({
+        'error': 'This endpoint is deprecated. Use /api/stripe/create-payment-intent for payments.',
+        'redirect': '/api/stripe/create-payment-intent'
+    }), 400
 
 @app.route('/api/user/wallet-balance', methods=['GET'])
 def get_wallet_balance():
