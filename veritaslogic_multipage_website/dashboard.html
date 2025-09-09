@@ -569,65 +569,40 @@
             }
         }
 
-        async function loadCreditPackages() {
-            console.log('loadCreditPackages() called');
-            try {
-                const response = await fetch('/api/credit-packages');
-                console.log('API response status:', response.status);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('API response data:', data);
-                    const packages = data.packages || data; // Handle both response formats
-                    console.log('Packages array:', packages);
-                    const container = document.getElementById('creditPackages');
-                    
-                    if (!container) {
-                        console.error('Credit packages container not found');
-                        return;
-                    }
-                    
-                    console.log('Container found:', container);
-                    container.innerHTML = '';
-                    
-                    if (Array.isArray(packages) && packages.length > 0) {
-                        console.log('Creating package elements...');
-                        packages.forEach((pkg, index) => {
-                            console.log(`Creating package ${index}:`, pkg);
-                            const packageElement = document.createElement('div');
-                            packageElement.className = 'credit-package';
-                            packageElement.style.border = '1px solid #ccc';
-                            packageElement.style.padding = '15px';
-                            packageElement.style.margin = '10px';
-                            packageElement.style.borderRadius = '8px';
-                            packageElement.style.cursor = 'pointer';
-                            packageElement.innerHTML = `
-                                <h4>$${pkg.amount}</h4>
-                                <p>${pkg.amount} Credits</p>
-                                <p class="package-desc">${pkg.display || ''}</p>
-                            `;
-                            packageElement.onclick = () => selectCreditPackage({
-                                id: `pkg_${pkg.amount}`,
-                                amount: pkg.amount,
-                                credits: pkg.amount,
-                                title: `$${pkg.amount} Package`
-                            });
-                            container.appendChild(packageElement);
-                        });
-                        console.log('All packages added to container');
-                    } else {
-                        console.log('No packages found, showing fallback');
-                        // Show fallback packages
-                        showFallbackPackages();
-                    }
-                } else {
-                    console.error('Failed to load credit packages, status:', response.status);
-                    showFallbackPackages();
-                }
-            } catch (error) {
-                console.error('Error loading credit packages:', error);
-                showFallbackPackages();
+        function loadCreditPackages() {
+            console.log('loadCreditPackages() called - START');
+            
+            const container = document.getElementById('creditPackages');
+            if (!container) {
+                console.error('Credit packages container not found!');
+                return;
             }
+            
+            console.log('Container found, clearing and adding packages...');
+            container.innerHTML = `
+                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
+                    <h4 style="color: #667eea;">$50</h4>
+                    <p>50 Credits</p>
+                    <p class="package-desc">Basic Package</p>
+                </div>
+                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
+                    <h4 style="color: #667eea;">$100</h4>
+                    <p>100 Credits</p>
+                    <p class="package-desc">Standard Package</p>
+                </div>
+                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
+                    <h4 style="color: #667eea;">$250</h4>
+                    <p>250 Credits</p>
+                    <p class="package-desc">Professional Package</p>
+                </div>
+                <div class="credit-package" style="border: 2px solid #667eea; padding: 20px; margin: 10px; border-radius: 12px; cursor: pointer; background: white;" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
+                    <h4 style="color: #667eea;">$500</h4>
+                    <p>500 Credits</p>
+                    <p class="package-desc">Enterprise Package</p>
+                </div>
+            `;
+            
+            console.log('Packages added to container successfully!');
         }
         
         function showFallbackPackages() {
