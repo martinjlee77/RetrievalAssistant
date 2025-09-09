@@ -460,8 +460,12 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display memo inline instead of switching pages
         st.markdown("---")
 
+        # Test with simple info first
+        st.info("🎉 **Analysis Complete!** Your ASC 606 memo is displayed below. Copy and paste the text or use the download button.")
+        
+        # Original container (keeping for debugging)
         with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+            st.markdown("""📋 **Instructions:** Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -486,7 +490,7 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
                 del st.session_state[analysis_key]
             
             # Clear all file-related session state to force file uploader reset
-            keys_to_remove = [key for key in st.session_state.keys() if 'contract_files' in key or 'upload' in key]
+            keys_to_remove = [key for key in st.session_state.keys() if 'contract_files' in key or 'asc606_uploader' in key or 'upload' in key]
             for key in keys_to_remove:
                 del st.session_state[key]
             
