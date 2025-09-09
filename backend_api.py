@@ -1262,6 +1262,182 @@ def health_check():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()}), 200
 
+@app.route('/api/user/usage-stats', methods=['GET'])
+def get_usage_stats():
+    """Get user usage statistics for dashboard"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get total analyses count
+        cursor.execute("""
+            SELECT COUNT(*) as total_analyses 
+            FROM analysis_sessions 
+            WHERE user_id = %s AND status = 'completed'
+        """, (user_id,))
+        result = cursor.fetchone()
+        total_analyses = result['total_analyses'] if result else 0
+        
+        # Get this month's analyses
+        cursor.execute("""
+            SELECT COUNT(*) as month_analyses 
+            FROM analysis_sessions 
+            WHERE user_id = %s AND status = 'completed'
+            AND created_at >= date_trunc('month', CURRENT_DATE)
+        """, (user_id,))
+        result = cursor.fetchone()
+        month_analyses = result['month_analyses'] if result else 0
+        
+        # Get total spent
+        cursor.execute("""
+            SELECT COALESCE(SUM(amount), 0) as total_spent
+            FROM credit_transactions 
+            WHERE user_id = %s AND reason = 'analysis_charge'
+        """, (user_id,))
+        result = cursor.fetchone()
+        total_spent = result['total_spent'] if result else 0
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'total_analyses': int(total_analyses),
+                'analyses_this_month': int(month_analyses),
+                'total_spent': float(total_spent)
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Usage stats error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to fetch usage statistics'}), 500
+
+@app.route('/api/user/analysis-history', methods=['GET'])
+def get_analysis_history():
+    """Get user's analysis history for dashboard"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get recent analyses with details
+        cursor.execute("""
+            SELECT 
+                a.id,
+                a.analysis_type,
+                a.created_at,
+                a.status,
+                ct.amount as cost,
+                a.document_name
+            FROM analysis_sessions a
+            LEFT JOIN credit_transactions ct ON a.id = ct.analysis_session_id 
+                AND ct.reason = 'analysis_charge'
+            WHERE a.user_id = %s 
+            ORDER BY a.created_at DESC
+            LIMIT 20
+        """, (user_id,))
+        
+        analyses = []
+        for row in cursor.fetchall():
+            analyses.append({
+                'id': row['id'],
+                'title': row['document_name'] or f"{row['analysis_type']} Analysis",
+                'asc_standard': row['analysis_type'] or 'Unknown',
+                'created_at': row['created_at'].isoformat() if row['created_at'] else '',
+                'status': row['status'],
+                'cost': float(row['cost']) if row['cost'] else 0,
+                'download_url': f"/api/download/{row['id']}"
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'analyses': analyses
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Analysis history error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to fetch analysis history'}), 500
+
+@app.route('/api/user/update-profile', methods=['PUT'])
+def update_profile():
+    """Update user profile information"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        
+        if not first_name or not last_name:
+            return jsonify({'error': 'First name and last name are required'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Update user profile
+        cursor.execute("""
+            UPDATE users 
+            SET first_name = %s, last_name = %s 
+            WHERE id = %s
+        """, (first_name, last_name, user_id))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"User {user_id} updated profile: {first_name} {last_name}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Profile updated successfully',
+            'first_name': first_name,
+            'last_name': last_name
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Update profile error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to update profile'}), 500
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()

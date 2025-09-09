@@ -208,6 +208,14 @@
                         <h3>📧 Account Information</h3>
                         <div class="profile-fields">
                             <div class="profile-field">
+                                <span class="field-label">First Name:</span>
+                                <span class="field-value" id="userFirstName">-</span>
+                            </div>
+                            <div class="profile-field">
+                                <span class="field-label">Last Name:</span>
+                                <span class="field-value" id="userLastName">-</span>
+                            </div>
+                            <div class="profile-field">
                                 <span class="field-label">Email:</span>
                                 <span class="field-value" id="userEmail">-</span>
                             </div>
@@ -223,6 +231,27 @@
                                 <span class="field-label">Account Status:</span>
                                 <span class="field-value" id="accountStatus">Active</span>
                             </div>
+                        </div>
+                        
+                        <!-- Edit Profile Section -->
+                        <div class="edit-profile-section">
+                            <h4>✏️ Edit Name</h4>
+                            <div id="editProfileMessage"></div>
+                            <form id="editProfileForm" style="margin-top: 15px;">
+                                <div class="form-group">
+                                    <label for="editFirstName">First Name</label>
+                                    <input type="text" id="editFirstName" name="firstName" required placeholder="Enter your first name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="editLastName">Last Name</label>
+                                    <input type="text" id="editLastName" name="lastName" required placeholder="Enter your last name">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" id="updateProfileButton">
+                                    Update Name
+                                </button>
+                            </form>
                         </div>
                     </div>
 
@@ -448,39 +477,133 @@
             container.innerHTML = `<div class="${type}-message">${message}</div>`;
         }
 
-        function populateDashboard(userData) {
+        async function populateDashboard(userData) {
             console.log('Populating dashboard with user data:', userData);
-            console.log('Email field:', userData.email);
-            console.log('Company field:', userData.company_name);
-            console.log('All user data keys:', Object.keys(userData));
             
             // Update welcome section (backend returns snake_case fields)
             document.getElementById('userName').textContent = userData.first_name || 'User';
             document.getElementById('memberSince').textContent = `Member since ${new Date(userData.member_since || Date.now()).toLocaleDateString()}`;
             
             // Update profile information
+            document.getElementById('userFirstName').textContent = userData.first_name || '-';
+            document.getElementById('userLastName').textContent = userData.last_name || '-';
             document.getElementById('userEmail').textContent = userData.email || '-';
             document.getElementById('userCompany').textContent = userData.company_name || '-';
             document.getElementById('memberSinceDate').textContent = new Date(userData.member_since || Date.now()).toLocaleDateString() || '-';
             
-            // Update credits and usage (backend returns snake_case fields)
-            const freeAnalyses = userData.free_analyses_remaining || 3;
+            // Pre-fill edit profile form
+            document.getElementById('editFirstName').value = userData.first_name || '';
+            document.getElementById('editLastName').value = userData.last_name || '';
+            
+            // Update credits display
             const paidCredits = userData.credits_balance || 0;
+            document.getElementById('creditsBalance').textContent = `$${paidCredits.toFixed(2)}`;
             
-            document.getElementById('freeAnalysesCount').textContent = freeAnalyses;
-            
-            if (paidCredits > 0) {
-                document.getElementById('creditsSection').style.display = 'block';
-                document.getElementById('creditsBalance').textContent = `$${paidCredits.toFixed(2)}`;
-            }
-            
-            // Update usage statistics
-            document.getElementById('totalAnalyses').textContent = userData.total_analyses || userData.totalAnalyses || 0;
-            document.getElementById('thisMonth').textContent = userData.analyses_this_month || userData.analysesThisMonth || 0;
-            document.getElementById('totalSpent').textContent = `$${(userData.total_spent || userData.totalSpent || 0).toFixed(2)}`;
+            // Load usage statistics
+            await loadUsageStatistics();
             
             // Load recent analyses
-            loadRecentAnalyses(userData.recentAnalyses || []);
+            await loadAnalysisHistory();
+            
+            // Load credit packages for Credits section
+            await loadCreditPackages();
+        }
+
+        async function loadUsageStatistics() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/usage-stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Update usage statistics
+                        document.getElementById('totalAnalyses').textContent = data.stats.total_analyses;
+                        document.getElementById('thisMonth').textContent = data.stats.analyses_this_month;
+                        document.getElementById('totalSpent').textContent = `$${data.stats.total_spent.toFixed(2)}`;
+                    }
+                } else {
+                    console.error('Failed to load usage statistics');
+                }
+            } catch (error) {
+                console.error('Error loading usage statistics:', error);
+            }
+        }
+
+        async function loadAnalysisHistory() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/analysis-history', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        loadRecentAnalyses(data.analyses);
+                    }
+                } else {
+                    console.error('Failed to load analysis history');
+                }
+            } catch (error) {
+                console.error('Error loading analysis history:', error);
+            }
+        }
+
+        async function loadCreditPackages() {
+            try {
+                const response = await fetch('/api/credit-packages');
+
+                if (response.ok) {
+                    const packages = await response.json();
+                    const container = document.getElementById('creditPackages');
+                    
+                    container.innerHTML = '';
+                    packages.forEach(pkg => {
+                        const packageElement = document.createElement('div');
+                        packageElement.className = 'credit-package';
+                        packageElement.innerHTML = `
+                            <h4>$${pkg.amount}</h4>
+                            <p>${pkg.credits} Credits</p>
+                            <p class="package-desc">${pkg.description || ''}</p>
+                        `;
+                        packageElement.onclick = () => selectCreditPackage(pkg);
+                        container.appendChild(packageElement);
+                    });
+                } else {
+                    console.error('Failed to load credit packages');
+                }
+            } catch (error) {
+                console.error('Error loading credit packages:', error);
+                // Fallback to basic packages
+                const container = document.getElementById('creditPackages');
+                container.innerHTML = `
+                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
+                        <h4>$50</h4>
+                        <p>50 Credits</p>
+                    </div>
+                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
+                        <h4>$100</h4>
+                        <p>100 Credits</p>
+                    </div>
+                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
+                        <h4>$250</h4>
+                        <p>250 Credits</p>
+                    </div>
+                    <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
+                        <h4>$500</h4>
+                        <p>500 Credits</p>
+                    </div>
+                `;
+            }
         }
 
         function loadRecentAnalyses(analyses) {
@@ -498,7 +621,7 @@
                 item.innerHTML = `
                     <div class="analysis-details">
                         <h4>${analysis.title}</h4>
-                        <p>${analysis.asc_standard} • ${new Date(analysis.created_at).toLocaleDateString()} • $${analysis.cost}</p>
+                        <p>${analysis.asc_standard} • ${new Date(analysis.created_at).toLocaleDateString()} • $${analysis.cost.toFixed(2)}</p>
                     </div>
                     <a href="${analysis.download_url}" class="btn btn-secondary" target="_blank">Download</a>
                 `;
@@ -554,6 +677,55 @@
         // Update showCreditPurchase to work with new layout
         function showCreditPurchase() {
             showSection('credits');
+        }
+
+        // Profile update functionality
+        async function updateProfile(firstName, lastName) {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/update-profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Update UI with new names
+                        document.getElementById('userName').textContent = firstName;
+                        document.getElementById('userFirstName').textContent = firstName;
+                        document.getElementById('userLastName').textContent = lastName;
+                        
+                        showEditProfileMessage('Profile updated successfully!', 'success');
+                        
+                        // Clear form
+                        document.getElementById('editProfileForm').reset();
+                    } else {
+                        showEditProfileMessage(data.error || 'Failed to update profile', 'error');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    showEditProfileMessage(errorData.error || 'Failed to update profile', 'error');
+                }
+            } catch (error) {
+                console.error('Profile update error:', error);
+                showEditProfileMessage('Network error. Please try again.', 'error');
+            }
+        }
+
+        function showEditProfileMessage(message, type) {
+            const container = document.getElementById('editProfileMessage');
+            if (container) {
+                container.innerHTML = `<div class="${type}-message">${message}</div>`;
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
 
         function logout() {
