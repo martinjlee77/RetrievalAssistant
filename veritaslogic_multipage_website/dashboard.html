@@ -18,14 +18,12 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <a href="/">VeritasLogic.ai</a>
-            </div>
-            <div class="nav-links">
-                <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" target="_blank">Analysis Platform</a>
-                <a href="/">Home</a>
-                <button onclick="logout()" class="btn btn-secondary btn-sm">Sign Out</button>
-            </div>
+            <a href="/" class="logo">VeritasLogic.ai</a>
+            <ul class="nav-links">
+                <li><a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" target="_blank">Analysis Platform</a></li>
+                <li><a href="/">Home</a></li>
+                <li><button onclick="logout()" class="btn btn-secondary btn-nav">Log Out</button></li>
+            </ul>
         </div>
     </nav>
 
@@ -100,9 +98,6 @@
                     <h1>Welcome back, <span id="userName">User</span>!</h1>
                     <p id="memberSince">Member since</p>
                 </div>
-                <div class="header-actions">
-                    <button onclick="logout()" class="btn btn-secondary">Sign Out</button>
-                </div>
             </div>
 
             <!-- Overview Section -->
@@ -113,14 +108,9 @@
                     <div class="card balance-card">
                         <h2>💳 Account Balance</h2>
                         
-                        <div id="freeAnalysesSection" class="free-analyses">
-                            <div class="number" id="freeAnalysesCount">3</div>
-                            <div class="label">Free Analyses Remaining</div>
-                        </div>
-                        
-                        <div class="credits-display" id="creditsSection" style="display: none;">
+                        <div class="credits-display" id="creditsSection">
                             <div class="number" id="creditsBalance">$0</div>
-                            <div class="label">Paid Credits Available</div>
+                            <div class="label">Account Credits Available</div>
                         </div>
                         
                         <button onclick="showSection('credits')" class="btn btn-primary" style="margin-top: 20px; width: 100%;">

@@ -80,6 +80,27 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 2px 4px rgba(255,255,255,0.3);
 }
 
+/* Navigation button styling */
+.btn-nav {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.4);
+    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+}
+
 .nav-links a.active::after {
     content: '';
     position: absolute;
@@ -3719,7 +3740,7 @@ a:focus {
 .dashboard-container {
     display: flex;
     min-height: calc(100vh - 100px);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
 }
 
 .dashboard-sidebar {
