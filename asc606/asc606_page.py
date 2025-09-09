@@ -62,13 +62,35 @@ def render_asc606_page():
             memo_content = st.session_state[memo_key]
             memo_generator.display_clean_memo(memo_content)
             
+            # DEBUG: Show current session state
+            all_keys = list(st.session_state.keys())
+            file_keys = [k for k in all_keys if 'upload' in k.lower() or 'file' in k.lower() or 'asc606' in k.lower()]
+            st.write(f"🔧 Current file-related keys: {file_keys}")
+            
             # Add "Analyze Another Contract" button
             st.markdown("---")
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                # Reset analysis state for new analysis
-                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower()]
-                for key in keys_to_clear:
-                    del st.session_state[key]
+                st.write("🔧 BUTTON CLICKED! Starting cleanup...")
+                
+                # Clear ALL file-related keys more aggressively
+                keys_to_delete = []
+                for key in list(st.session_state.keys()):
+                    if any(word in key.lower() for word in ['upload', 'file', 'asc606', 'contract']):
+                        keys_to_delete.append(key)
+                
+                st.write(f"🔧 Will delete these keys: {keys_to_delete}")
+                
+                # Delete all found keys
+                for key in keys_to_delete:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                        st.write(f"🔧 Deleted: {key}")
+                
+                # Force reset file uploader key
+                st.session_state.file_uploader_key = 8888
+                st.write(f"🔧 Set file_uploader_key to: {st.session_state.file_uploader_key}")
+                
+                st.write("🔧 About to rerun...")
                 st.rerun()
             return  # Exit early, don't show file upload interface
     
