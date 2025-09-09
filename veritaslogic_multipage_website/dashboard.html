@@ -572,22 +572,50 @@
         function loadCreditPackages() {
             console.log('=== CREDIT PACKAGES FUNCTION START ===');
             
-            try {
-                const container = document.getElementById('creditPackages');
-                console.log('Container:', container);
-                
-                if (!container) {
-                    console.error('Container not found!');
-                    return;
-                }
-                
-                console.log('Setting innerHTML...');
-                container.innerHTML = '<div style="background: red; color: white; padding: 20px; margin: 20px; border-radius: 8px;">CREDIT PACKAGES LOADED!</div><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;"><div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert(\'$50 package selected\')"><h4 style="color: #667eea; margin: 0 0 10px 0;">$50</h4><p style="margin: 0;">50 Credits</p><p style="margin: 5px 0 0 0; color: #666;">Basic Package</p></div><div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert(\'$100 package selected\')"><h4 style="color: #667eea; margin: 0 0 10px 0;">$100</h4><p style="margin: 0;">100 Credits</p><p style="margin: 5px 0 0 0; color: #666;">Standard Package</p></div><div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert(\'$250 package selected\')"><h4 style="color: #667eea; margin: 0 0 10px 0;">$250</h4><p style="margin: 0;">250 Credits</p><p style="margin: 5px 0 0 0; color: #666;">Professional Package</p></div><div style="border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;" onclick="alert(\'$500 package selected\')"><h4 style="color: #667eea; margin: 0 0 10px 0;">$500</h4><p style="margin: 0;">500 Credits</p><p style="margin: 5px 0 0 0; color: #666;">Enterprise Package</p></div></div>';
-                
-                console.log('=== CREDIT PACKAGES FUNCTION SUCCESS ===');
-            } catch (error) {
-                console.error('=== CREDIT PACKAGES ERROR ===', error);
+            const container = document.getElementById('creditPackages');
+            if (!container) {
+                console.error('Container not found!');
+                return;
             }
+            
+            // Clear container
+            container.innerHTML = '';
+            
+            // Add success banner
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background: green; color: white; padding: 20px; margin: 20px; border-radius: 8px; text-align: center;';
+            banner.textContent = 'CREDIT PACKAGES LOADED SUCCESSFULLY!';
+            container.appendChild(banner);
+            
+            // Create grid container
+            const grid = document.createElement('div');
+            grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;';
+            
+            // Package data
+            const packages = [
+                {amount: 50, desc: 'Basic Package'},
+                {amount: 100, desc: 'Standard Package'},
+                {amount: 250, desc: 'Professional Package'},
+                {amount: 500, desc: 'Enterprise Package'}
+            ];
+            
+            // Create package elements
+            packages.forEach(pkg => {
+                const packageDiv = document.createElement('div');
+                packageDiv.style.cssText = 'border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;';
+                packageDiv.onclick = () => alert(`$${pkg.amount} package selected`);
+                
+                packageDiv.innerHTML = `
+                    <h4 style="color: #667eea; margin: 0 0 10px 0;">$${pkg.amount}</h4>
+                    <p style="margin: 0;">${pkg.amount} Credits</p>
+                    <p style="margin: 5px 0 0 0; color: #666;">${pkg.desc}</p>
+                `;
+                
+                grid.appendChild(packageDiv);
+            });
+            
+            container.appendChild(grid);
+            console.log('=== CREDIT PACKAGES FUNCTION SUCCESS ===');
         }
         
         function showFallbackPackages() {
