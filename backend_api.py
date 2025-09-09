@@ -1286,7 +1286,7 @@ def get_usage_stats():
         # Get total analyses count
         cursor.execute("""
             SELECT COUNT(*) as total_analyses 
-            FROM analysis_sessions 
+            FROM analyses 
             WHERE user_id = %s AND status = 'completed'
         """, (user_id,))
         result = cursor.fetchone()
@@ -1295,9 +1295,9 @@ def get_usage_stats():
         # Get this month's analyses
         cursor.execute("""
             SELECT COUNT(*) as month_analyses 
-            FROM analysis_sessions 
+            FROM analyses 
             WHERE user_id = %s AND status = 'completed'
-            AND created_at >= date_trunc('month', CURRENT_DATE)
+            AND completed_at >= date_trunc('month', CURRENT_DATE)
         """, (user_id,))
         result = cursor.fetchone()
         month_analyses = result['month_analyses'] if result else 0
@@ -1351,16 +1351,16 @@ def get_analysis_history():
         cursor.execute("""
             SELECT 
                 a.id,
-                a.analysis_type,
-                a.created_at,
+                a.asc_standard,
+                a.completed_at,
                 a.status,
                 ct.amount as cost,
-                a.document_name
-            FROM analysis_sessions a
-            LEFT JOIN credit_transactions ct ON a.id = ct.analysis_session_id 
+                CONCAT(a.asc_standard, ' Analysis') as document_name
+            FROM analyses a
+            LEFT JOIN credit_transactions ct ON a.id = ct.analysis_id 
                 AND ct.reason = 'analysis_charge'
             WHERE a.user_id = %s 
-            ORDER BY a.created_at DESC
+            ORDER BY a.completed_at DESC
             LIMIT 20
         """, (user_id,))
         
@@ -1368,9 +1368,9 @@ def get_analysis_history():
         for row in cursor.fetchall():
             analyses.append({
                 'id': row['id'],
-                'title': row['document_name'] or f"{row['analysis_type']} Analysis",
-                'asc_standard': row['analysis_type'] or 'Unknown',
-                'created_at': row['created_at'].isoformat() if row['created_at'] else '',
+                'title': row['document_name'] or f"{row['asc_standard']} Analysis",
+                'asc_standard': row['asc_standard'] or 'Unknown',
+                'created_at': row['completed_at'].isoformat() if row['completed_at'] else '',
                 'status': row['status'],
                 'cost': float(row['cost']) if row['cost'] else 0,
                 'download_url': f"/api/download/{row['id']}"
