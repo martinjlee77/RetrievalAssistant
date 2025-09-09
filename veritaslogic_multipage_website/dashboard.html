@@ -237,7 +237,7 @@
                         <div class="edit-profile-section">
                             <h4>✏️ Edit Name</h4>
                             <div id="editProfileMessage"></div>
-                            <form id="editProfileForm" style="margin-top: 15px;">
+                            <form id="editProfileForm" style="margin-top: 15px;" onsubmit="submitProfileUpdate(event)">
                                 <div class="form-group">
                                     <label for="editFirstName">First Name</label>
                                     <input type="text" id="editFirstName" name="firstName" required placeholder="Enter your first name">
@@ -651,6 +651,13 @@
                 targetNav.classList.add('active');
             }
             
+            // Load section-specific data
+            if (sectionName === 'credits') {
+                loadCreditPackages();
+            } else if (sectionName === 'history') {
+                loadAnalysisHistory();
+            }
+            
             // Update URL hash
             window.location.hash = sectionName;
         }
@@ -725,6 +732,31 @@
             if (container) {
                 container.innerHTML = `<div class="${type}-message">${message}</div>`;
                 container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        // Profile form submission handler
+        async function submitProfileUpdate(event) {
+            event.preventDefault();
+            
+            const firstName = document.getElementById('editFirstName').value.trim();
+            const lastName = document.getElementById('editLastName').value.trim();
+            const button = document.getElementById('updateProfileButton');
+            
+            if (!firstName || !lastName) {
+                showEditProfileMessage('Please enter both first and last name', 'error');
+                return;
+            }
+            
+            // Show loading state
+            button.disabled = true;
+            button.textContent = 'Updating...';
+            
+            try {
+                await updateProfile(firstName, lastName);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Update Name';
             }
         }
 
