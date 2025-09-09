@@ -210,7 +210,7 @@ def show_credits_warning(required_credits: float, auth_manager: AuthManager):
             This analysis requires **\\${required_credits:.2f}** in credits.
             
             **Your current balance:**
-            - Wallet credits: \\${credits_info.get('credits_balance', 0):.2f}
+            - Credits: \\${credits_info.get('credits_balance', 0):.2f}
             
             **Next steps:**
             1. [Add credits to your account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html)

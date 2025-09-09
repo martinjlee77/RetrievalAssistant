@@ -1092,7 +1092,7 @@ def user_purchase_credits():
         
         # Record credit purchase transaction
         cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, transaction_date)
+            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
             VALUES (%s, %s, 'wallet_topup', NOW())
         """, (user_id, amount))
         
