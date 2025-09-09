@@ -216,10 +216,17 @@ class CleanMemoGenerator:
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
-        # Enhanced Download Section - BEFORE memo display
+        # Convert markdown to HTML manually to bypass Streamlit's markdown processor
+        html_content = self._convert_markdown_to_html(memo_content)
+        
+        # Use HTML display which preserves formatting
+        st.markdown(html_content, unsafe_allow_html=True)
+        
+        # Enhanced Download Section - AFTER memo display (for stability)
         if memo_content and len(memo_content.strip()) > 10:
+            st.markdown("---")
             st.markdown("### 💾 Save Your Memo")
-            st.info("**Important:** Save your memo before navigating away or refreshing the page.")
+            st.info("**Important:** Choose your preferred format to save this memo before navigating away.")
             
             # Create columns for download buttons
             col1, col2, col3, col4 = st.columns(4)
@@ -298,14 +305,6 @@ class CleanMemoGenerator:
                     </script>
                     """
                     st.components.v1.html(copy_js, height=0)
-                    
-            st.markdown("---")
-        
-        # Convert markdown to HTML manually to bypass Streamlit's markdown processor
-        html_content = self._convert_markdown_to_html(memo_content)
-        
-        # Use HTML display which preserves formatting
-        st.markdown(html_content, unsafe_allow_html=True)
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

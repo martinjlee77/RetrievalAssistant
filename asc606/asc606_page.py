@@ -42,6 +42,33 @@ def render_asc606_page():
     if analysis_manager.show_active_analysis_warning():
         return  # User has active analysis, show warning and exit
     
+    # Check for existing completed analysis in session state (restore persistence)
+    session_id = st.session_state.get('user_session_id', '')
+    if session_id:
+        analysis_key = f'asc606_analysis_complete_{session_id}'
+        memo_key = f'asc606_memo_data_{session_id}'
+        
+        # If analysis is complete and memo exists, show results instead of file upload
+        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            st.success("✅ **Analysis Complete!**")
+            st.markdown("### 📄 Generated ASC 606 Memo")
+            
+            # Display the existing memo with enhanced downloads
+            from asc606.clean_memo_generator import CleanMemoGenerator
+            memo_generator = CleanMemoGenerator()
+            memo_content = st.session_state[memo_key]
+            memo_generator.display_clean_memo(memo_content)
+            
+            # Add "Analyze Another Contract" button
+            st.markdown("---")
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                # Reset analysis state for new analysis including file uploaders
+                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+            return  # Exit early, don't show file upload interface
+    
     # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
 
