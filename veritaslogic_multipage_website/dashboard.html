@@ -599,16 +599,16 @@
                 {amount: 500, desc: 'Enterprise Package'}
             ];
             
-            // Create package elements
+            // Create package elements with proper CSS classes
             packages.forEach(pkg => {
                 const packageDiv = document.createElement('div');
-                packageDiv.style.cssText = 'border: 2px solid #667eea; padding: 20px; border-radius: 12px; cursor: pointer; background: white; text-align: center;';
+                packageDiv.className = 'credit-package';
                 packageDiv.onclick = () => alert(`$${pkg.amount} package selected`);
                 
                 packageDiv.innerHTML = `
-                    <h4 style="color: #667eea; margin: 0 0 10px 0;">$${pkg.amount}</h4>
-                    <p style="margin: 0;">${pkg.amount} Credits</p>
-                    <p style="margin: 5px 0 0 0; color: #666;">${pkg.desc}</p>
+                    <div class="package-amount">$${pkg.amount}</div>
+                    <div class="package-description">${pkg.amount} Credits - ${pkg.desc}</div>
+                    <button class="btn btn-primary">Select $${pkg.amount}</button>
                 `;
                 
                 grid.appendChild(packageDiv);
