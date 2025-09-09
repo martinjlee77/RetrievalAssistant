@@ -998,32 +998,6 @@
             loadCreditPackages();
         }
         
-        async function loadCreditPackages() {
-            try {
-                const response = await fetch('/api/credit-packages');
-                const { packages } = await response.json();
-                
-                const container = document.getElementById('creditPackages');
-                container.innerHTML = '';
-                
-                packages.forEach(pkg => {
-                    const packageEl = document.createElement('div');
-                    packageEl.className = 'credit-package';
-                    packageEl.innerHTML = `
-                        <div class="package-amount">$${pkg.amount}</div>
-                        <div class="package-description">${pkg.display}</div>
-                        <button onclick="selectPackage(${pkg.amount})" class="btn btn-primary">
-                            Select $${pkg.amount}
-                        </button>
-                    `;
-                    container.appendChild(packageEl);
-                });
-                
-            } catch (error) {
-                console.error('Failed to load credit packages:', error);
-                showPaymentMessage('Failed to load credit packages', 'error');
-            }
-        }
         
         function selectPackage(amount) {
             selectedAmount = amount;
