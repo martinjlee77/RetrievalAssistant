@@ -457,10 +457,15 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
              
+        # Clear completion message before displaying memo content
+        completion_message_placeholder.empty()
+        
         # Display memo inline instead of switching pages
         st.markdown("---")
 
-        st.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
+        # Create persistent placeholder for instructions
+        instructions_placeholder = st.empty()
+        instructions_placeholder.info("""Your ASC 606 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -469,9 +474,6 @@ def perform_asc606_analysis(contract_text: str, additional_context: str = "", co
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
-        
-        # Clear completion message immediately after memo displays
-        completion_message_placeholder.empty()
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
             # Clear analysis state for fresh start with session isolation
