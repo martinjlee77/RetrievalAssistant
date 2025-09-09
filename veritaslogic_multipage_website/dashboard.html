@@ -1006,7 +1006,7 @@
         }
         
         
-        function selectPackage(amount) {
+        async function selectPackage(amount) {
             selectedAmount = amount;
             
             document.getElementById('selectedPackageDisplay').innerHTML = `
@@ -1018,8 +1018,20 @@
             
             document.getElementById('paymentFormContainer').style.display = 'block';
             
+            // Initialize Stripe if not already done
+            if (!stripe) {
+                await initializeStripe();
+            }
+            
+            // Mount card element
             if (cardElement && !cardElement._mounted) {
-                cardElement.mount('#card-element');
+                try {
+                    cardElement.mount('#card-element');
+                    console.log('Card element mounted successfully');
+                } catch (error) {
+                    console.error('Error mounting card element:', error);
+                    showPaymentMessage('Failed to load payment form', 'error');
+                }
             }
         }
         
