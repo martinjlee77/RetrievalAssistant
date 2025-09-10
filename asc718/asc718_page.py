@@ -10,14 +10,16 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.cost_estimator import cost_estimator
 from shared.billing_manager import billing_manager
+from shared.preflight_pricing import preflight_pricing
+from shared.wallet_manager import wallet_manager
+from shared.analysis_manager import analysis_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
+from utils.document_extractor import DocumentExtractor
 from asc718.step_analyzer import ASC718StepAnalyzer
 from asc718.knowledge_search import ASC718KnowledgeSearch
-from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +71,7 @@ def get_asc718_inputs():
     """Get ASC 718 specific inputs."""
 
     # Document upload with ASC 718 specific help text
-    contract_text, filename = _upload_and_process_asc805()
+    contract_text, filename = _upload_and_process_asc718()
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -83,18 +85,18 @@ def get_asc718_inputs():
     return contract_text, filename, additional_context, is_ready
 
 
-def _upload_and_process_asc805():
-    """Handle file upload and processing specifically for ASC 805 analysis."""
+def _upload_and_process_asc718():
+    """Handle file upload and processing specifically for ASC 718 analysis."""
     # Use session state to control file uploader key for clearing
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
         
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload a **complete purchase agreement and related documents**, e.g., executed purchase agreement, asset purchase agreement, merger agreement, LOI, due diligence reports (required)",
+        "1️⃣ Upload **stock compensation agreements and related documents**, e.g., equity award agreements, stock option plans, RSU agreements, performance share awards (required)",
         type=['pdf', 'docx'],
-        help="Upload up to 5 relevant transaction documents (PDF or DOCX) for ASC 805 business combinations analysis. Include the main purchase agreement and any amendments, letters of intent, due diligence reports, or related documentation. Incomplete documentation may lead to inaccurate acquisition accounting analysis.",
+        help="Upload up to 5 relevant stock compensation documents (PDF or DOCX) for ASC 718 share-based payment analysis. Include equity award agreements, stock option plans, restricted stock agreements, performance share awards, or related documentation. Incomplete documentation may lead to inaccurate stock compensation accounting analysis.",
         accept_multiple_files=True,
-        key=f"contract_files_{st.session_state.file_uploader_key}"
+        key=f"asc718_files_{st.session_state.file_uploader_key}"
     )
     
     if not uploaded_files:
