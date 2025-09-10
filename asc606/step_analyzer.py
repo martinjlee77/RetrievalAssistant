@@ -523,36 +523,16 @@ CRITICAL FORMATTING REQUIREMENTS:
             if step_key in steps_data:
                 step_data = steps_data[step_key]
                 if isinstance(step_data, dict) and 'markdown_content' in step_data:
-                    # Extract conclusion from markdown content
-                    content = step_data['markdown_content']
+                    # Extract conclusion from markdown content using clean regex approach (ASC 842 pattern)
+                    markdown_content = step_data['markdown_content']
                     
-                    # Try multiple conclusion patterns - be more flexible
-                    conclusion = None
-                    
-                    # First try exact patterns
-                    for pattern in ['**Conclusion:**', 'Conclusion:']:
-                        if pattern in content:
-                            parts = content.split(pattern, 1)
-                            if len(parts) == 2:
-                                conclusion_part = parts[1]
-                                # Stop at next major section
-                                for end_pattern in ['**Issues or Uncertainties:**', 'Issues or Uncertainties:', '**Issues**', 'Issues:']:
-                                    if end_pattern in conclusion_part:
-                                        conclusion_part = conclusion_part.split(end_pattern)[0]
-                                        break
-                                conclusion = conclusion_part.strip()
-                                break
-                    
-                    # If no conclusion found, extract from the end of analysis section
-                    if not conclusion and '**Analysis:**' in content:
-                        # Get everything after **Analysis:** and extract the last substantive paragraph
-                        analysis_part = content.split('**Analysis:**', 1)[1]
-                        if analysis_part:
-                            # Split into paragraphs and get the last substantial one
-                            paragraphs = [p.strip() for p in analysis_part.split('\n\n') if p.strip()]
-                            if paragraphs:
-                                # Take the last paragraph as conclusion
-                                conclusion = paragraphs[-1]
+                    # Look for conclusion section in markdown using regex
+                    import re
+                    conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*([^*]+)', markdown_content, re.IGNORECASE | re.DOTALL)
+                    if conclusion_match:
+                        conclusion = conclusion_match.group(1).strip()
+                    else:
+                        conclusion = None
                     
                     if conclusion:
                         conclusions.append(f"Step {step_num}: {conclusion}")
