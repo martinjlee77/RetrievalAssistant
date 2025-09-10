@@ -282,7 +282,7 @@ def _upload_and_process_asc842():
         return None, None
 
 
-def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = None):
+def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt"):
     """Perform the complete ASC 842 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user

@@ -277,7 +277,12 @@ class CleanMemoGenerator:
                     pdf.cell(0, 5, line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
             
             pdf_output = pdf.output(dest='S')
-            return pdf_output if isinstance(pdf_output, bytes) else pdf_output.encode('latin-1')
+            if isinstance(pdf_output, bytes):
+                return pdf_output
+            elif isinstance(pdf_output, str):
+                return pdf_output.encode('latin-1')
+            else:
+                return bytes(pdf_output)
             
         except Exception as e:
             logger.error(f"Simple PDF generation error: {e}")
