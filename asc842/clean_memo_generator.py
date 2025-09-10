@@ -178,7 +178,7 @@ class CleanMemoGenerator:
             
             with col3:
                 # DOCX download
-                docx_data = self._generate_word_document(memo_content)
+                docx_data = self._generate_docx(memo_content)
                 if docx_data:
                     st.download_button(
                         label="📄 Word (.docx)",
@@ -221,45 +221,42 @@ class CleanMemoGenerator:
                     """
                     st.components.v1.html(copy_js, height=0)
     
-    def _generate_pdf(self, content: str) -> bytes:
-        """Generate PDF from markdown content."""
+    def _generate_pdf(self, memo_content: str) -> bytes:
+        """Generate PDF from memo content using WeasyPrint."""
         try:
-            import weasyprint
-            from markdown import markdown
-            
             # Convert markdown to HTML
-            html_content = f"""
+            html_content = self._convert_markdown_to_html(memo_content)
+            
+            # Add CSS styling for professional look with better margins
+            css_styled_html = f"""
             <html>
             <head>
-                <meta charset="utf-8">
                 <style>
-                    body {{ font-family: 'Times New Roman', serif; line-height: 1.6; margin: 40px; }}
-                    h1 {{ color: #2E4F99; border-bottom: 2px solid #2E4F99; }}
-                    h2 {{ color: #2E4F99; margin-top: 30px; }}
-                    h3 {{ color: #333; }}
-                    .disclaimer {{ background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0; }}
-                    table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}
-                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                    th {{ background-color: #f2f2f2; }}
+                    body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
+                    h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
+                    h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
+                    h3 {{ color: #5d6d7e; }}
+                    h4 {{ color: #7f8c8d; font-size: 12px; }} 
+                    h6 {{ color: #7f8c8d; font-size: 13px; font-weight: bold; }}
+                    p {{ margin: 12px 0; }}
+                    ul {{ margin: 10px 0; padding-left: 25px; }}
+                    li {{ margin: 5px 0; }}
+                    small {{ font-size: 11px; }}
+                    .disclaimer {{ font-size: 11px; color: #7f8c8d; margin-top: 30px; }}
                 </style>
             </head>
             <body>
-            {markdown(content, extensions=['tables', 'fenced_code'])}
+                {html_content}
             </body>
             </html>
             """
             
             # Generate PDF
-            pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
-            return pdf_bytes or b"PDF generation failed"
-            
-        except ImportError:
-            logger.error("WeasyPrint not available for PDF generation")
-            # Fallback to simple text PDF
-            return self._generate_simple_pdf(content)
+            pdf_bytes = weasyprint.HTML(string=css_styled_html).write_pdf()
+            return pdf_bytes
         except Exception as e:
-            logger.error(f"PDF generation error: {e}")
-            return self._generate_simple_pdf(content)
+            logger.error(f"PDF generation failed: {e}")
+            return None
     
     def _generate_simple_pdf(self, content: str) -> bytes:
         """Generate simple PDF using FPDF as fallback."""
@@ -300,52 +297,64 @@ class CleanMemoGenerator:
             logger.error(f"Simple PDF generation error: {e}")
             return b"PDF generation failed"
     
-    def _generate_word_document(self, content: str) -> bytes:
-        """Generate Word document from markdown content."""
+    def _clean_html_tags(self, text: str) -> str:
+        """Remove HTML tags from text for clean DOCX output."""
+        import re
+        # Remove ALL HTML tags for clean Word output
+        text = re.sub(r'<[^>]+>', '', text)  # Remove any HTML tag
+        # Convert common HTML entities
+        text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+        return text.strip()
+
+    def _generate_docx(self, memo_content: str) -> bytes:
+        """Generate DOCX from memo content using python-docx."""
         try:
-            from docx import Document
-            from docx.shared import Inches
-            import io
-            
             doc = Document()
             
-            # Split content into lines and process
-            lines = content.split('\n')
-            current_paragraph = doc.add_paragraph()
+            # Clean HTML tags from content first
+            clean_content = self._clean_html_tags(memo_content)
+            
+            # Process content line by line
+            lines = clean_content.split('\n')
             
             for line in lines:
                 line = line.strip()
-                
+                if not line:
+                    continue
+                    
+                # Headers
                 if line.startswith('# '):
-                    # Main heading
                     heading = doc.add_heading(line[2:], level=1)
                 elif line.startswith('## '):
-                    # Section heading
                     heading = doc.add_heading(line[3:], level=2)
                 elif line.startswith('### '):
-                    # Subsection heading
                     heading = doc.add_heading(line[4:], level=3)
+                # Bold text
                 elif line.startswith('**') and line.endswith('**'):
-                    # Bold text
                     p = doc.add_paragraph()
-                    run = p.add_run(line[2:-2])
-                    run.bold = True
-                elif line:
-                    # Regular paragraph
-                    doc.add_paragraph(line)
+                    p.add_run(line[2:-2]).bold = True
+                # Bullet points
+                elif line.startswith('- '):
+                    doc.add_paragraph(line[2:], style='List Bullet')
+                # Regular paragraphs
                 else:
-                    # Empty line - add space
-                    doc.add_paragraph()
+                    # Remove markdown formatting
+                    clean_line = line.replace('**', '').replace('*', '')
+                    doc.add_paragraph(clean_line)
             
             # Save to bytes
-            doc_io = io.BytesIO()
-            doc.save(doc_io)
-            doc_io.seek(0)
-            return doc_io.read()
-            
+            with tempfile.NamedTemporaryFile() as tmp_file:
+                doc.save(tmp_file.name)
+                tmp_file.seek(0)
+                return tmp_file.read()
+                
         except Exception as e:
-            logger.error(f"Word document generation error: {e}")
-            return b"Word document generation failed"
+            logger.error(f"DOCX generation failed: {e}")
+            return None
+
+    def _generate_word_document(self, content: str) -> bytes:
+        """Alias for _generate_docx to maintain compatibility."""
+        return self._generate_docx(content)
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

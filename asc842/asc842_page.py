@@ -62,11 +62,9 @@ def render_asc842_page():
                 memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
                 memo_generator.display_clean_memo(memo_content)
                 
-                # Option to clear and start new analysis
-                st.divider()
-                if st.button("🔄 Clear Results & Start New Analysis", 
-                           type="secondary", 
-                           use_container_width=True):
+                # Add "Analyze Another Contract" button
+                st.markdown("---")
+                if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
                     # Clear session state
                     if analysis_key in st.session_state:
                         del st.session_state[analysis_key]
