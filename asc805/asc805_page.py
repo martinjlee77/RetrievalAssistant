@@ -10,14 +10,14 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.cost_estimator import cost_estimator
-from shared.billing_manager import billing_manager
+from shared.preflight_pricing import PreflightPricing  
+from shared.wallet_manager import WalletManager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
 from asc805.step_analyzer import ASC805StepAnalyzer
 from asc805.knowledge_search import ASC805KnowledgeSearch
-from utils.document_extractor import DocumentExtractor
+from shared.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -33,30 +33,112 @@ def render_asc805_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 805 5-Step Memo Generator]")
+    st.title(":primary[ASC 805: Business Combinations]")
     with st.container(border=True):
         st.markdown(":primary[**Purpose:**] Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
     
     # Get user inputs with progressive disclosure
-    contract_text, filename, additional_context, is_ready = get_asc805_inputs()
+    uploaded_files, additional_context, is_ready = get_asc805_inputs_new()
 
-    # Critical user warning before analysis
-    if is_ready:
-        warning_placeholder = st.empty()  # Create a placeholder for the warning
-        warning_placeholder.info(
-            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-            "- Analysis takes **3-5 minutes** and costs significant API tokens\n"
-            "- Switching tabs or closing the browser will stop the analysis\n"
-            "- Stay on this tab until analysis is complete\n"
-            "- You'll see a completion message when it's done"
-        )
-        if st.button("3️⃣ Analyze Contract & Generate Memo",
-                   type="primary",
-                   use_container_width=True,
-                   key="asc805_analyze"):
-            warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc805_analysis(contract_text, additional_context)
+    # Session management for analysis isolation
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+    session_id = st.session_state.user_session_id
+    analysis_key = f'asc805_analysis_complete_{session_id}'
+
+    # Check if analysis already completed for this session
+    if st.session_state.get(analysis_key, False):
+        # Analysis completed - display memo
+        memo_key = f'asc805_memo_data_{session_id}'
+        if memo_key in st.session_state:
+            memo_data = st.session_state[memo_key]
+            st.info("✅ **Analysis completed in this session.** Your ASC 805 memo is displayed below.")
+            
+            # Display memo using CleanMemoGenerator
+            from asc805.clean_memo_generator import CleanMemoGenerator
+            memo_generator_display = CleanMemoGenerator()
+            memo_generator_display.display_clean_memo(memo_data['memo_content'])
+            
+            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+                # Clear analysis state for fresh start with session isolation
+                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+                
+                # Clean up session-specific data
+                if memo_key in st.session_state:
+                    del st.session_state[memo_key]
+                if analysis_key in st.session_state:
+                    del st.session_state[analysis_key]
+                
+                logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
+                st.rerun()
+        return
+
+    # Get user token for pricing
+    user_token = auth_manager.get_user_token()
+    
+    # Show pricing and credit validation
+    if is_ready and uploaded_files:
+        # Pricing section with modern preflight system
+        pricing_container = st.empty()
+        credit_container = st.empty()
+        warning_placeholder = st.empty()
+        
+        with pricing_container.container(border=True):
+            st.markdown("### 💰 Pricing & Credits")
+            
+            # Get preflight pricing estimate  
+            pricing_result = PreflightPricing.estimate_document_analysis(
+                uploaded_files, "asc805"
+            )
+            
+            # Display pricing information
+            if pricing_result and pricing_result.get('success'):
+                estimated_cost = pricing_result.get('estimated_cost', 0)
+                st.info(f"**Estimated cost:** {estimated_cost} credits for this analysis")
+                
+                # Check user's credit balance
+                wallet_manager = WalletManager()
+                current_balance = wallet_manager.get_balance(user_token) if user_token else 0
+                
+                with credit_container.container():
+                    if current_balance >= estimated_cost:
+                        st.success(f"✅ **Credit balance:** {current_balance} credits (sufficient)")
+                        
+                        # Show critical warning before analysis
+                        warning_placeholder.info(
+                            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+                            "- Analysis takes **3-5 minutes** and uses significant credits\n"
+                            "- Switching tabs or closing browser will stop analysis\n"  
+                            "- Stay on this tab until analysis completes\n"
+                            "- You'll see completion message when done"
+                        )
+                        
+                        if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
+                                   type="primary",
+                                   use_container_width=True,
+                                   key="asc805_analyze"):
+                            # Clear all UI elements that should disappear during analysis
+                            warning_placeholder.empty()  # Clear the warning 
+                            pricing_container.empty()    # Clear pricing information
+                            credit_container.empty()     # Clear credit balance info
+                            if not user_token:
+                                st.error("❌ Authentication required. Please refresh the page and log in again.")
+                                return
+                            perform_asc805_analysis_new(pricing_result, additional_context, user_token)
+                    else:
+                        st.error(f"❌ **Insufficient credits:** {current_balance} available, {estimated_cost} required")
+                        st.markdown("**[Purchase Credits →](https://veritaslogic.ai/pricing)**")
+                        
+                        st.button("3️⃣ Insufficient Credits", 
+                                 disabled=True, 
+                                 use_container_width=True,
+                                 key="asc805_analyze_disabled")
+            else:
+                st.error("❌ Unable to estimate pricing. Please try again.")
+                st.button("3️⃣ Pricing Error", 
+                         disabled=True, 
+                         use_container_width=True,
+                         key="asc805_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Contract & Generate Memo", 
@@ -65,22 +147,46 @@ def render_asc805_page():
                  key="asc805_analyze_disabled")
 
 
-def get_asc805_inputs():
-    """Get ASC 805 specific inputs."""
-
-    # Document upload with ASC 805 specific help text
-    contract_text, filename = _upload_and_process_asc805()
+def get_asc805_inputs_new():
+    """Get ASC 805 specific inputs with new preflight system."""
+    
+    # Document upload section       
+    uploaded_files = st.file_uploader(
+        "1️⃣ Upload business combination documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our business limit is 50MB per file (required)",
+        type=['pdf', 'docx'],
+        accept_multiple_files=True,
+        help="Upload purchase agreements, merger documents, LOI, due diligence reports for ASC 805 analysis",
+        key=f"asc805_uploader_{st.session_state.get('file_uploader_key', 0)}"
+    )
 
     # Additional info (optional)
     additional_context = st.text_area(
         "2️⃣ Additional information or concerns (optional)",
-        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specificy your areas of focus or concerns.",
+        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
         height=100)
 
-    # Check completion status - only contract text required
-    is_ready = bool(contract_text)
-
-    return contract_text, filename, additional_context, is_ready
+    # Custom file size validation (50MB limit per our business rules)
+    MAX_FILE_SIZE_MB = 50
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if uploaded_files:
+        # Validate file sizes
+        oversized_files = []
+        for file in uploaded_files:
+            if file.size > MAX_FILE_SIZE_BYTES:
+                oversized_files.append(f"{file.name} ({file.size / (1024*1024):.1f}MB)")
+        
+        if oversized_files:
+            st.error(f"❌ **File size limit exceeded (50MB maximum):**\n" + 
+                    "\n".join([f"• {f}" for f in oversized_files]))
+            st.info("💡 **Tip:** The widget shows 200MB (Streamlit's technical limit), but our business limit is 50MB per file.")
+            is_ready = False
+        else:
+            is_ready = True
+    else:
+        is_ready = False
+    
+    return uploaded_files, additional_context, is_ready
 
 
 def _upload_and_process_asc805():
