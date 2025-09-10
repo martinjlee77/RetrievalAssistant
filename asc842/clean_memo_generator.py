@@ -237,8 +237,8 @@ class CleanMemoGenerator:
             """
             
             # Generate PDF
-            pdf = weasyprint.HTML(string=html_content).write_pdf()
-            return pdf
+            pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
+            return pdf_bytes or b"PDF generation failed"
             
         except ImportError:
             logger.error("WeasyPrint not available for PDF generation")
@@ -275,7 +275,8 @@ class CleanMemoGenerator:
                 else:
                     pdf.cell(0, 5, line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
             
-            return pdf.output(dest='S').encode('latin-1')
+            pdf_output = pdf.output(dest='S')
+            return pdf_output if isinstance(pdf_output, bytes) else pdf_output.encode('latin-1')
             
         except Exception as e:
             logger.error(f"Simple PDF generation error: {e}")
