@@ -498,7 +498,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
                 knowledge_search = ASC805KnowledgeSearch()
                 from asc805.clean_memo_generator import CleanMemoGenerator
                 memo_generator = CleanMemoGenerator(
-                    template_path="asc606/templates/memo_template.md")
+                    template_path="asc805/templates/memo_template.md")
                 from shared.ui_components import SharedUIComponents
                 ui = SharedUIComponents()
             except RuntimeError as e:
@@ -625,7 +625,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
             
             # Clean up session-specific data
-            memo_key = f'asc606_memo_data_{session_id}'
+            memo_key = f'asc805_memo_data_{session_id}'
             if memo_key in st.session_state:
                 del st.session_state[memo_key]
             if analysis_key in st.session_state:
@@ -738,146 +738,7 @@ logging.basicConfig(level=logging.INFO)
 # Main function for Streamlit navigation
 def main():
     """Main function called by Streamlit navigation."""
-    render_asc606_page()
-
-
-
-
-def _extract_customer_name(contract_text: str) -> str:
-    """Extract the customer/recipient party name from typical contract preambles or headings."""
-    try:
-        import re
-        
-        if not contract_text:
-            return "Customer"
-
-        # Preprocess: examine the first part of the document (preamble/definitions often appear early)
-        sample = contract_text[:6000]
-
-        # Normalize quotes and whitespace
-        sample = sample.replace(""", '"').replace(""", '"').replace("'", "'")
-        sample = re.sub(r'[ \t]+', ' ', sample)
-
-        # Role vocabularies (lowercase)
-        customer_roles = {
-            "customer", "client", "buyer", "purchaser", "licensee", "lessee",
-            "subscriber", "tenant", "end user", "end-user", "grantee",
-            # PO/invoice style labels treated as customer indicators:
-            "bill to", "sold to", "ship to"
-        }
-        vendor_roles = {
-            "vendor", "supplier", "seller", "licensor", "lessor",
-            "service provider", "provider", "contractor", "consultant", "reseller"
-        }
-
-        def clean_name(name: str) -> str:
-            # Trim, remove enclosing quotes/parentheses, compress spaces, strip trailing punctuation
-            n = name.strip().strip(' "').strip()
-            n = re.sub(r'\s+', ' ', n)
-            # Remove common trailing descriptors like .,;:)
-            n = re.sub(r'[\s\.,;:)\]]+$', '', n)
-            # Avoid obvious non-names
-            if len(n) < 3 or len(n) > 120:
-                return ""
-            return n
-
-        def plausible_company(name: str) -> bool:
-            if not name:
-                return False
-            # Avoid address-like strings
-            addr_tokens = {"street", "st.", "road", "rd.", "avenue", "ave.", "suite", "ste.", "floor", "fl.", "drive", "dr.", "blvd", "boulevard", "lane", "ln.", "way", "p.o.", "po box", "box"}
-            lname = name.lower()
-            if any(t in lname for t in addr_tokens):
-                return False
-            # Contains at least one letter and not mostly numbers
-            if not re.search(r'[A-Za-z]', name):
-                return False
-            # Reasonable length already checked in clean_name
-            return True
-
-        # PRIORITY 1: Preamble with both parties defined by role, e.g.:
-        # "between Acme, Inc. ("Supplier") and Beta LLC ("Customer")"
-        preamble_pair = re.compile(
-            r'\bbetween\s+(?P<p1>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r1>[^"\')]+)["\']?\s*\)\s*(?:,|and)?\s*and\s+(?P<p2>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<r2>[^"\')]+)["\']?\s*\)',
-            re.IGNORECASE | re.DOTALL
-        )
-        for m in preamble_pair.finditer(sample):
-            p1, r1, p2, r2 = m.group('p1', 'r1', 'p2', 'r2')
-            name_role_pairs = [
-                (clean_name(p1), r1.strip().lower()),
-                (clean_name(p2), r2.strip().lower())
-            ]
-            for name, role in name_role_pairs:
-                if name and any(cr == role or role in cr for cr in customer_roles):
-                    return name
-            # If one is clearly vendor and the other not, pick the non-vendor
-            roles = [r1.strip().lower(), r2.strip().lower()]
-            names = [clean_name(p1), clean_name(p2)]
-            if any(rv in vendor_roles for rv in roles):
-                # choose the one whose role is not vendor-like
-                for name, role in zip(names, roles):
-                    if name and (role not in vendor_roles):
-                        return name
-            # If ambiguous, try r2 if it looks like a customer role
-            if clean_name(p2) and plausible_company(clean_name(p2)):
-                # Heuristic: often the second party is the customer
-                return clean_name(p2)
-
-        # PRIORITY 2: Single party labeled as customer-like in the preamble or headings:
-        # e.g., 'and Global Dynamics Corp. ("Customer")'
-        labeled_single = re.compile(
-            r'\b(?:and\s+)?(?P<name>[^,\n;]+?)\s*\(\s*(?:the\s+)?["\']?(?P<role>Customer|Client|Buyer|Purchaser|Licensee|Lessee|Subscriber|Tenant|End[-\s]?User)["\']?\s*\)',
-            re.IGNORECASE
-        )
-        for m in labeled_single.finditer(sample):
-            name = clean_name(m.group('name'))
-            if name and plausible_company(name):
-                return name
-
-        # PRIORITY 3: Header fields like "Customer: Acme, Inc." or "Licensee: Orion LLC" or "Bill To: ..."
-        labeled_field = re.compile(
-            r'\b(?P<label>Customer|Client|Buyer|Purchaser|Licensee|Lessee|Subscriber|Tenant|End[-\s]?User|Bill\s*To|Sold\s*To|Ship\s*To)\s*[:\-]\s*(?P<name>[A-Za-z0-9\.\,&\-\s]{3,120})',
-            re.IGNORECASE
-        )
-        for m in labeled_field.finditer(sample):
-            name = clean_name(m.group('name'))
-            if name and plausible_company(name):
-                return name
-
-        # PRIORITY 4: If there is a preamble "between X and Y" without roles, try to pick the second party
-        between_two = re.compile(
-            r'\bbetween\s+(?P<p1>[^,\n;]+?)\s+and\s+(?P<p2>[^,\n;]+)',
-            re.IGNORECASE
-        )
-        m = between_two.search(sample)
-        if m:
-            p2 = clean_name(m.group('p2'))
-            if p2 and plausible_company(p2):
-                return p2
-
-        # LAST RESORT: Any plausible company name with common corporate suffixes
-        company_suffix = re.compile(
-            r'([A-Z][A-Za-z0-9&\.\- ]{2,80}?\s(?:Inc\.?|Incorporated|LLC|L\.L\.C\.|Ltd\.?|Limited|Corp\.?|Corporation|PLC|LP|LLP|GmbH|S\.?A\.?R\.?L\.?|S\.?A\.?|SAS|BV|NV|Pty\.?\s?Ltd\.?|Co\.?))\b'
-        )
-        matches = company_suffix.findall(sample)
-        if matches:
-            # Prefer a name that is near customer-like labels elsewhere
-            for name in matches:
-                if plausible_company(clean_name(name)):
-                    return clean_name(name)
-
-        return "Customer"
-
-    except Exception as e:
-        # Keep existing logging if present
-        if 'logger' in globals():
-            logger.error(f"Error extracting customer name: {str(e)}")
-        return "Customer"
-
-
-def _generate_analysis_title() -> str:
-    """Generate analysis title with timestamp."""
-    return f"ASC805_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
+    render_asc805_page()
 
 
 # For direct execution/testing
