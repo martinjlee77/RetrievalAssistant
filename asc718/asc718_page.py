@@ -39,8 +39,8 @@ def render_asc718_page():
     with st.container(border=True):
         st.markdown(":primary[**Purpose:**] Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
     
-    # Get user inputs with progressive disclosure
-    contract_text, filename, additional_context, is_ready = get_asc718_inputs()
+    # Get user inputs with progressive disclosure  
+    uploaded_files, additional_context, is_ready = get_asc718_inputs_new()
 
     # Critical user warning before analysis
     if is_ready:
@@ -57,8 +57,8 @@ def render_asc718_page():
                    use_container_width=True,
                    key="asc718_analyze"):
             warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc718_analysis(contract_text, additional_context)
+            if uploaded_files:  # Type guard to ensure uploaded_files is not None
+                perform_asc718_analysis(uploaded_files, additional_context)
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Award & Generate Memo", 
@@ -67,27 +67,10 @@ def render_asc718_page():
                  key="asc718_analyze_disabled")
 
 
-def get_asc718_inputs():
-    """Get ASC 718 specific inputs."""
-
-    # Document upload with ASC 718 specific help text
-    contract_text, filename = _upload_and_process_asc718()
-
-    # Additional info (optional)
-    additional_context = st.text_area(
-        "2️⃣ Additional information or concerns (optional)",
-        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specificy your areas of focus or concerns.",
-        height=100)
-
-    # Check completion status - only contract text required
-    is_ready = bool(contract_text)
-
-    return contract_text, filename, additional_context, is_ready
-
-
-def _upload_and_process_asc718():
-    """Handle file upload and processing specifically for ASC 718 analysis."""
-    # Use session state to control file uploader key for clearing
+def get_asc718_inputs_new():
+    """Get ASC 718 specific inputs using modern direct file upload pattern."""
+    
+    # File uploader key initialization 
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
         
@@ -98,59 +81,21 @@ def _upload_and_process_asc718():
         accept_multiple_files=True,
         key=f"asc718_files_{st.session_state.file_uploader_key}"
     )
-    
-    if not uploaded_files:
-        return None, None
-        
-    # Limit to 5 files for practical processing
-    if len(uploaded_files) > 5:
-        st.warning("⚠️ Maximum 5 files allowed. Using first 5 files only.")
-        uploaded_files = uploaded_files[:5]
-        
-    try:
-        combined_text = ""
-        processed_filenames = []
-        extractor = DocumentExtractor()
-        
-        # Show processing status to users
-        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
-            for uploaded_file in uploaded_files:
-                # Extract text using existing extractor
-                extraction_result = extractor.extract_text(uploaded_file)
-                
-                # Check for extraction errors
-                if extraction_result.get('error'):
-                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
-                    continue
-                
-                # Get the text from the extraction result
-                extracted_text = extraction_result.get('text', '')
-                if extracted_text and extracted_text.strip():
-                    combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
-                    processed_filenames.append(uploaded_file.name)
-                    # st.success(f"✅ Successfully processed {uploaded_file.name} ({len(extracted_text):,} characters)")
-                else:
-                    st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
-        
-        if not combined_text.strip():
-            st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
-            return None, None
-        
-        # Create comma-separated filename string
-        filename_string = ", ".join(processed_filenames)
-        
-        # st.success(f"🎉 Successfully processed {len(processed_filenames)} document(s): {filename_string}")
-        # st.info(f"📄 Total extracted content: {len(combined_text):,} characters")
-        
-        return combined_text.strip(), filename_string
-        
-    except Exception as e:
-        logger.error(f"Error processing uploaded files: {str(e)}")
-        st.error(f"❌ Error processing files: {str(e)}")
-        return None, None
 
-def perform_asc718_analysis(contract_text: str, additional_context: str = ""):
-    """Perform the complete ASC 805 analysis and display results with session isolation."""
+    # Additional info (optional)
+    additional_context = st.text_area(
+        "2️⃣ Additional information or concerns (optional)",
+        placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreements, specific concerns about vesting conditions, performance metrics, or areas requiring focused analysis).",
+        height=100)
+
+    # Check completion status - only uploaded files required
+    is_ready = bool(uploaded_files)
+
+    return uploaded_files, additional_context, is_ready
+
+
+def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
+    """Perform the complete ASC 718 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:
