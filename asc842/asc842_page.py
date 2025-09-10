@@ -75,40 +75,13 @@ def render_asc842_page():
                     st.rerun()
                 return
     
-    # Get user inputs with progressive disclosure
-    contract_text, filename, additional_context, is_ready = get_asc842_inputs()
+    # Get user inputs with progressive disclosure  
+    uploaded_files, additional_context, is_ready = get_asc842_inputs_new()
 
     # Preflight pricing and payment flow
     if is_ready:
-        # Process contract text for pricing (convert to file-like structure for processing)
-        import io
-        temp_files = []
-        
-        if contract_text:
-            # Create file-like object that matches Streamlit uploaded file interface
-            class ContractFile:
-                def __init__(self, content, name):
-                    self.name = name
-                    self.content = content.encode('utf-8') if isinstance(content, str) else content
-                    self._io = io.BytesIO(self.content)
-                    self.size = len(self.content)
-                    
-                def read(self, size=-1):
-                    return self._io.read(size)
-                    
-                def seek(self, offset, whence=0):
-                    return self._io.seek(offset, whence)
-                    
-                def tell(self):
-                    return self._io.tell()
-                    
-                def getvalue(self):
-                    return self._io.getvalue()
-            
-            temp_files = [ContractFile(contract_text, filename or "lease_contract.txt")]
-        
-        # Process files for pricing using the same system as ASC 340-40
-        pricing_result = preflight_pricing.process_files_for_pricing(temp_files)
+        # Process files for pricing
+        pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
         
         if not pricing_result['success']:
             st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
@@ -190,8 +163,7 @@ def render_asc842_page():
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
-                if contract_text:  # Type guard to ensure contract_text is not None
-                    perform_asc842_analysis(contract_text, additional_context, filename or "lease_contract.txt")
+                perform_asc842_analysis_new(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -205,11 +177,17 @@ def render_asc842_page():
                  key="asc842_analyze_disabled")
 
 
-def get_asc842_inputs():
-    """Get ASC 842 specific inputs."""
-
-    # Document upload with ASC 842 specific help text
-    contract_text, filename = _upload_and_process_asc842()
+def get_asc842_inputs_new():
+    """Get ASC 842 specific inputs with new preflight system."""
+    
+    # Document upload section       
+    uploaded_files = st.file_uploader(
+        "1️⃣ Upload lease agreement and related documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our business limit is 50MB per file (required)",
+        type=['pdf', 'docx'],
+        accept_multiple_files=True,
+        help="Upload lease agreements, amendments, schedules, addenda, etc. for ASC 842 analysis",
+        key=f"asc842_uploader_{st.session_state.get('file_uploader_key', 0)}"
+    )
 
     # Additional info (optional)
     additional_context = st.text_area(
@@ -217,10 +195,28 @@ def get_asc842_inputs():
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents or specify your areas of focus or concerns.",
         height=100)
 
-    # Check completion status - only contract text required
-    is_ready = bool(contract_text)
-
-    return contract_text, filename, additional_context, is_ready
+    # Custom file size validation (50MB limit per our business rules)
+    MAX_FILE_SIZE_MB = 50
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if uploaded_files:
+        # Validate file sizes
+        oversized_files = []
+        for file in uploaded_files:
+            if file.size > MAX_FILE_SIZE_BYTES:
+                oversized_files.append(f"{file.name} ({file.size / (1024*1024):.1f}MB)")
+        
+        if oversized_files:
+            st.error(f"❌ **File size limit exceeded (50MB maximum):**\n" + 
+                    "\n".join([f"• {f}" for f in oversized_files]))
+            st.info("💡 **Tip:** The widget shows 200MB (Streamlit's technical limit), but our business limit is 50MB per file.")
+            is_ready = False
+        else:
+            is_ready = True
+    else:
+        is_ready = False
+    
+    return uploaded_files, additional_context, is_ready
 
 
 def _upload_and_process_asc842():
@@ -287,6 +283,73 @@ def _upload_and_process_asc842():
         st.error(f"❌ Error processing files: {str(e)}")
         return None, None
 
+
+def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, user_token: str):
+    """Perform the complete ASC 842 analysis using new file processing system."""
+    
+    # Session isolation - create unique session ID for this user
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
+    session_id = st.session_state.user_session_id
+    
+    # Create placeholder for the in-progress message
+    progress_message_placeholder = st.empty()
+    progress_message_placeholder.error(
+        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+        "Your analysis is running and will take up to 3-5 minutes. "
+        "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
+    )
+    
+    # Initialize analysis complete status with session isolation
+    analysis_key = f'asc842_analysis_complete_{session_id}'
+    memo_key = f'asc842_memo_data_{session_id}'
+    
+    if analysis_key not in st.session_state:
+        st.session_state[analysis_key] = False
+    
+    try:
+        # Process billing using wallet manager (like ASC 340-40)
+        required_price = pricing_result['tier_info']['price']
+        analysis_details = {
+            'asc_standard': 'ASC 842',
+            'total_words': pricing_result.get('total_words', 0),
+            'file_count': pricing_result.get('file_count', 0),
+            'tier_info': pricing_result['tier_info'],
+            'cost_charged': pricing_result['tier_info']['price']
+        }
+        
+        # Charge wallet
+        charge_result = wallet_manager.charge_for_analysis(user_token, required_price, analysis_details)
+        
+        if not charge_result['success']:
+            st.error(f"❌ **Payment Failed**\n\n{charge_result['error']}")
+            return
+        
+        # Extract combined text from file details (like ASC 340-40)
+        combined_text = ""
+        filename_list = []
+        
+        for file_detail in pricing_result.get('file_details', []):
+            if 'text_content' in file_detail and file_detail['text_content'].strip():
+                combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
+                filename_list.append(file_detail['filename'])
+        
+        filename_string = ", ".join(filename_list)
+        
+        if not combined_text.strip():
+            st.error("❌ No readable content found in uploaded files. Please check your documents and try again.")
+            return
+        
+        # Proceed with original analysis logic using the extracted text
+        perform_asc842_analysis(combined_text, additional_context, filename_string)
+        
+    except Exception as e:
+        logger.error(f"ASC 842 analysis error for session {session_id[:8]}: {str(e)}")
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
+        # Clear the progress message on error
+        progress_message_placeholder.empty()
 
 def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt"):
     """Perform the complete ASC 842 analysis and display results with session isolation."""
