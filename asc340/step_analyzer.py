@@ -642,11 +642,11 @@ Instructions:
                 return content
             else:
                 logger.error("Empty background response")
-                return f"We have reviewed the contract cost documents provided by {company_name} to determine the appropriate accounting treatment under ASC 340-40."
+                return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
             
         except Exception as e:
             logger.error(f"Error generating background: {str(e)}")
-            return f"We have reviewed the contract cost documents provided by {company_name} to determine the appropriate accounting treatment under ASC 340-40."
+            return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
     
     def generate_conclusion_section(self, conclusions_text: str) -> str:
         """Generate conclusion section using clean LLM call."""
