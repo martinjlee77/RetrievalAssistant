@@ -189,6 +189,175 @@ def get_asc805_inputs_new():
     return uploaded_files, additional_context, is_ready
 
 
+def perform_asc805_analysis_new(pricing_result, additional_context, user_token):
+    """Perform ASC 805 analysis with modern pricing system integration."""
+    
+    # Session management for isolation
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+    session_id = st.session_state.user_session_id
+    analysis_key = f'asc805_analysis_complete_{session_id}'
+    
+    # Progress message that will be cleared later
+    progress_message_placeholder = st.empty()
+    progress_message_placeholder.info("🔄 **Analysis in progress...** Please stay on this tab.")
+    
+    # Get contract text from pricing result
+    contract_text = pricing_result.get('combined_text', '')
+    filename = pricing_result.get('filename', 'Business Combination Documents')
+    customer_name = pricing_result.get('customer_name', 'Entity')
+    analysis_title = f"Business Combination Analysis for {customer_name}"
+
+    try:
+        # Initialize components
+        with st.spinner("Initializing analysis components..."):
+            try:
+                analyzer = ASC805StepAnalyzer()
+                knowledge_search = ASC805KnowledgeSearch()
+                from asc805.clean_memo_generator import CleanMemoGenerator
+                memo_generator = CleanMemoGenerator()
+                from shared.ui_components import SharedUIComponents
+                ui = SharedUIComponents()
+            except RuntimeError as e:
+                st.error(f"❌ Critical Error: {str(e)}")
+                st.error("ASC 805 knowledge base is not available. Try again and contact support if this persists.")
+                st.stop()
+                return
+
+        # Extract entity name using LLM (with regex fallback)
+        with st.spinner("🏢 Extracting entity name..."):
+            try:
+                customer_name = analyzer.extract_entity_name_llm(contract_text)
+                logger.info(f"LLM extracted customer : {customer_name}")
+            except Exception as e:
+                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
+                customer_name = _extract_customer_name(contract_text)
+                logger.info(f"Regex fallback customer name: {customer_name}")
+
+        # Display progress
+        steps = [
+            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
+            "Step 5", "Memo Generation"
+        ]
+        progress_placeholder = st.empty()
+
+        # Step-by-step analysis with progress indicators
+        analysis_results = {}
+        
+        # Create a separate placeholder for progress indicators that can be cleared
+        progress_indicator_placeholder = st.empty()
+        
+        # Run 5 ASC 805 steps with progress
+        for step_num in range(1, 6):
+            # Show progress indicators in clearable placeholder
+            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
+
+            with st.spinner(f"Analyzing Step {step_num}..."):
+                # Get relevant guidance from knowledge base
+                authoritative_context = knowledge_search.search_for_step(
+                    step_num, contract_text)
+
+                # Analyze the step with additional context
+                step_result = analyzer._analyze_step(
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    customer_name=customer_name,
+                    additional_context=additional_context)
+
+                analysis_results[f'step_{step_num}'] = step_result
+                logger.info(f"DEBUG: Completed step {step_num}")
+
+        # Generate additional sections (Executive Summary, Background, Conclusion)
+        # Show final progress indicators in clearable placeholder
+        ui.analysis_progress(steps, 6, progress_indicator_placeholder)
+
+        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
+            # Extract conclusions from the 5 steps
+            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
+            
+            # Generate the three additional sections
+            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
+            background = analyzer.generate_background_section(conclusions_text, customer_name)
+            conclusion = analyzer.generate_conclusion_section(conclusions_text)
+            
+            # Combine into the expected structure for memo generator
+            final_results = {
+                'customer_name': customer_name,
+                'analysis_title': analysis_title,
+                'analysis_date': datetime.now().strftime("%B %d, %Y"),
+                'filename': filename,
+                'steps': analysis_results,
+                'executive_summary': executive_summary,
+                'background': background,
+                'conclusion': conclusion
+            }
+            
+            
+            # Generate memo directly from complete analysis results
+            memo_content = memo_generator.combine_clean_steps(final_results)
+
+        # Store memo data in session state and clear progress messages
+        progress_message_placeholder.empty()  # Clears the in-progress message
+        progress_placeholder.empty()  # Clears the step headers
+        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
+        
+        # Create clearable completion message
+        completion_message_placeholder = st.empty()
+        completion_message_placeholder.success(
+            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 805 memo is ready. Scroll down to view the results."
+        )
+        
+        # Signal completion with session isolation
+        st.session_state[analysis_key] = True
+        
+        # Store memo data with session isolation
+        memo_key = f'asc805_memo_data_{session_id}'
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'customer_name': customer_name,
+            'analysis_title': analysis_title,
+            'analysis_date': datetime.now().strftime("%B %d, %Y")
+        }
+             
+        # Display memo inline instead of switching pages
+        st.markdown("---")
+
+        with st.container(border=True):
+            st.markdown("""Your ASC 805 memo is displayed below. To save the results, you can either:
+            
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
+- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
+                """)
+        
+        # Display the memo using CleanMemoGenerator
+        memo_generator_display = CleanMemoGenerator()
+        memo_generator_display.display_clean_memo(memo_content)
+        
+        # Clear completion message immediately after memo displays
+        completion_message_placeholder.empty()
+        
+        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
+            # Clear analysis state for fresh start with session isolation
+            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
+            
+            # Clean up session-specific data
+            memo_key = f'asc805_memo_data_{session_id}'
+            if memo_key in st.session_state:
+                del st.session_state[memo_key]
+            if analysis_key in st.session_state:
+                del st.session_state[analysis_key]
+            
+            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
+            st.rerun()
+
+    except Exception as e:
+        # Clear the progress message even on error
+        progress_message_placeholder.empty()
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
+        logger.error(f"ASC 805 analysis error for session {session_id[:8]}...: {str(e)}")
+
+
 def _upload_and_process_asc805():
     """Handle file upload and processing specifically for ASC 805 analysis."""
     # Use session state to control file uploader key for clearing
@@ -272,7 +441,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
     )
     
     # Initialize analysis complete status with session isolation
-    analysis_key = f'asc606_analysis_complete_{session_id}'
+    analysis_key = f'asc805_analysis_complete_{session_id}'
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
@@ -292,7 +461,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
                 ui = SharedUIComponents()
             except RuntimeError as e:
                 st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 606 knowledge base is not available. Try again and contact support if this persists.")
+                st.error("ASC 805 knowledge base is not available. Try again and contact support if this persists.")
                 st.stop()
                 return
 
@@ -319,7 +488,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
         # Create a separate placeholder for progress indicators that can be cleared
         progress_indicator_placeholder = st.empty()
         
-        # Run 5 ASC 606 steps with progress
+        # Run 5 ASC 805 steps with progress
         for step_num in range(1, 6):
             # Show progress indicators in clearable placeholder
             ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
@@ -377,14 +546,14 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
         # Create clearable completion message
         completion_message_placeholder = st.empty()
         completion_message_placeholder.success(
-            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
+            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 805 memo is ready. Scroll down to view the results."
         )
         
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
         # Store memo data with session isolation
-        memo_key = f'asc606_memo_data_{session_id}'
+        memo_key = f'asc805_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
             'customer_name': customer_name,
@@ -396,7 +565,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
         st.markdown("---")
 
         with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+            st.markdown("""Your ASC 805 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
 - **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
@@ -427,8 +596,87 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
         # Clear the progress message even on error
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 606 analysis error for session {session_id[:8]}...: {str(e)}")
+        logger.error(f"ASC 805 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
+
+def _extract_customer_name(contract_text: str) -> str:
+    """Extract entity name from business combination documents."""
+    try:
+        import re
+        
+        if not contract_text:
+            return "Entity"
+
+        # Normalize quotes and whitespace
+        sample = contract_text[:6000].replace(""", '"').replace(""", '"').replace("'", "'")
+        sample = re.sub(r'[ \t]+', ' ', sample)
+
+        def clean_name(name: str) -> str:
+            n = name.strip().strip(' "').strip()
+            n = re.sub(r'\s+', ' ', n)
+            n = re.sub(r'[\s\.,;:)\]]+$', '', n)
+            if len(n) < 3 or len(n) > 120:
+                return ""
+            return n
+
+        def plausible_company(name: str) -> bool:
+            if not name:
+                return False
+            addr_tokens = {"street", "st.", "road", "rd.", "avenue", "ave.", "suite", "ste.", "floor", "fl.", "drive", "dr.", "blvd", "boulevard", "lane", "ln.", "way", "p.o.", "po box", "box"}
+            lname = name.lower()
+            if any(t in lname for t in addr_tokens):
+                return False
+            if not re.search(r'[A-Za-z]', name):
+                return False
+            return True
+
+        # Look for acquiring/target company patterns
+        target_patterns = [
+            r'\b(?:target|acquired|acquisition)\s+(?:company|entity|corporation|corp|inc|llc)[\s:]*([A-Za-z0-9\.\,&\-\s]{3,120})',
+            r'\b([A-Za-z0-9\.\,&\-\s]{3,120})\s+\((?:the\s+)?["\']?(?:target|acquired|acquisition)["\']?\s*\)',
+            r'\bbetween\s+([^,\n;]+?)\s+and\s+([^,\n;]+)',
+        ]
+        
+        for pattern in target_patterns:
+            matches = re.finditer(pattern, sample, re.IGNORECASE)
+            for match in matches:
+                for group in match.groups():
+                    name = clean_name(group)
+                    if name and plausible_company(name):
+                        return name
+
+        # Company suffix fallback
+        company_suffix = re.compile(
+            r'([A-Z][A-Za-z0-9&\.\- ]{2,80}?\s(?:Inc\.?|Incorporated|LLC|L\.L\.C\.|Ltd\.?|Limited|Corp\.?|Corporation|PLC|LP|LLP|GmbH|S\.?A\.?R\.?L\.?|S\.?A\.?|SAS|BV|NV|Pty\.?\s?Ltd\.?|Co\.?))\b'
+        )
+        matches = company_suffix.findall(sample)
+        if matches:
+            for name in matches:
+                if plausible_company(clean_name(name)):
+                    return clean_name(name)
+
+        return "Entity"
+
+    except Exception as e:
+        if 'logger' in globals():
+            logger.error(f"Error extracting entity name: {str(e)}")
+        return "Entity"
+
+
+def _generate_analysis_title() -> str:
+    """Generate analysis title with timestamp."""
+    return f"ASC805_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+
+# Main function for Streamlit navigation
+def main():
+    """Main function called by Streamlit navigation."""
+    render_asc805_page()
+
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
 
