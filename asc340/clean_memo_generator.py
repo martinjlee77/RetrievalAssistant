@@ -4,9 +4,10 @@ Displays clean GPT-4o output without any corruption.
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
@@ -231,11 +232,11 @@ class CleanMemoGenerator:
                         copyToClipboard();
                     </script>
                     """
-                    st.components.v1.html(copy_js, height=0)
+                    components.html(copy_js, height=0)
         else:
             st.warning("Memo content too short for download. Please regenerate the analysis.")
     
-    def _generate_pdf(self, memo_content: str) -> bytes:
+    def _generate_pdf(self, memo_content: str) -> Optional[bytes]:
         """Generate PDF from memo content using WeasyPrint."""
         try:
             import weasyprint
@@ -282,7 +283,7 @@ class CleanMemoGenerator:
         text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
         return text.strip()
 
-    def _generate_docx(self, memo_content: str) -> bytes:
+    def _generate_docx(self, memo_content: str) -> Optional[bytes]:
         """Generate DOCX from memo content using python-docx."""
         try:
             from docx import Document
