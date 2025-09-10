@@ -678,16 +678,7 @@ def main():
     render_asc805_page()
 
 
-# OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
-
-
-# Executive summary generation moved to ASC606StepAnalyzer class
-
-
-# Final conclusion generation moved to ASC606StepAnalyzer class
-
-
-# Issues collection removed - issues are already included in individual step analyses
+# Legacy system components removed - Using modern direct approach
 
 
 # Configure logging
