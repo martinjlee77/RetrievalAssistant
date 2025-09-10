@@ -35,30 +35,124 @@ def render_asc718_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 718 5-Step Memo Generator]")
-    with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
+    st.title(":primary[ASC 718: Stock Compensation]")
+    st.info("**Purpose:** Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
+    
+    # Check for active analysis first
+    if analysis_manager.show_active_analysis_warning():
+        return  # User has active analysis, show warning and exit
+    
+    # Check for existing completed analysis in session state (restore persistence)
+    session_id = st.session_state.get('user_session_id', '')
+    if session_id:
+        analysis_key = f'asc718_analysis_complete_{session_id}'
+        memo_key = f'asc718_memo_data_{session_id}'
+        
+        # If analysis is complete and memo exists, show results instead of file upload
+        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            st.success("✅ **Analysis Complete!**")
+            st.markdown("### 📄 Generated ASC 718 Memo")
+            
+            # Display the existing memo with enhanced downloads
+            from asc718.clean_memo_generator import CleanMemoGenerator
+            memo_generator = CleanMemoGenerator()
+            memo_data = st.session_state[memo_key]
+            # Extract memo content from stored dictionary
+            memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
+            memo_generator.display_clean_memo(memo_content)
+            
+            # Add "Analyze Another Contract" button
+            st.markdown("---")
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                # Reset analysis state for new analysis including file uploaders
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc718' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+            return  # Exit early, don't show file upload interface
     
     # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc718_inputs_new()
 
-    # Critical user warning before analysis
+    # Preflight pricing and payment flow
     if is_ready:
-        warning_placeholder = st.empty()  # Create a placeholder for the warning
-        warning_placeholder.info(
-            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-            "- Analysis takes **3-5 minutes** and costs significant API tokens\n"
-            "- Switching tabs or closing the browser will stop the analysis\n"
-            "- Stay on this tab until analysis is complete\n"
-            "- You'll see a completion message when it's done"
-        )
-        if st.button("3️⃣ Analyze Award & Generate Memo",
-                   type="primary",
-                   use_container_width=True,
-                   key="asc718_analyze"):
-            warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if uploaded_files:  # Type guard to ensure uploaded_files is not None
-                perform_asc718_analysis(uploaded_files, additional_context)
+        # Process files for pricing
+        pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        
+        if not pricing_result['success']:
+            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+            return
+        
+        # Display pricing information
+        pricing_container = st.empty()
+        with pricing_container:
+            st.markdown("### :primary[Analysis Pricing]")
+            st.info(pricing_result['billing_summary'])
+            
+            # Show file processing details
+            if pricing_result.get('processing_errors'):
+                st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
+        
+        # Get required price and check wallet balance
+        required_price = pricing_result['tier_info']['price']
+        user_token = auth_manager.get_auth_token()
+        
+        # Get wallet balance
+        if not user_token:
+            st.error("❌ Authentication required. Please refresh the page and log in again.")
+            return
+        wallet_info = wallet_manager.get_user_balance(user_token)
+        current_balance = wallet_info.get('balance', 0.0)
+        
+        # Check if user has sufficient credits
+        credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
+        
+        # Credit balance display - store in variable so we can clear it
+        credit_container = st.empty()       
+        if credit_check['can_proceed']:
+            msg = (
+                f"{credit_check['message']}\n"
+                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
+            )
+            credit_container.info(msg)
+            can_proceed = True
+        else:
+            credit_container.error(credit_check['message'])
+            
+            # Show wallet top-up options
+            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
+            
+            if selected_amount:
+                st.info(f"Please complete your payment and refresh this page to proceed with the \\${required_price:.0f} analysis.")
+            can_proceed = False
+
+        # Analysis button with pricing integration
+        warning_placeholder = st.empty()
+        if can_proceed:
+            warning_placeholder.info(
+                "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+                "- Analysis takes **3-5 minutes** and will deduct credits from your account\n"
+                "- Switching tabs or closing the browser will stop the analysis and forfeit your progress\n"
+                "- Stay on this tab until analysis is complete\n"
+                "- You'll see a completion message when it's done"
+            )
+            if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc718_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                perform_asc718_analysis(pricing_result, additional_context, user_token)
+        else:
+            st.button("3️⃣ Insufficient Credits", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc718_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Award & Generate Memo", 
@@ -94,51 +188,27 @@ def get_asc718_inputs_new():
     return uploaded_files, additional_context, is_ready
 
 
-def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
+def perform_asc718_analysis(pricing_result, additional_context: str = "", user_token: str = ""):
     """Perform the complete ASC 718 analysis and display results with session isolation."""
     
-    # Process uploaded files first
-    if not uploaded_files:
-        st.error("❌ No files provided for analysis.")
+    # Validate pricing result and user token
+    if not pricing_result or not pricing_result.get('success'):
+        st.error("❌ Invalid pricing information.")
+        return
+    
+    if not user_token:
+        st.error("❌ Authentication required.")
+        return
+    
+    # Get processed file content from pricing result 
+    combined_text = pricing_result.get('combined_text', '')
+    filename_string = pricing_result.get('filename_summary', 'Uploaded Documents')
+    
+    if not combined_text or not combined_text.strip():
+        st.error("❌ No readable content found in uploaded files.")
         return
         
-    # Extract text from uploaded files
-    try:
-        combined_text = ""
-        processed_filenames = []
-        extractor = DocumentExtractor()
-        
-        # Show processing status to users
-        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
-            for uploaded_file in uploaded_files:
-                # Extract text using existing extractor
-                extraction_result = extractor.extract_text(uploaded_file)
-                
-                # Check for extraction errors
-                if extraction_result.get('error'):
-                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
-                    continue
-                
-                # Get the text from the extraction result
-                extracted_text = extraction_result.get('text', '')
-                if extracted_text and extracted_text.strip():
-                    combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
-                    processed_filenames.append(uploaded_file.name)
-                else:
-                    st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
-        
-        if not combined_text.strip():
-            st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
-            return
-            
-        # Create comma-separated filename string
-        filename_string = ", ".join(processed_filenames)
-        contract_text = combined_text.strip()
-        
-    except Exception as e:
-        logger.error(f"Error processing uploaded files: {str(e)}")
-        st.error(f"❌ Error processing files: {str(e)}")
-        return
+    contract_text = combined_text.strip()
     
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:
