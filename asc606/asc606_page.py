@@ -65,7 +65,7 @@ def render_asc606_page():
             st.markdown("---")
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
                 # Reset analysis state for new analysis including file uploaders
-                keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
                 for key in keys_to_clear:
                     del st.session_state[key]
                 st.rerun()
@@ -98,6 +98,9 @@ def render_asc606_page():
         user_token = auth_manager.get_auth_token()
         
         # Get wallet balance
+        if not user_token:
+            st.error("❌ Authentication required. Please refresh the page and log in again.")
+            return
         wallet_info = wallet_manager.get_user_balance(user_token)
         current_balance = wallet_info.get('balance', 0.0)
         
@@ -121,6 +124,9 @@ def render_asc606_page():
             
             if selected_amount:
                 # Process credit purchase
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
                 purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
                 
                 if purchase_result['success']:
@@ -150,6 +156,9 @@ def render_asc606_page():
                 warning_placeholder.empty()  # Clear the warning 
                 pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
                 perform_asc606_analysis_new(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
@@ -561,7 +570,7 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         st.markdown("---")
                         if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
                             # Reset analysis state for new analysis including file uploaders
-                            keys_to_clear = [k for k in st.session_state.keys() if 'asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower()]
+                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
                             for key in keys_to_clear:
                                 del st.session_state[key]
                             st.rerun()
