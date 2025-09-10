@@ -81,25 +81,31 @@ def render_asc842_page():
     # Preflight pricing and payment flow
     if is_ready:
         # Process contract text for pricing (convert to file-like structure for processing)
-        import tempfile
-        import os
+        import io
         temp_files = []
         
         if contract_text:
-            # Create temporary file for pricing calculation
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
-                f.write(contract_text)
-                temp_file_path = f.name
-            
-            # Create file-like object for preflight pricing
-            class TempFile:
-                def __init__(self, path, name):
+            # Create file-like object that matches Streamlit uploaded file interface
+            class ContractFile:
+                def __init__(self, content, name):
                     self.name = name
-                    with open(path, 'r', encoding='utf-8') as f:
-                        self.content = f.read()
-                    os.unlink(path)  # Clean up temp file
+                    self.content = content.encode('utf-8') if isinstance(content, str) else content
+                    self._io = io.BytesIO(self.content)
+                    self.size = len(self.content)
+                    
+                def read(self, size=-1):
+                    return self._io.read(size)
+                    
+                def seek(self, offset, whence=0):
+                    return self._io.seek(offset, whence)
+                    
+                def tell(self):
+                    return self._io.tell()
+                    
+                def getvalue(self):
+                    return self._io.getvalue()
             
-            temp_files = [TempFile(temp_file_path, filename or "lease_contract.txt")]
+            temp_files = [ContractFile(contract_text, filename or "lease_contract.txt")]
         
         # Process files for pricing using the same system as ASC 340-40
         pricing_result = preflight_pricing.process_files_for_pricing(temp_files)
