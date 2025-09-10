@@ -123,7 +123,18 @@ def render_asc718_page():
             selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
             
             if selected_amount:
-                st.info(f"Please complete your payment and refresh this page to proceed with the \\${required_price:.0f} analysis.")
+                # Process credit purchase
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
+                
+                if purchase_result['success']:
+                    st.success(purchase_result['message'])
+                    st.rerun()  # Refresh to update balance
+                else:
+                    st.error(purchase_result['message'])
+            
             can_proceed = False
 
         # Analysis button with pricing integration
@@ -131,8 +142,8 @@ def render_asc718_page():
         if can_proceed:
             warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-                "- Analysis takes **3-5 minutes** and will deduct credits from your account\n"
-                "- Switching tabs or closing the browser will stop the analysis and forfeit your progress\n"
+                "- Analysis takes **3-5 minutes**\n"
+                "- Switching tabs or closing the browser will stop the analysis\n"
                 "- Stay on this tab until analysis is complete\n"
                 "- You'll see a completion message when it's done"
             )
@@ -155,7 +166,7 @@ def render_asc718_page():
                      key="asc718_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
-        st.button("3️⃣ Analyze Award & Generate Memo", 
+        st.button("3️⃣ Analyze Contract & Generate Memo", 
                  disabled=True, 
                  use_container_width=True,
                  key="asc718_analyze_disabled")
@@ -169,11 +180,11 @@ def get_asc718_inputs_new():
         st.session_state.file_uploader_key = 0
         
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload **stock compensation agreements and related documents**, e.g., equity award agreements, stock option plans, RSU agreements, performance share awards (required)",
+        "1️⃣ Upload stock compensation agreements and related documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our business limit is 50MB per file (required)",
         type=['pdf', 'docx'],
-        help="Upload up to 5 relevant stock compensation documents (PDF or DOCX) for ASC 718 share-based payment analysis. Include equity award agreements, stock option plans, restricted stock agreements, performance share awards, or related documentation. Incomplete documentation may lead to inaccurate stock compensation accounting analysis.",
         accept_multiple_files=True,
-        key=f"asc718_files_{st.session_state.file_uploader_key}"
+        help="Upload stock compensation agreements, equity awards, or related documents for ASC 718 analysis",
+        key=f"asc718_uploader_{st.session_state.get('file_uploader_key', 0)}"
     )
 
     # Additional info (optional)
@@ -182,8 +193,26 @@ def get_asc718_inputs_new():
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreements, specific concerns about vesting conditions, performance metrics, or areas requiring focused analysis).",
         height=100)
 
-    # Check completion status - only uploaded files required
-    is_ready = bool(uploaded_files)
+    # Custom file size validation (50MB limit per our business rules)
+    MAX_FILE_SIZE_MB = 50
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    if uploaded_files:
+        # Validate file sizes
+        oversized_files = []
+        for file in uploaded_files:
+            if file.size > MAX_FILE_SIZE_BYTES:
+                oversized_files.append(f"{file.name} ({file.size / (1024*1024):.1f}MB)")
+        
+        if oversized_files:
+            st.error(f"❌ **File size limit exceeded (50MB maximum):**\n" + 
+                    "\n".join([f"• {f}" for f in oversized_files]))
+            st.info("💡 **Tip:** The widget shows 200MB (Streamlit's technical limit), but our business limit is 50MB per file.")
+            is_ready = False
+        else:
+            is_ready = True
+    else:
+        is_ready = False
 
     return uploaded_files, additional_context, is_ready
 
