@@ -63,7 +63,9 @@ def render_asc340_page():
                    key="asc340_analyze"):
             warning_placeholder.empty()  # Clear the warning after the button is pressed
             if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc340_analysis(contract_text, filename, additional_context)
+                # Ensure filename is not None for type safety
+                safe_filename = filename if filename is not None else "Unknown Document"
+                perform_asc340_analysis(contract_text, safe_filename, additional_context)
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Documents & Generate Memo", 
