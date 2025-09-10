@@ -161,7 +161,7 @@ def render_asc842_page():
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
                 if contract_text:  # Type guard to ensure contract_text is not None
-                    perform_asc842_analysis(contract_text, additional_context, filename or "lease_contract.txt", user_token)
+                    perform_asc842_analysis(contract_text, additional_context, filename or "lease_contract.txt")
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
