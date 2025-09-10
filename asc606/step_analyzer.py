@@ -51,7 +51,6 @@ class ASC606StepAnalyzer:
     def extract_entity_name_llm(self, contract_text: str) -> str:
         """Extract the customer entity name using LLM analysis."""
         try:
-            logger.info("DEBUG: Extracting customer entity name using LLM")
             
             request_params = {
                 "model": self.light_model,
@@ -97,7 +96,6 @@ Respond with ONLY the customer name, nothing else."""
                 logger.warning(f"LLM returned suspicious customer name: {entity_name}")
                 return "Customer"
                 
-            logger.info(f"DEBUG: LLM extracted customer name: {entity_name}")
             return entity_name
             
         except Exception as e:
@@ -199,21 +197,7 @@ Respond with ONLY the customer name, nothing else."""
                     }
         
         # Generate additional sections using clean LLM calls
-        logger.info("DEBUG: Starting additional section generation...")
-        logger.info(f"DEBUG: Results structure keys: {results.keys()}")
-        logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
-        
-        # DEBUG: Log step data before extraction
-        logger.info(f"DEBUG: About to extract conclusions from steps: {list(results['steps'].keys())}")
-        for step_key, step_data in results['steps'].items():
-            if isinstance(step_data, dict):
-                logger.info(f"DEBUG: {step_key} structure: {list(step_data.keys())}")
-                if 'markdown_content' in step_data:
-                    content = step_data['markdown_content']
-                    logger.info(f"DEBUG: {step_key} content length: {len(content)}")
-        
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
-        logger.info(f"DEBUG: Extracted conclusions text length: {len(conclusions_text)} chars")
         
         # Generate executive summary, background, and conclusion
         logger.info("Generating executive summary...")
@@ -222,7 +206,7 @@ Respond with ONLY the customer name, nothing else."""
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
-        logger.info("DEBUG: All additional sections generated successfully")
+        logger.info("Generated executive summary, background, and conclusion sections")
         
         logger.info("ASC 606 analysis completed successfully")
         return results
@@ -320,7 +304,6 @@ Respond with ONLY the customer name, nothing else."""
         
         # Make API call
         try:
-            logger.info(f"DEBUG: Making API call to {self.model} for Step {step_num}")
             # Build request parameters
             request_params = {
                 "model": self.model,
@@ -355,8 +338,6 @@ Respond with ONLY the customer name, nothing else."""
                 # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
                 
-                # Log sample of clean content for verification
-                logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
             
             # Return clean markdown content - NO PROCESSING
             return {
@@ -536,7 +517,6 @@ CRITICAL FORMATTING REQUIREMENTS:
         """Extract conclusion text from all completed steps."""
         conclusions = []
         logger.info(f"Extracting conclusions from {len(steps_data)} steps")
-        logger.info(f"DEBUG: steps_data keys: {list(steps_data.keys())}")
         
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
@@ -578,9 +558,7 @@ CRITICAL FORMATTING REQUIREMENTS:
                         conclusions.append(f"Step {step_num}: {conclusion}")
                         logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
                     else:
-                        logger.info(f"DEBUG: Failed to extract conclusion from Step {step_num}")
-                        logger.info(f"DEBUG: Step {step_num} content contains '**Conclusion:**': {'**Conclusion:**' in content}")
-                        logger.info(f"DEBUG: Step {step_num} content sample: {content[:100]}...")
+                        logger.warning(f"Could not extract conclusion from Step {step_num} content")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         
