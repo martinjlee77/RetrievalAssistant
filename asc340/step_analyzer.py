@@ -51,7 +51,7 @@ class ASC340StepAnalyzer:
     def extract_entity_name_llm(self, contract_text: str) -> str:
         """Extract the company name using LLM analysis."""
         try:
-            logger.info("DEBUG: Extracting company name using LLM")
+            logger.info("Extracting company name using LLM")
             
             request_params = {
                 "model": self.light_model,
@@ -139,7 +139,7 @@ Respond with ONLY the company name, nothing else."""
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
-                        company_name: str,
+                        customer_name: str,
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
@@ -148,14 +148,14 @@ Respond with ONLY the company name, nothing else."""
         Args:
             contract_text: The contract document text
             authoritative_context: Retrieved ASC 340-40 guidance
-            company_name: Company name
+            customer_name: Customer/company name
             analysis_title: Analysis title
             additional_context: Optional user-provided context
             
         Returns:
             Dictionary containing analysis results for each step
         """
-        logger.info(f"Starting ASC 340-40 analysis for {company_name}")
+        logger.info(f"Starting ASC 340-40 analysis for {customer_name}")
         
         # Add large contract warning
         word_count = len(contract_text.split())
@@ -163,7 +163,7 @@ Respond with ONLY the company name, nothing else."""
             logger.warning(f"Large contract ({word_count} words). Consider splitting if analysis fails.")
         
         results = {
-            'company_name': company_name,
+            'customer_name': customer_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y"),
             'steps': {}
@@ -178,7 +178,7 @@ Respond with ONLY the company name, nothing else."""
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    company_name=company_name,
+                    customer_name=customer_name,
                     additional_context=additional_context
                 ): step_num
                 for step_num in range(1, 3)
@@ -199,7 +199,7 @@ Respond with ONLY the company name, nothing else."""
                     }
         
         # Generate additional sections using clean LLM calls
-        logger.info("DEBUG: Starting additional section generation...")
+        logger.info("Starting additional section generation")
         logger.info(f"DEBUG: Results structure keys: {results.keys()}")
         logger.info(f"DEBUG: Steps data keys: {results['steps'].keys()}")
         
@@ -222,7 +222,7 @@ Respond with ONLY the company name, nothing else."""
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_conclusion_section(conclusions_text)
-        logger.info("DEBUG: All additional sections generated successfully")
+        logger.info("All additional sections generated successfully")
         
         logger.info("ASC 340-40 analysis completed successfully")
         return results
@@ -244,7 +244,7 @@ Respond with ONLY the company name, nothing else."""
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    company_name=company_name,
+                    customer_name=customer_name,
                     additional_context=additional_context
                 )
             except openai.RateLimitError as e:
@@ -563,9 +563,9 @@ CRITICAL FORMATTING REQUIREMENTS:
         
         return conclusions_text
     
-    def generate_executive_summary(self, conclusions_text: str, company_name: str) -> str:
+    def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
         """Generate executive summary using clean LLM call."""
-        prompt = f"""Generate a professional executive summary for an ASC 340-40 analysis for {company_name}.
+        prompt = f"""Generate a professional executive summary for an ASC 340-40 analysis for {customer_name}.
 
 Step Conclusions:
 {conclusions_text}
@@ -608,11 +608,11 @@ Requirements:
             logger.error(f"Error generating executive summary: {str(e)}")
             return "Executive summary generation failed. Please review individual step analyses below."
     
-    def generate_background_section(self, conclusions_text: str, company_name: str) -> str:
+    def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
         """Generate background section using clean LLM call."""
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
-Company: {company_name}
+Company: {customer_name}
 Contract Summary: {conclusions_text}
 
 Instructions:
@@ -757,7 +757,7 @@ Instructions:
         
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
 
-Company: {company_name}
+Company: {customer_name}
 Contract Summary: {conclusions_text}
 
 Instructions:

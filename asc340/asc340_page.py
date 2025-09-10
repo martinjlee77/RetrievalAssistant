@@ -504,12 +504,6 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 return
                 
     except Exception as e:
-        logger.error(f"Analysis workflow error: {str(e)}")
-        analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
-        st.error(f"❌ **Analysis Error**: {str(e)}")
-        return
-    
-    except Exception as e:
         logger.error(f"Critical error in new ASC 340-40 analysis: {str(e)}")
         
         # Auto-credit user for failed analysis
