@@ -485,11 +485,19 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
              
+        # Add the important persistent message before memo display (like ASC 606)
+        with st.container(border=True):
+            st.info("""**IMPORTANT:** Your ASC 842 memo is displayed below. To save the results, you can either:
+            
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
+- **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
+                """)
+        
         # Display the memo using CleanMemoGenerator (like ASC 606)
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
         
-        # Clear completion message immediately after memo displays
+        # Clear completion message after memo displays (but keep the important info above)
         completion_message_placeholder.empty()
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
