@@ -13,15 +13,122 @@ import os
 import re
 from datetime import datetime
 import logging
+from typing import Dict, Any
+from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
 
 class CleanMemoGenerator:
     """Clean memo generator for ASC 718 analysis with enhanced formatting and download options."""
     
-    def __init__(self):
+    def __init__(self, template_path=None):
         """Initialize the clean memo generator."""
         pass
+    
+    def combine_clean_steps(self, analysis_results: Dict[str, Any]) -> str:
+        """Combine clean step markdown into final memo - NO PROCESSING."""
+        
+        # Get basic info
+        customer_name = analysis_results.get('customer_name', 'Customer')
+        analysis_title = analysis_results.get('analysis_title', 'Stock Compensation Analysis')
+        analysis_date = datetime.now().strftime("%B %d, %Y")
+        
+        # Build memo with disclaimer at very top
+        memo_lines = [
+            DisclaimerGenerator.get_top_banner(),
+            "",
+            "# ASC 718 MEMORANDUM",
+            "",
+            f"**TO:** Chief Accounting Officer",
+            f"**FROM:** Technical Accounting Team - AI", 
+            f"**DATE:** {analysis_date}",
+            f"**RE:** {analysis_title} - ASC 718 Stock Compensation Analysis",
+            f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Stock Compensation Documents')}",
+            "",
+            ""
+        ]
+        
+        # Add Executive Summary
+        if 'executive_summary' in analysis_results:
+            memo_lines.extend([
+                "## EXECUTIVE SUMMARY",
+                "",
+                analysis_results['executive_summary'],
+                "",
+                ""
+            ])
+        
+        # Add Background
+        memo_lines.extend([
+            "## BACKGROUND",
+            ""
+        ])
+        
+        if 'background' in analysis_results:
+            memo_lines.extend([
+                analysis_results['background'],
+                "", 
+                ""
+            ])
+        else:
+            memo_lines.extend([
+                f"We have reviewed the stock compensation documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the ASC 718 methodology for share-based payment arrangements.",
+                "", 
+                ""
+            ])
+        
+        # Add Analysis Section Header
+        memo_lines.extend([
+            "## ASC 718 ANALYSIS",
+        ])
+        
+        # Add each step's clean markdown content - check both locations
+        steps_added = 0
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            step_data = None
+            
+            # Check if steps are in analysis_results directly
+            if step_key in analysis_results:
+                step_data = analysis_results[step_key]
+            # Check if steps are in analysis_results['steps']
+            elif 'steps' in analysis_results and step_key in analysis_results['steps']:
+                step_data = analysis_results['steps'][step_key]
+            
+            if step_data and isinstance(step_data, dict) and 'markdown_content' in step_data:
+                # Add clean content directly - ZERO PROCESSING
+                clean_content = step_data['markdown_content']
+                memo_lines.append(clean_content)
+                memo_lines.append("")
+                steps_added += 1
+                logger.info(f"Added clean step {step_num} content ({len(clean_content)} chars)")
+            else:
+                logger.warning(f"Step {step_num} not found or missing markdown_content. Available keys: {list(analysis_results.keys())}")
+        
+        # Add Conclusion Section
+        if 'conclusion' in analysis_results:
+            memo_lines.extend([
+                "",
+                "## CONCLUSION",
+                "",
+                analysis_results['conclusion'],
+                "",
+            ])
+        
+        # Add footer with full disclaimer
+        memo_lines.extend([
+            "---",
+            "",
+            "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
+            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]",
+            "",
+            DisclaimerGenerator.get_full_disclaimer()
+        ])
+        
+        # Join and return - NO PROCESSING
+        final_memo = "\n".join(memo_lines)
+        logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
+        return final_memo
     
     def display_clean_memo(self, memo_content: str):
         """Display clean memo with enhanced formatting and download options."""
@@ -310,3 +417,42 @@ class CleanMemoGenerator:
             processed_lines.append(line)
         
         return '\n'.join(processed_lines)
+    
+    def _convert_markdown_to_html(self, content: str) -> str:
+        """Convert markdown content to HTML for display."""
+        
+        # Convert headers
+        content = re.sub(r'^# (.+)$', r'<h1>\1</h1>', content, flags=re.MULTILINE)
+        content = re.sub(r'^## (.+)$', r'<h2>\1</h2>', content, flags=re.MULTILINE)
+        content = re.sub(r'^### (.+)$', r'<h3>\1</h3>', content, flags=re.MULTILINE)
+        content = re.sub(r'^#### (.+)$', r'<h4>\1</h4>', content, flags=re.MULTILINE)
+        content = re.sub(r'^##### (.+)$', r'<h5>\1</h5>', content, flags=re.MULTILINE)
+        content = re.sub(r'^###### (.+)$', r'<h6>\1</h6>', content, flags=re.MULTILINE)
+        
+        # Convert bold text
+        content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', content)
+        
+        # Convert italic text
+        content = re.sub(r'\*(.+?)\*', r'<em>\1</em>', content)
+        
+        # Convert bullet points
+        content = re.sub(r'^- (.+)$', r'<li>\1</li>', content, flags=re.MULTILINE)
+        
+        # Wrap consecutive list items in <ul> tags
+        content = re.sub(r'(<li>.*</li>\s*)+', r'<ul>\g<0></ul>', content, flags=re.DOTALL)
+        
+        # Convert line breaks to paragraphs
+        paragraphs = content.split('\n\n')
+        html_paragraphs = []
+        
+        for paragraph in paragraphs:
+            paragraph = paragraph.strip()
+            if paragraph:
+                # Don't wrap headers or lists in paragraph tags
+                if not (paragraph.startswith('<h') or paragraph.startswith('<ul>') or paragraph.startswith('<li>')):
+                    # Handle multi-line paragraphs
+                    paragraph = paragraph.replace('\n', '<br>')
+                    paragraph = f'<p>{paragraph}</p>'
+                html_paragraphs.append(paragraph)
+        
+        return '\n'.join(html_paragraphs)
