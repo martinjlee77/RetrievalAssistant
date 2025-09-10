@@ -10,8 +10,10 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.cost_estimator import cost_estimator
 from shared.billing_manager import billing_manager
+from shared.preflight_pricing import preflight_pricing
+from shared.wallet_manager import wallet_manager
+from shared.analysis_manager import analysis_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
