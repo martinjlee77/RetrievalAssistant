@@ -4,9 +4,10 @@ Displays clean GPT-4o output without any corruption.
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import logging
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
@@ -119,45 +120,213 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def display_clean_memo(self, memo_content: str) -> None:
-        """Display clean memo content using HTML to preserve formatting."""
+    def display_clean_memo(self, memo_content: str):
+        """Display memo with 4 download options - Markdown, PDF, Word, Copy to Clipboard."""
         
-        # Validate memo content
-        if not memo_content or memo_content.strip() == "":
-            st.error("Memo content is empty. Please regenerate the analysis.")
-            return
-            
-        # Log what we're about to display
-        logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
+        # First display the memo content
+        st.markdown("### 📄 Generated ASC 842 Memo")
+        st.markdown(memo_content)
         
-        # Convert markdown to HTML manually to bypass Streamlit's markdown processor
-        html_content = self._convert_markdown_to_html(memo_content)
+        # Create 4-column layout for download buttons
+        col1, col2, col3, col4 = st.columns(4)
         
-        # Use HTML display which preserves formatting
-        st.markdown(html_content, unsafe_allow_html=True)
-        
-        # Add blank line for spacing
-        st.markdown("")
-        
-        # Download button - only show if content exists and session state is preserved
-        # Check for session-isolated memo data
-        session_id = st.session_state.get('user_session_id', '')
-        memo_key = f'asc842_memo_data_{session_id}' if session_id else 'asc842_memo_data'
-        analysis_key = f'asc842_analysis_complete_{session_id}' if session_id else 'asc842_analysis_complete'
-        
-        if memo_content and len(memo_content.strip()) > 10:  # Minimal validation - always allow download for any real content
-            # Ensure session state persistence during download
-            st.session_state[analysis_key] = True
-            
+        # Button 1: Markdown Download
+        with col1:
             st.download_button(
-                label="📥 Download Memo (Markdown)",
+                label="📄 Download MD",
                 data=memo_content,
-                file_name=f"asc842_lease_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+                file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.md",
                 mime="text/markdown",
-                key=f"memo_download_{hash(memo_content[:100])}"  # Unique key prevents conflicts
+                use_container_width=True
             )
-        else:
-            st.warning("Memo content too short for download. Please regenerate the analysis.")
+        
+        # Button 2: PDF Download
+        with col2:
+            try:
+                pdf_bytes = self._generate_pdf(memo_content)
+                st.download_button(
+                    label="📑 Download PDF",
+                    data=pdf_bytes,
+                    file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+            except Exception as e:
+                logger.error(f"PDF generation failed: {e}")
+                st.button("📑 PDF Error", disabled=True, use_container_width=True)
+        
+        # Button 3: Word Download
+        with col3:
+            try:
+                docx_bytes = self._generate_word_document(memo_content)
+                st.download_button(
+                    label="📝 Download Word",
+                    data=docx_bytes,
+                    file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    use_container_width=True
+                )
+            except Exception as e:
+                logger.error(f"Word generation failed: {e}")
+                st.button("📝 Word Error", disabled=True, use_container_width=True)
+        
+        # Button 4: Copy to Clipboard
+        with col4:
+            # Create a unique key for this clipboard button
+            clipboard_key = f"clipboard_asc842_{hash(memo_content[:100])}"
+            
+            # JavaScript for copying to clipboard
+            copy_js = f"""
+            <script>
+            function copyToClipboard_{clipboard_key.replace('-', '_')}() {{
+                const text = `{memo_content.replace('`', '\\`').replace('$', '\\$')}`;
+                navigator.clipboard.writeText(text).then(function() {{
+                    // Success feedback could go here
+                }}).catch(function(err) {{
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }});
+            }}
+            </script>
+            """
+            
+            # Display the JavaScript
+            components.html(copy_js, height=0)
+            
+            # Create button that calls the JavaScript function
+            if st.button("📋 Copy Text", use_container_width=True, key=clipboard_key):
+                # Use JavaScript to copy
+                components.html(f"""
+                <script>
+                copyToClipboard_{clipboard_key.replace('-', '_')}();
+                </script>
+                """, height=0)
+                st.success("✅ Copied to clipboard!")
+    
+    def _generate_pdf(self, content: str) -> bytes:
+        """Generate PDF from markdown content."""
+        try:
+            import weasyprint
+            from markdown import markdown
+            
+            # Convert markdown to HTML
+            html_content = f"""
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body {{ font-family: 'Times New Roman', serif; line-height: 1.6; margin: 40px; }}
+                    h1 {{ color: #2E4F99; border-bottom: 2px solid #2E4F99; }}
+                    h2 {{ color: #2E4F99; margin-top: 30px; }}
+                    h3 {{ color: #333; }}
+                    .disclaimer {{ background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0; }}
+                    table {{ border-collapse: collapse; width: 100%; margin: 20px 0; }}
+                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+                    th {{ background-color: #f2f2f2; }}
+                </style>
+            </head>
+            <body>
+            {markdown(content, extensions=['tables', 'fenced_code'])}
+            </body>
+            </html>
+            """
+            
+            # Generate PDF
+            pdf = weasyprint.HTML(string=html_content).write_pdf()
+            return pdf
+            
+        except ImportError:
+            logger.error("WeasyPrint not available for PDF generation")
+            # Fallback to simple text PDF
+            return self._generate_simple_pdf(content)
+        except Exception as e:
+            logger.error(f"PDF generation error: {e}")
+            return self._generate_simple_pdf(content)
+    
+    def _generate_simple_pdf(self, content: str) -> bytes:
+        """Generate simple PDF using FPDF as fallback."""
+        try:
+            from fpdf import FPDF
+            
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font('Arial', size=11)
+            
+            # Split content into lines and add to PDF
+            lines = content.split('\n')
+            for line in lines:
+                # Handle long lines
+                if len(line) > 80:
+                    words = line.split(' ')
+                    current_line = ""
+                    for word in words:
+                        if len(current_line + word) < 80:
+                            current_line += word + " "
+                        else:
+                            pdf.cell(0, 5, current_line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+                            current_line = word + " "
+                    if current_line:
+                        pdf.cell(0, 5, current_line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+                else:
+                    pdf.cell(0, 5, line.encode('latin-1', 'replace').decode('latin-1'), ln=True)
+            
+            return pdf.output(dest='S').encode('latin-1')
+            
+        except Exception as e:
+            logger.error(f"Simple PDF generation error: {e}")
+            return b"PDF generation failed"
+    
+    def _generate_word_document(self, content: str) -> bytes:
+        """Generate Word document from markdown content."""
+        try:
+            from docx import Document
+            from docx.shared import Inches
+            import io
+            
+            doc = Document()
+            
+            # Split content into lines and process
+            lines = content.split('\n')
+            current_paragraph = doc.add_paragraph()
+            
+            for line in lines:
+                line = line.strip()
+                
+                if line.startswith('# '):
+                    # Main heading
+                    heading = doc.add_heading(line[2:], level=1)
+                elif line.startswith('## '):
+                    # Section heading
+                    heading = doc.add_heading(line[3:], level=2)
+                elif line.startswith('### '):
+                    # Subsection heading
+                    heading = doc.add_heading(line[4:], level=3)
+                elif line.startswith('**') and line.endswith('**'):
+                    # Bold text
+                    p = doc.add_paragraph()
+                    run = p.add_run(line[2:-2])
+                    run.bold = True
+                elif line:
+                    # Regular paragraph
+                    doc.add_paragraph(line)
+                else:
+                    # Empty line - add space
+                    doc.add_paragraph()
+            
+            # Save to bytes
+            doc_io = io.BytesIO()
+            doc.save(doc_io)
+            doc_io.seek(0)
+            return doc_io.read()
+            
+        except Exception as e:
+            logger.error(f"Word document generation error: {e}")
+            return b"Word document generation failed"
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""
