@@ -153,13 +153,55 @@ class CleanMemoGenerator:
             # Ensure session state persistence during download
             st.session_state[analysis_key] = True
             
-            st.download_button(
-                label="📥 Download Memo (Markdown)",
-                data=memo_content,
-                file_name=f"accounting_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                mime="text/markdown",
-                key=f"memo_download_{hash(memo_content[:100])}"  # Unique key prevents conflicts
-            )
+            # Multiple download options in columns
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.download_button(
+                    label="📥 Download Memo (Markdown)",
+                    data=memo_content,
+                    file_name=f"ASC340_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+                    mime="text/markdown",
+                    key=f"memo_download_md_{hash(memo_content[:100])}"
+                )
+            
+            with col2:
+                # Convert to PDF using WeasyPrint
+                try:
+                    from shared.pdf_generator import PDFGenerator
+                    pdf_generator = PDFGenerator()
+                    pdf_bytes = pdf_generator.markdown_to_pdf(memo_content)
+                    st.download_button(
+                        label="📄 Download Memo (PDF)",
+                        data=pdf_bytes,
+                        file_name=f"ASC340_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                        mime="application/pdf",
+                        key=f"memo_download_pdf_{hash(memo_content[:100])}"
+                    )
+                except ImportError:
+                    st.button("📄 PDF Download (Not Available)", disabled=True, help="PDF generation requires additional setup")
+                except Exception as e:
+                    logger.error(f"PDF generation failed: {str(e)}")
+                    st.button("📄 PDF Download (Error)", disabled=True, help=f"PDF generation error: {str(e)}")
+            
+            with col3:
+                # Convert to Word document using python-docx
+                try:
+                    from shared.docx_generator import DocxGenerator
+                    docx_generator = DocxGenerator()
+                    docx_bytes = docx_generator.markdown_to_docx(memo_content)
+                    st.download_button(
+                        label="📝 Download Memo (Word)",
+                        data=docx_bytes,
+                        file_name=f"ASC340_memo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key=f"memo_download_docx_{hash(memo_content[:100])}"
+                    )
+                except ImportError:
+                    st.button("📝 Word Download (Not Available)", disabled=True, help="Word generation requires additional setup")
+                except Exception as e:
+                    logger.error(f"Word generation failed: {str(e)}")
+                    st.button("📝 Word Download (Error)", disabled=True, help=f"Word generation error: {str(e)}")
         else:
             st.warning("Memo content too short for download. Please regenerate the analysis.")
     
