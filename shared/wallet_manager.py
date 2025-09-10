@@ -8,6 +8,7 @@ import requests
 import logging
 from typing import Dict, Any, List, Optional
 from .pricing_config import get_credit_packages
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -68,25 +69,21 @@ class WalletManager:
         """
         st.subheader(":primary[Add Credits to Your Account]")
         
-        # Show current balance and requirement
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Current Balance", f"${current_balance:.2f}")
+        # Show current balance and requirement, col1 and col4 are added for better layout
+        col1, col2, col3, col4 = st.columns([0.01,1,1,5])
+        with col2:
+            st.metric("Current Balance:", f"${current_balance:.0f}", border = True)
         
         if required_amount:
-            with col2:
+            with col3:
                 needed = max(0, required_amount - current_balance)
-                st.metric("Amount Needed", f"${needed:.2f}")
-        
-        # Redirect to dashboard for secure payment
-        st.info("💳 **Secure Payment Available**")
-        st.write("For your security and convenience, all credit purchases are processed through our secure dashboard.")
-        
+                st.metric("Add'l Amount Needed:", f"${needed:.0f}", border = True)       
+       
         # Create redirect button
         dashboard_url = "http://127.0.0.1:3000/dashboard.html#credits"
         
         st.markdown(f"""
-        <div style="text-align: center; margin: 20px 0;">
+        <div style="text-align: left; margin: 20px 0;">
             <a href="{dashboard_url}" target="_blank">
                 <button style="
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -106,12 +103,6 @@ class WalletManager:
             </a>
         </div>
         """, unsafe_allow_html=True)
-        
-        st.write("**Available payment options in dashboard:**")
-        st.write("• 💳 Credit/Debit Cards (Visa, Mastercard, Amex)")
-        st.write("• 📦 Quick packages: $50, $100, $250, $500")
-        st.write("• ✏️ Custom amounts: $10 - $1,000")
-        st.write("• 🔐 Secure Stripe processing")
         
         return None
     

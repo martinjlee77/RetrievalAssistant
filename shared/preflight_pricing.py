@@ -152,7 +152,7 @@ class PreflightPricing:
                 'current_credits': user_credits,
                 'required_credits': required_price,
                 'shortfall_amount': shortfall,
-                'message': f"⚠️ INSUFFICIENT CREDITS: You have \\${user_credits:.0f} but need \\${required_price:.0f}. Please add at least \\${shortfall:.0f} to your account using the form below."
+                'message': f"⚠️ INSUFFICIENT CREDITS: You have \\${user_credits:.0f} but need \\${required_price:.0f}. Please add at least \\${shortfall:.0f} to your account using the button below."
             }
 
 # Global instance for use across the application

@@ -241,7 +241,7 @@ class CleanMemoGenerator:
         if memo_content and len(memo_content.strip()) > 10:
             st.markdown("---")
             st.markdown("### 💾 Save Your Memo")
-            st.info("**Important:** Choose your preferred format to save this memo before navigating away.")
+            st.info("**IMPORTANT:** Choose your preferred format to save this memo before navigating away.")
             
             # Create columns for download buttons
             col1, col2, col3, col4 = st.columns(4)
@@ -281,7 +281,7 @@ class CleanMemoGenerator:
                 docx_data = self._generate_docx(memo_content)
                 if docx_data:
                     st.download_button(
-                        label="📄 Word",
+                        label="📄 Word (.docx)",
                         data=docx_data,
                         file_name=f"{base_filename}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -294,7 +294,7 @@ class CleanMemoGenerator:
             with col4:
                 # One-click copy button with JavaScript
                 copy_key = f"copy_{hash(memo_content[:100])}"
-                if st.button("📋 Copy All", use_container_width=True, key=copy_key):
+                if st.button("📋 Copy to Clipboard", use_container_width=True, key=copy_key):
                     # Escape content for JavaScript
                     escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
                     
