@@ -590,15 +590,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .status.available {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.status.coming {
-    background:#426280;
-    color: #5d90c0;
-    border: 1px solid #426280;
+    background: #212F3C;
+    color: #f2f2f2;
+    border: 1px solid #f2f2f2;
 }
 
 /* ================================
@@ -1438,7 +1432,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 2rem;
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.15);
-    font-family: 'Courier New', monospace;
+    font-family: 'Poppins', monospace;
     font-size: 0.9rem;
     line-height: 1.6;
     color: rgba(255,255,255,0.9);
@@ -1471,6 +1465,71 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     text-align: center;
     border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* New styles for standards boxes in right column */
+.standards-grid-visual {
+    padding: 2rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.standards-grid-visual h4 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+
+.standards-boxes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.standard-box {
+    background: rgba(255,255,255,0.08);
+    padding: 1.5rem 1rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s ease;
+}
+
+.standard-box:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+}
+
+.standard-number {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.standard-name {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.standards-boxes .status {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+}
+
+.standards-boxes .status.available {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .standard-number {
@@ -3968,16 +4027,10 @@ a:focus {
 
 .section-header h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: #ffffff;
     margin: 0 0 0.5rem 0;
     font-weight: 700;
-}
-
-.section-header p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
-    margin: 0;
 }
 
 /* Dashboard Grid Updates */
