@@ -9,6 +9,10 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
 from shared.disclaimer_generator import DisclaimerGenerator
+import weasyprint
+from docx import Document
+import tempfile
+import base64
 
 logger = logging.getLogger(__name__)
 

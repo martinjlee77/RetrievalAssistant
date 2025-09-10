@@ -51,7 +51,7 @@ def render_asc842_page():
         
         if analysis_key in st.session_state and st.session_state[analysis_key]:
             # Show completed analysis and download options
-            st.success("✅ **Analysis Complete!** Your ASC 842 lease accounting memo is ready.")
+            st.success("✅ **Analysis Complete!**")
             
             if memo_key in st.session_state:
                 # Display the existing memo with enhanced downloads
@@ -485,17 +485,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
              
-        # Display memo inline instead of switching pages
-        st.markdown("---")
-
-        with st.container(border=True):
-            st.markdown("""Your ASC 842 memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
-                """)
-        
-        # Display the memo using CleanMemoGenerator
+        # Display the memo using CleanMemoGenerator (like ASC 606)
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
         
