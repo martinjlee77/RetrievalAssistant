@@ -120,94 +120,106 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def display_clean_memo(self, memo_content: str):
-        """Display memo with 4 download options - Markdown, PDF, Word, Copy to Clipboard."""
+    def display_clean_memo(self, memo_content: str) -> None:
+        """Display clean memo content with enhanced download options."""
         
-        # First display the memo content
-        st.markdown("### 📄 Generated ASC 842 Memo")
-        st.markdown(memo_content)
+        # Validate memo content
+        if not memo_content or memo_content.strip() == "":
+            st.error("Memo content is empty. Please regenerate the analysis.")
+            return
+            
+        # Log what we're about to display
+        logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
         
-        # Create 4-column layout for download buttons
-        col1, col2, col3, col4 = st.columns(4)
+        # Convert markdown to HTML manually to bypass Streamlit's markdown processor
+        html_content = self._convert_markdown_to_html(memo_content)
         
-        # Button 1: Markdown Download
-        with col1:
-            st.download_button(
-                label="📄 Download MD",
-                data=memo_content,
-                file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.md",
-                mime="text/markdown",
-                use_container_width=True
-            )
+        # Use HTML display which preserves formatting
+        st.markdown(html_content, unsafe_allow_html=True)
         
-        # Button 2: PDF Download
-        with col2:
-            try:
-                pdf_bytes = self._generate_pdf(memo_content)
+        # Enhanced Download Section - AFTER memo display (for stability)
+        if memo_content and len(memo_content.strip()) > 10:
+            st.markdown("---")
+            st.markdown("### 💾 Save Your Memo")
+            st.info("**IMPORTANT:** Choose your preferred format to save this memo before navigating away.")
+            
+            # Create columns for download buttons
+            col1, col2, col3, col4 = st.columns(4)
+            
+            # Generate timestamp for consistent filenames
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            base_filename = f"asc842_memo_{timestamp}"
+            
+            with col1:
+                # Markdown download (existing)
                 st.download_button(
-                    label="📑 Download PDF",
-                    data=pdf_bytes,
-                    file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.pdf",
-                    mime="application/pdf",
+                    label="📄 Markdown",
+                    data=memo_content,
+                    file_name=f"{base_filename}.md",
+                    mime="text/markdown",
+                    key=f"download_md_{hash(memo_content[:100])}",
                     use_container_width=True
                 )
-            except Exception as e:
-                logger.error(f"PDF generation failed: {e}")
-                st.button("📑 PDF Error", disabled=True, use_container_width=True)
-        
-        # Button 3: Word Download
-        with col3:
-            try:
-                docx_bytes = self._generate_word_document(memo_content)
-                st.download_button(
-                    label="📝 Download Word",
-                    data=docx_bytes,
-                    file_name=f"asc842_memo_{datetime.now().strftime('%Y%m%d')}.docx",
-                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    use_container_width=True
-                )
-            except Exception as e:
-                logger.error(f"Word generation failed: {e}")
-                st.button("📝 Word Error", disabled=True, use_container_width=True)
-        
-        # Button 4: Copy to Clipboard
-        with col4:
-            # Create a unique key for this clipboard button
-            clipboard_key = f"clipboard_asc842_{hash(memo_content[:100])}"
             
-            # JavaScript for copying to clipboard - fix f-string escaping
-            escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$')
-            copy_js = f"""
-            <script>
-            function copyToClipboard_{clipboard_key.replace('-', '_')}() {{
-                const text = `{escaped_content}`;
-                navigator.clipboard.writeText(text).then(function() {{
-                    // Success feedback could go here
-                }}).catch(function(err) {{
-                    // Fallback for older browsers
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textArea);
-                }});
-            }}
-            </script>
-            """
+            with col2:
+                # PDF download
+                pdf_data = self._generate_pdf(memo_content)
+                if pdf_data:
+                    st.download_button(
+                        label="📄 PDF",
+                        data=pdf_data,
+                        file_name=f"{base_filename}.pdf",
+                        mime="application/pdf",
+                        key=f"download_pdf_{hash(memo_content[:100])}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("📄 PDF", disabled=True, use_container_width=True, help="PDF generation failed")
             
-            # Display the JavaScript
-            components.html(copy_js, height=0)
+            with col3:
+                # DOCX download
+                docx_data = self._generate_word_document(memo_content)
+                if docx_data:
+                    st.download_button(
+                        label="📄 Word (.docx)",
+                        data=docx_data,
+                        file_name=f"{base_filename}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key=f"download_docx_{hash(memo_content[:100])}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
             
-            # Create button that calls the JavaScript function
-            if st.button("📋 Copy Text", use_container_width=True, key=clipboard_key):
-                # Use JavaScript to copy
-                components.html(f"""
-                <script>
-                copyToClipboard_{clipboard_key.replace('-', '_')}();
-                </script>
-                """, height=0)
-                st.success("✅ Copied to clipboard!")
+            with col4:
+                # One-click copy button with JavaScript
+                copy_key = f"copy_{hash(memo_content[:100])}"
+                if st.button("📋 Copy to Clipboard", use_container_width=True, key=copy_key):
+                    # Escape content for JavaScript
+                    escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
+                    
+                    # Create JavaScript component to copy to clipboard
+                    copy_js = f"""
+                    <script>
+                        function copyToClipboard() {{
+                            const textToCopy = `{escaped_content}`;
+                            navigator.clipboard.writeText(textToCopy).then(function() {{
+                                alert('Memo copied to clipboard!');
+                            }}).catch(function(err) {{
+                                // Fallback for older browsers
+                                const textArea = document.createElement("textarea");
+                                textArea.value = textToCopy;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                alert('Memo copied to clipboard!');
+                            }});
+                        }}
+                        copyToClipboard();
+                    </script>
+                    """
+                    st.components.v1.html(copy_js, height=0)
     
     def _generate_pdf(self, content: str) -> bytes:
         """Generate PDF from markdown content."""

@@ -297,7 +297,7 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
     # Create placeholder for the in-progress message
     progress_message_placeholder = st.empty()
     progress_message_placeholder.error(
-        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+        "🚨 **IMPORTANT: ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
         "Your analysis is running and will take up to 3-5 minutes. "
         "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
     )
@@ -345,11 +345,14 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         # Proceed with original analysis logic using the extracted text
         perform_asc842_analysis(combined_text, additional_context, filename_string)
         
+        # Clear the progress message after analysis
+        progress_message_placeholder.empty()
+        
     except Exception as e:
         logger.error(f"ASC 842 analysis error for session {session_id[:8]}: {str(e)}")
-        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         # Clear the progress message on error
         progress_message_placeholder.empty()
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
 def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt"):
     """Perform the complete ASC 842 analysis and display results with session isolation."""
@@ -361,13 +364,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
     
     session_id = st.session_state.user_session_id
     
-    # Create placeholder for the in-progress message
-    progress_message_placeholder = st.empty()
-    progress_message_placeholder.error(
-        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
-        "Your analysis is running and will take up to 3-5 minutes. "
-        "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
-    )
+    # NOTE: Progress message now managed by calling function to avoid duplication
     
     # Initialize analysis complete status with session isolation
     analysis_key = f'asc842_analysis_complete_{session_id}'
@@ -468,7 +465,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             memo_content = memo_generator.combine_clean_steps(final_results)
 
         # Store memo data in session state and clear progress messages
-        progress_message_placeholder.empty()  # Clears the in-progress message
+        # NOTE: Progress message clearing handled by calling function
         progress_placeholder.empty()  # Clears the step headers
         progress_indicator_placeholder.empty()  # Clears the persistent success boxes
         
@@ -523,8 +520,6 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             st.rerun()
 
     except Exception as e:
-        # Clear the progress message even on error
-        progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 842 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
