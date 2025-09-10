@@ -97,6 +97,49 @@ def get_asc718_inputs_new():
 def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
     """Perform the complete ASC 718 analysis and display results with session isolation."""
     
+    # Process uploaded files first
+    if not uploaded_files:
+        st.error("❌ No files provided for analysis.")
+        return
+        
+    # Extract text from uploaded files
+    try:
+        combined_text = ""
+        processed_filenames = []
+        extractor = DocumentExtractor()
+        
+        # Show processing status to users
+        with st.spinner(f"Processing {len(uploaded_files)} document(s)..."):
+            for uploaded_file in uploaded_files:
+                # Extract text using existing extractor
+                extraction_result = extractor.extract_text(uploaded_file)
+                
+                # Check for extraction errors
+                if extraction_result.get('error'):
+                    st.error(f"❌ Document extraction failed for {uploaded_file.name}: {extraction_result['error']}")
+                    continue
+                
+                # Get the text from the extraction result
+                extracted_text = extraction_result.get('text', '')
+                if extracted_text and extracted_text.strip():
+                    combined_text += f"\\n\\n=== {uploaded_file.name} ===\\n\\n{extracted_text}"
+                    processed_filenames.append(uploaded_file.name)
+                else:
+                    st.warning(f"⚠️ No readable content extracted from {uploaded_file.name}")
+        
+        if not combined_text.strip():
+            st.error("❌ No readable content found in any uploaded files. Please check your documents and try again.")
+            return
+            
+        # Create comma-separated filename string
+        filename_string = ", ".join(processed_filenames)
+        contract_text = combined_text.strip()
+        
+    except Exception as e:
+        logger.error(f"Error processing uploaded files: {str(e)}")
+        st.error(f"❌ Error processing files: {str(e)}")
+        return
+    
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:
         st.session_state.user_session_id = str(uuid.uuid4())
@@ -113,7 +156,7 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
     )
     
     # Initialize analysis complete status with session isolation
-    analysis_key = f'asc606_analysis_complete_{session_id}'
+    analysis_key = f'asc718_analysis_complete_{session_id}'
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
@@ -126,14 +169,14 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
             try:
                 analyzer = ASC718StepAnalyzer()
                 knowledge_search = ASC718KnowledgeSearch()
-                from asc805.clean_memo_generator import CleanMemoGenerator
+                from asc718.clean_memo_generator import CleanMemoGenerator
                 memo_generator = CleanMemoGenerator(
                     template_path="asc606/templates/memo_template.md")
                 from shared.ui_components import SharedUIComponents
                 ui = SharedUIComponents()
             except RuntimeError as e:
                 st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 606 knowledge base is not available. Try again and contact support if this persists.")
+                st.error("ASC 718 knowledge base is not available. Try again and contact support if this persists.")
                 st.stop()
                 return
 
@@ -160,7 +203,7 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
         # Create a separate placeholder for progress indicators that can be cleared
         progress_indicator_placeholder = st.empty()
         
-        # Run 5 ASC 606 steps with progress
+        # Run 5 ASC 718 steps with progress
         for step_num in range(1, 6):
             # Show progress indicators in clearable placeholder
             ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
@@ -218,14 +261,14 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
         # Create clearable completion message
         completion_message_placeholder = st.empty()
         completion_message_placeholder.success(
-            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 606 memo is ready. Scroll down to view the results."
+            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 718 memo is ready. Scroll down to view the results."
         )
         
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
         # Store memo data with session isolation
-        memo_key = f'asc606_memo_data_{session_id}'
+        memo_key = f'asc718_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
             'customer_name': customer_name,
@@ -236,18 +279,19 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
         # Display memo inline instead of switching pages
         st.markdown("---")
 
+        # Add the important persistent message before memo display (like ASC 606/842)
         with st.container(border=True):
-            st.markdown("""Your ASC 606 memo is displayed below. To save the results, you can either:
+            st.info("""**IMPORTANT:** Your ASC 718 memo is displayed below. To save the results, you can either:
             
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
+- **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
                 """)
         
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
         
-        # Clear completion message immediately after memo displays
+        # Clear completion message after memo displays (but keep the important info above)
         completion_message_placeholder.empty()
         
         if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
@@ -255,7 +299,7 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
             st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
             
             # Clean up session-specific data
-            memo_key = f'asc606_memo_data_{session_id}'
+            memo_key = f'asc718_memo_data_{session_id}'
             if memo_key in st.session_state:
                 del st.session_state[memo_key]
             if analysis_key in st.session_state:
@@ -268,7 +312,7 @@ def perform_asc718_analysis(uploaded_files, additional_context: str = ""):
         # Clear the progress message even on error
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 606 analysis error for session {session_id[:8]}...: {str(e)}")
+        logger.error(f"ASC 718 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
