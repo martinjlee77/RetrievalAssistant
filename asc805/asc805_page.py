@@ -10,14 +10,16 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.preflight_pricing import PreflightPricing  
-from shared.wallet_manager import WalletManager
+from shared.billing_manager import billing_manager
+from shared.preflight_pricing import preflight_pricing
+from shared.wallet_manager import wallet_manager
+from shared.analysis_manager import analysis_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
 from asc805.step_analyzer import ASC805StepAnalyzer
 from asc805.knowledge_search import ASC805KnowledgeSearch
-from shared.document_extractor import DocumentExtractor
+from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -34,111 +36,135 @@ def render_asc805_page():
 
     # Page header
     st.title(":primary[ASC 805: Business Combinations]")
-    with st.container(border=True):
-        st.markdown(":primary[**Purpose:**] Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
+    st.info("**Purpose:** Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
     
-    # Get user inputs with progressive disclosure
+    # Check for active analysis first
+    if analysis_manager.show_active_analysis_warning():
+        return  # User has active analysis, show warning and exit
+    
+    # Check for existing completed analysis in session state (restore persistence)
+    session_id = st.session_state.get('user_session_id', '')
+    if session_id:
+        analysis_key = f'asc805_analysis_complete_{session_id}'
+        memo_key = f'asc805_memo_data_{session_id}'
+        
+        # If analysis is complete and memo exists, show results instead of file upload
+        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            st.success("✅ **Analysis Complete!**")
+            st.markdown("### 📄 Generated ASC 805 Memo")
+            
+            # Display the existing memo with enhanced downloads
+            from asc805.clean_memo_generator import CleanMemoGenerator
+            memo_generator = CleanMemoGenerator()
+            memo_data = st.session_state[memo_key]
+            # Extract memo content from stored dictionary
+            memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
+            memo_generator.display_clean_memo(memo_content)
+            
+            # Add "Analyze Another Contract" button
+            st.markdown("---")
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                # Reset analysis state for new analysis including file uploaders
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc805' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+            return  # Exit early, don't show file upload interface
+    
+    # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc805_inputs_new()
 
-    # Session management for analysis isolation
-    if 'user_session_id' not in st.session_state:
-        st.session_state.user_session_id = str(uuid.uuid4())
-    session_id = st.session_state.user_session_id
-    analysis_key = f'asc805_analysis_complete_{session_id}'
-
-    # Check if analysis already completed for this session
-    if st.session_state.get(analysis_key, False):
-        # Analysis completed - display memo
-        memo_key = f'asc805_memo_data_{session_id}'
-        if memo_key in st.session_state:
-            memo_data = st.session_state[memo_key]
-            st.info("✅ **Analysis completed in this session.** Your ASC 805 memo is displayed below.")
-            
-            # Display memo using CleanMemoGenerator
-            from asc805.clean_memo_generator import CleanMemoGenerator
-            memo_generator_display = CleanMemoGenerator()
-            memo_generator_display.display_clean_memo(memo_data['memo_content'])
-            
-            if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-                # Clear analysis state for fresh start with session isolation
-                st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-                
-                # Clean up session-specific data
-                if memo_key in st.session_state:
-                    del st.session_state[memo_key]
-                if analysis_key in st.session_state:
-                    del st.session_state[analysis_key]
-                
-                logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
-                st.rerun()
-        return
-
-    # Get user token for pricing
-    user_token = auth_manager.get_user_token()
-    
-    # Show pricing and credit validation
-    if is_ready and uploaded_files:
-        # Pricing section with modern preflight system
-        pricing_container = st.empty()
-        credit_container = st.empty()
-        warning_placeholder = st.empty()
+    # Preflight pricing and payment flow
+    if is_ready:
+        # Process files for pricing
+        pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
         
-        with pricing_container.container(border=True):
-            st.markdown("### 💰 Pricing & Credits")
+        if not pricing_result['success']:
+            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+            return
+        
+        # Display pricing information
+        pricing_container = st.empty()
+        with pricing_container:
+            st.markdown("### :primary[Analysis Pricing]")
+            st.info(pricing_result['billing_summary'])
             
-            # Get preflight pricing estimate  
-            pricing_result = PreflightPricing.estimate_document_analysis(
-                uploaded_files, "asc805"
+            # Show file processing details
+            if pricing_result.get('processing_errors'):
+                st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
+        
+        # Get required price and check wallet balance
+        required_price = pricing_result['tier_info']['price']
+        user_token = auth_manager.get_auth_token()
+        
+        # Get wallet balance
+        if not user_token:
+            st.error("❌ Authentication required. Please refresh the page and log in again.")
+            return
+        wallet_info = wallet_manager.get_user_balance(user_token)
+        current_balance = wallet_info.get('balance', 0.0)
+        
+        # Check if user has sufficient credits
+        credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
+        
+        # Credit balance display - store in variable so we can clear it
+        credit_container = st.empty()       
+        if credit_check['can_proceed']:
+            msg = (
+                f"{credit_check['message']}\n"
+                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
+            )
+            credit_container.info(msg)
+            can_proceed = True
+        else:
+            credit_container.error(credit_check['message'])
+            
+            # Show wallet top-up options
+            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
+            
+            if selected_amount:
+                # Process credit purchase
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
+                
+                if purchase_result['success']:
+                    st.success(purchase_result['message'])
+                    st.rerun()  # Refresh to update balance
+                else:
+                    st.error(purchase_result['message'])
+            
+            can_proceed = False
+        
+        # Analysis section
+        if can_proceed:
+            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder.info(
+                "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+                "- Analysis takes **3-5 minutes**\n"
+                "- Switching tabs or closing the browser will stop the analysis\n"
+                "- Stay on this tab until analysis is complete\n"
+                "- You'll see a completion message when it's done"
             )
             
-            # Display pricing information
-            if pricing_result and pricing_result.get('success'):
-                estimated_cost = pricing_result.get('estimated_cost', 0)
-                st.info(f"**Estimated cost:** {estimated_cost} credits for this analysis")
-                
-                # Check user's credit balance
-                wallet_manager = WalletManager()
-                current_balance = wallet_manager.get_balance(user_token) if user_token else 0
-                
-                with credit_container.container():
-                    if current_balance >= estimated_cost:
-                        st.success(f"✅ **Credit balance:** {current_balance} credits (sufficient)")
-                        
-                        # Show critical warning before analysis
-                        warning_placeholder.info(
-                            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-                            "- Analysis takes **3-5 minutes** and uses significant credits\n"
-                            "- Switching tabs or closing browser will stop analysis\n"  
-                            "- Stay on this tab until analysis completes\n"
-                            "- You'll see completion message when done"
-                        )
-                        
-                        if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
-                                   type="primary",
-                                   use_container_width=True,
-                                   key="asc805_analyze"):
-                            # Clear all UI elements that should disappear during analysis
-                            warning_placeholder.empty()  # Clear the warning 
-                            pricing_container.empty()    # Clear pricing information
-                            credit_container.empty()     # Clear credit balance info
-                            if not user_token:
-                                st.error("❌ Authentication required. Please refresh the page and log in again.")
-                                return
-                            perform_asc805_analysis_new(pricing_result, additional_context, user_token)
-                    else:
-                        st.error(f"❌ **Insufficient credits:** {current_balance} available, {estimated_cost} required")
-                        st.markdown("**[Purchase Credits →](https://veritaslogic.ai/pricing)**")
-                        
-                        st.button("3️⃣ Insufficient Credits", 
-                                 disabled=True, 
-                                 use_container_width=True,
-                                 key="asc805_analyze_disabled")
-            else:
-                st.error("❌ Unable to estimate pricing. Please try again.")
-                st.button("3️⃣ Pricing Error", 
-                         disabled=True, 
-                         use_container_width=True,
-                         key="asc805_analyze_disabled")
+            if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc805_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                perform_asc805_analysis_new(pricing_result, additional_context, user_token)
+        else:
+            st.button("3️⃣ Insufficient Credits", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc805_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Contract & Generate Memo", 
@@ -152,7 +178,7 @@ def get_asc805_inputs_new():
     
     # Document upload section       
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload business combination documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our business limit is 50MB per file (required)",
+        "1️⃣ Upload business combination documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our businsss limit is 50MB per file (required)",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload purchase agreements, merger documents, LOI, due diligence reports for ASC 805 analysis",
@@ -189,26 +215,42 @@ def get_asc805_inputs_new():
     return uploaded_files, additional_context, is_ready
 
 
-def perform_asc805_analysis_new(pricing_result, additional_context, user_token):
-    """Perform ASC 805 analysis with modern pricing system integration."""
+def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
+    """Perform ASC 805 analysis with new billing system integration."""
     
-    # Session management for isolation
-    if 'user_session_id' not in st.session_state:
-        st.session_state.user_session_id = str(uuid.uuid4())
-    session_id = st.session_state.user_session_id
-    analysis_key = f'asc805_analysis_complete_{session_id}'
+    analysis_id = None
     
-    # Progress message that will be cleared later
-    progress_message_placeholder = st.empty()
-    progress_message_placeholder.info("🔄 **Analysis in progress...** Please stay on this tab.")
-    
-    # Get contract text from pricing result
-    contract_text = pricing_result.get('combined_text', '')
-    filename = pricing_result.get('filename', 'Business Combination Documents')
-    customer_name = pricing_result.get('customer_name', 'Entity')
-    analysis_title = f"Business Combination Analysis for {customer_name}"
-
     try:
+        # Step 1: Start analysis tracking
+        analysis_details = {
+            'asc_standard': 'ASC 805',
+            'total_words': pricing_result['total_words'],
+            'file_count': pricing_result['file_count'],
+            'tier_info': pricing_result['tier_info'],
+            'cost_charged': pricing_result['tier_info']['price']
+        }
+        
+        analysis_id = analysis_manager.start_analysis(analysis_details)
+        
+        # Step 2: Charge wallet
+        charge_result = wallet_manager.charge_for_analysis(user_token, pricing_result['tier_info']['price'], analysis_details)
+        
+        if not charge_result['success']:
+            st.error(f"❌ **Payment Failed**\n\n{charge_result['message']}")
+            if analysis_id:
+                analysis_manager.end_analysis(analysis_id, 'failed')
+            return
+            
+        # Progress message that will be cleared later
+        progress_message_placeholder = st.empty()
+        progress_message_placeholder.info("🔄 **Analysis in progress...** Please stay on this tab.")
+        
+        # Get contract text from pricing result
+        contract_text = pricing_result.get('combined_text', '')
+        filename = pricing_result.get('filename', 'Business Combination Documents')
+        customer_name = pricing_result.get('customer_name', 'Entity')
+        analysis_title = f"Business Combination Analysis for {customer_name}"
+
         # Initialize components
         with st.spinner("Initializing analysis components..."):
             try:
@@ -596,8 +638,16 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
         # Clear the progress message even on error
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 805 analysis error for session {session_id[:8]}...: {str(e)}")
-        st.session_state[analysis_key] = True  # Signal completion (even on error)
+        logger.error(f"ASC 805 analysis error: {str(e)}")
+        
+        # End analysis tracking on error
+        if analysis_id:
+            analysis_manager.end_analysis(analysis_id, 'failed')
+            
+    finally:
+        # Always end analysis tracking
+        if analysis_id:
+            analysis_manager.end_analysis(analysis_id, 'completed')
 
 def _extract_customer_name(contract_text: str) -> str:
     """Extract entity name from business combination documents."""
