@@ -10,14 +10,16 @@ from typing import Dict, Any, List
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
-from shared.cost_estimator import cost_estimator
 from shared.billing_manager import billing_manager
+from shared.preflight_pricing import preflight_pricing
+from shared.wallet_manager import wallet_manager
+from shared.analysis_manager import analysis_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
+from utils.document_extractor import DocumentExtractor
 from asc842.step_analyzer import ASC842StepAnalyzer
 from asc842.knowledge_search import ASC842KnowledgeSearch
-from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
@@ -37,26 +39,134 @@ def render_asc842_page():
     with st.container(border=True):
         st.markdown(":primary[**Purpose:**] Automatically analyze lease contracts and generate a professional ASC 842 memo. Simply upload your lease documents to begin.")
     
+    # Check for active analysis first
+    if analysis_manager.show_active_analysis_warning():
+        return  # User has active analysis, show warning and exit
+    
+    # Check for existing completed analysis in session state (restore persistence)
+    session_id = st.session_state.get('user_session_id', '')
+    if session_id:
+        analysis_key = f'asc842_analysis_complete_{session_id}'
+        memo_key = f'asc842_memo_data_{session_id}'
+        
+        if analysis_key in st.session_state and st.session_state[analysis_key]:
+            # Show completed analysis and download options
+            st.success("✅ **Analysis Complete!** Your ASC 842 lease accounting memo is ready.")
+            
+            if memo_key in st.session_state:
+                # Display the existing memo with enhanced downloads
+                from asc842.clean_memo_generator import CleanMemoGenerator
+                memo_generator = CleanMemoGenerator()
+                memo_data = st.session_state[memo_key]
+                # Extract memo content from stored dictionary
+                memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
+                memo_generator.display_clean_memo(memo_content)
+                
+                # Option to clear and start new analysis
+                st.divider()
+                if st.button("🔄 Clear Results & Start New Analysis", 
+                           type="secondary", 
+                           use_container_width=True):
+                    # Clear session state
+                    if analysis_key in st.session_state:
+                        del st.session_state[analysis_key]
+                    if memo_key in st.session_state:
+                        del st.session_state[memo_key]
+                    st.rerun()
+                return
+    
     # Get user inputs with progressive disclosure
     contract_text, filename, additional_context, is_ready = get_asc842_inputs()
 
-    # Critical user warning before analysis
+    # Preflight pricing and payment flow
     if is_ready:
-        warning_placeholder = st.empty()  # Create a placeholder for the warning
-        warning_placeholder.info(
-            "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-            "- Analysis takes **3-5 minutes** and costs significant API tokens\n"
-            "- Switching tabs or closing the browser will stop the analysis\n"
-            "- Stay on this tab until analysis is complete\n"
-            "- You'll see a completion message when it's done"
-        )
-        if st.button("3️⃣ Analyze Lease Contract & Generate Memo",
-                   type="primary",
-                   use_container_width=True,
-                   key="asc842_analyze"):
-            warning_placeholder.empty()  # Clear the warning after the button is pressed
-            if contract_text:  # Type guard to ensure contract_text is not None
-                perform_asc842_analysis(contract_text, additional_context, filename)
+        # Mock pricing result for single contract text (similar to ASC 340-40 pattern)
+        pricing_result = {
+            'success': True,
+            'billing_summary': '💰 **Estimated Cost:** This analysis will consume approximately 15-25 credits',
+            'tier_info': {'price': 20},  # Estimated price
+            'processing_errors': []
+        }
+        
+        # Display pricing information
+        pricing_container = st.empty()
+        with pricing_container:
+            st.markdown("### :primary[Analysis Pricing]")
+            st.info(pricing_result['billing_summary'])
+        
+        # Get required price and check wallet balance
+        required_price = pricing_result['tier_info']['price']
+        user_token = auth_manager.get_auth_token()
+        
+        # Get wallet balance
+        if not user_token:
+            st.error("❌ Authentication required. Please refresh the page and log in again.")
+            return
+        wallet_info = wallet_manager.get_user_balance(user_token)
+        current_balance = wallet_info.get('balance', 0.0)
+        
+        # Check if user has sufficient credits
+        credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
+        
+        # Credit balance display
+        credit_container = st.empty()       
+        if credit_check['can_proceed']:
+            msg = (
+                f"{credit_check['message']}\n"
+                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
+            )
+            credit_container.info(msg)
+            can_proceed = True
+        else:
+            credit_container.error(credit_check['message'])
+            
+            # Show wallet top-up options
+            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
+            
+            if selected_amount:
+                # Process credit purchase
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
+                
+                if purchase_result['success']:
+                    st.success(purchase_result['message'])
+                    st.rerun()  # Refresh to update balance
+                else:
+                    st.error(purchase_result['message'])
+            
+            can_proceed = False
+        
+        # Analysis section
+        if can_proceed:
+            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder.info(
+                "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
+                "- Analysis takes **3-5 minutes**\n"
+                "- Switching tabs or closing the browser will stop the analysis\n"
+                "- Stay on this tab until analysis is complete\n"
+                "- You'll see a completion message when it's done"
+            )
+            
+            if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc842_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                if contract_text:  # Type guard to ensure contract_text is not None
+                    perform_asc842_analysis(contract_text, additional_context, filename or "lease_contract.txt", user_token)
+        else:
+            st.button("3️⃣ Insufficient Credits", 
+                     disabled=True, 
+                     use_container_width=True,
+                     key="asc842_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
         st.button("3️⃣ Analyze Lease Contract & Generate Memo", 
