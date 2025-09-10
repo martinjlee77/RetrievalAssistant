@@ -175,11 +175,12 @@ class CleanMemoGenerator:
             # Create a unique key for this clipboard button
             clipboard_key = f"clipboard_asc842_{hash(memo_content[:100])}"
             
-            # JavaScript for copying to clipboard
+            # JavaScript for copying to clipboard - fix f-string escaping
+            escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$')
             copy_js = f"""
             <script>
             function copyToClipboard_{clipboard_key.replace('-', '_')}() {{
-                const text = `{memo_content.replace('`', '\\`').replace('$', '\\$')}`;
+                const text = `{escaped_content}`;
                 navigator.clipboard.writeText(text).then(function() {{
                     // Success feedback could go here
                 }}).catch(function(err) {{

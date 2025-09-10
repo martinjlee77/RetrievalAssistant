@@ -80,19 +80,43 @@ def render_asc842_page():
 
     # Preflight pricing and payment flow
     if is_ready:
-        # Mock pricing result for single contract text (similar to ASC 340-40 pattern)
-        pricing_result = {
-            'success': True,
-            'billing_summary': '💰 **Estimated Cost:** This analysis will consume approximately 15-25 credits',
-            'tier_info': {'price': 20},  # Estimated price
-            'processing_errors': []
-        }
+        # Process contract text for pricing (convert to file-like structure for processing)
+        import tempfile
+        import os
+        temp_files = []
+        
+        if contract_text:
+            # Create temporary file for pricing calculation
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
+                f.write(contract_text)
+                temp_file_path = f.name
+            
+            # Create file-like object for preflight pricing
+            class TempFile:
+                def __init__(self, path, name):
+                    self.name = name
+                    with open(path, 'r', encoding='utf-8') as f:
+                        self.content = f.read()
+                    os.unlink(path)  # Clean up temp file
+            
+            temp_files = [TempFile(temp_file_path, filename or "lease_contract.txt")]
+        
+        # Process files for pricing using the same system as ASC 340-40
+        pricing_result = preflight_pricing.process_files_for_pricing(temp_files)
+        
+        if not pricing_result['success']:
+            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+            return
         
         # Display pricing information
         pricing_container = st.empty()
         with pricing_container:
             st.markdown("### :primary[Analysis Pricing]")
             st.info(pricing_result['billing_summary'])
+            
+            # Show file processing details
+            if pricing_result.get('processing_errors'):
+                st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
         
         # Get required price and check wallet balance
         required_price = pricing_result['tier_info']['price']
