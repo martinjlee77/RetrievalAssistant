@@ -1,6 +1,45 @@
-/* VeritasLogic.ai Multi-Page Website Styles */
+/* ================================
+   VERITASLOGIC.AI WEBSITE STYLES
+   ================================
+   
+   TABLE OF CONTENTS:
+   ==================
+   1. CSS RESET & BASE STYLES (line ~4)
+   2. TYPOGRAPHY & FONTS (line ~18)  
+   3. GLOBAL CONTAINERS & LAYOUT (line ~24)
+   4. NAVIGATION & HEADER (line ~33)
+   5. PAGE HEADERS (line ~140)
+   6. HERO SECTION - HOME PAGE (line ~174)
+   7. SECTION HEADERS - GLOBAL (line ~382)
+   8. HOW IT WORKS SECTION (line ~272)
+   9. DEMO PREVIEW SECTION (line ~297)
+   10. TRUST INDICATORS (line ~354)
+   11. FEATURE CARDS & GRIDS (line ~406)
+   12. COMPLIANCE SECTION (line ~489)
+   13. HUMAN REVIEW SECTION (line ~554)
+   14. BLOG SECTIONS (line ~708)
+   15. CTA SECTIONS (line ~2384)
+   16. FOOTER (line ~2630)
+   17. ABOUT PAGE STYLES (line ~1046)
+   18. FEATURES PAGE STYLES (line ~1162)
+   19. PRICING PAGE STYLES (line ~1226)
+   20. CONTACT PAGE STYLES (line ~1867)
+   21. AUTHENTICATION PAGES (line ~2606)
+   22. FORM STYLES (line ~2641)
+   23. UTILITY CLASSES (line ~2563)
+   24. RESPONSIVE DESIGN (line ~2456)
+   ================================ 
+   
+   USAGE NOTES:
+   - Use .section-header for consistent subheaders
+   - Use .standard-section class for 100px 0 padding
+   - Hero section padding left unchanged per user request
+   - All major sections now have consistent spacing
+   ================================ */
 
-/* CSS Reset and Base Styles */
+/* ================================
+   1. CSS RESET & BASE STYLES
+   ================================ */
 * {
     margin: 0;
     padding: 0;
@@ -8,20 +47,24 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: #ffffff;
     background-color: #212F3C;
     overflow-x: hidden;
 }
 
-/* Typography */
+/* ================================
+   2. TYPOGRAPHY & FONTS
+   ================================ */
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
     line-height: 1.2;
 }
 
-/* Container */
+/* ================================
+   3. GLOBAL CONTAINERS & LAYOUT
+   ================================ */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -30,7 +73,9 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 1;
 }
 
-/* Navigation */
+/* ================================
+   4. NAVIGATION & HEADER
+   ================================ */
 .navbar {
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
     padding: 1rem 0;
@@ -91,7 +136,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 .btn-nav:hover {
@@ -136,7 +181,9 @@ h1, h2, h3, h4, h5, h6 {
     cursor: pointer;
 }
 
-/* Page Headers */
+/* ================================
+   5. PAGE HEADERS (NON-HOME PAGES)
+   ================================ */
 .page-header {
     padding: 150px 0 80px 0;
     text-align: center;
@@ -171,11 +218,14 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-/* Hero Section (Home Page) */
+/* ================================
+   6. HERO SECTION - HOME PAGE
+   ================================
+   Note: Padding left unchanged per user request */
 .hero {
     background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
     color: white;
-    padding: 150px 0 100px 0;
+    padding: 230px 0 100px 0;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -244,55 +294,106 @@ h1, h2, h3, h4, h5, h6 {
 
 .demo-link,
 .secondary-cta {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    font-weight: 600;
-    margin-left: 1rem;
-    border: 2px solid rgba(255,255,255,0.3);
-    padding: 0.75rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    color: #f2f2f2;
+    padding: 1rem 2rem;
     border-radius: 8px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
     transition: all 0.3s ease;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    display: inline-block;
+    margin-right: 1rem;
+    /* box-shadow: 0 6px 18px rgba(255,255,255,0.2); */
+    border: 1px solid #f2f2f2;
+
 }
 
 .demo-link:hover,
 .secondary-cta:hover {
-    border-color: rgba(255,255,255,0.6);
-    background: rgba(255,255,255,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
 }
 
-/* Demo Preview */
+
+/* ================================
+   8. HOW IT WORKS SECTION
+   ================================ */
+.how-it-works {
+    background: #212F3C;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* hiw-container removed - using standard .container instead */
+
+.how-it-works-content {
+    /* max-width: 800px;*/ /* Adjust to fit your diagram's width */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.how-it-works-content img {
+    width: 100%; /* Make the image responsive */
+    /*max-width: 800px;*/
+    display: block; /* Removes extra space below the image */
+}
+
+/* ================================
+   9. DEMO PREVIEW SECTION
+   ================================ */
 .demo-preview {
-    max-width: 800px;
-    margin: 3rem auto 0;
-    background: rgba(255,255,255,0.08);
+    padding: 100px 0;
+    text-align: center; 
+    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+}
+
+
+.demo-container {
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 16px;
-    padding: 2rem;
-    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(15px);
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.demo-screen h4 {
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
+/* demo-container h2 removed - using standard .section-header h2 instead */
+
+.demo-container p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+  font-size: 1rem; /* Adjust if needed */
 }
 
-.demo-placeholder {
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.9);
-    font-family: monospace;
-    text-align: left;
-    margin-top: 1rem;
+.demo-description {
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-/* Trust Indicators */
+.video-container {
+    margin-top: 2rem; 
+    width: 100%; 
+    max-width: 900px; 
+    margin-left: auto;
+    margin-right: auto;
+    aspect-ratio: 16/9;
+}
+
+.video-container video {
+    width: 100%; 
+    height: auto;
+    display: block;
+}
+
+/* ================================
+   10. TRUST INDICATORS
+   ================================ */
 .trust-indicators {
     padding: 50px 0;
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
@@ -320,7 +421,10 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
 }
 
-/* Section Headers */
+/* ================================
+   7. SECTION HEADERS - GLOBAL
+   ================================
+   Use these classes for consistent subheaders across ALL sections */
 .section-header {
     text-align: center;
     margin-bottom: 4rem;
@@ -338,9 +442,12 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.8);
     max-width: 600px;
     margin: 0 auto;
+    text-align: center;
 }
 
-/* Feature Cards and Grids */
+/* ================================
+   11. FEATURE CARDS & GRIDS
+   ================================ */
 .features-summary,
 .value-props {
     padding: 100px 0;
@@ -437,9 +544,11 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.1);
 }
 
-/* Compliance Section */
+/* ================================
+   12. COMPLIANCE SECTION
+   ================================ */
 .compliance-section {
-    padding: 80px 0;
+    padding: 100px 0;
     background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
 }
 
@@ -460,7 +569,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .compliance-item h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: #ffffff;
@@ -486,11 +595,20 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
-/* Human Review Section */
+.status.coming {
+    background:#426280;
+    color: #5d90c0;
+    border: 1px solid #426280;
+}
+
+/* ================================
+   13. HUMAN REVIEW SECTION
+   ================================ */
 .human-review-section {
     padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
     position: relative;
+    text-align: center; /* Center the overall content */
 }
 
 .human-review-section::before {
@@ -500,8 +618,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-        linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.03) 25%, transparent 50%, rgba(255,255,255,0.03) 75%, transparent 100%);
+    background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.03) 25%, transparent 50%, rgba(255,255,255,0.03) 75%, transparent 100%);
 }
 
 .review-content {
@@ -509,14 +626,14 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
     align-items: center;
+    justify-content: center; /* Centers content horizontally */
 }
 
-.review-text h3 {
-    font-size: 2rem;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+.review-text {
+    text-align: left; /* Align text to the left */
 }
+
+/* review-text h2 removed - using standard .section-header h2 instead */
 
 .review-text p {
     color: rgba(255,255,255,0.8);
@@ -554,6 +671,7 @@ h1, h2, h3, h4, h5, h6 {
     border: 1px solid rgba(255,255,255,0.2);
     transition: all 0.3s ease;
     display: inline-block;
+    margin-top: 2rem; /* Added margin for spacing */
 }
 
 .review-cta:hover {
@@ -567,14 +685,17 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(15px);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .review-process h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 2rem;
     text-align: center;
 }
+
 
 .review-steps,
 .process-step {
@@ -608,13 +729,20 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1rem;
 }
 
-.process-arrow {
+/*.process-arrow {
     color: rgba(255,255,255,0.6);
     font-size: 1.5rem;
+}*/
+
+.process-separator {
+    height: 1px; /* Adjust as needed */
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.2); /* Adjust color as needed */
+    margin: 1rem 0; /* Adjust spacing as needed */
 }
 
 .process-step h5 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 0.5rem;
 }
@@ -624,7 +752,9 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.9rem;
 }
 
-/* Blog Sections */
+/* ================================
+   14. BLOG SECTIONS
+   ================================ */
 .blog-preview {
     padding: 100px 0;
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
@@ -817,7 +947,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.2rem;
     color: rgba(255,255,255,0.9);
     margin: 1.5rem 0 0.75rem 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 600;
 }
 
@@ -869,7 +999,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-widget h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 1rem;
     font-size: 1.2rem;
@@ -980,7 +1110,9 @@ h1, h2, h3, h4, h5, h6 {
     border-color: rgba(255,255,255,0.4);
 }
 
-/* About Page Specific Styles */
+/* ================================
+   17. ABOUT PAGE STYLES
+   ================================ */
 .founder-section {
     padding: 100px 0;
     background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
@@ -1054,7 +1186,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .credentials h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 1rem;
 }
@@ -1295,7 +1427,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .demo-screenshot h4,
 .feature-visual h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 1.5rem;
     text-align: center;
@@ -1378,7 +1510,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.5rem;
 }
 
-.demo-interactive {
+.demo-Poppinsactive {
     text-align: center;
 }
 
@@ -1405,7 +1537,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .step-content h5 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 0.5rem;
 }
@@ -1464,7 +1596,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .reviewer-credentials h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 1rem;
 }
@@ -1550,7 +1682,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-item h5 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 0.5rem;
 }
@@ -1590,7 +1722,7 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.1);
     color: #ffffff;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .comparison-table td {
@@ -1970,7 +2102,7 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.1);
     color: #ffffff;
     font-weight: 600;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .volume-table td {
@@ -2017,7 +2149,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
     margin-bottom: 1rem;
     font-size: 1.2rem;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 600;
 }
 
@@ -2077,7 +2209,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
     margin-bottom: 1rem;
     font-size: 1.3rem;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 600;
 }
 
@@ -2104,7 +2236,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .contact-form h3 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     color: #ffffff;
     margin-bottom: 2rem;
     text-align: center;
@@ -2300,7 +2432,9 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
 }
 
-/* CTA Sections */
+/* ================================
+   15. CTA SECTIONS
+   ================================ */
 .cta-section {
     padding: 100px 0;
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
@@ -2312,11 +2446,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-.cta-content h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #ffffff;
-}
+/* cta-content h2 removed - using standard .section-header h2 instead */
 
 .cta-content p {
     font-size: 1.2rem;
@@ -2353,7 +2483,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .footer-section h4 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-weight: 600;
     margin-bottom: 1.5rem;
     color: #ffffff;
@@ -2719,7 +2849,7 @@ html {
 
 .loading {
     opacity: 0.7;
-    pointer-events: none;
+    poPoppins-events: none;
 }
 
 /* Pricing Details Table */
@@ -2753,7 +2883,7 @@ html {
     background: rgba(255,255,255,0.1);
     color: #ffffff;
     font-weight: 600;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
 .pricing-table td {
@@ -3490,7 +3620,7 @@ html {
 
 .loading {
     opacity: 0.7;
-    pointer-events: none;
+    poPoppins-events: none;
 }
 
 /* Email Verification Page */
@@ -3656,8 +3786,8 @@ html {
 }
 
 .nav-cta.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #f2f2f2;
+    color: #212F3C;
     padding: 10px 20px;
     border-radius: 25px;
     text-decoration: none;
@@ -3674,18 +3804,18 @@ html {
 
 .nav-cta.secondary {
     background: transparent;
-    color: #667eea;
+    color: #f2f2f2;
     padding: 10px 20px;
     border-radius: 25px;
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
-    border: 2px solid #667eea;
+    border: 2px solid #212F3C;
     transition: all 0.3s ease;
 }
 
 .nav-cta.secondary:hover {
-    background: #667eea;
+    background: #212F3C;
     color: white;
     transform: translateY(-2px);
 }
@@ -3790,7 +3920,7 @@ a:focus {
     text-decoration: none;
     transition: all 0.3s ease;
     border-left: 3px solid transparent;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 500;
 }
 
@@ -4070,7 +4200,7 @@ a:focus {
 
 /* Enhanced Button Styling for Dashboard */
 .dashboard-section .btn {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
@@ -4105,7 +4235,7 @@ a:focus {
 .analysis-details h4 {
     color: #ffffff;
     margin: 0 0 0.5rem 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
 }
 
