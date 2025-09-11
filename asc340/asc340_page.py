@@ -74,8 +74,15 @@ def render_asc340_page():
             # Add rerun functionality for existing completed memo
             from shared.rerun_manager import RerunManager
             rerun_manager = RerunManager()
-            if analysis_id:
-                rerun_manager.add_rerun_button(str(analysis_id))
+            rerun_manager.add_rerun_button(analysis_id)
+            
+            # Add sidebar rerun access
+            with st.sidebar:
+                st.markdown("---")
+                st.markdown("### 🔄 Request Changes")
+                if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
+                    st.session_state[f'show_rerun_form_{analysis_id}'] = True
+                    st.rerun()
             
             # Add "Analyze Another Contract" button
             st.markdown("---")

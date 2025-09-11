@@ -71,6 +71,14 @@ def render_asc718_page():
             if analysis_id:
                 rerun_manager.add_rerun_button(str(analysis_id))
             
+            # Add sidebar rerun access
+            with st.sidebar:
+                st.markdown("---")
+                st.markdown("### 🔄 Request Changes")
+                if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
+                    st.session_state[f'show_rerun_form_{analysis_id}'] = True
+                    st.rerun()
+            
             # Add "Analyze Another Contract" button
             st.markdown("---")
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):

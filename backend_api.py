@@ -1401,7 +1401,7 @@ def get_analysis_history():
         # Get recent analyses with details
         cursor.execute("""
             SELECT 
-                a.id,
+                COALESCE(a.memo_id, a.id::text) as id,
                 a.asc_standard,
                 a.completed_at,
                 a.status,
@@ -1460,21 +1460,17 @@ def save_analysis():
             
         cursor = conn.cursor()
         
-        # Insert analysis record (match existing schema)
+        # Insert analysis record (use auto-generated integer ID, store analysis_id in memo_id field)
         cursor.execute("""
-            INSERT INTO analyses (id, user_id, asc_standard, status, completed_at, words_count)
+            INSERT INTO analyses (user_id, asc_standard, status, completed_at, words_count, memo_id)
             VALUES (%s, %s, %s, %s, %s, %s)
-            ON CONFLICT (id) DO UPDATE SET
-                status = EXCLUDED.status,
-                completed_at = EXCLUDED.completed_at,
-                words_count = EXCLUDED.words_count
         """, (
-            data.get('analysis_id'),
             user_id,
             data.get('asc_standard'),
             data.get('status'),
             data.get('completed_at'),
-            data.get('total_words', 0)
+            data.get('total_words', 0),
+            data.get('analysis_id')
         ))
         
         conn.commit()
