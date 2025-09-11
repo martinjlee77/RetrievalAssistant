@@ -23,7 +23,7 @@ class CleanMemoGenerator:
         """Initialize - template_path ignored for now."""
         pass
     
-    def combine_clean_steps(self, analysis_results: Dict[str, Any]) -> str:
+    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
@@ -31,8 +31,18 @@ class CleanMemoGenerator:
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%B %d, %Y")
         
-        # Build memo with disclaimer at very top
-        memo_lines = [
+        # Build memo with memo ID and disclaimer at very top
+        memo_lines = []
+        
+        # Add memo ID at the very top if provided
+        if analysis_id:
+            memo_lines.extend([
+                f"**MEMO ID:** {analysis_id}",
+                "",
+            ])
+        
+        # Add disclaimer
+        memo_lines.extend([
             DisclaimerGenerator.get_top_banner(),
             "",
             "# ASC 606 MEMORANDUM",
@@ -220,7 +230,7 @@ class CleanMemoGenerator:
             logger.error(f"DOCX generation failed: {e}")
             return None
 
-    def display_clean_memo(self, memo_content: str) -> None:
+    def display_clean_memo(self, memo_content: str, analysis_id: str = None, filename: str = None, customer_name: str = None) -> None:
         """Display clean memo content with enhanced download options."""
         
         # Validate memo content
@@ -320,6 +330,14 @@ class CleanMemoGenerator:
                     </script>
                     """
                     st.components.v1.html(copy_js, height=0)
+            
+            # Add audit pack download if analysis_id provided
+            if analysis_id:
+                st.markdown("---")
+                st.markdown("### 📋 Audit Pack")
+                from shared.audit_pack_generator import AuditPackGenerator
+                audit_generator = AuditPackGenerator()
+                audit_generator.add_audit_pack_download(memo_content, analysis_id, filename, customer_name)
     
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

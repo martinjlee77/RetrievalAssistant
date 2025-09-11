@@ -527,8 +527,8 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         'additional_context': additional_context
                     }
                     
-                    # Generate clean memo using the memo generator
-                    memo_result = memo_generator.combine_clean_steps(memo_analysis_results)
+                    # Generate clean memo using the memo generator with analysis_id
+                    memo_result = memo_generator.combine_clean_steps(memo_analysis_results, analysis_id)
                     
                     # Mark analysis as successful
                     analysis_manager.complete_analysis(analysis_id, success=True)
@@ -566,13 +566,21 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
 - **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
                                 """)
                         
-                        # Use the CleanMemoGenerator's display method
-                        memo_generator.display_clean_memo(memo_result)
+                        # Use the CleanMemoGenerator's display method with analysis_id
+                        memo_generator.display_clean_memo(memo_result, analysis_id, filename, customer_name)
                         
                         # Add rerun functionality
                         from shared.rerun_manager import RerunManager
                         rerun_manager = RerunManager()
                         rerun_manager.add_rerun_button(analysis_id)
+                        
+                        # Add sidebar rerun access
+                        with st.sidebar:
+                            st.markdown("---")
+                            st.markdown("### 🔄 Request Changes")
+                            if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
+                                st.session_state[f'show_rerun_form_{analysis_id}'] = True
+                                st.rerun()
                         
                     else:
                         st.error("❌ Memo generation produced empty content")

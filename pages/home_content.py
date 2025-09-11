@@ -139,7 +139,9 @@ st.divider()
 st.markdown("## :primary[How It Works]")
 
 with st.container():
-    st.image("assets/images/howitworks.jpeg")
+    # Temporarily comment out missing image
+    # st.image("assets/images/howitworks.jpeg")
+    st.info("📊 **How It Works**: Upload your documents → AI analyzes them → Professional memo generated")
 
 
 st.divider()

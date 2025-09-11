@@ -98,7 +98,7 @@ class AnalysisManager:
         
         return analysis_id
     
-    def complete_analysis(self, analysis_id: str, success: bool = True, error_message: str = None) -> bool:
+    def complete_analysis(self, analysis_id: str, success: bool = True, error_message: Optional[str] = None) -> bool:
         """
         Mark analysis as completed
         
@@ -172,7 +172,7 @@ class AnalysisManager:
         Please wait for the current analysis to complete before starting a new one.
         
         **Current Analysis Details:**
-        - Analysis ID: {active_analysis['analysis_id']}
+        - Memo ID: {active_analysis['analysis_id']}
         - Document Words: {active_analysis['total_words']:,}
         - Cost: \\${active_analysis['cost_charged']:.2f}
         """)

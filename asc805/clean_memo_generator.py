@@ -25,7 +25,7 @@ class CleanMemoGenerator:
         """Initialize - template_path ignored for now."""
         pass
     
-    def combine_clean_steps(self, analysis_results: Dict[str, Any]) -> str:
+    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
@@ -33,8 +33,18 @@ class CleanMemoGenerator:
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%B %d, %Y")
         
-        # Build memo with disclaimer at very top
-        memo_lines = [
+        # Build memo with memo ID and disclaimer at very top
+        memo_lines = []
+        
+        # Add memo ID at the very top if provided
+        if analysis_id:
+            memo_lines.extend([
+                f"**MEMO ID:** {analysis_id}",
+                "",
+            ])
+        
+        # Add disclaimer
+        memo_lines.extend([
             DisclaimerGenerator.get_top_banner(),
             "",
             "# ASC 805 MEMORANDUM",
@@ -46,7 +56,7 @@ class CleanMemoGenerator:
             f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Transaction Documents')}",
             "",
             ""
-        ]
+        ])
         
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
@@ -130,7 +140,7 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def display_clean_memo(self, memo_content: str):
+    def display_clean_memo(self, memo_content: str, analysis_id: str = None, filename: str = None, customer_name: str = None):
         """Display clean memo with enhanced formatting and download options."""
         
         # Apply HTML styling for better readability
@@ -148,13 +158,13 @@ class CleanMemoGenerator:
         with st.container(border=True):
             st.info("""**IMPORTANT:** Choose your preferred format to save this memo before navigating away. The analysis results will be lost if you leave this page without saving.""")
             
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             
             with col1:
                 # Markdown download
                 md_content = self._clean_markdown_content(memo_content)
                 st.download_button(
-                    label="📝 Download Markdown",
+                    label="📝 Markdown",
                     data=md_content,
                     file_name=f"ASC805_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                     mime="text/markdown",
@@ -166,7 +176,7 @@ class CleanMemoGenerator:
                 try:
                     pdf_bytes = self._generate_pdf(memo_content)
                     st.download_button(
-                        label="📄 Download PDF",
+                        label="📄 PDF",
                         data=pdf_bytes,
                         file_name=f"ASC805_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                         mime="application/pdf",
@@ -182,7 +192,7 @@ class CleanMemoGenerator:
                 try:
                     docx_bytes = self._generate_docx(memo_content)
                     st.download_button(
-                        label="📋 Download Word",
+                        label="📋 Word",
                         data=docx_bytes,
                         file_name=f"ASC805_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -192,6 +202,20 @@ class CleanMemoGenerator:
                     logger.error(f"DOCX generation failed: {e}")
                     st.button("📋 DOCX Error", disabled=True, use_container_width=True,
                              help="Word document generation temporarily unavailable")
+            
+            with col4:
+                # Copy to clipboard button
+                copy_key = f"copy_{hash(memo_content[:100])}"
+                if st.button("📋 Copy", use_container_width=True, key=copy_key, help="Copy memo to clipboard"):
+                    st.info("Copy functionality requires manual selection and Ctrl+C")
+            
+            # Add audit pack download if analysis_id provided
+            if analysis_id:
+                st.markdown("---")
+                st.markdown("### 📋 Audit Pack")
+                from shared.audit_pack_generator import AuditPackGenerator
+                audit_generator = AuditPackGenerator()
+                audit_generator.add_audit_pack_download(memo_content, analysis_id, filename, customer_name)
     
     
     def _apply_html_styling(self, content: str) -> str:

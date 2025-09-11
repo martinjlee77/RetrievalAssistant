@@ -8,6 +8,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import logging
+import html
 from shared.postmark_client import PostmarkClient
 
 logger = logging.getLogger(__name__)
@@ -52,9 +53,10 @@ class RerunManager:
             
             st.session_state[rerun_key] = rerun_data
             
-            # Send notification emails
+            # Send notification emails (escape HTML in user-provided content for security)
+            escaped_changes = html.escape(requested_changes) if requested_changes else ""
             admin_sent = self.postmark_client.send_rerun_notification(
-                memo_id, user_email or 'unknown@email.com', user_name or 'User', requested_changes
+                memo_id, user_email or 'unknown@email.com', user_name or 'User', escaped_changes
             )
             
             user_sent = self.postmark_client.send_rerun_confirmation(

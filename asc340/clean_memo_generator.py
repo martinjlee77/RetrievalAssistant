@@ -19,7 +19,7 @@ class CleanMemoGenerator:
         """Initialize - template_path ignored for now."""
         pass
     
-    def combine_clean_steps(self, analysis_results: Dict[str, Any]) -> str:
+    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
@@ -27,8 +27,18 @@ class CleanMemoGenerator:
         analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
         analysis_date = datetime.now().strftime("%B %d, %Y")
         
-        # Build memo with disclaimer at very top
-        memo_lines = [
+        # Build memo with memo ID and disclaimer at very top
+        memo_lines = []
+        
+        # Add memo ID at the very top if provided
+        if analysis_id:
+            memo_lines.extend([
+                f"**MEMO ID:** {analysis_id}",
+                "",
+            ])
+        
+        # Add disclaimer
+        memo_lines.extend([
             DisclaimerGenerator.get_top_banner(),
             "",
             "# ASC 340-40 MEMORANDUM",
@@ -40,7 +50,7 @@ class CleanMemoGenerator:
             f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}",
             "",
             ""
-        ]
+        ])
         
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
@@ -124,8 +134,8 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def display_clean_memo(self, memo_content: str) -> None:
-        """Display clean memo content using HTML to preserve formatting."""
+    def display_clean_memo(self, memo_content: str, analysis_id: str = None, filename: str = None, customer_name: str = None) -> None:
+        """Display clean memo content with enhanced download options."""
         
         # Validate memo content
         if not memo_content or memo_content.strip() == "":
@@ -140,15 +150,6 @@ class CleanMemoGenerator:
         
         # Use HTML display which preserves formatting
         st.markdown(html_content, unsafe_allow_html=True)
-        
-        # Add blank line for spacing
-        st.markdown("")
-        
-        # Download button - only show if content exists and session state is preserved
-        # Check for session-isolated memo data
-        session_id = st.session_state.get('user_session_id', '')
-        memo_key = f'asc340_memo_data_{session_id}' if session_id else 'asc340_memo_data'
-        analysis_key = f'asc340_analysis_complete_{session_id}' if session_id else 'asc340_analysis_complete'
         
         # Enhanced Download Section - AFTER memo display (for stability)
         if memo_content and len(memo_content.strip()) > 10:
@@ -233,8 +234,14 @@ class CleanMemoGenerator:
                     </script>
                     """
                     components.html(copy_js, height=0)
-        else:
-            st.warning("Memo content too short for download. Please regenerate the analysis.")
+            
+            # Add audit pack download if analysis_id provided
+            if analysis_id:
+                st.markdown("---")
+                st.markdown("### 📋 Audit Pack")
+                from shared.audit_pack_generator import AuditPackGenerator
+                audit_generator = AuditPackGenerator()
+                audit_generator.add_audit_pack_download(memo_content, analysis_id, filename, customer_name)
     
     def _generate_pdf(self, memo_content: str) -> Optional[bytes]:
         """Generate PDF from memo content using WeasyPrint."""

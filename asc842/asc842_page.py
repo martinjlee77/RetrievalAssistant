@@ -60,7 +60,17 @@ def render_asc842_page():
                 memo_data = st.session_state[memo_key]
                 # Extract memo content from stored dictionary
                 memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
-                memo_generator.display_clean_memo(memo_content)
+                # Extract parameters for memo display
+                analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
+                filename = memo_data.get('filename') if isinstance(memo_data, dict) else None
+                customer_name = memo_data.get('customer_name') if isinstance(memo_data, dict) else None
+                memo_generator.display_clean_memo(memo_content, analysis_id, filename, customer_name)
+                
+                # Add rerun functionality for existing completed memo
+                from shared.rerun_manager import RerunManager
+                rerun_manager = RerunManager()
+                if analysis_id:
+                    rerun_manager.add_rerun_button(str(analysis_id))
                 
                 # Add "Analyze Another Contract" button
                 st.markdown("---")
