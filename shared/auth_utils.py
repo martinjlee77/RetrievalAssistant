@@ -197,6 +197,14 @@ def show_user_sidebar(auth_manager: AuthManager):
         with col2:
             if st.button("Logout", use_container_width=True):
                 auth_manager.logout()
+        
+        # Global rerun request section
+        st.markdown("---")
+        st.markdown("### 🔄 Request Changes")
+        if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="global_sidebar_rerun"):
+            st.info("💡 **Tip**: Complete an analysis first, then use the rerun button in the memo section for specific change requests.")
+        
+        st.markdown("**Need help?** [Contact Support](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/contact.html)")
 
 def show_credits_warning(required_credits: float, auth_manager: AuthManager):
     """Show warning if user doesn't have sufficient credits"""

@@ -320,16 +320,16 @@ def signup():
         cursor.execute("""
             INSERT INTO users (email, first_name, last_name, company_name, job_title, 
                              password_hash, is_legacy_user, status, verified_at, free_analyses_remaining)
-            VALUES (%s, %s, %s, %s, %s, %s, FALSE, 'verified', NOW(), 3)
+            VALUES (%s, %s, %s, %s, %s, %s, FALSE, 'verified', NOW(), 0)
             RETURNING id
         """, (email, first_name, last_name, company_name, job_title, password_hash))
         
         user_id = cursor.fetchone()['id']
         
-        # Add trial credits transaction
+        # Add trial credits transaction (use config value)
         cursor.execute("""
             INSERT INTO credit_transactions (user_id, amount, reason)
-            VALUES (%s, 3, 'trial_grant')
+            VALUES (%s, 200, 'trial_grant')
         """, (user_id,))
         
         conn.commit()

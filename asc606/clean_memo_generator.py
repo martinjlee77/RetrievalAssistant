@@ -23,7 +23,7 @@ class CleanMemoGenerator:
         """Initialize - template_path ignored for now."""
         pass
     
-    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str = None) -> str:
+    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str | None = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
@@ -51,10 +51,10 @@ class CleanMemoGenerator:
             f"**FROM:** Technical Accounting Team - AI", 
             f"**DATE:** {analysis_date}",
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
-            f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}"
+            f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}",
             "",
             ""
-        ]
+        ])
         
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
