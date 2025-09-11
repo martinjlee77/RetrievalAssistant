@@ -232,8 +232,11 @@ class AuditPackGenerator:
             pdf.cell(0, 6, 'Review all citations and assumptions for accuracy before relying on this analysis', ln=True, align='C')
             
             pdf_output = pdf.output(dest='S')
+            # Handle different output types (bytes, bytearray, or str)
             if isinstance(pdf_output, str):
                 return pdf_output.encode('latin-1')
+            elif isinstance(pdf_output, bytearray):
+                return bytes(pdf_output)
             return pdf_output
             
         except Exception as e:
@@ -246,8 +249,11 @@ class AuditPackGenerator:
             pdf.cell(0, 10, 'Error generating detailed audit pack.', ln=True)
             pdf.cell(0, 10, f'Generated: {datetime.now().strftime("%B %d, %Y")}', ln=True)
             pdf_output = pdf.output(dest='S')
+            # Handle different output types (bytes, bytearray, or str)
             if isinstance(pdf_output, str):
                 return pdf_output.encode('latin-1')
+            elif isinstance(pdf_output, bytearray):
+                return bytes(pdf_output)
             return pdf_output
     
     def add_audit_pack_download(self, memo_content: str, analysis_id: str, 

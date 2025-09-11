@@ -221,8 +221,7 @@ class AnalysisManager:
                 'status': analysis_record.get('status'),
                 'cost': analysis_record.get('cost_charged', 0),
                 'completed_at': analysis_record.get('end_timestamp'),
-                'total_words': analysis_record.get('total_words', 0),
-                'file_count': analysis_record.get('file_count', 0)
+                'total_words': analysis_record.get('total_words', 0)
             }
             
             # Save to database via backend API

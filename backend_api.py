@@ -1460,21 +1460,21 @@ def save_analysis():
             
         cursor = conn.cursor()
         
-        # Insert analysis record
+        # Insert analysis record (match existing schema)
         cursor.execute("""
-            INSERT INTO analyses (id, user_id, asc_standard, status, completed_at, total_words, file_count)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO analyses (id, user_id, asc_standard, status, completed_at, words_count)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (id) DO UPDATE SET
                 status = EXCLUDED.status,
-                completed_at = EXCLUDED.completed_at
+                completed_at = EXCLUDED.completed_at,
+                words_count = EXCLUDED.words_count
         """, (
             data.get('analysis_id'),
             user_id,
             data.get('asc_standard'),
             data.get('status'),
             data.get('completed_at'),
-            data.get('total_words', 0),
-            data.get('file_count', 0)
+            data.get('total_words', 0)
         ))
         
         conn.commit()
@@ -1485,6 +1485,45 @@ def save_analysis():
     except Exception as e:
         logger.error(f"Save analysis error: {e}")
         return jsonify({'success': False, 'error': 'Failed to save analysis'}), 500
+
+@app.route('/api/submit-rerun-request', methods=['POST'])
+def submit_rerun_request():
+    """Submit rerun request via email"""
+    try:
+        data = request.get_json()
+        
+        # Create email content
+        subject = f"Memo Rerun Request - {data.get('memoId', 'Unknown')}"
+        
+        html_content = f"""
+        <h2>New Memo Rerun Request</h2>
+        <p><strong>Memo ID:</strong> {data.get('memoId', 'Not provided')}</p>
+        <p><strong>Request Type:</strong> {data.get('requestType', 'Not specified')}</p>
+        <p><strong>Urgency:</strong> {data.get('urgency', 'Standard')}</p>
+        <p><strong>Change Details:</strong></p>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            {data.get('changeDetails', 'No details provided').replace(chr(10), '<br>')}
+        </div>
+        <hr>
+        <p><em>Action Required: Review request and apply $200 rerun credit to user account</em></p>
+        """
+        
+        # Send notification email
+        from shared.postmark_client import send_notification_email
+        success = send_notification_email(
+            subject=subject,
+            html_content=html_content,
+            memo_id=data.get('memoId', 'unknown')
+        )
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Rerun request submitted successfully'}), 200
+        else:
+            return jsonify({'success': False, 'error': 'Failed to send notification'}), 500
+            
+    except Exception as e:
+        logger.error(f"Rerun request submission error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to submit rerun request'}), 500
 
 @app.route('/api/user/update-profile', methods=['PUT'])
 def update_profile():
