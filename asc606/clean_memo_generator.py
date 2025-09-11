@@ -138,7 +138,7 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def _generate_pdf(self, memo_content: str) -> bytes:
+    def _generate_pdf(self, memo_content: str) -> bytes | None:
         """Generate PDF from memo content using WeasyPrint."""
         try:
             # Convert markdown to HTML
@@ -184,7 +184,7 @@ class CleanMemoGenerator:
         text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
         return text.strip()
 
-    def _generate_docx(self, memo_content: str) -> bytes:
+    def _generate_docx(self, memo_content: str) -> bytes | None:
         """Generate DOCX from memo content using python-docx."""
         try:
             doc = Document()
@@ -230,7 +230,7 @@ class CleanMemoGenerator:
             logger.error(f"DOCX generation failed: {e}")
             return None
 
-    def display_clean_memo(self, memo_content: str, analysis_id: str = None, filename: str = None, customer_name: str = None) -> None:
+    def display_clean_memo(self, memo_content: str, analysis_id: str | None = None, filename: str | None = None, customer_name: str | None = None) -> None:
         """Display clean memo content with enhanced download options."""
         
         # Validate memo content
@@ -329,7 +329,11 @@ class CleanMemoGenerator:
                         copyToClipboard();
                     </script>
                     """
-                    st.components.v1.html(copy_js, height=0)
+                    try:
+                        import streamlit.components.v1 as components
+                        components.html(copy_js, height=0)
+                    except:
+                        st.success("Content ready to copy manually")
             
             # Add audit pack download if analysis_id provided
             if analysis_id:

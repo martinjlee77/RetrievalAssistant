@@ -1438,6 +1438,54 @@ def get_analysis_history():
         logger.error(f"Analysis history error: {e}")
         return jsonify({'success': False, 'error': 'Failed to fetch analysis history'}), 500
 
+@app.route('/api/save-analysis', methods=['POST'])
+def save_analysis():
+    """Save completed analysis to database"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+            
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+            
+        user_id = payload['user_id']
+        data = request.get_json()
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+            
+        cursor = conn.cursor()
+        
+        # Insert analysis record
+        cursor.execute("""
+            INSERT INTO analyses (id, user_id, asc_standard, status, completed_at, total_words, file_count)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (id) DO UPDATE SET
+                status = EXCLUDED.status,
+                completed_at = EXCLUDED.completed_at
+        """, (
+            data.get('analysis_id'),
+            user_id,
+            data.get('asc_standard'),
+            data.get('status'),
+            data.get('completed_at'),
+            data.get('total_words', 0),
+            data.get('file_count', 0)
+        ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True}), 200
+        
+    except Exception as e:
+        logger.error(f"Save analysis error: {e}")
+        return jsonify({'success': False, 'error': 'Failed to save analysis'}), 500
+
 @app.route('/api/user/update-profile', methods=['PUT'])
 def update_profile():
     """Update user profile information"""

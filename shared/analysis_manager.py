@@ -130,6 +130,9 @@ class AnalysisManager:
         if error_message:
             active_analysis['error_message'] = error_message
         
+        # Save to database for dashboard history  
+        self._save_to_database(active_analysis)
+        
         # Add to analysis history
         self._add_to_history(active_analysis)
         
@@ -198,6 +201,45 @@ class AnalysisManager:
         if len(history) > 10:
             history = history[-10:]
             st.session_state[self.session_key_history] = history
+    
+    def _save_to_database(self, analysis_record: Dict[str, Any]):
+        """Save completed analysis to database for dashboard history"""
+        try:
+            import requests
+            from shared.auth_utils import auth_manager
+            
+            # Get auth token for database request
+            token = auth_manager.get_auth_token()
+            if not token:
+                logger.warning("No auth token available for database save")
+                return
+            
+            # Prepare analysis data for database
+            analysis_data = {
+                'analysis_id': analysis_record.get('analysis_id'),
+                'asc_standard': analysis_record.get('asc_standard'),
+                'status': analysis_record.get('status'),
+                'cost': analysis_record.get('cost_charged', 0),
+                'completed_at': analysis_record.get('end_timestamp'),
+                'total_words': analysis_record.get('total_words', 0),
+                'file_count': analysis_record.get('file_count', 0)
+            }
+            
+            # Save to database via backend API
+            response = requests.post(
+                'http://localhost:3000/api/save-analysis',
+                headers={'Authorization': f'Bearer {token}'},
+                json=analysis_data,
+                timeout=5
+            )
+            
+            if response.ok:
+                logger.info(f"Analysis {analysis_data['analysis_id']} saved to database")
+            else:
+                logger.warning(f"Failed to save analysis to database: {response.status_code}")
+                
+        except Exception as e:
+            logger.error(f"Database save error: {e}")
     
     def _log_analysis_event(self, event_type: str, analysis_data: Dict[str, Any]):
         """Log analysis events for operational monitoring"""
