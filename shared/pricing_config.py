@@ -6,39 +6,31 @@ Easy to update pricing without touching code
 # Tiered Pricing Structure - Update prices here only
 PRICING_TIERS = {
     1: {
-        "name": "Short",
-        "price": 9.00,
-        "max_words": 2000,
-        "description": "Basic contracts and simple agreements",
-        "per_1k_rate": 4.50
+        "name": "15K (≤50 pages)",
+        "price": 395.00,
+        "max_words": 15000,
+        "description": "Same features in every tier. For shorter packages.",
+        "docs_per_run": 10,
+        "reruns_included": 1,
+        "rerun_window_days": 14
     },
     2: {
-        "name": "Medium", 
-        "price": 19.00,
-        "max_words": 5000,
-        "description": "Standard business contracts",
-        "per_1k_rate": 3.80
+        "name": "30K (≤100 pages)",
+        "price": 695.00,
+        "max_words": 30000,
+        "description": "Same features in every tier. For standard-length packages.",
+        "docs_per_run": 10,
+        "reruns_included": 1,
+        "rerun_window_days": 14
     },
     3: {
-        "name": "Large",
-        "price": 35.00,
-        "max_words": 10000,
-        "description": "Complex agreements with multiple terms",
-        "per_1k_rate": 3.50
-    },
-    4: {
-        "name": "Extensive",
-        "price": 59.00,
-        "max_words": 20000,
-        "description": "Large enterprise agreements",
-        "per_1k_rate": 2.95
-    },
-    5: {
-        "name": "Enterprise",
-        "price": 119.00,
-        "max_words": 50000,
-        "description": "Enterprise-scale document sets",
-        "per_1k_rate": 2.38
+        "name": "60K (≤200 pages)",
+        "price": 1195.00,
+        "max_words": 60000,
+        "description": "Same features in every tier. For long or complex packages.",
+        "docs_per_run": 10,
+        "reruns_included": 1,
+        "rerun_window_days": 14
     }
 }
 
@@ -69,7 +61,7 @@ APPROVED_BUSINESS_DOMAINS = [
 
 # Credit Settings
 CREDIT_EXPIRATION_MONTHS = 12
-NEW_USER_WELCOME_CREDITS = 100  # $100 free credits instead of 3 free analyses
+NEW_USER_WELCOME_CREDITS = 200  # $200 First Memo Credit
 
 def get_price_tier(word_count):
     """
@@ -89,18 +81,22 @@ def get_price_tier(word_count):
                 'price': tier_info['price'],
                 'description': tier_info['description'],
                 'max_words': tier_info['max_words'],
-                'per_1k_rate': tier_info['per_1k_rate'],
+                'docs_per_run': tier_info['docs_per_run'],
+                'reruns_included': tier_info['reruns_included'],
+                'rerun_window_days': tier_info['rerun_window_days'],
                 'word_count': word_count
             }
     
-    # Fallback to highest tier (Enterprise)
+    # Fallback to highest tier (60K)
     return {
-        'tier': 5,
-        'name': PRICING_TIERS[5]['name'],
-        'price': PRICING_TIERS[5]['price'],
-        'description': PRICING_TIERS[5]['description'],
-        'max_words': PRICING_TIERS[5]['max_words'],
-        'per_1k_rate': PRICING_TIERS[5]['per_1k_rate'],
+        'tier': 3,
+        'name': PRICING_TIERS[3]['name'],
+        'price': PRICING_TIERS[3]['price'],
+        'description': PRICING_TIERS[3]['description'],
+        'max_words': PRICING_TIERS[3]['max_words'],
+        'docs_per_run': PRICING_TIERS[3]['docs_per_run'],
+        'reruns_included': PRICING_TIERS[3]['reruns_included'],
+        'rerun_window_days': PRICING_TIERS[3]['rerun_window_days'],
         'word_count': word_count
     }
 

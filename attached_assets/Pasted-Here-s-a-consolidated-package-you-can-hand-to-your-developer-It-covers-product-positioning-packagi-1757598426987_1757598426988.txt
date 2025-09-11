@@ -1,0 +1,297 @@
+Here’s a consolidated package you can hand to your developer. It covers product positioning, packaging, pricing, rerun policy, implementation details, and updated website copy (HTML sections you can paste in). It’s organized so you can pick up each part independently.
+
+Packaging and pricing (final spec)
+Positioning
+
+Who it’s for: Public-company and large private technical accounting teams that need audit-ready draft memos fast.
+What it delivers: A complete, Big 4–style technical memo (ASC paragraph citations, executive summary, background, analysis, conclusion). Optional human review by an ex–EY partner.
+Pricing model: Per-analysis. Same features in every tier. Tiers differ only by input length and allowed number of documents.
+Tiers (length-based, same benefits)
+
+15K (≤50 pages)
+Price: $395
+Max words: 15,000
+Docs per run: up to 5
+Reruns included: 1 within 14 days (same doc set; minor edits allowed)
+30K (≤100 pages)
+Price: $695
+Max words: 30,000
+Docs per run: up to 7
+Reruns included: 1 within 14 days (same doc set; minor edits allowed)
+60K (≤200 pages)
+Price: $1,195
+Max words: 60,000
+Docs per run: up to 10
+Reruns included: 1 within 14 days (same doc set; minor edits allowed)
+What’s included in every tier
+
+Up to N documents per run (per tier above)
+Full memo with paragraph-level ASC citations, executive summary, background, analysis, and conclusion
+1 complimentary rerun within 14 days (same document set; minor edits allowed)
+Email support with same business-day target response
+Audit Pack export (citations list + assumptions/judgments + references)
+Add-ons
+
+Rush processing: +$150 (priority queue)
+Human review by ex–EY partner: $300/hour (sell in 1h, 3h, 6h blocks; no discounts)
+Trial and trust
+
+First Memo Credit: $200 off your first paid memo (any tier)
+Money-back guarantee: If your first paid memo is unusable for the stated purpose, we’ll refund it
+Founding Customer Pricing note
+
+Label the current list prices as “Founding Customer Pricing” for the first 20–30 customer companies. This is a positioning device, not necessarily a discount. In exchange, request permission to use logo and a short testimonial (optional).
+Rerun policy (public-facing copy)
+Reruns included
+
+Each analysis includes 1 complimentary rerun within 14 days of the original run.
+Reruns are intended for minor adjustments, formatting refinements, or clarifications.
+What qualifies as a rerun
+
+Same document set with minor edits (generally ≤10% changes in total word count).
+Same scope and standard. If the contract set or scope changes materially, it’s a new analysis.
+How to request a rerun
+
+Re-upload your documents, select “This is a rerun,” and include your original memo ID in the notes.
+Describe what you want adjusted (e.g., emphasize specific clauses, clarify conclusions, adjust tone).
+What’s not covered
+
+Major scope changes, new or additional contracts, or different standards require a new analysis.
+Rerun window expires after 14 days.
+Developer implementation notes
+Data model (add fields if not present)
+
+runs table
+
+run_id (UUID)
+user_id
+tier_id
+input_word_count
+max_words_allowed
+docs_per_run_allowed
+documents_metadata (array of {filename, size, hash})
+docset_hash (aggregate hash)
+reruns_included (int)
+reruns_used (int)
+parent_run_id (nullable; points to the original run if this is a rerun)
+rerun_expiry (timestamp = created_at + 14 days)
+status (queued, processing, completed, failed)
+price_charged
+coupons_applied (array)
+created_at, completed_at
+coupons table
+
+coupon_id
+type (FIRST_MEMO_200, RERUN_100)
+amount_off or percent_off
+max_uses (1)
+expires_at
+constraints JSON (e.g., must reference parent_run_id; must be same tier; only within 14 days)
+Rerun flow (Phase 1: coupon-based)
+
+UI changes:
+Add a checkbox: “This is a rerun”
+Text input: “Original memo ID” (free text)
+Text area: “What should we adjust?”
+Server logic:
+If “rerun” checked:
+Validate original memo ID belongs to user.
+Check original run reruns_used < reruns_included and now < rerun_expiry.
+Compute current docset_hash and compare to original; allow if “minor edits” threshold is met (e.g., within 10% total word count delta OR heuristic comparing combined file sizes).
+Generate a one-time RERUN_100 coupon (100% off) tied to parent_run_id and this user.
+Process normally; set parent_run_id to original; increment reruns_used on parent.
+Prompting:
+Prepend a rerun note to the system or developer prompt:
+Include original memo ID, key sections (or a short summary), and user change notes.
+“Treat this as a refinement of the original analysis; maintain structure and citations.”
+Word and page estimation
+
+Word count: compute from extracted text. If OCR needed, do OCR first; if extraction fails, estimate pages × 300 words/page.
+Pre-check:
+Show estimated words and tier suggestion before payment.
+If over cap, automatically propose next tier. Do not do overages.
+Upload limits
+
+Set a per-run size cap (e.g., 150 MB total).
+Allowed file types: PDF, DOCX, TXT (and images if OCR included).
+Doc count per tier as above (5/7/10), but you can globally cap to 5 if needed initially.
+Queueing and rate limits
+
+Start with 1–2 concurrent analyses per org/user; increase later.
+Implement retry with exponential backoff on model calls.
+Batch embeddings/OCR to smooth spikes.
+Audit Pack export
+
+Build a simple export payload:
+Citations (ASC references with paragraph numbers)
+Key assumptions and judgments
+References list (source docs)
+Provide downloadable PDF (and optionally a ZIP containing a JSON of the same for internal audit systems).
+Metrics to log
+
+Acceptance rate at list price
+Tier mix (15K vs 30K vs 60K)
+Rerun request rate and pass/fail against policy
+% taking human review and average hours purchased
+Average tokens per run (ingest, retrieve, draft, verify) to confirm margin
+First Memo Credit logic
+
+On first paid run for a new organization, auto-offer a FIRST_MEMO_200 coupon at checkout. Expire 30–60 days from sign-up.
+PRICING_TIERS object (drop-in)
+PRICING_TIERS = { 1: { "name": "15K (≤50 pages)", "price": 395.00, "max_words": 15000, "description": "Same features in every tier. For shorter packages.", "docs_per_run": 5, "reruns_included": 1, "rerun_window_days": 14 }, 2: { "name": "30K (≤100 pages)", "price": 695.00, "max_words": 30000, "description": "Same features in every tier. For standard-length packages.", "docs_per_run": 7, "reruns_included": 1, "rerun_window_days": 14 }, 3: { "name": "60K (≤200 pages)", "price": 1195.00, "max_words": 60000, "description": "Same features in every tier. For long packages.", "docs_per_run": 10, "reruns_included": 1, "rerun_window_days": 14 } }
+
+ADD_ONS = { "rush_processing": { "name": "Rush Processing", "price": 150.00, "description": "Priority queue for urgent analyses." }, "human_review": { "name": "Human Review", "price_per_hour": 300.00, "packages": [1, 3, 6], "description": "Ex–EY partner review with written comments." } }
+
+PROMOS = { "first_memo_credit": { "code": "FIRST200", "amount_off": 200.00, "conditions": "New customer; one-time use; expires in 60 days" } }
+
+Updated website copy (HTML replacements)
+Replace page header section with:
+
+<section class="page-header"> <div class="container"> <h1>Simple, Transparent Per‑Analysis Pricing</h1> <p>Same features in every tier. Choose by document length. No subscriptions, no overages.</p> <div class="founding-badge">Founding Customer Pricing</div> </div> </section>
+Replace pricing overview section with:
+
+<section class="pricing-overview"> <div class="container"> <div class="pricing-philosophy"> <h2>Three Tiers by Document Length</h2> <div class="philosophy-grid"> <div class="philosophy-item"> <h3>Automatic Tiering</h3> <p>We estimate word count and suggest the right tier before you pay. No surprises.</p> </div> <div class="philosophy-item"> <h3>Same Features, Any Tier</h3> <p>Every analysis includes a full Big 4–style memo with paragraph‑level ASC citations.</p> </div> <div class="philosophy-item"> <h3>No Overage Charges</h3> <p>If you exceed a cap, we propose the next tier automatically. No hidden fees.</p> </div> </div> </div> </div> </section>
+Replace main pricing cards with:
+
+<section class="pricing-main"> <div class="container"> <div class="pricing-cards">
+<div class="pricing-card standard-card featured">
+    <div class="popular-badge">Most Popular</div>
+    <div class="card-header">
+      <h3>15K (≤50 pages)</h3>
+      <div class="price">
+        <span class="currency">$</span>
+        <span class="amount">395</span>
+        <span class="period">per analysis</span>
+      </div>
+    </div>
+    <div class="card-content">
+      <ul class="features-list">
+        <li>Same features in every tier</li>
+        <li>Up to 5 documents per run</li>
+        <li>Full memo with paragraph‑level ASC citations</li>
+        <li>1 complimentary rerun within 14 days</li>
+        <li>Audit Pack export included</li>
+        <li>Email support (same business‑day target)</li>
+      </ul>
+      <a href="signup.html" class="pricing-cta primary">Start for $195 with FIRST200</a>
+      <p class="card-note">Founding Customer Pricing</p>
+    </div>
+  </div>
+
+  <div class="pricing-card standard-card">
+    <div class="card-header">
+      <h3>30K (≤100 pages)</h3>
+      <div class="price">
+        <span class="currency">$</span>
+        <span class="amount">695</span>
+        <span class="period">per analysis</span>
+      </div>
+    </div>
+    <div class="card-content">
+      <ul class="features-list">
+        <li>Same features in every tier</li>
+        <li>Up to 7 documents per run</li>
+        <li>Full memo with paragraph‑level ASC citations</li>
+        <li>1 complimentary rerun within 14 days</li>
+        <li>Audit Pack export included</li>
+        <li>Email support (same business‑day target)</li>
+      </ul>
+      <a href="signup.html" class="pricing-cta primary">Get Started</a>
+      <p class="card-note">Great for multi‑document packages</p>
+    </div>
+  </div>
+
+  <div class="pricing-card standard-card">
+    <div class="card-header">
+      <h3>60K (≤200 pages)</h3>
+      <div class="price">
+        <span class="currency">$</span>
+        <span class="amount">1195</span>
+        <span class="period">per analysis</span>
+      </div>
+    </div>
+    <div class="card-content">
+      <ul class="features-list">
+        <li>Same features in every tier</li>
+        <li>Up to 10 documents per run</li>
+        <li>Full memo with paragraph‑level ASC citations</li>
+        <li>1 complimentary rerun within 14 days</li>
+        <li>Audit Pack export included</li>
+        <li>Email support (same business‑day target)</li>
+      </ul>
+      <a href="signup.html" class="pricing-cta primary">Get Started</a>
+      <p class="card-note">For long or complex packages</p>
+    </div>
+  </div>
+
+</div>
+
+</div> </section>
+Replace add-ons section with:
+
+<section class="addon-services"> <div class="container"> <h2>Optional Add‑Ons</h2> <div class="addon-grid"> <div class="addon-card"> <h3>Human Review</h3> <div class="addon-price">$300/hour</div> <p>Ex–EY partner review with written comments. Available in 1h, 3h, or 6h blocks.</p> <ul> <li>Full technical review</li> <li>Written reviewer commentary</li> <li>Target 1–2 business‑day turnaround</li> </ul> </div> <div class="addon-card"> <h3>Rush Processing</h3> <div class="addon-price">+$150 per analysis</div> <p>Priority queue for urgent analyses.</p> <ul> <li>Accelerated start</li> <li>Business hours availability</li> <li>Same quality standards</li> </ul> </div> </div> </div> </section>
+Replace cost comparison with:
+
+<section class="cost-comparison"> <div class="container"> <h2>Cost and Time Comparison</h2> <div class="comparison-cards"> <div class="comparison-card"> <h3>Traditional Manual Analysis</h3> <div class="cost-breakdown"> <div class="cost-item"><span class="cost-label">Typical cost</span><span class="cost-amount">$3,000–$10,000</span></div> <div class="cost-item"><span class="cost-label">Time</span><span class="cost-amount">2–5+ days</span></div> </div> </div> <div class="comparison-card highlighted"> <h3>VeritasLogic.ai Analysis</h3> <div class="cost-breakdown"> <div class="cost-item"><span class="cost-label">AI analysis</span><span class="cost-amount">$395–$1,195</span></div> <div class="cost-item"><span class="cost-label">Optional human review</span><span class="cost-amount">$300/hour</span></div> <div class="cost-item"><span class="cost-label">Time</span><span class="cost-amount">Minutes to draft + review</span></div> </div> <div class="savings-badge">Save days of work; a fraction of advisory costs</div> </div> </div> </div> </section>
+Replace pricing details table with:
+
+<section class="pricing-details"> <div class="container"> <h2>How Pricing Works</h2> <p>Upload up to the allowed number of documents. We estimate the total word count and suggest a tier before payment.</p> <div class="pricing-table"> <table> <thead> <tr><th>Tier</th><th>Document Length</th><th>Price</th><th>Docs per Run</th></tr> </thead> <tbody> <tr><td><strong>15K (≤50 pages)</strong></td><td>Up to 15,000 words</td><td>$395</td><td>Up to 5</td></tr> <tr><td><strong>30K (≤100 pages)</strong></td><td>Up to 30,000 words</td><td>$695</td><td>Up to 7</td></tr> <tr><td><strong>60K (≤200 pages)</strong></td><td>Up to 60,000 words</td><td>$1,195</td><td>Up to 10</td></tr> </tbody> </table> </div> <p class="pricing-note">No overage charges. If a package exceeds a cap, we’ll suggest the next tier automatically.</p> </div> </section>
+Replace FAQ with:
+
+<section class="pricing-faq"> <div class="container"> <h2>Frequently Asked Questions</h2> <div class="faq-grid">
+<div class="faq-item">
+    <h3>How does billing work?</h3>
+    <p>Each analysis is a one‑time purchase. We suggest the right tier based on word count before you pay. No subscriptions or overages.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>What’s included in each analysis?</h3>
+    <p>A complete professional memo with paragraph‑level ASC citations, executive summary, background, analysis, and conclusion—plus an Audit Pack export.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>What is your rerun policy?</h3>
+    <p>Each analysis includes 1 complimentary rerun within 14 days for the same document set (minor edits allowed). Reruns are for refinements; major scope changes require a new analysis.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>How do you measure pages and words?</h3>
+    <p>We estimate from extracted text. When needed, we assume ~300 words per page to provide a conservative estimate before payment.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Do you offer a trial?</h3>
+    <p>New customers receive a $200 credit on their first memo (code: FIRST200). We also offer a money‑back guarantee if your first memo is unusable for the stated purpose.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>Do you offer volume pricing?</h3>
+    <p>Yes. For departments planning 25+ analyses per year, contact us to discuss volume bundles.</p>
+  </div>
+
+</div>
+
+</div> </section>
+Replace CTA with:
+
+<section class="cta-section"> <div class="container"> <div class="cta-content"> <h2>Ready to Get Started?</h2> <p>Claim $200 off your first memo and see how fast an audit‑ready draft comes together.</p> <div class="cta-actions"> <a href="signup.html" class="hero-cta">Claim FIRST200</a> <a href="contact.html" class="secondary-cta">Contact Sales</a> </div> <p class="cta-note">Founding Customer Pricing • No subscriptions • Money‑back guarantee on your first memo</p> </div> </div> </section>
+Update meta description in the head:
+
+<meta name="description" content="Per-analysis pricing for audit-ready technical accounting memos. Same features in every tier—choose by document length. First memo $200 credit.">
+Public copy snippets you can reuse elsewhere
+Short value prop
+
+Audit-ready draft technical accounting memos in minutes. Paragraph-level ASC citations, Big 4–style structure. Optional ex–EY partner review.
+Short pricing explainer
+
+Same features in every tier. Choose by document length. No overages—if your package exceeds a cap, we’ll suggest the next tier automatically.
+Short rerun explainer
+
+Every analysis includes 1 complimentary rerun within 14 days for minor refinements to the same document set.
+Pilot/offer line
+
+Founding Customer Pricing for early adopters. $200 off your first memo with code FIRST200. Money-back guarantee on your first memo if it’s unusable for the stated purpose.
+Notes on context and scalability (internal)
+Even at 60K words, you should not push model context if you keep your staged pipeline: chunk → retrieve top‑K → section summaries → final draft from structured notes. Keep final prompts within the model’s context window. Monitor token usage; request higher API rate limits if you experience quarter‑end spikes.
+Start with a single concurrency slot per org during launch, raise when stable.
+If you want, I can also produce a one-page “Pricing & Rerun Policy” PDF copy for legal/terms, or draft your in‑app checkout microcopy (tier selector, estimator tooltip, rerun checkbox label, and coupon field labels).

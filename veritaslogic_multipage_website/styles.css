@@ -590,7 +590,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .status.available {
-    background: #212F3C;
+    background: #738596;
     color: #f2f2f2;
     border: 1px solid #f2f2f2;
 }
@@ -1405,7 +1405,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .feature-benefits li::before {
     content: '✓';
-    color: #22c55e;
+    color: #f2f2f2;
     font-weight: bold;
     position: absolute;
     left: 0;
@@ -1527,9 +1527,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .standards-boxes .status.available {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    background: #738596;
+    color: #f2f2f2;
+    border: 1px solid #f2f2f2;
 }
 
 .standard-number {
@@ -1752,8 +1752,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .feature-comparison {
-    padding: 100px 0;
+    padding: 50px 0;
     background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+}
+
+.feature-comparison h2 {
+    font-size: 2.2rem;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
+    
 }
 
 .comparison-table {
@@ -2505,7 +2513,11 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-/* cta-content h2 removed - using standard .section-header h2 instead */
+.cta-content h2 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
 
 .cta-content p {
     font-size: 1.2rem;

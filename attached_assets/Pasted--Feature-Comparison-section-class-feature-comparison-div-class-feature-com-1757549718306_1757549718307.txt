@@ -1,0 +1,62 @@
+<!-- Feature Comparison -->
+    <section class="feature-comparison">
+        <div class="feature-comparison h2">
+            <h2>Why Choose VeritasLogic.ai?</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>VeritasLogic.ai</th>
+                            <th>Generic AI Tools</th>
+                            <th>Manual Analysis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Technical Knowledge (ASC)</td>
+                            <td>✓ Built-in FASB guidance</td>
+                            <td>❌ Generic knowledge</td>
+                            <td>⚠️ Manual research required</td>
+                        </tr>
+                        <tr>
+                            <td>Technical Knowledge (ASC)</td>
+                            <td>✓ Built-in FASB guidance</td>
+                            <td>❌ Generic knowledge</td>
+                            <td>⚠️ Manual research required</td>
+                        </tr>
+                                                <tr>
+                            <td>Professional Memo Format</td>
+                            <td>✓ Industry standard templates</td>
+                            <td>❌ Generic formatting</td>
+                            <td>✓ Manual formatting</td>
+                        </tr>
+                        <tr>
+                            <td>Time to Complete</td>
+                            <td>✓ 3-5 minutes</td>
+                            <td>⚠️ 30+ minutes</td>
+                            <td>❌ 1-3 days</td>
+                        </tr>
+                        <tr>
+                            <td>Human Review Option</td>
+                            <td>✓ Professional reviewers</td>
+                            <td>❌ Not available</td>
+                            <td>✓ Built-in human review</td>
+                        </tr>
+                        <tr>
+                            <td>Data Security</td>
+                            <td>✓ Enterprise-grade</td>
+                            <td>⚠️ Variable</td>
+                            <td>✓ Poppinsnal control</td>
+                        </tr>
+                        <tr>
+                            <td>Cost per Analysis</td>
+                            <td>✓ Low consumption cost</td>
+                            <td>⚠️ Subscription based</td>
+                            <td>❌ High labor cost</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>

@@ -61,14 +61,13 @@ def render_asc606_page():
             memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
             memo_generator.display_clean_memo(memo_content)
             
-            # Add "Analyze Another Contract" button
-            st.markdown("---")
-            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                # Reset analysis state for new analysis including file uploaders
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
-                for key in keys_to_clear:
-                    del st.session_state[key]
-                st.rerun()
+            # Add rerun functionality for existing completed memo
+            from shared.rerun_manager import RerunManager
+            rerun_manager = RerunManager()
+            # Get analysis_id from memo_data or generate fallback
+            analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
+            if analysis_id:
+                rerun_manager.add_rerun_button(str(analysis_id))
             return  # Exit early, don't show file upload interface
     
     # Get user inputs with progressive disclosure  
@@ -552,8 +551,12 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         memo_key = f'asc606_memo_data_{session_id}'
                         analysis_key = f'asc606_analysis_complete_{session_id}'
                         
-                        # Store memo data and completion state
-                        st.session_state[memo_key] = memo_result
+                        # Store memo data and completion state with analysis ID
+                        st.session_state[memo_key] = {
+                            'memo_content': memo_result,
+                            'analysis_id': analysis_id,
+                            'completion_timestamp': datetime.now().isoformat()
+                        }
                         st.session_state[analysis_key] = True
                                                 
                         with st.container(border=True):
@@ -566,14 +569,10 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         # Use the CleanMemoGenerator's display method
                         memo_generator.display_clean_memo(memo_result)
                         
-                        # Add "Analyze Another Contract" button
-                        st.markdown("---")
-                        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                            # Reset analysis state for new analysis including file uploaders
-                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc606' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
-                            for key in keys_to_clear:
-                                del st.session_state[key]
-                            st.rerun()
+                        # Add rerun functionality
+                        from shared.rerun_manager import RerunManager
+                        rerun_manager = RerunManager()
+                        rerun_manager.add_rerun_button(analysis_id)
                         
                     else:
                         st.error("❌ Memo generation produced empty content")
