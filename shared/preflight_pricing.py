@@ -6,7 +6,7 @@ Handles multi-file word counting, tier determination, and pricing before analysi
 import logging
 from typing import List, Dict, Any, Optional, Tuple
 from utils.document_extractor import DocumentExtractor
-from .pricing_config import get_price_tier
+from shared.pricing_config import get_price_tier
 
 logger = logging.getLogger(__name__)
 
@@ -54,9 +54,10 @@ class PreflightPricing:
                 if extraction_result.get('error'):
                     # Handle scanned PDF detection with detailed user message
                     if extraction_result.get('error') == 'scanned_pdf_detected':
-                        # Use the detailed user message instead of the error code
-                        user_friendly_msg = extraction_result.get('user_message', 'Scanned PDF detected')
-                        errors.append(user_friendly_msg)
+                        # Create filename-aware message for scanned PDFs
+                        reasons = extraction_result.get('detection_reasons', [])
+                        filename_msg = self._create_scanned_pdf_message(uploaded_file.name, reasons)
+                        errors.append(filename_msg)
                         logger.error(f"File {i} ({uploaded_file.name}): scanned_pdf_detected")
                     else:
                         # Handle other errors normally
@@ -91,7 +92,7 @@ class PreflightPricing:
         # Check if we have any successful extractions
         if total_words == 0:
             # Special handling for all-scanned-PDFs case to trigger clean UI
-            all_scanned = all(error.startswith('🔍 **Scanned/Image-Based PDF Detected**') for error in errors)
+            all_scanned = all(isinstance(error, str) and error.startswith('🔍 **Scanned/Image-Based PDF Detected') for error in errors)
             
             if all_scanned and len(errors) == 1:
                 # Single scanned PDF - use clean expandable UI
@@ -175,6 +176,10 @@ class PreflightPricing:
                 'shortfall_amount': shortfall,
                 'message': f"⚠️ INSUFFICIENT CREDITS: You have \\${user_credits:.0f} but need \\${required_price:.0f}. Please add at least \\${shortfall:.0f} to your account using the button below."
             }
+    
+    def _create_scanned_pdf_message(self, filename: str, reasons) -> str:
+        """Create filename-aware scanned PDF message using DocumentExtractor's method"""
+        return self.document_extractor._get_scanned_pdf_message(reasons=reasons, filename=filename)
 
 # Global instance for use across the application
 preflight_pricing = PreflightPricing()

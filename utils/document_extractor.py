@@ -146,8 +146,7 @@ class DocumentExtractor:
         # Clean up the text
         text = self._clean_text(text)
         
-        # Enhanced scanned PDF detection
-        is_likely_scanned = self._detect_scanned_pdf(pages, text)
+        # Removed duplicate detection line
         
         # Enhanced scanned PDF detection with detailed analysis
         detection_analysis = self._analyze_text_quality(text, pages)
@@ -431,10 +430,11 @@ class DocumentExtractor:
             }
         }
     
-    def _get_scanned_pdf_message(self, reasons = None) -> str:
+    def _get_scanned_pdf_message(self, reasons = None, filename = None) -> str:
         """Return user-friendly message for scanned PDF detection with specific reasons"""
+        filename_text = f': "{filename}"' if filename else ''
         base_message = (
-            "🔍 **Scanned/Image-Based PDF Detected**\n\n"
+            f"🔍 **Scanned/Image-Based PDF Detected{filename_text}**\n\n"
             "This PDF appears to be scanned or image-based and cannot be processed directly.\n\n"
         )
         
@@ -448,10 +448,10 @@ class DocumentExtractor:
             reasons_text = ""
         
         solutions = (
-            "**Quick Solutions:**\n"
-            "• **ChatGPT-4 Vision**: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document\n"
-            "• **OCR Software**: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text\n"
-            "• **Contact Support**: We can assist with document processing guidance\n\n"
+            "**Quick Solutions:**\n\n"
+            "- **ChatGPT-4 Vision**: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document\n\n"
+            "- **OCR Software**: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text\n\n"
+            "- **Contact Support**: We can assist with document processing guidance\n\n"
             "**Once converted to text-based PDF, please re-upload for analysis.**"
         )
         

@@ -120,7 +120,7 @@ def serve_streamlit_app():
         <script>
             function openStreamlit() {
                 // Streamlit is now on external port 3002!
-                const streamlitUrl = 'https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002';
+                const streamlitUrl = window.location.protocol + '//' + window.location.hostname + ':5000';
                 window.open(streamlitUrl, '_blank');
             }
             
