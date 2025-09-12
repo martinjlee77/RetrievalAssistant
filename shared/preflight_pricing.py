@@ -90,13 +90,28 @@ class PreflightPricing:
         
         # Check if we have any successful extractions
         if total_words == 0:
-            return {
-                'success': False,
-                'error': 'No text could be extracted from any files. ' + '; '.join(errors),
-                'total_words': 0,
-                'tier_info': None,
-                'file_details': file_details
-            }
+            # Special handling for all-scanned-PDFs case to trigger clean UI
+            all_scanned = all(error.startswith('🔍 **Scanned/Image-Based PDF Detected**') for error in errors)
+            
+            if all_scanned and len(errors) == 1:
+                # Single scanned PDF - use clean expandable UI
+                return {
+                    'success': False,
+                    'error': 'scanned_pdf_detected',
+                    'user_message': errors[0],  # The detailed message
+                    'total_words': 0,
+                    'tier_info': None,
+                    'file_details': file_details
+                }
+            else:
+                # Multiple files or mixed error types - use generic handler
+                return {
+                    'success': False,
+                    'error': 'No text could be extracted from any files. ' + '; '.join(errors),
+                    'total_words': 0,
+                    'tier_info': None,
+                    'file_details': file_details
+                }
         
         # Get tier information based on total words
         tier_info = get_price_tier(total_words)
