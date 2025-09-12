@@ -413,7 +413,7 @@ def login():
                 'last_name': user['last_name'],
                 'company_name': user['company_name'],
                 'job_title': user['job_title'],
-                'credits_balance': float(user['credits_balance']),
+                'credits_balance': float(user['credits_balance'] or 0),
                 'free_analyses_remaining': user['free_analyses_remaining']
             }
         }), 200
@@ -705,21 +705,21 @@ def get_user_profile():
                 'last_name': user['last_name'],
                 'company_name': user['company_name'],
                 'job_title': user['job_title'],
-                'credits_balance': float(user['credits_balance']),
+                'credits_balance': float(user['credits_balance'] or 0),
                 'free_analyses_remaining': user['free_analyses_remaining'],
                 'member_since': user['created_at'].isoformat()
             },
             'recent_analyses': [
                 {
                     'asc_standard': analysis['asc_standard'],
-                    'cost': float(analysis['billed_credits']),
+                    'cost': float(analysis['billed_credits'] or 0),
                     'completed_at': analysis['completed_at'].isoformat()
                 }
                 for analysis in recent_analyses
             ],
             'transactions': [
                 {
-                    'amount': float(transaction['amount']),
+                    'amount': float(transaction['amount'] or 0),
                     'reason': transaction['reason'],
                     'date': transaction['created_at'].isoformat()
                 }
@@ -774,7 +774,7 @@ def check_user_credits():
         
         return jsonify({
             'can_proceed': can_proceed,
-            'credits_balance': float(user['credits_balance']),
+            'credits_balance': float(user['credits_balance'] or 0),
             'free_analyses_remaining': user['free_analyses_remaining'],
             'is_free_analysis': user['free_analyses_remaining'] > 0
         }), 200
@@ -1098,7 +1098,7 @@ def get_wallet_balance():
         
         if result:
             return jsonify({
-                'balance': float(result['credits_balance'])
+                'balance': float(result['credits_balance'] or 0)
             }), 200
         else:
             return jsonify({'error': 'User not found'}), 404
@@ -1207,7 +1207,7 @@ def charge_wallet():
             conn.close()
             return jsonify({'error': 'User not found'}), 404
         
-        current_balance = float(result['credits_balance'])
+        current_balance = float(result['credits_balance'] or 0)
         
         if current_balance < charge_amount:
             conn.close()
@@ -1284,7 +1284,7 @@ def auto_credit_wallet():
         """, (user_id,))
         
         result = cursor.fetchone()
-        new_balance = float(result['credits_balance'])
+        new_balance = float(result['credits_balance'] or 0)
         
         # Record auto-credit transaction
         cursor.execute("""
