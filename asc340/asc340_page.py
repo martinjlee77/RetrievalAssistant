@@ -186,11 +186,7 @@ def render_asc340_page():
         if can_proceed:
             warning_placeholder = st.empty()  # Create a placeholder for the warning
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Keep this browser tab active during analysis!\n\n"
-                "- Analysis takes **3-5 minutes**\n"
-                "- Switching tabs or closing the browser will stop the analysis\n"
-                "- Stay on this tab until analysis is complete\n"
-                "- You'll see a completion message when it's done"
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-5 minutes**. Please don't close this tab until complete"
             )
             
             if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
@@ -223,7 +219,7 @@ def get_asc340_inputs_new():
     
     # Document upload section       
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload commission and related documents - PDF or DOCX files, max 5 files - **FILE SIZE LIMIT:** Widget shows 200MB but our business limit is 50MB per file (required)",
+        "1️⃣ Upload commission and related documents - PDF or DOCX files (required)",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
         help="Upload commission plans, compensation policies, SPIFF announcements, channel agreements, etc. for ASC 340-40 analysis",
@@ -235,30 +231,6 @@ def get_asc340_inputs_new():
         "2️⃣ Additional information or concerns (optional)",
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents or specify your areas of focus or concerns.",
         height=100)
-
-    # Custom file size validation (50MB limit per our business rules)
-    MAX_FILE_SIZE_MB = 50
-    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
-    
-    if uploaded_files:
-        # Validate file sizes
-        oversized_files = []
-        for file in uploaded_files:
-            if file.size > MAX_FILE_SIZE_BYTES:
-                oversized_files.append(f"{file.name} ({file.size / (1024*1024):.1f}MB)")
-        
-        if oversized_files:
-            st.error(f"❌ **File size limit exceeded (50MB maximum):**\n" + 
-                    "\n".join([f"• {f}" for f in oversized_files]))
-            st.info("💡 **Tip:** The widget shows 200MB (Streamlit's technical limit), but our business limit is 50MB per file.")
-            is_ready = False
-        else:
-            is_ready = True
-    else:
-        is_ready = False
-    
-    return uploaded_files, additional_context, is_ready
-
 
 def get_asc340_inputs():
     """Get ASC 340-40 specific inputs."""
@@ -398,9 +370,9 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Step 4: Show analysis warning and proceed with full workflow
         progress_message_placeholder = st.empty()
         progress_message_placeholder.error(
-            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
+            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
             "Your analysis is running and will take up to 3-5 minutes. "
-            "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
+            "Closing this browser will stop the analysis and forfeit your progress."
         )
         
         # Step 5: Initialize components

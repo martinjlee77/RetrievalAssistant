@@ -149,17 +149,56 @@ class CleanMemoGenerator:
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
-                    h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
-                    h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
-                    h3 {{ color: #5d6d7e; }}
-                    h4 {{ color: #7f8c8d; font-size: 12px; }} 
-                    h6 {{ color: #7f8c8d; font-size: 13px; font-weight: bold; }}
-                    p {{ margin: 12px 0; }}
-                    ul {{ margin: 10px 0; padding-left: 25px; }}
-                    li {{ margin: 5px 0; }}
-                    small {{ font-size: 11px; }}
-                    .disclaimer {{ font-size: 11px; color: #7f8c8d; margin-top: 30px; }}
+                    body {{
+                        font-family: Poppins, sans-serif;
+                        margin: 15px;
+                        line-height: 1.5;
+                        font-size: 11px;
+                    }}
+                    h1 {{
+                        color: #2c3e50;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 5px;
+                        margin-bottom: 10px;
+                    }}
+                    h2 {{
+                        color: #34495e;
+                        border-bottom: 1px solid #bdc3c7;
+                        padding-bottom: 3px;
+                        margin-bottom: 5px;
+                    }}
+                    h3 {{
+                        color: #5d6d7e;
+                        margin-bottom: 3px;
+                    }}
+                    h4 {{
+                        color: #7f8c8d;
+                        font-size: 13px;
+                    }}
+                    h6 {{
+                        color: #7f8c8d;
+                        font-size: 12px;
+                        font-weight: bold;
+                    }}
+                    p {{
+                        margin: 8px 0;
+                        font-size: 11px;
+                    }}
+                    ul {{
+                        margin: 8px 0;
+                        padding-left: 20px;
+                    }}
+                    li {{
+                        margin: 4px 0;
+                    }}
+                    small {{
+                        font-size: 8px;
+                    }}
+                    .disclaimer {{
+                        font-size: 8px;
+                        color: #7f8c8d;
+                        margin-top: 15px;
+                    }}
                 </style>
             </head>
             <body>
