@@ -162,8 +162,8 @@ class DocumentExtractor:
                 'is_likely_scanned': True,
                 'error': 'scanned_pdf_detected',
                 'user_message': self._get_scanned_pdf_message(detection_analysis.get('reasons', [])),
-                'detection_reasons': detection_analysis['reasons'],
-                'detection_metrics': detection_analysis['metrics']
+                'detection_reasons': detection_analysis.get('reasons', ['Detection failed']),
+                'detection_metrics': detection_analysis.get('metrics', {})
             }
         
         return {
@@ -326,7 +326,11 @@ class DocumentExtractor:
         
         text = raw_text.strip()
         if not text:
-            return {'is_likely_scanned': True, 'reasons': ['No text extracted']}
+            return {
+                'is_likely_scanned': True, 
+                'reasons': ['No text extracted'],
+                'metrics': {}
+            }
         
         total_chars = len(text)
         reasons = []
@@ -343,7 +347,11 @@ class DocumentExtractor:
         word_count = len(words)
         
         if word_count == 0:
-            return {'is_likely_scanned': True, 'reasons': ['No words found']}
+            return {
+                'is_likely_scanned': True, 
+                'reasons': ['No words found'],
+                'metrics': {}
+            }
         
         # Calculate quality metrics
         avg_chars_per_page = total_chars / pages if pages > 0 else 0
