@@ -58,8 +58,7 @@ class DocumentExtractor:
 
             # Check if extraction yielded meaningful text
             extracted_text = extraction_result.get('text', '').strip()
-            if len(extracted_text) < 50:  # Less than 50 characters is likely failed extraction
-                raise ValueError("File processed but no meaningful text extracted (may be image-only PDF or corrupted)")
+            # Note: Removed early error for short text - let scanned PDF detection handle this case
 
             # Enhanced word counting with proper tokenization
             word_count = self._count_words(extracted_text)
