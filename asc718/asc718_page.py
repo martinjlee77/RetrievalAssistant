@@ -92,24 +92,25 @@ def render_asc718_page():
     # Get user inputs with progressive disclosure  
     uploaded_files, additional_context, is_ready = get_asc718_inputs_new()
 
-    # Preflight pricing and payment flow
-    if is_ready:
-        # Process files for pricing
+    # Show pricing information immediately when files are uploaded (regardless of is_ready)
+    pricing_result = None
+    if uploaded_files:
+        # Process files for pricing - dynamic cost updating
         pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
         
-        if not pricing_result['success']:
-            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
-            return
-        
-        # Display pricing information
-        pricing_container = st.empty()
-        with pricing_container:
+        if pricing_result['success']:
+            # Display pricing information dynamically
             st.markdown("### :primary[Analysis Pricing]")
             st.info(pricing_result['billing_summary'])
             
             # Show file processing details
             if pricing_result.get('processing_errors'):
                 st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
+        else:
+            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+
+    # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
+    if is_ready and pricing_result and pricing_result['success']:
         
         # Get required price and check wallet balance
         required_price = pricing_result['tier_info']['price']
@@ -171,7 +172,7 @@ def render_asc718_page():
                        key="asc718_analyze"):
                 # Clear all UI elements that should disappear during analysis
                 warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
+                # Keep pricing information visible during analysis (it's helpful)
                 credit_container.empty()     # Clear credit balance info
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")

@@ -52,19 +52,17 @@ class CostEstimator:
             }
             
         except Exception as e:
-            logger.error(f"Tier pricing error: {e}")
-            # Return safe fallback - Tier 1 pricing (lowest tier)
-            from shared.pricing_config import PRICING_TIERS
-            tier_1 = PRICING_TIERS[1]
+            logger.error(f"Tier pricing error: {e}")  # Still log the error for debugging
             return {
-                'estimated_cost': tier_1['price'],
-                'cost_cap': tier_1['price'],
-                'tier': 1,
-                'tier_name': tier_1['name'],
-                'tier_description': tier_1['description'],
-                'word_count': 0,
+                'error': "An error occurred while calculating the price. Please contact support for assistance.",
+                'estimated_cost': None,
+                'cost_cap': None,
+                'tier': None,
+                'tier_name': None,
+                'tier_description': None,
+                'word_count': None,
                 'asc_standard': asc_standard,
-                'billing_model': 'fixed_tier_pricing'
+                'billing_model': None
             }
     
     def format_cost_display(self, cost_estimate: Dict[str, Any]) -> str:

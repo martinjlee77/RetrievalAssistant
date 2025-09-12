@@ -35,10 +35,8 @@ class PreflightPricing:
                 'file_details': []
             }
         
-        # Limit to 5 files maximum
-        if len(uploaded_files) > 5:
-            logger.warning(f"User uploaded {len(uploaded_files)} files, limiting to 5")
-            uploaded_files = uploaded_files[:5]
+        # Process all uploaded files (no limit - charge for all contracts)
+        logger.info(f"Processing {len(uploaded_files)} uploaded files")
         
         file_details = []
         total_words = 0
