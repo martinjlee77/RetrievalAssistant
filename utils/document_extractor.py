@@ -146,12 +146,27 @@ class DocumentExtractor:
         # Clean up the text
         text = self._clean_text(text)
         
+        # Enhanced scanned PDF detection
+        is_likely_scanned = self._detect_scanned_pdf(pages, text)
+        
+        # If scanned PDF detected, return specific error message
+        if is_likely_scanned:
+            return {
+                'text': text,
+                'pages': pages,
+                'word_count': self._count_words(text) if text else 0,
+                'extraction_method': extraction_method,
+                'is_likely_scanned': True,
+                'error': 'scanned_pdf_detected',
+                'user_message': self._get_scanned_pdf_message()
+            }
+        
         return {
             'text': text,
             'pages': pages,
             'word_count': self._count_words(text) if text else 0,
             'extraction_method': extraction_method,
-            'is_likely_scanned': False,  # Will enhance this later
+            'is_likely_scanned': False,
             'error': None if text else "No text could be extracted from PDF"
         }
     
@@ -288,3 +303,45 @@ class DocumentExtractor:
                 return True
         
         return False
+    
+    def _detect_scanned_pdf(self, pages: int, extracted_text: str) -> bool:
+        """Detect if PDF is likely scanned/image-based using multiple indicators"""
+        if not extracted_text or not extracted_text.strip():
+            return True  # No text extracted at all
+        
+        text_length = len(extracted_text.strip())
+        
+        # Method 1: Check text extraction ratio per page
+        if pages > 0:
+            avg_chars_per_page = text_length / pages
+            if avg_chars_per_page < 100:  # Less than ~100 chars per page suggests scanning
+                return True
+        
+        # Method 2: Check for very short documents (likely failed extraction)
+        if text_length < 50:  # Less than 50 characters total
+            return True
+        
+        # Method 3: Check for garbled text patterns (poor OCR)
+        if self._detect_garbled_text(extracted_text):
+            return True
+        
+        # Method 4: Check for excessive single characters and spaces (OCR artifacts)
+        words = extracted_text.split()
+        if len(words) > 20:  # Only check if we have enough words
+            single_chars = sum(1 for word in words if len(word) == 1 and word.isalpha())
+            if (single_chars / len(words)) > 0.3:  # More than 30% single character "words"
+                return True
+        
+        return False
+    
+    def _get_scanned_pdf_message(self) -> str:
+        """Return user-friendly message for scanned PDF detection"""
+        return (
+            "🔍 **Scanned/Image-Based PDF Detected**\n\n"
+            "This PDF appears to be scanned or image-based and cannot be processed directly.\n\n"
+            "**Quick Solutions:**\n"
+            "• **ChatGPT-4 Vision**: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document\n"
+            "• **OCR Software**: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text\n"
+            "• **Contact Support**: We can assist with document processing guidance\n\n"
+            "**Once converted to text-based PDF, please re-upload for analysis.**"
+        )

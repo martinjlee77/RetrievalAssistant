@@ -110,7 +110,27 @@ def render_asc842_page():
             if pricing_result.get('processing_errors'):
                 st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
         else:
-            st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+            # Handle different error types
+            if pricing_result.get('error') == 'scanned_pdf_detected':
+                st.error(pricing_result.get('user_message', 'Scanned PDF detected'))
+                
+                # Add helpful expandable section
+                with st.expander("💡 Detailed Instructions"):
+                    st.markdown("""
+                    **Using ChatGPT-4 Vision:**
+                    1. Go to ChatGPT-4 with Vision
+                    2. Upload your scanned PDF
+                    3. Ask: "Please convert this document to clean, searchable text"
+                    4. Copy the text and create a new Word/PDF document
+                    5. Upload the new text-based document here
+                    
+                    **Alternative Tools:**
+                    - Adobe Acrobat (OCR feature)
+                    - Google Docs (automatically OCRs uploaded PDFs)
+                    - Microsoft Word (Insert > Object > Text from File)
+                    """)
+            else:
+                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
