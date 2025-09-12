@@ -6,6 +6,24 @@ Easy to update pricing without touching code
 # Tiered Pricing Structure - Update prices here only
 PRICING_TIERS = {
     1: {
+        "name": "3K (≤10 pages)",
+        "price": 95.00,
+        "max_words": 3000,
+        "description": "Same features in every tier. For very short packages.",
+        "docs_per_run": 10,
+        "reruns_included": 1,
+        "rerun_window_days": 14
+    },
+    2: {
+        "name": "9K (≤30 pages)",
+        "price": 245.00,
+        "max_words": 9000,
+        "description": "Same features in every tier. For short packages.",
+        "docs_per_run": 10,
+        "reruns_included": 1,
+        "rerun_window_days": 14
+    },
+    3: {
         "name": "15K (≤50 pages)",
         "price": 395.00,
         "max_words": 15000,
@@ -14,7 +32,7 @@ PRICING_TIERS = {
         "reruns_included": 1,
         "rerun_window_days": 14
     },
-    2: {
+    4: {
         "name": "30K (≤100 pages)",
         "price": 695.00,
         "max_words": 30000,
@@ -23,7 +41,7 @@ PRICING_TIERS = {
         "reruns_included": 1,
         "rerun_window_days": 14
     },
-    3: {
+    5: {
         "name": "60K (≤200 pages)",
         "price": 1195.00,
         "max_words": 60000,
@@ -89,14 +107,14 @@ def get_price_tier(word_count):
     
     # Fallback to highest tier (60K)
     return {
-        'tier': 3,
-        'name': PRICING_TIERS[3]['name'],
-        'price': PRICING_TIERS[3]['price'],
-        'description': PRICING_TIERS[3]['description'],
-        'max_words': PRICING_TIERS[3]['max_words'],
-        'docs_per_run': PRICING_TIERS[3]['docs_per_run'],
-        'reruns_included': PRICING_TIERS[3]['reruns_included'],
-        'rerun_window_days': PRICING_TIERS[3]['rerun_window_days'],
+        'tier': 5,
+        'name': PRICING_TIERS[5]['name'],
+        'price': PRICING_TIERS[5]['price'],
+        'description': PRICING_TIERS[5]['description'],
+        'max_words': PRICING_TIERS[5]['max_words'],
+        'docs_per_run': PRICING_TIERS[5]['docs_per_run'],
+        'reruns_included': PRICING_TIERS[5]['reruns_included'],
+        'rerun_window_days': PRICING_TIERS[5]['rerun_window_days'],
         'word_count': word_count
     }
 

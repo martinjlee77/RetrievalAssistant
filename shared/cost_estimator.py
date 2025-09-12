@@ -53,13 +53,15 @@ class CostEstimator:
             
         except Exception as e:
             logger.error(f"Tier pricing error: {e}")
-            # Return safe fallback - Tier 2 pricing
+            # Return safe fallback - Tier 1 pricing (lowest tier)
+            from shared.pricing_config import PRICING_TIERS
+            tier_1 = PRICING_TIERS[1]
             return {
-                'estimated_cost': 6.00,
-                'cost_cap': 6.00,
-                'tier': 2,
-                'tier_name': 'Standard',
-                'tier_description': 'Standard business contracts',
+                'estimated_cost': tier_1['price'],
+                'cost_cap': tier_1['price'],
+                'tier': 1,
+                'tier_name': tier_1['name'],
+                'tier_description': tier_1['description'],
                 'word_count': 0,
                 'asc_standard': asc_standard,
                 'billing_model': 'fixed_tier_pricing'
