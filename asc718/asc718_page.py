@@ -130,13 +130,9 @@ def render_asc718_page():
             else:
                 # Check if this contains multiple scanned PDF messages
                 if "🔍 **Scanned/Image-Based PDF Detected" in pricing_result['error']:
-                    # Multiple scanned PDFs - display each separately with spacing
-                    messages = pricing_result['error'].replace("No text could be extracted from any files. ", "").split('\n\n')
-                    st.error("⚠️ **Some files had issues:**")
-                    for msg in messages:
-                        if msg.strip():
-                            st.error(msg.strip())
-                            st.write("")  # Add spacing
+                    # Multiple scanned PDFs - use HTML line breaks within single error box
+                    error_msg = pricing_result['error'].replace('\n\n', '<br><br>')
+                    st.error(error_msg, unsafe_allow_html=True)
                 else:
                     st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
 
