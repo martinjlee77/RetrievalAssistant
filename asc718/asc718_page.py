@@ -228,6 +228,14 @@ def get_asc718_inputs_new():
         "2️⃣ Additional information or concerns (optional)",
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreements, specific concerns about vesting conditions, performance metrics, or areas requiring focused analysis).",
         height=100)
+    
+    # Determine if ready to proceed (no file size limits for enterprise)
+    if uploaded_files:
+        is_ready = True
+    else:
+        is_ready = False
+    
+    return uploaded_files, additional_context, is_ready
 
 
 def perform_asc718_analysis(pricing_result, additional_context: str = "", user_token: str = ""):

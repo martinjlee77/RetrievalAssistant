@@ -226,6 +226,14 @@ def get_asc805_inputs_new():
         "2️⃣ Additional information or concerns (optional)",
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
         height=100)
+    
+    # Determine if ready to proceed (no file size limits for enterprise)
+    if uploaded_files:
+        is_ready = True
+    else:
+        is_ready = False
+    
+    return uploaded_files, additional_context, is_ready
 
 def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
     """Perform ASC 805 analysis with new billing system integration."""

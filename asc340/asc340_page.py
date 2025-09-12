@@ -231,6 +231,14 @@ def get_asc340_inputs_new():
         "2️⃣ Additional information or concerns (optional)",
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents or specify your areas of focus or concerns.",
         height=100)
+    
+    # Determine if ready to proceed (no file size limits for enterprise)
+    if uploaded_files:
+        is_ready = True
+    else:
+        is_ready = False
+    
+    return uploaded_files, additional_context, is_ready
 
 def get_asc340_inputs():
     """Get ASC 340-40 specific inputs."""
