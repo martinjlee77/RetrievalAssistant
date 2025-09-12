@@ -52,9 +52,17 @@ class PreflightPricing:
                 extraction_result = self.document_extractor.extract_text(uploaded_file)
                 
                 if extraction_result.get('error'):
-                    error_msg = f"File {i} ({uploaded_file.name}): {extraction_result['error']}"
-                    errors.append(error_msg)
-                    logger.error(error_msg)
+                    # Handle scanned PDF detection with detailed user message
+                    if extraction_result.get('error') == 'scanned_pdf_detected':
+                        # Use the detailed user message instead of the error code
+                        user_friendly_msg = extraction_result.get('user_message', 'Scanned PDF detected')
+                        errors.append(user_friendly_msg)
+                        logger.error(f"File {i} ({uploaded_file.name}): scanned_pdf_detected")
+                    else:
+                        # Handle other errors normally
+                        error_msg = f"File {i} ({uploaded_file.name}): {extraction_result['error']}"
+                        errors.append(error_msg)
+                        logger.error(error_msg)
                     continue
                 
                 file_word_count = extraction_result.get('word_count', 0)
