@@ -149,7 +149,11 @@ class DocumentExtractor:
         # Enhanced scanned PDF detection
         is_likely_scanned = self._detect_scanned_pdf(pages, text)
         
-        # If scanned PDF detected, return specific error message
+        # Enhanced scanned PDF detection with detailed analysis
+        detection_analysis = self._analyze_text_quality(text, pages)
+        is_likely_scanned = detection_analysis['is_likely_scanned']
+        
+        # If scanned PDF detected, return specific error message with reasons
         if is_likely_scanned:
             return {
                 'text': text,
@@ -158,7 +162,9 @@ class DocumentExtractor:
                 'extraction_method': extraction_method,
                 'is_likely_scanned': True,
                 'error': 'scanned_pdf_detected',
-                'user_message': self._get_scanned_pdf_message()
+                'user_message': self._get_scanned_pdf_message(detection_analysis.get('reasons', [])),
+                'detection_reasons': detection_analysis['reasons'],
+                'detection_metrics': detection_analysis['metrics']
             }
         
         return {
@@ -305,43 +311,148 @@ class DocumentExtractor:
         return False
     
     def _detect_scanned_pdf(self, pages: int, extracted_text: str) -> bool:
-        """Detect if PDF is likely scanned/image-based using multiple indicators"""
+        """Detect if PDF is likely scanned/image-based using strict quality-based metrics"""
         if not extracted_text or not extracted_text.strip():
             return True  # No text extracted at all
         
-        text_length = len(extracted_text.strip())
+        # Analyze raw text quality (before cleaning) - this is key for catching OCR artifacts
+        detection_result = self._analyze_text_quality(extracted_text, pages)
         
-        # Method 1: Check text extraction ratio per page
-        if pages > 0:
-            avg_chars_per_page = text_length / pages
-            if avg_chars_per_page < 100:  # Less than ~100 chars per page suggests scanning
-                return True
-        
-        # Method 2: Check for very short documents (likely failed extraction)
-        if text_length < 50:  # Less than 50 characters total
-            return True
-        
-        # Method 3: Check for garbled text patterns (poor OCR)
-        if self._detect_garbled_text(extracted_text):
-            return True
-        
-        # Method 4: Check for excessive single characters and spaces (OCR artifacts)
-        words = extracted_text.split()
-        if len(words) > 20:  # Only check if we have enough words
-            single_chars = sum(1 for word in words if len(word) == 1 and word.isalpha())
-            if (single_chars / len(words)) > 0.3:  # More than 30% single character "words"
-                return True
-        
-        return False
+        # Return True if ANY strict quality threshold is exceeded (defensive approach)
+        return detection_result['is_likely_scanned']
     
-    def _get_scanned_pdf_message(self) -> str:
-        """Return user-friendly message for scanned PDF detection"""
-        return (
+    def _analyze_text_quality(self, raw_text: str, pages: int) -> dict:
+        """Comprehensive text quality analysis for scanned PDF detection"""
+        import re
+        
+        text = raw_text.strip()
+        if not text:
+            return {'is_likely_scanned': True, 'reasons': ['No text extracted']}
+        
+        total_chars = len(text)
+        reasons = []
+        
+        # Basic character analysis
+        spaces = text.count(' ')
+        alpha_chars = sum(1 for c in text if c.isalpha())
+        digit_chars = sum(1 for c in text if c.isdigit())
+        special_chars = sum(1 for c in text if not c.isalnum() and not c.isspace())
+        non_ascii_chars = sum(1 for c in text if ord(c) > 127)
+        
+        # Word analysis
+        words = text.split()
+        word_count = len(words)
+        
+        if word_count == 0:
+            return {'is_likely_scanned': True, 'reasons': ['No words found']}
+        
+        # Calculate quality metrics
+        avg_chars_per_page = total_chars / pages if pages > 0 else 0
+        whitespace_ratio = spaces / total_chars if total_chars > 0 else 0
+        special_ratio = special_chars / total_chars if total_chars > 0 else 0
+        non_ascii_ratio = non_ascii_chars / total_chars if total_chars > 0 else 0
+        
+        # Word quality metrics
+        single_char_words = sum(1 for word in words if len(word) == 1 and word.isalpha())
+        short_words = sum(1 for word in words if len(word) <= 2)
+        words_with_digits = sum(1 for word in words if any(c.isdigit() for c in word))
+        
+        prop_single_char_words = single_char_words / word_count
+        prop_short_words = short_words / word_count
+        prop_words_with_digits = words_with_digits / word_count
+        avg_word_len = sum(len(word) for word in words) / word_count
+        
+        # OCR artifact detection
+        hyphen_count = text.count('-')
+        hyphen_rate = (hyphen_count / total_chars) * 1000  # per 1000 chars
+        
+        # Multi-space runs (common in OCR)
+        multi_space_runs = len(re.findall(r'\s{2,}', text))
+        multi_space_rate = (multi_space_runs / total_chars) * 1000
+        
+        # Broken word patterns (like "thi~ ~s" or "wo rd")
+        broken_patterns = len(re.findall(r'[A-Za-z][\s~\-]{1,3}[A-Za-z]', text))
+        broken_pattern_rate = (broken_patterns / total_chars) * 1000
+        
+        # STRICT THRESHOLDS - ANY single metric triggers detection
+        
+        # Volume-based (still keep but not primary)
+        if avg_chars_per_page < 600:
+            reasons.append(f'Low text density ({avg_chars_per_page:.0f} chars/page < 600)')
+        
+        # Quality-based thresholds (much stricter)
+        if special_ratio > 0.20:
+            reasons.append(f'High special character ratio ({special_ratio:.2%} > 20%)')
+            
+        if whitespace_ratio > 0.32:
+            reasons.append(f'Excessive whitespace ({whitespace_ratio:.2%} > 32%)')
+            
+        if non_ascii_ratio > 0.02:
+            reasons.append(f'Non-ASCII artifacts ({non_ascii_ratio:.2%} > 2%)')
+            
+        if prop_single_char_words > 0.10:
+            reasons.append(f'Too many single-character words ({prop_single_char_words:.2%} > 10%)')
+            
+        if prop_short_words > 0.28:
+            reasons.append(f'Too many short words ({prop_short_words:.2%} > 28%)')
+            
+        if avg_word_len < 4.2:
+            reasons.append(f'Short average word length ({avg_word_len:.1f} < 4.2)')
+            
+        if prop_words_with_digits > 0.12:
+            reasons.append(f'High digit-word mix ({prop_words_with_digits:.2%} > 12%)')
+            
+        if hyphen_rate > 30:
+            reasons.append(f'Excessive hyphens ({hyphen_rate:.1f} per 1000 chars > 30)')
+            
+        if multi_space_rate > 8:
+            reasons.append(f'Multiple space runs ({multi_space_rate:.1f} per 1000 chars > 8)')
+            
+        if broken_pattern_rate > 10:
+            reasons.append(f'Broken word patterns ({broken_pattern_rate:.1f} per 1000 chars > 10)')
+        
+        is_scanned = len(reasons) > 0
+        
+        return {
+            'is_likely_scanned': is_scanned,
+            'reasons': reasons[:3],  # Show first 3 reasons to user
+            'metrics': {
+                'avg_chars_per_page': avg_chars_per_page,
+                'whitespace_ratio': whitespace_ratio,
+                'special_ratio': special_ratio,
+                'non_ascii_ratio': non_ascii_ratio,
+                'prop_single_char_words': prop_single_char_words,
+                'prop_short_words': prop_short_words,
+                'avg_word_len': avg_word_len,
+                'prop_words_with_digits': prop_words_with_digits,
+                'hyphen_rate': hyphen_rate,
+                'multi_space_rate': multi_space_rate,
+                'broken_pattern_rate': broken_pattern_rate
+            }
+        }
+    
+    def _get_scanned_pdf_message(self, reasons = None) -> str:
+        """Return user-friendly message for scanned PDF detection with specific reasons"""
+        base_message = (
             "🔍 **Scanned/Image-Based PDF Detected**\n\n"
             "This PDF appears to be scanned or image-based and cannot be processed directly.\n\n"
+        )
+        
+        # Add specific reasons if available
+        if reasons:
+            reasons_text = "**Issues Detected:**\n"
+            for reason in reasons:
+                reasons_text += f"• {reason}\n"
+            reasons_text += "\n"
+        else:
+            reasons_text = ""
+        
+        solutions = (
             "**Quick Solutions:**\n"
             "• **ChatGPT-4 Vision**: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document\n"
             "• **OCR Software**: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text\n"
             "• **Contact Support**: We can assist with document processing guidance\n\n"
             "**Once converted to text-based PDF, please re-upload for analysis.**"
         )
+        
+        return base_message + reasons_text + solutions
