@@ -100,8 +100,9 @@ def render_asc340_page():
     # Show pricing information immediately when files are uploaded (regardless of is_ready)
     pricing_result = None
     if uploaded_files:
-        # Process files for pricing - dynamic cost updating
-        pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        # Process files for pricing - dynamic cost updating with progress indicator
+        with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
+            pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
         
         if pricing_result['success']:
             # Display pricing information dynamically
