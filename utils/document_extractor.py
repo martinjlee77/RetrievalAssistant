@@ -40,11 +40,9 @@ class DocumentExtractor:
             file_content = uploaded_file.read()
             file_size_mb = len(file_content) / (1024 * 1024)  # Convert to MB
             
-            if len(file_content) < 100:  # Less than 100 bytes is likely empty/corrupted
-                raise ValueError(f"File appears to be empty or corrupted (size: {len(file_content)} bytes)")
+            # Note: Removed minimum file size check - let scanned PDF detection handle edge cases
             
-            if file_size_mb > 50:  # 50MB limit
-                raise ValueError(f"File size ({file_size_mb:.1f}MB) exceeds 50MB limit. Please upload a smaller file.")
+            # Note: Removed file size limits for enterprise customers
             
             # Reset file pointer for actual extraction
             uploaded_file.seek(0)
