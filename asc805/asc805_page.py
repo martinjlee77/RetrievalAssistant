@@ -128,7 +128,17 @@ def render_asc805_page():
                     - Microsoft Word (Insert > Object > Text from File)
                     """)
             else:
-                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+                # Check if this contains multiple scanned PDF messages
+                if "🔍 **Scanned/Image-Based PDF Detected" in pricing_result['error']:
+                    # Multiple scanned PDFs - display each separately with spacing
+                    messages = pricing_result['error'].replace("No text could be extracted from any files. ", "").split('\n\n')
+                    st.error("⚠️ **Some files had issues:**")
+                    for msg in messages:
+                        if msg.strip():
+                            st.error(msg.strip())
+                            st.write("")  # Add spacing
+                else:
+                    st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
