@@ -133,13 +133,7 @@ def render_asc340_page():
                     - Microsoft Word (Insert > Object > Text from File)
                     """)
             else:
-                # Check if this contains multiple scanned PDF messages
-                if "🔍 **Scanned/Image-Based PDF Detected" in pricing_result['error']:
-                    # Multiple scanned PDFs - use HTML line breaks within single error box
-                    error_msg = pricing_result['error'].replace('\n\n', '<br><br>')
-                    st.error(error_msg, unsafe_allow_html=True)
-                else:
-                    st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:

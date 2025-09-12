@@ -108,7 +108,7 @@ class PreflightPricing:
                 # Multiple files or mixed error types - use generic handler
                 return {
                     'success': False,
-                    'error': 'No text could be extracted from any files. ' + '\n\n'.join(errors),
+                    'error': 'No text could be extracted from any files. ' + '; '.join(errors),
                     'total_words': 0,
                     'tier_info': None,
                     'file_details': file_details
