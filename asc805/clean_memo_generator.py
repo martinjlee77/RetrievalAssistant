@@ -209,13 +209,6 @@ class CleanMemoGenerator:
                 if st.button("📋 Copy", use_container_width=True, key=copy_key, help="Copy memo to clipboard"):
                     st.info("Copy functionality requires manual selection and Ctrl+C")
             
-            # Add audit pack download if analysis_id provided
-            if analysis_id:
-                st.markdown("---")
-                st.markdown("### 📋 Audit Pack")
-                from shared.audit_pack_generator import AuditPackGenerator
-                audit_generator = AuditPackGenerator()
-                audit_generator.add_audit_pack_download(memo_content, analysis_id, filename, customer_name)
     
     
     def _apply_html_styling(self, content: str) -> str:

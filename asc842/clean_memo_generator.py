@@ -235,15 +235,6 @@ class CleanMemoGenerator:
                     """
                     st.components.v1.html(copy_js, height=0)
             
-            # Add audit pack download if analysis_id provided
-            if analysis_id:
-                st.markdown("---")
-                st.markdown("### 📋 Audit Pack")
-                from shared.audit_pack_generator import AuditPackGenerator
-                audit_generator = AuditPackGenerator()
-                # Normalize analysis_id to string to avoid type comparison issues
-                analysis_id_str = str(analysis_id) if analysis_id else None
-                audit_generator.add_audit_pack_download(memo_content, analysis_id_str, filename, customer_name)
     
     def _generate_pdf(self, memo_content: str) -> bytes:
         """Generate PDF from memo content using WeasyPrint."""
