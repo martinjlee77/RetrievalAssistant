@@ -16,6 +16,8 @@ import logging
 import bcrypt
 import secrets
 import stripe
+import json
+import uuid
 from shared.pricing_config import is_business_email
 
 # Set up logging
@@ -783,32 +785,41 @@ def check_user_credits():
         logger.error(f"Check credits error: {e}")
         return jsonify({'error': 'Failed to check credits'}), 500
 
-@app.route('/api/user/record-analysis', methods=['POST'])
-def record_analysis():
-    """Record completed analysis and handle billing"""
+@app.route('/api/analysis/complete', methods=['POST'])
+def complete_analysis():
+    """Unified endpoint for analysis completion - handles both recording and billing atomically"""
     try:
-        # Get token from Authorization header
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            return jsonify({'error': 'No valid authorization token'}), 401
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
         
-        token = auth_header.split(' ')[1]
+        # Verify token and get user
         payload = verify_token(token)
-        
         if 'error' in payload:
             return jsonify({'error': payload['error']}), 401
         
         user_id = payload['user_id']
         data = request.get_json()
         
-        # Extract billing information
-        asc_standard = data.get('asc_standard')
-        words_count = data.get('words_count', 0)
-        estimate_cap_credits = Decimal(str(data.get('estimate_cap_credits', 0)))
-        actual_credits = Decimal(str(data.get('actual_credits', 0)))
-        billed_credits = Decimal(str(data.get('billed_credits', 0)))
+        # Extract and validate input data
+        asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
+        words_count = max(0, int(data.get('words_count', 0)))
+        api_cost = Decimal(str(data.get('api_cost', 0)))  # What OpenAI actually charged
+        file_count = max(0, int(data.get('file_count', 0)))
+        tier_name = sanitize_string(data.get('tier_name', ''), 100)
         is_free_analysis = data.get('is_free_analysis', False)
-        price_tier = data.get('price_tier', 2)  # Default to tier 2 if not provided
+        idempotency_key = sanitize_string(data.get('idempotency_key', ''), 100)
+        started_at = data.get('started_at')
+        duration_seconds = max(0, int(data.get('duration_seconds', 0)))
+        
+        # Server-side cost calculation (no more client-provided billing amounts)
+        from shared.pricing_config import get_price_tier
+        tier_info = get_price_tier(words_count)
+        final_charged_credits = Decimal(str(tier_info['price']))
+        
+        # Generate customer-facing memo UUID
+        import uuid
+        memo_uuid = str(uuid.uuid4())[:8]
         
         conn = get_db_connection()
         if not conn:
@@ -816,59 +827,138 @@ def record_analysis():
         
         cursor = conn.cursor()
         
-        # Insert analysis record
-        cursor.execute("""
-            INSERT INTO analyses (user_id, asc_standard, words_count, estimate_cap_credits, 
-                                actual_credits, billed_credits, price_tier, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed')
-            RETURNING id
-        """, (user_id, asc_standard, words_count, estimate_cap_credits, actual_credits, billed_credits, price_tier))
-        
-        analysis_id = cursor.fetchone()['id']
-        
-        if is_free_analysis:
-            # Deduct from free analyses count
-            cursor.execute("""
-                UPDATE users 
-                SET free_analyses_remaining = GREATEST(free_analyses_remaining - 1, 0)
-                WHERE id = %s
-            """, (user_id,))
+        try:
+            # Check idempotency - prevent duplicate charges
+            if idempotency_key:
+                cursor.execute("""
+                    SELECT analysis_id, memo_uuid FROM credit_transactions 
+                    WHERE user_id = %s AND reason = 'analysis_charge' 
+                    AND metadata->>'idempotency_key' = %s
+                """, (user_id, idempotency_key))
+                existing = cursor.fetchone()
+                if existing:
+                    return jsonify({
+                        'message': 'Analysis already recorded (idempotent)',
+                        'analysis_id': existing['analysis_id'],
+                        'memo_uuid': existing['memo_uuid'],
+                        'final_charged_credits': float(final_charged_credits),
+                        'is_duplicate': True
+                    }), 200
             
-            # Record credit transaction for tracking
+            # Insert analysis record with all required fields (including billed_credits for backward compatibility)
             cursor.execute("""
-                INSERT INTO credit_transactions (user_id, analysis_id, amount, reason)
-                VALUES (%s, %s, %s, 'analysis_charge')
-            """, (user_id, analysis_id, 0))
+                INSERT INTO analyses (user_id, asc_standard, words_count, api_cost, 
+                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
+                                    started_at, completed_at, duration_seconds, file_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed', %s, %s, NOW(), %s, %s)
+                RETURNING id
+            """, (user_id, asc_standard, words_count, api_cost, final_charged_credits, 
+                  final_charged_credits, tier_name, memo_uuid, started_at, duration_seconds, file_count))
             
-        else:
-            # Deduct from credits balance
-            cursor.execute("""
-                UPDATE users 
-                SET credits_balance = GREATEST(credits_balance - %s, 0)
-                WHERE id = %s
-            """, (billed_credits, user_id))
+            analysis_id = cursor.fetchone()['id']
             
-            # Record credit transaction
-            cursor.execute("""
-                INSERT INTO credit_transactions (user_id, analysis_id, amount, reason)
-                VALUES (%s, %s, %s, 'analysis_charge')
-            """, (user_id, analysis_id, -billed_credits))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"Analysis recorded for user {user_id}: {asc_standard}, cost: {billed_credits}")
-        
-        return jsonify({
-            'message': 'Analysis recorded successfully',
-            'analysis_id': analysis_id,
-            'billed_amount': float(billed_credits),
-            'is_free_analysis': is_free_analysis
-        }), 200
+            # Get current balance for balance_after calculation
+            cursor.execute("SELECT credits_balance FROM users WHERE id = %s", (user_id,))
+            current_balance = cursor.fetchone()['credits_balance']
+            
+            if is_free_analysis:
+                # Deduct from free analyses count
+                cursor.execute("""
+                    UPDATE users 
+                    SET free_analyses_remaining = GREATEST(free_analyses_remaining - 1, 0)
+                    WHERE id = %s
+                """, (user_id,))
+                
+                balance_after = current_balance  # No credit charge for free analysis
+                
+                # Record credit transaction for tracking (zero amount)
+                cursor.execute("""
+                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason, 
+                                                   balance_after, memo_uuid, metadata, created_at)
+                    VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
+                """, (user_id, analysis_id, 0, balance_after, memo_uuid, 
+                      json.dumps({'idempotency_key': idempotency_key, 'api_cost': float(api_cost)}) if idempotency_key else json.dumps({'api_cost': float(api_cost)})))
+                
+            else:
+                # Calculate new balance after charge
+                balance_after = max(current_balance - final_charged_credits, 0)
+                
+                # Deduct from credits balance
+                cursor.execute("""
+                    UPDATE users 
+                    SET credits_balance = %s
+                    WHERE id = %s
+                """, (balance_after, user_id))
+                
+                # Record credit transaction with full audit trail
+                cursor.execute("""
+                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason,
+                                                   balance_after, memo_uuid, metadata, created_at)
+                    VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
+                """, (user_id, analysis_id, -final_charged_credits, balance_after, memo_uuid,
+                      json.dumps({'idempotency_key': idempotency_key, 'api_cost': float(api_cost)}) if idempotency_key else json.dumps({'api_cost': float(api_cost)})))
+            
+            conn.commit()
+            
+            logger.info(f"Analysis completed for user {user_id}: {asc_standard}, memo: {memo_uuid}, cost: {final_charged_credits}")
+            
+            return jsonify({
+                'message': 'Analysis completed successfully',
+                'analysis_id': analysis_id,  # Database primary key
+                'memo_uuid': memo_uuid,      # Customer-facing ID
+                'final_charged_credits': float(final_charged_credits),
+                'balance_remaining': float(balance_after),
+                'is_free_analysis': is_free_analysis
+            }), 200
+            
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
         
     except Exception as e:
-        logger.error(f"Record analysis error: {e}")
-        return jsonify({'error': 'Failed to record analysis'}), 500
+        logger.error(f"Complete analysis error: {e}")
+        return jsonify({'error': 'Failed to complete analysis'}), 500
+
+# Legacy endpoint - deprecated but maintained for backwards compatibility
+@app.route('/api/user/record-analysis', methods=['POST'])
+def record_analysis():
+    """DEPRECATED: Use /api/analysis/complete instead - Proxy to new unified endpoint"""
+    logger.warning("DEPRECATED ENDPOINT: /api/user/record-analysis called. Use /api/analysis/complete")
+    
+    try:
+        # Transform legacy request format to new unified format
+        data = request.get_json()
+        
+        # Map legacy fields to new format
+        transformed_data = {
+            'asc_standard': data.get('asc_standard'),
+            'words_count': data.get('words_count', 0),
+            'api_cost': data.get('actual_credits', 0),  # actual_credits becomes api_cost
+            'file_count': 1,  # Default for legacy requests
+            'tier_name': f"Tier {data.get('price_tier', 2)}",
+            'is_free_analysis': data.get('is_free_analysis', False),
+            'idempotency_key': f"legacy_{int(datetime.now().timestamp()*1000)}_{data.get('asc_standard', 'unknown')}",
+            'started_at': datetime.now().isoformat(),
+            'duration_seconds': 0  # Legacy requests don't have timing
+        }
+        
+        # Replace request data for proxy
+        request_backup = request.get_json
+        request.get_json = lambda: transformed_data
+        
+        # Call the new unified endpoint
+        response = complete_analysis()
+        
+        # Restore original request
+        request.get_json = request_backup
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Legacy record analysis proxy error: {e}")
+        return jsonify({'error': 'Failed to record analysis via legacy endpoint'}), 500
 
 # Stripe Payment Endpoints
 @app.route('/api/stripe/config', methods=['GET'])
@@ -1440,47 +1530,9 @@ def get_analysis_history():
 
 @app.route('/api/save-analysis', methods=['POST'])
 def save_analysis():
-    """Save completed analysis to database"""
-    try:
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        if not token:
-            return jsonify({'error': 'Authorization token required'}), 401
-            
-        # Verify token and get user
-        payload = verify_token(token)
-        if 'error' in payload:
-            return jsonify({'error': payload['error']}), 401
-            
-        user_id = payload['user_id']
-        data = request.get_json()
-        
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-            
-        cursor = conn.cursor()
-        
-        # Insert analysis record (use auto-generated integer ID, store analysis_id in memo_id field)
-        cursor.execute("""
-            INSERT INTO analyses (user_id, asc_standard, status, completed_at, words_count, memo_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (
-            user_id,
-            data.get('asc_standard'),
-            data.get('status'),
-            data.get('completed_at'),
-            data.get('total_words', 0),
-            data.get('analysis_id')
-        ))
-        
-        conn.commit()
-        conn.close()
-        
-        return jsonify({'success': True}), 200
-        
-    except Exception as e:
-        logger.error(f"Save analysis error: {e}")
-        return jsonify({'success': False, 'error': 'Failed to save analysis'}), 500
+    """DEPRECATED: Save completed analysis to database - Use /api/analysis/complete instead"""
+    logger.warning("DEPRECATED ENDPOINT: /api/save-analysis called. Use /api/analysis/complete")
+    return jsonify({'error': 'Endpoint deprecated. Use /api/analysis/complete'}), 410
 
 @app.route('/api/submit-rerun-request', methods=['POST'])
 def submit_rerun_request():

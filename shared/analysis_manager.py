@@ -203,7 +203,7 @@ class AnalysisManager:
             st.session_state[self.session_key_history] = history
     
     def _save_to_database(self, analysis_record: Dict[str, Any]):
-        """Save completed analysis to database for dashboard history"""
+        """Save completed analysis to database using unified endpoint"""
         try:
             import requests
             from shared.auth_utils import auth_manager
@@ -214,28 +214,33 @@ class AnalysisManager:
                 logger.warning("No auth token available for database save")
                 return
             
-            # Prepare analysis data for database
+            # Prepare analysis data for unified endpoint
             analysis_data = {
-                'analysis_id': analysis_record.get('analysis_id'),
                 'asc_standard': analysis_record.get('asc_standard'),
-                'status': analysis_record.get('status'),
-                'cost': analysis_record.get('cost_charged', 0),
-                'completed_at': analysis_record.get('end_timestamp'),
-                'total_words': analysis_record.get('total_words', 0)
+                'words_count': analysis_record.get('total_words', 0),
+                'api_cost': 0,  # TODO: Track actual OpenAI API costs
+                'file_count': analysis_record.get('file_count', 1),
+                'tier_name': analysis_record.get('tier_info', {}).get('name', 'Unknown'),
+                'is_free_analysis': analysis_record.get('cost_charged', 0) == 0,
+                'idempotency_key': f"manager_{analysis_record.get('analysis_id', 'unknown')}_{int(analysis_record.get('start_time', 0)*1000)}",
+                'started_at': analysis_record.get('start_timestamp'),
+                'duration_seconds': analysis_record.get('duration_seconds', 0)
             }
             
-            # Save to database via backend API
+            # Save to database via new unified API endpoint
             response = requests.post(
-                'http://localhost:3000/api/save-analysis',
+                'http://localhost:3000/api/analysis/complete',
                 headers={'Authorization': f'Bearer {token}'},
                 json=analysis_data,
-                timeout=5
+                timeout=10
             )
             
             if response.ok:
-                logger.info(f"Analysis {analysis_data['analysis_id']} saved to database")
+                response_data = response.json()
+                memo_uuid = response_data.get('memo_uuid')
+                logger.info(f"Analysis {analysis_record.get('analysis_id')} saved to database with memo UUID: {memo_uuid}")
             else:
-                logger.warning(f"Failed to save analysis to database: {response.status_code}")
+                logger.warning(f"Failed to save analysis to database: {response.status_code} - {response.text}")
                 
         except Exception as e:
             logger.error(f"Database save error: {e}")
