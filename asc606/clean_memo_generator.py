@@ -16,103 +16,98 @@ import base64
 
 logger = logging.getLogger(__name__)
 
+
 class CleanMemoGenerator:
     """Clean memo generator that preserves GPT-4o text exactly as generated."""
-    
+
     def __init__(self, template_path=None):
         """Initialize - template_path ignored for now."""
         pass
-    
-    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str | None = None) -> str:
+
+    def combine_clean_steps(self,
+                            analysis_results: Dict[str, Any],
+                            analysis_id: str | None = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
-        
+
         # Get basic info
         customer_name = analysis_results.get('customer_name', 'Customer')
-        analysis_title = analysis_results.get('analysis_title', 'Contract Analysis')
+        analysis_title = analysis_results.get('analysis_title',
+                                              'Contract Analysis')
         analysis_date = datetime.now().strftime("%B %d, %Y")
-        
+
         # Build memo with memo ID and disclaimer at very top
         memo_lines = []
-        
+
         # Add memo ID at the very top if provided
         if analysis_id:
             memo_lines.extend([
                 f"**MEMO ID:** {analysis_id}",
                 "",
             ])
-        
+
         # Add disclaimer
         memo_lines.extend([
-            DisclaimerGenerator.get_top_banner(),
-            "",
-            "# ASC 606 MEMORANDUM",
-            "",
-            f"**TO:** Chief Accounting Officer",
-            f"**FROM:** Technical Accounting Team - AI", 
+            DisclaimerGenerator.get_top_banner(), "", "# ASC 606 MEMORANDUM",
+            "", f"**TO:** Chief Accounting Officer",
+            f"**FROM:** Technical Accounting Team - AI",
             f"**DATE:** {analysis_date}",
             f"**RE:** {analysis_title} - ASC 606 Revenue Recognition Analysis",
             f"**DOCUMENTS REVIEWED:** {analysis_results.get('filename', 'Contract Documents')}",
-            "",
-            ""
+            "", ""
         ])
-        
+
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
             memo_lines.extend([
-                "## EXECUTIVE SUMMARY",
-                "",
-                analysis_results['executive_summary'],
-                "",
-                ""
+                "## EXECUTIVE SUMMARY", "",
+                analysis_results['executive_summary'], "", ""
             ])
-        
+
         # Add Background
-        memo_lines.extend([
-            "## BACKGROUND",
-            ""
-        ])
-        
+        memo_lines.extend(["## BACKGROUND", ""])
+
         if 'background' in analysis_results:
-            memo_lines.extend([
-                analysis_results['background'],
-                "", 
-                ""
-            ])
+            memo_lines.extend([analysis_results['background'], "", ""])
         else:
             memo_lines.extend([
                 f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology.",
-                "", 
-                ""
+                "", ""
             ])
-        
+
         # Add Analysis Section Header
         memo_lines.extend([
             "## ASC 606 ANALYSIS",
         ])
-        
+
         # Add each step's clean markdown content - check both locations
         steps_added = 0
         for step_num in range(1, 6):
             step_key = f'step_{step_num}'
             step_data = None
-            
+
             # Check if steps are in analysis_results directly
             if step_key in analysis_results:
                 step_data = analysis_results[step_key]
             # Check if steps are in analysis_results['steps']
-            elif 'steps' in analysis_results and step_key in analysis_results['steps']:
+            elif 'steps' in analysis_results and step_key in analysis_results[
+                    'steps']:
                 step_data = analysis_results['steps'][step_key]
-            
-            if step_data and isinstance(step_data, dict) and 'markdown_content' in step_data:
+
+            if step_data and isinstance(
+                    step_data, dict) and 'markdown_content' in step_data:
                 # Add clean content directly - ZERO PROCESSING
                 clean_content = step_data['markdown_content']
                 memo_lines.append(clean_content)
                 memo_lines.append("")
                 steps_added += 1
-                logger.info(f"Added clean step {step_num} content ({len(clean_content)} chars)")
+                logger.info(
+                    f"Added clean step {step_num} content ({len(clean_content)} chars)"
+                )
             else:
-                logger.warning(f"Step {step_num} not found or missing markdown_content. Available keys: {list(analysis_results.keys())}")
-        
+                logger.warning(
+                    f"Step {step_num} not found or missing markdown_content. Available keys: {list(analysis_results.keys())}"
+                )
+
         # Add Conclusion Section
         if 'conclusion' in analysis_results:
             memo_lines.extend([
@@ -122,28 +117,27 @@ class CleanMemoGenerator:
                 analysis_results['conclusion'],
                 "",
             ])
-        
+
         # Add footer with full disclaimer
         memo_lines.extend([
-            "---",
-            "",
-            "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
-            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]",
-            "",
+            "---", "", "**PREPARED BY:** [Analyst Name] | [Title] | [Date]",
+            "**REVIEWED BY:** [Reviewer Name] | [Title] | [Date]", "",
             DisclaimerGenerator.get_full_disclaimer()
         ])
-        
+
         # Join and return - NO PROCESSING
         final_memo = "\n".join(memo_lines)
-        logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
+        logger.info(
+            f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps"
+        )
         return final_memo
-    
+
     def _generate_pdf(self, memo_content: str) -> bytes | None:
         """Generate PDF from memo content using WeasyPrint."""
         try:
             # Convert markdown to HTML
             html_content = self._convert_markdown_to_html(memo_content)
-            
+
             # Add CSS styling for professional look with better margins
             css_styled_html = f"""
             <html>
@@ -151,32 +145,27 @@ class CleanMemoGenerator:
                 <style>
                     body {{
                         font-family: Poppins, sans-serif;
-                        margin: 15px;
+                        margin: 10px;
                         line-height: 1.5;
                         font-size: 11px;
                     }}
                     h1 {{
-                        color: #2c3e50;
                         border-bottom: 2px solid #3498db;
                         padding-bottom: 5px;
                         margin-bottom: 10px;
                     }}
                     h2 {{
-                        color: #34495e;
                         border-bottom: 1px solid #bdc3c7;
                         padding-bottom: 3px;
                         margin-bottom: 5px;
                     }}
                     h3 {{
-                        color: #5d6d7e;
                         margin-bottom: 3px;
                     }}
                     h4 {{
-                        color: #7f8c8d;
                         font-size: 13px;
                     }}
                     h6 {{
-                        color: #7f8c8d;
                         font-size: 12px;
                         font-weight: bold;
                     }}
@@ -198,6 +187,7 @@ class CleanMemoGenerator:
                         font-size: 8px;
                         color: #7f8c8d;
                         margin-top: 15px;
+                        font-style: italic;
                     }}
                 </style>
             </head>
@@ -206,7 +196,7 @@ class CleanMemoGenerator:
             </body>
             </html>
             """
-            
+
             # Generate PDF
             pdf_bytes = weasyprint.HTML(string=css_styled_html).write_pdf()
             return pdf_bytes
@@ -220,25 +210,26 @@ class CleanMemoGenerator:
         # Remove ALL HTML tags for clean Word output
         text = re.sub(r'<[^>]+>', '', text)  # Remove any HTML tag
         # Convert common HTML entities
-        text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+        text = text.replace('&lt;', '<').replace('&gt;',
+                                                 '>').replace('&amp;', '&')
         return text.strip()
 
     def _generate_docx(self, memo_content: str) -> bytes | None:
         """Generate DOCX from memo content using python-docx."""
         try:
             doc = Document()
-            
+
             # Clean HTML tags from content first
             clean_content = self._clean_html_tags(memo_content)
-            
+
             # Process content line by line
             lines = clean_content.split('\n')
-            
+
             for line in lines:
                 line = line.strip()
                 if not line:
                     continue
-                    
+
                 # Headers
                 if line.startswith('# '):
                     heading = doc.add_heading(line[2:], level=1)
@@ -258,47 +249,54 @@ class CleanMemoGenerator:
                     # Remove markdown formatting
                     clean_line = line.replace('**', '').replace('*', '')
                     doc.add_paragraph(clean_line)
-            
+
             # Save to bytes
             with tempfile.NamedTemporaryFile() as tmp_file:
                 doc.save(tmp_file.name)
                 tmp_file.seek(0)
                 return tmp_file.read()
-                
+
         except Exception as e:
             logger.error(f"DOCX generation failed: {e}")
             return None
 
-    def display_clean_memo(self, memo_content: str, analysis_id: str | None = None, filename: str | None = None, customer_name: str | None = None) -> None:
+    def display_clean_memo(self,
+                           memo_content: str,
+                           analysis_id: str | None = None,
+                           filename: str | None = None,
+                           customer_name: str | None = None) -> None:
         """Display clean memo content with enhanced download options."""
-        
+
         # Validate memo content
         if not memo_content or memo_content.strip() == "":
             st.error("Memo content is empty. Please regenerate the analysis.")
             return
-            
+
         # Log what we're about to display
-        logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
-        
+        logger.info(
+            f"Displaying clean memo sample: {repr(memo_content[:150])}")
+
         # Convert markdown to HTML manually to bypass Streamlit's markdown processor
         html_content = self._convert_markdown_to_html(memo_content)
-        
+
         # Use HTML display which preserves formatting
         st.markdown(html_content, unsafe_allow_html=True)
-        
+
         # Enhanced Download Section - AFTER memo display (for stability)
         if memo_content and len(memo_content.strip()) > 10:
             st.markdown("---")
             st.markdown("### 💾 Save Your Memo")
-            st.info("**IMPORTANT:** Choose your preferred format to save this memo before navigating away.")
-            
+            st.info(
+                "**IMPORTANT:** Choose your preferred format to save this memo before navigating away."
+            )
+
             # Create columns for download buttons
             col1, col2, col3, col4 = st.columns(4)
-            
+
             # Generate timestamp for consistent filenames
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             base_filename = f"asc606_memo_{timestamp}"
-            
+
             with col1:
                 # Markdown download (existing)
                 st.download_button(
@@ -307,9 +305,8 @@ class CleanMemoGenerator:
                     file_name=f"{base_filename}.md",
                     mime="text/markdown",
                     key=f"download_md_{hash(memo_content[:100])}",
-                    use_container_width=True
-                )
-            
+                    use_container_width=True)
+
             with col2:
                 # PDF download
                 pdf_data = self._generate_pdf(memo_content)
@@ -320,11 +317,13 @@ class CleanMemoGenerator:
                         file_name=f"{base_filename}.pdf",
                         mime="application/pdf",
                         key=f"download_pdf_{hash(memo_content[:100])}",
-                        use_container_width=True
-                    )
+                        use_container_width=True)
                 else:
-                    st.button("📄 PDF", disabled=True, use_container_width=True, help="PDF generation failed")
-            
+                    st.button("📄 PDF",
+                              disabled=True,
+                              use_container_width=True,
+                              help="PDF generation failed")
+
             with col3:
                 # DOCX download
                 docx_data = self._generate_docx(memo_content)
@@ -333,20 +332,26 @@ class CleanMemoGenerator:
                         label="📄 Word (.docx)",
                         data=docx_data,
                         file_name=f"{base_filename}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        mime=
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         key=f"download_docx_{hash(memo_content[:100])}",
-                        use_container_width=True
-                    )
+                        use_container_width=True)
                 else:
-                    st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
-            
+                    st.button("📄 Word",
+                              disabled=True,
+                              use_container_width=True,
+                              help="Word generation failed")
+
             with col4:
                 # One-click copy button with JavaScript
                 copy_key = f"copy_{hash(memo_content[:100])}"
-                if st.button("📋 Copy to Clipboard", use_container_width=True, key=copy_key):
+                if st.button("📋 Copy to Clipboard",
+                             use_container_width=True,
+                             key=copy_key):
                     # Escape content for JavaScript
-                    escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
-                    
+                    escaped_content = memo_content.replace('`', '\\`').replace(
+                        '$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
+
                     # Create JavaScript component to copy to clipboard
                     copy_js = f"""
                     <script>
@@ -373,51 +378,62 @@ class CleanMemoGenerator:
                         components.html(copy_js, height=0)
                     except:
                         st.success("Content ready to copy manually")
-            
+
             # Add audit pack download if analysis_id provided
             if analysis_id:
                 st.markdown("---")
                 st.markdown("### 📋 Audit Pack")
                 from shared.audit_pack_generator import AuditPackGenerator
                 audit_generator = AuditPackGenerator()
-                audit_generator.add_audit_pack_download(memo_content, analysis_id, filename, customer_name)
-    
+                audit_generator.add_audit_pack_download(
+                    memo_content, analysis_id, filename, customer_name)
+
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""
-        
+
         # Split into lines and process each one
         lines = markdown_content.split('\n')
         html_lines = []
         in_list = False
-        
+
         for line in lines:
             # Convert headers with better spacing
             if line.startswith('# '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h1 style="margin: 20px 0 15px 0; font-weight: bold;">{line[2:]}</h1>')
+                html_lines.append(
+                    f'<h1 style="margin: 20px 0 15px 0; font-weight: bold;">{line[2:]}</h1>'
+                )
             elif line.startswith('## '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h2 style="margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>')
+                html_lines.append(
+                    f'<h2 style="margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>'
+                )
             elif line.startswith('### '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h3 style="margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>')
+                html_lines.append(
+                    f'<h3 style="margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>'
+                )
             # Handle bullet points better
             elif line.strip().startswith('- '):
                 if not in_list:
-                    html_lines.append('<ul style="margin: 10px 0; padding-left: 25px;">')
+                    html_lines.append(
+                        '<ul style="margin: 10px 0; padding-left: 25px;">')
                     in_list = True
                 content = line.strip()[2:].strip()
                 # Handle bold text in list items
                 if '**' in content:
                     while '**' in content:
-                        content = content.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
-                html_lines.append(f'<li style="margin: 6px 0; line-height: 1.4;">{content}</li>')
+                        content = content.replace('**', '<strong>', 1).replace(
+                            '**', '</strong>', 1)
+                html_lines.append(
+                    f'<li style="margin: 6px 0; line-height: 1.4;">{content}</li>'
+                )
             # Convert bold text in paragraphs
             elif '**' in line and line.strip():
                 if in_list:
@@ -426,8 +442,11 @@ class CleanMemoGenerator:
                 # Handle multiple bold sections
                 processed_line = line
                 while '**' in processed_line:
-                    processed_line = processed_line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
-                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{processed_line}</p>')
+                    processed_line = processed_line.replace(
+                        '**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(
+                    f'<p style="margin: 10px 0; line-height: 1.6;">{processed_line}</p>'
+                )
             # Skip horizontal rules (as requested)
             elif line.strip() == '---':
                 continue
@@ -442,12 +461,13 @@ class CleanMemoGenerator:
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{line}</p>')
-        
+                html_lines.append(
+                    f'<p style="margin: 10px 0; line-height: 1.6;">{line}</p>')
+
         # Close any open lists
         if in_list:
             html_lines.append('</ul>')
-        
+
         # Join with improved styling
         html_content = f"""
         <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
@@ -457,5 +477,5 @@ class CleanMemoGenerator:
             {''.join(html_lines)}
         </div>
         """
-        
+
         return html_content

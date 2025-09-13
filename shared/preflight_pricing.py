@@ -108,7 +108,7 @@ class PreflightPricing:
                 # Multiple files or mixed error types - use generic handler
                 return {
                     'success': False,
-                    'error': 'No text could be extracted from any files. ' + '; '.join(errors),
+                    'error': 'No text could be extracted from any files. ' + '\n\n'.join(errors),
                     'total_words': 0,
                     'tier_info': None,
                     'file_details': file_details
@@ -140,9 +140,9 @@ class PreflightPricing:
         return f"""
 **COST FOR THIS ANALYSIS: \\${int(tier_info['price'])}** based on the following factors:
 
-- Document analysis: {total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}
+- Document analysis: **{total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}**
 - Pricing tier: {tier_info['name']} (up to {tier_info['max_words']:,} words)
-- Just FYI, estimated pages: ~{estimated_pages} pages (at 300 words/page)
+- Just FYI, estimated # of pages for extracted words: ~{estimated_pages} pages (at 300 words/page)
 
         """.strip()
     
