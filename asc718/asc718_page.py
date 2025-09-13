@@ -102,7 +102,8 @@ def render_asc718_page():
         if pricing_result['success']:
             # Display pricing information dynamically
             st.markdown("### :primary[Analysis Pricing]")
-            st.info(pricing_result['billing_summary'])
+            pricing_container = st.empty()  # Create clearable container
+            pricing_container.info(pricing_result['billing_summary'])
             
             # Show file processing details
             if pricing_result.get('processing_errors'):
@@ -189,7 +190,7 @@ def render_asc718_page():
                        key="asc718_analyze"):
                 # Clear all UI elements that should disappear during analysis
                 warning_placeholder.empty()  # Clear the warning 
-                # Keep pricing information visible during analysis (it's helpful)
+                pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
