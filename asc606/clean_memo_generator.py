@@ -185,7 +185,6 @@ class CleanMemoGenerator:
                     }}
                     .disclaimer {{
                         font-size: 8px;
-                        color: #7f8c8d;
                         margin-top: 15px;
                         font-style: italic;
                     }}
@@ -385,8 +384,10 @@ class CleanMemoGenerator:
                 st.markdown("### 📋 Audit Pack")
                 from shared.audit_pack_generator import AuditPackGenerator
                 audit_generator = AuditPackGenerator()
+                # Normalize analysis_id to string to avoid type comparison issues
+                analysis_id_str = str(analysis_id) if analysis_id else None
                 audit_generator.add_audit_pack_download(
-                    memo_content, analysis_id, filename, customer_name)
+                    memo_content, analysis_id_str, filename, customer_name)
 
     def _convert_markdown_to_html(self, markdown_content: str) -> str:
         """Convert markdown to HTML manually to preserve currency formatting."""

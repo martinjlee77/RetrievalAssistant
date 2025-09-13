@@ -59,13 +59,13 @@ def render_asc606_page():
             memo_data = st.session_state[memo_key]
             # Extract memo content from stored dictionary
             memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
-            memo_generator.display_clean_memo(memo_content)
+            # Get analysis_id from memo_data or generate fallback
+            analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
+            memo_generator.display_clean_memo(memo_content, analysis_id)
             
             # Add rerun functionality for existing completed memo
             from shared.rerun_manager import RerunManager
             rerun_manager = RerunManager()
-            # Get analysis_id from memo_data or generate fallback
-            analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
             if analysis_id:
                 rerun_manager.add_rerun_button(str(analysis_id))
             return  # Exit early, don't show file upload interface
