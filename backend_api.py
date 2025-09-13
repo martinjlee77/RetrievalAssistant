@@ -321,8 +321,8 @@ def signup():
         # Business email validated - create verified account immediately
         cursor.execute("""
             INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                             password_hash, is_legacy_user, status, verified_at, free_analyses_remaining)
-            VALUES (%s, %s, %s, %s, %s, %s, FALSE, 'verified', NOW(), 0)
+                             password_hash, terms_accepted_at)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW())
             RETURNING id
         """, (email, first_name, last_name, company_name, job_title, password_hash))
         
@@ -352,7 +352,7 @@ def signup():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    """Handle user login with password support and legacy email-only fallback"""
+    """Handle enterprise user login with password authentication"""
     try:
         data = request.get_json()
         email = sanitize_email(data.get('email', ''))
@@ -368,8 +368,7 @@ def login():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title, 
-                   status, credits_balance, free_analyses_remaining,
-                   password_hash, is_legacy_user
+                   credits_balance, password_hash, created_at
             FROM users 
             WHERE email = %s
         """, (email,))
@@ -380,22 +379,16 @@ def login():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Check authentication based on user type
-        if user['is_legacy_user']:
-            # Legacy user - email-only authentication (no password required)
-            if password:
-                return jsonify({'error': 'Legacy users should not provide a password'}), 400
-        else:
-            # New user - password required
-            if not password:
-                return jsonify({'error': 'Password is required'}), 400
-            
-            if not user['password_hash']:
-                return jsonify({'error': 'User account is corrupted. Please contact support'}), 500
-            
-            # Verify password
-            if not verify_password(password, user['password_hash']):
-                return jsonify({'error': 'Invalid password'}), 401
+        # All users are now enterprise users - password required
+        if not password:
+            return jsonify({'error': 'Password is required'}), 400
+        
+        if not user['password_hash']:
+            return jsonify({'error': 'User account is corrupted. Please contact support'}), 500
+        
+        # Verify password
+        if not verify_password(password, user['password_hash']):
+            return jsonify({'error': 'Invalid password'}), 401
         
         # Generate login token
         login_token = jwt.encode({
@@ -416,7 +409,7 @@ def login():
                 'company_name': user['company_name'],
                 'job_title': user['job_title'],
                 'credits_balance': float(user['credits_balance'] or 0),
-                'free_analyses_remaining': user['free_analyses_remaining']
+                'free_analyses_remaining': 0  # Legacy field removed, always 0 for enterprise
             }
         }), 200
         
@@ -440,9 +433,9 @@ def forgot_password():
         
         cursor = conn.cursor()
         
-        # Check if user exists and is not a legacy user
+        # Check if user exists
         cursor.execute("""
-            SELECT id, first_name, is_legacy_user 
+            SELECT id, first_name
             FROM users 
             WHERE email = %s
         """, (email,))
@@ -455,11 +448,7 @@ def forgot_password():
                 'message': 'If an account with that email exists, you will receive a password reset email.'
             }), 200
         
-        if user['is_legacy_user']:
-            conn.close()
-            return jsonify({
-                'error': 'Legacy users cannot reset passwords. Please contact support for assistance.'
-            }), 400
+        # All users are now enterprise users - can reset passwords
         
         # Generate reset token
         reset_token = generate_reset_token()
@@ -477,10 +466,9 @@ def forgot_password():
         logger.info(f"Password reset token generated for user {email}")
         
         # In a production environment, you would send an email here
-        # For now, we'll return the token in the response (remove in production)
+        # Token should NEVER be returned in API response for security
         return jsonify({
-            'message': 'Password reset instructions have been sent to your email.',
-            'reset_token': reset_token  # Remove this in production
+            'message': 'Password reset instructions have been sent to your email.'
         }), 200
         
     except Exception as e:
@@ -530,10 +518,10 @@ def reset_password():
         # Hash new password
         password_hash = hash_password(new_password)
         
-        # Update user password and mark as non-legacy
+        # Update user password
         cursor.execute("""
             UPDATE users 
-            SET password_hash = %s, is_legacy_user = FALSE
+            SET password_hash = %s
             WHERE id = %s
         """, (password_hash, user_id))
         
@@ -593,7 +581,7 @@ def change_password():
         
         # Get user data
         cursor.execute("""
-            SELECT password_hash, is_legacy_user
+            SELECT password_hash
             FROM users 
             WHERE id = %s
         """, (user_id,))
@@ -604,25 +592,21 @@ def change_password():
             conn.close()
             return jsonify({'error': 'User not found'}), 404
         
-        # Verify current password (unless legacy user)
-        if user['is_legacy_user']:
-            # Legacy users don't need to provide current password
-            pass
-        else:
-            if not current_password:
-                return jsonify({'error': 'Current password is required'}), 400
-            
-            if not user['password_hash'] or not verify_password(current_password, user['password_hash']):
-                conn.close()
-                return jsonify({'error': 'Current password is incorrect'}), 401
+        # All users are now enterprise users - verify current password required
+        if not current_password:
+            return jsonify({'error': 'Current password is required'}), 400
+        
+        if not user['password_hash'] or not verify_password(current_password, user['password_hash']):
+            conn.close()
+            return jsonify({'error': 'Current password is incorrect'}), 401
         
         # Hash new password
         password_hash = hash_password(new_password)
         
-        # Update password and mark as non-legacy
+        # Update password
         cursor.execute("""
             UPDATE users 
-            SET password_hash = %s, is_legacy_user = FALSE
+            SET password_hash = %s
             WHERE id = %s
         """, (password_hash, user_id))
         
@@ -665,9 +649,9 @@ def get_user_profile():
         # Get user data
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title,
-                   credits_balance, free_analyses_remaining, created_at
+                   credits_balance, created_at
             FROM users 
-            WHERE id = %s AND status = 'verified'
+            WHERE id = %s
         """, (user_id,))
         
         user = cursor.fetchone()
@@ -708,7 +692,7 @@ def get_user_profile():
                 'company_name': user['company_name'],
                 'job_title': user['job_title'],
                 'credits_balance': float(user['credits_balance'] or 0),
-                'free_analyses_remaining': user['free_analyses_remaining'],
+                'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
                 'member_since': user['created_at'].isoformat()
             },
             'recent_analyses': [
@@ -758,9 +742,9 @@ def check_user_credits():
         
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT credits_balance, free_analyses_remaining
+            SELECT credits_balance
             FROM users 
-            WHERE id = %s AND status = 'verified'
+            WHERE id = %s
         """, (user_id,))
         
         user = cursor.fetchone()
@@ -769,16 +753,13 @@ def check_user_credits():
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        can_proceed = (
-            user['free_analyses_remaining'] > 0 or 
-            user['credits_balance'] >= required_credits
-        )
+        can_proceed = (user['credits_balance'] >= required_credits)
         
         return jsonify({
             'can_proceed': can_proceed,
             'credits_balance': float(user['credits_balance'] or 0),
-            'free_analyses_remaining': user['free_analyses_remaining'],
-            'is_free_analysis': user['free_analyses_remaining'] > 0
+            'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
+            'is_free_analysis': False  # No free analyses in enterprise model
         }), 200
         
     except Exception as e:
@@ -862,12 +843,8 @@ def complete_analysis():
             current_balance = cursor.fetchone()['credits_balance']
             
             if is_free_analysis:
-                # Deduct from free analyses count
-                cursor.execute("""
-                    UPDATE users 
-                    SET free_analyses_remaining = GREATEST(free_analyses_remaining - 1, 0)
-                    WHERE id = %s
-                """, (user_id,))
+                # No free analyses in enterprise model - this is for backward compatibility only
+                pass  # No database update needed since free_analyses_remaining field was removed
                 
                 balance_after = current_balance  # No credit charge for free analysis
                 
