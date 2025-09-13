@@ -316,6 +316,34 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 8px 25px rgba(255,255,255,0.3);
 }
 
+.hero-microcopy {
+    font-size: 0.875rem;        /* 14px - smaller than body text */
+    line-height: 1.5;
+    color: rgba(255,255,255,0.75);  /* Light text for dark background */
+    margin-top: 2rem;           /* More space from CTA buttons */
+    max-width: 650px;           /* Slightly wider for readability */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;            /* Side padding for mobile */
+}
+
+.hero-microcopy .disclaimer {
+    color: rgba(255,255,255,0.6);  /* Slightly dimmer for disclaimer */
+    font-style: italic;
+    font-size: 0.8rem;          /* 12.8px - smallest text */
+    display: block;              /* Put disclaimer on new line */
+    margin-top: 0.5rem;         /* Space above disclaimer */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .hero-microcopy {
+        font-size: 0.8rem;      /* Slightly smaller on mobile */
+        margin-top: 1rem;
+        padding: 0 1rem;        /* Side padding on mobile */
+    }
+}
+
 
 /* ================================
    8. HOW IT WORKS SECTION

@@ -328,12 +328,6 @@ def signup():
         
         user_id = cursor.fetchone()['id']
         
-        # Add trial credits transaction (use config value)
-        cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason)
-            VALUES (%s, 200, 'trial_grant')
-        """, (user_id,))
-        
         conn.commit()
         conn.close()
         
