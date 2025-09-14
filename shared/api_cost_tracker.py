@@ -114,12 +114,17 @@ class APITracker:
             "formatted_total": f"${self.total_cost:.4f}"
         }
 
-# Global instance for tracking across an analysis session
-api_tracker = APITracker()
+def get_session_tracker() -> APITracker:
+    """Get session-scoped API tracker to prevent cross-user cost leakage"""
+    import streamlit as st
+    if "api_cost_tracker" not in st.session_state:
+        st.session_state.api_cost_tracker = APITracker()
+    return st.session_state.api_cost_tracker
 
 def reset_cost_tracking():
-    """Reset cost tracking for new analysis session"""
-    api_tracker.reset()
+    """Reset cost tracking for current session"""
+    tracker = get_session_tracker()
+    tracker.reset()
 
 def track_openai_request(messages: List[Dict[str, str]], response_text: str, model: str, request_type: str = "analysis") -> float:
     """
@@ -134,12 +139,15 @@ def track_openai_request(messages: List[Dict[str, str]], response_text: str, mod
     Returns:
         Estimated cost in USD for this request
     """
-    return api_tracker.track_request(messages, response_text, model, request_type)
+    tracker = get_session_tracker()
+    return tracker.track_request(messages, response_text, model, request_type)
 
 def get_total_estimated_cost() -> float:
     """Get total estimated API cost for current analysis session"""
-    return api_tracker.get_total_cost()
+    tracker = get_session_tracker()
+    return tracker.get_total_cost()
 
 def get_cost_summary() -> Dict[str, Any]:
     """Get comprehensive cost summary for current analysis session"""
-    return api_tracker.get_summary()
+    tracker = get_session_tracker()
+    return tracker.get_summary()

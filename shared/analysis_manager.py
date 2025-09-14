@@ -75,6 +75,9 @@ class AnalysisManager:
         # Generate unique analysis ID
         analysis_id = str(uuid.uuid4())[:8]
         
+        # Reset API cost tracking for new analysis
+        reset_cost_tracking()
+        
         # Create analysis record
         analysis_record = {
             'analysis_id': analysis_id,
