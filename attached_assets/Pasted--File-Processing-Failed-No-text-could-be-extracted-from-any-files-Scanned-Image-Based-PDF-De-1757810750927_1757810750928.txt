@@ -1,0 +1,65 @@
+❌ File Processing Failed
+
+No text could be extracted from any files. 🔍 Scanned/Image-Based PDF Detected: "invoice.pdf"
+
+This PDF appears to be scanned or image-based and cannot be processed directly.
+
+Issues Detected: • Low text density (305 chars/page < 600) • Non-ASCII artifacts (4.26% > 2%) • High digit-word mix (29.27% > 12%)
+
+Quick Solutions:
+
+ChatGPT-4 Vision: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document
+
+OCR Software: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text
+
+Contact Support: We can assist with document processing guidance
+
+Once converted to text-based PDF, please re-upload for analysis.
+
+🔍 Scanned/Image-Based PDF Detected: "Netflix.pdf"
+
+This PDF appears to be scanned or image-based and cannot be processed directly.
+
+Issues Detected: • Low text density (253 chars/page < 600) • Non-ASCII artifacts (2.37% > 2%) • Broken word patterns (122.5 per 1000 chars > 10)
+
+Quick Solutions:
+
+ChatGPT-4 Vision: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document
+
+OCR Software: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text
+
+Contact Support: We can assist with document processing guidance
+
+Once converted to text-based PDF, please re-upload for analysis.
+
+🔍 Scanned/Image-Based PDF Detected: "pricing.pdf"
+
+This PDF appears to be scanned or image-based and cannot be processed directly.
+
+Issues Detected: • Broken word patterns (137.4 per 1000 chars > 10)
+
+Quick Solutions:
+
+ChatGPT-4 Vision: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document
+
+OCR Software: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text
+
+Contact Support: We can assist with document processing guidance
+
+Once converted to text-based PDF, please re-upload for analysis.
+
+🔍 Scanned/Image-Based PDF Detected: "terms.pdf"
+
+This PDF appears to be scanned or image-based and cannot be processed directly.
+
+Issues Detected: • Broken word patterns (137.5 per 1000 chars > 10)
+
+Quick Solutions:
+
+ChatGPT-4 Vision: Upload your PDF to ChatGPT-4 with Vision and ask it to convert to text, then paste into a new document
+
+OCR Software: Use Adobe Acrobat, Google Docs, or other OCR tools to convert to searchable text
+
+Contact Support: We can assist with document processing guidance
+
+Once converted to text-based PDF, please re-upload for analysis.

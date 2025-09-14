@@ -140,13 +140,11 @@ class DocumentExtractor:
                 self.logger.error(f"PyPDF2 also failed: {str(e)}")
                 text = ""
         
-        # Clean up the text
-        text = self._clean_text(text)
-        
-        # Removed duplicate detection line
-        
-        # Enhanced scanned PDF detection with detailed analysis
+        # Enhanced scanned PDF detection with detailed analysis on RAW text (before cleaning)
         detection_analysis = self._analyze_text_quality(text, pages)
+        
+        # Clean up the text AFTER quality analysis
+        text = self._clean_text(text)
         is_likely_scanned = detection_analysis['is_likely_scanned']
         
         # If scanned PDF detected, return specific error message with reasons
@@ -378,44 +376,58 @@ class DocumentExtractor:
         broken_patterns = len(re.findall(r'[A-Za-z][\s~\-]{1,3}[A-Za-z]', text))
         broken_pattern_rate = (broken_patterns / total_chars) * 1000
         
-        # STRICT THRESHOLDS - ANY single metric triggers detection
+        # RELAXED THRESHOLDS - Require multiple metrics to fail for rejection
         
-        # Volume-based (still keep but not primary)
-        if avg_chars_per_page < 600:
-            reasons.append(f'Low text density ({avg_chars_per_page:.0f} chars/page < 600)')
+        # Volume-based (relaxed for invoices/payment docs)
+        if avg_chars_per_page < 200:
+            reasons.append(f'Very low text density ({avg_chars_per_page:.0f} chars/page < 200)')
         
-        # Quality-based thresholds (much stricter)
-        if special_ratio > 0.20:
-            reasons.append(f'High special character ratio ({special_ratio:.2%} > 20%)')
+        # Quality-based thresholds (much more reasonable)
+        if special_ratio > 0.35:
+            reasons.append(f'High special character ratio ({special_ratio:.2%} > 35%)')
             
-        if whitespace_ratio > 0.32:
-            reasons.append(f'Excessive whitespace ({whitespace_ratio:.2%} > 32%)')
+        if whitespace_ratio > 0.45:
+            reasons.append(f'Excessive whitespace ({whitespace_ratio:.2%} > 45%)')
             
-        if non_ascii_ratio > 0.02:
-            reasons.append(f'Non-ASCII artifacts ({non_ascii_ratio:.2%} > 2%)')
+        if non_ascii_ratio > 0.08:
+            reasons.append(f'Non-ASCII artifacts ({non_ascii_ratio:.2%} > 8%)')
             
-        if prop_single_char_words > 0.10:
-            reasons.append(f'Too many single-character words ({prop_single_char_words:.2%} > 10%)')
+        if prop_single_char_words > 0.20:
+            reasons.append(f'Too many single-character words ({prop_single_char_words:.2%} > 20%)')
             
-        if prop_short_words > 0.28:
-            reasons.append(f'Too many short words ({prop_short_words:.2%} > 28%)')
+        if prop_short_words > 0.45:
+            reasons.append(f'Too many short words ({prop_short_words:.2%} > 45%)')
             
-        if avg_word_len < 4.2:
-            reasons.append(f'Short average word length ({avg_word_len:.1f} < 4.2)')
+        if avg_word_len < 3.0:
+            reasons.append(f'Very short average word length ({avg_word_len:.1f} < 3.0)')
             
-        if prop_words_with_digits > 0.12:
-            reasons.append(f'High digit-word mix ({prop_words_with_digits:.2%} > 12%)')
+        if prop_words_with_digits > 0.35:
+            reasons.append(f'Excessive digit-word mix ({prop_words_with_digits:.2%} > 35%)')
             
-        if hyphen_rate > 30:
-            reasons.append(f'Excessive hyphens ({hyphen_rate:.1f} per 1000 chars > 30)')
+        if hyphen_rate > 80:
+            reasons.append(f'Excessive hyphens ({hyphen_rate:.1f} per 1000 chars > 80)')
             
-        if multi_space_rate > 8:
-            reasons.append(f'Multiple space runs ({multi_space_rate:.1f} per 1000 chars > 8)')
+        if multi_space_rate > 25:
+            reasons.append(f'Multiple space runs ({multi_space_rate:.1f} per 1000 chars > 25)')
             
-        if broken_pattern_rate > 10:
-            reasons.append(f'Broken word patterns ({broken_pattern_rate:.1f} per 1000 chars > 10)')
+        if broken_pattern_rate > 50:
+            reasons.append(f'Broken word patterns ({broken_pattern_rate:.1f} per 1000 chars > 50)')
         
-        is_scanned = len(reasons) > 0
+        # Severity override for extreme cases (immediate rejection)
+        extreme_issues = []
+        if broken_pattern_rate > 150:
+            extreme_issues.append(f'Severely broken text patterns ({broken_pattern_rate:.1f} per 1000 chars)')
+        if non_ascii_ratio > 0.25:
+            extreme_issues.append(f'Extreme non-ASCII ratio ({non_ascii_ratio:.2%})')
+        if multi_space_rate > 80:
+            extreme_issues.append(f'Extreme spacing issues ({multi_space_rate:.1f} per 1000 chars)')
+        
+        # Reject immediately if extreme issues OR require 2+ normal issues
+        is_scanned = len(extreme_issues) > 0 or len(reasons) >= 2
+        
+        # Add extreme issues to reasons for user feedback
+        if extreme_issues:
+            reasons = extreme_issues + reasons
         
         return {
             'is_likely_scanned': is_scanned,
