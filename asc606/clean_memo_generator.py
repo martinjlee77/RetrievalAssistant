@@ -190,13 +190,14 @@ class CleanMemoGenerator:
                         line-height: 1.3;
                     }}
                     /* Universal italics for all disclaimer content */
-                    em, .disclaimer em, p em, h6 em, li em, div em {{
+                    em, small em, p em, h6 em, li em, div em,
+                    .disclaimer em, .disclaimer p em, .disclaimer li em {{
                         font-style: italic !important;
-                        font-size: 8px;
+                        font-size: 8px !important;
                     }}
-                    .disclaimer, small {{
-                        font-size: 8px;
-                        margin-top: 15px;
+                    .disclaimer, small, div[style*="font-size:smaller"] {{
+                        font-style: italic !important;
+                        font-size: 8px !important;
                     }}
                     /* Professional table styling */
                     table {{
