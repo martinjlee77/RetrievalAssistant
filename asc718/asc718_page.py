@@ -285,6 +285,16 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
+    # Start analysis tracking for database capture
+    analysis_details = {
+        'asc_standard': 'ASC 718',
+        'total_words': len(str(pricing_result).split()),
+        'file_count': len(pricing_result.get('file_details', [])),
+        'tier_info': st.session_state.get('user_data', {}).get('tier_info', {}),
+        'cost_charged': 0.0  # Cost calculated by billing manager
+    }
+    analysis_id = analysis_manager.start_analysis(analysis_details)
+    
     # Generate analysis title
     analysis_title = _generate_analysis_title()
 
@@ -392,13 +402,18 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
+        # Complete analysis for database capture  
+        if analysis_id:
+            analysis_manager.complete_analysis(analysis_id, success=True)
+        
         # Store memo data with session isolation
         memo_key = f'asc718_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
             'customer_name': customer_name,
             'analysis_title': analysis_title,
-            'analysis_date': datetime.now().strftime("%B %d, %Y")
+            'analysis_date': datetime.now().strftime("%B %d, %Y"),
+            'analysis_id': analysis_id
         }
              
         # Display memo inline instead of switching pages
@@ -414,7 +429,7 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
+        memo_generator_display.display_clean_memo(memo_content, analysis_id, filename_string, customer_name)
         
         # Clear completion message after memo displays (but keep the important info above)
         completion_message_placeholder.empty()
@@ -439,6 +454,10 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 718 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
+        
+        # Complete analysis for database capture (failure)
+        if 'analysis_id' in locals():
+            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
 

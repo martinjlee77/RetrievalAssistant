@@ -389,6 +389,16 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
+    # Start analysis tracking for database capture
+    analysis_details = {
+        'asc_standard': 'ASC 842',
+        'total_words': len(contract_text.split()),
+        'file_count': 1,
+        'tier_info': st.session_state.get('user_data', {}).get('tier_info', {}),
+        'cost_charged': 0.0  # Cost calculated by billing manager
+    }
+    analysis_id = analysis_manager.start_analysis(analysis_details)
+    
     # Generate analysis title
     analysis_title = _generate_analysis_title()
 
@@ -496,13 +506,18 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
+        # Complete analysis for database capture  
+        if analysis_id:
+            analysis_manager.complete_analysis(analysis_id, success=True)
+        
         # Store memo data with session isolation
         memo_key = f'asc842_memo_data_{session_id}'
         st.session_state[memo_key] = {
             'memo_content': memo_content,
             'entity_name': entity_name,
             'analysis_title': analysis_title,
-            'analysis_date': datetime.now().strftime("%B %d, %Y")
+            'analysis_date': datetime.now().strftime("%B %d, %Y"),
+            'analysis_id': analysis_id
         }
              
         # Add the important persistent message before memo display (like ASC 606)
@@ -515,7 +530,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         
         # Display the memo using CleanMemoGenerator (like ASC 606)
         memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
+        memo_generator_display.display_clean_memo(memo_content, analysis_id, filename, entity_name)
         
         # Clear completion message after memo displays (but keep the important info above)
         completion_message_placeholder.empty()
@@ -539,6 +554,10 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 842 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
+        
+        # Complete analysis for database capture (failure)
+        if 'analysis_id' in locals():
+            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
 
 
 # OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
