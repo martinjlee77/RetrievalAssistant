@@ -220,22 +220,21 @@ class CleanMemoGenerator:
                         margin: 2px 0;
                         line-height: 1.3;
                     }}
-                    /* Universal italics for all disclaimer content - WeasyPrint compatible */
-                    em {{
-                        font-style: italic !important;
-                        font-size: 8px !important;
+                    /* Force VLSerif font family on all italic elements - WeasyPrint compatible */
+                    em, i {{
+                        font: italic 400 8px/1.4 'VLSerif', serif !important;
+                    }}
+                    h6 em, h6 i, strong em, b em {{
+                        font: italic 700 10px/1.4 'VLSerif', serif !important;
                     }}
                     small em {{
-                        font-style: italic !important;
-                        font-size: 8px !important;
+                        font: italic 400 8px/1.4 'VLSerif', serif !important;
                     }}
                     p em {{
-                        font-style: italic !important;
-                        font-size: 8px !important;
+                        font: italic 400 8px/1.4 'VLSerif', serif !important;
                     }}
                     div em {{
-                        font-style: italic !important;
-                        font-size: 8px !important;
+                        font: italic 400 8px/1.4 'VLSerif', serif !important;
                     }}
                     .disclaimer, small {{
                         font-size: 8px !important;
@@ -522,9 +521,9 @@ class CleanMemoGenerator:
         if in_list:
             html_lines.append('</ul>')
 
-        # Join with improved styling
+        # Join with improved styling - Use VLSerif for PDF compatibility
         html_content = f"""
-        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+        <div style="font-family: 'VLSerif', serif; 
         line-height: 1.6; max-width: 850px; padding: 30px; 
         border: 1px solid #e1e5e9; 
         border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
