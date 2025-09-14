@@ -189,14 +189,24 @@ class CleanMemoGenerator:
                         margin: 2px 0;
                         line-height: 1.3;
                     }}
-                    /* Universal italics for all disclaimer content */
-                    em, small em, p em, h6 em, li em, div em,
-                    .disclaimer em, .disclaimer p em, .disclaimer li em {{
+                    /* Universal italics for all disclaimer content - WeasyPrint compatible */
+                    em {{
                         font-style: italic !important;
                         font-size: 8px !important;
                     }}
-                    .disclaimer, small, div[style*="font-size:smaller"] {{
+                    small em {{
                         font-style: italic !important;
+                        font-size: 8px !important;
+                    }}
+                    p em {{
+                        font-style: italic !important;
+                        font-size: 8px !important;
+                    }}
+                    div em {{
+                        font-style: italic !important;
+                        font-size: 8px !important;
+                    }}
+                    .disclaimer, small {{
                         font-size: 8px !important;
                     }}
                     /* Professional table styling */
