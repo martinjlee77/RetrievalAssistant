@@ -175,7 +175,6 @@ class CleanMemoGenerator:
                     }}
                     
                     body {{
-                        font-family: 'VLSerif', serif;
                         margin: 10px;
                         line-height: 1.5;
                         font-size: 11px;
@@ -222,19 +221,19 @@ class CleanMemoGenerator:
                     }}
                     /* Force VLSerif font family on all italic elements - WeasyPrint compatible */
                     em, i {{
-                        font: italic 400 8px/1.4 'VLSerif', serif !important;
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-size: inherit;
+                        line-height: inherit;
+                        font-weight: inherit;
                     }}
+                    /* Bold italic combinations */
                     h6 em, h6 i, strong em, b em {{
-                        font: italic 700 10px/1.4 'VLSerif', serif !important;
-                    }}
-                    small em {{
-                        font: italic 400 8px/1.4 'VLSerif', serif !important;
-                    }}
-                    p em {{
-                        font: italic 400 8px/1.4 'VLSerif', serif !important;
-                    }}
-                    div em {{
-                        font: italic 400 8px/1.4 'VLSerif', serif !important;
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-weight: 700 !important;
+                        font-size: inherit;
+                        line-height: inherit;
                     }}
                     .disclaimer, small {{
                         font-size: 8px !important;
