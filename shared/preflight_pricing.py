@@ -138,11 +138,10 @@ class PreflightPricing:
         
         """Format billing summary for user display"""
         return f"""
-**COST FOR THIS ANALYSIS: \\${int(tier_info['price'])}** based on the following factors:
+**COST FOR THIS ANALYSIS IS \\${int(tier_info['price'])}** based on the following factors:
 
-- Document analysis: **{total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}**
-- Pricing tier: {tier_info['name']} (up to {tier_info['max_words']:,} words)
-- Just FYI, estimated # of pages for extracted words: ~{estimated_pages} pages (at 300 words/page)
+- Word count: **{total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}**, ~{estimated_pages} pages (at 300 words/page)
+- Pricing tier: **{tier_info['name']}**
 
         """.strip()
     

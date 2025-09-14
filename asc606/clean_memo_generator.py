@@ -149,44 +149,65 @@ class CleanMemoGenerator:
                         line-height: 1.5;
                         font-size: 11px;
                     }}
+                    /* Remove borders from HTML content for clean PDF */
+                    div {{
+                        border: none !important;
+                        box-shadow: none !important;
+                        border-radius: 0 !important;
+                    }}
                     h1 {{
-                        border-bottom: 2px solid #3498db;
+                        border-bottom: 2px solid #bdc3c7;
                         padding-bottom: 5px;
-                        margin-bottom: 10px;
+                        margin: 20px 0 15px 0;
                     }}
                     h2 {{
                         border-bottom: 1px solid #bdc3c7;
                         padding-bottom: 3px;
-                        margin-bottom: 5px;
+                        margin: 18px 0 12px 0;
                     }}
                     h3 {{
-                        margin-bottom: 3px;
+                        margin: 16px 0 10px 0;
                     }}
                     h4 {{
-                        font-size: 13px;
+                        font-size: 12px;
+                        margin: 14px 0 8px 0;
                     }}
                     h6 {{
-                        font-size: 12px;
+                        font-size: 10px;
                         font-weight: bold;
                     }}
                     p {{
-                        margin: 8px 0;
+                        margin: 6px 0;
                         font-size: 11px;
+                        line-height: 1.4;
                     }}
                     ul {{
-                        margin: 8px 0;
-                        padding-left: 20px;
+                        margin: 6px 0;
+                        padding-left: 18px;
                     }}
                     li {{
-                        margin: 4px 0;
+                        margin: 2px 0;
+                        line-height: 1.3;
                     }}
-                    small {{
+                    /* Universal italics for all disclaimer content */
+                    em, .disclaimer em, p em, h6 em, li em, div em {{
+                        font-style: italic !important;
                         font-size: 8px;
                     }}
-                    .disclaimer {{
+                    .disclaimer, small {{
                         font-size: 8px;
                         margin-top: 15px;
-                        font-style: italic;
+                    }}
+                    /* Professional table styling */
+                    table {{
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin: 10px 0;
+                    }}
+                    th, td {{
+                        border: 1px solid #ddd;
+                        padding: 4px 6px;
+                        font-size: 10px;
                     }}
                 </style>
             </head>
