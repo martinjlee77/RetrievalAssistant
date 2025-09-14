@@ -390,12 +390,13 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         st.session_state[analysis_key] = False
     
     # Start analysis tracking for database capture
+    pricing_result = st.session_state.get('pricing_result', {})
     analysis_details = {
         'asc_standard': 'ASC 842',
         'total_words': len(contract_text.split()),
         'file_count': 1,
-        'tier_info': st.session_state.get('user_data', {}).get('tier_info', {}),
-        'cost_charged': 0.0  # Cost calculated by billing manager
+        'tier_info': pricing_result.get('tier_info', {}),
+        'cost_charged': pricing_result.get('tier_info', {}).get('price', 0.0)
     }
     analysis_id = analysis_manager.start_analysis(analysis_details)
     

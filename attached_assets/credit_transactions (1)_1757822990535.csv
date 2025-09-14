@@ -1,0 +1,2 @@
+"id","user_id","analysis_id","amount","reason","created_at","expires_at","stripe_payment_id","balance_after","memo_uuid","metadata"
+"73","6","11","0.00","analysis_charge","""2025-09-14T04:06:41.512Z""",,,"9810.00","17973c9d","{""est_api_cost"":0,""idempotency_key"":""manager_708d543d_1757822744028""}"

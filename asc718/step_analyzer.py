@@ -84,6 +84,15 @@ Respond with ONLY the granting company name, nothing else."""
             
             response = self.client.chat.completions.create(**request_params)
             
+            # Track API cost for entity extraction
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="entity_extraction"
+            )
+            
             entity_name = response.choices[0].message.content
             if entity_name is None:
                 logger.warning("LLM returned None for customer name")
@@ -344,6 +353,15 @@ Respond with ONLY the granting company name, nothing else."""
             
             response = self.client.chat.completions.create(**request_params)
             
+            # Track API cost for this request
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.model,
+                request_type=f"step_{step_num}_analysis"
+            )
+            
             markdown_content = response.choices[0].message.content
             
             if markdown_content is None:
@@ -553,6 +571,16 @@ Format as clean markdown - no headers, just paragraphs and bullet points."""
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for executive summary
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="executive_summary"
+            )
+            
             summary = response.choices[0].message.content
             
             if summary is None:
@@ -603,6 +631,16 @@ Format as clean markdown - no headers, just paragraphs."""
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for background section
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="background_generation"
+            )
+            
             background = response.choices[0].message.content
             
             if background is None:
@@ -653,6 +691,16 @@ Format as clean markdown - no headers, just paragraphs."""
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for conclusion section
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="conclusion_generation"
+            )
+            
             conclusion = response.choices[0].message.content
             
             if conclusion is None:

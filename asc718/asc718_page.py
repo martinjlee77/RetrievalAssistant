@@ -290,8 +290,8 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         'asc_standard': 'ASC 718',
         'total_words': len(str(pricing_result).split()),
         'file_count': len(pricing_result.get('file_details', [])),
-        'tier_info': st.session_state.get('user_data', {}).get('tier_info', {}),
-        'cost_charged': 0.0  # Cost calculated by billing manager
+        'tier_info': pricing_result.get('tier_info', {}),
+        'cost_charged': pricing_result.get('tier_info', {}).get('price', 0.0)
     }
     analysis_id = analysis_manager.start_analysis(analysis_details)
     
