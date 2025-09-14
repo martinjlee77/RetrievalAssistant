@@ -143,6 +143,11 @@ class CleanMemoGenerator:
         if not memo_content or memo_content.strip() == "":
             st.error("Memo content is empty. Please regenerate the analysis.")
             return
+        
+        # Inject memo ID at display time if provided and not already present
+        if analysis_id and not memo_content.startswith("**MEMO ID:**"):
+            memo_content = f"**MEMO ID:** {analysis_id}\n\n{memo_content}"
+            logger.info(f"Prepended memo ID {analysis_id} to memo content")
             
         # Log what we're about to display
         logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")

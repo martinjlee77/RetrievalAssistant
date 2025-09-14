@@ -60,8 +60,10 @@ def render_asc842_page():
                 memo_data = st.session_state[memo_key]
                 # Extract memo content from stored dictionary
                 memo_content = memo_data['memo_content'] if isinstance(memo_data, dict) else memo_data
-                # Extract parameters for memo display
-                analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
+                # Extract parameters for memo display - prioritize session memo UUID
+                analysis_id = (memo_data.get('analysis_id') if isinstance(memo_data, dict) else None) or \
+                              st.session_state.get('analysis_manager_memo_uuid') or \
+                              f"memo_{session_id}"
                 filename = memo_data.get('filename') if isinstance(memo_data, dict) else None
                 customer_name = memo_data.get('customer_name') if isinstance(memo_data, dict) else None
                 memo_generator.display_clean_memo(memo_content, analysis_id, filename, customer_name)
