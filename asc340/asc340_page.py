@@ -344,13 +344,7 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         analysis_id = analysis_manager.start_analysis(analysis_details)
         
-        # Step 2: Charge wallet
-        charge_result = wallet_manager.charge_for_analysis(user_token, pricing_result['tier_info']['price'], analysis_details)
-        
-        if not charge_result['success']:
-            analysis_manager.complete_analysis(analysis_id, success=False, error_message=f"Payment failed: {charge_result['error']}")
-            st.error(f"❌ **Payment Failed**\\n\\n{charge_result['error']}")
-            return
+        # Step 2: Payment will be processed when analysis completes (no upfront charging)
         
         # Step 3: Reconstruct combined text from file details
         combined_text = ""
@@ -372,12 +366,11 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
             st.error("❌ **Technical Implementation Note**: Full file content reconstruction not yet implemented.")
             st.info("🔄 **Temporary Workaround**: This integration is in progress. The preflight pricing system is working, but the analysis part needs the file content to be properly passed through.")
             
-            # Auto-credit the user since analysis can't proceed
+            # Mark analysis as failed (no refund needed since payment happens on completion)
             if analysis_id:
-                billing_manager.auto_credit_on_failure(user_token, pricing_result['tier_info']['price'], analysis_id)
                 analysis_manager.complete_analysis(analysis_id, success=False, error_message="File content reconstruction not implemented")
             
-            st.success("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
+            st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
             return
         
         # Step 4: Show analysis warning and proceed with full workflow

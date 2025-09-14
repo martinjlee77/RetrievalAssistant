@@ -256,14 +256,7 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         analysis_id = analysis_manager.start_analysis(analysis_details)
         
-        # Step 2: Charge wallet
-        charge_result = wallet_manager.charge_for_analysis(user_token, pricing_result['tier_info']['price'], analysis_details)
-        
-        if not charge_result['success']:
-            st.error(f"❌ **Payment Failed**\n\n{charge_result['message']}")
-            if analysis_id:
-                analysis_manager.end_analysis(analysis_id, 'failed')
-            return
+        # Step 2: Payment will be processed when analysis completes (no upfront charging)
             
         # Progress message that will be cleared later
         progress_message_placeholder = st.empty()

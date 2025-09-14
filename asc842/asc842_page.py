@@ -343,12 +343,7 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
             'cost_charged': pricing_result['tier_info']['price']
         }
         
-        # Charge wallet
-        charge_result = wallet_manager.charge_for_analysis(user_token, required_price, analysis_details)
-        
-        if not charge_result['success']:
-            st.error(f"❌ **Payment Failed**\n\n{charge_result['error']}")
-            return
+        # Payment will be processed when analysis completes (no upfront charging)
         
         # Extract combined text from file details (like ASC 340-40)
         combined_text = ""
