@@ -144,7 +144,7 @@ class CleanMemoGenerator:
             <head>
                 <style>
                     body {{
-                        font-family: Poppins, sans-serif;
+                        font-family: "Liberation Serif", "DejaVu Serif", "Times New Roman", "Nimbus Roman", serif;
                         margin: 10px;
                         line-height: 1.5;
                         font-size: 11px;
