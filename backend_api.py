@@ -822,7 +822,7 @@ def complete_analysis():
             
             # Insert analysis record with all required fields (including billed_credits for backward compatibility)
             cursor.execute("""
-                INSERT INTO analyses (user_id, asc_standard, words_count, api_cost, 
+                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
                                     started_at, completed_at, duration_seconds, file_count)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed', %s, %s, NOW(), %s, %s)
@@ -848,7 +848,7 @@ def complete_analysis():
                                                    balance_after, memo_uuid, metadata, created_at)
                     VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
                 """, (user_id, analysis_id, 0, balance_after, memo_uuid, 
-                      json.dumps({'idempotency_key': idempotency_key, 'api_cost': float(api_cost)}) if idempotency_key else json.dumps({'api_cost': float(api_cost)})))
+                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
                 
             else:
                 # Calculate new balance after charge
@@ -867,7 +867,7 @@ def complete_analysis():
                                                    balance_after, memo_uuid, metadata, created_at)
                     VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
                 """, (user_id, analysis_id, -final_charged_credits, balance_after, memo_uuid,
-                      json.dumps({'idempotency_key': idempotency_key, 'api_cost': float(api_cost)}) if idempotency_key else json.dumps({'api_cost': float(api_cost)})))
+                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
             
             conn.commit()
             
@@ -906,9 +906,9 @@ def record_analysis():
         transformed_data = {
             'asc_standard': data.get('asc_standard'),
             'words_count': data.get('words_count', 0),
-            'api_cost': data.get('actual_credits', 0),  # actual_credits becomes api_cost
+            'est_api_cost': data.get('est_api_cost', 0),  # Use new column name
             'file_count': 1,  # Default for legacy requests
-            'tier_name': f"Tier {data.get('price_tier', 2)}",
+            'tier_name': data.get('tier_name', 'Tier 2'),  # Use actual tier_name instead of price_tier
             'is_free_analysis': data.get('is_free_analysis', False),
             'idempotency_key': f"legacy_{int(datetime.now().timestamp()*1000)}_{data.get('asc_standard', 'unknown')}",
             'started_at': datetime.now().isoformat(),

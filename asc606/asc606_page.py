@@ -427,7 +427,11 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
             return
         
-        # Step 4: Show analysis warning and proceed with full workflow
+        # Step 4: Reset API cost tracking for new analysis
+        from shared.api_cost_tracker import reset_cost_tracking
+        reset_cost_tracking()
+        
+        # Step 5: Show analysis warning and proceed with full workflow
         # Add the important warning box that users should not leave the page
         progress_message_placeholder = st.empty()
         progress_message_placeholder.error(

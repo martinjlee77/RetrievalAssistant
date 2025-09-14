@@ -15,3 +15,4 @@ docx
 streamlit
 flask
 stripe
+tiktoken

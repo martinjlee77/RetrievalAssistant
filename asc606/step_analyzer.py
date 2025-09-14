@@ -14,6 +14,7 @@ import random
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+from shared.api_cost_tracker import track_openai_request, reset_cost_tracking, get_total_estimated_cost
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,14 @@ Respond with ONLY the customer name, nothing else."""
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for entity extraction
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="entity_extraction"
+            )
             
             entity_name = response.choices[0].message.content
             if entity_name is None:
@@ -326,6 +335,14 @@ Respond with ONLY the customer name, nothing else."""
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for step analysis
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.model,
+                request_type=f"step_{step_num}_analysis"
+            )
             
             markdown_content = response.choices[0].message.content
             

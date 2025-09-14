@@ -10,6 +10,7 @@ import uuid
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import json
+from shared.api_cost_tracker import reset_cost_tracking, get_total_estimated_cost
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +219,7 @@ class AnalysisManager:
             analysis_data = {
                 'asc_standard': analysis_record.get('asc_standard'),
                 'words_count': analysis_record.get('total_words', 0),
-                'api_cost': 0,  # TODO: Track actual OpenAI API costs
+                'est_api_cost': get_total_estimated_cost(),  # Get actual tracked API costs
                 'file_count': analysis_record.get('file_count', 1),
                 'tier_name': analysis_record.get('tier_info', {}).get('name', 'Unknown'),
                 'is_free_analysis': analysis_record.get('cost_charged', 0) == 0,
