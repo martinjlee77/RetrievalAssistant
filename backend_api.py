@@ -1462,7 +1462,7 @@ def get_analysis_history():
         # Get recent analyses with details
         cursor.execute("""
             SELECT 
-                COALESCE(a.memo_id, a.id::text) as id,
+                COALESCE(a.memo_uuid, a.id::text) as id,
                 a.asc_standard,
                 a.completed_at,
                 a.status,
