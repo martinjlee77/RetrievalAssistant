@@ -222,7 +222,7 @@ class AnalysisManager:
             analysis_data = {
                 'asc_standard': analysis_record.get('asc_standard'),
                 'words_count': analysis_record.get('total_words', 0),
-                'est_api_cost': get_total_estimated_cost(),  # Get actual tracked API costs
+                'api_cost': get_total_estimated_cost(),  # Get actual tracked API costs
                 'file_count': analysis_record.get('file_count', 1),
                 'tier_name': analysis_record.get('tier_info', {}).get('name', 'Unknown'),
                 'is_free_analysis': analysis_record.get('cost_charged', 0) == 0,
