@@ -113,6 +113,10 @@ def render_asc340_page():
             # Show file processing details
             if pricing_result.get('processing_errors'):
                 st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
+            
+            # Display document quality feedback
+            if pricing_result.get('file_details'):
+                SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])
         else:
             # Handle different error types
             if pricing_result.get('error') == 'scanned_pdf_detected':

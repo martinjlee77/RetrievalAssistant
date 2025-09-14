@@ -62,6 +62,7 @@ class DocumentExtractor:
             word_count = self._count_words(extracted_text)
             extraction_result['word_count'] = word_count
             extraction_result['file_size_mb'] = round(file_size_mb, 2)
+            extraction_result['filename'] = uploaded_file.name
             
             # Add page estimate for user context (≈300 words/page)
             extraction_result['estimated_pages'] = max(1, round(word_count / 300))
@@ -72,6 +73,8 @@ class DocumentExtractor:
             self.logger.error(f"Error extracting text from {uploaded_file.name}: {str(e)}")
             return {
                 'text': '',
+                'filename': uploaded_file.name,
+                'quality_state': 'blocked',
                 'error': str(e),
                 'pages': 0,
                 'word_count': 0,
@@ -155,6 +158,7 @@ class DocumentExtractor:
                 'word_count': self._count_words(text) if text else 0,
                 'extraction_method': extraction_method,
                 'is_likely_scanned': True,
+                'quality_state': detection_analysis.get('quality_state', 'blocked'),
                 'error': 'scanned_pdf_detected',
                 'user_message': self._get_scanned_pdf_message(detection_analysis.get('reasons', [])),
                 'detection_reasons': detection_analysis.get('reasons', ['Detection failed']),
@@ -167,7 +171,10 @@ class DocumentExtractor:
             'word_count': self._count_words(text) if text else 0,
             'extraction_method': extraction_method,
             'is_likely_scanned': False,
-            'error': None if text else "No text could be extracted from PDF"
+            'error': None if text else "No text could be extracted from PDF",
+            'quality_state': detection_analysis.get('quality_state', 'good'),
+            'detection_reasons': detection_analysis.get('reasons', []),
+            'detection_metrics': detection_analysis.get('metrics', {})
         }
     
     def _extract_word_text(self, uploaded_file) -> Dict[str, Any]:
@@ -200,7 +207,10 @@ class DocumentExtractor:
                 'word_count': self._count_words(text) if text else 0,
                 'extraction_method': 'python-docx',
                 'is_likely_scanned': False,
-                'error': None
+                'error': None,
+                'quality_state': 'good',  # Word docs are typically clean
+                'detection_reasons': [],
+                'detection_metrics': {}
             }
             
         except Exception as e:
@@ -323,6 +333,7 @@ class DocumentExtractor:
         if not text:
             return {
                 'is_likely_scanned': True, 
+                'quality_state': 'blocked',
                 'reasons': ['No text extracted'],
                 'metrics': {}
             }
@@ -343,7 +354,8 @@ class DocumentExtractor:
         
         if word_count == 0:
             return {
-                'is_likely_scanned': True, 
+                'is_likely_scanned': True,
+                'quality_state': 'blocked', 
                 'reasons': ['No words found'],
                 'metrics': {}
             }
@@ -429,8 +441,17 @@ class DocumentExtractor:
         if extreme_issues:
             reasons = extreme_issues + reasons
         
+        # Determine quality state (3-tier system)
+        quality_state = self._determine_quality_state(extreme_issues, reasons, {
+            'broken_pattern_rate': broken_pattern_rate,
+            'non_ascii_ratio': non_ascii_ratio,
+            'multi_space_rate': multi_space_rate,
+            'avg_chars_per_page': avg_chars_per_page
+        })
+        
         return {
             'is_likely_scanned': is_scanned,
+            'quality_state': quality_state,
             'reasons': reasons[:3],  # Show first 3 reasons to user
             'metrics': {
                 'avg_chars_per_page': avg_chars_per_page,
@@ -446,6 +467,37 @@ class DocumentExtractor:
                 'broken_pattern_rate': broken_pattern_rate
             }
         }
+    
+    def _determine_quality_state(self, extreme_issues: List[str], reasons: List[str], metrics: Dict[str, float]) -> str:
+        """Determine document quality state: good, degraded, or blocked"""
+        
+        # Blocked: Extreme issues or 2+ normal issues
+        if len(extreme_issues) > 0 or len(reasons) >= 2:
+            return "blocked"
+        
+        # Degraded: Any single issue OR moderate quality concerns
+        if len(reasons) > 0:
+            return "degraded"
+            
+        # Check for moderate degraded thresholds (80% of extreme levels)
+        degraded_thresholds = {
+            'broken_pattern_rate': 120,  # 80% of 150
+            'non_ascii_ratio': 0.20,     # 80% of 0.25
+            'multi_space_rate': 64,      # 80% of 80
+            'avg_chars_per_page': 250    # Moderate concern level
+        }
+        
+        # Check if any metric is in degraded range
+        for metric, threshold in degraded_thresholds.items():
+            if metric in metrics:
+                if metric == 'avg_chars_per_page':
+                    if metrics[metric] < threshold:
+                        return "degraded"
+                else:
+                    if metrics[metric] > threshold:
+                        return "degraded"
+        
+        return "good"
     
     def _get_scanned_pdf_message(self, reasons = None, filename = None) -> str:
         """Return user-friendly message for scanned PDF detection with specific reasons"""

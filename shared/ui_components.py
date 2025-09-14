@@ -102,3 +102,110 @@ class SharedUIComponents:
             st.write(f"**Knowledge Base:** {kb_info.get('documents', 'guidance documents')}")
             st.write(f"**Status:** {kb_info.get('status', 'Active')}")
             st.write(f"_{kb_info.get('note', 'Analysis based on current authoritative guidance')}_")
+    
+    @staticmethod
+    def display_document_quality_feedback(file_results: List[Dict[str, Any]]) -> None:
+        """
+        Display document quality feedback with 3-tier quality indicators.
+        
+        Args:
+            file_results: List of document extraction results with quality metrics
+        """
+        if not file_results:
+            return
+        
+        # Group files by quality state
+        quality_groups = {'good': [], 'degraded': [], 'blocked': []}
+        
+        for result in file_results:
+            filename = result.get('filename', 'Unknown file')
+            # Derive quality state more robustly
+            quality_state = result.get('quality_state')
+            if not quality_state:
+                # Fallback logic for missing quality_state
+                if (result.get('error') == 'scanned_pdf_detected' or 
+                    result.get('is_likely_scanned') or 
+                    result.get('error')):
+                    quality_state = 'blocked'
+                else:
+                    quality_state = 'good'
+            
+            word_count = result.get('word_count', 0)
+            reasons = result.get('detection_reasons', [])
+            
+            quality_groups[quality_state].append({
+                'filename': filename,
+                'word_count': word_count,
+                'reasons': reasons,
+                'result': result
+            })
+        
+        # Display overall summary
+        total_files = len(file_results)
+        good_count = len(quality_groups['good'])
+        degraded_count = len(quality_groups['degraded'])
+        blocked_count = len(quality_groups['blocked'])
+        
+        if blocked_count > 0:
+            st.error(f"❌ Document Processing: {blocked_count} file(s) blocked, {good_count + degraded_count} processed")
+        elif degraded_count > 0:
+            st.warning(f"⚠️ Document Processing: {total_files} file(s) processed ({degraded_count} with quality issues)")
+        else:
+            st.success(f"✅ Document Processing: {total_files} file(s) processed successfully")
+        
+        # Display file details
+        for result in file_results:
+            filename = result.get('filename', 'Unknown file')
+            # Use same robust quality state derivation
+            quality_state = result.get('quality_state')
+            if not quality_state:
+                if (result.get('error') == 'scanned_pdf_detected' or 
+                    result.get('is_likely_scanned') or 
+                    result.get('error')):
+                    quality_state = 'blocked'
+                else:
+                    quality_state = 'good'
+            
+            word_count = result.get('word_count', 0)
+            reasons = result.get('detection_reasons', [])
+            
+            # Quality indicator and basic info
+            if quality_state == 'good':
+                st.write(f"📄 **{filename}** - ✅ Good Quality ({word_count:,} words)")
+            elif quality_state == 'degraded':
+                st.write(f"📄 **{filename}** - ⚠️ Degraded Quality ({word_count:,} words)")
+                
+                # Show quality details in expandable section
+                with st.expander(f"Quality Details: {filename}", expanded=False):
+                    if reasons:
+                        st.write("**Issues Detected:**")
+                        for reason in reasons:
+                            st.write(f"• {reason}")
+                    st.info("💡 **Tip:** Analysis will proceed with enhanced text cleaning. For best results, use original text-based PDFs when possible.")
+            else:  # blocked
+                st.write(f"📄 **{filename}** - ❌ Blocked")
+                if reasons:
+                    st.write("**Issues:**")
+                    for reason in reasons[:2]:  # Show first 2 reasons
+                        st.write(f"• {reason}")
+                    
+        # Show degraded quality tips if any degraded files
+        if degraded_count > 0:
+            with st.expander("📋 Document Quality Tips", expanded=False):
+                st.markdown("""
+                **For better analysis quality:**
+                - Use original text-based PDFs instead of scanned documents
+                - Ensure documents are not password-protected
+                - Check that text is selectable in the PDF viewer
+                - Consider using OCR software for scanned documents
+                """)
+    
+    @staticmethod 
+    def get_quality_icon(quality_state: str) -> str:
+        """Get the appropriate icon for quality state."""
+        icons = {
+            'good': '✅',
+            'degraded': '⚠️', 
+            'blocked': '❌'
+        }
+        return icons.get(quality_state, '❓')
