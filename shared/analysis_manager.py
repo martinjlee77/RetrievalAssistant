@@ -242,6 +242,9 @@ class AnalysisManager:
             if response.ok:
                 response_data = response.json()
                 memo_uuid = response_data.get('memo_uuid')
+                # Store memo_uuid in session state for access by calling code
+                import streamlit as st
+                st.session_state['analysis_manager_memo_uuid'] = memo_uuid
                 logger.info(f"Analysis {analysis_record.get('analysis_id')} saved to database with memo UUID: {memo_uuid}")
             else:
                 logger.warning(f"Failed to save analysis to database: {response.status_code} - {response.text}")

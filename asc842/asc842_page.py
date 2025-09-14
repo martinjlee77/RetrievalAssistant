@@ -361,7 +361,7 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
             return
         
         # Proceed with original analysis logic using the extracted text
-        perform_asc842_analysis(combined_text, additional_context, filename_string)
+        perform_asc842_analysis(combined_text, additional_context, filename_string, analysis_details)
         
         # Clear the progress message after analysis
         progress_message_placeholder.empty()
@@ -372,7 +372,7 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
-def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt"):
+def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt", analysis_details: dict = None):
     """Perform the complete ASC 842 analysis and display results with session isolation."""
     
     # Session isolation - create unique session ID for this user
@@ -390,14 +390,16 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         st.session_state[analysis_key] = False
     
     # Start analysis tracking for database capture
-    pricing_result = st.session_state.get('pricing_result', {})
-    analysis_details = {
-        'asc_standard': 'ASC 842',
-        'total_words': len(contract_text.split()),
-        'file_count': 1,
-        'tier_info': pricing_result.get('tier_info', {}),
-        'cost_charged': pricing_result.get('tier_info', {}).get('price', 0.0)
-    }
+    if analysis_details is None:
+        # Fallback for legacy calls
+        pricing_result = st.session_state.get('pricing_result', {})
+        analysis_details = {
+            'asc_standard': 'ASC 842',
+            'total_words': len(contract_text.split()),
+            'file_count': 1,
+            'tier_info': pricing_result.get('tier_info', {}),
+            'cost_charged': pricing_result.get('tier_info', {}).get('price', 0.0)
+        }
     analysis_id = analysis_manager.start_analysis(analysis_details)
     
     # Generate analysis title
@@ -508,8 +510,11 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         st.session_state[analysis_key] = True
         
         # Complete analysis for database capture  
+        memo_uuid = None
         if analysis_id:
-            analysis_manager.complete_analysis(analysis_id, success=True)
+            completion_result = analysis_manager.complete_analysis(analysis_id, success=True)
+            # Extract memo_uuid from the database save response
+            memo_uuid = st.session_state.get('analysis_manager_memo_uuid', analysis_id)
         
         # Store memo data with session isolation
         memo_key = f'asc842_memo_data_{session_id}'
@@ -518,7 +523,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             'entity_name': entity_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y"),
-            'analysis_id': analysis_id
+            'analysis_id': memo_uuid or analysis_id  # Use database memo_uuid if available
         }
              
         # Add the important persistent message before memo display (like ASC 606)
