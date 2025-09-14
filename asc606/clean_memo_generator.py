@@ -521,9 +521,9 @@ class CleanMemoGenerator:
         if in_list:
             html_lines.append('</ul>')
 
-        # Join with improved styling - Use VLSerif for PDF compatibility
+        # Join with improved styling - Original fonts for HTML, VLSerif only for PDF italics
         html_content = f"""
-        <div style="font-family: 'VLSerif', serif; 
+        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
         line-height: 1.6; max-width: 850px; padding: 30px; 
         border: 1px solid #e1e5e9; 
         border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
