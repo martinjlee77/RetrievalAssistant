@@ -154,7 +154,7 @@ class SharedUIComponents:
             st.success(f"✅ Document Processing: {total_files} file(s) processed successfully")
         
         # Display file details
-        for result in file_results:
+        for idx, result in enumerate(file_results):
             filename = result.get('filename', 'Unknown file')
             # Use same robust quality state derivation
             quality_state = result.get('quality_state')
@@ -188,6 +188,43 @@ class SharedUIComponents:
                     st.write("**Issues:**")
                     for reason in reasons[:2]:  # Show first 2 reasons
                         st.write(f"• {reason}")
+            
+            # Debugging feature - show extracted text preview
+            extracted_text = result.get('text_content', '')
+            if extracted_text and st.checkbox(f"🔍 Show extracted text preview", key=f"debug_preview_file_{idx}"):
+                with st.expander(f"📝 Extracted Text Preview: {filename}", expanded=True):
+                    # Show first 500 words
+                    words = extracted_text.split()
+                    preview_words = words[:500]
+                    preview_text = ' '.join(preview_words)
+                    
+                    if len(words) > 500:
+                        preview_text += "\n\n[... text truncated for display ...]"
+                    
+                    st.text_area(
+                        "Extracted Content:", 
+                        preview_text, 
+                        height=300, 
+                        disabled=True,
+                        help=f"Showing first 500 words of {len(words):,} total words"
+                    )
+                    
+                    # Show extraction metadata
+                    st.caption(f"**Total length:** {len(extracted_text):,} characters | **Word count:** {word_count:,} words")
+                    
+                    # Show quality metrics if available
+                    metrics = result.get('detection_metrics', {})
+                    if metrics:
+                        with st.expander("🔢 Quality Metrics", expanded=False):
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                st.metric("Characters per page", f"{metrics.get('avg_chars_per_page', 0):.0f}")
+                                st.metric("Special char ratio", f"{metrics.get('special_ratio', 0):.1%}")
+                                st.metric("Non-ASCII ratio", f"{metrics.get('non_ascii_ratio', 0):.1%}")
+                            with col2:
+                                st.metric("Broken patterns", f"{metrics.get('broken_pattern_rate', 0):.1f}/1000")
+                                st.metric("Multi-space rate", f"{metrics.get('multi_space_rate', 0):.1f}/1000")
+                                st.metric("Average word length", f"{metrics.get('avg_word_len', 0):.1f}")
                     
         # Show degraded quality tips if any degraded files
         if degraded_count > 0:
