@@ -200,10 +200,10 @@ def get_asc606_inputs_new():
     
     # Document upload section       
     uploaded_files = st.file_uploader(
-        "1️⃣ Upload revenue contract documents - PDF or DOCX files (required)",
+        "1️⃣ Upload revenue contract documents - PDF or DOCX files (required) - NOTE: completeness and document quality will drive the quality of the memo.",
         type=['pdf', 'docx'],
         accept_multiple_files=True,
-        help="Upload revenue contracts, agreements, or amendments for ASC 606 analysis",
+        help="Upload complete revenue contracts, agreements, or amendments for ASC 606 analysis. Incomplete information or poor quality documents provided will result in incomplete or low quality analysis. For PDFs, if available, always use the original text-based version.",
         key=f"asc606_uploader_{st.session_state.get('file_uploader_key', 0)}"
     )
 

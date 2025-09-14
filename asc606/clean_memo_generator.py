@@ -10,9 +10,10 @@ from typing import Dict, Any
 from shared.disclaimer_generator import DisclaimerGenerator
 import weasyprint
 from docx import Document
-from docx.shared import Inches
+from docx.shared import Inches, Pt, Inches
 import tempfile
 import base64
+
 
 logger = logging.getLogger(__name__)
 
@@ -279,6 +280,21 @@ class CleanMemoGenerator:
         try:
             doc = Document()
 
+            # Page set up
+            sections = doc.sections
+            for section in sections:
+                section.top_margin = Inches(1)
+                section.bottom_margin = Inches(1)
+                section.left_margin = Inches(1)
+                section.right_margin = Inches(1)
+            
+            # D. Set default font for the whole document
+            style = doc.styles['Normal']
+            style.font.name = 'Calibri'
+            style.font.size = Pt(11)
+            style.paragraph_format.line_spacing = 1.15
+            style.paragraph_format.space_after = Pt(6)
+                        
             # Clean HTML tags from content first
             clean_content = self._clean_html_tags(memo_content)
 
@@ -293,23 +309,44 @@ class CleanMemoGenerator:
                 # Headers
                 if line.startswith('# '):
                     heading = doc.add_heading(line[2:], level=1)
+                    heading.runs[0].font.size = Pt(24)
+                    # C. Better section spacing for main title
+                    heading.paragraph_format.space_before = Pt(18)
+                    heading.paragraph_format.space_after = Pt(12)
                 elif line.startswith('## '):
                     heading = doc.add_heading(line[3:], level=2)
+                    heading.runs[0].font.size = Pt(18)
+                    # C. Better section spacing for section headers
+                    heading.paragraph_format.space_before = Pt(15)
+                    heading.paragraph_format.space_after = Pt(9)
                 elif line.startswith('### '):
                     heading = doc.add_heading(line[4:], level=3)
+                    heading.runs[0].font.size = Pt(14)
+                    # C. Better section spacing for step headers
+                    heading.paragraph_format.space_before = Pt(12)
+                    heading.paragraph_format.space_after = Pt(6)
                 # Bold text
                 elif line.startswith('**') and line.endswith('**'):
                     p = doc.add_paragraph()
                     p.add_run(line[2:-2]).bold = True
+                    # B. Add line spacing for bold paragraphs
+                    p.paragraph_format.space_after = Pt(6)
+                    p.paragraph_format.line_spacing = 1.15
                 # Bullet points
                 elif line.startswith('- '):
-                    doc.add_paragraph(line[2:], style='List Bullet')
+                    p = doc.add_paragraph(line[2:], style='List Bullet')
+                    # B. Add line spacing for bullet points
+                    p.paragraph_format.space_after = Pt(3)
+                    p.paragraph_format.line_spacing = 1.15
                 # Regular paragraphs
                 else:
                     # Remove markdown formatting
                     clean_line = line.replace('**', '').replace('*', '')
-                    doc.add_paragraph(clean_line)
-
+                    p = doc.add_paragraph(clean_line)
+                    # B. Add line spacing for regular paragraphs  
+                    p.paragraph_format.space_after = Pt(6)
+                    p.paragraph_format.line_spacing = 1.15
+                
             # Save to bytes
             with tempfile.NamedTemporaryFile() as tmp_file:
                 doc.save(tmp_file.name)
