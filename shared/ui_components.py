@@ -191,7 +191,7 @@ class SharedUIComponents:
             
             # Debugging feature - show extracted text preview
             extracted_text = result.get('text_content', '')
-            if extracted_text and st.checkbox(f"🔍 Show extracted text preview", key=f"debug_preview_file_{idx}"):
+            if extracted_text and st.checkbox(f"🔍 Show extracted text preview (first 2,000 characters only)", key=f"debug_preview_file_{idx}"):
                 with st.expander(f"📝 Extracted Text Preview: {filename}", expanded=True):
                     # Show first 500 words
                     words = extracted_text.split()

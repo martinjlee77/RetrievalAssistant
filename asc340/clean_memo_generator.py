@@ -9,6 +9,12 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
 from shared.disclaimer_generator import DisclaimerGenerator
+import weasyprint
+from docx import Document
+from docx.shared import Inches, Pt, RGBColor
+import tempfile
+import base64
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -237,28 +243,117 @@ class CleanMemoGenerator:
             
     
     def _generate_pdf(self, memo_content: str) -> Optional[bytes]:
-        """Generate PDF from memo content using WeasyPrint."""
+        """Generate PDF from memo content using WeasyPrint with enhanced font support."""
         try:
-            import weasyprint
             # Convert markdown to HTML
             html_content = self._convert_markdown_to_html(memo_content)
-            
-            # Add CSS styling for professional look with better margins
+
+            # Enhanced CSS with embedded fonts for italic support
             css_styled_html = f"""
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
-                    h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
-                    h2 {{ color: #34495e; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }}
-                    h3 {{ color: #5d6d7e; }}
-                    h4 {{ color: #7f8c8d; font-size: 12px; }} 
-                    h6 {{ color: #7f8c8d; font-size: 13px; font-weight: bold; }}
-                    p {{ margin: 12px 0; }}
-                    ul {{ margin: 10px 0; padding-left: 25px; }}
-                    li {{ margin: 5px 0; }}
-                    small {{ font-size: 11px; }}
-                    .disclaimer {{ font-size: 11px; color: #7f8c8d; margin-top: 30px; }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif.ttf")}') format('truetype');
+                        font-weight: 400;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-Italic.ttf")}') format('truetype');
+                        font-weight: 400;
+                        font-style: italic;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-Bold.ttf")}') format('truetype');
+                        font-weight: 700;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-BoldItalic.ttf")}') format('truetype');
+                        font-weight: 700;
+                        font-style: italic;
+                    }}
+                    
+                    body {{
+                        font-family: 'VLSerif', serif;
+                        margin: 10px;
+                        line-height: 1.5;
+                        font-size: 11px;
+                    }}
+                    /* Remove borders from HTML content for clean PDF */
+                    div {{
+                        border: none !important;
+                        box-shadow: none !important;
+                        border-radius: 0 !important;
+                    }}
+                    h1 {{
+                        border-bottom: 2px solid #bdc3c7;
+                        padding-bottom: 5px;
+                        margin: 20px 0 15px 0;
+                    }}
+                    h2 {{
+                        border-bottom: 1px solid #bdc3c7;
+                        padding-bottom: 3px;
+                        margin: 18px 0 12px 0;
+                    }}
+                    h3 {{
+                        margin: 16px 0 10px 0;
+                    }}
+                    h4 {{
+                        font-size: 12px;
+                        margin: 14px 0 8px 0;
+                    }}
+                    h6 {{
+                        font-size: 10px;
+                        font-weight: 700;
+                    }}
+                    p {{
+                        margin: 6px 0;
+                        font-size: 11px;
+                        line-height: 1.4;
+                    }}
+                    ul {{
+                        margin: 6px 0;
+                        padding-left: 18px;
+                    }}
+                    li {{
+                        margin: 2px 0;
+                        line-height: 1.3;
+                    }}
+                    /* Force VLSerif font family on all italic elements - WeasyPrint compatible */
+                    em, i {{
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-size: inherit;
+                        line-height: inherit;
+                        font-weight: inherit;
+                    }}
+                    /* Bold italic combinations */
+                    h6 em, h6 i, strong em, b em {{
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-weight: 700 !important;
+                        font-size: inherit;
+                        line-height: inherit;
+                    }}
+                    .disclaimer, small {{
+                        font-size: 8px !important;
+                    }}
+                    /* Professional table styling */
+                    table {{
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin: 10px 0;
+                    }}
+                    th, td {{
+                        border: 1px solid #ddd;
+                        padding: 4px 6px;
+                        font-size: 10px;
+                    }}
                 </style>
             </head>
             <body>
@@ -266,9 +361,9 @@ class CleanMemoGenerator:
             </body>
             </html>
             """
-            
-            # Generate PDF
-            pdf_bytes = weasyprint.HTML(string=css_styled_html).write_pdf()
+
+            # Generate PDF with base_url for font loading
+            pdf_bytes = weasyprint.HTML(string=css_styled_html, base_url=os.getcwd()).write_pdf()
             return pdf_bytes
         except Exception as e:
             logger.error(f"PDF generation failed: {e}")
@@ -286,49 +381,84 @@ class CleanMemoGenerator:
     def _generate_docx(self, memo_content: str) -> Optional[bytes]:
         """Generate DOCX from memo content using python-docx."""
         try:
-            from docx import Document
-            import tempfile
-            
             doc = Document()
+
+            # Page set up
+            sections = doc.sections
+            for section in sections:
+                section.top_margin = Inches(1)
+                section.bottom_margin = Inches(1)
+                section.left_margin = Inches(1.25)
+                section.right_margin = Inches(1.25)
             
+            # Set default font for the whole document
+            style = doc.styles['Normal']
+            style.font.name = 'Calibri'
+            style.font.size = Pt(11)
+            style.paragraph_format.line_spacing = 1.15
+            style.paragraph_format.space_after = Pt(6)
+                        
             # Clean HTML tags from content first
             clean_content = self._clean_html_tags(memo_content)
-            
+
             # Process content line by line
             lines = clean_content.split('\n')
-            
+
             for line in lines:
                 line = line.strip()
                 if not line:
                     continue
-                    
+
                 # Headers
                 if line.startswith('# '):
                     heading = doc.add_heading(line[2:], level=1)
+                    heading.runs[0].font.size = Pt(24)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for main title
+                    heading.paragraph_format.space_before = Pt(18)
+                    heading.paragraph_format.space_after = Pt(12)
                 elif line.startswith('## '):
                     heading = doc.add_heading(line[3:], level=2)
+                    heading.runs[0].font.size = Pt(18)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for section headers
+                    heading.paragraph_format.space_before = Pt(15)
+                    heading.paragraph_format.space_after = Pt(9)
                 elif line.startswith('### '):
                     heading = doc.add_heading(line[4:], level=3)
+                    heading.runs[0].font.size = Pt(14)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for step headers
+                    heading.paragraph_format.space_before = Pt(12)
+                    heading.paragraph_format.space_after = Pt(6)
                 # Bold text
                 elif line.startswith('**') and line.endswith('**'):
                     p = doc.add_paragraph()
                     p.add_run(line[2:-2]).bold = True
+                    # Add line spacing for bold paragraphs
+                    p.paragraph_format.space_after = Pt(6)
+                    p.paragraph_format.line_spacing = 1.15
                 # Bullet points
                 elif line.startswith('- '):
-                    doc.add_paragraph(line[2:], style='List Bullet')
+                    p = doc.add_paragraph(line[2:], style='List Bullet')
+                    # Add line spacing for bullet points
+                    p.paragraph_format.space_after = Pt(3)
+                    p.paragraph_format.line_spacing = 1.15
                 # Regular paragraphs
                 else:
                     # Remove markdown formatting
-                    clean_line = line.replace('**', '').replace('*', '').replace('`', '')
-                    if clean_line:
-                        doc.add_paragraph(clean_line)
-            
+                    clean_line = line.replace('**', '').replace('*', '')
+                    p = doc.add_paragraph(clean_line)
+                    # Add line spacing for regular paragraphs  
+                    p.paragraph_format.space_after = Pt(6)
+                    p.paragraph_format.line_spacing = 1.15
+                
             # Save to bytes
             with tempfile.NamedTemporaryFile() as tmp_file:
                 doc.save(tmp_file.name)
                 tmp_file.seek(0)
                 return tmp_file.read()
-                
+
         except Exception as e:
             logger.error(f"DOCX generation failed: {e}")
             return None

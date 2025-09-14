@@ -3,17 +3,16 @@ ASC 718 Clean Memo Generator
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import weasyprint
 from docx import Document
-from docx.shared import Inches
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
+from docx.shared import Inches, Pt, RGBColor
 import tempfile
 import os
 import re
 from datetime import datetime
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from shared.disclaimer_generator import DisclaimerGenerator
 
 logger = logging.getLogger(__name__)
@@ -25,7 +24,7 @@ class CleanMemoGenerator:
         """Initialize the clean memo generator."""
         pass
     
-    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: str = None) -> str:
+    def combine_clean_steps(self, analysis_results: Dict[str, Any], analysis_id: Optional[str] = None) -> str:
         """Combine clean step markdown into final memo - NO PROCESSING."""
         
         # Get basic info
@@ -140,7 +139,7 @@ class CleanMemoGenerator:
         logger.info(f"Clean memo generated: {len(final_memo)} chars, {steps_added}/5 steps")
         return final_memo
     
-    def display_clean_memo(self, memo_content: str, analysis_id: str = None, filename: str = None, customer_name: str = None):
+    def display_clean_memo(self, memo_content: str, analysis_id: Optional[str] = None, filename: Optional[str] = None, customer_name: Optional[str] = None):
         """Display clean memo with enhanced formatting and download options."""
         
         # Apply HTML styling for better readability
@@ -175,13 +174,17 @@ class CleanMemoGenerator:
                 # PDF download
                 try:
                     pdf_bytes = self._generate_pdf(memo_content)
-                    st.download_button(
-                        label="📄 PDF",
-                        data=pdf_bytes,
-                        file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                        mime="application/pdf",
-                        use_container_width=True
-                    )
+                    if pdf_bytes:
+                        st.download_button(
+                            label="📄 PDF",
+                            data=pdf_bytes,
+                            file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                    else:
+                        st.button("📄 PDF Error", disabled=True, use_container_width=True, 
+                                 help="PDF generation failed")
                 except Exception as e:
                     logger.error(f"PDF generation failed: {e}")
                     st.button("📄 PDF Error", disabled=True, use_container_width=True, 
@@ -191,13 +194,17 @@ class CleanMemoGenerator:
                 # DOCX download
                 try:
                     docx_bytes = self._generate_docx(memo_content)
-                    st.download_button(
-                        label="📋 Word",
-                        data=docx_bytes,
-                        file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        use_container_width=True
-                    )
+                    if docx_bytes:
+                        st.download_button(
+                            label="📋 Word",
+                            data=docx_bytes,
+                            file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            use_container_width=True
+                        )
+                    else:
+                        st.button("📋 DOCX Error", disabled=True, use_container_width=True,
+                                 help="Word document generation failed")
                 except Exception as e:
                     logger.error(f"DOCX generation failed: {e}")
                     st.button("📋 DOCX Error", disabled=True, use_container_width=True,
@@ -259,136 +266,214 @@ class CleanMemoGenerator:
         
         return '\n'.join(cleaned_lines)
     
-    def _generate_pdf(self, content: str) -> bytes:
-        """Generate PDF from markdown content."""
-        
-        # Convert markdown to HTML
-        html_content = self._markdown_to_html(content)
-        
-        # Add CSS styling
-        styled_html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <style>
-                body {{
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    line-height: 1.6;
-                    margin: 0.5in;
-                    color: #333;
-                }}
-                h1 {{
-                    color: #1f77b4;
-                    border-bottom: 2px solid #1f77b4;
-                    padding-bottom: 10px;
-                    margin-top: 30px;
-                    margin-bottom: 20px;
-                }}
-                h2 {{
-                    color: #333;
-                    margin-top: 25px;
-                    margin-bottom: 15px;
-                }}
-                h3 {{
-                    color: #555;
-                    margin-top: 20px;
-                    margin-bottom: 10px;
-                }}
-                p {{
-                    margin-bottom: 15px;
-                }}
-                ul {{
-                    margin: 10px 0;
-                    padding-left: 20px;
-                }}
-                li {{
-                    margin-bottom: 5px;
-                }}
-                table {{
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 15px 0;
-                }}
-                th, td {{
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: left;
-                }}
-                th {{
-                    background-color: #f2f2f2;
-                }}
-                .header {{
-                    text-align: center;
-                    margin-bottom: 30px;
-                }}
-                .date {{
-                    text-align: right;
-                    color: #666;
-                    font-size: 0.9em;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>ASC 718 Stock Compensation Analysis</h1>
-                <div class="date">Generated on {datetime.now().strftime("%B %d, %Y")}</div>
-            </div>
-            {html_content}
-        </body>
-        </html>
-        """
-        
-        # Generate PDF using WeasyPrint
-        pdf_bytes = weasyprint.HTML(string=styled_html).write_pdf()
-        return pdf_bytes
+    def _generate_pdf(self, content: str) -> Optional[bytes]:
+        """Generate PDF from markdown content with enhanced font support."""
+        try:
+            # Convert markdown to HTML
+            html_content = self._markdown_to_html(content)
+
+            # Enhanced CSS with embedded fonts for italic support
+            css_styled_html = f"""
+            <html>
+            <head>
+                <style>
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif.ttf")}') format('truetype');
+                        font-weight: 400;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-Italic.ttf")}') format('truetype');
+                        font-weight: 400;
+                        font-style: italic;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-Bold.ttf")}') format('truetype');
+                        font-weight: 700;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{os.path.abspath("assets/fonts/DejaVuSerif-BoldItalic.ttf")}') format('truetype');
+                        font-weight: 700;
+                        font-style: italic;
+                    }}
+                    
+                    body {{
+                        font-family: 'VLSerif', serif;
+                        margin: 10px;
+                        line-height: 1.5;
+                        font-size: 11px;
+                    }}
+                    /* Remove borders from HTML content for clean PDF */
+                    div {{
+                        border: none !important;
+                        box-shadow: none !important;
+                        border-radius: 0 !important;
+                    }}
+                    h1 {{
+                        border-bottom: 2px solid #bdc3c7;
+                        padding-bottom: 5px;
+                        margin: 20px 0 15px 0;
+                    }}
+                    h2 {{
+                        border-bottom: 1px solid #bdc3c7;
+                        padding-bottom: 3px;
+                        margin: 18px 0 12px 0;
+                    }}
+                    h3 {{
+                        margin: 16px 0 10px 0;
+                    }}
+                    h4 {{
+                        font-size: 12px;
+                        margin: 14px 0 8px 0;
+                    }}
+                    h6 {{
+                        font-size: 10px;
+                        font-weight: 700;
+                    }}
+                    p {{
+                        margin: 6px 0;
+                        font-size: 11px;
+                        line-height: 1.4;
+                    }}
+                    ul {{
+                        margin: 6px 0;
+                        padding-left: 18px;
+                    }}
+                    li {{
+                        margin: 2px 0;
+                        line-height: 1.3;
+                    }}
+                    /* Force VLSerif font family on all italic elements - WeasyPrint compatible */
+                    em, i {{
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-size: inherit;
+                        line-height: inherit;
+                        font-weight: inherit;
+                    }}
+                    /* Bold italic combinations */
+                    h6 em, h6 i, strong em, b em {{
+                        font-style: italic !important;
+                        font-family: 'VLSerif', serif !important;
+                        font-weight: 700 !important;
+                        font-size: inherit;
+                        line-height: inherit;
+                    }}
+                    .disclaimer, small {{
+                        font-size: 8px !important;
+                    }}
+                    /* Professional table styling */
+                    table {{
+                        border-collapse: collapse;
+                        width: 100%;
+                        margin: 10px 0;
+                    }}
+                    th, td {{
+                        border: 1px solid #ddd;
+                        padding: 4px 6px;
+                        font-size: 10px;
+                    }}
+                </style>
+            </head>
+            <body>
+                {html_content}
+            </body>
+            </html>
+            """
+
+            # Generate PDF with base_url for font loading
+            pdf_bytes = weasyprint.HTML(string=css_styled_html, base_url=os.getcwd()).write_pdf()
+            return pdf_bytes
+        except Exception as e:
+            logger.error(f"PDF generation failed: {e}")
+            return None
     
-    def _generate_docx(self, content: str) -> bytes:
+    def _generate_docx(self, content: str) -> Optional[bytes]:
         """Generate DOCX from markdown content."""
-        
-        doc = Document()
-        
-        # Add title
-        title = doc.add_heading('ASC 718 Stock Compensation Analysis', 0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        # Add generation date
-        date_paragraph = doc.add_paragraph(f"Generated on {datetime.now().strftime('%B %d, %Y')}")
-        date_paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        
-        doc.add_paragraph()  # Add spacing
-        
-        # Process content line by line
-        lines = content.split('\n')
-        
-        for line in lines:
-            line = line.strip()
+        try:
+            doc = Document()
+
+            # Page set up
+            sections = doc.sections
+            for section in sections:
+                section.top_margin = Inches(1)
+                section.bottom_margin = Inches(1)
+                section.left_margin = Inches(1.25)
+                section.right_margin = Inches(1.25)
             
-            if not line:
-                doc.add_paragraph()  # Add blank line
-                continue
-            
-            # Headers
-            if line.startswith('# '):
-                heading = doc.add_heading(line[2:], 1)
-            elif line.startswith('## '):
-                heading = doc.add_heading(line[3:], 2)
-            elif line.startswith('### '):
-                heading = doc.add_heading(line[4:], 3)
-            # Bullet points
-            elif line.startswith('- '):
-                doc.add_paragraph(line[2:], style='List Bullet')
-            # Regular paragraphs
-            else:
-                # Handle bold text
-                paragraph = doc.add_paragraph()
-                self._add_formatted_text(paragraph, line)
-        
-        # Save to bytes
-        with tempfile.NamedTemporaryFile() as tmp_file:
-            doc.save(tmp_file.name)
-            tmp_file.seek(0)
-            return tmp_file.read()
+            # Set default font for the whole document
+            style = doc.styles['Normal']
+            style.font.name = 'Calibri'
+            style.font.size = Pt(11)
+            style.paragraph_format.line_spacing = 1.15
+            style.paragraph_format.space_after = Pt(6)
+                        
+            # Process content line by line
+            lines = content.split('\n')
+
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+
+                # Headers
+                if line.startswith('# '):
+                    heading = doc.add_heading(line[2:], level=1)
+                    heading.runs[0].font.size = Pt(24)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for main title
+                    heading.paragraph_format.space_before = Pt(18)
+                    heading.paragraph_format.space_after = Pt(12)
+                elif line.startswith('## '):
+                    heading = doc.add_heading(line[3:], level=2)
+                    heading.runs[0].font.size = Pt(18)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for section headers
+                    heading.paragraph_format.space_before = Pt(15)
+                    heading.paragraph_format.space_after = Pt(9)
+                elif line.startswith('### '):
+                    heading = doc.add_heading(line[4:], level=3)
+                    heading.runs[0].font.size = Pt(14)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for step headers
+                    heading.paragraph_format.space_before = Pt(12)
+                    heading.paragraph_format.space_after = Pt(6)
+                # Bold text
+                elif line.startswith('**') and line.endswith('**'):
+                    p = doc.add_paragraph()
+                    p.add_run(line[2:-2]).bold = True
+                    # Add line spacing for bold paragraphs
+                    p.paragraph_format.space_after = Pt(6)
+                    p.paragraph_format.line_spacing = 1.15
+                # Bullet points
+                elif line.startswith('- '):
+                    p = doc.add_paragraph(line[2:], style='List Bullet')
+                    # Add line spacing for bullet points
+                    p.paragraph_format.space_after = Pt(3)
+                    p.paragraph_format.line_spacing = 1.15
+                # Regular paragraphs
+                else:
+                    # Handle bold text
+                    paragraph = doc.add_paragraph()
+                    self._add_formatted_text(paragraph, line)
+                    # Add line spacing for regular paragraphs  
+                    paragraph.paragraph_format.space_after = Pt(6)
+                    paragraph.paragraph_format.line_spacing = 1.15
+                
+            # Save to bytes
+            with tempfile.NamedTemporaryFile() as tmp_file:
+                doc.save(tmp_file.name)
+                tmp_file.seek(0)
+                return tmp_file.read()
+
+        except Exception as e:
+            logger.error(f"DOCX generation failed: {e}")
+            return None
     
     def _add_formatted_text(self, paragraph, text: str):
         """Add formatted text to paragraph, handling bold markup."""

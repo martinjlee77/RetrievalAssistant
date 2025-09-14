@@ -10,7 +10,7 @@ from typing import Dict, Any
 from shared.disclaimer_generator import DisclaimerGenerator
 import weasyprint
 from docx import Document
-from docx.shared import Inches, Pt, Inches
+from docx.shared import Inches, Pt, Inches, RGBColor
 import tempfile
 import base64
 
@@ -176,6 +176,7 @@ class CleanMemoGenerator:
                     }}
                     
                     body {{
+                        font-family: 'VLSerif', serif;
                         margin: 10px;
                         line-height: 1.5;
                         font-size: 11px;
@@ -285,10 +286,10 @@ class CleanMemoGenerator:
             for section in sections:
                 section.top_margin = Inches(1)
                 section.bottom_margin = Inches(1)
-                section.left_margin = Inches(1)
-                section.right_margin = Inches(1)
+                section.left_margin = Inches(1.25)
+                section.right_margin = Inches(1.25)
             
-            # D. Set default font for the whole document
+            # Set default font for the whole document
             style = doc.styles['Normal']
             style.font.name = 'Calibri'
             style.font.size = Pt(11)
@@ -310,18 +311,21 @@ class CleanMemoGenerator:
                 if line.startswith('# '):
                     heading = doc.add_heading(line[2:], level=1)
                     heading.runs[0].font.size = Pt(24)
-                    # C. Better section spacing for main title
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
+                    # Better section spacing for main title
                     heading.paragraph_format.space_before = Pt(18)
                     heading.paragraph_format.space_after = Pt(12)
                 elif line.startswith('## '):
                     heading = doc.add_heading(line[3:], level=2)
                     heading.runs[0].font.size = Pt(18)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
                     # C. Better section spacing for section headers
                     heading.paragraph_format.space_before = Pt(15)
                     heading.paragraph_format.space_after = Pt(9)
                 elif line.startswith('### '):
                     heading = doc.add_heading(line[4:], level=3)
                     heading.runs[0].font.size = Pt(14)
+                    heading.runs[0].font.color.rgb = RGBColor(0, 0, 0)
                     # C. Better section spacing for step headers
                     heading.paragraph_format.space_before = Pt(12)
                     heading.paragraph_format.space_after = Pt(6)
@@ -335,7 +339,7 @@ class CleanMemoGenerator:
                 # Bullet points
                 elif line.startswith('- '):
                     p = doc.add_paragraph(line[2:], style='List Bullet')
-                    # B. Add line spacing for bullet points
+                    # Add line spacing for bullet points
                     p.paragraph_format.space_after = Pt(3)
                     p.paragraph_format.line_spacing = 1.15
                 # Regular paragraphs
@@ -343,7 +347,7 @@ class CleanMemoGenerator:
                     # Remove markdown formatting
                     clean_line = line.replace('**', '').replace('*', '')
                     p = doc.add_paragraph(clean_line)
-                    # B. Add line spacing for regular paragraphs  
+                    # Add line spacing for regular paragraphs  
                     p.paragraph_format.space_after = Pt(6)
                     p.paragraph_format.line_spacing = 1.15
                 
