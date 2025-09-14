@@ -84,6 +84,15 @@ Respond with ONLY the company name, nothing else."""
             
             response = self.client.chat.completions.create(**request_params)
             
+            # Track API cost for entity extraction
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="entity_extraction"
+            )
+            
             entity_name = response.choices[0].message.content
             if entity_name is None:
                 logger.warning("LLM returned None for company entity name")
@@ -344,6 +353,15 @@ Respond with ONLY the company name, nothing else."""
             
             response = self.client.chat.completions.create(**request_params)
             
+            # Track API cost for this request
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.model,
+                request_type=f"step_{step_num}_analysis"
+            )
+            
             markdown_content = response.choices[0].message.content
             
             if markdown_content is None:
@@ -575,6 +593,15 @@ Requirements:
             
             response = self.client.chat.completions.create(**params)
             
+            # Track API cost for executive summary
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=params["model"],
+                request_type="executive_summary"
+            )
+            
             content = response.choices[0].message.content
             if content:
                 content = content.strip()
@@ -614,6 +641,15 @@ Instructions:
             params.update(self._get_max_tokens_param("background"))
             
             response = self.client.chat.completions.create(**params)
+            
+            # Track API cost for background section
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=params["model"],
+                request_type="background_generation"
+            )
             
             content = response.choices[0].message.content
             if content:
@@ -655,6 +691,15 @@ Instructions:
             params.update(self._get_max_tokens_param("conclusion"))
             
             response = self.client.chat.completions.create(**params)
+            
+            # Track API cost for conclusion section
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=params["model"],
+                request_type="conclusion_generation"
+            )
             
             content = response.choices[0].message.content
             if content:
@@ -715,6 +760,16 @@ Instructions:
             }
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for final conclusion
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="final_conclusion"
+            )
+            
             return response.choices[0].message.content.strip()
             
         except Exception as e:
@@ -766,6 +821,16 @@ Instructions:
             }
             
             response = self.client.chat.completions.create(**request_params)
+            
+            # Track API cost for background section (old)
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=request_params["messages"],
+                response_text=response.choices[0].message.content or "",
+                model=self.light_model,
+                request_type="background_generation_old"
+            )
+            
             return response.choices[0].message.content.strip()
             
         except Exception as e:
