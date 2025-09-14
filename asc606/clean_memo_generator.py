@@ -135,16 +135,47 @@ class CleanMemoGenerator:
     def _generate_pdf(self, memo_content: str) -> bytes | None:
         """Generate PDF from memo content using WeasyPrint."""
         try:
+            import os
+            
             # Convert markdown to HTML
             html_content = self._convert_markdown_to_html(memo_content)
 
-            # Add CSS styling for professional look with better margins
+            # Get absolute paths to font files
+            font_dir = os.path.abspath('assets/fonts')
+            
+            # Add CSS styling with @font-face declarations for DejaVu Serif
             css_styled_html = f"""
             <html>
             <head>
                 <style>
+                    /* DejaVu Serif font family with all variants */
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{font_dir}/DejaVuSerif.ttf') format('truetype');
+                        font-weight: 400;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{font_dir}/DejaVuSerif-Italic.ttf') format('truetype');
+                        font-weight: 400;
+                        font-style: italic;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{font_dir}/DejaVuSerif-Bold.ttf') format('truetype');
+                        font-weight: 700;
+                        font-style: normal;
+                    }}
+                    @font-face {{
+                        font-family: 'VLSerif';
+                        src: url('file://{font_dir}/DejaVuSerif-BoldItalic.ttf') format('truetype');
+                        font-weight: 700;
+                        font-style: italic;
+                    }}
+                    
                     body {{
-                        font-family: "Liberation Serif", "DejaVu Serif", "Times New Roman", "Nimbus Roman", serif;
+                        font-family: 'VLSerif', serif;
                         margin: 10px;
                         line-height: 1.5;
                         font-size: 11px;
@@ -228,8 +259,8 @@ class CleanMemoGenerator:
             </html>
             """
 
-            # Generate PDF
-            pdf_bytes = weasyprint.HTML(string=css_styled_html).write_pdf()
+            # Generate PDF with base_url for font loading
+            pdf_bytes = weasyprint.HTML(string=css_styled_html, base_url=os.getcwd()).write_pdf()
             return pdf_bytes
         except Exception as e:
             logger.error(f"PDF generation failed: {e}")

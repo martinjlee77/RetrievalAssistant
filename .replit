@@ -2,7 +2,7 @@ modules = ["python-3.11", "python3", "postgresql-16"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["cargo", "fontconfig", "freetype", "ghostscript", "glib", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "jre", "libiconv", "libjpeg_turbo", "libxcrypt", "mupdf", "openjpeg", "pango", "rustc", "swig", "xcbuild"]
+packages = ["cargo", "fontconfig", "freetype", "ghostscript", "glib", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "jre", "libiconv", "libjpeg_turbo", "libxcrypt", "mupdf", "openjpeg", "pango", "rustc", "swig", "xcbuild", "unzip"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -71,10 +71,6 @@ externalPort = 8080
 [[ports]]
 localPort = 8501
 externalPort = 3002
-
-[[ports]]
-localPort = 33077
-externalPort = 4200
 
 [[ports]]
 localPort = 43801
