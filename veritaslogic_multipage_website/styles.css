@@ -1870,8 +1870,8 @@ h1, h2, h3, h4, h5, h6 {
 /* Two-Column Pricing Layout */
 .pricing-layout {
     display: grid;
-    grid-template-columns: 1.0fr 0.9fr;
-    gap: 5rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
     align-items: start;
     max-width: 1200px;
     margin: 0 auto;
@@ -1894,7 +1894,7 @@ h1, h2, h3, h4, h5, h6 {
     display: grid;
     grid-template-columns: 1fr 1fr 2fr;
     align-items: center;
-    padding: 1.5rem 2rem;
+    padding: 1.6rem 1.6rem;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s ease;
     position: relative;
@@ -2019,7 +2019,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Features Section (Right Column) */
 .features-section {
     background: rgba(255,255,255,0.05);
-    padding: 1.8rem;
+    padding: 1.8rem 1.8rem 0.5rem 1.8rem;
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
@@ -2029,7 +2029,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .features-section h3 {
     color: #ffffff;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     margin-bottom: 1.2rem;
     font-weight: 600;
     text-align: center;
@@ -2045,8 +2045,8 @@ h1, h2, h3, h4, h5, h6 {
 .features-list li {
     color: rgba(255,255,255,0.9);
     font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 0.5rem;
+    line-height: 1 !important;
+    margin-bottom: 0.3rem;
     padding-left: 1.5rem;
     position: relative;
 }
@@ -2055,7 +2055,8 @@ h1, h2, h3, h4, h5, h6 {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.6rem;
+    top: 40%;
+    transform: translateY(-40%);
     width: 6px;
     height: 6px;
     background: #ffffff;
