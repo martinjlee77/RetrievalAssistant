@@ -1820,7 +1820,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Pricing Page Specific Styles */
 .pricing-overview {
     padding: 80px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
 }
 
 .pricing-philosophy {
@@ -1857,13 +1857,217 @@ h1, h2, h3, h4, h5, h6 {
 .pricing-main {
     padding: 100px 0;
     background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    text-align: center;
 }
 
-.pricing-cards {
+.pricing-main h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* New Compact Pricing Table Styles */
+.pricing-compact-table {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.pricing-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 3rem;
+    grid-template-columns: 1fr 1.5fr 1fr 1.2fr;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: background-color 0.3s ease;
+}
+
+.pricing-row:last-child {
+    border-bottom: none;
+}
+
+.pricing-row:hover:not(.header) {
+    background: rgba(255,255,255,0.05);
+}
+
+.pricing-row.header {
+    background: rgba(255,255,255,0.15);
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+.pricing-row.featured {
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.3);
+    position: relative;
+}
+
+.pricing-row.featured::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+.tier-info {
+    text-align: left;
+}
+
+.tier-info strong {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+}
+
+.tier-note {
+    display: block;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+.tier-docs {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 500;
+}
+
+.tier-price {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.tier-action {
+    text-align: center;
+}
+
+.table-cta-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.table-cta-btn:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+}
+
+.table-cta-btn.primary {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    color: #212F3C;
+    border-color: #ffffff;
+}
+
+.table-cta-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255,255,255,0.3);
+}
+
+/* Unified Features Section Styles */
+.features-included {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    text-align: center;
+}
+
+.features-included h2 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
     margin-top: 3rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-3px);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.feature-content {
+    flex: 1;
+}
+
+.feature-content strong {
+    display: block;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.feature-content p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.features-note {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-note p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin: 0;
 }
 
 .pricing-card {
@@ -2660,6 +2864,74 @@ h1, h2, h3, h4, h5, h6 {
     .value-grid,
     .pricing-cards {
         grid-template-columns: 1fr;
+    }
+    
+    /* Mobile Pricing Table Styles */
+    .pricing-compact-table {
+        margin: 0 1rem;
+    }
+    
+    .pricing-row {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+    }
+    
+    .pricing-row.header {
+        display: none; /* Hide header on mobile, use card style instead */
+    }
+    
+    .pricing-row:not(.header) {
+        background: rgba(255,255,255,0.08);
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.15);
+        text-align: center;
+    }
+    
+    .pricing-row.featured {
+        border-color: rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.12);
+    }
+    
+    .tier-info,
+    .tier-docs,
+    .tier-price,
+    .tier-action {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tier-info:before {
+        content: "";
+        display: block;
+        font-weight: 600;
+        color: rgba(255,255,255,0.8);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .tier-docs:before {
+        content: "Document Size: ";
+        display: inline;
+        font-weight: 600;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .tier-price:before {
+        content: "Price: ";
+        display: inline;
+        font-weight: 600;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-item {
+        padding: 1.5rem;
     }
     
     .comparison-cards {
