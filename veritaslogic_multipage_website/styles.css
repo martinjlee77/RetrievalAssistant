@@ -1870,10 +1870,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Two-Column Pricing Layout */
 .pricing-layout {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: 1.0fr 0.9fr;
     gap: 5rem;
     align-items: start;
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
