@@ -19,6 +19,7 @@ import stripe
 import json
 import uuid
 from shared.pricing_config import is_business_email
+from postmarker.core import PostmarkClient
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -1368,6 +1369,96 @@ def auto_credit_wallet():
     except Exception as e:
         logger.error(f"Auto-credit error: {e}")
         return jsonify({'error': 'Failed to auto-credit wallet'}), 500
+
+@app.route('/api/contact', methods=['POST'])
+def contact_form():
+    """Handle unified contact form submissions via Postmark"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['inquiry_type', 'name', 'email', 'company', 'role', 'message']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'error': f'{field} is required'}), 400
+        
+        # Initialize Postmark client
+        postmark = PostmarkClient(server_token=os.getenv('POSTMARK_API_KEY'))
+        
+        # Prepare email content based on inquiry type
+        inquiry_type = data.get('inquiry_type')
+        name = data.get('name')
+        email = data.get('email')
+        company = data.get('company')
+        role = data.get('role')
+        message = data.get('message')
+        
+        # Get optional conditional fields
+        monthly_volume = data.get('monthly_volume', '')
+        team_size = data.get('team_size', '')
+        implementation_timeframe = data.get('implementation_timeframe', '')
+        
+        # Create subject line based on inquiry type
+        subject_map = {
+            'professional-services': 'Professional Services Inquiry',
+            'enterprise-sales': 'Enterprise Sales Inquiry',
+            'demo-request': 'Demo Request',
+            'technical-support': 'Technical Support Request',
+            'general-inquiry': 'General Inquiry'
+        }
+        subject = subject_map.get(inquiry_type, 'Contact Form Submission')
+        
+        # Create email body
+        email_body = f"""
+New contact form submission from VeritasLogic.ai
+
+Contact Information:
+- Name: {name}
+- Email: {email}
+- Company: {company}
+- Role: {role}
+- Inquiry Type: {inquiry_type.replace('-', ' ').title()}
+
+"""
+        
+        # Add conditional fields if present
+        if monthly_volume:
+            email_body += f"- Expected Monthly Volume: {monthly_volume}\n"
+        if team_size:
+            email_body += f"- Team Size: {team_size}\n"
+        if implementation_timeframe:
+            email_body += f"- Implementation Timeframe: {implementation_timeframe}\n"
+        
+        email_body += f"""
+Message:
+{message}
+
+---
+Sent from VeritasLogic.ai contact form
+Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+"""
+        
+        # Send email via Postmark
+        postmark.emails.send(
+            From='hello@veritaslogic.ai',
+            To='hello@veritaslogic.ai',
+            Subject=f'[VeritasLogic] {subject} - {company}',
+            TextBody=email_body,
+            ReplyTo=email
+        )
+        
+        logger.info(f"Contact form submitted: {inquiry_type} from {email} ({company})")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Your message has been sent successfully! We\'ll respond within 4 hours during business days.'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Contact form error: {e}")
+        return jsonify({
+            'error': 'Failed to send message. Please try again or email us directly at hello@veritaslogic.ai'
+        }), 500
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
