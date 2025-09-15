@@ -1123,13 +1123,15 @@ h1, h2, h3, h4, h5, h6 {
 /* ================================
    17. ABOUT PAGE STYLES
    ================================ */
-.founder-section {
+.founder-section,
+.company-story-section {
     padding: 100px 0;
     background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
     position: relative;
 }
 
-.founder-section::before {
+.founder-section::before,
+.company-story-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1145,6 +1147,63 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: 1fr 2fr;
     gap: 4rem;
     align-items: start;
+}
+
+.story-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.story-content h2 {
+    font-size: 2.2rem;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.story-content p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.differentiator-box {
+    background: rgba(255,255,255,0.08);
+    padding: 2.5rem;
+    border-radius: 16px;
+    margin-top: 3rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.differentiator-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 16px;
+    z-index: -1;
+}
+
+.differentiator-box h3 {
+    font-size: 1.6rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.differentiator-box p {
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+    margin-bottom: 1rem;
 }
 
 .founder-image,
@@ -1894,7 +1953,7 @@ h1, h2, h3, h4, h5, h6 {
     display: grid;
     grid-template-columns: 1fr 1fr 2fr;
     align-items: center;
-    padding: 1.6rem 1.6rem;
+    padding: 2.0rem 1.6rem;
     border-bottom: 1px solid rgba(255,255,255,0.1);
     transition: all 0.3s ease;
     position: relative;
@@ -1982,7 +2041,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .tier-docs {
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 1.0rem;
     color: rgba(255,255,255,0.85);
     font-weight: 400;
     line-height: 1.4;
@@ -2032,7 +2091,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.4rem;
     margin-bottom: 1.2rem;
     font-weight: 600;
-    text-align: center;
+    text-align: left;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -2044,8 +2103,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .features-list li {
     color: rgba(255,255,255,0.9);
-    font-size: 1rem;
-    line-height: 1 !important;
+    font-size: 1.1rem;
+    line-height: 1.2 !important;
     margin-bottom: 0.3rem;
     padding-left: 1.5rem;
     position: relative;
@@ -2172,7 +2231,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     transition: all 0.3s ease;
     margin: 1rem 0;
-    width: 100%;
+    width: 60%;
     text-align: center;
 }
 
@@ -2285,8 +2344,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .comparison-card.highlighted {
-    border-color: rgba(34, 197, 94, 0.3);
-    background: rgba(34, 197, 94, 0.05);
+    border-color: rgb(33, 66, 196, 0.3);
+    background: rgb(61, 138, 219, 0.05);
     position: relative;
 }
 
@@ -2353,7 +2412,7 @@ h1, h2, h3, h4, h5, h6 {
     position: absolute;
     top: -15px;
     right: 20px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: linear-gradient(135deg, #447ef3, #161ba2);
     color: white;
     padding: 0.5rem 1.5rem;
     border-radius: 20px;
