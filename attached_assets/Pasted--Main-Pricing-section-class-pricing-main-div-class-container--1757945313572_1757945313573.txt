@@ -1,0 +1,65 @@
+    <!-- Main Pricing -->
+    <section class="pricing-main">
+        <div class="container">
+            <div class="pricing-layout">
+                <div class="pricing-table-section">
+                    <div class="pricing-compact-table">
+                        <div class="pricing-row header">
+                            <div class="tier-info">Pricing Tier</div>
+                            <div class="tier-price">Price</div>
+                            <div class="tier-docs">Document Size Analyzed</div>
+                        </div>
+                        <div class="pricing-row tier-3k">
+                            <div class="tier-info">
+                                3K
+                            </div>
+                            <div class="tier-price">
+                                <strong>$95</strong></div>
+                            <div class="tier-docs">Up to 3,000 words (~10 pages)</div>
+                        </div>
+                        <div class="pricing-row tier-9k">
+                            <div class="tier-info">
+                                9K
+                            </div>
+                            <div class="tier-price"><strong>$245</strong></div>
+                            <div class="tier-docs">Up to 9,000 words (~30 pages)</div>
+                        </div>
+                        <div class="pricing-row tier-15k">
+                            <div class="tier-info">
+                                15K
+                            </div>
+                            <div class="tier-price"><strong>$395</strong></div>
+                            <div class="tier-docs">Up to 15,000 words (~50 pages)</div>
+                        </div>
+                        <div class="pricing-row tier-30k">
+                            <div class="tier-info">
+                                30K
+                            </div>
+                            <div class="tier-price"><strong>$695</strong></div>
+                            <div class="tier-docs">Up to 30,000 words (~100 pages)</div>
+                        </div>
+                        <div class="pricing-row tier-60k">
+                            <div class="tier-info">
+                                60K
+                            </div>
+                            <div class="tier-price"><strong>$1,195</strong></div>
+                            <div class="tier-docs">Up to 60,000 words (~200 pages)</div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="features-section">
+                    <ul class="features-list">
+                        <li>Automatic tier selection - your documents are analyzed and the appropriate tier is suggested before payment (No surprises!)</li>
+                        <li>1 complimentary rerun within 14 days</li>
+                        <li>Proprietary analysis workflow that guides AI for each accounting standard</li>
+                        <li>Full memo with paragraph-level ASC citations</li>
+                        <li>Professional memo formatting and language</li>
+                        <li>Export to DOCX, PDF, HTML and Markdown formats</li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </section>

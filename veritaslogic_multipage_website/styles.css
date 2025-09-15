@@ -1870,10 +1870,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Two-Column Pricing Layout */
 .pricing-layout {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 4rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
     align-items: start;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -1923,7 +1923,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #B5C9D8, #9FB6C9 100%);
 }
 
 .pricing-row.tier-9k::before {
@@ -1933,7 +1933,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    background: linear-gradient(135deg, #BBD0DD, #A5C0D2 100%);
 }
 
 .pricing-row.tier-15k::before {
@@ -1943,7 +1943,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, #C1D5E2, #ABC7D8 100%);
 }
 
 .pricing-row.tier-30k::before {
@@ -1953,7 +1953,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #C7DBE7, #B1CFDE 100%);
 }
 
 .pricing-row.tier-60k::before {
@@ -1963,7 +1963,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, #D0E2EC, #B9D5E4 100%);
 }
 
 .tier-info {
@@ -2019,7 +2019,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Features Section (Right Column) */
 .features-section {
     background: rgba(255,255,255,0.05);
-    padding: 2.5rem;
+    padding: 1.8rem;
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
@@ -2030,9 +2030,10 @@ h1, h2, h3, h4, h5, h6 {
 .features-section h3 {
     color: #ffffff;
     font-size: 1.6rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     font-weight: 600;
     text-align: center;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .features-list {
@@ -2045,18 +2046,20 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.9);
     font-size: 1rem;
     line-height: 1.6;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     padding-left: 1.5rem;
     position: relative;
 }
 
 .features-list li::before {
-    content: '✓';
+    content: '';
     position: absolute;
     left: 0;
-    color: #10b981;
-    font-weight: bold;
-    font-size: 1.1rem;
+    top: 0.6rem;
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 50%;
 }
 
 .features-highlight {
@@ -2884,7 +2887,7 @@ h1, h2, h3, h4, h5, h6 {
     .features-section {
         order: 2;
         position: static;
-        padding: 2rem;
+        padding: 1.5rem;
     }
     
     .pricing-compact-table {
@@ -2939,7 +2942,7 @@ h1, h2, h3, h4, h5, h6 {
     
     .features-list li {
         font-size: 0.95rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem;
     }
     
     .comparison-cards {
