@@ -131,12 +131,28 @@ class PreflightPricing:
             'billing_summary': self._format_billing_summary(tier_info, total_words, estimated_total_pages, len(file_details))
         }
         
-        logger.info(f"Preflight pricing complete: {total_words} words, {tier_info['name']} tier, ${tier_info['price']}")
+        if tier_info.get('contact_support'):
+            logger.info(f"Preflight pricing complete: {total_words} words, {tier_info['name']} - contact support required")
+        else:
+            logger.info(f"Preflight pricing complete: {total_words} words, {tier_info['name']} tier, ${tier_info['price']}")
         return result
     
     def _format_billing_summary(self, tier_info: Dict[str, Any], total_words: int, estimated_pages: int, file_count: int) -> str:
         
         """Format billing summary for user display"""
+        # Handle contact support case for oversized documents
+        if tier_info.get('contact_support'):
+            return f"""
+**DOCUMENT TOO LARGE FOR STANDARD PRICING**
+
+- Word count: **{total_words:,} words across {file_count} file{'s' if file_count != 1 else ''}** (~{estimated_pages} pages)
+- This exceeds our maximum tier of 60,000 words
+
+**Next Steps:** Please contact support at support@veritaslogic.ai for custom enterprise pricing on documents of this size.
+
+        """.strip()
+        
+        # Standard pricing display
         return f"""
 **COST FOR THIS ANALYSIS IS \\${int(tier_info['price'])}** based on the following factors:
 

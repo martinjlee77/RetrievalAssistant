@@ -1967,18 +1967,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .tier-info {
-    text-align: left;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #ffffff;
 }
 
 .tier-info strong {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #ffffff;
     display: block;
 }
 
 .tier-docs {
-    text-align: right;
+    text-align: center;
     font-size: 0.95rem;
     color: rgba(255,255,255,0.85);
     font-weight: 400;
@@ -1988,8 +1991,15 @@ h1, h2, h3, h4, h5, h6 {
 .tier-price {
     text-align: center;
     font-size: 1.4rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.tier-price strong {
+    font-size: 1.4rem;
     font-weight: 700;
     color: #ffffff;
+    display: block;
 }
 
 .pricing-note {

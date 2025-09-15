@@ -105,16 +105,17 @@ def get_price_tier(word_count):
                 'word_count': word_count
             }
     
-    # Fallback to highest tier (60K)
+    # Document exceeds maximum tier - contact support required
     return {
-        'tier': 5,
-        'name': PRICING_TIERS[5]['name'],
-        'price': PRICING_TIERS[5]['price'],
-        'description': PRICING_TIERS[5]['description'],
-        'max_words': PRICING_TIERS[5]['max_words'],
-        'docs_per_run': PRICING_TIERS[5]['docs_per_run'],
-        'reruns_included': PRICING_TIERS[5]['reruns_included'],
-        'rerun_window_days': PRICING_TIERS[5]['rerun_window_days'],
+        'tier': None,
+        'name': 'Contact Support Required',
+        'price': None,
+        'description': f'Document exceeds 60,000 words ({word_count:,} words). Please contact support for custom pricing.',
+        'max_words': None,
+        'docs_per_run': None,
+        'reruns_included': None,
+        'rerun_window_days': None,
+        'contact_support': True,
         'word_count': word_count
     }
 

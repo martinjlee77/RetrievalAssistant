@@ -40,6 +40,20 @@ class CostEstimator:
             # Get tier information based on word count
             tier_info = get_price_tier(word_count)
             
+            # Handle contact support case for oversized documents
+            if tier_info.get('contact_support'):
+                return {
+                    'estimated_cost': None,
+                    'cost_cap': None,
+                    'tier': None,
+                    'tier_name': tier_info['name'],
+                    'tier_description': tier_info['description'],
+                    'word_count': word_count,
+                    'asc_standard': asc_standard,
+                    'billing_model': 'contact_support_required',
+                    'contact_support': True
+                }
+            
             return {
                 'estimated_cost': tier_info['price'],
                 'cost_cap': tier_info['price'],  # Fixed price, no cap needed
@@ -67,6 +81,21 @@ class CostEstimator:
     
     def format_cost_display(self, cost_estimate: Dict[str, Any]) -> str:
         """Format tier pricing for user display"""
+        # Handle contact support case for oversized documents
+        if cost_estimate.get('contact_support'):
+            word_count = cost_estimate['word_count']
+            description = cost_estimate['tier_description']
+            return f"""
+        **📞 {cost_estimate['tier_name']}**
+        
+        - **Document Length:** {word_count:,} words
+        - **Analysis Type:** {cost_estimate['asc_standard']}
+        - **Required Action:** {description}
+        
+        *Please contact support@veritaslogic.ai for custom enterprise pricing*
+        """
+        
+        # Standard pricing display
         tier = cost_estimate['tier']
         name = cost_estimate['tier_name']
         price = cost_estimate['estimated_cost']
