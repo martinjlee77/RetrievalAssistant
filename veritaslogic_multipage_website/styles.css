@@ -2162,13 +2162,6 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.5;
 }
 
-.features-list li::before {
-    content: '✓';
-    color: #22c55e;
-    font-weight: bold;
-    position: absolute;
-    left: 0;
-}
 
 .pricing-cta {
     display: inline-block;
