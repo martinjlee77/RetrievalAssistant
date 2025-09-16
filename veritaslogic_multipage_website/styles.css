@@ -2704,6 +2704,98 @@ h1, h2, h3, h4, h5, h6 {
     color: #2c3e50;
 }
 
+/* Analysis Table Styling */
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.analysis-table th,
+.analysis-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.analysis-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.analysis-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.analysis-table td {
+    color: #555;
+}
+
+/* Credit Package Styling */
+.credit-package {
+    background: #4a5568;
+    border: 2px solid #4a5568;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0.5rem;
+}
+
+.credit-package:hover {
+    background: #2d3748;
+    border-color: #2d3748;
+    transform: translateY(-2px);
+}
+
+.credit-package .package-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.credit-package .package-description {
+    color: #ffffff;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Sidebar Launch Analysis Button */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+}
+
+.sidebar-footer .btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+/* Cancel Button Styling */
+.btn.btn-secondary[onclick*="cancelPayment"] {
+    background-color: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn.btn-secondary[onclick*="cancelPayment"]:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
     color: #ffffff;
@@ -3966,6 +4058,19 @@ html {
     .error-actions .btn {
         width: 200px;
     }
+}
+
+/* Quick Actions Button Consistency */
+.action-buttons .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    text-align: center;
+}
+
+.action-buttons a.btn {
+    color: inherit;
 }
 
 /* Login Page Styles - use specific class for login only */

@@ -619,11 +619,8 @@
                 packageEl.onclick = () => selectPackage(pkg.amount);
                 
                 packageEl.innerHTML = `
-                    <div class="package-amount">$${pkg.amount}</div>
-                    <div class="package-description">${pkg.display}</div>
-                    <button class="btn btn-primary" onclick="selectPackage(${pkg.amount})">
-                        Select $${pkg.amount}
-                    </button>
+                    <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
+                    <div class="package-description">Add $${pkg.amount.toLocaleString()} Credits</div>
                 `;
                 container.appendChild(packageEl);
             });
@@ -639,26 +636,36 @@
                 return;
             }
             
-            container.innerHTML = '';
+            // Create table structure
+            container.innerHTML = `
+                <table class="analysis-table">
+                    <thead>
+                        <tr>
+                            <th>Date Completed</th>
+                            <th>ASC Standard</th>
+                            <th>Document Size</th>
+                            <th>Files</th>
+                            <th>Tier</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysisTableBody">
+                    </tbody>
+                </table>
+            `;
+            
+            const tbody = document.getElementById('analysisTableBody');
             analyses.forEach(analysis => {
-                const item = document.createElement('div');
-                item.className = 'analysis-item';
-                item.innerHTML = `
-                    <div class="analysis-details">
-                        <h4>${analysis.title}</h4>
-                        <div class="analysis-meta">
-                            <span><strong>Standard:</strong> ${analysis.asc_standard}</span>
-                            <span><strong>Completed:</strong> ${new Date(analysis.created_at).toLocaleDateString()}</span>
-                            <span><strong>Cost:</strong> $${analysis.cost.toFixed(2)}</span>
-                        </div>
-                        <div class="analysis-stats">
-                            <span><strong>Document Size:</strong> ${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</span>
-                            <span><strong>Files:</strong> ${analysis.file_count || 0} uploaded</span>
-                            <span><strong>Tier:</strong> ${analysis.tier_name || 'N/A'}</span>
-                        </div>
-                    </div>
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(analysis.created_at).toLocaleDateString()}</td>
+                    <td>${analysis.asc_standard}</td>
+                    <td>${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</td>
+                    <td>${analysis.file_count || 0}</td>
+                    <td>${analysis.tier_name || 'N/A'}</td>
+                    <td>$${analysis.cost.toFixed(2)}</td>
                 `;
-                container.appendChild(item);
+                tbody.appendChild(row);
             });
         }
 
@@ -1105,7 +1112,7 @@
                         showPaymentMessage(`Success! $${expectedAmount} credits added to your account!`, 'success');
                         
                         // Update the displayed balance immediately
-                        document.getElementById('creditsBalance').textContent = `$${data.credits_balance}`;
+                        document.getElementById('creditsBalance').textContent = `$${data.credits_balance.toLocaleString()}`;
                         
                         // Hide payment form and refresh dashboard
                         setTimeout(() => {
