@@ -1440,8 +1440,8 @@ Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
         
         # Send email via Postmark
         postmark.emails.send(
-            From='hello@veritaslogic.ai',
-            To='hello@veritaslogic.ai',
+            From='support@veritaslogic.ai',
+            To='support@veritaslogic.ai',
             Subject=f'[VeritasLogic] {subject} - {company}',
             TextBody=email_body,
             ReplyTo=email

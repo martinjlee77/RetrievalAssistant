@@ -2648,6 +2648,7 @@ h1, h2, h3, h4, h5, h6 {
     outline: none;
     border-color: rgba(255,255,255,0.4);
     background: rgba(255,255,255,0.15);
+    color: #2c3e50;
 }
 
 .form-group input::placeholder,
