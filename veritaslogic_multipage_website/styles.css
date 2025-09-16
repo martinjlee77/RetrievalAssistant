@@ -2729,8 +2729,23 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #f8f9fa;
 }
 
+.analysis-table {
+    color: #ffffff;
+}
+
+.analysis-table th {
+    background-color: #2d3748;
+    color: #ffffff;
+    border-bottom: 2px solid #4a5568;
+}
+
 .analysis-table td {
-    color: #555;
+    color: #ffffff;
+    border-bottom: 1px solid #4a5568;
+}
+
+.analysis-table tr:hover {
+    background-color: #2d3748;
 }
 
 /* Credit Package Styling */
@@ -2764,20 +2779,23 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.9;
 }
 
-/* Sidebar Launch Analysis Button */
+/* Sidebar Launch Analysis Button - Make it white */
 .sidebar-footer {
     margin-top: auto;
     padding: 1rem;
 }
 
-.sidebar-footer .btn {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 1rem;
-    font-weight: 600;
+.sidebar-footer a {
+    color: #ffffff !important;
     text-decoration: none;
-    border-radius: 6px;
-    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.sidebar-footer a:hover {
+    color: #cbd5e0 !important;
+    text-decoration: underline;
 }
 
 /* Cancel Button Styling */
@@ -4060,17 +4078,30 @@ html {
     }
 }
 
-/* Quick Actions Button Consistency */
+/* Quick Actions Button Consistency - All White Buttons with Dark Text */
 .action-buttons .btn {
     display: block;
     width: 100%;
     margin-bottom: 0.5rem;
     text-decoration: none;
     text-align: center;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #ddd;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn:hover {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    transform: translateY(-1px);
 }
 
 .action-buttons a.btn {
-    color: inherit;
+    color: #333333;
 }
 
 /* Login Page Styles - use specific class for login only */

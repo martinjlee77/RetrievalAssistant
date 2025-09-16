@@ -585,11 +585,8 @@
                     packageEl.onclick = () => selectPackage(pkg.amount);
                     
                     packageEl.innerHTML = `
-                        <div class="package-amount">$${pkg.amount}</div>
-                        <div class="package-description">${pkg.display}</div>
-                        <button class="btn btn-primary" onclick="selectPackage(${pkg.amount})">
-                            Select $${pkg.amount}
-                        </button>
+                        <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
+                        <div class="package-description">Add $${pkg.amount.toLocaleString()} Credits</div>
                     `;
                     container.appendChild(packageEl);
                 });
@@ -608,9 +605,9 @@
             container.innerHTML = '';
             
             const packages = [
-                {amount: 500, display: '500 Credits - Professional Package'},
-                {amount: 1000, display: '1,000 Credits - Enterprise Package'},
-                {amount: 2000, display: '2,000 Credits - Premium Package'}
+                {amount: 500, display: 'Professional Package'},
+                {amount: 1000, display: 'Enterprise Package'},
+                {amount: 2000, display: 'Premium Package'}
             ];
             
             packages.forEach(pkg => {
@@ -1112,7 +1109,8 @@
                         showPaymentMessage(`Success! $${expectedAmount} credits added to your account!`, 'success');
                         
                         // Update the displayed balance immediately
-                        document.getElementById('creditsBalance').textContent = `$${data.credits_balance.toLocaleString()}`;
+                        const balance = parseFloat(data.credits_balance);
+                        document.getElementById('creditsBalance').textContent = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                         
                         // Hide payment form and refresh dashboard
                         setTimeout(() => {
