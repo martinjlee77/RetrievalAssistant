@@ -1557,11 +1557,12 @@ def get_analysis_history():
                 a.asc_standard,
                 a.completed_at,
                 a.status,
-                ct.amount as cost,
+                a.final_charged_credits as cost,
+                a.words_count,
+                a.file_count,
+                a.tier_name,
                 CONCAT(a.asc_standard, ' Analysis') as document_name
             FROM analyses a
-            LEFT JOIN credit_transactions ct ON a.id = ct.analysis_id 
-                AND ct.reason = 'analysis_charge'
             WHERE a.user_id = %s 
             ORDER BY a.completed_at DESC
             LIMIT 20
@@ -1576,7 +1577,9 @@ def get_analysis_history():
                 'created_at': row['completed_at'].isoformat() if row['completed_at'] else '',
                 'status': row['status'],
                 'cost': float(row['cost']) if row['cost'] else 0,
-                'download_url': f"/api/download/{row['id']}"
+                'words_count': int(row['words_count']) if row['words_count'] else 0,
+                'file_count': int(row['file_count']) if row['file_count'] else 0,
+                'tier_name': row['tier_name'] or 'Unknown'
             })
         
         conn.close()

@@ -54,10 +54,9 @@ PRICING_TIERS = {
 
 # Credit Purchase Options
 CREDIT_PACKAGES = [
-    {"amount": 50, "display": "Add $50 Credits"},
-    {"amount": 100, "display": "Add $100 Credits"}, 
-    {"amount": 250, "display": "Add $250 Credits"},
-    {"amount": 500, "display": "Add $500 Credits"}
+    {"amount": 500, "display": "Add $500 Credits"},
+    {"amount": 1000, "display": "Add $1,000 Credits"}, 
+    {"amount": 2000, "display": "Add $2,000 Credits"}
 ]
 
 # Business Email Configuration

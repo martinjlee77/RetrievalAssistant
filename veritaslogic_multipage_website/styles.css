@@ -2659,6 +2659,51 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: underline;
 }
 
+/* Analysis History Improved Styling */
+.analysis-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.analysis-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0.5rem 0;
+    font-size: 0.85rem;
+    color: #888;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eee;
+}
+
+.analysis-meta span,
+.analysis-stats span {
+    white-space: nowrap;
+}
+
+.analysis-meta strong,
+.analysis-stats strong {
+    color: #333;
+}
+
+/* Improve analysis item spacing */
+.analysis-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.analysis-item h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
     color: #ffffff;

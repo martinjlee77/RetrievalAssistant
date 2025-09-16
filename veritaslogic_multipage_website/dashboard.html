@@ -20,7 +20,7 @@
         <div class="nav-container">
             <a href="/" class="logo">VeritasLogic.ai</a>
             <ul class="nav-links">
-                <li><a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" target="_blank">Analysis Platform</a></li>
+                <li><a href="/analysis" target="_blank">Analysis Platform</a></li>
                 <li><a href="/">Home</a></li>
                 <li><button onclick="logout()" class="btn btn-secondary btn-nav">Log Out</button></li>
             </ul>
@@ -52,7 +52,7 @@
                 </a>
             </nav>
             <div class="sidebar-footer">
-                <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary btn-sm" target="_blank">Launch Analysis</a>
+                <a href="/analysis" class="btn btn-primary" target="_blank">Launch Analysis</a>
             </div>
         </div>
 
@@ -141,7 +141,7 @@
                     <div class="card actions-card">
                         <h2>🚀 Quick Actions</h2>
                         <div class="action-buttons">
-                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Launch Analysis Tool</a>
+                            <a href="/analysis" class="btn btn-secondary" target="_blank">Launch Analysis Tool</a>
                             <button onclick="showSection('credits')" class="btn btn-secondary">Add Credits</button>
                             <button onclick="showSection('history')" class="btn btn-secondary">View History</button>
                         </div>
@@ -308,7 +308,7 @@
                         <div class="empty-state">
                             <div>📄</div>
                             <p>No analyses yet. Ready to get started?</p>
-                            <a href="https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tmm3.picard.replit.dev:3002" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
+                            <a href="/analysis" class="btn btn-primary" target="_blank">Start Your First Analysis</a>
                         </div>
                     </div>
                 </div>
@@ -536,7 +536,7 @@
                         // Update usage statistics
                         document.getElementById('totalAnalyses').textContent = data.stats.total_analyses;
                         document.getElementById('thisMonth').textContent = data.stats.analyses_this_month;
-                        document.getElementById('totalSpent').textContent = `$${data.stats.total_spent.toFixed(2)}`;
+                        document.getElementById('totalSpent').textContent = `$${Math.abs(data.stats.total_spent).toFixed(2)}`;
                     }
                 } else {
                     console.error('Failed to load usage statistics');
@@ -608,10 +608,9 @@
             container.innerHTML = '';
             
             const packages = [
-                {amount: 50, display: '50 Credits - Basic Package'},
-                {amount: 100, display: '100 Credits - Standard Package'},
-                {amount: 250, display: '250 Credits - Professional Package'},
-                {amount: 500, display: '500 Credits - Enterprise Package'}
+                {amount: 500, display: '500 Credits - Professional Package'},
+                {amount: 1000, display: '1,000 Credits - Enterprise Package'},
+                {amount: 2000, display: '2,000 Credits - Premium Package'}
             ];
             
             packages.forEach(pkg => {
@@ -629,28 +628,7 @@
                 container.appendChild(packageEl);
             });
             
-            container.innerHTML = `
-                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_50', amount: 50, credits: 50, title: '$50 Package'})">
-                    <h4>$50</h4>
-                    <p>50 Credits</p>
-                    <p class="package-desc">Basic Package</p>
-                </div>
-                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_100', amount: 100, credits: 100, title: '$100 Package'})">
-                    <h4>$100</h4>
-                    <p>100 Credits</p>
-                    <p class="package-desc">Standard Package</p>
-                </div>
-                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_250', amount: 250, credits: 250, title: '$250 Package'})">
-                    <h4>$250</h4>
-                    <p>250 Credits</p>
-                    <p class="package-desc">Professional Package</p>
-                </div>
-                <div class="credit-package" onclick="selectCreditPackage({id: 'pkg_500', amount: 500, credits: 500, title: '$500 Package'})">
-                    <h4>$500</h4>
-                    <p>500 Credits</p>
-                    <p class="package-desc">Enterprise Package</p>
-                </div>
-            `;
+            // Remove hardcoded packages - use dynamic loading above
         }
 
         function loadRecentAnalyses(analyses) {
@@ -668,9 +646,17 @@
                 item.innerHTML = `
                     <div class="analysis-details">
                         <h4>${analysis.title}</h4>
-                        <p>${analysis.asc_standard} • ${new Date(analysis.created_at).toLocaleDateString()} • $${analysis.cost.toFixed(2)}</p>
+                        <div class="analysis-meta">
+                            <span><strong>Standard:</strong> ${analysis.asc_standard}</span>
+                            <span><strong>Completed:</strong> ${new Date(analysis.created_at).toLocaleDateString()}</span>
+                            <span><strong>Cost:</strong> $${analysis.cost.toFixed(2)}</span>
+                        </div>
+                        <div class="analysis-stats">
+                            <span><strong>Document Size:</strong> ${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</span>
+                            <span><strong>Files:</strong> ${analysis.file_count || 0} uploaded</span>
+                            <span><strong>Tier:</strong> ${analysis.tier_name || 'N/A'}</span>
+                        </div>
                     </div>
-                    <a href="${analysis.download_url}" class="btn btn-secondary" target="_blank">Download</a>
                 `;
                 container.appendChild(item);
             });
@@ -812,7 +798,8 @@
 
         function logout() {
             localStorage.removeItem('authToken');
-            showLoginForm();
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
         }
         
         // Password strength validation function
