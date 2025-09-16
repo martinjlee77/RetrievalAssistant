@@ -2583,6 +2583,11 @@ h1, h2, h3, h4, h5, h6 {
     backdrop-filter: blur(15px);
 }
 
+.unified-contact-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+}
+
 .contact-form {
     background: rgba(255,255,255,0.05);
     padding: 3rem;
@@ -2599,8 +2604,15 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.5rem;
 }
 
+/* Ensure contact form labels are visible */
+.contact-form .form-group label,
+.unified-contact-section .form-group label {
+    color: #ffffff !important;
+}
+
 .form-group {
     margin-bottom: 1.5rem;
+    color: #ffffff;
 }
 
 .form-row {
