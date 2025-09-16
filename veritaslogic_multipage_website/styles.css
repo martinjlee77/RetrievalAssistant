@@ -3874,14 +3874,14 @@ html {
     }
 }
 
-/* Login Page Styles */
-.auth-section {
+/* Login Page Styles - use specific class for login only */
+.login-page .auth-section {
     min-height: calc(100vh - 140px); /* Account for header/footer */
     padding: 100px 0 60px 0;
     background: #f8fafc;
 }
 
-.auth-container {
+.login-page .auth-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3890,7 +3890,7 @@ html {
     margin: 0 auto;
 }
 
-.auth-form {
+.login-page .auth-form {
     background: white;
     padding: 40px;
     border-radius: 12px;
