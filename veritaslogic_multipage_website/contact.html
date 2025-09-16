@@ -52,6 +52,7 @@
                             <option value="professional-services">Professional Services (Expert Review, Custom AI Workflows)</option>
                             <option value="enterprise-sales">Enterprise Sales & Volume Pricing</option>
                             <option value="demo-request">Schedule a Live Demo</option>
+                            <option value="memo-rerun">Request Memo Rerun</option>
                             <option value="technical-support">Technical Support</option>
                             <option value="general-inquiry">General Inquiry</option>
                         </select>
@@ -91,6 +92,34 @@
                                 <option value="100-250">100-250 analyses</option>
                                 <option value="250+">250+ analyses</option>
                                 <option value="unsure">Not sure yet</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="memo-rerun-fields" class="conditional-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="memo-id">Memo ID *</label>
+                            <input type="text" id="memo-id" name="memo_id" placeholder="e.g., MEM-23fdc477 or 23fdc477">
+                            <small>Enter the Memo ID shown at the top of your analysis memo</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="change-type">Change Type *</label>
+                            <select id="change-type" name="change_type">
+                                <option value="">Select change type</option>
+                                <option value="methodology_change">Change accounting methodology or approach</option>
+                                <option value="data_correction">Correct contract data or interpretation</option>
+                                <option value="conclusion_revision">Revise conclusions or judgments</option>
+                                <option value="formatting_change">Formatting or presentation changes</option>
+                                <option value="additional_analysis">Add additional analysis or considerations</option>
+                                <option value="other">Other (please specify in message)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="urgency-level">Urgency Level</label>
+                            <select id="urgency-level" name="urgency_level">
+                                <option value="standard">Standard (1-2 business days)</option>
+                                <option value="high">High (Same day)</option>
+                                <option value="urgent">Urgent (Within 4 hours)</option>
                             </select>
                         </div>
                     </div>
@@ -191,15 +220,30 @@
             // Hide all conditional fields first
             const enterpriseFields = document.getElementById('enterprise-fields');
             const demoFields = document.getElementById('demo-fields');
+            const memoRerunFields = document.getElementById('memo-rerun-fields');
             
             if (enterpriseFields) enterpriseFields.style.display = 'none';
             if (demoFields) demoFields.style.display = 'none';
+            if (memoRerunFields) memoRerunFields.style.display = 'none';
             
             // Show relevant fields based on inquiry type
             if (inquiryType === 'enterprise-sales' && enterpriseFields) {
                 enterpriseFields.style.display = 'block';
             } else if (inquiryType === 'demo-request' && demoFields) {
                 demoFields.style.display = 'block';
+            } else if (inquiryType === 'memo-rerun' && memoRerunFields) {
+                memoRerunFields.style.display = 'block';
+                // Make memo fields required when shown
+                const memoIdField = document.getElementById('memo-id');
+                const changeTypeField = document.getElementById('change-type');
+                if (memoIdField) memoIdField.required = true;
+                if (changeTypeField) changeTypeField.required = true;
+            } else {
+                // Remove required attribute when memo rerun not selected
+                const memoIdField = document.getElementById('memo-id');
+                const changeTypeField = document.getElementById('change-type');
+                if (memoIdField) memoIdField.required = false;
+                if (changeTypeField) changeTypeField.required = false;
             }
         }
         
