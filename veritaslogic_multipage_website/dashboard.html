@@ -497,8 +497,8 @@
             document.getElementById('editLastName').value = userData.last_name || '';
             
             // Update credits display
-            const paidCredits = userData.credits_balance || 0;
-            document.getElementById('creditsBalance').textContent = `$${paidCredits.toFixed(2)}`;
+            const paidCredits = parseFloat(userData.credits_balance || 0);
+            document.getElementById('creditsBalance').textContent = `$${paidCredits.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             
             // Load usage statistics
             await loadUsageStatistics();
