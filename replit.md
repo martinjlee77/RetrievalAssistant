@@ -1,7 +1,7 @@
 # VeritasLogic.ai - Enterprise Accounting AI Platform
 
 ## Overview
-VeritasLogic.ai is a premium enterprise AI platform designed for Big 4 accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI technology. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining the rigor and citation quality expected in Big 4 environments, and allows professionals to focus on judgment and client advisory.
+VeritasLogic.ai is a premium enterprise AI platform designed for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI technology. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining the rigor and citation quality expected in professional environments, and allows professionals to focus on judgment and client advisory.
 
 ## User Preferences
 - **Communication Style**: Simple, everyday language for technical explanations
