@@ -296,11 +296,10 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: auto;
 }
 .hero-actions {
-    margin: 2.5rem 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: 2rem; /* ← Change this value to adjust spacing */
 }
 /* Use .btn.btn--primary instead */
 .demo-link,
