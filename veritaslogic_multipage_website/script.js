@@ -32,8 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Active Navigation Link Highlighting
+    // Active Navigation Link Highlighting - Only for single-page navigation
     function updateActiveNavLink() {
+        // Only run on single pages with sections (not multi-page navigation)
+        const isMultiPageNav = document.querySelector('.nav-links a[href$=".html"]');
+        if (isMultiPageNav) {
+            return; // Skip scroll-based active states for multi-page navigation
+        }
+        
         const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.nav-links a');
         
@@ -50,14 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${currentSection}`) {
-                link.classList.add('active');
+            // Only modify active states for anchor links, not page links
+            if (link.getAttribute('href').startsWith('#')) {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
             }
         });
     }
 
-    // Update active nav link on scroll
+    // Update active nav link on scroll (only for single-page navigation)
     window.addEventListener('scroll', updateActiveNavLink);
     
     // Initial call to set active link
