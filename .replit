@@ -73,10 +73,6 @@ localPort = 8501
 externalPort = 3002
 
 [[ports]]
-localPort = 34649
-externalPort = 6800
-
-[[ports]]
 localPort = 35263
 externalPort = 5173
 
@@ -95,6 +91,10 @@ externalPort = 3003
 [[ports]]
 localPort = 44889
 externalPort = 6000
+
+[[ports]]
+localPort = 46535
+externalPort = 6800
 
 [agent]
 integrations = ["python_sendgrid==1.0.0"]
