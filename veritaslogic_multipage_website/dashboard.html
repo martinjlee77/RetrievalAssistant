@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - VeritasLogic.ai</title>
-    <!-- Force cache refresh -->
+    
+    <!-- SEO and Security -->
     <meta name="description" content="Manage your VeritasLogic account, track your usage, and access your ASC analysis tools.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://veritaslogic.ai/dashboard.html">
+    <meta name="referrer" content="no-referrer">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css?v=2025090702">
     <!-- Stripe JavaScript -->
     <script src="https://js.stripe.com/v3/"></script>
@@ -68,14 +74,19 @@
             <div class="login-form-container">
                 <div class="login-form">
                     <h2>🔐 Sign In to Your Dashboard</h2>
-                    <p>Enter your registered business email address to access your account.</p>
+                    <p>Enter your business email and password to access your account.</p>
                     
-                    <div id="loginMessage"></div>
+                    <div id="loginMessage" aria-live="polite"></div>
                     
                     <form id="dashboardLoginForm">
                         <div class="form-group">
                             <label for="loginEmail">Business Email Address</label>
-                            <input type="email" id="loginEmail" name="email" placeholder="your.email@company.com" required>
+                            <input type="email" id="loginEmail" name="email" placeholder="your.email@company.com" required autocomplete="email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" name="password" required autocomplete="current-password">
                         </div>
                         
                         <button type="submit" class="btn btn-primary" id="loginButton">
@@ -111,6 +122,7 @@
                         <div class="credits-display" id="creditsDisplay">
                             <div class="number" id="creditsBalance">$0</div>
                             <div class="label">Account Credits Available</div>
+                            <small class="credits-expiry">Credits expire 12 months from purchase.</small>
                         </div>
                         
                         <button onclick="showSection('credits')" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
@@ -154,6 +166,7 @@
                 <div class="section-header">
                     <h2>💳 Manage Credits</h2>
                     <p>Add credits to your account to continue using our analysis platform.</p>
+                    <p class="credits-policy"><strong>Credits expire 12 months from purchase</strong> and are automatically deducted per analysis based on document size. Payments are processed securely via Stripe.</p>
                 </div>
             
                 <div class="card credit-purchase-card">
@@ -166,10 +179,10 @@
                     <h3>✏️ Custom Amount</h3>
                     <div class="custom-amount-section">
                         <div class="custom-amount-input">
-                            <label for="customAmount">Enter amount ($10 - $1,000):</label>
+                            <label for="customAmount">Enter amount ($95 - $3,000):</label>
                             <div class="amount-input-group">
                                 <span class="currency-symbol">$</span>
-                                <input type="number" id="customAmount" min="10" max="1000" step="1" placeholder="50">
+                                <input type="number" id="customAmount" min="95" max="3000" step="1" placeholder="500">
                                 <button onclick="selectCustomAmount()" class="btn btn-secondary">Select</button>
                             </div>
                         </div>
@@ -193,7 +206,7 @@
                         <button onclick="cancelPayment()" class="btn btn-secondary">Cancel</button>
                     </div>
                     
-                    <div id="payment-messages"></div>
+                    <div id="payment-messages" aria-live="polite"></div>
                 </div>
             </div>
 
@@ -237,16 +250,16 @@
                         <!-- Edit Profile Section -->
                         <div class="edit-profile-section">
                             <h4>✏️ Edit Name</h4>
-                            <div id="editProfileMessage"></div>
+                            <div id="editProfileMessage" aria-live="polite"></div>
                             <form id="editProfileForm" style="margin-top: 15px;" onsubmit="submitProfileUpdate(event)">
                                 <div class="form-group">
                                     <label for="editFirstName">First Name</label>
-                                    <input type="text" id="editFirstName" name="firstName" required placeholder="Enter your first name">
+                                    <input type="text" id="editFirstName" name="firstName" required placeholder="Enter your first name" autocomplete="given-name">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="editLastName">Last Name</label>
-                                    <input type="text" id="editLastName" name="lastName" required placeholder="Enter your last name">
+                                    <input type="text" id="editLastName" name="lastName" required placeholder="Enter your last name" autocomplete="family-name">
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary" id="updateProfileButton">
@@ -259,17 +272,16 @@
                     <div class="card password-card">
                 
                         <h3>🔐 Change Password</h3>
-                    <div id="changePasswordMessage"></div>
+                    <div id="changePasswordMessage" aria-live="polite"></div>
                     <form id="changePasswordForm" style="margin-top: 15px;">
                         <div class="form-group">
                             <label for="currentPassword">Current Password</label>
-                            <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password (legacy users can leave blank)">
-                            <small>Legacy users (email-only login) can leave this field blank</small>
+                            <input type="password" id="currentPassword" name="currentPassword" required placeholder="Enter your current password" autocomplete="current-password">
                         </div>
                         
                         <div class="form-group">
                             <label for="newPassword">New Password</label>
-                            <input type="password" id="newPassword" name="newPassword" required placeholder="Enter your new password">
+                            <input type="password" id="newPassword" name="newPassword" required placeholder="Enter your new password" autocomplete="new-password">
                             <div class="password-requirements">
                                 <small>Password must contain at least:</small>
                                 <ul>
@@ -284,7 +296,7 @@
                         
                         <div class="form-group">
                             <label for="confirmNewPassword">Confirm New Password</label>
-                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Confirm your new password">
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" required placeholder="Confirm your new password" autocomplete="new-password">
                             <div id="password-match" class="password-feedback"></div>
                         </div>
                         
@@ -422,11 +434,17 @@
             e.preventDefault();
             
             const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
             const loginButton = document.getElementById('loginButton');
             const messageContainer = document.getElementById('loginMessage');
             
             if (!email) {
                 showLoginMessage('Please enter your email address', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showLoginMessage('Please enter your password', 'error');
                 return;
             }
             
@@ -441,7 +459,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email: email })
+                    body: JSON.stringify({ email: email, password: password })
                 });
 
                 if (response.ok) {
@@ -483,14 +501,14 @@
             
             // Update welcome section (backend returns snake_case fields)
             document.getElementById('userName').textContent = userData.first_name || 'User';
-            document.getElementById('memberSince').textContent = `Member since ${new Date(userData.member_since || Date.now()).toLocaleDateString()}`;
+            document.getElementById('memberSince').textContent = userData.member_since ? `Member since ${new Date(userData.member_since).toLocaleDateString()}` : 'Member since —';
             
             // Update profile information
             document.getElementById('userFirstName').textContent = userData.first_name || '-';
             document.getElementById('userLastName').textContent = userData.last_name || '-';
             document.getElementById('userEmail').textContent = userData.email || '-';
             document.getElementById('userCompany').textContent = userData.company_name || '-';
-            document.getElementById('memberSinceDate').textContent = new Date(userData.member_since || Date.now()).toLocaleDateString() || '-';
+            document.getElementById('memberSinceDate').textContent = userData.member_since ? new Date(userData.member_since).toLocaleDateString() : '—';
             
             // Pre-fill edit profile form
             document.getElementById('editFirstName').value = userData.first_name || '';
@@ -660,7 +678,7 @@
                     <td>${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</td>
                     <td>${analysis.file_count || 0}</td>
                     <td>${analysis.tier_name || 'N/A'}</td>
-                    <td>$${analysis.cost.toFixed(2)}</td>
+                    <td>${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(analysis.cost)}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -707,12 +725,12 @@
             const customAmount = document.getElementById('customAmount').value;
             const amount = parseFloat(customAmount);
             
-            if (!amount || amount < 10 || amount > 1000) {
-                alert('Please enter an amount between $10 and $1,000');
+            if (!amount || amount < 95 || amount > 3000) {
+                alert('Please enter an amount between $95 and $3,000');
                 return;
             }
             
-            selectCreditPackage({
+            selectPackage(amount);
                 id: 'custom',
                 amount: amount,
                 credits: amount,
@@ -985,16 +1003,6 @@
             }
         }
         
-        async function showCreditPurchase() {
-            document.getElementById('creditPurchaseSection').style.display = 'block';
-            document.getElementById('creditPurchaseSection').scrollIntoView({ behavior: 'smooth' });
-            
-            if (!stripe) {
-                await initializeStripe();
-            }
-            
-            loadCreditPackages();
-        }
         
         
         async function selectPackage(amount) {
@@ -1002,8 +1010,8 @@
             
             document.getElementById('selectedPackageDisplay').innerHTML = `
                 <div class="selected-package-info">
-                    <h4>Selected Package: $${amount} Credits</h4>
-                    <p>You will be charged $${amount} USD</p>
+                    <h4>Selected Package: $${amount.toLocaleString()} Credits</h4>
+                    <p>You will be charged $${amount.toLocaleString()} USD. Credits expire 12 months from purchase.</p>
                 </div>
             `;
             
@@ -1014,10 +1022,11 @@
                 await initializeStripe();
             }
             
-            // Mount card element
-            if (cardElement && !cardElement._mounted) {
+            // Mount card element (track our own mounted state)
+            if (cardElement && !cardElement.isCardMounted) {
                 try {
                     cardElement.mount('#card-element');
+                    cardElement.isCardMounted = true;
                     console.log('Card element mounted successfully');
                 } catch (error) {
                     console.error('Error mounting card element:', error);
@@ -1091,7 +1100,7 @@
         }
         
         async function pollForBalanceUpdate(expectedAmount) {
-            const originalBalance = parseInt(document.getElementById('creditsBalance').textContent.replace('$', '')) || 0;
+            const originalBalance = Number(document.getElementById('creditsBalance').textContent.replace(/[^0-9.-]+/g, '')) || 0;
             const maxAttempts = 20; // Poll for up to 20 seconds
             let attempts = 0;
             
@@ -1110,7 +1119,8 @@
                         
                         // Update the displayed balance immediately
                         const balance = parseFloat(data.credits_balance);
-                        document.getElementById('creditsBalance').textContent = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+                        document.getElementById('creditsBalance').textContent = fmt.format(balance);
                         
                         // Hide payment form and refresh dashboard
                         setTimeout(() => {

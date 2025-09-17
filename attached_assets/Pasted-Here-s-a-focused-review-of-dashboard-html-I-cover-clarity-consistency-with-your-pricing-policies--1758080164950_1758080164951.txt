@@ -1,0 +1,219 @@
+Here’s a focused review of dashboard.html. I cover clarity, consistency with your pricing/policies, UX, and key technical issues that will affect credibility and conversion. I’ve included copy you can paste and specific fixes for a few bugs.
+
+Overall verdict
+
+Strong skeleton and clear sections. To feel enterprise-ready, tighten authentication messaging, align credits with your 
+500
+/
+500/1,000/$2,000 policy, surface the 12‑month expiration, and polish the History table with sorting and actions. Fix a few code bugs in credits/payment.
+Head/SEO/security
+
+Add noindex to avoid search engines indexing customer dashboards:
+<meta name="robots" content="noindex, nofollow">
+Optional but good: set a canonical to the dashboard root and add a stricter referrer policy:
+<link rel="canonical" href="https://veritaslogic.ai/dashboard.html">
+<meta name="referrer" content="no-referrer">
+Consider a simple CSP later; not blocking for now.
+Navigation
+
+Clear. Consider adding a “Support” link in the nav or sidebar that opens mailto:support@veritaslogic.ai.
+Authentication and login messaging
+
+The current flow looks like email-only sign-in (no password) but you also offer password change. That’s confusing.
+If you are “passwordless” (magic link/one-time code), reflect that:
+Headline: “Sign in with your business email”
+Subtext: “We’ll verify and sign you in” (or “Check your email for a magic link” if that’s your flow)
+If you are moving to passwords, keep the login as email+password and remove “legacy” language.
+Inline microcopy suggestions:
+Replace “Enter your registered business email address to access your account.” with “Use your business email. We’ll verify and sign you in.”
+Replace “Legacy users (email-only login) can leave this field blank” with a clearer line above the form:
+“If you signed up without a password, you can set one here.”
+Overview section (copy polish)
+
+Add one reassurance line about credits and expiration:
+Under Account Balance: “Credits expire 12 months from purchase.”
+Add direct CTA microcopy:
+On “Add Credits” button hover: “Buy credits (
+500
+,
+500,1,000, $2,000).”
+Credits section (policy alignment + clarity)
+
+Align with your public pricing: 
+500
+/
+500/1,000/
+2
+,
+000
+b
+l
+o
+c
+k
+s
+,
+12
+‑
+m
+o
+n
+t
+h
+e
+x
+p
+i
+r
+a
+t
+i
+o
+n
+.
+R
+i
+g
+h
+t
+n
+o
+w
+,
+t
+h
+e
+“
+C
+u
+s
+t
+o
+m
+A
+m
+o
+u
+n
+t
+(
+2,000blocks,12‑monthexpiration.Rightnow,the“CustomAmount(10–$1,000)” conflicts with pricing.
+Option A (recommended): Remove custom purchases or restrict to 
+500
+–
+500–2,000 in 
+500
+i
+n
+c
+r
+e
+m
+e
+n
+t
+s
+.
+K
+e
+e
+p
+“
+C
+o
+n
+t
+a
+c
+t
+s
+a
+l
+e
+s
+f
+o
+r
+>
+500increments.Keep“Contactsalesfor>2,000.”
+Option B: If you keep custom: update the Pricing page to mention custom credits (breaks your current messaging).
+Add explicit policy text:
+“Credits expire 12 months from purchase. Credits are auto‑deducted per analysis based on the detected tier.”
+Add small trust line:
+“Payments are processed securely via Stripe.”
+Payment UI and messaging
+
+In “Selected Package” block, add expiration info:
+“You will be charged $X USD. Credits expire 12 months from purchase.”
+Replace alert-style errors with inline messages (you already have #payment-messages—good).
+Add a link to view invoices/receipts (even if it’s “Coming soon”):
+“Need an invoice? Contact support@veritaslogic.ai.”
+Profile section
+
+Let users edit company name (common need for invoicing) and possibly add “Billing contact email” (optional).
+“Member since” should not default to today if missing—show “—” instead to avoid confusion.
+Change password section
+
+Clarify the model:
+Add a short explainer above the form: “If you signed up without a password, you can set one now.”
+Remove “legacy users” phrasing—it implies instability.
+History section (enterprise expectations)
+
+Add action buttons per row if available:
+“View details,” “Download DOCX,” “Download PDF,” “Open in Analysis”
+Add filters:
+By date range, by standard (ASC 606, 842, etc.)
+Add an export button:
+“Export CSV”
+Sorting:
+Default to latest first; add clickable table headers for sorting.
+Consistency with marketing site
+
+Credits: enforce 
+500
+/
+500/1,000/$2,000 blocks to match Pricing (and mention 12‑month expiration).
+Time claims: use “3–5 minutes typical” consistently in any dashboard helper text/tooltips.
+Support email: use support@veritaslogic.ai everywhere.
+Accessibility/UX polish
+
+Add aria-live="polite" to message containers (#loginMessage, #editProfileMessage, #changePasswordMessage, #payment-messages) so screen readers announce updates.
+Add autocomplete attributes:
+loginEmail autocomplete="email"
+first/last name fields autocomplete="given-name"/"family-name"
+Replace emoji-only headings with text+emoji for screen readers (you already have text; keep it that way).
+Key technical issues/bugs to fix
+
+Duplicate function name showCreditPurchase:
+One version uses creditPurchaseSection (which doesn’t exist). Remove/rename this duplicate to avoid confusion.
+selectCustomAmount calls undefined selectCreditPackage:
+Replace with selectPackage(amount).
+Numeric parsing bug in pollForBalanceUpdate:
+You use parseInt on a string like “$1,095.00”, which becomes 1. Use a safer parse:
+const originalBalance = Number(document.getElementById('creditsBalance').textContent.replace(/[^0-9.-]+/g, '')) || 0;
+Stripe Element mount check:
+cardElement._mounted is not part of the public API. Track your own flag:
+let cardMounted = false; if (!cardMounted) { cardElement.mount('#card-element'); cardMounted = true; }
+History sorting:
+Sort analyses by created_at desc before rendering.
+Currency formatting:
+In usage stats and history costs, use toLocaleString for currency:
+const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+fmt.format(number)
+Member since default:
+Don’t default to Date.now() if missing. Show “—”.
+Missing element reference:
+If you keep the “creditPurchaseSection” logic, add the corresponding DOM element; otherwise remove that code.
+Ready-to-paste copy snippets
+
+Credits policy (below Credit Packages heading):
+“Credits expire 12 months from purchase and are automatically deducted per analysis based on document size. Payments are processed securely via Stripe.”
+Selected package block:
+<div class="selected-package-info"> <h4>Selected Package: $X Credits</h4> <p>You will be charged $X USD. Credits expire 12 months from purchase.</p> </div>
+Account balance helper (small text under balance):
+“Credits expire 12 months from purchase.”
+Optional enhancements
+
+Add a “Receipts” subsection under Credits (list Stripe charge date, amount, last4, invoice PDF link if available).
+Add a “Support” card in Overview with support@veritaslogic.ai and “We respond within 4 business hours.”
+Show earliest credit expiration date (e.g., “Earliest expiration: Jan 12, 2026”) if you track per‑purchase buckets.
