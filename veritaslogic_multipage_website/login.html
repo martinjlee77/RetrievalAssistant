@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VeritasLogic.ai</title>
-    <meta name="description" content="Sign in to your VeritasLogic account to access your ASC analysis tools and account dashboard.">
+    <title>Sign In — VeritasLogic.ai</title>
+    <meta name="description" content="Sign in to access your technical accounting analysis tools and dashboard.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://veritaslogic.ai/login.html">
+    <meta property="og:title" content="Sign In — VeritasLogic.ai">
+    <meta property="og:description" content="Sign in to access your technical accounting analysis tools and dashboard.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://veritaslogic.ai/login.html">
+    <meta name="twitter:card" content="summary">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +31,7 @@
                 <li><a href="contact.html">Contact</a></li>
             </ul>
             <button class="mobile-menu-btn">☰</button>
-            <a href="signup.html" class="nav-cta">Sign Up</a>
+            <a href="contact.html#contact-form" class="nav-cta">Start Risk Free</a>
         </div>
     </nav>
 
@@ -35,20 +42,20 @@
                 <form class="contact-form" id="loginForm">
                     <div class="form-header">
                         <h2>Welcome Back</h2>
-                        <p>Sign in to continue your analysis work</p>
+                        <p>Use your business email and password to sign in.</p>
                     </div>
                 
-                <div id="messageContainer"></div>
+                <div id="messageContainer" aria-live="polite" role="status" tabindex="-1"></div>
                 
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="john@company.com">
+                    <input type="email" id="email" name="email" required placeholder="john@company.com" autocomplete="email" inputmode="email" autofocus>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password">
-                    <small>Leave blank for legacy accounts (email-only login)</small>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+                    <small>If you previously used email-only login, you can set a password on the <a href="forgot-password.html">reset page</a>.</small>
                 </div>
                 
                 <button type="submit" class="form-submit" id="submitButton">
@@ -57,8 +64,8 @@
                 
                 <div class="form-links">
                     <p><a href="forgot-password.html">Forgot your password?</a></p>
-                    <p>Don't have an account? <a href="signup.html">Create one here</a></p>
-                    <p>Need help? <a href="contact.html">Contact support</a></p>
+                    <p>Don't have an account? <a href="contact.html#contact-form">Start Risk Free</a></p>
+                    <p>Need help? <a href="contact.html#contact-form">Contact support</a></p>
                     <p><a href="index.html">← Back to homepage</a></p>
                 </div>
             </form>
@@ -72,10 +79,6 @@
                 <div class="footer-section">
                     <h3>VeritasLogic.ai</h3>
                     <p>Domain-specific AI for accounting professionals. Generate comprehensive ASC analyses in minutes.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="LinkedIn">in</a>
-                        <a href="#" aria-label="Twitter">🐦</a>
-                    </div>
                 </div>
                 
                 <div class="footer-section">
@@ -93,6 +96,7 @@
                         <li><a href="about.html">About</a></li>
                         <li><a href="blog.html">Blog</a></li>
                         <li><a href="contact.html">Contact</a></li>
+                        <li><a href="mailto:support@veritaslogic.ai">Support</a></li>
                     </ul>
                 </div>
                 
@@ -101,12 +105,13 @@
                     <ul>
                         <li><a href="terms.html">Terms of Service</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="features.html#security">Security Overview</a></li>
                     </ul>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 VeritasLogic.ai. All rights reserved.</p>
+                <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -134,10 +139,17 @@
                 return;
             }
             
+            if (!password) {
+                showMessage('Please enter your password', 'error');
+                return;
+            }
+            
             // Show loading state
             submitButton.disabled = true;
             submitButton.textContent = 'Signing In...';
             form.classList.add('loading');
+            
+            let succeeded = false;
             
             try {
                 // Use relative API path (works in both dev and production)
@@ -153,24 +165,22 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    // Store the token and user data
+                    succeeded = true;
                     localStorage.setItem('authToken', result.token);
                     localStorage.setItem('userData', JSON.stringify(result.user));
-                    
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Redirecting...';
                     showMessage('Login successful! Redirecting to dashboard...', 'success');
-                    
-                    // Redirect to dashboard
                     setTimeout(() => {
                         window.location.href = 'dashboard.html';
-                    }, 1500);
+                    }, 1000);
                     
                 } else {
-                    if (result.error === 'Please verify your email first') {
-                        showMessage('Please verify your email address first. Check your inbox for the verification link.', 'error');
-                    } else if (result.error === 'User not found') {
-                        showMessage('Email not found. <a href="signup.html">Create an account</a> to get started.', 'error');
+                    // Use generic message to avoid revealing whether an account exists
+                    if (result.error && result.error.toLowerCase().includes('verify')) {
+                        showMessage('Please check your email for a verification link.', 'error');
                     } else {
-                        showMessage(result.error || 'Login failed. Please try again.', 'error');
+                        showMessage('Invalid email or password. Please try again.', 'error');
                     }
                 }
                 
@@ -178,18 +188,24 @@
                 console.error('Login error:', error);
                 showMessage('Network error. Please check your connection and try again.', 'error');
             } finally {
-                // Reset loading state
-                submitButton.disabled = false;
-                submitButton.textContent = 'Sign In';
-                form.classList.remove('loading');
+                // Only reset loading state if login was not successful
+                if (!succeeded) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Sign In';
+                    form.classList.remove('loading');
+                }
             }
         });
         
         function showMessage(message, type) {
             const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message`;
+            messageDiv.textContent = message;
             
-            // Scroll to top to show message
+            container.innerHTML = '';
+            container.appendChild(messageDiv);
+            container.focus?.();
             container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
@@ -202,8 +218,6 @@
             }
         });
         
-        // Auto-focus email field
-        document.getElementById('email').focus();
         
         // Handle query parameters (e.g., from email verification)
         const urlParams = new URLSearchParams(window.location.search);
