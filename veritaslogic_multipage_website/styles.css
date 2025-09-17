@@ -319,25 +319,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 2.5rem 0;
 }
 
-.hero-cta {
-    display: inline-flex;
-    align-items: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    color: #212F3C;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    margin-right: 1rem;
-    box-shadow: 0 6px 18px rgba(255,255,255,0.2);
-}
-
-.hero-cta:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
-}
+/* Use .btn.btn--primary instead */
 
 .demo-link,
 .secondary-cta {
@@ -538,37 +520,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 4rem;
 }
 
-.feature-card,
-.value-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
-    padding: 2.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-    text-align: center;
-}
-
-.feature-card::before,
-.value-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%);
-}
-
-.feature-card:hover,
-.value-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255,255,255,0.2);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
-}
+/* Use .glass-panel.glass-panel--centered.glass-panel--interactive.glass-panel--highlight instead */
 
 .feature-icon {
     font-size: 2.5rem;
@@ -591,21 +543,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1.5rem;
 }
 
-.feature-link {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.feature-link:hover {
-    border-color: rgba(255,255,255,0.6);
-    background: rgba(255,255,255,0.1);
-}
+/* Use .btn.btn--ghost instead */
 
 /* ================================
    12. COMPLIANCE SECTION
@@ -718,23 +656,7 @@ h1, h2, h3, h4, h5, h6 {
     left: 0;
 }
 
-.review-cta {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.2);
-    transition: all 0.3s ease;
-    display: inline-block;
-    margin-top: 2rem; /* Added margin for spacing */
-}
-
-.review-cta:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-}
+/* Use .btn.btn--secondary instead */
 
 .review-process {
     background: rgba(255,255,255,0.05);
@@ -1577,7 +1499,141 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--gradient-primary);
 }
 
-/* Utility Classes */
+/* ================================
+   UTILITY CLASSES & COMPONENT SYSTEMS
+   ================================ */
+
+/* Unified Button System */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn--primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+}
+
+.btn--secondary {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.2);
+}
+
+.btn--secondary:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+}
+
+.btn--ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.3);
+    padding: 0.5rem 1rem;
+}
+
+.btn--ghost:hover {
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+}
+
+.btn--nav {
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    border: 2px solid transparent;
+}
+
+.btn--nav-primary {
+    background: #f2f2f2;
+    color: var(--color-primary);
+}
+
+.btn--nav-secondary {
+    background: transparent;
+    color: #f2f2f2;
+    border-color: var(--color-primary);
+}
+
+.btn--nav:hover {
+    transform: translateY(-2px);
+}
+
+/* Unified Glass Panel System */
+.glass-panel {
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+    border: var(--border-subtle);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-panel--interactive:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-card);
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+}
+
+.glass-panel--centered {
+    text-align: center;
+    padding: 2.5rem;
+}
+
+.glass-panel--compact {
+    padding: 2rem;
+}
+
+.glass-panel--highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+}
+
+/* Grid Utilities */
+.grid {
+    display: grid;
+    gap: var(--space-content);
+}
+
+.grid--auto-280 {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grid--2col {
+    grid-template-columns: 1fr 1fr;
+}
+
+.grid--3col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* Background Utilities */
+.bg-primary { background: var(--gradient-primary); }
+.bg-secondary { background: var(--gradient-secondary); }
+.bg-tertiary { background: var(--gradient-tertiary); }
+.bg-quaternary { background: var(--gradient-quaternary); }
+
+/* Spacing Utilities */
 .standard-section {
     padding: var(--space-section) 0;
 }
@@ -1588,6 +1644,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .standard-section-lg {
     padding: var(--space-section-lg) 0;
+}
+
+/* Text Utilities */
+.text-muted {
+    color: var(--color-text-muted);
 }
 
 /* Legacy .feature-section removed - now using specific section classes with gradient backgrounds */
@@ -4609,40 +4670,7 @@ html {
     align-items: center;
 }
 
-.nav-cta.primary {
-    background: #f2f2f2;
-    color: #212F3C;
-    padding: 10px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-}
-
-.nav-cta.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-}
-
-.nav-cta.secondary {
-    background: transparent;
-    color: #f2f2f2;
-    padding: 10px 20px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    border: 2px solid #212F3C;
-    transition: all 0.3s ease;
-}
-
-.nav-cta.secondary:hover {
-    background: #212F3C;
-    color: white;
-    transform: translateY(-2px);
-}
+/* Use .btn.btn--nav.btn--nav-primary and .btn.btn--nav.btn--nav-secondary instead */
 
 /* Mobile responsive for auth buttons */
 @media (max-width: 768px) {
