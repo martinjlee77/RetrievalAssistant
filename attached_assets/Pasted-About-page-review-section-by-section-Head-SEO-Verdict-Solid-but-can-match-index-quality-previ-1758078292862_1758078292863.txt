@@ -1,0 +1,90 @@
+About page review (section by section)
+
+Head/SEO
+Verdict: Solid but can match index-quality previews.
+Suggestions:
+Title: “About — VeritasLogic.ai | Built by Accountants for Technical Accounting Teams”
+Meta description: “Founded by a 20+ year Big 4 veteran. Our mission: audit-ready ASC analyses in minutes with enterprise data practices and expert review options.”
+Add Open Graph/Twitter tags for better internal share previews (mirror index.html pattern).
+Navigation
+Verdict: Inconsistent CTA labels.
+Fixes:
+Replace “Sign In” with “Start Risk Free” to match your standard sitewide CTA.
+Ensure both buttons link correctly (Start Risk Free → contact.html#contact-form; Log In → login.html).
+Page Header Current:
+“Hours of Technical Analysis. Minutes with AI.”
+Support paragraph: strong and relevant.
+Suggestions:
+
+Keep the headline; it’s tight and benefits-led. Consider adding your persona to the subhead:
+“Designed for Controllers, CAOs, and technical accounting teams—deliver professional memos in minutes without sacrificing quality.”
+Optional micro-proof line beneath: “ASC 606, 842 (Lessee), 805, 718, 340‑40; paragraph-level citations; export to DOCX/PDF/HTML.”
+Company Story (“How VeritasLogic.ai Started”)
+Verdict: Genuine, credible. Could be tightened and include founder credentials explicitly.
+Suggestions:
+Add founder bio line near the top for authority:
+“VeritasLogic.ai was founded by a Big 4 audit veteran with 20+ years supporting Fortune 500 clients across tech, biotech, consumer, and retail.”
+Add a sentence tying the “predictable analytical patterns” to your product method:
+“We codified those patterns into a rigorous analysis workflow, backed by a standards-specific knowledge base and a memo structure auditors expect.”
+Consider adding a “Who we serve” subline:
+“We serve Fortune 500 controllers, CAOs, and technical accounting teams who need speed without compromising audit readiness.”
+Differentiator box (“What Makes Us Different”)
+Verdict: Reads defensive as written. Use one of the options above. Additional improvements:
+Add two bullets to make it scannable:
+“Customer-funded and independently owned”
+“Roadmap driven by real technical workflows, shipped weekly”
+Avoid negative competitor framing entirely.
+Values Section
+Verdict: Strong themes. Tighten copy and ensure security claims are accurate to your posture.
+Edits:
+Quality First (tighten):
+“Every release aims to improve accuracy and clarity—prompt design, workflows, RAG updates, and model selection are all tuned for professional standards.”
+Security and Privacy (accuracy + plain English):
+“We process your documents in a temporary session and don’t store files after analysis. Only an analysis history entry is retained. We use the OpenAI API with data retention off—your data isn’t used to train models. Our platform runs on providers with SOC 2 Type II compliant infrastructure, with TLS 1.3 in transit and AES‑256 at rest.”
+Customer First (tighten + practical):
+“Same-day support from accounting specialists, rapid iteration on feedback, and pragmatic features that remove hours from close and audit timelines.”
+Community Impact (specificity):
+If you can, add a named initiative or partner for credibility. If not, keep it simple:
+“We commit 10% of profits to job training and community support initiatives.”
+Add a Leadership/Advisors section (recommended)
+Why: Enterprise buyers look for credibility and accountability.
+Suggested section:
+Headline: Leadership
+Copy: Founder name, credentials (e.g., CPA if applicable), years at EY, industry coverage. A short 2–3 sentence bio.
+Optional: “Technical Review Network” with “15+ years avg. experience; Big 4 background; ASC specialization” (mirrors the Expert Review message).
+Add a Methodology/Trust section (optional but high-impact)
+Headline: How We Ensure Quality
+Bullets:
+“Standards-specific workflows (ASC 606, 842 Lessee, 805, 718, 340‑40)”
+“Paragraph-level citations to authoritative guidance”
+“Extract-then-calculate approach for financial accuracy”
+“Human expert review available for complex issues (1–2 business days)”
+Close with a brief reassurance line:
+“Our goal is to deliver drafts your team can finalize quickly with confidence.”
+CTA section
+Verdict: Good.
+Suggestions:
+Ensure CTA buttons link to contact.html#contact-form.
+Add reassurance line mirroring others: “14-day first-memo refund; pay per analysis; no subscriptions.”
+Footer
+Verdict: Solid.
+Suggestions:
+Confirm Support email is support@veritaslogic.ai (looks consistent).
+If you don’t have a separate Security page, link to features.html#security and label “Security Overview.”
+Tone and style refinements (global across About)
+
+Avoid comparative/negative language about competitors or investors.
+Keep sentences concise and outcome-focused.
+Repeat personas (Controllers, CAOs, technical accounting teams) at least once on the page.
+Be precise about scope: if you mention ASC 842, specify “Lessee only” when relevant.
+Quick copy blocks you can paste
+
+Founder credential sentence:
+
+“Founded by a 20+ year Big 4 audit veteran, VeritasLogic.ai is built by practitioners who know the standards, the audit process, and the documentation reviewers expect.”
+Customer-first independence (short version):
+
+“We’re privately, employee-owned—so our priorities are simple: accuracy, responsiveness, and long-term trust with our customers.”
+Security/value line (consistency with other pages):
+
+“We process your documents in a temporary session and don’t store files after analysis. Only your analysis history entry is retained. We use the OpenAI API with data retention turned off—your data isn’t used to train models.”
