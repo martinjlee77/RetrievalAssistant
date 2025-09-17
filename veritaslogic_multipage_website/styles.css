@@ -169,7 +169,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-links a.active {
     color: var(--color-accent);
     background: rgba(255, 255, 255, 0.15);
-    padding: 0.5rem 1rem; /* Only active links get padding like original */
+    padding: 0.5rem 1.5rem; /* Increased horizontal padding to fully cover text */
     text-shadow: 0 2px 4px rgba(255,255,255,0.3);
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.2);
     font-weight: 600;
