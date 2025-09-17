@@ -384,9 +384,9 @@ h1, h2, h3, h4, h5, h6 {
    8. HOW IT WORKS SECTION
    ================================ */
 .how-it-works {
-    background: #212F3C;
+    background: var(--color-primary);
     color: white;
-    padding: 100px 0;
+    padding: var(--space-section) 0;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -410,9 +410,9 @@ h1, h2, h3, h4, h5, h6 {
    9. DEMO PREVIEW SECTION
    ================================ */
 .demo-preview {
-    padding: 100px 0;
+    padding: var(--space-section) 0;
     text-align: center; 
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    background: var(--gradient-primary);
 }
 
 
@@ -459,7 +459,7 @@ h1, h2, h3, h4, h5, h6 {
    ================================ */
 .trust-indicators {
     padding: 50px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    background: var(--gradient-secondary);
     text-align: center;
 }
 
@@ -662,8 +662,8 @@ h1, h2, h3, h4, h5, h6 {
    13. HUMAN REVIEW SECTION
    ================================ */
 .human-review-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-secondary);
     position: relative;
     text-align: center; /* Center the overall content */
 }
@@ -813,8 +813,8 @@ h1, h2, h3, h4, h5, h6 {
    14. BLOG SECTIONS
    ================================ */
 .blog-preview {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
     position: relative;
 }
 
@@ -1172,8 +1172,8 @@ h1, h2, h3, h4, h5, h6 {
    ================================ */
 .founder-section,
 .company-story-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
     position: relative;
 }
 
@@ -1276,8 +1276,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Leadership Section Styles */
 .leadership-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
     position: relative;
 }
 
@@ -1405,8 +1405,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .vision-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 .vision-grid {
@@ -1436,8 +1436,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .values-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .values-grid {
@@ -1477,8 +1477,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .team-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 .team-grid {
@@ -1524,8 +1524,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .recognition-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .recognition-grid {
@@ -1590,14 +1590,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: var(--space-section-lg) 0;
 }
 
-.feature-section {
-    padding: 4rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.feature-section:last-child {
-    border-bottom: none;
-}
+/* Legacy .feature-section removed - now using specific section classes with gradient backgrounds */
 
 .feature-content {
     display: grid;
@@ -2078,8 +2071,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pricing-main {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
     text-align: center;
 }
 
@@ -2427,8 +2420,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .addon-services {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 .addon-grid {
@@ -2488,8 +2481,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .cost-comparison {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .comparison-cards {
@@ -2585,8 +2578,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .volume-pricing {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 .volume-table {
@@ -2638,8 +2631,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pricing-faq {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .faq-grid {
@@ -2672,8 +2665,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Contact Page Specific Styles */
 .trial-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .trial-content {
@@ -2740,8 +2733,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .unified-contact-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .contact-form {
@@ -3062,8 +3055,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .contact-options {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 .contact-grid {
@@ -3132,8 +3125,8 @@ h1, h2, h3, h4, h5, h6 {
 .demo-form-section,
 .enterprise-form-section,
 .academic-form-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .form-container {
@@ -3157,16 +3150,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .contact-faq {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
 }
 
 /* ================================
    15. CTA SECTIONS
    ================================ */
 .cta-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-secondary);
     text-align: center;
 }
 
@@ -3261,7 +3254,7 @@ h1, h2, h3, h4, h5, h6 {
         text-align: center;
     }
     
-    .feature-section.reverse .feature-content {
+    .feature-content.reverse {
         direction: ltr;
     }
     
