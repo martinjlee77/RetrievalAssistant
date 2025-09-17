@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - VeritasLogic.ai</title>
-    <meta name="description" content="Get in touch with VeritasLogic.ai. Start risk free, schedule a demo, or contact our support team.">
+    <title>Contact — VeritasLogic.ai</title>
+    <meta name="description" content="Contact us for demos, professional services, enterprise pricing, or support. We respond within 4 business hours.">
+    <link rel="canonical" href="https://veritaslogic.ai/contact.html">
+    <meta property="og:title" content="Contact — VeritasLogic.ai">
+    <meta property="og:description" content="Contact us for demos, professional services, enterprise pricing, or support. We respond within 4 business hours.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://veritaslogic.ai/contact.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contact — VeritasLogic.ai">
+    <meta name="twitter:description" content="Contact us for demos, professional services, enterprise pricing, or support. We respond within 4 business hours.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +33,7 @@
             </ul>
             <button class="mobile-menu-btn">☰</button>
             <div class="nav-auth-buttons">
-                <a href="signup.html" class="nav-cta primary">Sign Up</a>
+                <a href="contact.html#contact-form" class="nav-cta primary">Start Risk Free</a>
                 <a href="login.html" class="nav-cta secondary">Log In</a>
             </div>
         </div>
@@ -35,7 +43,7 @@
     <section class="page-header">
         <div class="container">
             <h1>Get in Touch</h1>
-            <p>Ready to transform your accounting workflow? Get in touch for demos, professional services, or questions.</p>
+            <p>We respond within 4 business hours (Mon–Fri, 9am–6pm PT). For demo requests, include your time zone and ideal times.</p>
         </div>
     </section>
 
@@ -61,23 +69,53 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contact-name">Full Name *</label>
-                            <input type="text" id="contact-name" name="name" required>
+                            <input type="text" id="contact-name" name="name" required autocomplete="name">
                         </div>
                         <div class="form-group">
                             <label for="contact-email">Email *</label>
-                            <input type="email" id="contact-email" name="email" required>
+                            <input type="email" id="contact-email" name="email" required autocomplete="email">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contact-company">Company *</label>
-                            <input type="text" id="contact-company" name="company" required>
+                            <input type="text" id="contact-company" name="company" required autocomplete="organization">
                         </div>
                         <div class="form-group">
                             <label for="contact-role">Your Role *</label>
-                            <input type="text" id="contact-role" name="role" required placeholder="e.g., Controller, Technical Accountant, Partner">
+                            <input type="text" id="contact-role" name="role" required placeholder="e.g., Controller, Technical Accountant, Partner" autocomplete="organization-title">
                         </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact-phone">Phone Number</label>
+                            <input type="tel" id="contact-phone" name="phone" placeholder="(optional)" autocomplete="tel">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-timezone">Time Zone</label>
+                            <input type="text" id="contact-timezone" name="timezone" placeholder="e.g., PT, ET, GMT+1" autocomplete="off">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="standards-interest">Standards of Interest</label>
+                        <select id="standards-interest" name="standards_interest" multiple>
+                            <option value="asc606">ASC 606</option>
+                            <option value="asc34040">ASC 340‑40</option>
+                            <option value="asc842-lessee">ASC 842 (Lessee)</option>
+                            <option value="asc718">ASC 718</option>
+                            <option value="asc805">ASC 805</option>
+                            <option value="asc815">ASC 815 (Coming Soon)</option>
+                        </select>
+                        <small>Select one or more (optional)</small>
+                    </div>
+                    
+                    <!-- Honeypot field (hidden from users, visible to spam bots) -->
+                    <div class="form-group" style="display: none;">
+                        <label for="website">Website</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                     </div>
                     
                     <!-- Conditional fields that show based on inquiry type -->
@@ -121,6 +159,10 @@
                                 <option value="high">High (Same day)</option>
                                 <option value="urgent">Urgent (Within 4 hours)</option>
                             </select>
+                            <small>Additional fees may apply for High/Urgent requests</small>
+                        </div>
+                        <div class="memo-rerun-scope">
+                            <p><strong>Memo Rerun Scope:</strong> Covers input corrections or extractable text issues. Methodology changes or expanded scope may require a new analysis.</p>
                         </div>
                     </div>
                     
@@ -147,6 +189,11 @@
                                 <option value="just-exploring">Just exploring</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="preferred-times">Preferred Dates/Times for Demo</label>
+                            <input type="text" id="preferred-times" name="preferred_times" placeholder="e.g., Tue 10–12 PT or Thu 2–4 ET (optional)">
+                            <small>Include your availability to help us schedule quickly</small>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -155,7 +202,14 @@
                     </div>
                     
                     <button type="submit" class="form-submit">Send Message</button>
-                    <p class="form-note">We'll respond within 4 hours during business days.</p>
+                    
+                    <div id="form-success-message" class="form-success" style="display: none;">
+                        <p><strong>Thank you!</strong> Your request is in. We'll reply within 4 business hours with next steps and proposed times.</p>
+                    </div>
+                    
+                    <p class="form-note">We'll respond within 4 business hours (Mon–Fri, 9am–6pm PT).</p>
+                    <p class="form-privacy">We'll only use your information to respond to your inquiry. See our <a href="privacy.html">Privacy Policy</a>.</p>
+                    <p class="form-trust">No file uploads here. For demos, we can review a redacted sample under NDA if needed.</p>
                 </form>
             </div>
         </div>
@@ -176,8 +230,8 @@
                     <h4>Platform</h4>
                     <a href="features.html">Features</a>
                     <a href="pricing.html">Pricing</a>
-                    <a href="features.html#demo">Demo</a>
-                    <a href="contact.html#trial">Free Trial</a>
+                    <a href="contact.html#contact-form">Demo</a>
+                    <a href="contact.html#contact-form">Start Risk Free</a>
                 </div>
                 
                 <div class="footer-section">
@@ -185,14 +239,14 @@
                     <a href="about.html">About Us</a>
                     <a href="blog.html">Blog</a>
                     <a href="contact.html">Contact</a>
-                    <a href="mailto:hello@veritaslogic.ai">Support</a>
+                    <a href="mailto:support@veritaslogic.ai">Support</a>
                 </div>
                 
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <a href="privacy.html">Privacy Policy</a>
                     <a href="terms.html">Terms of Service</a>
-                    <a href="security.html">Security</a>
+                    <a href="features.html#security">Security Overview</a>
                 </div>
             </div>
             
@@ -272,6 +326,15 @@
                         const formData = new FormData(this);
                         const data = Object.fromEntries(formData.entries());
                         
+                        // Fix multi-select field serialization
+                        data.standards_interest = formData.getAll('standards_interest');
+                        
+                        // Honeypot field check - if filled, it's likely spam
+                        if (data.website) {
+                            console.log('Honeypot field detected spam submission');
+                            return; // Silently reject spam
+                        }
+                        
                         const response = await fetch('/api/contact', {
                             method: 'POST',
                             headers: {
@@ -281,8 +344,12 @@
                         });
                         
                         if (response.ok) {
-                            // Show success message
-                            alert('Thank you for your message! We\'ll respond within 4 hours during business days.');
+                            // Show inline success message
+                            const successMessage = document.getElementById('form-success-message');
+                            if (successMessage) {
+                                successMessage.style.display = 'block';
+                                successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
                             this.reset();
                             showConditionalFields(''); // Hide conditional fields
                         } else {
@@ -290,7 +357,7 @@
                         }
                     } catch (error) {
                         console.error('Error:', error);
-                        alert('Sorry, there was an error sending your message. Please try again or email us directly at hello@veritaslogic.ai');
+                        alert('Sorry, there was an error sending your message. Please try again or email us directly at support@veritaslogic.ai');
                     } finally {
                         submitBtn.textContent = originalText;
                         submitBtn.disabled = false;

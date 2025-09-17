@@ -1,0 +1,107 @@
+
+Here’s a focused, section-by-section review of contact.html with clear, practical edits. I’ve included ready-to-paste copy where useful.
+
+Overall verdict
+
+Solid structure and a strong unified form. A few inconsistencies (CTA labels, emails, anchors) and missing reassurance/details that enterprise buyers expect. Add small UX touches to speed qualified requests and reduce back-and-forth.
+Head/SEO
+
+Keep but consider aligning with the rest of the site previews.
+Suggested tags:
+Title: Contact — VeritasLogic.ai
+Meta description: Contact us for demos, professional services, enterprise pricing, or support. We respond within 4 business hours.
+Add canonical and OG/Twitter tags like index.html for clean share previews.
+Navigation
+
+Inconsistencies with your sitewide CTA choice.
+Fixes:
+Change “Sign Up” to “Start Risk Free” and link to #contact-form.
+Ensure mobile menu script is loaded and working on this page.
+Contact Header
+
+Clear. Add SLA and preferred audience to increase confidence.
+Suggested subcopy:
+“We respond within 4 business hours (Mon–Fri, 9am–6pm PT). For demo requests, include your time zone and ideal times.”
+Unified Contact Form
+
+Strong layout and conditional fields. Add a few enterprise qualifiers and reassurance.
+
+Additions:
+
+Add optional fields many enterprises expect:
+Phone (optional), Time zone, Country/Region
+Standards of interest (multi-select): ASC 606, 340‑40, 842 (Lessee), 718, 805, 815 (Coming Soon)
+For demo-request: Preferred dates/times; video platform preference (Teams/Zoom/Google Meet)
+For enterprise-sales: Procurement stage (exploring/budgeted/in process), security requirements (NDA, DPA)
+Add privacy reassurance and consent microcopy under the form:
+“We’ll only use your information to respond to your inquiry. See our Privacy Policy.”
+Add a small trust line:
+“No file uploads here. For demos, we can review a redacted sample under NDA if needed.”
+Ready-to-paste microcopy:
+
+Under the button: “We’ll respond within 4 business hours (Mon–Fri, 9am–6pm PT).”
+Privacy note (below the note above): “We respect your privacy. By submitting, you agree to our Privacy Policy.”
+Conditional fields logic and labels
+
+Memo Rerun:
+Good. Add a brief scope note to match pricing page language:
+“Covers input corrections or extractable text issues. Methodology changes or expanded scope may require a new analysis.”
+Consider adding a small “additional fees may apply” note for High/Urgent to set expectations.
+Demo Request:
+Add fields for time zone and preferred times (optional).
+Enterprise Sales:
+Add a question: “Security review needed? (NDA, DPA, vendor form)” as a checkbox or select.
+Form UX enhancements (optional but high-impact)
+
+Quick-select chips above the form that preselect the inquiry type and scroll to the form:
+“Schedule a Live Demo,” “Enterprise Sales,” “Professional Services,” “Memo Rerun,” “Support”
+Each chip onclick calls selectInquiryType('…').
+Autocomplete attributes for fields to improve fill speed:
+name: autocomplete="name"; email: autocomplete="email"; company: autocomplete="organization"; role: autocomplete="organization-title".
+Input validation hints:
+For “role,” placeholder is good; consider a datalist with common roles if you like.
+Submission behavior and messages
+
+Success message is fine. Consider replacing alert with an inline success state above the form for a smoother experience.
+Error email must use the official address:
+Replace hello@veritaslogic.ai with support@veritaslogic.ai in the catch block.
+Consider a line stating expected next steps after success (demo: “We’ll propose 2–3 demo times”).
+Footer
+
+Several inconsistencies to fix:
+Platform: “Demo” → contact.html#contact-form (features.html#demo doesn’t exist)
+“Free Trial” → “Start Risk Free” and link to #contact-form
+Support email: ensure support@veritaslogic.ai everywhere (currently shows hello@ in JS and Support link)
+“Security” → features.html#security and label as “Security Overview” for consistency
+Consistency checklist
+
+CTA wording: Use “Start Risk Free” everywhere.
+Email: Use support@veritaslogic.ai everywhere (footer, JS error, support link).
+Anchors: Use contact.html#contact-form (replace #trial).
+SLA: Use “within 4 business hours (Mon–Fri, 9am–6pm PT)” consistently across contact/demos.
+Copy blocks you can paste
+
+Quick-select chips (place above the form)
+<div class="contact-quick-links"> <button type="button" class="chip" onclick="selectInquiryType('demo-request')">Schedule a Live Demo</button> <button type="button" class="chip" onclick="selectInquiryType('enterprise-sales')">Enterprise Sales</button> <button type="button" class="chip" onclick="selectInquiryType('professional-services')">Professional Services</button> <button type="button" class="chip" onclick="selectInquiryType('memo-rerun')">Memo Rerun</button> <button type="button" class="chip" onclick="selectInquiryType('technical-support')">Technical Support</button> </div>
+Add optional fields (examples)
+Time zone (global):
+<div class="form-group"> <label for="timezone">Time Zone</label> <input type="text" id="timezone" name="timezone" placeholder="e.g., PT, ET, GMT+1"> </div>
+Standards of interest:
+<div class="form-group"> <label for="standards">Standards of Interest</label> <select id="standards" name="standards" multiple> <option value="asc606">ASC 606</option> <option value="asc34040">ASC 340‑40</option> <option value="asc842-lessee">ASC 842 (Lessee)</option> <option value="asc718">ASC 718</option> <option value="asc805">ASC 805</option> <option value="asc815">ASC 815 (Coming Soon)</option> </select> <small>Select one or more (optional)</small> </div>
+Demo preferred times:
+<div class="form-group"> <label for="preferred-times">Preferred Dates/Times for Demo (optional)</label> <input type="text" id="preferred-times" name="preferred_times" placeholder="e.g., Tue 10–12 PT or Thu 2–4 ET"> </div>
+Enterprise security needs:
+<div class="form-group"> <label for="security-needs">Security/Procurement Needs (optional)</label> <select id="security-needs" name="security_needs"> <option value="">Select one</option> <option value="nda">NDA required before demo</option> <option value="dpa">DPA required</option> <option value="vendor-form">Vendor security questionnaire</option> <option value="none">None at this stage</option> </select> </div>
+Privacy/consent and SLA microcopy (below the submit button)
+<p class="form-note">We’ll respond within 4 business hours (Mon–Fri, 9am–6pm PT).</p> <p class="form-privacy">We’ll only use your information to respond to your inquiry. See our <a href="privacy.html">Privacy Policy</a>.</p>
+JS error email fix
+In the catch block: replace hello@veritaslogic.ai with support@veritaslogic.ai
+Footer platform links (replace)
+<a href="contact.html#contact-form">Demo</a> <a href="contact.html#contact-form">Start Risk Free</a>
+Navigation CTA (replace)
+<a href="contact.html#contact-form" class="nav-cta primary">Start Risk Free</a>
+Optional enhancements
+
+Add a “Schedule now” link to a calendar (e.g., Calendly) when inquiry type = demo-request; reveal a “Schedule a live demo now” button that opens your calendar.
+Add a honeypot input or basic trap text to reduce spam (invisible field).
+After successful submit, show an inline message with next steps instead of alert: “Thanks—your request is in. We’ll reply within 4 business hours with next steps and proposed times.”
