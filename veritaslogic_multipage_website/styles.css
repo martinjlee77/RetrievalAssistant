@@ -1227,6 +1227,85 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.6;
 }
 
+/* Leadership Section Styles */
+.leadership-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    position: relative;
+}
+
+.leadership-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
+}
+
+.leadership-section h2 {
+    font-size: 2.2rem;
+    color: #ffffff;
+    margin-bottom: 3rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.founder-profile {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 4rem;
+    align-items: start;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.founder-image {
+    width: 300px;
+    height: 300px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.founder-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.founder-bio h3 {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.founder-title {
+    color: rgba(255,255,255,0.7);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem !important;
+    font-weight: 500;
+}
+
+.founder-bio p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
 .founder-story h2 {
     font-size: 2.2rem;
     color: #ffffff;
