@@ -1,0 +1,164 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Privacy Policy — VeritasLogic.ai</title> <meta name="description" content="How VeritasLogic.ai collects, uses, and protects personal information. Session-based processing, no file storage post-analysis, OpenAI API with data retention off, Stripe payments."> <link rel="canonical" href="https://veritaslogic.ai/privacy.html"> <meta property="og:title" content="Privacy Policy — VeritasLogic.ai"> <meta property="og:description" content="Session-based processing; no file storage post-analysis. OpenAI API with data retention off. Learn how we handle your data."> <meta property="og:type" content="website"> <meta property="og:url" content="https://veritaslogic.ai/privacy.html"> <meta name="twitter:card" content="summary"> <link rel="stylesheet" href="styles.css"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> </head> <body> <!-- Navigation --> <nav class="navbar"> <div class="nav-container"> <a href="index.html" class="logo">VeritasLogic.ai</a> <ul class="nav-links"> <li><a href="index.html">Home</a></li> <li><a href="features.html">Features</a></li> <li><a href="pricing.html">Pricing</a></li> <li><a href="about.html">About</a></li> <li><a href="blog.html">Blog</a></li> <li><a href="contact.html">Contact</a></li> </ul> <button class="mobile-menu-btn">☰</button> <div class="nav-auth-buttons"> <a href="contact.html#contact-form" class="nav-cta primary">Start Risk Free</a> <a href="login.html" class="nav-cta secondary">Log In</a> </div> </div> </nav>
+<main>
+  <div class="container" style="max-width: 900px; margin: 80px auto; padding: 40px 20px;">
+    <h1>Privacy Policy</h1>
+    <p><em>Last updated: September 17, 2025</em></p>
+
+    <p>VeritasLogic.ai (“VeritasLogic,” “we,” “our,” or “us”) provides an AI‑assisted technical accounting analysis platform that generates professional memos with paragraph‑level citations across multiple FASB standards. This Privacy Policy explains how we collect, use, disclose, and protect personal information when you visit our websites, use our platform, or interact with us.</p>
+
+    <h2>1) Scope</h2>
+    <p>This Policy applies to website visitors, platform users, and individuals who contact us (e.g., demos, sales, support). It does not apply to third‑party websites or services linked from our site.</p>
+
+    <h2>2) Key definitions and roles</h2>
+    <ul>
+      <li><strong>Customer</strong>: The organization that contracts with VeritasLogic.</li>
+      <li><strong>Customer Content</strong>: Files, contracts, and other documents a Customer or its users upload for analysis, and outputs the platform generates.</li>
+      <li><strong>Personal Information</strong>: Information that identifies or can reasonably be linked to an individual (e.g., name, email, IP address).</li>
+    </ul>
+    <p>For Customer Content, we act as a processor/service provider, processing on behalf of the Customer under our agreement (and any data protection addendum, if applicable). For website, account, billing, and marketing data, we act as a controller/business.</p>
+
+    <h2>3) Information we collect</h2>
+    <ul>
+      <li><strong>Account and profile</strong>: Name, business email, company, role/title, password (if you set one), preferences.</li>
+      <li><strong>Billing and transactions</strong>: Processed by Stripe; we retain limited billing metadata (amount, date, last4) for records.</li>
+      <li><strong>Customer Content</strong>: Contracts and other documents you submit for analysis; related metadata you provide.</li>
+      <li><strong>Usage and device data</strong>: IP address, browser type, pages visited, timestamps, and feature interactions.</li>
+      <li><strong>Communications</strong>: Messages you send via forms, email, or support channels (e.g., demo requests, memo reruns, professional services).</li>
+      <li><strong>Cookies</strong>: Essential cookies for authentication and session management; limited analytics/performance cookies to improve our website and service.</li>
+    </ul>
+
+    <h2>4) How we use information</h2>
+    <ul>
+      <li><strong>Provide and improve the platform</strong>: Authenticate users; process documents; generate memos; maintain analysis history entries; provide exports.</li>
+      <li><strong>Operate, secure, and troubleshoot</strong>: Monitor performance, prevent fraud/abuse, detect security incidents, and fix bugs.</li>
+      <li><strong>Billing and account administration</strong>: Process credit purchases; maintain invoices/receipts; manage credit balances and expirations.</li>
+      <li><strong>Support and communications</strong>: Respond to inquiries, schedule demos, manage professional services, send service notices.</li>
+      <li><strong>Product development</strong>: Improve workflows and quality using aggregated or de‑identified data where appropriate.</li>
+      <li><strong>Marketing (optional)</strong>: Send product updates or newsletters; you can opt out at any time.</li>
+    </ul>
+
+    <h2>5) Legal bases for processing (EEA/UK)</h2>
+    <p>Where GDPR/UK GDPR applies, we rely on: (a) contract performance; (b) legitimate interests (to secure, operate, and improve the platform, and to prevent fraud); (c) consent (for optional marketing or non‑essential cookies); and (d) legal obligations (tax/accounting, compliance).</p>
+
+    <h2>6) How we handle Customer Content</h2>
+    <ul>
+      <li><strong>Session‑based processing; no file storage post‑analysis</strong>: We process your documents in a temporary session and do not store your uploaded files after analysis completes. Only an analysis history entry is retained (e.g., date, standard, document size, tier, cost).</li>
+      <li><strong>Outputs</strong>: We generate memo outputs (DOCX/PDF/HTML/Markdown) for you to download. Please retain your own copies.</li>
+      <li><strong>Professional services (optional)</strong>: If you request expert review or custom workflows, we will access Customer Content only as directed by you, solely to provide those services, and under confidentiality obligations.</li>
+      <li><strong>Model training</strong>: We do not use Customer Content to train AI models. We use the OpenAI API with data retention turned off; your data is not used to train OpenAI’s models.</li>
+    </ul>
+
+    <h2>7) Sharing and disclosures</h2>
+    <p>We do <strong>not</strong> sell Personal Information or share it for cross‑context behavioral advertising.</p>
+    <p>We may disclose Personal Information to:</p>
+    <ul>
+      <li><strong>Service providers/subprocessors</strong>: Hosting and infrastructure (providers with SOC 2 Type II–compliant environments), payment processing (Stripe), email/support tools, document processing infrastructure, and AI API providers (OpenAI API with data retention off).</li>
+      <li><strong>Professional services reviewers (optional)</strong>: Senior accounting reviewers, under confidentiality, when you engage expert review.</li>
+      <li><strong>Business operations</strong>: Advisors (legal/accounting), auditors, or potential acquirers or transferees in a corporate transaction, under appropriate confidentiality.</li>
+      <li><strong>Legal and safety</strong>: Where required by law, court order, or to protect rights, safety, and the integrity of our users and services.</li>
+    </ul>
+    <p>We may update subprocessors as needed; material changes for contracted Customers will be communicated per the DPA or agreement.</p>
+
+    <h2>8) Data retention</h2>
+    <ul>
+      <li><strong>Customer Content files</strong>: Processed in a temporary session; not stored after analysis completes.</li>
+      <li><strong>Analysis history entries</strong>: Retained to provide your history and for billing/records, while your account is active and as required by law.</li>
+      <li><strong>Account, billing, and support records</strong>: Retained for the duration of the relationship and as required by applicable laws.</li>
+      <li><strong>Marketing preferences</strong>: Retained until you opt out or request deletion, or for the minimum period necessary.</li>
+    </ul>
+
+    <h2>9) Security</h2>
+    <p>We use administrative, technical, and organizational measures designed to protect Personal Information, including:</p>
+    <ul>
+      <li>Encryption in transit (TLS 1.3) and at rest on our providers (AES‑256 where applicable).</li>
+      <li>Session‑based document processing; no persistent storage of uploaded files after analysis completion.</li>
+      <li>OpenAI API used with data retention turned off; your data is not used to train models.</li>
+      <li>Access controls, logging, and monitoring appropriate for our service.</li>
+    </ul>
+    <p>No method of transmission or storage is 100% secure. If you believe your account has been compromised, contact us immediately at <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>. For an overview of our security posture, see our <a href="features.html#security">Security Overview</a>.</p>
+
+    <h2>10) International transfers</h2>
+    <p>We may process Personal Information in the United States and other countries where we or our service providers operate. Where required, we use appropriate safeguards for transfers (e.g., Standard Contractual Clauses) and implement additional controls as needed.</p>
+
+    <h2>11) Your privacy rights</h2>
+    <p>Depending on your location, you may have rights to access, correct, delete, or port your Personal Information; object to or restrict processing; and withdraw consent where processing is based on consent. To exercise rights, contact <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>. We may need to verify your identity. If we process Personal Information as a processor for a Customer, we will direct you to that Customer (the controller) to fulfill your request.</p>
+
+    <h2>12) California (CCPA/CPRA) and other U.S. state rights</h2>
+    <ul>
+      <li>We do not sell Personal Information or share it for cross‑context behavioral advertising.</li>
+      <li>You may request access, correction, or deletion of Personal Information, and information about our data practices.</li>
+      <li>We do not discriminate for exercising your rights.</li>
+    </ul>
+    <p>Submit requests to <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>. You may designate an authorized agent; we will require proof of authorization and verification.</p>
+
+    <h2>13) Cookies and analytics</h2>
+    <p>We use essential cookies for site functionality (e.g., login, session management) and may use limited analytics/performance cookies to improve the site and product experience. You can control cookies via your browser settings and, where required, via our cookie banner. Disabling cookies may impact functionality.</p>
+
+    <h2>14) Children’s privacy</h2>
+    <p>Our services are not directed to individuals under 16, and we do not knowingly collect Personal Information from children. If you believe a child provided us Personal Information, contact us and we will take appropriate steps.</p>
+
+    <h2>15) Communications and marketing</h2>
+    <p>You can opt out of marketing emails at any time by clicking unsubscribe or contacting <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>. We may still send transactional or service‑related communications (e.g., password resets, billing notices).</p>
+
+    <h2>16) Data protection addendum (DPA)</h2>
+    <p>Enterprise Customers that require a DPA can contact <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>. We process Customer Content strictly under your instructions and the terms of our DPA and agreement.</p>
+
+    <h2>17) Changes to this Policy</h2>
+    <p>We may update this Privacy Policy from time to time. We will post the updated Policy with a new “Last updated” date. For material changes, we will provide additional notice as required by law. Your continued use of the services after an update constitutes acceptance.</p>
+
+    <h2>18) Contact us</h2>
+    <p>Email: <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a></p>
+    <p>Postal address available upon request.</p>
+
+    <h3>Service‑specific notes</h3>
+    <ul>
+      <li><strong>Credits and billing</strong>: Payments are processed by Stripe. Credits you purchase typically expire 12 months from purchase (see <a href="pricing.html">Pricing</a> and <a href="terms.html">Terms</a>). We retain billing records as required by law.</li>
+      <li><strong>Analysis handling</strong>: Documents are processed in a temporary session and are not stored after analysis. Only analysis history entries are retained. We use the OpenAI API with data retention turned off; your data is not used to train models.</li>
+    </ul>
+
+    <p style="margin-top: 24px;"><a href="index.html">← Back to Home</a> • <a href="contact.html#contact-form">Contact Support</a></p>
+  </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>VeritasLogic.ai</h4>
+                <p>Transforming technical accounting with domain‑specific AI for preparation and expert reviews.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <a href="features.html">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="contact.html#contact-form">Demo</a>
+                <a href="contact.html#contact-form">Start Risk Free</a>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="blog.html">Blog</a>
+                <a href="contact.html">Contact</a>
+                <a href="mailto:support@veritaslogic.ai">Support</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="features.html#security">Security Overview</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+  // Optional: mobile menu toggle (if used elsewhere)
+  document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+      document.querySelector('.nav-links')?.classList.toggle('mobile-open');
+  });
+</script>
+
+</body> </html>
