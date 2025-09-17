@@ -528,6 +528,21 @@ h1, h2, h3, h4, h5, h6 {
     color: #f2f2f2;
     border: 1px solid #f2f2f2;
 }
+.roadmap-note {
+    text-align: center;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+}
+
 /* ================================
    13. HUMAN REVIEW SECTION
    ================================ */
@@ -3638,4 +3653,52 @@ a:focus {
     font-size: 1.1rem;
     margin-bottom: 2rem;
     color: rgba(255, 255, 255, 0.8);
+}
+
+/* Review Process Timeline */
+.timeline {
+  position: relative;
+  margin: 1.5rem auto 0;
+  padding-left: 2rem;
+  max-width: 720px;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  top: 0.25rem;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
+}
+.timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0 1.25rem;
+}
+.timeline-marker {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #fff; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 0 8px rgba(255,255,255,0.15);
+  z-index: 1;
+}
+.timeline-content {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--border-radius);
+  padding: 1rem 1.25rem;
+  backdrop-filter: blur(10px);
+}
+.timeline-content h4 { margin: 0 0 0.25rem; color: #fff; font-size: 1.05rem; }
+.timeline-content p { margin: 0; color: var(--color-text-muted); font-size: 0.95rem; }
+@media (max-width: 600px) {
+  .timeline { padding-left: 1.25rem; }
+  .timeline::before { left: 0.7rem; }
+  .timeline-item { grid-template-columns: 2.25rem 1fr; }
+  .timeline-marker { width: 1.75rem; height: 1.75rem; font-size: 0.9rem; }
 }
