@@ -1,0 +1,124 @@
+Here’s a focused review of signup.html for clarity, conversion, security, and consistency. I’ve included ready-to-paste copy and small code fixes.
+
+Overall verdict
+
+Clear and professional. Strengthen enterprise trust with noindex, consistent CTAs, stricter business-email enforcement, safer messaging (avoid XSS), and accessibility. Add minor UX touches (show/hide password, caps lock hint) and align footer links.
+Head/SEO
+
+Add noindex to keep auth pages out of search.
+Add canonical and OG/Twitter tags for clean internal shares.
+Standardize fonts (use Poppins like the rest of marketing pages).
+Suggested tags to add/replace in <head>:
+
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://veritaslogic.ai/signup.html">
+<meta property="og:title" content="Create Your Account — VeritasLogic.ai">
+<meta property="og:description" content="Create your VeritasLogic account. Business email required. First‑memo refund within 14 days.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://veritaslogic.ai/signup.html">
+<meta name="twitter:card" content="summary">
+Consider switching Inter to Poppins to match other pages.
+Navigation
+
+CTA consistency:
+Consider adding a “Start Risk Free” CTA in nav (primary) linking to contact.html#contact-form. Keep “Log In” as secondary.
+Ensure mobile menu script works (script.js already included; good).
+Header copy
+
+Current copy is good. Optional clarity:
+“Business email required. First‑memo refund within 14 days if not usable for your stated purpose.”
+Signup form: policy alignment and UX/security
+
+Business email enforcement:
+You state “Only corporate email addresses are accepted” but there’s no enforcement. Add a blocklist of common free domains and server-side validation to match. Provide inline error messaging.
+Email verification:
+If you require verification, add a note: “We’ll email you a verification link to activate your account.”
+Password security:
+Add show/hide toggle and Caps Lock warning to reduce failed attempts.
+Consider raising minimum length to 12 for enterprise accounts (if feasible) and ensure backend enforces it.
+Accessibility:
+Add aria-live to message container.
+Add autocomplete attributes: given-name, family-name, email, organization, organization-title, new-password, new-password confirmation.
+Add aria-describedby on password for requirements list.
+XSS safety:
+Your showMessage injects innerHTML with server-provided strings. Switch to textContent or sanitize.
+“Other” role handling:
+If “Other” is selected, reveal a short free-text role input (optional but helpful).
+Privacy microcopy:
+Add a one-liner under the form button: “We’ll only use your information to create your account and provide the service. See our Privacy Policy.”
+Footer
+
+Fix typos and links:
+“expert reviews..” → “expert reviews.”
+“Demo” → contact.html#contact-form (features.html#demo anchor doesn’t exist)
+“Start Risk Free” should not link to signup; link to contact.html#contact-form
+“Security” → features.html#security labeled “Security Overview”
+Ready-to-paste changes
+
+A) Message container accessibility and safer showMessage
+
+Change container:
+<div id="messageContainer" aria-live="polite" role="status"></div>
+Safer showMessage (no HTML injection): function showMessage(message, type) { const container = document.getElementById('messageContainer'); const box = document.createElement('div'); box.className = ${type}-message; box.textContent = message; // prevents XSS container.innerHTML = ''; container.appendChild(box); container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+B) Autocomplete and input attributes
+
+First/Last name:
+<input ... autocomplete="given-name">
+<input ... autocomplete="family-name">
+Email:
+<input type="email" ... autocomplete="email" inputmode="email">
+Company:
+<input ... autocomplete="organization">
+Job title:
+<select ... autocomplete="organization-title">
+Passwords:
+<input type="password" ... autocomplete="new-password">
+<input type="password" ... autocomplete="new-password" aria-describedby="password-help">
+Add id="password-help" to the requirements container.
+C) Business email blocklist (client-side) Add before form submit handler: const freeDomains = [ 'gmail.com','yahoo.com','outlook.com','hotmail.com','live.com','aol.com','icloud.com', 'mail.com','proton.me','protonmail.com','yandex.com','gmx.com','zoho.com','me.com' ]; function isBusinessEmail(email) { const domain = email.split('@')[1]?.toLowerCase().trim(); return domain && !freeDomains.includes(domain); } In submit handler, after regex validation: if (!isBusinessEmail(formData.email)) { showMessage('Please use a valid business email address (no gmail, outlook, yahoo, etc.)', 'error'); return; } Note: Enforce this server-side too.
+
+D) Password show/hide + Caps Lock (optional UX)
+
+Add a toggle button next to password fields: <button type="button" id="togglePwd" class="btn-link">Show</button> JS: document.getElementById('togglePwd').addEventListener('click', () => { const pwd = document.getElementById('password'); const isPwd = pwd.type === 'password'; pwd.type = isPwd ? 'text' : 'password'; document.getElementById('togglePwd').textContent = isPwd ? 'Hide' : 'Show'; }); document.getElementById('password').addEventListener('keydown', (e) => { if (e.getModifierState && e.getModifierState('CapsLock')) { showMessage('Heads up: Caps Lock is on', 'info'); } });
+E) “Other” role free-text (optional)
+
+After the jobTitle select:
+<div class="form-group" id="jobTitleOtherGroup" style="display:none;"> <label for="jobTitleOther">Your Role</label> <input type="text" id="jobTitleOther" name="jobTitleOther" placeholder="Enter your role"> </div> JS: document.getElementById('jobTitle').addEventListener('change', (e) => { const show = e.target.value === 'Other'; document.getElementById('jobTitleOtherGroup').style.display = show ? 'block' : 'none'; });
+F) Terms checkbox copy (small clarity)
+
+Current is fine. Optional tweak:
+“… and acknowledge the service does not constitute legal, audit, or accounting advice.”
+G) Footer link fixes (replace the Platform block)
+
+<a href="features.html">Features</a>
+<a href="pricing.html">Pricing</a>
+<a href="contact.html#contact-form">Demo</a>
+<a href="contact.html#contact-form">Start Risk Free</a> Also fix the sentence:
+Transforming technical accounting with domain-specific AI for preparation and expert reviews.
+H) Head tags (noindex/canonical/OG) Add to <head>: <meta name="robots" content="noindex, nofollow">
+
+<link rel="canonical" href="https://veritaslogic.ai/signup.html"> <meta property="og:title" content="Create Your Account — VeritasLogic.ai"> <meta property="og:description" content="Create your VeritasLogic account. Business email required. First‑memo refund within 14 days."> <meta property="og:type" content="website"> <meta property="og:url" content="https://veritaslogic.ai/signup.html"> <meta name="twitter:card" content="summary">
+I) Success flow messaging
+
+If you require email verification:
+On success, show: “Account created. Please check your email for a verification link.”
+Only redirect to login after verification (or keep current behavior if you allow immediate login).
+Disable the submit button after success: submitButton.disabled = true; submitButton.textContent = 'Account Created';
+J) Minor copy tweaks
+
+Business notice:
+“Business Email Required: Only corporate email addresses are accepted. Personal emails (gmail, outlook, yahoo, etc.) are not permitted. Business accounts are activated instantly.”
+If you require verification, change last sentence to: “We’ll email you a verification link.”
+K) Backend consistency reminders
+
+Enforce business-email restrictions on the server-side as the source of truth.
+Enforce password requirements server-side (length/complexity).
+Sanitize server error messages to avoid HTML injection and keep them generic.
+Final checklist
+
+Add noindex and canonical tags.
+Enforce business email policy (client + server).
+Add aria-live and autocomplete attributes.
+Replace innerHTML injection with safe text insertion.
+Fix footer links and typo; standardize to contact.html#contact-form for “Demo” and “Start Risk Free.”
+Optional but recommended: password toggle and caps lock hint; “Other” role text field; verification note.
