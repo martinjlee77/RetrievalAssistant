@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog - VeritasLogic.ai</title>
-    <meta name="description" content="Accounting & AI insights from the VeritasLogic.ai team. Stay updated on the latest in technical accounting and AI innovation.">
+    <title>Blog — Technical Accounting & AI Insights | VeritasLogic.ai</title>
+    <meta name="description" content="Accounting and AI insights for Controllers, CAOs, and technical accountants. ASC 606, 842 (Lessee), 805, 718, 340‑40. Practical, audit‑ready guidance.">
+    <link rel="canonical" href="https://veritaslogic.ai/blog.html">
+    <meta property="og:title" content="Blog — Technical Accounting & AI Insights">
+    <meta property="og:description" content="Accounting and AI insights for Controllers, CAOs, and technical accountants. ASC 606, 842 (Lessee), 805, 718, 340‑40.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://veritaslogic.ai/blog.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog — Technical Accounting & AI Insights">
+    <meta name="twitter:description" content="Accounting and AI insights for Controllers, CAOs, and technical accountants.">
+    <link rel="alternate" type="application/rss+xml" title="VeritasLogic.ai Blog" href="/blog.xml">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +34,7 @@
             </ul>
             <button class="mobile-menu-btn">☰</button>
             <div class="nav-auth-buttons">
-                <a href="signup.html" class="nav-cta primary">Sign Up</a>
+                <a href="contact.html#contact-form" class="nav-cta primary">Start Risk Free</a>
                 <a href="login.html" class="nav-cta secondary">Log In</a>
             </div>
         </div>
@@ -35,7 +44,7 @@
     <section class="page-header">
         <div class="container">
             <h1>Accounting & AI Insights</h1>
-            <p>Stay updated on the latest developments in technical accounting, AI technology, and industry best practices from our expert team.</p>
+            <p>Practical insights for Controllers, CAOs, and technical accounting teams. ASC 606, 842 (Lessee), 805, 718, 340‑40.</p>
         </div>
     </section>
 
@@ -46,9 +55,10 @@
                 <!-- Main Content -->
                 <main class="blog-main">
                     <!-- Featured Post -->
-                    <article class="featured-post" id="post1">
+                    <article class="featured-post" id="post1" data-category="asc-606">
                         <div class="post-meta">
-                            <span class="post-date">March 15, 2025</span>
+                            <time class="post-date" datetime="2025-03-15">March 15, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
                             <span class="post-category">ASC 606</span>
                             <span class="post-read-time">8 min read</span>
                         </div>
@@ -110,9 +120,10 @@
                     </article>
 
                     <!-- Regular Posts -->
-                    <article class="blog-post" id="post2">
+                    <article class="blog-post" id="post2" data-category="ai-accounting">
                         <div class="post-meta">
-                            <span class="post-date">March 8, 2025</span>
+                            <time class="post-date" datetime="2025-03-08">March 8, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
                             <span class="post-category">AI & Accounting</span>
                             <span class="post-read-time">6 min read</span>
                         </div>
@@ -144,9 +155,10 @@
                         </div>
                     </article>
 
-                    <article class="blog-post" id="post3">
+                    <article class="blog-post" id="post3" data-category="best-practices">
                         <div class="post-meta">
-                            <span class="post-date">February 28, 2025</span>
+                            <time class="post-date" datetime="2025-02-28">February 28, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
                             <span class="post-category">Best Practices</span>
                             <span class="post-read-time">5 min read</span>
                         </div>
@@ -173,9 +185,10 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" id="post4" data-category="asc-842">
                         <div class="post-meta">
-                            <span class="post-date">February 15, 2025</span>
+                            <time class="post-date" datetime="2025-02-15">February 15, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
                             <span class="post-category">ASC 842</span>
                             <span class="post-read-time">7 min read</span>
                         </div>
@@ -196,9 +209,10 @@
                         </div>
                     </article>
 
-                    <article class="blog-post">
+                    <article class="blog-post" id="post5" data-category="technology">
                         <div class="post-meta">
-                            <span class="post-date">February 1, 2025</span>
+                            <time class="post-date" datetime="2025-02-01">February 1, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
                             <span class="post-category">Technology</span>
                             <span class="post-read-time">4 min read</span>
                         </div>
@@ -229,7 +243,7 @@
                 <aside class="blog-sidebar">
                     <div class="sidebar-widget">
                         <h3>Categories</h3>
-                        <ul class="category-list">
+                        <ul class="category-list" aria-label="Filter blog posts by category">
                             <li><a href="#" data-category="all">All Posts <span>(5)</span></a></li>
                             <li><a href="#" data-category="asc-606">ASC 606 <span>(1)</span></a></li>
                             <li><a href="#" data-category="asc-842">ASC 842 <span>(1)</span></a></li>
@@ -244,8 +258,9 @@
                         <p>Get the latest insights delivered to your inbox</p>
                         <form class="subscribe-form">
                             <input type="email" placeholder="Your email address" required>
-                            <button type="submit">Subscribe</button>
+                            <button type="submit" aria-label="Subscribe to blog updates">Subscribe</button>
                         </form>
+                        <p class="subscribe-note">No spam. 1–2 emails/month. By subscribing, you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
                     </div>
 
                     <div class="sidebar-widget">
@@ -264,8 +279,9 @@
 
                     <div class="sidebar-widget">
                         <h3>Ready to Try VeritasLogic.ai?</h3>
-                        <p>Experience the future of technical accounting analysis</p>
-                        <a href="contact.html#trial" class="sidebar-cta">Start Free Trial</a>
+                        <p>Experience the future of technical accounting analysis.</p>
+                        <a href="contact.html#contact-form" class="sidebar-cta">Start Risk Free</a>
+                        <p class="microcopy">14‑day first‑memo refund; pay per analysis.</p>
                     </div>
                 </aside>
             </div>
@@ -278,15 +294,15 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h4>VeritasLogic.ai</h4>
-                    <p> <li><a href="about.html">About</a></li></p>
+                    <p>Transforming technical accounting with domain‑specific AI for preparation and expert reviews.</p>
                 </div>
                 
                 <div class="footer-section">
                     <h4>Platform</h4>
                     <a href="features.html">Features</a>
                     <a href="pricing.html">Pricing</a>
-                    <a href="features.html#demo">Demo</a>
-                    <a href="contact.html">Start Risk Free</a>
+                    <a href="contact.html#contact-form">Demo</a>
+                    <a href="contact.html#contact-form">Start Risk Free</a>
                 </div>
                 
                 <div class="footer-section">
@@ -301,7 +317,7 @@
                     <h4>Legal</h4>
                     <a href="privacy.html">Privacy Policy</a>
                     <a href="terms.html">Terms of Service</a>
-                    <a href="security.html">Security</a>
+                    <a href="features.html#security">Security Overview</a>
                 </div>
             </div>
             
@@ -325,14 +341,29 @@
                 });
             }
 
-            // Category filtering (basic implementation)
-            const categoryLinks = document.querySelectorAll('[data-category]');
+            // Category filtering (functional implementation)
+            const categoryLinks = document.querySelectorAll('.category-list [data-category]');
+            const posts = document.querySelectorAll('.featured-post, .blog-post');
+            
             categoryLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const category = this.getAttribute('data-category');
-                    console.log('Filter by category:', category);
-                    // Implementation for filtering posts would go here
+                    
+                    // Remove active class from all links
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Filter posts
+                    posts.forEach(post => {
+                        const postCategory = post.getAttribute('data-category');
+                        if (category === 'all' || postCategory === category) {
+                            post.style.display = '';
+                        } else {
+                            post.style.display = 'none';
+                        }
+                    });
                 });
             });
         });
