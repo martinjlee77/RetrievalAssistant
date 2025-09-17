@@ -421,6 +421,46 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
 }
 
+.demo-preview-points {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+
+.demo-preview-points p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.demo-preview-points ul {
+    color: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+    list-style-type: disc;
+    margin-left: 2rem;
+}
+
+.demo-preview-points li {
+    margin-bottom: 0.5rem;
+}
+
+.demo-fallback {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+}
+
+.demo-fallback a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.demo-fallback a:hover {
+    color: #ffffff;
+}
+
 .video-container {
     margin-top: 2rem; 
     width: 100%; 
@@ -1237,11 +1277,8 @@ h1, h2, h3, h4, h5, h6 {
 .founder-image {
     width: 300px;
     height: 300px;
-    border-radius: 20px;
+    border-radius: 50%;
     overflow: hidden;
-    border: 3px solid rgba(255,255,255,0.15);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    background: rgba(255,255,255,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2152,6 +2189,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: start;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 2rem;
 }
 
 .pricing-table-section {
@@ -2354,6 +2392,57 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.95rem;
     margin: 0;
     line-height: 1.5;
+}
+
+/* Pricing Notes Section */
+.pricing-notes {
+    margin-top: 3rem;
+    padding: 2rem;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.measurement-note,
+.estimator-note,
+.edge-case-note {
+    margin-bottom: 1.5rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.tier-examples {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.tier-examples p {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+}
+
+.tier-examples ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.tier-examples li {
+    margin-bottom: 0.75rem;
+    color: rgba(255,255,255,0.8);
+    padding-left: 1rem;
+    position: relative;
+}
+
+.tier-examples li::before {
+    content: "•";
+    color: rgba(255,255,255,0.6);
+    position: absolute;
+    left: 0;
 }
 
 .pricing-card {
@@ -3251,7 +3340,7 @@ h1, h2, h3, h4, h5, h6 {
 .cta-note {
     color: rgba(255,255,255,0.6);
     font-size: 0.9rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
 }
 
 /* Footer */
@@ -3605,7 +3694,7 @@ html {
 }
 
 .form-group small {
-    color: #666;
+    color: rgba(255,255,255,0.8);
     font-size: 12px;
     margin-top: 5px;
     display: block;
