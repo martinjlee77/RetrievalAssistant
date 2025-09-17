@@ -81,8 +81,8 @@
     --border-radius: 12px;
     --border-radius-sm: 8px;
     /* Navigation */
-    --nav-gap: 0.8rem; /* Controls spacing between buttons */
-    --nav-pad-x: 1rem; /* Controls button width */
+    --nav-gap: 1rem; /* Controls spacing between buttons */
+    --nav-pad-x: 0.5rem; /* Controls button width */
     --nav-pad-y: 0.5rem; /* Controls button height */
 }
 body {
@@ -555,6 +555,34 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.1rem;
     font-weight: 400;
     max-width: 600px;
+}
+
+/* Two-column feature layout */
+.feature-content.two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.feature-left h2 {
+    margin-bottom: 1rem;
+}
+
+.feature-left .value-statement {
+    margin-bottom: 1.5rem;
+}
+
+.feature-right p {
+    margin-bottom: 2rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .feature-content.two-column {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
 }
 
 /* ================================
