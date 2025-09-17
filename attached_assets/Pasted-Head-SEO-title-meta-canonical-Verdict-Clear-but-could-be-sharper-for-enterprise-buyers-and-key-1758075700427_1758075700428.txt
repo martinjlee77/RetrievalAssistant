@@ -1,0 +1,71 @@
+Head/SEO (title, meta, canonical)
+Verdict: Clear but could be sharper for enterprise buyers and keyword intent.
+Top 3 edits:
+Update title to include strongest outcomes + standards: “VeritasLogic.ai — Technical Accounting Memos in Minutes (ASC 606, 842, 805, 718)”.
+Update meta description to highlight persona + benefit + proof: “Generate audit-ready ASC analyses in minutes with paragraph-level citations. Built for Controllers, CAOs, and technical accountants. Start risk free.”
+Add Open Graph/Twitter tags to improve link previews (title, description, image). This helps with credibility when links are shared internally.
+Navigation
+Verdict: Clear. Good IA and CTA placement.
+Top 3 edits:
+Standardize the primary CTA label to “Start Risk Free” (replace all “Start Free Trial” variants).
+Consider adding a short persona tag under the logo on desktop (“Built for Controllers, CAOs, and Technical Accountants”) to instantly qualify the audience.
+Ensure all anchor links exist: features.html#demo and contact.html#trial anchors currently don’t exist. Either add the anchors or change links to contact.html#contact-form and features.html (Demo section).
+Hero section
+Verdict: Strong headline and supporting sentence. Well aligned with your audience and desired primary action.
+Top 3 edits:
+Add a credibility subline to strengthen trust: “Built by accountants. Designed for Fortune 500 technical accounting teams.”
+Mention standards right in the hero to set scope: “Handles ASC 606, 842 (Lessee), 805, 718, 340‑40.”
+Fix CTA link target and spacing: change Request a Demo (double space) to “Request a Demo”; ensure Start Risk Free links to a working anchor (contact.html#contact-form).
+How It Works
+Verdict: Clear and simple. Could give more specifics to reduce perceived risk.
+Top 3 edits:
+Replace “You upload documents, AI does the work, and you review” with a 3-step line: “1) Upload contracts and docs 2) AI drafts memo with ASC citations 3) You review, finalize, and export.”
+Add a short reassurance line under the steps: “Session-based processing; only your analysis history is retained.”
+Add a 15–20 word caption under the diagram image summarizing expected time: “Typical end-to-end time: 3–5 minutes for a 30-page contract.”
+Demo Preview
+Verdict: Clear. Good to have a video.
+Top 3 edits:
+Add a 3-bullet “What you’ll see” list: “Upload flow; ASC 606 analysis steps; final memo with paragraph-level citations.”
+Add video length in the description (e.g., “3-minute walkthrough”) to reduce friction.
+Add a fallback CTA near the video: “Prefer a live walkthrough? Request a Demo” linking to contact.html#contact-form.
+Expert Review Services (Human-in-the-Loop)
+Verdict: Good positioning. Messaging order can be tighter.
+Top 3 edits:
+Lead with a one-liner value statement: “Get senior technical accountants to review and finalize complex issues within 1–2 business days.”
+Add specificity: “15+ years avg. experience; Big 4 background; ASC specialization.” Consider an SLA snippet: “Turnaround: 1–2 business days.”
+Add a price/engagement cue: “Contact for pricing” and link to contact.html?inquiry=professional-services#contact-form.
+Accounting Standards Currently Available
+Verdict: Clear but one material accuracy fix and one scope clarification needed.
+Top 3 edits:
+Fix “ASC 818 Hedging” to “ASC 815 Derivatives and Hedging (Coming Soon).”
+Clarify ASC 842 scope: “ASC 842 (Lessee only).”
+Consider adding a “Roadmap” note: “Lessor not currently supported.” Keeps expectations tight for enterprise buyers.
+Latest Blog Posts
+Verdict: Solid credibility builder. Dates and categories look fine for launch.
+Top 3 edits:
+Add reading time to each card (e.g., “6 min read”) to improve click-through.
+Add a short author line or “From the VeritasLogic.ai Accounting Team” for authority.
+Make sure the links resolve to real anchors or pages (blog.html#post1 etc. should exist).
+CTA (“Ready to Learn More?”)
+Verdict: Good placement. Minor inconsistencies.
+Top 3 edits:
+Standardize button label to “Start Risk Free” (not “Start Free Trial”).
+Update demo CTA to “Request a Demo” and point to contact.html#contact-form.
+Add single-sentence social proof or reassurance underneath: “14-day first-memo refund; no subscriptions; pay per analysis.”
+Footer
+Verdict: Strong structure. Some link/email cleanup needed.
+Top 3 edits:
+Standardize Support email to support@veritaslogic.ai (it’s correct here—ensure sitewide consistency).
+Confirm that “Security” page exists or change to a shorter “Security Overview” section on Features if not ready.
+Fix anchor references: features.html#demo (no anchor exists), contact.html#trial (no anchor exists). Use #contact-form.
+Cross-page consistency flags from index.html references
+
+CTA language: Use “Start Risk Free” everywhere.
+Email: Use support@veritaslogic.ai everywhere (contact page currently includes hello@).
+Standards: Use “ASC 815 Derivatives and Hedging (Coming Soon).”
+ASC 842 scope: “Lessee only.”
+Anchors: Add or fix #trial and #demo anchors or point to #contact-form.
+Security and data retention wording to keep simple and accurate (for later pages, but relevant to homepage expectations)
+
+Suggested plain-English phrasing: “We process your documents in a temporary session and don’t store your files after analysis. Only your analysis history entry is retained. We use OpenAI’s enterprise-grade API with data retention off—your data isn’t used to train models.”
+This keeps it non-technical but precise, and aligns with your actual behavior.
