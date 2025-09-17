@@ -80,6 +80,10 @@
     --border-subtle: 1px solid rgba(255,255,255,0.1);
     --border-radius: 12px;
     --border-radius-sm: 8px;
+    /* Navigation */
+    --nav-gap: 2rem;
+    --nav-pad-x: 1rem;
+    --nav-pad-y: 0.5rem;
 }
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
