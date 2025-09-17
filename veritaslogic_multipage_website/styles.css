@@ -585,6 +585,84 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+/* Enterprise Controls Grid */
+.enterprise-controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.control-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.control-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.control-card h4 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.control-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.control-card ul li {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.4;
+}
+
+.control-card ul li:before {
+    content: '•';
+    color: #4a90e2;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.security-cta {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.security-cta .cta-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+/* Mobile responsive for enterprise controls */
+@media (max-width: 768px) {
+    .enterprise-controls-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .control-card {
+        padding: 1.25rem;
+    }
+}
+
 /* ================================
    13. HUMAN REVIEW SECTION
    ================================ */
