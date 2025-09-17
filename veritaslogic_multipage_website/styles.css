@@ -119,7 +119,7 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: var(--border-subtle);
 }
 .nav-container {
-    max-width: clamp(800px, 90vw, 1000px); /* Responsive navbar width - experiment with different values */
+    max-width: clamp(1000px, 95vw, 1200px); /* Restored generous width from original */
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -137,18 +137,30 @@ h1, h2, h3, h4, h5, h6 {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 0.5rem;
-    flex-wrap: wrap; /* Prevents overflow on smaller screens */
+    gap: 2rem; /* Restored comfortable spacing from original */
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
 }
+.nav-links li {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
 .nav-links a {
     color: rgba(255,255,255,0.8);
     text-decoration: none;
     font-weight: 500;
     transition: all 0.3s ease;
     position: relative;
-    padding: 0.5rem 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
     border-radius: var(--border-radius-sm);
-    display: inline-block;
+    white-space: nowrap;
+    box-sizing: border-box;
 }
 .nav-links a:hover {
     color: var(--color-accent);
@@ -157,6 +169,7 @@ h1, h2, h3, h4, h5, h6 {
 .nav-links a.active {
     color: var(--color-accent);
     background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem; /* Only active links get padding like original */
     text-shadow: 0 2px 4px rgba(255,255,255,0.3);
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.2);
     font-weight: 600;
