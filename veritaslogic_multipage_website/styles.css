@@ -46,11 +46,56 @@
     box-sizing: border-box;
 }
 
+/* ================================
+   CSS DESIGN TOKENS
+   ================================ */
+:root {
+    /* Colors */
+    --color-primary: #212F3C;
+    --color-primary-light: #2C3E50;
+    --color-secondary: #1A252F;
+    --color-accent: #ffffff;
+    --color-text: #ffffff;
+    --color-text-muted: rgba(255,255,255,0.8);
+    
+    /* Navbar Colors */
+    --navbar-bg: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    --navbar-active-bg: linear-gradient(135deg, #2A353F 0%, #31434C 100%);
+    --navbar-active-light: rgba(42, 53, 63, 0.8);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    --gradient-secondary: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    --gradient-tertiary: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    --gradient-quaternary: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
+    
+    /* Spacing */
+    --space-section: 100px;
+    --space-section-sm: 80px;
+    --space-section-lg: 120px;
+    --space-content: 4rem;
+    --space-header: 2rem;
+    
+    /* Typography */
+    --font-size-h1: 3rem;
+    --font-size-h2: 2.5rem;
+    --font-size-h3: 2rem;
+    --font-size-body: 1rem;
+    --font-size-large: 1.2rem;
+    
+    /* Effects */
+    --shadow-card: 0 12px 40px rgba(0,0,0,0.3);
+    --shadow-hover: 0 6px 18px rgba(255,255,255,0.3);
+    --border-subtle: 1px solid rgba(255,255,255,0.1);
+    --border-radius: 12px;
+    --border-radius-sm: 8px;
+}
+
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
-    color: #ffffff;
-    background-color: #212F3C;
+    color: var(--color-text);
+    background-color: var(--color-primary);
     overflow-x: hidden;
 }
 
@@ -77,14 +122,14 @@ h1, h2, h3, h4, h5, h6 {
    4. NAVIGATION & HEADER
    ================================ */
 .navbar {
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    background: var(--navbar-bg);
     padding: 1rem 0;
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
     box-shadow: 0 2px 15px rgba(0,0,0,0.4);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: var(--border-subtle);
 }
 
 .nav-container {
@@ -119,10 +164,20 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
 }
 
-.nav-links a:hover,
-.nav-links a.active {
-    color: #ffffff;
+.nav-links a:hover {
+    color: var(--color-accent);
     text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+}
+
+.nav-links a.active {
+    color: var(--color-accent);
+    background: var(--navbar-active-light);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    margin: -0.5rem 0;
+    transition: all 0.3s ease;
 }
 
 /* Navigation button styling */
@@ -146,15 +201,7 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 2px 4px rgba(255,255,255,0.3);
 }
 
-.nav-links a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: rgba(255,255,255,0.8);
-}
+/* Enhanced active state - background styling replaces underline */
 
 .nav-cta {
     background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
@@ -187,7 +234,7 @@ h1, h2, h3, h4, h5, h6 {
 .page-header {
     padding: 150px 0 80px 0;
     text-align: center;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    background: var(--gradient-primary);
     position: relative;
     overflow: hidden;
 }
@@ -223,7 +270,7 @@ h1, h2, h3, h4, h5, h6 {
    ================================
    Note: Padding left unchanged per user request */
 .hero {
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    background: var(--gradient-primary);
     color: white;
     padding: 230px 0 100px 0;
     text-align: center;
@@ -466,8 +513,8 @@ h1, h2, h3, h4, h5, h6 {
    ================================ */
 .features-summary,
 .value-props {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
     position: relative;
 }
 
@@ -564,8 +611,8 @@ h1, h2, h3, h4, h5, h6 {
    12. COMPLIANCE SECTION
    ================================ */
 .compliance-section {
-    padding: 100px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
 }
 
 .compliance-grid {
@@ -1509,8 +1556,38 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Features Page Specific Styles */
 .features-detailed {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
+    padding: var(--space-section-sm) 0;
+    background: var(--gradient-quaternary);
+}
+
+/* New Features Page Section Styles */
+.feature-memo-generation {
+    background: var(--gradient-primary);
+}
+
+.feature-standards {
+    background: var(--gradient-tertiary);
+}
+
+.feature-human-review {
+    background: var(--gradient-secondary);
+}
+
+.feature-security {
+    background: var(--gradient-primary);
+}
+
+/* Utility Classes */
+.standard-section {
+    padding: var(--space-section) 0;
+}
+
+.standard-section-sm {
+    padding: var(--space-section-sm) 0;
+}
+
+.standard-section-lg {
+    padding: var(--space-section-lg) 0;
 }
 
 .feature-section {
@@ -1529,12 +1606,12 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
 }
 
-.feature-section.reverse .feature-content {
+.feature-content.reverse {
     direction: rtl;
 }
 
-.feature-section.reverse .feature-text,
-.feature-section.reverse .feature-visual {
+.feature-content.reverse .feature-text,
+.feature-content.reverse .feature-visual {
     direction: ltr;
 }
 
