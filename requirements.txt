@@ -13,7 +13,5 @@ postmarker==1.0
 chromadb
 docx
 streamlit
-flask
 stripe
 tiktoken
-postmarker
