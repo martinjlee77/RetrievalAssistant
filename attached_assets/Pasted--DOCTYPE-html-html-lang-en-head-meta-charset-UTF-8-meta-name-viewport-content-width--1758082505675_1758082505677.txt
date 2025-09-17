@@ -1,0 +1,186 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Terms of Service — VeritasLogic.ai</title> <meta name="description" content="Terms of Service for VeritasLogic.ai. Pay‑per‑analysis credits, 12‑month expiration, session‑based processing (no file storage post‑analysis), OpenAI API with data retention off."> <link rel="canonical" href="https://veritaslogic.ai/terms.html"> <meta property="og:title" content="Terms of Service — VeritasLogic.ai"> <meta property="og:description" content="Read the Terms governing your use of VeritasLogic.ai’s technical accounting AI platform."> <meta property="og:type" content="website"> <meta property="og:url" content="https://veritaslogic.ai/terms.html"> <meta name="twitter:card" content="summary"> <link rel="stylesheet" href="styles.css"> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> </head> <body> <!-- Navigation --> <nav class="navbar"> <div class="nav-container"> <a href="index.html" class="logo">VeritasLogic.ai</a> <ul class="nav-links"> <li><a href="index.html">Home</a></li> <li><a href="features.html">Features</a></li> <li><a href="pricing.html">Pricing</a></li> <li><a href="about.html">About</a></li> <li><a href="blog.html">Blog</a></li> <li><a href="contact.html">Contact</a></li> </ul> <button class="mobile-menu-btn">☰</button> <div class="nav-auth-buttons"> <a href="contact.html#contact-form" class="nav-cta primary">Start Risk Free</a> <a href="login.html" class="nav-cta secondary">Log In</a> </div> </div> </nav>
+<main>
+  <div class="container" style="max-width: 900px; margin: 80px auto; padding: 40px 20px;">
+    <h1>Terms of Service</h1>
+    <p><em>Last updated: September 17, 2025</em></p>
+
+    <p>These Terms of Service (“Terms”) govern your access to and use of the VeritasLogic.ai websites, dashboards, and services (collectively, the “Service”) provided by VeritasLogic.ai (“VeritasLogic,” “we,” “our,” or “us”). By accessing or using the Service, you agree to these Terms. If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.</p>
+
+    <h2>1) Definitions</h2>
+    <ul>
+      <li><strong>Customer</strong>: The organization or individual entering into an agreement with VeritasLogic to use the Service.</li>
+      <li><strong>Customer Content</strong>: Files, contracts, and other materials uploaded to the Service for analysis, and the outputs generated from those inputs.</li>
+      <li><strong>User</strong>: Any individual authorized by Customer to access and use the Service.</li>
+      <li><strong>Order</strong>: An online checkout, order form, or written agreement specifying the Service, credit purchases, or professional services.</li>
+    </ul>
+
+    <h2>2) Account Registration and Access</h2>
+    <ul>
+      <li>You must provide accurate account information and keep it current. You are responsible for maintaining the confidentiality of your login credentials and for all activities under your account.</li>
+      <li>You must be at least 18 years old to use the Service.</li>
+      <li>We may suspend or terminate access if we reasonably believe there is unauthorized use, security risk, non‑payment, or violation of these Terms.</li>
+    </ul>
+
+    <h2>3) Service Description; No Professional Advice</h2>
+    <ul>
+      <li>The Service uses AI‑assisted workflows to generate draft technical accounting analyses and professional‑format memos with paragraph‑level citations across specified FASB standards (e.g., ASC 606, 340‑40, 842 (Lessee), 718, 805). Optional expert review services can be requested separately.</li>
+      <li><strong>No legal, audit, or accounting advice:</strong> Outputs are drafts to support your team’s work and do not constitute legal or professional advice, assurance, or audit services. You are solely responsible for reviewing, validating, and finalizing any conclusions, calculations, or documentation before use.</li>
+      <li><strong>Scope clarity:</strong> ASC 842 coverage is Lessee only; Lessor is not supported unless explicitly stated in an Order.</li>
+    </ul>
+
+    <h2>4) Customer Content; Data Handling</h2>
+    <ul>
+      <li><strong>Session‑based processing; no file storage post‑analysis:</strong> We process documents in a temporary session and do not store uploaded files after analysis completes. Only an analysis history entry (e.g., date, standard, document size, tier, cost) is retained.</li>
+      <li><strong>Outputs:</strong> We generate outputs (e.g., DOCX/PDF/HTML/Markdown) for your download. Retain your own copies.</li>
+      <li><strong>OpenAI API with data retention off:</strong> We use the OpenAI API with data retention turned off; your data is not used to train OpenAI’s models.</li>
+      <li><strong>Permissions:</strong> You represent and warrant you have all rights necessary to upload Customer Content and to instruct our processing under these Terms.</li>
+      <li><strong>Sensitive data:</strong> Do not upload regulated personal data or special categories (e.g., PHI under HIPAA, cardholder data under PCI‑DSS) unless we agree in writing.</li>
+      <li><strong>Professional services:</strong> If you request expert review or custom workflows, we will access Customer Content only as directed by you and solely to deliver those services under confidentiality obligations.</li>
+      <li>Additional details on how we handle personal information are in our <a href="privacy.html">Privacy Policy</a>.</li>
+    </ul>
+
+    <h2>5) Acceptable Use</h2>
+    <ul>
+      <li>Do not misuse the Service, including by: violating laws or third‑party rights; uploading unlawful or harmful content; attempting to access the Service or systems without authorization; probing or scanning for vulnerabilities; interfering with or overloading the Service; reverse engineering or circumventing security; using the Service for high‑risk activities where failure could lead to death, personal injury, or severe environmental or property damage.</li>
+      <li>Do not resell, sublicense, or offer the Service on a service bureau basis without our prior written consent.</li>
+    </ul>
+
+    <h2>6) Fees, Credits, and Payment</h2>
+    <ul>
+      <li><strong>Credit purchases:</strong> The Service uses pre‑paid credits typically purchased in $500, $1,000, or $2,000 blocks. Credits expire 12 months from purchase unless otherwise stated in an Order.</li>
+      <li><strong>Per‑analysis deduction:</strong> Credits are automatically deducted per completed analysis based on the detected document size/tier. You are charged only after successful analysis completion.</li>
+      <li><strong>Refund policy (first memo):</strong> For your first analysis only, you may request a refund within 14 days if the draft is not usable for your stated purpose. Refunds are manually reviewed and approved at our reasonable discretion.</li>
+      <li><strong>Other refunds:</strong> Except for the first‑memo refund above or where required by law, credit purchases are non‑refundable and non‑transferable.</li>
+      <li><strong>Taxes and changes:</strong> Fees are exclusive of taxes; you are responsible for applicable taxes. We may change pricing or tiers prospectively; we will post updates or notify you as appropriate.</li>
+      <li><strong>Payments:</strong> Payments are processed by Stripe. By purchasing credits, you authorize us (and our processor) to charge the payment method you provide.</li>
+      <li><strong>Non‑payment:</strong> We may suspend access for non‑payment or insufficient credits.</li>
+    </ul>
+
+    <h2>7) Intellectual Property</h2>
+    <ul>
+      <li><strong>Ownership—VeritasLogic:</strong> We and our licensors own all rights, title, and interest in and to the Service, including software, workflows, models, documentation, and branding, subject only to the licenses expressly granted here.</li>
+      <li><strong>Ownership—Customer:</strong> As between the parties, Customer owns Customer Content and the specific outputs generated from Customer Content.</li>
+      <li><strong>Feedback:</strong> If you provide suggestions or feedback, you grant us a non‑exclusive, worldwide, perpetual, irrevocable, royalty‑free license to use and incorporate it without restriction.</li>
+    </ul>
+
+    <h2>8) Confidentiality</h2>
+    <ul>
+      <li>“Confidential Information” means information disclosed by one party to the other that is designated confidential or would reasonably be understood as confidential given the nature of the information and circumstances of disclosure, including Customer Content, business plans, pricing, and security practices.</li>
+      <li>Each party will protect the other’s Confidential Information using at least reasonable care, and will not use or disclose it except to perform its obligations under these Terms or as required by law.</li>
+      <li>Exclusions: information that is or becomes public through no fault of the receiving party; already known without confidentiality obligations; independently developed; or rightfully obtained from a third party without confidentiality obligations.</li>
+    </ul>
+
+    <h2>9) Third‑Party Services</h2>
+    <ul>
+      <li>The Service may interoperate with third‑party services (e.g., Stripe, OpenAI API, hosting providers). We are not responsible for third‑party services, their terms, or their privacy practices.</li>
+      <li>We use the OpenAI API with data retention off. Your data is not used to train OpenAI’s models.</li>
+    </ul>
+
+    <h2>10) Warranties; Disclaimers</h2>
+    <ul>
+      <li>We will provide the Service in a professional and workmanlike manner consistent with applicable documentation.</li>
+      <li><strong>EXCEPT AS EXPRESSLY STATED, THE SERVICE AND ANY OUTPUTS ARE PROVIDED “AS IS” AND “AS AVAILABLE,” WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON‑INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICE WILL BE ERROR‑FREE OR UNINTERRUPTED, OR THAT OUTPUTS WILL MEET YOUR REQUIREMENTS.</strong></li>
+      <li>You are solely responsible for reviewing, validating, and finalizing any outputs before use. The Service does not constitute legal, audit, or accounting advice.</li>
+    </ul>
+
+    <h2>11) Indemnification</h2>
+    <ul>
+      <li><strong>By Customer:</strong> Customer will defend and indemnify VeritasLogic and its affiliates, officers, directors, and personnel against claims, losses, liabilities, damages, costs, and expenses (including reasonable attorneys’ fees) arising from: (a) Customer Content; (b) Customer’s use of the Service in violation of these Terms or law; or (c) alleged infringement or violation of third‑party rights caused by Customer Content.</li>
+      <li><strong>By VeritasLogic:</strong> VeritasLogic will defend and indemnify Customer against third‑party claims alleging that the Service (excluding Customer Content or third‑party services) infringes a U.S. patent, copyright, or trademark, or misappropriates a trade secret, and will pay damages finally awarded by a court or agreed in settlement. If the Service is enjoined or likely to be, we may procure a right to continue, modify the Service, or terminate the affected access and refund any prepaid, unused fees. This indemnity does not apply to claims arising from Customer’s misuse, modifications not made by us, or combinations with items not provided by us.</li>
+    </ul>
+
+    <h2>12) Limitation of Liability</h2>
+    <ul>
+      <li><strong>TO THE MAXIMUM EXTENT PERMITTED BY LAW, NEITHER PARTY WILL BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, NOR FOR LOST PROFITS, REVENUE, GOODWILL, OR DATA, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</strong></li>
+      <li><strong>TO THE MAXIMUM EXTENT PERMITTED BY LAW, EACH PARTY’S TOTAL LIABILITY ARISING OUT OF OR RELATED TO THE SERVICE OR THESE TERMS WILL NOT EXCEED THE AMOUNTS PAID OR PAYABLE BY CUSTOMER TO VERITASLOGIC FOR THE SERVICE IN THE 12 MONTHS BEFORE THE EVENT GIVING RISE TO LIABILITY (OR $1,000 IF NO AMOUNTS WERE PAID).</strong></li>
+      <li>The limitations above do not apply to a party’s indemnification obligations, infringement of the other party’s IP rights, or breach of confidentiality to the extent such limitations are prohibited by law.</li>
+    </ul>
+
+    <h2>13) Beta Features and Free Access</h2>
+    <ul>
+      <li>We may offer beta, preview, or experimental features. These are provided “as is,” may be subject to additional terms, and may be discontinued at any time. We make no commitments regarding availability or support for beta features.</li>
+    </ul>
+
+    <h2>14) Term; Termination; Suspension</h2>
+    <ul>
+      <li>These Terms continue while you access or use the Service. Either party may terminate for material breach if not cured within 30 days after written notice.</li>
+      <li>We may suspend access immediately for security risks, suspected fraud or abuse, or non‑payment.</li>
+      <li>Upon termination, your right to access the Service ends. We have no obligation to store Customer Content; please retain your own copies of outputs. We retain analysis history entries and billing records as required by law.</li>
+    </ul>
+
+    <h2>15) Privacy and Security</h2>
+    <ul>
+      <li>Our <a href="privacy.html">Privacy Policy</a> describes how we handle personal information.</li>
+      <li>We implement security measures appropriate to our Service, including TLS 1.3 in transit, AES‑256 at rest on providers, and session‑based document processing. See our <a href="features.html#security">Security Overview</a>.</li>
+      <li>For enterprise Customers requiring a Data Protection Addendum (DPA), contact <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>.</li>
+    </ul>
+
+    <h2>16) Publicity</h2>
+    <p>We will not use your name or logo without your prior written consent. With consent, we may identify you as a customer and reference your use of the Service.</p>
+
+    <h2>17) Export; Anti‑Corruption; Sanctions</h2>
+    <ul>
+      <li>You agree to comply with all applicable export control, anti‑corruption, and sanctions laws and regulations. You will not use the Service in, or for the benefit of, embargoed or sanctioned countries or parties.</li>
+    </ul>
+
+    <h2>18) Governing Law; Venue</h2>
+    <p>These Terms are governed by the laws of the State of California, without regard to its conflict of law rules. The parties consent to exclusive jurisdiction and venue in the state and federal courts located in San Francisco County, California.</p>
+
+    <h2>19) Changes to the Service or Terms</h2>
+    <p>We may modify the Service or these Terms from time to time. We will post updated Terms with a new “Last updated” date and, for material changes, provide additional notice as required by law. Your continued use of the Service after changes become effective constitutes acceptance.</p>
+
+    <h2>20) Miscellaneous</h2>
+    <ul>
+      <li><strong>Entire Agreement; Order of Precedence:</strong> These Terms, any applicable Order, and any DPA constitute the entire agreement regarding the Service. If there is a conflict, the Order (if any) controls, then the DPA (for data protection matters), then these Terms.</li>
+      <li><strong>Assignment:</strong> You may not assign these Terms without our prior written consent. We may assign to an affiliate or in connection with a merger, acquisition, or sale of assets.</li>
+      <li><strong>Notices:</strong> We may provide notices via the Service, email, or your account address. You may send notices to <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>.</li>
+      <li><strong>Severability:</strong> If any provision is unenforceable, the remainder will remain in effect.</li>
+      <li><strong>Waiver:</strong> Failure to enforce any right is not a waiver.</li>
+      <li><strong>Force Majeure:</strong> Neither party is liable for delays or failures due to events beyond reasonable control.</li>
+    </ul>
+
+    <p style="margin-top: 24px;"><a href="index.html">← Back to Home</a> • <a href="contact.html#contact-form">Contact Support</a></p>
+  </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>VeritasLogic.ai</h4>
+                <p>Transforming technical accounting with domain‑specific AI for preparation and expert reviews.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <a href="features.html">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="contact.html#contact-form">Demo</a>
+                <a href="contact.html#contact-form">Start Risk Free</a>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <a href="about.html">About Us</a>
+                <a href="blog.html">Blog</a>
+                <a href="contact.html">Contact</a>
+                <a href="mailto:support@veritaslogic.ai">Support</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="features.html#security">Security Overview</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+  document.querySelector('.mobile-menu-btn')?.addEventListener('click', function() {
+      document.querySelector('.nav-links')?.classList.toggle('mobile-open');
+  });
+</script>
+
+</body> </html>
