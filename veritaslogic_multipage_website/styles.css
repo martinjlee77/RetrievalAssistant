@@ -1841,7 +1841,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     transition: all 0.3s ease;
     margin: 1rem 0;
-    width: 60%;
+    width: 50%;
     text-align: center;
 }
 .pricing-cta.primary {
@@ -1885,11 +1885,11 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.5rem;
 }
 .addon-price {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #22c55e;
     margin-bottom: 1rem;
-    font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+    font-family: 'Poppins', 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
 }
 .addon-card p {
     color: rgba(255,255,255,0.8);
@@ -2280,7 +2280,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: rgba(255,255,255,0.5);
+    color: #a0a0a0;
 }
 .checkbox-group label {
     display: flex;

@@ -1382,9 +1382,11 @@ def contact_form():
             if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
         
-        # Initialize Postmark client
-        postmark = PostmarkClient(server_token=os.getenv('POSTMARK_API_KEY'))
-        
+        # Send email using direct Postmark API (more reliable)
+        api_key = os.getenv('POSTMARK_API_KEY')
+        if not api_key:
+            raise Exception("POSTMARK_API_KEY not configured")
+            
         # Prepare email content based on inquiry type
         inquiry_type = data.get('inquiry_type')
         name = data.get('name')
@@ -1438,14 +1440,30 @@ Sent from VeritasLogic.ai contact form
 Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
 """
         
-        # Send email via Postmark
-        postmark.emails.send(
-            From='support@veritaslogic.ai',
-            To='support@veritaslogic.ai',
-            Subject=f'[VeritasLogic] {subject} - {company}',
-            TextBody=email_body,
-            ReplyTo=email
+        # Send email via direct Postmark API
+        headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Postmark-Server-Token': api_key
+        }
+        
+        email_data = {
+            'From': 'support@veritaslogic.ai',
+            'To': 'support@veritaslogic.ai',
+            'Subject': f'[VeritasLogic] {subject} - {company}',
+            'TextBody': email_body,
+            'ReplyTo': email
+        }
+        
+        response = requests.post(
+            'https://api.postmarkapp.com/email',
+            json=email_data,
+            headers=headers,
+            timeout=30
         )
+        
+        if response.status_code != 200:
+            raise Exception(f"Postmark API error: {response.status_code} - {response.text}")
         
         logger.info(f"Contact form submitted: {inquiry_type} from {email} ({company})")
         
