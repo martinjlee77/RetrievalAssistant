@@ -233,3 +233,92 @@ If you have any questions, reply to this email and we'll help.
         except Exception as e:
             logger.error(f"Error sending password reset email: {e}")
             return False
+            
+    def send_email_verification(self, user_email: str, user_name: str, verification_token: str) -> bool:
+        """
+        Send email verification email to user
+        
+        Args:
+            user_email: User's email address
+            user_name: User's first name
+            verification_token: Email verification token
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            # Create the verification link
+            verification_link = f"https://veritaslogic.ai/verify-email.html?token={verification_token}"
+            
+            email_data = {
+                'From': self.from_email,
+                'To': user_email,
+                'Subject': 'Verify Your VeritasLogic Email Address',
+                'HtmlBody': f"""
+                <h2>🔒 Welcome to VeritasLogic!</h2>
+                <p>Hello {user_name},</p>
+                <p>Thank you for signing up for VeritasLogic. To complete your registration and start using our platform, please verify your email address.</p>
+                
+                <p><strong>Click the link below to verify your email:</strong></p>
+                <p><a href="{verification_link}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Verify My Email</a></p>
+                
+                <p><strong>Or copy and paste this link into your browser:</strong><br>
+                {verification_link}</p>
+                
+                <p><strong>Important:</strong></p>
+                <ul>
+                    <li>This link will expire in 24 hours</li>
+                    <li>You must verify your email before you can log in</li>
+                    <li>If you didn't create an account, please ignore this email</li>
+                </ul>
+                
+                <p>Once verified, you'll have access to our AI-powered accounting analysis platform.</p>
+                <p>If you have any questions, reply to this email and we'll help.</p>
+                <p><em>- The VeritasLogic Team</em></p>
+                """,
+                'TextBody': f"""
+Welcome to VeritasLogic!
+
+Hello {user_name},
+
+Thank you for signing up for VeritasLogic. To complete your registration and start using our platform, please verify your email address.
+
+Click the link below to verify your email:
+{verification_link}
+
+Important:
+- This link will expire in 24 hours
+- You must verify your email before you can log in
+- If you didn't create an account, please ignore this email
+
+Once verified, you'll have access to our AI-powered accounting analysis platform.
+
+If you have any questions, reply to this email and we'll help.
+
+- The VeritasLogic Team
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Email verification sent successfully to {user_email}")
+                return True
+            else:
+                logger.error(f"Failed to send email verification: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending email verification: {e}")
+            return False

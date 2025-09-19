@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email — VeritasLogic.ai</title>
+    
+    <!-- SEO and Security -->
+    <meta name="description" content="Verify your email address to complete your VeritasLogic.ai account setup.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://veritaslogic.ai/verify-email.html">
+    <meta property="og:title" content="Verify Your Email — VeritasLogic.ai">
+    <meta property="og:description" content="Verify your email address to complete your VeritasLogic.ai account setup.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://veritaslogic.ai/verify-email.html">
+    <meta name="twitter:card" content="summary">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">VeritasLogic.ai</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="features.html">Features</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+            <a href="login.html" class="nav-cta">Sign In</a>
+        </div>
+    </nav>
+
+    <!-- Email Verification Section -->
+    <section class="unified-contact-section">
+        <div class="container">
+            <div class="form-container">
+                <div class="contact-form">
+                    <div class="form-header">
+                        <h2>Verify Your Email Address</h2>
+                        <p>Please wait while we verify your email address...</p>
+                    </div>
+                
+                    <div id="messageContainer" aria-live="polite" role="status"></div>
+                    
+                    <div id="verificationStatus" class="verification-status">
+                        <div class="loading-spinner"></div>
+                        <p>Verifying your email address...</p>
+                    </div>
+                    
+                    <div class="form-links">
+                        <p><a href="login.html">← Back to login</a></p>
+                        <p>Need help? <a href="contact.html">Contact support</a></p>
+                        <p><a href="index.html">← Back to homepage</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>VeritasLogic.ai</h3>
+                    <p>Empowering accounting professionals with AI-driven expertise</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                        <li><a href="contact.html#contact-form">Demo</a></li>
+                        <li><a href="contact.html#contact-form">Start Risk Free</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="features.html#security">Security Overview</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('mobile-open');
+        });
+    </script>
+
+    <script>
+        // Get token from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const verificationToken = urlParams.get('token');
+        
+        // Auto-verify on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            verifyEmail();
+        });
+        
+        async function verifyEmail() {
+            const messageContainer = document.getElementById('messageContainer');
+            const statusContainer = document.getElementById('verificationStatus');
+            
+            // Check if token is present
+            if (!verificationToken) {
+                showMessage('Invalid or missing verification token. Please click the verification link from your email.', 'error');
+                statusContainer.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const apiUrl = '/api/verify-email';
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        token: verificationToken
+                    })
+                });
+                
+                const result = await response.json();
+                statusContainer.style.display = 'none';
+                
+                if (response.ok) {
+                    showMessage('✅ Email verified successfully! You can now log in to your account.', 'success');
+                    
+                    // Redirect to login after success
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                    
+                } else {
+                    if (result.error === 'Invalid or expired verification token') {
+                        showMessage('⚠️ Your verification link has expired or is invalid. Please contact support for a new verification email.', 'error');
+                    } else {
+                        showMessage(result.error || 'Email verification failed. Please try again.', 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Email verification error:', error);
+                statusContainer.style.display = 'none';
+                showMessage('Network error. Please check your connection and try again.', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            // Scroll to top to show message
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+
+    <style>
+        .verification-status {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin: 1rem 0;
+        }
+        
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin: 1rem 0;
+        }
+    </style>
+</body>
+</html>

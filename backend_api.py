@@ -261,6 +261,10 @@ def generate_reset_token():
     """Generate a secure password reset token"""
     return secrets.token_urlsafe(32)
 
+def generate_verification_token():
+    """Generate a secure email verification token"""
+    return secrets.token_urlsafe(32)
+
 
 # API Routes
 @app.route('/api/signup', methods=['POST'])
@@ -320,25 +324,48 @@ def signup():
         # Hash password before storing
         password_hash = hash_password(password)
         
-        # Business email validated - create verified account immediately
+        # Create unverified account that requires email verification
         cursor.execute("""
             INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                             password_hash, terms_accepted_at)
-            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                             password_hash, terms_accepted_at, email_verified)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW(), FALSE)
             RETURNING id
         """, (email, first_name, last_name, company_name, job_title, password_hash))
         
         user_id = cursor.fetchone()['id']
         
+        # Generate verification token
+        verification_token = generate_verification_token()
+        expires_at = datetime.utcnow() + timedelta(hours=24)  # Token expires in 24 hours
+        
+        # Store verification token
+        cursor.execute("""
+            INSERT INTO email_verification_tokens (user_id, token, expires_at)
+            VALUES (%s, %s, %s)
+        """, (user_id, verification_token, expires_at))
+        
         conn.commit()
         conn.close()
         
-        logger.info(f"Business email {email} successfully registered and verified")
+        # Send verification email
+        postmark_client = PostmarkClient()
+        email_sent = postmark_client.send_email_verification(
+            user_email=email,
+            user_name=first_name,
+            verification_token=verification_token
+        )
+        
+        if email_sent:
+            logger.info(f"Email verification sent successfully to {email}")
+        else:
+            logger.error(f"Failed to send email verification to {email}")
+        
+        logger.info(f"User {email} registered successfully - pending email verification")
         
         return jsonify({
-            'message': 'Registration successful! Your account is ready to use. You can now log in.',
+            'message': 'Registration successful! Please check your email and click the verification link to complete your account setup.',
             'user_id': user_id,
-            'auto_verified': True
+            'verification_required': True
         }), 201
             
     except Exception as e:
@@ -364,7 +391,7 @@ def login():
         cursor = conn.cursor()
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title, 
-                   credits_balance, password_hash, created_at
+                   credits_balance, password_hash, created_at, email_verified
             FROM users 
             WHERE email = %s
         """, (email,))
@@ -374,6 +401,13 @@ def login():
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
+        
+        # Check if email is verified
+        if not user['email_verified']:
+            return jsonify({
+                'error': 'Please verify your email address before logging in. Check your inbox for a verification email.',
+                'verification_required': True
+            }), 403
         
         # All users are now enterprise users - password required
         if not password:
@@ -553,6 +587,68 @@ def reset_password():
     except Exception as e:
         logger.error(f"Reset password error: {e}")
         return jsonify({'error': 'Password reset failed'}), 500
+
+@app.route('/api/verify-email', methods=['POST'])
+def verify_email():
+    """Handle email verification with token"""
+    try:
+        data = request.get_json()
+        token = data.get('token', '')
+        
+        if not token:
+            return jsonify({'error': 'Verification token is required'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Find valid verification token
+        cursor.execute("""
+            SELECT evt.user_id, u.email, u.first_name
+            FROM email_verification_tokens evt
+            JOIN users u ON evt.user_id = u.id
+            WHERE evt.token = %s 
+              AND evt.expires_at > NOW()
+              AND evt.verified_at IS NULL
+        """, (token,))
+        
+        verification_request = cursor.fetchone()
+        
+        if not verification_request:
+            conn.close()
+            return jsonify({'error': 'Invalid or expired verification token'}), 400
+        
+        user_id = verification_request['user_id']
+        user_email = verification_request['email']
+        
+        # Mark user as verified
+        cursor.execute("""
+            UPDATE users 
+            SET email_verified = TRUE
+            WHERE id = %s
+        """, (user_id,))
+        
+        # Mark token as used
+        cursor.execute("""
+            UPDATE email_verification_tokens 
+            SET verified_at = NOW()
+            WHERE token = %s
+        """, (token,))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Email verification successful for user {user_email}")
+        
+        return jsonify({
+            'message': 'Email verified successfully! You can now log in to your account.'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Email verification error: {e}")
+        return jsonify({'error': 'Email verification failed'}), 500
 
 @app.route('/api/change-password', methods=['POST'])
 def change_password():
