@@ -956,7 +956,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: inherit;
 }
 .subscribe-form input::placeholder {
-    color: rgba(255,255,255,0.5);
+    color: #a0a0a0;
 }
 .subscribe-form button {
     background: rgba(255,255,255,0.1);
@@ -3565,7 +3565,7 @@ a:focus {
     outline: none;
 }
 .amount-input-group input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+    color: #a0a0a0;
 }
 .amount-input-group .btn {
     margin: 0;

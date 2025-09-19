@@ -18,6 +18,7 @@ import secrets
 import stripe
 import json
 import uuid
+import requests
 from shared.pricing_config import is_business_email
 from postmarker.core import PostmarkClient
 
