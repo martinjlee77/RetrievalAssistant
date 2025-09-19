@@ -2643,6 +2643,26 @@ html {
 .form-group input::placeholder {
     color: #999999;
 }
+
+/* Light theme contact form placeholder fix - higher specificity */
+.unified-contact-section .contact-form input::placeholder,
+.unified-contact-section .contact-form textarea::placeholder {
+    color: #6B7280 !important;
+    opacity: 1;
+}
+
+/* Vendor prefixes for broader browser support */
+.unified-contact-section .contact-form input::-webkit-input-placeholder,
+.unified-contact-section .contact-form textarea::-webkit-input-placeholder {
+    color: #6B7280 !important;
+    opacity: 1;
+}
+
+.unified-contact-section .contact-form input:-ms-input-placeholder,
+.unified-contact-section .contact-form textarea:-ms-input-placeholder {
+    color: #6B7280 !important;
+    opacity: 1;
+}
 .form-group small {
     color: rgba(255,255,255,0.8);
     font-size: 12px;

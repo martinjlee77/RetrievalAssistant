@@ -1375,7 +1375,12 @@ def auto_credit_wallet():
 def contact_form():
     """Handle unified contact form submissions via Postmark"""
     try:
+        logger.info("CONTACT FORM: Request received")
+        logger.info(f"CONTACT FORM: Headers: {dict(request.headers)}")
+        logger.info(f"CONTACT FORM: Content-Type: {request.content_type}")
+        
         data = request.get_json()
+        logger.info(f"CONTACT FORM: Parsed data keys: {list(data.keys()) if data else 'No data'}")
         
         # Validate required fields
         required_fields = ['inquiry_type', 'name', 'email', 'company', 'role', 'message']

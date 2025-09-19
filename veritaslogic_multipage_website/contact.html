@@ -322,11 +322,14 @@
                     submitBtn.disabled = true;
                     
                     try {
+                        console.log('Form submission started');
                         const formData = new FormData(this);
                         const data = Object.fromEntries(formData.entries());
                         
                         // Fix multi-select field serialization
                         data.standards_interest = formData.getAll('standards_interest');
+                        
+                        console.log('Form data prepared:', data);
                         
                         // Honeypot field check - if filled, it's likely spam
                         if (data.website) {
@@ -334,6 +337,7 @@
                             return; // Silently reject spam
                         }
                         
+                        console.log('About to fetch /api/contact');
                         const response = await fetch('/api/contact', {
                             method: 'POST',
                             headers: {
@@ -341,6 +345,8 @@
                             },
                             body: JSON.stringify(data)
                         });
+                        
+                        console.log('Fetch response:', response.status, response.ok);
                         
                         if (response.ok) {
                             // Show inline success message
