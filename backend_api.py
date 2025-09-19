@@ -20,7 +20,7 @@ import json
 import uuid
 import requests
 from shared.pricing_config import is_business_email
-from postmarker.core import PostmarkClient
+from shared.postmark_client import PostmarkClient
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -461,10 +461,23 @@ def forgot_password():
         
         logger.info(f"Password reset token generated for user {email}")
         
-        # In a production environment, you would send an email here
+        # Send password reset email
+        postmark_client = PostmarkClient()
+        email_sent = postmark_client.send_password_reset_email(
+            user_email=email,
+            user_name=user['first_name'],
+            reset_token=reset_token
+        )
+        
+        if email_sent:
+            logger.info(f"Password reset email sent successfully to {email}")
+        else:
+            logger.error(f"Failed to send password reset email to {email}")
+        
+        # Always return success message for security (don't reveal if email failed)
         # Token should NEVER be returned in API response for security
         return jsonify({
-            'message': 'Password reset instructions have been sent to your email.'
+            'message': 'If an account with that email exists, you will receive a password reset email.'
         }), 200
         
     except Exception as e:
