@@ -147,3 +147,89 @@ Questions? Reply to this email and we'll help.
         except Exception as e:
             logger.error(f"Error sending rerun confirmation: {e}")
             return False
+            
+    def send_password_reset_email(self, user_email: str, user_name: str, reset_token: str) -> bool:
+        """
+        Send password reset email to user
+        
+        Args:
+            user_email: User's email address
+            user_name: User's first name
+            reset_token: Password reset token
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            # Create the reset link
+            reset_link = f"https://veritaslogic.ai/reset-password.html?token={reset_token}"
+            
+            email_data = {
+                'From': self.from_email,
+                'To': user_email,
+                'Subject': 'Reset Your VeritasLogic Password',
+                'HtmlBody': f"""
+                <h2>🔐 Password Reset Request</h2>
+                <p>Hello {user_name},</p>
+                <p>We received a request to reset your password for your VeritasLogic account.</p>
+                
+                <p><strong>Click the link below to reset your password:</strong></p>
+                <p><a href="{reset_link}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset My Password</a></p>
+                
+                <p><strong>Or copy and paste this link into your browser:</strong><br>
+                {reset_link}</p>
+                
+                <p><strong>Important security notes:</strong></p>
+                <ul>
+                    <li>This link will expire in 1 hour for your security</li>
+                    <li>If you didn't request this reset, you can safely ignore this email</li>
+                    <li>Never share this link with anyone</li>
+                </ul>
+                
+                <p>If you have any questions, reply to this email and we'll help.</p>
+                <p><em>- The VeritasLogic Team</em></p>
+                """,
+                'TextBody': f"""
+Password Reset Request
+
+Hello {user_name},
+
+We received a request to reset your password for your VeritasLogic account.
+
+Click the link below to reset your password:
+{reset_link}
+
+Important security notes:
+- This link will expire in 1 hour for your security
+- If you didn't request this reset, you can safely ignore this email
+- Never share this link with anyone
+
+If you have any questions, reply to this email and we'll help.
+
+- The VeritasLogic Team
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Password reset email sent successfully to {user_email}")
+                return True
+            else:
+                logger.error(f"Failed to send password reset email: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending password reset email: {e}")
+            return False
