@@ -2644,24 +2644,30 @@ html {
     color: #999999;
 }
 
-/* Light theme contact form placeholder fix - higher specificity */
-.unified-contact-section .contact-form input::placeholder,
-.unified-contact-section .contact-form textarea::placeholder {
+/* Contact form placeholder fix - targeting all contact inputs specifically */
+#contact-role::placeholder,
+#contact-timezone::placeholder,
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
     color: #6B7280 !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 /* Vendor prefixes for broader browser support */
-.unified-contact-section .contact-form input::-webkit-input-placeholder,
-.unified-contact-section .contact-form textarea::-webkit-input-placeholder {
+#contact-role::-webkit-input-placeholder,
+#contact-timezone::-webkit-input-placeholder,
+.contact-form input::-webkit-input-placeholder,
+.contact-form textarea::-webkit-input-placeholder {
     color: #6B7280 !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 
-.unified-contact-section .contact-form input:-ms-input-placeholder,
-.unified-contact-section .contact-form textarea:-ms-input-placeholder {
+#contact-role:-ms-input-placeholder,
+#contact-timezone:-ms-input-placeholder,
+.contact-form input:-ms-input-placeholder,
+.contact-form textarea:-ms-input-placeholder {
     color: #6B7280 !important;
-    opacity: 1;
+    opacity: 1 !important;
 }
 .form-group small {
     color: rgba(255,255,255,0.8);
