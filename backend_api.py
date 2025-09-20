@@ -588,6 +588,97 @@ def reset_password():
         logger.error(f"Reset password error: {e}")
         return jsonify({'error': 'Password reset failed'}), 500
 
+@app.route('/api/resend-verification', methods=['POST'])
+def resend_verification():
+    """Resend email verification for authenticated user"""
+    try:
+        # Get token from Authorization header
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'No valid authorization token'}), 401
+        
+        token = auth_header.split(' ')[1]
+        payload = verify_token(token)
+        
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get user data and check if already verified
+        cursor.execute("""
+            SELECT email, first_name, email_verified
+            FROM users 
+            WHERE id = %s
+        """, (user_id,))
+        
+        user = cursor.fetchone()
+        if not user:
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+        
+        if user['email_verified']:
+            conn.close()
+            return jsonify({'error': 'Email is already verified'}), 400
+        
+        # Check for rate limiting (max 3 requests per hour per user)
+        cursor.execute("""
+            SELECT COUNT(*) as count
+            FROM email_verification_tokens 
+            WHERE user_id = %s 
+              AND created_at > NOW() - INTERVAL '1 hour'
+        """, (user_id,))
+        
+        recent_requests = cursor.fetchone()
+        if recent_requests['count'] >= 3:
+            conn.close()
+            return jsonify({'error': 'Too many verification requests. Please wait before requesting another.'}), 429
+        
+        # Invalidate old tokens
+        cursor.execute("""
+            DELETE FROM email_verification_tokens 
+            WHERE user_id = %s
+        """, (user_id,))
+        
+        # Generate new verification token
+        verification_token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+        
+        cursor.execute("""
+            INSERT INTO email_verification_tokens (user_id, token, expires_at)
+            VALUES (%s, %s, %s)
+        """, (user_id, verification_token, expires_at))
+        
+        conn.commit()
+        conn.close()
+        
+        # Send verification email
+        postmark_client = PostmarkClient()
+        email_sent = postmark_client.send_email_verification(
+            user_email=user['email'],
+            user_name=user['first_name'],
+            verification_token=verification_token
+        )
+        
+        if email_sent:
+            logger.info(f"Verification email resent successfully to {user['email']}")
+            return jsonify({
+                'message': 'Verification email sent! Please check your inbox and click the verification link.'
+            }), 200
+        else:
+            logger.error(f"Failed to resend verification email to {user['email']}")
+            return jsonify({'error': 'Failed to send verification email. Please try again later.'}), 500
+        
+    except Exception as e:
+        logger.error(f"Resend verification error: {e}")
+        return jsonify({'error': 'Failed to resend verification email'}), 500
+
 @app.route('/api/verify-email', methods=['POST'])
 def verify_email():
     """Handle email verification with token"""
@@ -754,7 +845,7 @@ def get_user_profile():
         # Get user data
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title,
-                   credits_balance, created_at
+                   credits_balance, created_at, email_verified
             FROM users 
             WHERE id = %s
         """, (user_id,))
@@ -798,7 +889,8 @@ def get_user_profile():
                 'job_title': user['job_title'],
                 'credits_balance': float(user['credits_balance'] or 0),
                 'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
-                'member_since': user['created_at'].isoformat()
+                'member_since': user['created_at'].isoformat(),
+                'email_verified': bool(user['email_verified'])
             },
             'recent_analyses': [
                 {

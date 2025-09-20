@@ -101,6 +101,55 @@
                 </div>
             </div>
         </div>
+
+        <!-- Email Verification Required Section -->
+        <div id="verificationSection" style="display: none;">
+            <div class="verification-container">
+                <div class="verification-card">
+                    <div class="verification-header">
+                        <h2>📧 Please Verify Your Email Address</h2>
+                        <p>To access your dashboard and start using VeritasLogic, please verify your email address.</p>
+                    </div>
+                    
+                    <div class="verification-status">
+                        <div class="email-display">
+                            <span class="email-label">We sent a verification email to:</span>
+                            <span class="email-address" id="verificationEmail">your-email@domain.com</span>
+                        </div>
+                        
+                        <div class="verification-instructions">
+                            <h3>📋 What to do next:</h3>
+                            <ol>
+                                <li><strong>Check your email inbox</strong> for a message from VeritasLogic</li>
+                                <li><strong>Click the verification link</strong> in the email</li>
+                                <li><strong>Return to this page</strong> - your dashboard will unlock automatically</li>
+                            </ol>
+                        </div>
+                        
+                        <div id="verificationMessage" aria-live="polite" class="verification-message"></div>
+                        
+                        <div class="verification-actions">
+                            <button onclick="resendVerification()" class="btn btn-primary" id="resendBtn">
+                                📧 Resend Verification Email
+                            </button>
+                            <button onclick="checkVerificationStatus()" class="btn btn-secondary" id="refreshBtn">
+                                🔄 I've Verified - Refresh Dashboard
+                            </button>
+                        </div>
+                        
+                        <div class="verification-help">
+                            <h4>💡 Didn't receive the email?</h4>
+                            <ul>
+                                <li>Check your <strong>spam/junk folder</strong></li>
+                                <li>Add <strong>support@veritaslogic.ai</strong> to your contacts</li>
+                                <li>Wait a few minutes for delivery</li>
+                                <li>Contact <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a> if you still need help</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <!-- Main dashboard content -->
         <div id="mainContent" style="display: none;">
@@ -329,6 +378,156 @@
         </div>
     </div>
 
+    <style>
+        /* Verification Section Styles */
+        .verification-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+            padding: 2rem;
+        }
+
+        .verification-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-radius: 16px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 100%;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .verification-header h2 {
+            margin: 0 0 1rem 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .verification-header p {
+            margin: 0 0 2rem 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .email-display {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .email-label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .email-address {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fbbf24;
+        }
+
+        .verification-instructions {
+            margin: 2rem 0;
+        }
+
+        .verification-instructions h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.25rem;
+        }
+
+        .verification-instructions ol {
+            padding-left: 1.5rem;
+        }
+
+        .verification-instructions li {
+            margin: 0.75rem 0;
+            line-height: 1.6;
+        }
+
+        .verification-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .verification-actions .btn {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .verification-help {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .verification-help h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .verification-help ul {
+            padding-left: 1.5rem;
+            margin: 0;
+        }
+
+        .verification-help li {
+            margin: 0.5rem 0;
+            line-height: 1.5;
+        }
+
+        .verification-message {
+            margin: 1rem 0;
+            min-height: 1.5rem;
+        }
+
+        .success-message {
+            background-color: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background-color: #ef4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .info-message {
+            background-color: #3b82f6;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .verification-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .verification-actions {
+                flex-direction: column;
+            }
+
+            .verification-actions .btn {
+                min-width: auto;
+            }
+        }
+    </style>
+
     <script>
         // Dashboard initialization
         document.addEventListener('DOMContentLoaded', function() {
@@ -384,6 +583,14 @@
         function showDashboard(userData) {
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('loginSection').style.display = 'none';
+            
+            // Check email verification status
+            if (!userData.email_verified) {
+                showVerificationRequired(userData);
+                return;
+            }
+            
+            document.getElementById('verificationSection').style.display = 'none';
             document.getElementById('mainContent').style.display = 'block';
             document.getElementById('dashboardSidebar').style.display = 'block';
             document.getElementById('dashboardMain').style.display = 'block';
@@ -397,6 +604,162 @@
                 showSection('overview');
             }
         }
+
+        function showVerificationRequired(userData) {
+            document.getElementById('verificationSection').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('dashboardSidebar').style.display = 'none';
+            document.getElementById('dashboardMain').style.display = 'none';
+            
+            // Display obfuscated email
+            const email = userData.email;
+            const [localPart, domain] = email.split('@');
+            const obfuscatedLocal = localPart.charAt(0) + '*'.repeat(Math.max(0, localPart.length - 2)) + localPart.slice(-1);
+            const obfuscatedEmail = `${obfuscatedLocal}@${domain}`;
+            document.getElementById('verificationEmail').textContent = obfuscatedEmail;
+            
+            // Start auto-check polling (every 10 seconds)
+            startVerificationPolling();
+        }
+
+        let verificationPollInterval = null;
+
+        function startVerificationPolling() {
+            // Clear any existing polling
+            if (verificationPollInterval) {
+                clearInterval(verificationPollInterval);
+            }
+            
+            // Start polling every 10 seconds
+            verificationPollInterval = setInterval(async () => {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch('/api/user/profile', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.user.email_verified) {
+                            // Email verified! Stop polling and show dashboard
+                            clearInterval(verificationPollInterval);
+                            showVerificationMessage('✅ Email verified! Loading your dashboard...', 'success');
+                            setTimeout(() => {
+                                showDashboard(data.user);
+                            }, 1500);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Verification polling error:', error);
+                }
+            }, 10000);
+        }
+
+        async function resendVerification() {
+            const resendBtn = document.getElementById('resendBtn');
+            const originalText = resendBtn.textContent;
+            
+            try {
+                resendBtn.disabled = true;
+                resendBtn.textContent = 'Sending...';
+                
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/resend-verification', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showVerificationMessage('✅ ' + data.message, 'success');
+                    
+                    // Disable resend button for 60 seconds (cooldown)
+                    let countdown = 60;
+                    const countdownInterval = setInterval(() => {
+                        resendBtn.textContent = `Wait ${countdown}s`;
+                        countdown--;
+                        
+                        if (countdown < 0) {
+                            clearInterval(countdownInterval);
+                            resendBtn.disabled = false;
+                            resendBtn.textContent = originalText;
+                        }
+                    }, 1000);
+                    
+                } else {
+                    showVerificationMessage('⚠️ ' + data.error, 'error');
+                    resendBtn.disabled = false;
+                    resendBtn.textContent = originalText;
+                }
+                
+            } catch (error) {
+                console.error('Resend verification error:', error);
+                showVerificationMessage('❌ Network error. Please try again.', 'error');
+                resendBtn.disabled = false;
+                resendBtn.textContent = originalText;
+            }
+        }
+
+        async function checkVerificationStatus() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const originalText = refreshBtn.textContent;
+            
+            try {
+                refreshBtn.disabled = true;
+                refreshBtn.textContent = '🔄 Checking...';
+                
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.user.email_verified) {
+                        showVerificationMessage('✅ Email verified! Loading your dashboard...', 'success');
+                        setTimeout(() => {
+                            showDashboard(data.user);
+                        }, 1500);
+                    } else {
+                        showVerificationMessage('⏳ Email not yet verified. Please check your inbox and click the verification link.', 'info');
+                        refreshBtn.disabled = false;
+                        refreshBtn.textContent = originalText;
+                    }
+                } else {
+                    showVerificationMessage('❌ Failed to check verification status.', 'error');
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = originalText;
+                }
+                
+            } catch (error) {
+                console.error('Check verification error:', error);
+                showVerificationMessage('❌ Network error. Please try again.', 'error');
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = originalText;
+            }
+        }
+
+        function showVerificationMessage(message, type) {
+            const container = document.getElementById('verificationMessage');
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+        }
+
+        // Stop polling when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (verificationPollInterval) {
+                clearInterval(verificationPollInterval);
+            }
+        });
 
         function showNetworkError() {
             document.getElementById('loadingState').style.display = 'none';
