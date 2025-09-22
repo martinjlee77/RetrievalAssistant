@@ -30,8 +30,33 @@ logger = logging.getLogger(__name__)
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 
+# Environment configuration
+WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
+DEVELOPMENT_URLS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000", 
+    "http://localhost:5000",
+    "http://127.0.0.1:5000"
+]
+
+# Configure allowed origins for CORS
+ALLOWED_ORIGINS = [
+    WEBSITE_URL,
+    STREAMLIT_URL,
+    # Allow all VeritasLogic subdomains in production
+    "https://*.veritaslogic.ai"
+] + DEVELOPMENT_URLS
+
 app = Flask(__name__, static_folder='veritaslogic_multipage_website', static_url_path='')
-CORS(app, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
+
+# Enhanced CORS configuration for subdomain support
+CORS(app, 
+     origins=ALLOWED_ORIGINS,
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
+     supports_credentials=True,  # Important for cookie sharing
+     expose_headers=["Content-Type", "Authorization"])
 
 # Serve static files (HTML, CSS, JS)
 @app.route('/')
@@ -420,15 +445,18 @@ def login():
         if not verify_password(password, user['password_hash']):
             return jsonify({'error': 'Invalid password'}), 401
         
-        # Generate login token
+        # Generate login token with domain information for cross-subdomain auth
         login_token = jwt.encode({
             'user_id': user['id'],
             'email': user['email'],
             'exp': datetime.utcnow() + timedelta(days=7),
-            'purpose': 'authentication'
+            'purpose': 'authentication',
+            'domain': 'veritaslogic.ai',  # Allow token to work across subdomains
+            'issued_at': datetime.utcnow().isoformat()
         }, app.config['SECRET_KEY'], algorithm='HS256')
         
-        return jsonify({
+        # Create response with enhanced user data for cross-subdomain sharing
+        response_data = {
             'message': 'Login successful',
             'token': login_token,
             'user': {
@@ -439,13 +467,100 @@ def login():
                 'company_name': user['company_name'],
                 'job_title': user['job_title'],
                 'credits_balance': float(user['credits_balance'] or 0),
-                'free_analyses_remaining': 0  # Legacy field removed, always 0 for enterprise
+                'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
+                'email_verified': bool(user['email_verified'])
+            },
+            'redirect_urls': {
+                'dashboard': f"{WEBSITE_URL}/dashboard.html",
+                'streamlit': STREAMLIT_URL
             }
-        }), 200
+        }
+        
+        # Create response and optionally set cross-domain cookies for better UX
+        response = jsonify(response_data)
+        
+        # In production, set secure cookies for *.veritaslogic.ai
+        if not request.host.startswith('localhost') and not request.host.startswith('127.0.0.1'):
+            response.set_cookie(
+                'vl_auth_token', 
+                login_token, 
+                domain='.veritaslogic.ai',  # Works across all subdomains
+                secure=True,  # HTTPS only
+                httponly=False,  # Allow JS access for Streamlit
+                samesite='Lax',  # Cross-site requests allowed
+                max_age=7*24*60*60  # 7 days
+            )
+        
+        return response, 200
         
     except Exception as e:
         logger.error(f"Login error: {e}")
         return jsonify({'error': 'Login failed'}), 500
+
+@app.route('/api/auth/validate-token', methods=['POST'])
+def validate_cross_domain_token():
+    """Validate authentication token for cross-subdomain access"""
+    try:
+        data = request.get_json()
+        token = data.get('token') if data else None
+        
+        # Also check Authorization header as fallback
+        if not token:
+            auth_header = request.headers.get('Authorization', '')
+            if auth_header.startswith('Bearer '):
+                token = auth_header.replace('Bearer ', '')
+        
+        # Also check cookies for seamless cross-subdomain experience
+        if not token:
+            token = request.cookies.get('vl_auth_token')
+        
+        if not token:
+            return jsonify({'valid': False, 'error': 'No token provided'}), 400
+        
+        # Verify token
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'valid': False, 'error': payload['error']}), 401
+        
+        # Get fresh user data to ensure account is still active and verified
+        user_id = payload['user_id']
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'valid': False, 'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, email, first_name, last_name, company_name, job_title, 
+                   credits_balance, email_verified, created_at
+            FROM users 
+            WHERE id = %s AND email_verified = true
+        """, (user_id,))
+        
+        user = cursor.fetchone()
+        conn.close()
+        
+        if not user:
+            return jsonify({'valid': False, 'error': 'User not found or not verified'}), 404
+        
+        # Return validation success with fresh user data
+        return jsonify({
+            'valid': True,
+            'user': {
+                'id': user['id'],
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name'],
+                'company_name': user['company_name'],
+                'job_title': user['job_title'],
+                'credits_balance': float(user['credits_balance'] or 0),
+                'email_verified': bool(user['email_verified']),
+                'member_since': user['created_at'].isoformat()
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Token validation error: {e}")
+        return jsonify({'valid': False, 'error': 'Token validation failed'}), 500
 
 @app.route('/api/forgot-password', methods=['POST'])
 def forgot_password():
