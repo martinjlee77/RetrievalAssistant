@@ -65,14 +65,39 @@ def serve_index():
 
 @app.route('/analysis')
 def serve_streamlit_app():
-    """Simple redirect to Streamlit - development approach"""
-    return '''
+    """Redirect to Streamlit app with seamless authentication"""
+    
+    # Check if user is authenticated
+    auth_header = request.headers.get('Authorization')
+    token = None
+    
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header.split(' ')[1]
+    
+    # Also check cookies
+    if not token:
+        token = request.cookies.get('vl_auth_token')
+    
+    # Build redirect URL
+    if token:
+        # Validate token before redirecting
+        payload = verify_token(token)
+        if 'error' not in payload:
+            redirect_url = f"{STREAMLIT_URL}?auth_token={token}"
+        else:
+            redirect_url = STREAMLIT_URL
+    else:
+        redirect_url = STREAMLIT_URL
+    
+    # Build the HTML response with proper string formatting
+    html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <title>Redirecting to Analysis Platform</title>
+        <meta http-equiv="refresh" content="2;url={redirect_url}">
         <style>
-            body {
+            body {{
                 font-family: Arial, sans-serif;
                 display: flex;
                 align-items: center;
@@ -81,16 +106,16 @@ def serve_streamlit_app():
                 margin: 0;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
-            }
-            .redirect-container {
+            }}
+            .redirect-container {{
                 text-align: center;
                 background: rgba(255,255,255,0.1);
                 padding: 3rem;
                 border-radius: 20px;
                 backdrop-filter: blur(10px);
                 max-width: 500px;
-            }
-            .spinner {
+            }}
+            .spinner {{
                 border: 4px solid rgba(255,255,255,0.3);
                 border-top: 4px solid white;
                 border-radius: 50%;
@@ -98,12 +123,12 @@ def serve_streamlit_app():
                 height: 50px;
                 animation: spin 1s linear infinite;
                 margin: 0 auto 2rem;
-            }
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            .btn {
+            }}
+            @keyframes spin {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
+            .btn {{
                 background: white;
                 color: #667eea;
                 padding: 1rem 2rem;
@@ -114,16 +139,16 @@ def serve_streamlit_app():
                 font-size: 16px;
                 font-weight: bold;
                 transition: all 0.3s ease;
-            }
-            .btn:hover { 
+            }}
+            .btn:hover {{ 
                 transform: translateY(-2px);
                 box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            }
-            .alt-btn {
+            }}
+            .alt-btn {{
                 background: transparent;
                 color: white;
                 border: 2px solid white;
-            }
+            }}
         </style>
     </head>
     <body>
@@ -147,18 +172,17 @@ def serve_streamlit_app():
         </div>
         
         <script>
-            function openStreamlit() {
-                // Streamlit is now on external port 3002!
-                const streamlitUrl = window.location.protocol + '//' + window.location.hostname + ':5000';
-                window.open(streamlitUrl, '_blank');
-            }
+            function openStreamlit() {{
+                window.location.href = '{redirect_url}';
+            }}
             
-            // Auto-launch after 2 seconds
             setTimeout(openStreamlit, 2000);
         </script>
     </body>
     </html>
-    '''
+    """
+    
+    return html_content
 
 @app.route('/<path:path>')
 def serve_static(path):

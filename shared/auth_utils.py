@@ -11,8 +11,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Backend API configuration
-BACKEND_URL = "http://127.0.0.1:3000/api"
+# Backend API configuration - Use environment variables for cross-deployment support
+import os
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
 
 class AuthManager:
     """Manages user authentication and session state"""
@@ -106,6 +109,11 @@ def require_authentication():
     """
     auth_manager = AuthManager()
     
+    # First try cross-domain authentication (from URL parameters, etc.)
+    if not auth_manager.is_authenticated():
+        if try_cross_domain_auth():
+            auth_manager = AuthManager()  # Refresh after potential login
+    
     if not auth_manager.is_authenticated():
         show_login_page()
         return False
@@ -143,22 +151,22 @@ def show_login_page():
             
     # Links to full registration site
     st.markdown(
-        """
+        f"""
 
-        **[Reset your password](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/forgot-password.html)** - Forgot your password? Reset it here
+        **[Reset your password]({WEBSITE_URL}/forgot-password.html)** - Forgot your password? Reset it here
         
-        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/signup.html)** - New users, sign up here
+        **[Create Account]({WEBSITE_URL}/signup.html)** - New users, sign up here
         
 
         
-        **[Your Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/login.html)** - Log in to your account dashboard
+        **[Your Account]({WEBSITE_URL}/login.html)** - Log in to your account dashboard
         
-        **[Need Help?](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/contact.html)** - Contact support
+        **[Need Help?]({WEBSITE_URL}/contact.html)** - Contact support
         """
     )
 
 def attempt_login(email: str, password: str) -> Dict[str, Any]:
-    """Attempt to login user with email and password"""
+    """Attempt to login user with email and password via main website"""
     try:
         response = requests.post(
             f"{BACKEND_URL}/login",
@@ -180,6 +188,46 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
         logger.error(f"Login error: {e}")
         return {'success': False, 'error': 'Network error. Please try again.'}
 
+def validate_existing_token(token: str) -> Dict[str, Any]:
+    """Validate an existing token using the cross-subdomain validation endpoint"""
+    try:
+        response = requests.post(
+            f"{BACKEND_URL}/auth/validate-token",
+            json={'token': token},
+            timeout=10
+        )
+        
+        if response.ok:
+            data = response.json()
+            if data.get('valid'):
+                return {'valid': True, 'user': data['user']}
+            else:
+                return {'valid': False, 'error': data.get('error', 'Invalid token')}
+        else:
+            return {'valid': False, 'error': 'Token validation failed'}
+            
+    except Exception as e:
+        logger.error(f"Token validation error: {e}")
+        return {'valid': False, 'error': 'Network error during validation'}
+
+def try_cross_domain_auth():
+    """Try to authenticate using tokens from URL parameters or cross-domain cookies"""
+    # Check for token in URL parameters (from redirects)
+    query_params = st.query_params
+    
+    if 'auth_token' in query_params:
+        token = query_params['auth_token']
+        validation = validate_existing_token(token)
+        
+        if validation.get('valid'):
+            st.session_state.auth_token = token
+            st.session_state.user_data = validation['user']
+            # Clear the token from URL for security
+            st.query_params.clear()
+            return True
+    
+    return False
+
 def show_user_sidebar(auth_manager: AuthManager):
     """Show user information and controls in sidebar"""
     user_data = auth_manager.get_user_data()
@@ -196,7 +244,7 @@ def show_user_sidebar(auth_manager: AuthManager):
         # Action buttons
         col1, col2 = st.columns(2)
         with col1:
-            st.link_button("Dashboard", "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/dashboard.html")
+            st.link_button("Dashboard", f"{WEBSITE_URL}/dashboard.html")
         
         with col2:
             if st.button("Logout", use_container_width=True):
@@ -209,11 +257,11 @@ def show_user_sidebar(auth_manager: AuthManager):
         col1, col2 = st.columns(2)
         with col1:
             st.link_button("Request Rerun", 
-                          "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/request-memo-rerun.html", 
+                          f"{WEBSITE_URL}/request-memo-rerun.html", 
                           use_container_width=True)
         with col2:
             st.link_button("Contact Support", 
-                          "https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/contact.html", 
+                          f"{WEBSITE_URL}/contact.html", 
                           use_container_width=True)
 
 def show_credits_warning(required_credits: float, auth_manager: AuthManager):
@@ -231,7 +279,7 @@ def show_credits_warning(required_credits: float, auth_manager: AuthManager):
             - Credits: \\${credits_info.get('credits_balance', 0):.2f}
             
             **Next steps:**
-            1. [Add credits to your account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:8000/dashboard.html)
+            1. [Add credits to your account]({WEBSITE_URL}/dashboard.html)
             2. Contact support for assistance
             """
         )
