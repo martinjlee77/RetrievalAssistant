@@ -142,10 +142,14 @@ def show_login_page():
     st.markdown("---")
             
     # Links to full registration site
-    st.markdown("#### New User?")
     st.markdown(
         """
-        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/signup.html)** - Sign up here
+
+        **[Reset your password](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/forgot-password.html)** - Forgot your password? Reset it here
+        
+        **[Create Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/signup.html)** - New users, sign up here
+        
+
         
         **[Your Account](https://a45dfa8e-cff4-4d5e-842f-dc8d14b3b2d2-00-3khkzanf4tnm3.picard.replit.dev:3001/login.html)** - Log in to your account dashboard
         
@@ -187,7 +191,7 @@ def show_user_sidebar(auth_manager: AuthManager):
         # User info
         st.markdown(f"Logged in as {user_data['first_name']} {user_data['last_name']}")
         st.markdown(f"{user_data['company_name']}")
-        st.text(user_data['email'])
+        # st.text(user_data['email'])
               
         # Action buttons
         col1, col2 = st.columns(2)

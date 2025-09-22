@@ -16,7 +16,7 @@ PRICING_TIERS = {
     },
     2: {
         "name": "9K (≤30 pages)",
-        "price": 245.00,
+        "price": 195.00,
         "max_words": 9000,
         "description": "Same features in every tier. For short packages.",
         "docs_per_run": 10,
@@ -25,7 +25,7 @@ PRICING_TIERS = {
     },
     3: {
         "name": "15K (≤50 pages)",
-        "price": 395.00,
+        "price": 295.00,
         "max_words": 15000,
         "description": "Same features in every tier. For shorter packages.",
         "docs_per_run": 10,
@@ -34,7 +34,7 @@ PRICING_TIERS = {
     },
     4: {
         "name": "30K (≤100 pages)",
-        "price": 695.00,
+        "price": 495.00,
         "max_words": 30000,
         "description": "Same features in every tier. For standard-length packages.",
         "docs_per_run": 10,
@@ -43,7 +43,7 @@ PRICING_TIERS = {
     },
     5: {
         "name": "60K (≤200 pages)",
-        "price": 1195.00,
+        "price": 895.00,
         "max_words": 60000,
         "description": "Same features in every tier. For long or complex packages.",
         "docs_per_run": 10,
