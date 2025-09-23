@@ -26,7 +26,13 @@
         <div class="nav-container">
             <a href="/" class="logo">VeritasLogic.ai</a>
             <ul class="nav-links">
-                <li><a href="/analysis" target="_blank">Analysis Platform</a></li>
+                <li class="platform-nav-item">
+                    <a href="/analysis" class="platform-nav-link" id="navPlatformLink" target="_blank">
+                        <span class="nav-status-dot" id="navStatusDot"></span>
+                        <span class="nav-platform-text">Analysis Platform</span>
+                        <span class="nav-platform-status" id="navPlatformStatus">Checking...</span>
+                    </a>
+                </li>
                 <li><a href="/">Home</a></li>
                 <li><button onclick="logout()" class="btn btn-secondary btn-nav">Log Out</button></li>
             </ul>
@@ -1550,9 +1556,19 @@
             const statusDot = document.querySelector('#analysisPlatformStatus .status-dot');
             const launchBtn = document.getElementById('platformLaunchBtn');
             
+            // Navigation bar elements
+            const navStatusDot = document.getElementById('navStatusDot');
+            const navPlatformStatus = document.getElementById('navPlatformStatus');
+            const navPlatformLink = document.getElementById('navPlatformLink');
+            
             try {
-                statusValue.textContent = 'Checking...';
-                statusDot.className = 'status-dot checking';
+                // Update dashboard status
+                if (statusValue) statusValue.textContent = 'Checking...';
+                if (statusDot) statusDot.className = 'status-dot checking';
+                
+                // Update navigation status
+                if (navStatusDot) navStatusDot.className = 'nav-status-dot checking';
+                if (navPlatformStatus) navPlatformStatus.textContent = 'Checking...';
                 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -1565,19 +1581,36 @@
                 clearTimeout(timeoutId);
                 
                 if (response.ok) {
-                    statusValue.textContent = 'Online';
-                    statusDot.className = 'status-dot online';
-                    launchBtn.disabled = false;
-                    launchBtn.innerHTML = '🚀 Launch Analysis Platform';
+                    // Update dashboard status
+                    if (statusValue) statusValue.textContent = 'Online';
+                    if (statusDot) statusDot.className = 'status-dot online';
+                    if (launchBtn) {
+                        launchBtn.disabled = false;
+                        launchBtn.innerHTML = '🚀 Launch Analysis Platform';
+                    }
+                    
+                    // Update navigation status
+                    if (navStatusDot) navStatusDot.className = 'nav-status-dot online';
+                    if (navPlatformStatus) navPlatformStatus.textContent = 'Online';
+                    if (navPlatformLink) navPlatformLink.classList.remove('platform-unavailable');
+                    
                 } else {
                     throw new Error('Platform unavailable');
                 }
                 
             } catch (error) {
-                statusValue.textContent = 'Unavailable';
-                statusDot.className = 'status-dot offline';
-                launchBtn.disabled = true;
-                launchBtn.innerHTML = '⚠️ Platform Unavailable';
+                // Update dashboard status
+                if (statusValue) statusValue.textContent = 'Unavailable';
+                if (statusDot) statusDot.className = 'status-dot offline';
+                if (launchBtn) {
+                    launchBtn.disabled = true;
+                    launchBtn.innerHTML = '⚠️ Platform Unavailable';
+                }
+                
+                // Update navigation status
+                if (navStatusDot) navStatusDot.className = 'nav-status-dot offline';
+                if (navPlatformStatus) navPlatformStatus.textContent = 'Unavailable';
+                if (navPlatformLink) navPlatformLink.classList.add('platform-unavailable');
                 
                 console.warn('Analysis platform status check failed:', error);
                 
@@ -1709,6 +1742,111 @@
             border-radius: 8px;
         }
         
+        /* Enhanced Navigation Bar */
+        .platform-nav-item {
+            position: relative;
+        }
+        
+        .platform-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .platform-nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        
+        .platform-nav-link.platform-unavailable {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .platform-nav-link.platform-unavailable:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        
+        .nav-status-dot.online {
+            background: #4ade80;
+            animation: nav-pulse 2s infinite;
+        }
+        
+        .nav-status-dot.checking {
+            background: #fbbf24;
+            animation: nav-pulse 1s infinite;
+        }
+        
+        .nav-status-dot.offline {
+            background: #ef4444;
+            animation: none;
+        }
+        
+        @keyframes nav-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .nav-platform-text {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .nav-platform-status {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            color: #fbbf24;
+        }
+        
+        /* Cross-platform notification system */
+        .platform-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .platform-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .platform-notification .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .platform-notification .notification-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
         /* Responsive design for platform status */
         @media (max-width: 768px) {
             .platform-status {
@@ -1723,6 +1861,27 @@
                 padding: 0.75rem;
                 font-size: 0.9rem;
             }
+            
+            .platform-nav-link {
+                padding: 0.4rem 0.8rem;
+            }
+            
+            .nav-platform-status {
+                display: none; /* Hide status text on mobile */
+            }
+            
+            .platform-notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+        
+        /* Navigation enhancement for platform connectivity */
+        .navbar .nav-links li:has(.platform-nav-link) {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 0.2rem;
         }
     </style>
 </body>
