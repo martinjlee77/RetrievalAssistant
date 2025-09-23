@@ -620,7 +620,7 @@ function revertToGuestNavigation() {
     if (authButtons) {
         authButtons.innerHTML = `
             <a href="/contact.html#trial" class="nav-cta primary">Start Risk Free</a>
-            <button onclick="showLoginModal()" class="nav-cta secondary">Log In</button>
+            <a href="/login.html" class="nav-cta secondary">Log In</a>
         `;
     }
 }
