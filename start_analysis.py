@@ -7,8 +7,8 @@ import sys
 import subprocess
 
 def main():
-    # Get port from environment or default to 8501
-    port = int(os.environ.get('PORT', 8501))
+    # Get port from environment or default to 5000 (Railway will override with $PORT)
+    port = int(os.environ.get('PORT', 5000))
     
     print(f"Starting VeritasLogic Analysis Platform on port {port}")
     
