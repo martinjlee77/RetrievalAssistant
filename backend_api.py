@@ -420,8 +420,18 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key
 
 # Database connection
 def get_db_connection():
-    """Get database connection using Replit environment variables"""
+    """Get database connection using DATABASE_URL or individual environment variables"""
     try:
+        # Try DATABASE_URL first (for Railway/production)
+        database_url = os.environ.get('DATABASE_URL')
+        if database_url:
+            conn = psycopg2.connect(
+                database_url,
+                cursor_factory=psycopg2.extras.RealDictCursor
+            )
+            return conn
+        
+        # Fall back to individual variables (for Replit/development)
         conn = psycopg2.connect(
             host=os.environ.get('PGHOST'),
             database=os.environ.get('PGDATABASE'),
