@@ -538,13 +538,29 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('VeritasLogic.ai website initialized successfully');
 });
 
+// Helper function to get cookie value
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
 // Authentication state management
 async function checkAuthenticationState() {
-    const token = localStorage.getItem('authToken');
-    
+    // First check for token in localStorage or cookies
+    let token = localStorage.getItem('authToken');
     if (!token || token === 'null' || token === 'undefined') {
+        token = getCookie('vl_auth_token');
+    }
+    
+    if (!token) {
         return; // Not logged in - keep default nav
     }
+    
+    // If we have a token, optimistically show authenticated navbar
+    // We'll revert if validation fails
+    const hasOptimisticUpdate = showOptimisticAuthState();
     
     // Verify token is still valid and get user info
     try {
@@ -558,14 +574,34 @@ async function checkAuthenticationState() {
         if (response.ok) {
             const profileData = await response.json();
             updateNavigationForLoggedInUser(profileData.user);
+            
+            // Store valid token in localStorage for faster future checks
+            if (token !== localStorage.getItem('authToken')) {
+                localStorage.setItem('authToken', token);
+            }
         } else {
-            // Token invalid - clear it
+            // Token invalid - clear it and revert to guest nav
             localStorage.removeItem('authToken');
+            revertToGuestNavigation();
         }
     } catch (error) {
         console.log('Auth check failed:', error);
-        // Network error - keep default nav
+        // Network error - if we had optimistic update, keep it
+        // User will see auth state but may get redirected if they try protected actions
     }
+}
+
+function showOptimisticAuthState() {
+    const authButtons = document.querySelector('.nav-auth-buttons');
+    if (authButtons) {
+        authButtons.innerHTML = `
+            <a href="/dashboard.html" class="nav-cta primary">Dashboard</a>
+            <span class="nav-user-greeting">Hello, User!</span>
+            <button onclick="logout()" class="nav-cta secondary">Sign Out</button>
+        `;
+        return true;
+    }
+    return false;
 }
 
 function updateNavigationForLoggedInUser(userData) {
@@ -579,8 +615,22 @@ function updateNavigationForLoggedInUser(userData) {
     }
 }
 
+function revertToGuestNavigation() {
+    const authButtons = document.querySelector('.nav-auth-buttons');
+    if (authButtons) {
+        authButtons.innerHTML = `
+            <a href="/contact.html#trial" class="nav-cta primary">Start Risk Free</a>
+            <button onclick="showLoginModal()" class="nav-cta secondary">Log In</button>
+        `;
+    }
+}
+
 function logout() {
     localStorage.removeItem('authToken');
+    
+    // Clear the cross-domain cookie
+    document.cookie = 'vl_auth_token=; path=/; domain=.veritaslogic.ai; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
     window.location.reload(); // Refresh to show logged-out state
 }
 
