@@ -552,6 +552,44 @@ def generate_verification_token():
 
 
 # API Routes
+@app.route('/api/fix-database', methods=['GET'])
+def fix_database():
+    """Temporary endpoint to fix database schema - remove after use"""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Add missing column
+        cursor.execute("""
+            ALTER TABLE email_verification_tokens 
+            ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP;
+        """)
+        
+        # Verify columns
+        cursor.execute("""
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_name = 'email_verification_tokens' 
+            ORDER BY ordinal_position;
+        """)
+        
+        columns = cursor.fetchall()
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Database fixed successfully!',
+            'columns': [{'name': col[0], 'type': col[1]} for col in columns]
+        })
+        
+    except Exception as e:
+        logger.error(f"Database fix error: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/signup', methods=['POST'])
 def signup():
     """Handle user registration"""
