@@ -198,13 +198,46 @@
                         </div>
                     </div>
                     
+                    <!-- Platform Status Card -->
+                    <div class="card platform-status-card">
+                        <h2>🌐 Platform Status</h2>
+                        <div class="platform-status">
+                            <div class="status-item">
+                                <div class="status-indicator" id="mainPlatformStatus">
+                                    <span class="status-dot checking"></span>
+                                    <span class="status-label">Main Platform</span>
+                                </div>
+                                <div class="status-value">Active</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator" id="analysisPlatformStatus">
+                                    <span class="status-dot checking"></span>
+                                    <span class="status-label">Analysis Platform</span>
+                                </div>
+                                <div class="status-value" id="analysisPlatformValue">Checking...</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-indicator" id="databaseStatus">
+                                    <span class="status-dot online"></span>
+                                    <span class="status-label">Database</span>
+                                </div>
+                                <div class="status-value">Connected</div>
+                            </div>
+                        </div>
+                        <div class="platform-actions">
+                            <a href="/analysis" class="btn btn-primary platform-launch-btn" id="platformLaunchBtn">
+                                🚀 Launch Analysis Platform
+                            </a>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions Card -->
                     <div class="card actions-card">
-                        <h2>🚀 Quick Actions</h2>
+                        <h2>⚡ Quick Actions</h2>
                         <div class="action-buttons">
-                            <a href="/analysis" class="btn btn-secondary" target="_blank">Launch Analysis Tool</a>
-                            <button onclick="showSection('credits')" class="btn btn-secondary">Add Credits</button>
-                            <button onclick="showSection('history')" class="btn btn-secondary">View History</button>
+                            <button onclick="showSection('credits')" class="btn btn-secondary">💳 Add Credits</button>
+                            <button onclick="showSection('history')" class="btn btn-secondary">📈 View History</button>
+                            <button onclick="showSection('profile')" class="btn btn-secondary">👤 Profile</button>
                         </div>
                     </div>
                 </div>
@@ -1510,6 +1543,59 @@
             setTimeout(checkBalance, 1000);
         }
         
+        // Platform Status Checking
+        async function checkPlatformStatus() {
+            const analysisPlatformUrl = '/analysis'; // Check through our redirect endpoint
+            const statusValue = document.getElementById('analysisPlatformValue');
+            const statusDot = document.querySelector('#analysisPlatformStatus .status-dot');
+            const launchBtn = document.getElementById('platformLaunchBtn');
+            
+            try {
+                statusValue.textContent = 'Checking...';
+                statusDot.className = 'status-dot checking';
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(analysisPlatformUrl, {
+                    method: 'HEAD',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    statusValue.textContent = 'Online';
+                    statusDot.className = 'status-dot online';
+                    launchBtn.disabled = false;
+                    launchBtn.innerHTML = '🚀 Launch Analysis Platform';
+                } else {
+                    throw new Error('Platform unavailable');
+                }
+                
+            } catch (error) {
+                statusValue.textContent = 'Unavailable';
+                statusDot.className = 'status-dot offline';
+                launchBtn.disabled = true;
+                launchBtn.innerHTML = '⚠️ Platform Unavailable';
+                
+                console.warn('Analysis platform status check failed:', error);
+                
+                // Retry after 30 seconds
+                setTimeout(checkPlatformStatus, 30000);
+            }
+        }
+        
+        // Initialize platform status checking
+        function initializePlatformStatus() {
+            checkPlatformStatus();
+            // Check status every 5 minutes
+            setInterval(checkPlatformStatus, 300000);
+        }
+        
+        // Call platform status check after dashboard is loaded
+        setTimeout(initializePlatformStatus, 2000);
+        
         // Initialize payment form handler
         setTimeout(() => {
             const paymentForm = document.getElementById('payment-form');
@@ -1518,5 +1604,126 @@
             }
         }, 100);
     </script>
+    
+    <style>
+        /* Platform Status Styles */
+        .platform-status-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .platform-status {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-dot.online {
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.checking {
+            background: #fbbf24;
+            animation: pulse 1s infinite;
+        }
+        
+        .status-dot.offline {
+            background: #ef4444;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .status-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .platform-actions {
+            margin-top: 1.5rem;
+        }
+        
+        .platform-launch-btn {
+            width: 100%;
+            padding: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .platform-launch-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .platform-launch-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        /* Enhanced Quick Actions */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .action-buttons .btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 8px;
+        }
+        
+        /* Responsive design for platform status */
+        @media (max-width: 768px) {
+            .platform-status {
+                gap: 0.75rem;
+            }
+            
+            .status-item {
+                padding: 0.5rem;
+            }
+            
+            .platform-launch-btn {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </body>
 </html>
