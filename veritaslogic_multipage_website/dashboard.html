@@ -62,6 +62,10 @@
                     <span class="nav-icon">📈</span>
                     <span class="nav-text">History</span>
                 </a>
+                <a href="#preferences" class="nav-item" onclick="showSection('preferences')">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Preferences</span>
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <a href="/analysis" class="btn btn-primary" target="_blank">Launch Analysis</a>
@@ -394,6 +398,152 @@
                         </form>
                     </div>
                 </div>
+            </div>
+
+            <!-- Preferences Section -->
+            <div id="preferencesSection" class="dashboard-section">
+                <div class="section-header">
+                    <h2>⚙️ Platform Preferences</h2>
+                    <p>Customize your experience across both main website and analysis platform.</p>
+                </div>
+                
+                <div class="preferences-grid">
+                    <!-- General Preferences -->
+                    <div class="card preferences-card">
+                        <h3>🎨 General Settings</h3>
+                        <div class="preference-group">
+                            <label class="preference-item">
+                                <span class="preference-label">Theme</span>
+                                <select id="themePreference" class="preference-select">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="auto">Auto (System)</option>
+                                </select>
+                            </label>
+                            
+                            <label class="preference-item">
+                                <span class="preference-label">Recent Items Count</span>
+                                <select id="recentItemsCount" class="preference-select">
+                                    <option value="5">5 items</option>
+                                    <option value="10">10 items</option>
+                                    <option value="20">20 items</option>
+                                </select>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="showPlatformStatus" class="preference-checkbox">
+                                <span class="preference-label">Show Platform Status in Navigation</span>
+                                <span class="preference-description">Display real-time status of analysis platform</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Preferences -->
+                    <div class="card preferences-card">
+                        <h3>🔔 Notifications</h3>
+                        <div class="preference-group">
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="analysisCompleteNotifications" class="preference-checkbox">
+                                <span class="preference-label">Analysis Complete</span>
+                                <span class="preference-description">Get notified when analysis finishes</span>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="platformStatusNotifications" class="preference-checkbox">
+                                <span class="preference-label">Platform Status Updates</span>
+                                <span class="preference-description">Alerts about platform availability</span>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="creditAlerts" class="preference-checkbox">
+                                <span class="preference-label">Credit Balance Alerts</span>
+                                <span class="preference-description">Warnings when credits are low</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Platform Preferences -->
+                    <div class="card preferences-card">
+                        <h3>📊 Analysis Platform</h3>
+                        <div class="preference-group">
+                            <label class="preference-item">
+                                <span class="preference-label">Preferred Standards</span>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="prefASC606" class="standard-checkbox" value="ASC 606">
+                                        <span>ASC 606</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="prefASC842" class="standard-checkbox" value="ASC 842">
+                                        <span>ASC 842</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="prefASC718" class="standard-checkbox" value="ASC 718">
+                                        <span>ASC 718</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="prefASC805" class="standard-checkbox" value="ASC 805">
+                                        <span>ASC 805</span>
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="prefASC340" class="standard-checkbox" value="ASC 340-40">
+                                        <span>ASC 340-40</span>
+                                    </label>
+                                </div>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="autoSavePreference" class="preference-checkbox">
+                                <span class="preference-label">Auto-save Analysis Progress</span>
+                                <span class="preference-description">Automatically save work in progress</span>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="detailedCitations" class="preference-checkbox">
+                                <span class="preference-label">Detailed Citations</span>
+                                <span class="preference-description">Include comprehensive source references</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Platform Integration Preferences -->
+                    <div class="card preferences-card">
+                        <h3>🔗 Platform Integration</h3>
+                        <div class="preference-group">
+                            <label class="preference-item">
+                                <span class="preference-label">Launch Delay</span>
+                                <select id="launchDelay" class="preference-select">
+                                    <option value="0">Instant</option>
+                                    <option value="1">1 second</option>
+                                    <option value="2">2 seconds</option>
+                                    <option value="3">3 seconds</option>
+                                </select>
+                                <span class="preference-description">Delay before redirecting to analysis platform</span>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="autoLaunchPlatform" class="preference-checkbox">
+                                <span class="preference-label">Auto-launch Analysis Platform</span>
+                                <span class="preference-description">Automatically open when clicking launch button</span>
+                            </label>
+                            
+                            <label class="preference-item checkbox-item">
+                                <input type="checkbox" id="sidebarCollapsed" class="preference-checkbox">
+                                <span class="preference-label">Collapse Dashboard Sidebar</span>
+                                <span class="preference-description">Start with compact sidebar view</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Preferences Actions -->
+                <div class="preferences-actions">
+                    <button id="savePreferences" class="btn btn-primary">💾 Save Preferences</button>
+                    <button id="resetPreferences" class="btn btn-secondary">🔄 Reset to Defaults</button>
+                    <button id="syncPreferences" class="btn btn-secondary">🔄 Sync Across Platforms</button>
+                </div>
+                
+                <div id="preferencesMessage" class="preferences-message" aria-live="polite"></div>
             </div>
 
             <!-- History Section -->
@@ -1629,6 +1779,217 @@
         // Call platform status check after dashboard is loaded
         setTimeout(initializePlatformStatus, 2000);
         
+        // Preferences Management
+        let currentPreferences = {};
+        
+        async function loadUserPreferences() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/preferences', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentPreferences = data.preferences;
+                    populatePreferencesForm(currentPreferences);
+                } else {
+                    console.error('Failed to load preferences');
+                    showPreferencesMessage('Failed to load preferences', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+                showPreferencesMessage('Error loading preferences', 'error');
+            }
+        }
+        
+        function populatePreferencesForm(preferences) {
+            // General settings
+            document.getElementById('themePreference').value = preferences.theme || 'light';
+            document.getElementById('recentItemsCount').value = preferences.ui_preferences?.recent_items_count || 10;
+            document.getElementById('showPlatformStatus').checked = preferences.platform_settings?.show_platform_status !== false;
+            
+            // Notifications
+            document.getElementById('analysisCompleteNotifications').checked = preferences.notifications?.analysis_complete !== false;
+            document.getElementById('platformStatusNotifications').checked = preferences.notifications?.platform_status !== false;
+            document.getElementById('creditAlerts').checked = preferences.notifications?.credit_alerts !== false;
+            
+            // Analysis platform
+            const preferredStandards = preferences.analysis_defaults?.preferred_standards || ['ASC 606', 'ASC 842'];
+            document.getElementById('prefASC606').checked = preferredStandards.includes('ASC 606');
+            document.getElementById('prefASC842').checked = preferredStandards.includes('ASC 842');
+            document.getElementById('prefASC718').checked = preferredStandards.includes('ASC 718');
+            document.getElementById('prefASC805').checked = preferredStandards.includes('ASC 805');
+            document.getElementById('prefASC340').checked = preferredStandards.includes('ASC 340-40');
+            
+            document.getElementById('autoSavePreference').checked = preferences.analysis_defaults?.auto_save !== false;
+            document.getElementById('detailedCitations').checked = preferences.analysis_defaults?.detailed_citations !== false;
+            
+            // Platform integration
+            document.getElementById('launchDelay').value = preferences.platform_settings?.default_redirect_delay || 2;
+            document.getElementById('autoLaunchPlatform').checked = preferences.platform_settings?.auto_launch_platform === true;
+            document.getElementById('sidebarCollapsed').checked = preferences.ui_preferences?.sidebar_collapsed === true;
+        }
+        
+        function collectPreferencesFromForm() {
+            // Collect preferred standards
+            const preferredStandards = [];
+            if (document.getElementById('prefASC606').checked) preferredStandards.push('ASC 606');
+            if (document.getElementById('prefASC842').checked) preferredStandards.push('ASC 842');
+            if (document.getElementById('prefASC718').checked) preferredStandards.push('ASC 718');
+            if (document.getElementById('prefASC805').checked) preferredStandards.push('ASC 805');
+            if (document.getElementById('prefASC340').checked) preferredStandards.push('ASC 340-40');
+            
+            return {
+                theme: document.getElementById('themePreference').value,
+                notifications: {
+                    analysis_complete: document.getElementById('analysisCompleteNotifications').checked,
+                    platform_status: document.getElementById('platformStatusNotifications').checked,
+                    credit_alerts: document.getElementById('creditAlerts').checked
+                },
+                analysis_defaults: {
+                    preferred_standards: preferredStandards,
+                    auto_save: document.getElementById('autoSavePreference').checked,
+                    detailed_citations: document.getElementById('detailedCitations').checked
+                },
+                platform_settings: {
+                    default_redirect_delay: parseInt(document.getElementById('launchDelay').value),
+                    auto_launch_platform: document.getElementById('autoLaunchPlatform').checked,
+                    show_platform_status: document.getElementById('showPlatformStatus').checked
+                },
+                ui_preferences: {
+                    sidebar_collapsed: document.getElementById('sidebarCollapsed').checked,
+                    recent_items_count: parseInt(document.getElementById('recentItemsCount').value)
+                }
+            };
+        }
+        
+        async function saveUserPreferences() {
+            try {
+                const preferences = collectPreferencesFromForm();
+                const token = localStorage.getItem('authToken');
+                
+                const response = await fetch('/api/user/preferences', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ preferences })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentPreferences = data.preferences;
+                    showPreferencesMessage('Preferences saved successfully!', 'success');
+                    
+                    // Apply preferences immediately
+                    applyPreferences(currentPreferences);
+                } else {
+                    showPreferencesMessage('Failed to save preferences', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+                showPreferencesMessage('Error saving preferences', 'error');
+            }
+        }
+        
+        async function syncPreferencesAcrossPlatforms() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch('/api/user/session-sync', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        platform: 'website',
+                        session_data: { preferences: currentPreferences }
+                    })
+                });
+                
+                if (response.ok) {
+                    showPreferencesMessage('Preferences synchronized across platforms!', 'success');
+                } else {
+                    showPreferencesMessage('Failed to sync preferences', 'error');
+                }
+            } catch (error) {
+                console.error('Error syncing preferences:', error);
+                showPreferencesMessage('Error syncing preferences', 'error');
+            }
+        }
+        
+        function resetPreferencesToDefaults() {
+            if (confirm('Are you sure you want to reset all preferences to defaults?')) {
+                const defaultPreferences = {
+                    theme: 'light',
+                    notifications: {
+                        analysis_complete: true,
+                        platform_status: true,
+                        credit_alerts: true
+                    },
+                    analysis_defaults: {
+                        preferred_standards: ['ASC 606', 'ASC 842'],
+                        auto_save: true,
+                        detailed_citations: true
+                    },
+                    platform_settings: {
+                        default_redirect_delay: 2,
+                        auto_launch_platform: false,
+                        show_platform_status: true
+                    },
+                    ui_preferences: {
+                        sidebar_collapsed: false,
+                        recent_items_count: 10
+                    }
+                };
+                
+                populatePreferencesForm(defaultPreferences);
+                showPreferencesMessage('Preferences reset to defaults', 'info');
+            }
+        }
+        
+        function applyPreferences(preferences) {
+            // Apply sidebar collapse preference
+            if (preferences.ui_preferences?.sidebar_collapsed) {
+                document.getElementById('dashboardSidebar').classList.add('collapsed');
+            }
+            
+            // Apply platform status visibility
+            if (!preferences.platform_settings?.show_platform_status) {
+                const statusElements = document.querySelectorAll('.nav-platform-status, .platform-status-card');
+                statusElements.forEach(el => el.style.display = 'none');
+            }
+        }
+        
+        function showPreferencesMessage(message, type) {
+            const container = document.getElementById('preferencesMessage');
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            
+            // Auto-clear after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Initialize preferences when dashboard loads
+        function initializePreferences() {
+            // Add event listeners
+            document.getElementById('savePreferences').addEventListener('click', saveUserPreferences);
+            document.getElementById('resetPreferences').addEventListener('click', resetPreferencesToDefaults);
+            document.getElementById('syncPreferences').addEventListener('click', syncPreferencesAcrossPlatforms);
+            
+            // Load user preferences
+            loadUserPreferences();
+        }
+        
+        // Call preferences initialization after dashboard is loaded
+        setTimeout(initializePreferences, 2000);
+        
         // Initialize payment form handler
         setTimeout(() => {
             const paymentForm = document.getElementById('payment-form');
@@ -1882,6 +2243,208 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             padding: 0.2rem;
+        }
+        
+        /* Preferences Section Styles */
+        .preferences-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .preferences-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .preferences-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .preferences-card h3 {
+            margin: 0 0 1.5rem 0;
+            color: #1f2937;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 0.75rem;
+        }
+        
+        .preference-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .preference-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .preference-item.checkbox-item {
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .preference-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        .preference-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .checkbox-item .preference-label {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .checkbox-item .preference-description {
+            margin-top: 0.25rem;
+            margin-left: 0;
+        }
+        
+        .preference-select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+        
+        .preference-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .preference-checkbox {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: #667eea;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .checkbox-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+        
+        .standard-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+        
+        .preferences-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+        
+        .preferences-actions .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .preferences-message {
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .preferences-message .success-message {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .preferences-message .error-message {
+            background: #ef4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .preferences-message .info-message {
+            background: #3b82f6;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        /* Responsive design for preferences */
+        @media (max-width: 1024px) {
+            .preferences-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .preferences-card {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .preferences-grid {
+                gap: 1rem;
+            }
+            
+            .preferences-card {
+                padding: 1rem;
+            }
+            
+            .preferences-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .preferences-actions .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .checkbox-group {
+                gap: 0.75rem;
+            }
+            
+            .checkbox-inline {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </body>
