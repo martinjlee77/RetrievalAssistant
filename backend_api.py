@@ -424,18 +424,14 @@ def get_db_connection():
     try:
         # Try DATABASE_URL first (for Railway/production)
         database_url = os.environ.get('DATABASE_URL')
-        logger.info(f"DATABASE_URL present: {bool(database_url)}")
         if database_url:
-            logger.info("Attempting DATABASE_URL connection...")
             conn = psycopg2.connect(
                 database_url,
                 cursor_factory=psycopg2.extras.RealDictCursor
             )
-            logger.info("DATABASE_URL connection successful!")
             return conn
         
         # Fall back to individual variables (for Replit/development)
-        logger.info("Using individual PostgreSQL variables...")
         conn = psycopg2.connect(
             host=os.environ.get('PGHOST'),
             database=os.environ.get('PGDATABASE'),
