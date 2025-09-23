@@ -63,6 +63,10 @@ CORS(app,
 def serve_index():
     return send_from_directory('veritaslogic_multipage_website', 'index.html')
 
+@app.route('/dashboard')
+def serve_dashboard():
+    return send_from_directory('veritaslogic_multipage_website', 'dashboard.html')
+
 @app.route('/analysis')
 def serve_streamlit_app():
     """Redirect to Streamlit app with seamless authentication"""
