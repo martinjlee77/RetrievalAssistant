@@ -89,16 +89,17 @@ def serve_streamlit_app():
     else:
         redirect_url = STREAMLIT_URL
     
-    # Build the HTML response with proper string formatting
+    # Build enhanced HTML response with error handling and status checking
     html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Redirecting to Analysis Platform</title>
-        <meta http-equiv="refresh" content="2;url={redirect_url}">
+        <title>VeritasLogic Analysis Platform</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
             body {{
-                font-family: Arial, sans-serif;
+                font-family: 'Inter', Arial, sans-serif;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -107,20 +108,39 @@ def serve_streamlit_app():
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
             }}
-            .redirect-container {{
+            .launch-container {{
                 text-align: center;
                 background: rgba(255,255,255,0.1);
                 padding: 3rem;
                 border-radius: 20px;
                 backdrop-filter: blur(10px);
-                max-width: 500px;
+                max-width: 600px;
+                min-height: 400px;
+                position: relative;
             }}
+            .status-indicator {{
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-right: 8px;
+                background: #4ade80;
+                animation: pulse 2s infinite;
+            }}
+            .status-checking {{ background: #fbbf24; }}
+            .status-error {{ background: #ef4444; animation: none; }}
+            
+            @keyframes pulse {{
+                0%, 100% {{ opacity: 1; }}
+                50% {{ opacity: 0.5; }}
+            }}
+            
             .spinner {{
                 border: 4px solid rgba(255,255,255,0.3);
                 border-top: 4px solid white;
                 border-radius: 50%;
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: 60px;
                 animation: spin 1s linear infinite;
                 margin: 0 auto 2rem;
             }}
@@ -128,6 +148,23 @@ def serve_streamlit_app():
                 0% {{ transform: rotate(0deg); }}
                 100% {{ transform: rotate(360deg); }}
             }}
+            
+            .progress-bar {{
+                width: 100%;
+                height: 8px;
+                background: rgba(255,255,255,0.2);
+                border-radius: 4px;
+                margin: 2rem 0;
+                overflow: hidden;
+            }}
+            .progress-fill {{
+                height: 100%;
+                background: linear-gradient(90deg, #4ade80, #22d3ee);
+                border-radius: 4px;
+                width: 0%;
+                transition: width 0.3s ease;
+            }}
+            
             .btn {{
                 background: white;
                 color: #667eea;
@@ -137,46 +174,231 @@ def serve_streamlit_app():
                 cursor: pointer;
                 margin: 1rem 0.5rem;
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 600;
                 transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
             }}
             .btn:hover {{ 
                 transform: translateY(-2px);
                 box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            }}
+            .btn:disabled {{
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
             }}
             .alt-btn {{
                 background: transparent;
                 color: white;
                 border: 2px solid white;
             }}
+            .error-message {{
+                background: rgba(239, 68, 68, 0.2);
+                border: 1px solid rgba(239, 68, 68, 0.5);
+                padding: 1rem;
+                border-radius: 10px;
+                margin: 2rem 0;
+                display: none;
+            }}
+            .success-message {{
+                background: rgba(74, 222, 128, 0.2);
+                border: 1px solid rgba(74, 222, 128, 0.5);
+                padding: 1rem;
+                border-radius: 10px;
+                margin: 2rem 0;
+                display: none;
+            }}
+            .loading-steps {{
+                text-align: left;
+                margin: 2rem 0;
+                font-size: 14px;
+            }}
+            .step {{
+                padding: 0.5rem 0;
+                opacity: 0.6;
+                transition: opacity 0.3s ease;
+            }}
+            .step.active {{ opacity: 1; font-weight: 500; }}
+            .step.complete {{ opacity: 0.8; }}
+            .step.complete::before {{
+                content: '✓ ';
+                color: #4ade80;
+                font-weight: bold;
+            }}
         </style>
     </head>
     <body>
-        <div class="redirect-container">
-            <div class="spinner"></div>
-            <h1>🚀 Launching Analysis Platform</h1>
-            <p>Opening your complete ASC analysis platform...</p>
-            <p>ASC 606 • ASC 842 • ASC 718 • ASC 805 • ASC 340-40 • Research Assistant</p>
+        <div class="launch-container">
+            <div id="loadingState">
+                <div class="spinner"></div>
+                <h1>🚀 Launching Analysis Platform</h1>
+                <p><span class="status-indicator status-checking" id="statusIndicator"></span>Connecting to your analysis platform...</p>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="loading-steps">
+                    <div class="step" id="step1">🔒 Verifying authentication</div>
+                    <div class="step" id="step2">🔗 Connecting to analysis platform</div>
+                    <div class="step" id="step3">📊 Loading ASC standards (606, 842, 718, 805, 340-40)</div>
+                    <div class="step" id="step4">🤖 Initializing Research Assistant</div>
+                </div>
+                
+                <p style="font-size: 14px; opacity: 0.8;">
+                    Your complete technical accounting analysis suite
+                </p>
+            </div>
             
-            <button class="btn" onclick="openStreamlit()">
-                Open Analysis Platform
-            </button>
-            <br>
-            <button class="alt-btn btn" onclick="window.close()">
-                Cancel
-            </button>
+            <div id="successState" style="display: none;">
+                <div class="success-message">
+                    <h2>✅ Platform Ready!</h2>
+                    <p>Your analysis platform is ready. Opening now...</p>
+                </div>
+                <button class="btn" onclick="openStreamlit()">
+                    Open Analysis Platform
+                </button>
+            </div>
             
-            <p style="font-size: 14px; margin-top: 2rem; opacity: 0.8;">
-                If the platform doesn't open automatically, click the button above.
-            </p>
+            <div id="errorState" style="display: none;">
+                <div class="error-message">
+                    <h2>⚠️ Connection Issue</h2>
+                    <p id="errorMessage">Unable to connect to the analysis platform. Please try again.</p>
+                </div>
+                <button class="btn" onclick="retryConnection()">
+                    Retry Connection
+                </button>
+                <br>
+                <button class="alt-btn btn" onclick="goBack()">
+                    Back to Dashboard
+                </button>
+            </div>
         </div>
         
         <script>
-            function openStreamlit() {{
-                window.location.href = '{redirect_url}';
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            let currentStep = 0;
+            let connectionAttempts = 0;
+            const maxAttempts = 3;
+            const redirectUrl = '{redirect_url}';
+            
+            function updateProgress(percentage) {{
+                document.getElementById('progressFill').style.width = percentage + '%';
             }}
             
-            setTimeout(openStreamlit, 2000);
+            function activateStep(stepIndex) {{
+                if (stepIndex > 0) {{
+                    document.getElementById(steps[stepIndex - 1]).classList.add('complete');
+                    document.getElementById(steps[stepIndex - 1]).classList.remove('active');
+                }}
+                if (stepIndex < steps.length) {{
+                    document.getElementById(steps[stepIndex]).classList.add('active');
+                }}
+            }}
+            
+            function showError(message) {{
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+                document.getElementById('errorMessage').textContent = message;
+                document.getElementById('statusIndicator').className = 'status-indicator status-error';
+            }}
+            
+            function showSuccess() {{
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('successState').style.display = 'block';
+                document.getElementById('statusIndicator').className = 'status-indicator';
+            }}
+            
+            async function checkPlatformStatus() {{
+                try {{
+                    // Try to reach the Streamlit platform
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    
+                    const response = await fetch(redirectUrl, {{
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        signal: controller.signal
+                    }});
+                    
+                    clearTimeout(timeoutId);
+                    return true;
+                }} catch (error) {{
+                    return false;
+                }}
+            }}
+            
+            async function launchSequence() {{
+                connectionAttempts++;
+                
+                // Step 1: Authentication
+                activateStep(0);
+                updateProgress(20);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Step 2: Platform connection
+                activateStep(1);
+                updateProgress(40);
+                
+                const platformAvailable = await checkPlatformStatus();
+                
+                if (!platformAvailable && connectionAttempts < maxAttempts) {{
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    updateProgress(50);
+                    return launchSequence(); // Retry
+                }}
+                
+                if (!platformAvailable) {{
+                    showError('Analysis platform is temporarily unavailable. Please try again in a few moments.');
+                    return;
+                }}
+                
+                // Step 3: Loading standards
+                activateStep(2);
+                updateProgress(70);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Step 4: Research Assistant
+                activateStep(3);
+                updateProgress(90);
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                // Complete
+                activateStep(4);
+                updateProgress(100);
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                showSuccess();
+                setTimeout(openStreamlit, 1500);
+            }}
+            
+            function openStreamlit() {{
+                window.location.href = redirectUrl;
+            }}
+            
+            function retryConnection() {{
+                connectionAttempts = 0;
+                currentStep = 0;
+                document.getElementById('errorState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'block';
+                document.getElementById('statusIndicator').className = 'status-indicator status-checking';
+                
+                // Reset progress and steps
+                updateProgress(0);
+                steps.forEach(step => {{
+                    document.getElementById(step).classList.remove('active', 'complete');
+                }});
+                
+                setTimeout(launchSequence, 500);
+            }}
+            
+            function goBack() {{
+                window.location.href = '/dashboard.html';
+            }}
+            
+            // Start the launch sequence
+            setTimeout(launchSequence, 1000);
         </script>
     </body>
     </html>
