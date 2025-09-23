@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS email_verification_tokens (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token VARCHAR(255) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
+    verified_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
 );
 

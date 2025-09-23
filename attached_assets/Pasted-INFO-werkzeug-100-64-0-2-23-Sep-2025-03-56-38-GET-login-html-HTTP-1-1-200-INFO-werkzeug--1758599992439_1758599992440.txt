@@ -1,0 +1,28 @@
+INFO:werkzeug:100.64.0.2 - - [23/Sep/2025 03:56:38] "GET /login.html HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [23/Sep/2025 03:56:39] "GET /signup.html HTTP/1.1" 200 -
+INFO:backend_api:DATABASE_URL present: True
+INFO:backend_api:Attempting DATABASE_URL connection...
+INFO:backend_api:DATABASE_URL connection successful!
+INFO:shared.pricing_config:Email martin.lee@veritaslogic.ai approved: pre-approved business domain veritaslogic.ai
+INFO:shared.postmark_client:Email verification sent successfully to martin.lee@veritaslogic.ai
+INFO:backend_api:Email verification sent successfully to martin.lee@veritaslogic.ai
+INFO:backend_api:User martin.lee@veritaslogic.ai registered successfully - pending email verification
+INFO:werkzeug:100.64.0.2 - - [23/Sep/2025 03:57:00] "POST /api/signup HTTP/1.1" 201 -
+INFO:werkzeug:100.64.0.2 - - [23/Sep/2025 03:57:02] "GET /dashboard.html HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [23/Sep/2025 03:57:04] "HEAD /analysis HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.3 - - [23/Sep/2025 03:57:45] "GET /verify-email.html?token=iYp7vgepHXZYhYFUBaE0vcZ8DZ5yGe-xPlQ-AGwZtOY HTTP/1.1" 200 -
+INFO:backend_api:DATABASE_URL present: True
+INFO:backend_api:Attempting DATABASE_URL connection...
+INFO:backend_api:DATABASE_URL connection successful!
+ERROR:backend_api:Email verification error: column evt.verified_at does not exist
+LINE 7:               AND evt.verified_at IS NULL
+                          ^
+INFO:werkzeug:100.64.0.3 - - [23/Sep/2025 03:57:45] "POST /api/verify-email HTTP/1.1" 500 -
+INFO:werkzeug:100.64.0.3 - - [23/Sep/2025 03:57:53] "GET /verify-email.html?token=iYp7vgepHXZYhYFUBaE0vcZ8DZ5yGe-xPlQ-AGwZtOY HTTP/1.1" 304 -
+INFO:backend_api:DATABASE_URL present: True
+INFO:backend_api:Attempting DATABASE_URL connection...
+INFO:backend_api:DATABASE_URL connection successful!
+ERROR:backend_api:Email verification error: column evt.verified_at does not exist
+LINE 7:               AND evt.verified_at IS NULL
+                          ^
+INFO:werkzeug:100.64.0.3 - - [23/Sep/2025 03:57:54] "POST /api/verify-email HTTP/1.1" 500 -
