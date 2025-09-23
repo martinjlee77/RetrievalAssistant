@@ -20,6 +20,6 @@ secondaryBackgroundColor = "#36404A" # Darker gray, also backgroundColor for sid
 # theme.dataframeHeaderBackgroundColor = "#000000"
 # showWidgetBorder = true
 
-[theme.sidebar]
-weight = "600" #100 to 600
+# [theme.sidebar]
+# weight = "600" #100 to 600 - Invalid config option, removed
 # baseFontSize = "18px"
