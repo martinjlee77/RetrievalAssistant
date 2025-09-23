@@ -2270,6 +2270,257 @@ def update_profile():
         logger.error(f"Update profile error: {e}")
         return jsonify({'success': False, 'error': 'Failed to update profile'}), 500
 
+@app.route('/api/user/preferences', methods=['GET', 'POST'])
+def manage_user_preferences():
+    """Get or update user preferences for cross-platform synchronization"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        if request.method == 'GET':
+            # Get user preferences
+            cursor.execute("""
+                SELECT preferences FROM users WHERE id = %s
+            """, (user_id,))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            if not result:
+                return jsonify({'error': 'User not found'}), 404
+            
+            preferences = result['preferences'] or {}
+            
+            # Default preferences structure for cross-platform sync
+            default_preferences = {
+                'theme': 'light',
+                'notifications': {
+                    'analysis_complete': True,
+                    'platform_status': True,
+                    'credit_alerts': True
+                },
+                'analysis_defaults': {
+                    'preferred_standards': ['ASC 606', 'ASC 842'],
+                    'auto_save': True,
+                    'detailed_citations': True
+                },
+                'platform_settings': {
+                    'default_redirect_delay': 2,
+                    'auto_launch_platform': False,
+                    'show_platform_status': True
+                },
+                'ui_preferences': {
+                    'sidebar_collapsed': False,
+                    'dashboard_cards_collapsed': {},
+                    'recent_items_count': 10
+                }
+            }
+            
+            # Merge with user preferences
+            if isinstance(preferences, dict):
+                for key, value in default_preferences.items():
+                    if key not in preferences:
+                        preferences[key] = value
+                    elif isinstance(value, dict) and isinstance(preferences[key], dict):
+                        for subkey, subvalue in value.items():
+                            if subkey not in preferences[key]:
+                                preferences[key][subkey] = subvalue
+            else:
+                preferences = default_preferences
+            
+            return jsonify({
+                'success': True,
+                'preferences': preferences
+            }), 200
+            
+        elif request.method == 'POST':
+            # Update user preferences
+            data = request.get_json()
+            new_preferences = data.get('preferences', {})
+            
+            if not isinstance(new_preferences, dict):
+                return jsonify({'error': 'Invalid preferences format'}), 400
+            
+            # Get current preferences
+            cursor.execute("""
+                SELECT preferences FROM users WHERE id = %s
+            """, (user_id,))
+            
+            result = cursor.fetchone()
+            if not result:
+                conn.close()
+                return jsonify({'error': 'User not found'}), 404
+            
+            current_preferences = result['preferences'] or {}
+            
+            # Merge preferences (deep merge for nested objects)
+            def deep_merge(target, source):
+                for key, value in source.items():
+                    if key in target and isinstance(target[key], dict) and isinstance(value, dict):
+                        deep_merge(target[key], value)
+                    else:
+                        target[key] = value
+                return target
+            
+            updated_preferences = deep_merge(current_preferences.copy(), new_preferences)
+            
+            # Update preferences in database
+            cursor.execute("""
+                UPDATE users 
+                SET preferences = %s 
+                WHERE id = %s
+            """, (json.dumps(updated_preferences), user_id))
+            
+            conn.commit()
+            conn.close()
+            
+            logger.info(f"User {user_id} updated preferences")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Preferences updated successfully',
+                'preferences': updated_preferences
+            }), 200
+        
+    except Exception as e:
+        logger.error(f"Manage preferences error: {e}")
+        return jsonify({'error': 'Failed to manage preferences'}), 500
+
+@app.route('/api/user/session-sync', methods=['POST'])
+def sync_user_session():
+    """Synchronize user session data across platforms"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        session_data = data.get('session_data', {})
+        platform = data.get('platform', 'unknown')  # 'website' or 'streamlit'
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Get current user data for cross-platform sync
+        cursor.execute("""
+            SELECT id, email, first_name, last_name, company_name, 
+                   credits_balance, preferences, created_at
+            FROM users 
+            WHERE id = %s
+        """, (user_id,))
+        
+        user = cursor.fetchone()
+        conn.close()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Build synchronized session data
+        sync_response = {
+            'success': True,
+            'user_profile': {
+                'id': user['id'],
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name'],
+                'company_name': user['company_name'],
+                'credits_balance': float(user['credits_balance'] or 0),
+                'member_since': user['created_at'].isoformat(),
+                'preferences': user['preferences'] or {}
+            },
+            'platform_status': {
+                'current_platform': platform,
+                'last_sync': datetime.now().isoformat(),
+                'session_valid': True
+            },
+            'cross_platform_data': session_data
+        }
+        
+        logger.info(f"User {user_id} synchronized session from {platform}")
+        
+        return jsonify(sync_response), 200
+        
+    except Exception as e:
+        logger.error(f"Session sync error: {e}")
+        return jsonify({'error': 'Failed to sync session'}), 500
+
+@app.route('/api/user/platform-activity', methods=['POST'])
+def log_platform_activity():
+    """Log user activity across platforms for unified tracking"""
+    try:
+        data = request.get_json()
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        activity_type = data.get('activity_type')  # 'platform_switch', 'analysis_start', etc.
+        platform = data.get('platform')  # 'website' or 'streamlit'
+        metadata = data.get('metadata', {})
+        
+        if not activity_type or not platform:
+            return jsonify({'error': 'Activity type and platform required'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        # Log activity (you might want to create a dedicated activity table)
+        # For now, we'll use the existing credit_transactions table with a special reason
+        if activity_type in ['platform_switch', 'analysis_start', 'session_sync']:
+            cursor.execute("""
+                INSERT INTO credit_transactions (user_id, amount, reason, created_at)
+                VALUES (%s, %s, %s, NOW())
+            """, (user_id, 0, f"{platform}_{activity_type}"))
+            
+            conn.commit()
+        
+        conn.close()
+        
+        logger.info(f"User {user_id} activity logged: {activity_type} on {platform}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Activity logged successfully'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Platform activity error: {e}")
+        return jsonify({'error': 'Failed to log activity'}), 500
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
