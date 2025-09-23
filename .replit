@@ -33,7 +33,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run home.py --server.port 5000 --server.address 0.0.0.0"
+args = "streamlit run home.py --server.address 0.0.0.0 --server.port ${PORT:-5000}"
 waitForPort = 5000
 
 [[workflows.workflow]]
