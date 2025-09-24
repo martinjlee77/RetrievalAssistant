@@ -2147,9 +2147,10 @@ def get_analysis_history():
         cursor = conn.cursor()
         
         # Get recent analyses with details
+        # Use memo_uuid as primary identifier since it's guaranteed to exist
         cursor.execute("""
             SELECT 
-                COALESCE(a.memo_uuid, a.id::text) as id,
+                COALESCE(a.memo_uuid, 'unknown') as id,
                 a.asc_standard,
                 a.completed_at,
                 a.status,
