@@ -558,9 +558,7 @@ async function checkAuthenticationState() {
         return; // Not logged in - keep default nav
     }
     
-    // If we have a token, optimistically show authenticated navbar
-    // We'll revert if validation fails
-    const hasOptimisticUpdate = showOptimisticAuthState();
+    // No optimistic update - wait for validation to avoid flashing
     
     // Verify token is still valid and get user info
     try {
@@ -595,9 +593,8 @@ function showOptimisticAuthState() {
     const authButtons = document.querySelector('.nav-auth-buttons');
     if (authButtons) {
         authButtons.innerHTML = `
-            <a href="/dashboard.html" class="nav-cta primary">Dashboard</a>
-            <span class="nav-user-greeting">Hello, User!</span>
-            <button onclick="logout()" class="nav-cta secondary">Sign Out</button>
+            <a href="/dashboard.html" class="nav-cta primary">My Account</a>
+            <a href="#" onclick="logout(); return false;" class="nav-cta secondary">Sign Out</a>
         `;
         return true;
     }
@@ -608,9 +605,8 @@ function updateNavigationForLoggedInUser(userData) {
     const authButtons = document.querySelector('.nav-auth-buttons');
     if (authButtons) {
         authButtons.innerHTML = `
-            <a href="/dashboard.html" class="nav-cta primary">Dashboard</a>
-            <span class="nav-user-greeting">Hello, ${userData.first_name || 'User'}!</span>
-            <button onclick="logout()" class="nav-cta secondary">Sign Out</button>
+            <a href="/dashboard.html" class="nav-cta primary">My Account</a>
+            <a href="#" onclick="logout(); return false;" class="nav-cta secondary">Sign Out</a>
         `;
     }
 }
