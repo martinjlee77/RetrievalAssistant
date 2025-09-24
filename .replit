@@ -101,12 +101,12 @@ localPort = 44927
 externalPort = 8008
 
 [[ports]]
-localPort = 46133
-externalPort = 8081
+localPort = 45383
+externalPort = 8099
 
 [[ports]]
-localPort = 46277
-externalPort = 8099
+localPort = 46133
+externalPort = 8081
 
 [agent]
 integrations = ["python_sendgrid==1.0.0"]
