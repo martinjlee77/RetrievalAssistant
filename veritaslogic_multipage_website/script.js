@@ -558,9 +558,11 @@ async function checkAuthenticationState() {
         return; // Not logged in - keep default nav
     }
     
-    // No optimistic update - wait for validation to avoid flashing
+    // Immediately show authenticated navbar if we have a token
+    // This eliminates the flashing delay while background validation runs
+    showOptimisticAuthState();
     
-    // Verify token is still valid and get user info
+    // Verify token is still valid and get user info in background
     try {
         const response = await fetch('/api/user/profile', {
             headers: {
@@ -584,8 +586,8 @@ async function checkAuthenticationState() {
         }
     } catch (error) {
         console.log('Auth check failed:', error);
-        // Network error - if we had optimistic update, keep it
-        // User will see auth state but may get redirected if they try protected actions
+        // Network error - revert to guest nav for safety
+        revertToGuestNavigation();
     }
 }
 
