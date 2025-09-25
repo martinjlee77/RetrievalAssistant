@@ -53,16 +53,14 @@ class ASC606StepAnalyzer:
         """Extract the customer entity name using LLM analysis."""
         try:
             
-            request_params = {
-                "model": self.light_model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the name of the customer company from the contract document."
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""Based on this revenue contract, what is the name of the customer company?
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying customer names in revenue contracts. Your task is to identify the name of the customer company from the contract document."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Based on this revenue contract, what is the name of the customer company?
 
 Please identify:
 - The company that is purchasing goods or services (the customer, not the vendor)
@@ -73,26 +71,20 @@ Contract Text:
 {contract_text[:4000]}
 
 Respond with ONLY the customer name, nothing else."""
-                    }
-                ],
-                **self._get_max_tokens_param("default", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
-            }
+                }
+            ]
             
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
-            response = self.client.chat.completions.create(**request_params)
+            response_content = self._make_llm_request(messages, self.light_model, "default")
             
             # Track API cost for entity extraction
             track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
+                messages=messages,
+                response_text=response_content or "",
                 model=self.light_model,
                 request_type="entity_extraction"
             )
             
-            entity_name = response.choices[0].message.content
+            entity_name = response_content
             if entity_name is None:
                 logger.warning("LLM returned None for customer name")
                 return "Customer"
@@ -142,6 +134,31 @@ Respond with ONLY the customer name, nothing else."""
                 "default": 2000
             }
             return {"max_tokens": token_limits.get(request_type, 2000)}
+    
+    def _make_llm_request(self, messages, model=None, request_type="default"):
+        """Helper method to route between Responses API (GPT-5) and Chat Completions API (GPT-4o)."""
+        target_model = model or self.model
+        
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # Use Responses API for GPT-5 models
+            response = self.client.responses.create(
+                model=target_model,
+                input=messages,
+                max_output_tokens=8000,  # GPT-5 uses max_output_tokens
+                reasoning={"effort": "medium"}
+            )
+            # Access response content from Responses API format
+            return response.choices[0].message.content
+        else:
+            # Use Chat Completions API for GPT-4o models
+            request_params = {
+                "model": target_model,
+                "messages": messages,
+                "temperature": self._get_temperature(target_model),
+                **self._get_max_tokens_param(request_type, target_model)
+            }
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content
     
     def analyze_contract(self, 
                         contract_text: str,
@@ -355,6 +372,18 @@ Respond with ONLY the customer name, nothing else."""
                 # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
                 
+                # Validate the output for quality assurance
+                validation_result = self.validate_step_output(markdown_content, step_num)
+                if not validation_result["valid"]:
+                    logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
+                    # Append validation issues to the Issues section
+                    if "**Issues or Uncertainties:**" in markdown_content:
+                        issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
+                        markdown_content = markdown_content.replace(
+                            "**Issues or Uncertainties:**", 
+                            "**Issues or Uncertainties:**" + issues_section + "\n\n**Original Issues:**"
+                        )
+                
             
             # Return clean markdown content - NO PROCESSING
             return {
@@ -366,6 +395,31 @@ Respond with ONLY the customer name, nothing else."""
         except Exception as e:
             logger.error(f"API error in step {step_num}: {str(e)}")
             raise
+    
+    def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
+        """Validate step output for required sections and formatting issues."""
+        issues = []
+        
+        # Check for required sections
+        if "**Analysis:**" not in markdown_content:
+            issues.append(f"Missing Analysis section in Step {step_num}")
+        
+        if "**Conclusion:**" not in markdown_content:
+            issues.append(f"Missing Conclusion section in Step {step_num}")
+        
+        # Check currency formatting - flag numbers that look like currency but missing $
+        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
+        # Filter out obvious non-currency (years, quantities, etc.)
+        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
+        if suspicious_currency:
+            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
+        
+        # Flag potentially fabricated citations (section numbers, page numbers)
+        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
+        if fake_citations:
+            issues.append(f"Potentially fabricated citations: {fake_citations}")
+        
+        return {"valid": len(issues) == 0, "issues": issues}
     
     def _get_markdown_system_prompt(self) -> str:
         """Get the system prompt for markdown generation."""

@@ -213,9 +213,38 @@ def get_asc606_inputs_new():
         placeholder="Provide any guidance to the AI that is not included in the uploaded documents (e.g., verbal agreement) or specify your areas of focus or concerns.",
         height=100)
     
-    # Determine if ready to proceed (no file size limits for enterprise)
+    # Determine if ready to proceed with word count enforcement
     if uploaded_files:
-        is_ready = True
+        # Check total word count across all files
+        try:
+            from utils.document_extractor import DocumentExtractor
+            extractor = DocumentExtractor()
+            total_words = 0
+            
+            for file in uploaded_files:
+                file_text = extractor.extract_text_from_uploaded_file(file)
+                total_words += len(file_text.split())
+            
+            if total_words > 60000:
+                st.error(f"""
+                📄 **Document too large ({total_words:,} words)**
+                
+                Contracts over 60,000 words require custom handling and consultation. 
+                
+                Please contact our support team at **support@veritaslogic.ai** for:
+                - Large contract analysis (60k+ words)
+                - Complex multi-document arrangements  
+                - Custom enterprise solutions
+                
+                We'll provide dedicated assistance for your large-scale analysis needs.
+                """)
+                is_ready = False
+            else:
+                is_ready = True
+        except Exception as e:
+            # If word count check fails, allow to proceed but log the issue
+            logger.warning(f"Word count check failed: {str(e)}")
+            is_ready = True
     else:
         is_ready = False
     

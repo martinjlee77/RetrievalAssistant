@@ -549,6 +549,31 @@ CRITICAL FORMATTING REQUIREMENTS:
         
         return prompt
     
+    def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
+        """Validate step output for required sections and formatting issues."""
+        issues = []
+        
+        # Check for required sections
+        if "**Analysis:**" not in markdown_content:
+            issues.append(f"Missing Analysis section in Step {step_num}")
+        
+        if "**Conclusion:**" not in markdown_content:
+            issues.append(f"Missing Conclusion section in Step {step_num}")
+        
+        # Check currency formatting - flag numbers that look like currency but missing $
+        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
+        # Filter out obvious non-currency (years, quantities, etc.)
+        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
+        if suspicious_currency:
+            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
+        
+        # Flag potentially fabricated citations (section numbers, page numbers)
+        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
+        if fake_citations:
+            issues.append(f"Potentially fabricated citations: {fake_citations}")
+        
+        return {"valid": len(issues) == 0, "issues": issues}
+    
     def _get_step_title(self, step_num: int) -> str:
         """Get the title for a step."""
         titles = {

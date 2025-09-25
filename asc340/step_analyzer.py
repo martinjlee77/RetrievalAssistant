@@ -373,6 +373,18 @@ Respond with ONLY the company name, nothing else."""
                 # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
                 
+                # Validate the output for quality assurance
+                validation_result = self.validate_step_output(markdown_content, step_num)
+                if not validation_result["valid"]:
+                    logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
+                    # Append validation issues to the Issues section
+                    if "**Issues or Uncertainties:**" in markdown_content:
+                        issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
+                        markdown_content = markdown_content.replace(
+                            "**Issues or Uncertainties:**", 
+                            "**Issues or Uncertainties:**" + issues_section + "\n\n**Original Issues:**"
+                        )
+                
                 # Log sample of clean content for verification
                 logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
             
@@ -386,6 +398,31 @@ Respond with ONLY the company name, nothing else."""
         except Exception as e:
             logger.error(f"API error in step {step_num}: {str(e)}")
             raise
+    
+    def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
+        """Validate step output for required sections and formatting issues."""
+        issues = []
+        
+        # Check for required sections
+        if "**Analysis:**" not in markdown_content:
+            issues.append(f"Missing Analysis section in Step {step_num}")
+        
+        if "**Conclusion:**" not in markdown_content:
+            issues.append(f"Missing Conclusion section in Step {step_num}")
+        
+        # Check currency formatting - flag numbers that look like currency but missing $
+        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
+        # Filter out obvious non-currency (years, quantities, etc.)
+        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
+        if suspicious_currency:
+            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
+        
+        # Flag potentially fabricated citations (section numbers, page numbers)
+        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
+        if fake_citations:
+            issues.append(f"Potentially fabricated citations: {fake_citations}")
+        
+        return {"valid": len(issues) == 0, "issues": issues}
     
     def _get_markdown_system_prompt(self) -> str:
         """Get the system prompt for markdown generation."""
