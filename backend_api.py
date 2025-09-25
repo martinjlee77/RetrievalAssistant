@@ -1521,24 +1521,40 @@ def create_payment_intent():
     """Create a Stripe payment intent for credit purchase"""
     try:
         data = request.get_json()
+        logger.info(f"Payment intent request data: {data}")
+        
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         
         if not token:
+            logger.error("No authorization token provided")
             return jsonify({'error': 'Authorization token required'}), 401
         
         # Verify token and get user
         payload = verify_token(token)
         if 'error' in payload:
+            logger.error(f"Token verification failed: {payload['error']}")
             return jsonify({'error': payload['error']}), 401
         
         user_id = payload['user_id']
         amount = data.get('amount')
+        logger.info(f"Received amount: {amount} (type: {type(amount)})")
+        
+        # Convert string amount to int if necessary
+        if isinstance(amount, str):
+            try:
+                amount = int(amount)
+                logger.info(f"Converted string amount to int: {amount}")
+            except ValueError:
+                logger.error(f"Could not convert amount to int: {amount}")
+                return jsonify({'error': 'Invalid amount format'}), 400
         
         # Validate amount against available credit packages
         from shared.pricing_config import CREDIT_PACKAGES
         valid_amounts = [pkg['amount'] for pkg in CREDIT_PACKAGES]
+        logger.info(f"Valid amounts: {valid_amounts}")
         
         if not amount or amount not in valid_amounts:
+            logger.error(f"Invalid amount {amount}, valid amounts are: {valid_amounts}")
             return jsonify({'error': f'Invalid credit amount. Must be one of: {valid_amounts}'}), 400
         
         # Get user info for payment metadata
