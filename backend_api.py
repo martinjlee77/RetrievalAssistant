@@ -1548,14 +1548,18 @@ def create_payment_intent():
                 logger.error(f"Could not convert amount to int: {amount}")
                 return jsonify({'error': 'Invalid amount format'}), 400
         
-        # Validate amount against available credit packages
+        # Validate amount - allow preset packages OR custom amounts within range
         from shared.pricing_config import CREDIT_PACKAGES
-        valid_amounts = [pkg['amount'] for pkg in CREDIT_PACKAGES]
-        logger.info(f"Valid amounts: {valid_amounts}")
+        preset_amounts = [pkg['amount'] for pkg in CREDIT_PACKAGES]
+        logger.info(f"Preset amounts: {preset_amounts}")
         
-        if not amount or amount not in valid_amounts:
-            logger.error(f"Invalid amount {amount}, valid amounts are: {valid_amounts}")
-            return jsonify({'error': f'Invalid credit amount. Must be one of: {valid_amounts}'}), 400
+        # Allow preset packages OR custom amounts between $95-$3000 (matching frontend validation)
+        if not amount:
+            logger.error("No amount provided")
+            return jsonify({'error': 'Amount is required'}), 400
+        elif amount < 95 or amount > 3000:
+            logger.error(f"Amount {amount} outside valid range $95-$3000")
+            return jsonify({'error': 'Amount must be between $95 and $3,000'}), 400
         
         # Get user info for payment metadata
         conn = get_db_connection()
