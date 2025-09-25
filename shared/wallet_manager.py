@@ -84,30 +84,43 @@ class WalletManager:
                 needed = max(0, required_amount - current_balance)
                 st.metric("Add'l Amount Needed:", f"${needed:.0f}", border = True)       
        
-        # Create redirect button
+        # Create buttons row
         dashboard_url = f"{WEBSITE_URL}/dashboard.html#credits"
         
-        st.markdown(f"""
-        <div style="text-align: left; margin: 20px 0;">
-            <a href="{dashboard_url}" target="_blank">
-                <button style="
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    padding: 15px 30px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    text-decoration: none;
-                    display: inline-block;
-                    transition: transform 0.2s;
-                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                    🔒 Add Credits Securely
-                </button>
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 2])
+        
+        with col1:
+            st.markdown(f"""
+            <div style="text-align: left; margin: 20px 0;">
+                <a href="{dashboard_url}" target="_blank">
+                    <button style="
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        text-decoration: none;
+                        display: inline-block;
+                        transition: transform 0.2s;
+                        width: 100%;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        🔒 Add Credits
+                    </button>
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Add refresh balance button that preserves form data
+            if st.button("🔄 Refresh Balance", key="refresh_balance_btn", help="Update balance without losing your form data"):
+                # Force a rerun to fetch fresh balance - this preserves all form state
+                st.rerun()
+        
+        # Add helpful instruction
+        st.info("💡 **Tip:** After adding credits in the dashboard, use the 'Refresh Balance' button to update your balance without losing your uploaded files or form data.")
         
         return None
     
