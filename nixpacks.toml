@@ -10,6 +10,8 @@ nixPkgs = [
     "cairo", 
     "pango",
     "gobject-introspection",
+    # GObject runtime library (for gobject-2.0-0)
+    "gobject",
     # WeasyPrint runtime dependencies (missing from previous attempts)
     "gdk-pixbuf",
     "libxml2",
