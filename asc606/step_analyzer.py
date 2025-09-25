@@ -63,7 +63,7 @@ class ASC606StepAnalyzer:
                     "content": f"""Based on this revenue contract, what is the name of the customer company?
 
 Please identify:
-- The company that is purchasing goods or services (the customer, not the vendor)
+- The company that is purchasing goods or services (this is the customer and not the vendor)
 - The name including suffixes like Inc., LLC, Corp., etc.
 - Ignore addresses, reference numbers, or other non-company identifiers
 
@@ -466,15 +466,26 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'focus': 'Identify distinct goods or services using ASC 606-10-25-14 and 25-22',
                 'key_points': [
                     'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
-                    'Evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
-                    'Evaluate whether each promised good or service is distinct within the context of the contract per ASC 606-10-25-21(a-c):',
-                    '   a. The good or service is regularly sold separately',
-                    '   b. The customer can benefit from the good or service on its own or with other readily available resources',
-                    '   c. The good or service is not highly interdependent with other promises in the contract',
-                    'Combine non-distinct goods/services into single performance obligations (ASC 606-10-25-22)',
+                    'Separately evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
+                    'Separately evaluate whether each promised good or service is distinct within the context of the contract (or also called separately identifiable) per ASC 606-10-25-21(a-c):',
+                    '   a. The entity provides a significant service of integrating goods or services with other goods or services promised in the contract into a bundle of goods or services that represent the combined output or outputs for which the customer has contracted. In other words, the entity is using the goods or services as inputs to produce or deliver the combined output or outputs specified by the customer. A combined output or outputs might include more than one phase, element, or unit.',
+                    '   b. One or more of the goods or services significantly modifies or customizes, or are significantly modified or customized by, one or more of the other goods or services promised in the contract.',
+                    '   c. The good or service is not highly interdependent with other promises in the contract. In other words, each of the goods or services is significantly affected by one or more of the other goods or services in the contract. For example, in some cases, two or more goods or services are significantly affected by each other because the entity would not be able to fulfill its promise by transferring each of the goods or services independently.',
+                    'Combine non-distinct goods/services into a single performance obligation (ASC 606-10-25-22)',
                     'Determine final list of performance obligations',
-                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-55-36 to 55-40)',
-                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)'
+                    'Consider principal vs. agent determination if a third party or parties are involved (ASC 606-10-55-36 to 55-40)',
+                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)',
+                    '',
+                    'Please provide a summary of the performance obligations identified in your analysis. This summary should list each distinct performance obligation and its key characteristics for executive review.',
+                    '',
+                    '[BEGIN_PO_SUMMARY]',
+                    'Count: [Number]',
+                    'List:',
+                    '- [PO 1 short label]',
+                    '- [PO 2 short label]',
+                    '- [Additional POs as needed]',
+                    '[END_PO_SUMMARY]'
+                                  
                 ]
             },
             3: {
@@ -482,17 +493,18 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'focus': 'Establish the transaction price per ASC 606-10-32-2',
                 'key_points': [
                     'Fixed consideration amounts',
-                    'Variable consideration amounts (ASC 606-10-32-5 to 32-10)',
-                    'Constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-14',
+                    'Variable consideration amounts (ASC 606-10-32-5 to 32-9)',
+                    'Constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-13',
                     'Total transaction price calculation',
                     'Significant financing components (if present)',
                     'Noncash consideration (if present)',
                     'Consideration paid or payable to a customer (if present)'
+    
                 ]
             },
             4: {
                 'title': 'Step 4: Allocate the Transaction Price',
-                'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
+                'focus': 'Allocate price to performance obligations based on standalone selling prices or SSPs (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
                 'key_points': [
                     'Summarize the performance obligations determined in Step 2',
                     'State that standalone selling prices (SSPs) should be determined separately based on observable data (ASC 606-10-32-31 to 32-34)',
@@ -521,7 +533,7 @@ STEP {step_num}: {step['title'].upper()}
 OBJECTIVE: {step['focus']}
 
 CONTRACT INFORMATION:
-Contract Analysis: Analyze the contract with the customer {customer_name} to determine the appropriate revenue recognition treatment under ASC 606 for the company.
+Contract Analysis: Analyze the contract with the customer {customer_name} to determine the appropriate revenue recognition treatment under ASC 606.
 
 Instructions: Analyze this contract from the company's perspective. {customer_name} is the customer receiving goods or services.
 
@@ -550,13 +562,24 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 606 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Analysis:** [Detailed analysis with supporting evidence. Include:
-- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Contract §X.Y, p. N])
-- ASC 606 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 606-10-25-19])
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
+- Contract citations must reference actual text from the document:
+    Good: [Contract, Payment Terms clause], [Contract, 'payment due within 30 days']
+    Bad: [Contract §4.2], [Contract, p. 15] (unless these exact references appear in the contract text)
+- Only cite section numbers/page numbers if they are explicitly visible in the contract text
+- ASC 606 guidance paraphrased with citations; include only brief
+decisive phrases when directly supportive (e.g., [ASC 606-10-25-19])
 
 **Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 606 citation.]
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
+
+CRITICAL ANALYSIS REQUIREMENTS:
+- If information is not explicitly stated in the contract, write "Not specified in contract"
+- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
+- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
+- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Format currency as: $240,000 (with comma, no spaces)
