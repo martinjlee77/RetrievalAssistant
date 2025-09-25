@@ -523,13 +523,20 @@ CRITICAL FORMATTING REQUIREMENTS:
                     # Extract conclusion from markdown content using clean regex approach (ASC 842 pattern)
                     markdown_content = step_data['markdown_content']
                     
-                    # Look for conclusion section in markdown using regex
+                    # Look for conclusion section in markdown - try markers first, then improved regex
                     import re
-                    conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*([^*]+)', markdown_content, re.IGNORECASE | re.DOTALL)
-                    if conclusion_match:
-                        conclusion = conclusion_match.group(1).strip()
+                    
+                    # Try markers first ([BEGIN_CONCLUSION]...[END_CONCLUSION])
+                    marker_match = re.search(r'\[BEGIN_CONCLUSION\](.*?)\[END_CONCLUSION\]', markdown_content, re.DOTALL)
+                    if marker_match:
+                        conclusion = marker_match.group(1).strip()
                     else:
-                        conclusion = None
+                        # Fallback to improved regex that captures until next bold section or end
+                        conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if conclusion_match:
+                            conclusion = conclusion_match.group(1).strip()
+                        else:
+                            conclusion = None
                     
                     if conclusion:
                         conclusions.append(f"Step {step_num}: {conclusion}")

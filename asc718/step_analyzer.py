@@ -729,28 +729,31 @@ Format as clean markdown - no headers, just paragraphs."""
                     content = step_data['markdown_content']
                     logger.info(f"DEBUG: {step_key} has markdown content of length {len(content)}")
                     
-                    # Extract conclusion from markdown content
-                    if '**Conclusion:**' in content:
-                        # Find the conclusion section
-                        conclusion_start = content.find('**Conclusion:**')
-                        if conclusion_start != -1:
-                            conclusion_text = content[conclusion_start:].strip()
-                            # Get just the conclusion paragraph (until next section or end)
-                            lines = conclusion_text.split('\n')
-                            conclusion_paragraph = lines[0] if lines else conclusion_text
-                            conclusions.append(f"Step {step_num}: {conclusion_paragraph}")
-                            logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_paragraph[:100]}...")
-                        else:
-                            logger.warning(f"DEBUG: Found 'Conclusion:' but couldn't extract for {step_key}")
+                    # Extract conclusion from markdown content - try markers first, then improved regex
+                    import re
+                    
+                    # Try markers first ([BEGIN_CONCLUSION]...[END_CONCLUSION])
+                    marker_match = re.search(r'\[BEGIN_CONCLUSION\](.*?)\[END_CONCLUSION\]', content, re.DOTALL)
+                    if marker_match:
+                        conclusion_text = marker_match.group(1).strip()
+                        conclusions.append(f"Step {step_num}: {conclusion_text}")
+                        logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_text[:100]}...")
                     else:
-                        # Fallback: use last paragraph as conclusion
-                        paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
-                        if paragraphs:
-                            last_paragraph = paragraphs[-1]
-                            conclusions.append(f"Step {step_num}: {last_paragraph}")
-                            logger.info(f"DEBUG: Used last paragraph as conclusion for {step_key}: {last_paragraph[:100]}...")
+                        # Fallback to improved regex that captures until next bold section or end
+                        conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', content, re.IGNORECASE | re.DOTALL)
+                        if conclusion_match:
+                            conclusion_text = conclusion_match.group(1).strip()
+                            conclusions.append(f"Step {step_num}: {conclusion_text}")
+                            logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_text[:100]}...")
                         else:
-                            logger.warning(f"DEBUG: No content found for {step_key}")
+                            # Final fallback: use last paragraph as conclusion
+                            paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
+                            if paragraphs:
+                                last_paragraph = paragraphs[-1]
+                                conclusions.append(f"Step {step_num}: {last_paragraph}")
+                                logger.info(f"DEBUG: Used last paragraph as conclusion for {step_key}: {last_paragraph[:100]}...")
+                            else:
+                                logger.warning(f"DEBUG: No content found for {step_key}")
                 else:
                     logger.warning(f"DEBUG: {step_key} missing markdown_content. Available keys: {list(step_data.keys()) if isinstance(step_data, dict) else 'Not a dict'}")
             else:

@@ -419,8 +419,8 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     '   c. The good or service is not highly interdependent with other promises in the contract',
                     'Combine non-distinct goods/services into single performance obligations (ASC 606-10-25-22)',
                     'Determine final list of performance obligations',
-                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-25-75 to 25-79)',
-                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-25-20)'
+                    'Consider principal vs. agent determination if third parties are involved (ASC 606-10-55-36 to 55-40)',
+                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)'
                 ]
             },
             3: {
@@ -440,7 +440,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 4: Allocate the Transaction Price',
                 'focus': 'Allocate price to performance obligations based on standalone selling prices (SSPs to be determined separately per ASC 606-10-32-31 to 32-34)',
                 'key_points': [
-                    'Summarize Identify the performance obligations determined in Step 2',
+                    'Summarize the performance obligations determined in Step 2',
                     'State that standalone selling prices (SSPs) should be determined separately based on observable data (ASC 606-10-32-31 to 32-34)',
                     'Describe the allocation methodology to be used (proportional to SSPs)',
                     'Note any discount allocation considerations (ASC 606-10-32-36)',
@@ -543,13 +543,20 @@ CRITICAL FORMATTING REQUIREMENTS:
                     # Extract conclusion from markdown content using clean regex approach (ASC 842 pattern)
                     markdown_content = step_data['markdown_content']
                     
-                    # Look for conclusion section in markdown using regex
+                    # Look for conclusion section in markdown - try markers first, then improved regex
                     import re
-                    conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*([^*]+)', markdown_content, re.IGNORECASE | re.DOTALL)
-                    if conclusion_match:
-                        conclusion = conclusion_match.group(1).strip()
+                    
+                    # Try markers first ([BEGIN_CONCLUSION]...[END_CONCLUSION])
+                    marker_match = re.search(r'\[BEGIN_CONCLUSION\](.*?)\[END_CONCLUSION\]', markdown_content, re.DOTALL)
+                    if marker_match:
+                        conclusion = marker_match.group(1).strip()
                     else:
-                        conclusion = None
+                        # Fallback to improved regex that captures until next bold section or end
+                        conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if conclusion_match:
+                            conclusion = conclusion_match.group(1).strip()
+                        else:
+                            conclusion = None
                     
                     if conclusion:
                         conclusions.append(f"Step {step_num}: {conclusion}")

@@ -574,14 +574,24 @@ CRITICAL FORMATTING REQUIREMENTS:
                     # Extract conclusion from markdown content
                     markdown_content = step_data['markdown_content']
                     
-                    # Look for conclusion section in markdown
-                    conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*([^*]+)', markdown_content, re.IGNORECASE | re.DOTALL)
-                    if conclusion_match:
-                        conclusion_text = conclusion_match.group(1).strip()
+                    # Look for conclusion section in markdown - try markers first, then improved regex
+                    import re
+                    
+                    # Try markers first ([BEGIN_CONCLUSION]...[END_CONCLUSION])
+                    marker_match = re.search(r'\[BEGIN_CONCLUSION\](.*?)\[END_CONCLUSION\]', markdown_content, re.DOTALL)
+                    if marker_match:
+                        conclusion_text = marker_match.group(1).strip()
                         conclusions.append(f"Step {step_num}: {conclusion_text}")
                         logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
                     else:
-                        logger.warning(f"DEBUG: No conclusion found in step {step_num} markdown")
+                        # Fallback to improved regex that captures until next bold section or end
+                        conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if conclusion_match:
+                            conclusion_text = conclusion_match.group(1).strip()
+                            conclusions.append(f"Step {step_num}: {conclusion_text}")
+                            logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
+                        else:
+                            logger.warning(f"DEBUG: No conclusion found in step {step_num} markdown")
                 else:
                     logger.warning(f"DEBUG: Step {step_num} missing markdown_content")
         

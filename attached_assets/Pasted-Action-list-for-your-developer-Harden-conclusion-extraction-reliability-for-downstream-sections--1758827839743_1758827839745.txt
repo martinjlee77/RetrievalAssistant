@@ -1,0 +1,286 @@
+Action list for your developer
+
+Harden conclusion extraction (reliability for downstream sections)
+Why: The current regex r'**Conclusion:**\s*([^*]+)' often truncates multi-line conclusions or stops early if an asterisk appears in the text. Even if you ask for 2–3 sentences, models still insert line breaks, bullets, or bold text, making the regex fragile.
+Recommended approach (choose one): A. Regex improvement (minimal change):
+New pattern: r'**Conclusion:**\s*(.+?)(?:\n\s***|$)' with flags re.DOTALL | re.IGNORECASE. This captures all text after “Conclusion” until the next bold section (e.g., “**Issues…”).
+Add fallback patterns for:
+r'^### .?Conclusion.?\n+(.+?)(?:\n### |\Z)' (if the model uses a “Conclusion” heading)
+r'[BEGIN CONCLUSION](.+?)[END CONCLUSION]' (if you adopt delimiters) B. Markers (most robust and future-proof):
+Update the Required Output Format to include explicit markers:
+“Include a conclusion markers block: [BEGIN CONCLUSION] … [END CONCLUSION]”
+Update extraction to use markers first, regex fallback second. C. Markdown parser (most accurate, more work):
+Use a markdown AST (markdown-it-py or mistune) to locate the strong text “Conclusion” and collect the paragraph(s) following it. Reduces brittleness and avoids regex errors.
+Code location: _extract_conclusions_from_steps()
+Mitigate fabricated pinpoint contract citations
+Why: The prompt currently suggests bracketed pinpoint citations like [Contract §X.Y, p. N], but the raw contract_text lacks reliable section/page metadata. The model may invent numbers, which is risky in audit settings.
+Prompt policy update:
+Replace the current instruction with:
+“Use neutral contract references: [Contract, Clause: ‘<clause name>’] or [Contract, ‘<short quoted phrase>’]. Do NOT invent section or page numbers. If a clause name is not explicit, use a short quoted phrase from the contract.”
+Add an explicit safeguard:
+“If specific pinpoint details are unknown, write ‘Not specified in contract’ rather than guessing.”
+Optional post-processor/validator:
+After receiving markdown, detect and flag/normalize risky patterns:
+If you see patterns like r'[Contract\s*§|\bp.\s*\d+]' replace with a neutral form or raise a warning.
+Code locations:
+Prompt change: _get_step_markdown_prompt() under “Required Output Format” and bullet list.
+Validator: add a small sanitizer in _analyze_step() after content is returned, or a separate post-processing utility.
+Context size/token limits and large contract handling
+Why: Entire contract_text is inlined. For large documents, this risks context overflow, API errors, or poor focus.
+Recommended strategy (map-reduce + retrieval):
+Preprocessing:
+Chunk the contract by semantic paragraphs or pages (e.g., 1,500–2,000 tokens per chunk with ~200-token overlap). Store chunk IDs, doc name, page ranges, and detected clause headings (via PyMuPDF or layout analysis).
+Step-specific retrieval:
+For each step, define a keyword/topic profile to retrieve top-k relevant chunks. Examples:
+Step 1: terms like approval, effective date, signatures, commercial substance, payment terms, collectibility, termination, governing law, assignment, refund, acceptance.
+Step 2: scope of services, deliverables, license, SaaS, hardware, implementation, integration, third-party, options, upgrades, renewals.
+Step 3: fees, variable, rebates, credits, penalties, bonuses, refunds, clawbacks, minimums, price concessions, financing.
+Step 4: SSP, list price, standalone, discount, allocation.
+Step 5: delivery, acceptance, control, transfer, milestones, percentage-of-completion, bill-and-hold, usage, royalties.
+Map-reduce prompting:
+Map: Summarize each relevant chunk with a step-specific lens.
+Reduce: Aggregate the mapped summaries into a single final step prompt (include only the reduce summary + citations back to chunk IDs and clause names).
+Benefits: Lower token usage, better focus, explicit chunk-level citations using clause names. You can keep this module mostly unchanged and handle chunking upstream.
+Code location:
+Preferably upstream (document processing / retrieval layer). If you must do it here, add a contract reducer helper, but that’s less clean architecturally.
+Executive summary — reliable performance obligation count
+Your approach: rely on the LLM to infer count.
+Risk: It can hallucinate if Step 2 isn’t explicit or if the model compresses multiple promises into a single PO without stating the count clearly.
+Minimal, high-reliability fix:
+In Step 2’s Required Output Format, add a short machine-readable footer:
+[BEGIN_PO_SUMMARY]
+Count: N
+List:
+<PO 1 short label>
+<PO 2 short label>
+…
+[END_PO_SUMMARY]
+Then modify generate_executive_summary() to parse Count: N with a simple regex.
+Code locations:
+Prompt change: _get_step_markdown_prompt() for Step 2 only.
+Parsing: In analyze_contract(), parse the Step 2 markdown_content to extract this block and pass a reliable count into generate_executive_summary() (or append to conclusions_text).
+Align to GPT-5 Responses API for production
+Why: Your code uses chat.completions with gpt-5(-mini) names and sets response_format/max_completion_tokens. GPT-5 is generally exposed via the Responses API with different parameters.
+Suggested standardization:
+Use Responses API for GPT-5/5-mini:
+client.responses.create( model="gpt-5" or "gpt-5-mini", input=[{role: "system", content: ...}, {role: "user", content: ...}], temperature=1, max_output_tokens=8000, reasoning={"effort": "medium"}, modalities=["text"], response_format={"type": "text"} // optional, stick to text )
+Keep chat.completions only for GPT-4o family.
+Abstract request building into a helper that switches API path/params by model family to avoid duplication and errors.
+Cost tracking:
+Ensure track_openai_request still works with the Responses API’s response structure (token usage fields may differ).
+Code locations:
+init(), _get_max_tokens_param(), _get_temperature()
+All LLM call sites: _analyze_step(), extract_entity_name_llm(), generate_executive_summary(), generate_background_section(), generate_conclusion_section(), generate_final_conclusion().
+Exception classes and retry logic
+Why: SDK exception classes differ by version (e.g., openai.RateLimitError vs. openai.error.RateLimitError vs. APIConnectionError variants). Mismatches can cause unhandled exceptions in production.
+Recommendation:
+Update imports and catches to match your installed SDK version. Consider a thin wrapper that normalizes OpenAI exceptions into app-specific exceptions (RateLimit, Timeout, Connection, API).
+Keep exponential backoff with jitter (good as-is).
+Tighten prompt language to reduce ambiguity and improve auditability
+In “Required Output Format”:
+Add:
+“If a required fact is not provided in the contract, state ‘Not specified in contract.’ Do not infer or guess.”
+“Do not invent section numbers, page numbers, dates, or clause titles.”
+“Use concise, assertive language (‘We conclude…’) rather than hedging (‘It appears…’) unless a gap is material.”
+Keep: “Quote contract language only when outcome-determinative” — good.
+Step-specific content refinements:
+Step 1: Consider mentioning contract combination and modifications scanning:
+Add: “Identify if multiple contracts should be combined (ASC 606-10-25-9). Identify any modifications present (ASC 606-10-25-10 through 25-13) and whether they are separate contracts or part of the existing contract.”
+Step 2: Your existing references are solid. You may add:
+“If licenses are implicated, specify if the license is a separate PO and whether it is a functional or symbolic license (ASC 606-10-55-58 through 55-65).”
+Step 3: Make the guidance bullets more explicit:
+“Variable consideration method selection (expected value or most likely amount) and why (ASC 606-10-32-8).”
+“Constraint on variable consideration (ASC 606-10-32-11 through 32-13).”
+“Significant financing component (ASC 606-10-32-15 through 32-20).”
+“Noncash consideration (ASC 606-10-32-21 through 32-24).”
+“Consideration payable to a customer (ASC 606-10-32-25 through 32-27).”
+“Sales- or usage-based royalty constraint for licenses (ASC 606-10-55-65).”
+Step 4: Add allocation details:
+“Allocate discounts proportionately unless specific discount allocation criteria are met (ASC 606-10-32-36 through 32-38).”
+“Allocation of variable consideration to specific performance obligations when criteria are met (ASC 606-10-32-39 through 32-41).”
+“Changes in transaction price—reallocation when required (ASC 606-10-32-42 through 32-45).”
+Step 5: Clarify recognition mechanics:
+“Determine over-time criteria per ASC 606-10-25-27 (a–c).”
+“Control indicators (ASC 606-10-25-30).”
+“Measure progress methods and consistency (ASC 606-10-25-31 through 25-37).”
+“If licenses are present, apply license timing guidance (ASC 606-10-55-58 through 55-65).”
+Note: Please verify paragraph ranges against your internal reference set. The above are widely used anchors, but confirm before updating prompts.
+Add a small, structured footer for Step 3 amounts (optional but valuable)
+Why: You follow “Extract-Then-Calculate.” A small machine-readable summary improves accuracy and eliminates math hallucinations while keeping the narrative format.
+Proposal (append to Step 3 output spec):
+“After the Analysis, include: [BEGIN_AMOUNT_SUMMARY] Fixed consideration: 
+X
+V
+a
+r
+i
+a
+b
+l
+e
+c
+o
+n
+s
+i
+d
+e
+r
+a
+t
+i
+o
+n
+(
+u
+n
+c
+o
+n
+s
+t
+r
+a
+i
+n
+e
+d
+)
+:
+XVariableconsideration(unconstrained):Y Constraint applied: Yes/No; Basis: <short reason> Significant financing component: Yes/No; Adjustment: 
+Z
+(
+i
+f
+d
+e
+t
+e
+r
+m
+i
+n
+a
+b
+l
+e
+)
+N
+o
+n
+c
+a
+s
+h
+c
+o
+n
+s
+i
+d
+e
+r
+a
+t
+i
+o
+n
+:
+D
+e
+s
+c
+r
+i
+p
+t
+i
+o
+n
+C
+o
+n
+s
+i
+d
+e
+r
+a
+t
+i
+o
+n
+p
+a
+y
+a
+b
+l
+e
+t
+o
+c
+u
+s
+t
+o
+m
+e
+r
+:
+Z(ifdeterminable)Noncashconsideration:DescriptionConsiderationpayabletocustomer:A [END_AMOUNT_SUMMARY]”
+Parsing: A simple regex block parser; amounts remain narrative elsewhere.
+Output validation before saving/using downstream
+Why: Catch issues early and prevent an audit slip.
+Validator checks (fast and simple):
+Presence of all required section labels: “### Step X”, “Analysis:”, “Conclusion:”, “Issues or Uncertainties:”.
+Currency formatting regex: r'$\d{1,3}(,\d{3})*(.\d{2})?' — flag deviations like “240,000” without $.
+No invented pinpoint references: flag if matches r'[Contract\s*§|\bp.\s*\d+]'.
+Optional: word-count bounds to prevent overly terse or overly long sections per step.
+Code location: After _analyze_step() returns content; log and optionally annotate Issues or Uncertainties if validation fails.
+Multi-document references (optional enhancement)
+If multiple documents are processed (MSA, Order Form, SOW), instruct the model to tag citations with the document label:
+[MSA, Clause: “Payment Terms”], [Order Form, “Fees”].
+Requires upstream doc segmentation and passing document name with each chunk.
+Model temperature and determinism
+GPT-5: Temperature is effectively fixed at 1 in your helper. If Responses API allows top_p or similar, consider setting a low top_p (e.g., 0.2–0.3) for more deterministic outputs while keeping reasoning quality. If temperature cannot be changed for GPT-5, emphasize determinism in the prompt: “Follow the output format exactly; do not introduce extra sections or headings.”
+Direct answers to your specific questions
+
+Conclusion extraction fragility even with 2–3 sentence instruction: Yes, still fragile. Use the improved regex or add [BEGIN/END CONCLUSION] markers. Best: markers + regex fallback.
+
+Fabricated pinpoint citations: Change the spec to use clause names or short quotes, forbid section/page guesses, and add a validator to catch risky patterns. This balances auditability and avoids hallucinations.
+
+Context size/token limits: Adopt chunking + retrieval + map-reduce. Keep this module clean; do preprocessing upstream. Include clause names and doc labels for solid citations.
+
+Executive summary “number of POs” via LLM inference: It can work but may hallucinate under ambiguity. The [BEGIN_PO_SUMMARY] block in Step 2 is a safe, minimal change to ensure a reliable count.
+
+GPT-5 branch/API alignment: Move GPT-5 and GPT-5-mini to the Responses API; standardize parameters across all call sites; keep GPT-4o on chat.completions as a fallback.
+
+OpenAI exception classes: Normalize exceptions or wrap them to shield the app from SDK changes.
+
+Any other mis-citations beyond principal/agent and material rights: The main gaps I noticed are the missing references to:
+
+Contract combination (ASC 606-10-25-9) and modifications (ASC 606-10-25-10 through 25-13).
+Step 3/4 ranges as suggested above (32-36 to 32-45; 32-11 to 32-13, etc.).
+Over-time/control/progress measurement references in Step 5 (25-27, 25-30, 25-31 through 25-37).
+License timing/royalty constraint (55-58 through 55-65). Please verify internally before changing the prompt text.
+Tone/format rules: Your current directions are strong. I recommend explicitly adding:
+
+“Do not guess; write ‘Not specified in contract’ for missing facts.”
+“Use assertive language and avoid hedging unless the gap is material.”
+The clause-based citation rule above.
+Final GPT-5-oriented prompt improvements to enhance memo quality
+
+Add a short “What to do if information is missing” bullet in the system prompt:
+“If a required input is missing or ambiguous, explicitly note the gap, explain why it matters, and state what evidence would resolve it.”
+Require a “Key ASC Citations Used” bullet list at the end of each step (2–5 bullets). This drives crisp anchoring and helps reviewers.
+For Step 5 (recognition), require the model to explicitly state:
+Whether revenue is recognized over time or point in time for each PO, the specific criterion (25-27(a–c)), and the selected progress method (output vs input).
+For Step 2, require a one-line distinctness conclusion for each promised good/service tied to 25-20 and 25-21, with a brief “because” clause.
+Add explicit note: “Do not perform numerical allocations in narrative; amounts will be computed separately. Provide the methodology and the inputs only.” This matches your Extract-Then-Calculate pattern.
+Implementation reminders under Prompt Protection
+
+Because this file contains user-facing analysis instructions and prompt content, changes require your explicit approval. If the developer needs to modify those strings, ensure you approve each change. If any automated process attempts to modify them, it should be blocked and surfaced for review.
+If my suggestions require changing protected text (e.g., “Required Output Format”), your developer should apply those changes manually after your approval. If I were to attempt it programmatically, I would issue:
+“⚠️ PROMPT PROTECTION ALERT: I cannot modify asc606/step_analyzer.py prompt text due to the prompt protection rules in replit.md. You will need to make this change manually. Here’s exactly what needs to be changed: [specific instructions].”
+If you’d like, I can draft exact redlines for the Step 2 and Step 3–5 prompt bullets (with the citation tweaks and the new clause-based citation language), plus the [BEGIN_PO_SUMMARY] and [BEGIN_AMOUNT_SUMMARY] footer blocks, so your developer can paste them in verbatim after your approval.
