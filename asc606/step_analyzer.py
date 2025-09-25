@@ -474,17 +474,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Combine non-distinct goods/services into a single performance obligation (ASC 606-10-25-22)',
                     'Determine final list of performance obligations',
                     'Consider principal vs. agent determination if a third party or parties are involved (ASC 606-10-55-36 to 55-40)',
-                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)',
-                    '',
-                    'Please provide a summary of the performance obligations identified in your analysis. This summary should list each distinct performance obligation and its key characteristics for executive review.',
-                    '',
-                    '[BEGIN_PO_SUMMARY]',
-                    'Count: [Number]',
-                    'List:',
-                    '- [PO 1 short label]',
-                    '- [PO 2 short label]',
-                    '- [Additional POs as needed]',
-                    '[END_PO_SUMMARY]'
+                    'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)'
                                   
                 ]
             },
