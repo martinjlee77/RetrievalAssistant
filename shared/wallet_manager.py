@@ -6,17 +6,22 @@ Handles credit top-ups, balance checking, and payment processing
 import streamlit as st
 import requests
 import logging
+import os
 from typing import Dict, Any, List, Optional
 from .pricing_config import get_credit_packages
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+# Backend API configuration - Use environment variables for cross-deployment support
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+
 class WalletManager:
     """Manages user wallet operations and credit transactions"""
     
     def __init__(self):
-        self.backend_url = "http://127.0.0.1:3000/api"
+        self.backend_url = BACKEND_URL
     
     def get_user_balance(self, user_token: str) -> Dict[str, Any]:
         """
@@ -80,7 +85,7 @@ class WalletManager:
                 st.metric("Add'l Amount Needed:", f"${needed:.0f}", border = True)       
        
         # Create redirect button
-        dashboard_url = "http://127.0.0.1:3000/dashboard.html#credits"
+        dashboard_url = f"{WEBSITE_URL}/dashboard.html#credits"
         
         st.markdown(f"""
         <div style="text-align: left; margin: 20px 0;">
@@ -121,7 +126,7 @@ class WalletManager:
             'success': False,
             'redirect_required': True,
             'message': "Please use the secure dashboard to add credits to your account.",
-            'dashboard_url': "http://127.0.0.1:3000/dashboard.html#credits"
+            'dashboard_url': f"{WEBSITE_URL}/dashboard.html#credits"
         }
     
     def charge_for_analysis(self, user_token: str, amount: float, analysis_details: Dict[str, Any]) -> Dict[str, Any]:
