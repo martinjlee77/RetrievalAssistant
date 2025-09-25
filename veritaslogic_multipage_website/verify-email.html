@@ -127,8 +127,22 @@
             
             // Check if token is present
             if (!verificationToken) {
-                showMessage('Invalid or missing verification token. Please click the verification link from your email.', 'error');
-                statusContainer.style.display = 'none';
+                // No token means user came from signup - show friendly message
+                showMessage('📧 Account created successfully! Please check your email inbox and click the verification link to activate your account.', 'info');
+                statusContainer.innerHTML = `
+                    <div class="verification-instructions">
+                        <h3>📋 What to do next:</h3>
+                        <ol>
+                            <li><strong>Check your email inbox</strong> for a message from VeritasLogic</li>
+                            <li><strong>Click the verification link</strong> in the email</li>
+                            <li><strong>Return to login page</strong> - your account will be activated</li>
+                        </ol>
+                        <div class="verification-actions">
+                            <a href="login.html" class="btn btn-primary">Go to Login Page</a>
+                            <a href="contact.html" class="btn btn-secondary">Need Help?</a>
+                        </div>
+                    </div>
+                `;
                 return;
             }
             

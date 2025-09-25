@@ -290,11 +290,11 @@
                 if (response.ok) {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Account Created';
-                    showMessage('Account created successfully! Redirecting to dashboard...', 'success');
+                    showMessage('Account created successfully! Please check your email to verify your account...', 'success');
                     
-                    // Redirect to dashboard after 2 seconds
+                    // Redirect to email verification page after 2 seconds
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = 'verify-email.html';
                     }, 2000);
                     
                 } else {
