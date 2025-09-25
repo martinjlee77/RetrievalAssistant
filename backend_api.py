@@ -1639,22 +1639,35 @@ def stripe_webhook():
             
             cursor = conn.cursor()
             
-            # Add credits to user's balance
+            # Get current balance before update
+            cursor.execute("SELECT credits_balance FROM users WHERE id = %s", (user_id,))
+            result = cursor.fetchone()
+            if not result:
+                logger.error(f"User {user_id} not found")
+                conn.close()
+                return jsonify({'error': 'User not found'}), 404
+            
+            current_balance = float(result['credits_balance'] or 0)
+            new_balance = current_balance + float(credit_amount)
+            
+            logger.info(f"Balance update: ${current_balance} -> ${new_balance} (+ ${credit_amount})")
+            
+            # Update user's balance
             cursor.execute("""
                 UPDATE users 
-                SET credits_balance = credits_balance + %s
+                SET credits_balance = %s
                 WHERE id = %s
-            """, (credit_amount, user_id))
+            """, (new_balance, user_id))
             
             rows_affected = cursor.rowcount
             logger.info(f"Updated {rows_affected} user records")
             
-            # Record credit purchase transaction
+            # Record credit purchase transaction with balance_after
             from shared.pricing_config import CREDIT_EXPIRATION_MONTHS
             cursor.execute("""
-                INSERT INTO credit_transactions (user_id, amount, reason, expires_at, stripe_payment_id)
-                VALUES (%s, %s, 'stripe_purchase', NOW() + INTERVAL '%s months', %s)
-            """, (user_id, credit_amount, CREDIT_EXPIRATION_MONTHS, payment_id))
+                INSERT INTO credit_transactions (user_id, amount, reason, balance_after, expires_at, stripe_payment_id)
+                VALUES (%s, %s, 'stripe_purchase', %s, NOW() + INTERVAL '%s months', %s)
+            """, (user_id, credit_amount, new_balance, CREDIT_EXPIRATION_MONTHS, payment_id))
             
             conn.commit()
             conn.close()
