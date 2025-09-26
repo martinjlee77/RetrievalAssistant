@@ -246,7 +246,7 @@ def get_asc340_inputs_new():
             total_words = 0
             
             for file in uploaded_files:
-                file_text = extractor.extract_text_from_uploaded_file(file)
+                file_text = extractor.extract_text(file)['text']
                 total_words += len(file_text.split())
             
             if total_words > 60000:
