@@ -45,5 +45,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Start command
-CMD ["streamlit", "run", "home.py", "--server.port", "5000", "--server.address", "0.0.0.0", "--server.headless", "true"]
+# Start command (use Railway's PORT environment variable)
+CMD ["sh", "-c", "streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true"]

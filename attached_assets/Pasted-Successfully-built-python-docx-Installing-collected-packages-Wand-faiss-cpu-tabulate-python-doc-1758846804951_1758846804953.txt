@@ -1,0 +1,84 @@
+Successfully built python-docx
+Installing collected packages: Wand, faiss-cpu, tabulate, python-docx, pymupdf, pydantic-core, propcache, numpy, multidict, markdown2, frozenlist, fpdf2, et-xmlfile, chardet, aiohappyeyeballs, yarl, tiktoken, pydantic, pandas, openpyxl, aiosignal, tabula-py, pdfminer-six, aiohttp, pdfplumber, openai, camelot-py, streamlit-navigation-bar
+  Attempting uninstall: python-docx
+    Found existing installation: python-docx 1.2.0
+    Uninstalling python-docx-1.2.0:
+      Successfully uninstalled python-docx-1.2.0
+  Attempting uninstall: pydantic-core
+    Found existing installation: pydantic_core 2.33.2
+    Uninstalling pydantic_core-2.33.2:
+      Successfully uninstalled pydantic_core-2.33.2
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.3.3
+    Uninstalling numpy-2.3.3:
+      Successfully uninstalled numpy-2.3.3
+  Attempting uninstall: fpdf2
+    Found existing installation: fpdf2 2.8.4
+    Uninstalling fpdf2-2.8.4:
+      Successfully uninstalled fpdf2-2.8.4
+  Attempting uninstall: tiktoken
+    Found existing installation: tiktoken 0.11.0
+    Uninstalling tiktoken-0.11.0:
+      Successfully uninstalled tiktoken-0.11.0
+  Attempting uninstall: pydantic
+    Found existing installation: pydantic 2.11.9
+    Uninstalling pydantic-2.11.9:
+      Successfully uninstalled pydantic-2.11.9
+  Attempting uninstall: pandas
+    Found existing installation: pandas 2.3.2
+    Uninstalling pandas-2.3.2:
+      Successfully uninstalled pandas-2.3.2
+  Attempting uninstall: pdfminer-six
+    Found existing installation: pdfminer.six 20250506
+    Uninstalling pdfminer.six-20250506:
+      Successfully uninstalled pdfminer.six-20250506
+  Attempting uninstall: pdfplumber
+    Found existing installation: pdfplumber 0.11.7
+    Uninstalling pdfplumber-0.11.7:
+      Successfully uninstalled pdfplumber-0.11.7
+  Attempting uninstall: openai
+    Found existing installation: openai 1.109.1
+    Uninstalling openai-1.109.1:
+      Successfully uninstalled openai-1.109.1
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+unstructured-client 0.42.3 requires pydantic>=2.11.2, but you have pydantic 2.0.3 which is incompatible.
+scipy 1.16.2 requires numpy<2.6,>=1.25.2, but you have numpy 1.24.3 which is incompatible.
+Successfully installed Wand-0.6.13 aiohappyeyeballs-2.6.1 aiohttp-3.12.15 aiosignal-1.4.0 camelot-py-0.10.1 chardet-5.2.0 et-xmlfile-2.0.0 faiss-cpu-1.7.4 fpdf2-2.7.4 frozenlist-1.7.0 markdown2-2.4.9 multidict-6.6.4 numpy-1.24.3 openai-0.27.8 openpyxl-3.1.5 pandas-2.0.3 pdfminer-six-20221105 pdfplumber-0.9.0 propcache-0.3.2 pydantic-2.0.3 pydantic-core-2.3.0 pymupdf-1.22.5 python-docx-0.8.11 streamlit-navigation-bar-2.0.0 tabula-py-2.7.0 tabulate-0.9.0 tiktoken-0.4.0 yarl-1.20.1
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+
+6
+COPY . .
+1s
+
+auth
+sharing credentials for production-us-east4-eqdc4a.railway-registry.com
+0ms
+
+importing to docker
+21s
+Build time: 152.30 seconds
+ 
+====================
+Starting Healthcheck
+====================
+Path: /
+Retry window: 5m0s
+ 
+Attempt #1 failed with service unavailable. Continuing to retry for 4m49s
+Attempt #2 failed with service unavailable. Continuing to retry for 4m38s
+Attempt #3 failed with service unavailable. Continuing to retry for 4m36s
+Attempt #4 failed with service unavailable. Continuing to retry for 4m32s
+Attempt #5 failed with service unavailable. Continuing to retry for 4m24s
+Attempt #6 failed with service unavailable. Continuing to retry for 4m8s
+Attempt #7 failed with service unavailable. Continuing to retry for 3m38s
+Attempt #8 failed with service unavailable. Continuing to retry for 3m8s
+Attempt #9 failed with service unavailable. Continuing to retry for 2m38s
+Attempt #10 failed with service unavailable. Continuing to retry for 2m8s
+Attempt #11 failed with service unavailable. Continuing to retry for 1m37s
+Attempt #12 failed with service unavailable. Continuing to retry for 1m7s
+Attempt #13 failed with service unavailable. Continuing to retry for 37s
+Attempt #14 failed with service unavailable. Continuing to retry for 7s
+ 
+1/1 replicas never became healthy!
+Healthcheck failed!
