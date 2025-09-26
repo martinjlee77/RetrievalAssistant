@@ -302,7 +302,7 @@ class AnalysisManager:
             website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
             api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url.replace('/api', '')
             
-            # Test current token
+            # Test current token (use GET method)
             test_response = requests.get(
                 f'{api_base_url}/api/auth/validate-token',
                 headers={'Authorization': f'Bearer {token}'},
@@ -313,9 +313,19 @@ class AnalysisManager:
                 logger.info("Current auth token is valid")
                 return token
             
-            # Token is expired, try to refresh
+            # Token is expired, try to refresh using session cookies  
             logger.info("Auth token expired, attempting refresh")
-            refresh_response = requests.post(
+            import streamlit as st
+            
+            # STRATEGIC FIX: Use session to preserve cookies for cross-domain requests
+            session = requests.Session()
+            
+            # If we're in Streamlit context, try to get refresh token from browser
+            if hasattr(st, 'session_state') and hasattr(st.session_state, 'refresh_token'):
+                refresh_token = st.session_state.refresh_token
+                session.cookies.set('refresh_token', refresh_token)
+            
+            refresh_response = session.post(
                 f'{api_base_url}/api/auth/refresh-token',
                 timeout=5
             )

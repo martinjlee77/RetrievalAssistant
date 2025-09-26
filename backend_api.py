@@ -757,15 +757,28 @@ def login():
         # Create response and set refresh token cookie
         response = jsonify(response_data)
         
-        # Set refresh token cookie (HTTP-only, secure, SameSite)
-        response.set_cookie(
-            'refresh_token',
-            refresh_token,
-            max_age=7*24*60*60,  # 7 days
-            httponly=True,
-            secure=True,
-            samesite='None'  # Allow cross-site for subdomain access
-        )
+        # STRATEGIC FIX: Set refresh token cookie with proper cross-domain settings
+        if not request.host.startswith('localhost') and not request.host.startswith('127.0.0.1'):
+            # Production: Set for all .veritaslogic.ai subdomains
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                max_age=7*24*60*60,  # 7 days
+                domain='.veritaslogic.ai',  # Works across all subdomains
+                httponly=True,
+                secure=True,
+                samesite='None'  # Allow cross-site for subdomain access
+            )
+        else:
+            # Development: Set for local testing
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                max_age=7*24*60*60,  # 7 days
+                httponly=True,
+                secure=False,  # Local development doesn't use HTTPS
+                samesite='Lax'  # Local development
+            )
         
         # In production, set secure cookies for *.veritaslogic.ai
         if not request.host.startswith('localhost') and not request.host.startswith('127.0.0.1'):
@@ -824,12 +837,16 @@ def refresh_access_token():
         logger.error(f"Token refresh error: {e}")
         return jsonify({'error': 'Token refresh failed'}), 500
 
-@app.route('/api/auth/validate-token', methods=['POST'])
+@app.route('/api/auth/validate-token', methods=['GET', 'POST'])
 def validate_cross_domain_token():
     """Validate authentication token for cross-subdomain access"""
     try:
-        data = request.get_json()
-        token = data.get('token') if data else None
+        # Handle both GET and POST requests
+        if request.method == 'POST':
+            data = request.get_json()
+            token = data.get('token') if data else None
+        else:
+            token = None
         
         # Also check Authorization header as fallback
         if not token:
