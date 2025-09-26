@@ -1,0 +1,117 @@
+You reached the start of the range
+Sep 26, 2025, 8:52 AM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:shared.preflight_pricing:Processed file 1: gemini_sow.docx - 519 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 519 words, 3K (≤10 pages) tier, $95.0
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:shared.preflight_pricing:Processed file 1: gemini_sow.docx - 519 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 519 words, 3K (≤10 pages) tier, $95.0
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-09-26T12:56:28.901044", "analysis_id": "61a61dac", "asc_standard": "ASC 606", "total_words": 519, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 95.0, "user_id": 6, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis 61a61dac: ASC 606 - 519 words
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:chromadb.telemetry.product.posthog:Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+INFO:shared.knowledge_base:ChromaDB client initialized for asc606_knowledge_base
+INFO:shared.knowledge_base:Embedding function initialized successfully
+INFO:shared.knowledge_base:Collection 'asc606_guidance' loaded successfully
+INFO:asc606.knowledge_search:ASC 606 knowledge search initialized successfully
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 829, Output tokens: 4, Cost: $0.0001
+INFO:shared.api_cost_tracker:Tracked entity_extraction request: $0.0001 (Total: $0.0001)
+INFO:__main__:LLM extracted customer: Global Dynamics Corp.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:Retrieved 8 relevant guidance chunks
+INFO:asc606.knowledge_search:Retrieved guidance for Step 1
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o, Input tokens: 2470, Output tokens: 594, Cost: $0.0213
+INFO:shared.api_cost_tracker:Tracked step_1_analysis request: $0.0213 (Total: $0.0214)
+WARNING:asc606.step_analyzer:Step 1 validation issues: ["Currency potentially missing $ symbol: ['240,000', '50,000', '75,000', '30,000']"]
+INFO:__main__:Completed ASC 606 Step 1
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:Retrieved 8 relevant guidance chunks
+INFO:asc606.knowledge_search:Retrieved guidance for Step 2
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o, Input tokens: 2802, Output tokens: 557, Cost: $0.0224
+INFO:shared.api_cost_tracker:Tracked step_2_analysis request: $0.0224 (Total: $0.0438)
+INFO:__main__:Completed ASC 606 Step 2
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:Retrieved 8 relevant guidance chunks
+INFO:asc606.knowledge_search:Retrieved guidance for Step 3
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o, Input tokens: 2472, Output tokens: 560, Cost: $0.0208
+INFO:shared.api_cost_tracker:Tracked step_3_analysis request: $0.0208 (Total: $0.0645)
+WARNING:asc606.step_analyzer:Step 3 validation issues: ["Currency potentially missing $ symbol: ['240,000', '720,000', '50,000', '75,000', '30,000', '845,000', '720,000', '50,000', '75,000', '30,000']"]
+INFO:__main__:Completed ASC 606 Step 3
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:Retrieved 8 relevant guidance chunks
+INFO:asc606.knowledge_search:Retrieved guidance for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o, Input tokens: 2257, Output tokens: 491, Cost: $0.0186
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0186 (Total: $0.0832)
+WARNING:asc606.step_analyzer:Step 4 validation issues: ["Currency potentially missing $ symbol: ['365,000', '240,000', '50,000', '75,000', '30,000']"]
+INFO:__main__:Completed ASC 606 Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:Retrieved 8 relevant guidance chunks
+INFO:asc606.knowledge_search:Retrieved guidance for Step 5
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o, Input tokens: 2302, Output tokens: 506, Cost: $0.0191
+INFO:shared.api_cost_tracker:Tracked step_5_analysis request: $0.0191 (Total: $0.1023)
+INFO:__main__:Completed ASC 606 Step 5
+INFO:asc606.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc606.step_analyzer:Extracted conclusion for Step 1: The contract between InnovateTech Solutions Inc. a...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 2: We identify three distinct performance obligations...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 3: The total transaction price is calculated as $845,...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 4: The transaction price should be allocated to the p...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 5: Revenue for the Logi-AI Suite SaaS License should ...
+INFO:asc606.step_analyzer:Total conclusions extracted: 5, text length: 1817
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc606.step_analyzer:Generated executive summary (1445 chars)
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc606.step_analyzer:Generated background section (641 chars)
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc606.clean_memo_generator:Added clean step 1 content (2841 chars)
+INFO:asc606.clean_memo_generator:Added clean step 2 content (2866 chars)
+INFO:asc606.clean_memo_generator:Added clean step 3 content (2815 chars)
+INFO:asc606.clean_memo_generator:Added clean step 4 content (2549 chars)
+INFO:asc606.clean_memo_generator:Added clean step 5 content (2396 chars)
+INFO:asc606.clean_memo_generator:Clean memo generated: 24394 chars, 5/5 steps
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:Analysis 61a61dac saved to database with memo UUID: 99df02fb
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-09-26T12:58:01.065850", "analysis_id": "61a61dac", "asc_standard": "ASC 606", "total_words": 519, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 95.0, "user_id": 6, "status": "completed", "success": true, "duration": 91.93718147277832, "error": null}
+INFO:shared.analysis_manager:Completed analysis 61a61dac: success - 91.9s
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 61a61dac\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by Veritas'
+INFO:asc606.clean_memo_generator:Generating PDF using isolated PDF generator
+INFO:shared.pdf_generator:Generating PDF using wkhtmltopdf (WebKit)
+WARNING:shared.pdf_generator:Direct wkhtmltopdf generation failed: No wkhtmltopdf executable found: "b''"
+If this file exists please check that this process can read it or you can pass path to it manually in method call, check README. Otherwise please install wkhtmltopdf - https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
+ERROR:shared.pdf_generator:wkhtmltopdf PDF generation failed: No wkhtmltopdf executable found: "b''"
+If this file exists please check that this process can read it or you can pass path to it manually in method call, check README. Otherwise please install wkhtmltopdf - https://github.com/JazzCore/python-pdfkit/wiki/Installing-wkhtmltopdf
+WARNING:shared.pdf_generator:Falling back to WeasyPrint
+INFO:shared.pdf_generator:Cleared conflicting module: streamlit.elements.pdf
+INFO:shared.pdf_generator:Importing WeasyPrint with clean module cache
+INFO:shared.pdf_generator:Creating HTML document for PDF generation
+INFO:shared.pdf_generator:Generating PDF from HTML document
+WARNING:weasyprint:Ignored `box-shadow: none ` at 37:21, unknown property.
+ERROR:shared.pdf_generator:WeasyPrint PDF generation failed: PDF.__init__() takes 1 positional argument but 3 were given
+WARNING:shared.pdf_generator:wkhtmltopdf failed, using WeasyPrint fallback
+INFO:shared.pdf_generator:Cleared conflicting module: streamlit.elements.pdf
+INFO:shared.pdf_generator:Importing WeasyPrint with clean module cache
+INFO:shared.pdf_generator:Creating HTML document for PDF generation
+INFO:shared.pdf_generator:Generating PDF from HTML document
+WARNING:weasyprint:Ignored `box-shadow: none ` at 37:21, unknown property.
