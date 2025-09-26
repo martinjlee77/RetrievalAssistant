@@ -231,9 +231,16 @@ class AnalysisManager:
                 'duration_seconds': analysis_record.get('duration_seconds', 0)
             }
             
-            # Save to database via new unified API endpoint
+            # Save to database via new unified API endpoint - use environment variable
+            import os
+            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+            website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+            
+            # For production cross-service communication, use website URL
+            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url.replace('/api', '')
+            
             response = requests.post(
-                'http://localhost:3000/api/analysis/complete',
+                f'{api_base_url}/api/analysis/complete',
                 headers={'Authorization': f'Bearer {token}'},
                 json=analysis_data,
                 timeout=10

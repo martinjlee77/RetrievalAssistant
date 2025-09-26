@@ -83,9 +83,11 @@ def main():
             }
             
             try:
-                # Submit to backend
+                # Submit to backend - use environment variable 
+                import os
+                website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
                 response = requests.post(
-                    'http://localhost:3000/api/submit-rerun-request',
+                    f'{website_url}/api/submit-rerun-request',
                     json=request_data,
                     timeout=10
                 )
