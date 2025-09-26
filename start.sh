@@ -1,12 +1,8 @@
 #!/bin/sh
 set -e
 
-# Unset problematic Streamlit env var that Railway sets to literal "$PORT"
-unset STREAMLIT_SERVER_PORT
+# Completely bypass Railway's PORT variable - just use 5000
+echo "Starting app on hardcoded port 5000"
 
-# Resolve PORT environment variable with fallback
-PORT="${PORT:-5000}"
-echo "Using port: $PORT"
-
-# Start Streamlit with resolved port
-exec streamlit run home.py --server.port "$PORT" --server.address 0.0.0.0 --server.headless true
+# Start Streamlit with hardcoded port 5000
+exec streamlit run home.py --server.port 5000 --server.address 0.0.0.0 --server.headless true
