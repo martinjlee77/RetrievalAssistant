@@ -276,24 +276,75 @@ class CleanMemoGenerator:
                 logger.info("Importing WeasyPrint with clean module cache")
                 wp = importlib.import_module('weasyprint')
                 
-                # DEPLOYMENT FIX: Streamlit pre-imports streamlit.elements.pdf.PDF which shadows weasyprint.pdf.pdf.PDF
-                # Need to explicitly restore the correct PDF class
+                # DEPLOYMENT FIX: Streamlit pre-imports streamlit.elements.pdf.PDF which shadows WeasyPrint's PDF class
+                # Need to explicitly restore the correct PDF class using proper module path
                 try:
-                    from weasyprint.pdf import pdf as wp_pdf
-                    importlib.reload(wp_pdf)
+                    # Check what PDF class is currently loaded
+                    import weasyprint.pdf
+                    logger.info(f"Current weasyprint.pdf contents: {dir(weasyprint.pdf)}")
+                    
+                    # Force correct pydyf.PDF import and patch any PDF references
                     from pydyf import PDF as PydyfPDF
-                    logger.info(f"Original PDF class: {wp_pdf.PDF.__module__}")
-                    wp_pdf.PDF = PydyfPDF
-                    logger.info("Patched WeasyPrint PDF class with correct pydyf.PDF")
+                    logger.info(f"PydyfPDF class: {PydyfPDF} with signature: {PydyfPDF.__init__.__code__.co_varnames[:3]}")
+                    
+                    # Check if there's a PDF class in the weasyprint namespace that's wrong
+                    import weasyprint
+                    if hasattr(weasyprint, 'PDF'):
+                        logger.warning(f"Found conflicting PDF class in weasyprint: {weasyprint.PDF}")
+                        weasyprint.PDF = PydyfPDF
+                        logger.info("Patched weasyprint.PDF with correct pydyf.PDF")
+                        
+                    logger.info("PDF class environment prepared")
                 except Exception as patch_error:
-                    logger.warning(f"PDF class patching failed: {patch_error}")
+                    logger.warning(f"PDF class inspection/patching failed: {patch_error}")
                 
                 logger.info("Creating HTML document")
                 html_doc = wp.HTML(string=css_styled_html, base_url=os.getcwd())
                 logger.info("Generating PDF from HTML")
-                pdf_bytes = html_doc.write_pdf()
-                logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
-                return pdf_bytes
+                
+                # AGGRESSIVE PDF FIX: Monkey-patch any PDF classes that might be called with wrong signature
+                try:
+                    import sys
+                    original_classes = {}
+                    
+                    # Find and patch all PDF classes in loaded modules
+                    for module_name, module in sys.modules.items():
+                        if module and hasattr(module, 'PDF'):
+                            pdf_class = getattr(module, 'PDF')
+                            if hasattr(pdf_class, '__init__'):
+                                # Check if it expects only self parameter
+                                import inspect
+                                try:
+                                    sig = inspect.signature(pdf_class.__init__)
+                                    params = list(sig.parameters.keys())
+                                    if len(params) == 1 and params[0] == 'self':
+                                        # This is likely pydyf.PDF - keep it
+                                        logger.info(f"Keeping correct PDF class in {module_name}: {params}")
+                                    else:
+                                        # This expects more parameters - replace it with pydyf.PDF
+                                        logger.warning(f"Replacing PDF class in {module_name} (expects {params})")
+                                        original_classes[module_name] = pdf_class
+                                        from pydyf import PDF as PydyfPDF
+                                        setattr(module, 'PDF', PydyfPDF)
+                                except:
+                                    pass
+                    
+                    pdf_bytes = html_doc.write_pdf()
+                    logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
+                    
+                    # Restore original classes
+                    for module_name, original_class in original_classes.items():
+                        if module_name in sys.modules:
+                            setattr(sys.modules[module_name], 'PDF', original_class)
+                    
+                    return pdf_bytes
+                    
+                except Exception as aggressive_error:
+                    logger.error(f"Aggressive PDF fix failed: {aggressive_error}")
+                    # Try without the monkey patching
+                    pdf_bytes = html_doc.write_pdf()
+                    logger.info(f"PDF generation successful without patching: {len(pdf_bytes)} bytes")
+                    return pdf_bytes
             except Exception as pdf_error:
                 logger.error(f"WeasyPrint PDF generation failed: {pdf_error}")
                 try:
