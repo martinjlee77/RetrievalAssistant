@@ -8,7 +8,6 @@ import logging
 from datetime import datetime
 from typing import Dict, Any
 from shared.disclaimer_generator import DisclaimerGenerator
-import weasyprint
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 import tempfile
@@ -134,13 +133,12 @@ class CleanMemoGenerator:
         return final_memo
 
     def _generate_pdf(self, memo_content: str) -> bytes | None:
-        """Generate PDF from memo content using isolated PDF generator."""
+        """Generate PDF using xhtml2pdf"""
         try:
-            # STRATEGIC FIX: Use isolated PDF generator to avoid Streamlit module pollution
-            from shared.pdf_generator import generate_styled_pdf
+            from shared.pdf_generator import generate_pdf_from_markdown
             
-            logger.info("Generating PDF using isolated PDF generator")
-            pdf_bytes = generate_styled_pdf(memo_content, self.memo_id)
+            logger.info("Generating PDF using xhtml2pdf")
+            pdf_bytes = generate_pdf_from_markdown(memo_content)
             
             if pdf_bytes:
                 logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
