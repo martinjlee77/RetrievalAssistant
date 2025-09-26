@@ -45,5 +45,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Start command (use Railway's PORT environment variable)
-CMD ["sh", "-c", "streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true"]
+# Start command with debugging to capture startup crashes
+CMD ["sh", "-c", "echo 'Starting app...' && streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true 2>&1 | tee /tmp/app.log || (echo 'App crashed! Log contents:' && cat /tmp/app.log && sleep 300)"]
