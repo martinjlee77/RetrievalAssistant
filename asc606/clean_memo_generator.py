@@ -278,7 +278,9 @@ class CleanMemoGenerator:
             except Exception as pdf_error:
                 logger.error(f"WeasyPrint PDF generation failed: {pdf_error}")
                 try:
-                    # Fallback without base_url
+                    # Fallback without base_url - ensure wp is available
+                    if 'wp' not in locals():
+                        wp = importlib.import_module('weasyprint')
                     html_doc = wp.HTML(string=css_styled_html)
                     pdf_bytes = html_doc.write_pdf()
                     return pdf_bytes
