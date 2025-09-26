@@ -10,6 +10,16 @@ import re
 
 logger = logging.getLogger(__name__)
 
+def _clean_html_tags(text: str) -> str:
+    """Remove HTML tags and entities from text for clean PDF output."""
+    import re
+    # Remove ALL HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    # Convert common HTML entities
+    text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+    text = text.replace('&nbsp;', ' ').replace('&quot;', '"').replace('&apos;', "'")
+    return text.strip()
+
 def generate_pdf_from_markdown(markdown_content: str) -> Optional[bytes]:
     """
     Generate PDF from markdown content using ReportLab.
@@ -86,31 +96,36 @@ def generate_pdf_from_markdown(markdown_content: str) -> Optional[bytes]:
             if not line:
                 story.append(Spacer(1, 6))
                 continue
-                
+            
+            # Clean HTML tags first
+            clean_line = _clean_html_tags(line)
+            
             # Headers
-            if line.startswith('# '):
-                text = line[2:].strip()
+            if clean_line.startswith('# '):
+                text = clean_line[2:].strip()
                 story.append(Paragraph(text, title_style))
-            elif line.startswith('## '):
-                text = line[3:].strip()
+            elif clean_line.startswith('## '):
+                text = clean_line[3:].strip()
                 story.append(Paragraph(text, heading_style))
-            elif line.startswith('### '):
-                text = line[4:].strip()
+            elif clean_line.startswith('### '):
+                text = clean_line[4:].strip()
                 story.append(Paragraph(text, heading_style))
             # Bold text
-            elif line.startswith('**') and line.endswith('**'):
-                text = line[2:-2].strip()
+            elif clean_line.startswith('**') and clean_line.endswith('**'):
+                text = clean_line[2:-2].strip()
                 story.append(Paragraph(f"<b>{text}</b>", normal_style))
             # Regular paragraph
             else:
                 # Convert markdown formatting
-                text = line
+                text = clean_line
                 # Bold formatting
                 text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
                 # Italic formatting  
                 text = re.sub(r'\*(.*?)\*', r'<i>\1</i>', text)
                 
-                story.append(Paragraph(text, normal_style))
+                # Only add non-empty paragraphs
+                if text.strip():
+                    story.append(Paragraph(text, normal_style))
         
         # Build PDF
         doc.build(story)
