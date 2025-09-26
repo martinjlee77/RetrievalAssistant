@@ -15,3 +15,5 @@ docx
 streamlit
 stripe
 tiktoken
+pdfkit
+reportlab

@@ -716,7 +716,7 @@ def login():
         access_token = jwt.encode({
             'user_id': user['id'],
             'email': user['email'],
-            'exp': datetime.utcnow() + timedelta(minutes=10),  # Short-lived access token
+            'exp': datetime.utcnow() + timedelta(minutes=60),  # Extended for large contracts
             'purpose': 'access',
             'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()
@@ -805,7 +805,7 @@ def refresh_access_token():
         new_access_token = jwt.encode({
             'user_id': payload['user_id'],
             'email': payload['email'],
-            'exp': datetime.utcnow() + timedelta(minutes=10),  # 10 minutes
+            'exp': datetime.utcnow() + timedelta(minutes=60),  # Extended for large contracts
             'purpose': 'access',
             'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()

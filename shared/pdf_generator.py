@@ -1,6 +1,7 @@
 """
 Isolated PDF Generator Module for VeritasLogic
-Uses deterministic WeasyPrint import strategy to avoid Streamlit module pollution
+STRATEGIC REPLACEMENT: Uses wkhtmltopdf/ReportLab instead of WeasyPrint to avoid Streamlit conflicts
+Based on architect recommendation for enterprise-grade PDF generation
 """
 
 import logging
@@ -10,12 +11,12 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-def generate_pdf_from_html(html_content: str, base_url: str = None) -> Optional[bytes]:
+def generate_pdf_from_html_wkhtmltopdf(html_content: str, base_url: str = None) -> Optional[bytes]:
     """
-    Generate PDF from HTML using isolated WeasyPrint import
+    Generate PDF from HTML using wkhtmltopdf (enterprise-grade replacement for WeasyPrint)
     
-    STRATEGIC FIX: This function imports WeasyPrint in a clean environment
-    to avoid Streamlit's module pollution that causes PDF class conflicts.
+    ARCHITECT RECOMMENDATION: wkhtmltopdf leverages battle-tested WebKit rendering 
+    with full HTML/CSS support, precise font embedding, and proven enterprise reliability.
     
     Args:
         html_content: HTML content to convert to PDF
@@ -23,6 +24,57 @@ def generate_pdf_from_html(html_content: str, base_url: str = None) -> Optional[
         
     Returns:
         PDF bytes or None if generation failed
+    """
+    try:
+        import pdfkit
+        import tempfile
+        import os
+        
+        logger.info("Generating PDF using wkhtmltopdf (WebKit)")
+        
+        # wkhtmltopdf options for enterprise-quality output
+        options = {
+            'page-size': 'Letter',
+            'margin-top': '0.75in',
+            'margin-right': '0.75in', 
+            'margin-bottom': '0.75in',
+            'margin-left': '0.75in',
+            'encoding': "UTF-8",
+            'no-outline': None,
+            'enable-local-file-access': None,  # For local font files
+        }
+        
+        # Try to generate PDF directly from HTML string
+        try:
+            pdf_bytes = pdfkit.from_string(html_content, False, options=options)
+            logger.info(f"wkhtmltopdf PDF generation successful: {len(pdf_bytes)} bytes")
+            return pdf_bytes
+        except Exception as direct_error:
+            logger.warning(f"Direct wkhtmltopdf generation failed: {direct_error}")
+            
+            # Fallback: Use temporary file approach
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as tmp_file:
+                tmp_file.write(html_content)
+                tmp_file.flush()
+                
+                try:
+                    pdf_bytes = pdfkit.from_file(tmp_file.name, False, options=options)
+                    logger.info(f"wkhtmltopdf PDF generation via temp file successful: {len(pdf_bytes)} bytes")
+                    return pdf_bytes
+                finally:
+                    os.unlink(tmp_file.name)
+        
+    except ImportError:
+        logger.warning("pdfkit not available, falling back to WeasyPrint")
+        return generate_pdf_from_html_weasyprint(html_content, base_url)
+    except Exception as e:
+        logger.error(f"wkhtmltopdf PDF generation failed: {e}")
+        logger.warning("Falling back to WeasyPrint")
+        return generate_pdf_from_html_weasyprint(html_content, base_url)
+
+def generate_pdf_from_html_weasyprint(html_content: str, base_url: str = None) -> Optional[bytes]:
+    """
+    Fallback PDF generation using WeasyPrint (with module isolation)
     """
     try:
         # Clear specific conflicting modules before WeasyPrint import
@@ -54,11 +106,11 @@ def generate_pdf_from_html(html_content: str, base_url: str = None) -> Optional[
             if module_obj is not None:
                 sys.modules[module_name] = module_obj
         
-        logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
+        logger.info(f"WeasyPrint PDF generation successful: {len(pdf_bytes)} bytes")
         return pdf_bytes
         
     except Exception as e:
-        logger.error(f"PDF generation failed: {e}")
+        logger.error(f"WeasyPrint PDF generation failed: {e}")
         
         # Restore cleared modules on error
         for module_name, module_obj in cleared_modules.items():
@@ -66,6 +118,22 @@ def generate_pdf_from_html(html_content: str, base_url: str = None) -> Optional[
                 sys.modules[module_name] = module_obj
         
         return None
+
+def generate_pdf_from_html(html_content: str, base_url: str = None) -> Optional[bytes]:
+    """
+    Primary PDF generation function - tries wkhtmltopdf first, falls back to WeasyPrint
+    
+    STRATEGIC ARCHITECTURE: Architect-recommended approach using enterprise-grade wkhtmltopdf
+    with WeasyPrint fallback for maximum reliability.
+    """
+    # Try wkhtmltopdf first (architect recommendation)
+    pdf_bytes = generate_pdf_from_html_wkhtmltopdf(html_content, base_url)
+    if pdf_bytes:
+        return pdf_bytes
+    
+    # Fallback to WeasyPrint if wkhtmltopdf fails
+    logger.warning("wkhtmltopdf failed, using WeasyPrint fallback")
+    return generate_pdf_from_html_weasyprint(html_content, base_url)
 
 def generate_styled_pdf(markdown_content: str, memo_id: str) -> Optional[bytes]:
     """
