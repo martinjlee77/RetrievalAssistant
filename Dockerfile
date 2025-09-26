@@ -45,5 +45,5 @@ COPY . .
 # Expose port
 EXPOSE 5000
 
-# Start command with visible logging (let crashes be seen in Railway logs)
-CMD ["sh", "-c", "echo 'Starting app...' && streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true 2>&1 | tee /tmp/app.log"]
+# Start command with PORT debugging
+CMD ["sh", "-c", "echo 'PORT env var is: '$PORT && echo 'Using port: '${PORT:-5000} && streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true"]
