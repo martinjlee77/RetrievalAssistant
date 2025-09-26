@@ -381,7 +381,7 @@ Respond with ONLY the customer name, nothing else."""
                         issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
                         markdown_content = markdown_content.replace(
                             "**Issues or Uncertainties:**", 
-                            "**Issues or Uncertainties:**" + issues_section + "\n\n**Original Issues:**"
+                            "**Issues or Uncertainties:**" + issues_section + "\n\n"
                         )
                 
             
@@ -407,12 +407,6 @@ Respond with ONLY the customer name, nothing else."""
         if "**Conclusion:**" not in markdown_content:
             issues.append(f"Missing Conclusion section in Step {step_num}")
         
-        # Check currency formatting - flag numbers that look like currency but missing $
-        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
-        # Filter out obvious non-currency (years, quantities, etc.)
-        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
-        if suspicious_currency:
-            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
         
         # Flag potentially fabricated citations (section numbers, page numbers)
         fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
