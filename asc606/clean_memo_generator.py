@@ -133,11 +133,11 @@ class CleanMemoGenerator:
         return final_memo
 
     def _generate_pdf(self, memo_content: str) -> bytes | None:
-        """Generate PDF using xhtml2pdf"""
+        """Generate PDF using ReportLab"""
         try:
             from shared.pdf_generator import generate_pdf_from_markdown
             
-            logger.info("Generating PDF using xhtml2pdf")
+            logger.info("Generating PDF using ReportLab")
             pdf_bytes = generate_pdf_from_markdown(memo_content)
             
             if pdf_bytes:
