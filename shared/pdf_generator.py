@@ -1,20 +1,20 @@
 """
-Simple PDF Generator for VeritasLogic using xhtml2pdf
-Pure Python solution - no system dependencies required
+Pure Python PDF Generator for VeritasLogic using ReportLab
+No system dependencies required - works in any environment
 """
 
 import logging
-import markdown
 from typing import Optional
 from io import BytesIO
+import re
 
 logger = logging.getLogger(__name__)
 
 def generate_pdf_from_markdown(markdown_content: str) -> Optional[bytes]:
     """
-    Generate PDF from markdown content using xhtml2pdf.
+    Generate PDF from markdown content using ReportLab.
     
-    Simple, reliable pipeline: Markdown → HTML → PDF
+    Pure Python solution with zero system dependencies.
     
     Args:
         markdown_content: Markdown content to convert to PDF
@@ -23,99 +23,107 @@ def generate_pdf_from_markdown(markdown_content: str) -> Optional[bytes]:
         PDF bytes or None if generation failed
     """
     try:
-        from xhtml2pdf import pisa
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import letter
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
         
-        logger.info("Converting markdown to HTML")
+        logger.info("Generating PDF using ReportLab")
         
-        # Convert markdown to HTML
-        html = markdown.markdown(markdown_content, extensions=['tables', 'fenced_code'])
+        # Create PDF buffer
+        buffer = BytesIO()
         
-        # Add basic professional styling
-        styled_html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body {{
-                    font-family: "Times New Roman", serif;
-                    font-size: 12pt;
-                    line-height: 1.4;
-                    margin: 1in;
-                    color: #000;
-                }}
-                h1 {{
-                    font-size: 16pt;
-                    font-weight: bold;
-                    margin-top: 24pt;
-                    margin-bottom: 12pt;
-                    text-align: center;
-                }}
-                h2 {{
-                    font-size: 14pt;
-                    font-weight: bold;
-                    margin-top: 18pt;
-                    margin-bottom: 6pt;
-                }}
-                h3 {{
-                    font-size: 12pt;
-                    font-weight: bold;
-                    margin-top: 12pt;
-                    margin-bottom: 6pt;
-                }}
-                p {{
-                    margin-bottom: 6pt;
-                    text-align: justify;
-                }}
-                table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 12pt 0;
-                }}
-                th, td {{
-                    border: 1pt solid #000;
-                    padding: 6pt;
-                    text-align: left;
-                }}
-                th {{
-                    background-color: #f0f0f0;
-                    font-weight: bold;
-                }}
-                strong {{
-                    font-weight: bold;
-                }}
-                em {{
-                    font-style: italic;
-                }}
-                small {{
-                    font-size: 10pt;
-                }}
-            </style>
-        </head>
-        <body>
-            {html}
-        </body>
-        </html>
-        """
+        # Create document
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=letter,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=72,
+            bottomMargin=72
+        )
         
-        logger.info("Generating PDF from HTML using xhtml2pdf")
+        # Get styles
+        styles = getSampleStyleSheet()
         
-        # Create PDF
-        result = BytesIO()
-        pisa_status = pisa.CreatePDF(styled_html, dest=result)
+        # Custom styles for professional memo
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Title'],
+            fontSize=16,
+            spaceAfter=12,
+            alignment=1,  # Center
+            fontName='Helvetica-Bold'
+        )
         
-        if pisa_status.err:
-            logger.error(f"xhtml2pdf generation failed with {pisa_status.err} errors")
-            return None
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading1'],
+            fontSize=14,
+            spaceAfter=6,
+            spaceBefore=12,
+            fontName='Helvetica-Bold'
+        )
         
-        pdf_bytes = result.getvalue()
-        result.close()
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontSize=11,
+            spaceAfter=6,
+            fontName='Helvetica',
+            leftIndent=0,
+            rightIndent=0
+        )
+        
+        # Parse markdown and build story
+        story = []
+        lines = markdown_content.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            
+            if not line:
+                story.append(Spacer(1, 6))
+                continue
+                
+            # Headers
+            if line.startswith('# '):
+                text = line[2:].strip()
+                story.append(Paragraph(text, title_style))
+            elif line.startswith('## '):
+                text = line[3:].strip()
+                story.append(Paragraph(text, heading_style))
+            elif line.startswith('### '):
+                text = line[4:].strip()
+                story.append(Paragraph(text, heading_style))
+            # Bold text
+            elif line.startswith('**') and line.endswith('**'):
+                text = line[2:-2].strip()
+                story.append(Paragraph(f"<b>{text}</b>", normal_style))
+            # Regular paragraph
+            else:
+                # Convert markdown formatting
+                text = line
+                # Bold formatting
+                text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+                # Italic formatting  
+                text = re.sub(r'\*(.*?)\*', r'<i>\1</i>', text)
+                
+                story.append(Paragraph(text, normal_style))
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Get PDF bytes
+        pdf_bytes = buffer.getvalue()
+        buffer.close()
         
         logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
         return pdf_bytes
         
     except ImportError as e:
-        logger.error(f"xhtml2pdf not available: {e}")
+        logger.error(f"ReportLab not available: {e}")
         return None
     except Exception as e:
         logger.error(f"PDF generation failed: {e}")
@@ -123,7 +131,10 @@ def generate_pdf_from_markdown(markdown_content: str) -> Optional[bytes]:
 
 def generate_pdf_from_html(html_content: str) -> Optional[bytes]:
     """
-    Generate PDF directly from HTML content using xhtml2pdf.
+    Generate PDF from HTML content using ReportLab.
+    
+    Note: This is a simple implementation for basic HTML.
+    For complex HTML, consider using the markdown version.
     
     Args:
         html_content: HTML content to convert to PDF
@@ -132,27 +143,16 @@ def generate_pdf_from_html(html_content: str) -> Optional[bytes]:
         PDF bytes or None if generation failed
     """
     try:
-        from xhtml2pdf import pisa
+        # For now, strip HTML tags and treat as plain text
+        import re
         
-        logger.info("Generating PDF from HTML using xhtml2pdf")
+        # Remove HTML tags
+        clean_text = re.sub(r'<[^>]+>', '', html_content)
+        # Convert to simple markdown format
+        clean_text = clean_text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
         
-        # Create PDF
-        result = BytesIO()
-        pisa_status = pisa.CreatePDF(html_content, dest=result)
+        return generate_pdf_from_markdown(clean_text)
         
-        if pisa_status.err:
-            logger.error(f"xhtml2pdf generation failed with {pisa_status.err} errors")
-            return None
-        
-        pdf_bytes = result.getvalue()
-        result.close()
-        
-        logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
-        return pdf_bytes
-        
-    except ImportError as e:
-        logger.error(f"xhtml2pdf not available: {e}")
-        return None
     except Exception as e:
-        logger.error(f"PDF generation failed: {e}")
+        logger.error(f"HTML to PDF conversion failed: {e}")
         return None
