@@ -6,7 +6,8 @@ Creates audit-ready export packages with citations, assumptions, and references
 import logging
 import re
 from typing import Dict, Any, List, Optional
-from fpdf import FPDF
+# Lazy import to avoid conflicts with weasyprint
+# from fpdf import FPDF
 from datetime import datetime
 import tempfile
 
@@ -164,8 +165,9 @@ class AuditPackGenerator:
             assumptions = self.extract_assumptions_from_memo(memo_content)
             references = self.extract_references_from_memo(memo_content, filename)
             
-            # Create PDF
-            pdf = FPDF()
+            # Create PDF with lazy import
+            from fpdf import FPDF as FPDFClass
+            pdf = FPDFClass()
             pdf.add_page()
             pdf.set_font('Arial', 'B', 16)
             
@@ -241,8 +243,9 @@ class AuditPackGenerator:
             
         except Exception as e:
             logger.error(f"Audit pack generation error: {e}")
-            # Return minimal PDF on error
-            pdf = FPDF()
+            # Return minimal PDF on error with lazy import
+            from fpdf import FPDF as FPDFClass
+            pdf = FPDFClass()
             pdf.add_page()
             pdf.set_font('Arial', '', 12)
             pdf.cell(0, 10, f'Audit Pack for Memo {analysis_id}', ln=True)

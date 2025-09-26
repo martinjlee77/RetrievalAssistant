@@ -10,7 +10,7 @@ from typing import Dict, Any
 from shared.disclaimer_generator import DisclaimerGenerator
 import weasyprint
 from docx import Document
-from docx.shared import Inches, Pt, Inches, RGBColor
+from docx.shared import Inches, Pt, RGBColor
 import tempfile
 import base64
 
@@ -259,11 +259,39 @@ class CleanMemoGenerator:
             </html>
             """
 
-            # Generate PDF with base_url for font loading
-            pdf_bytes = weasyprint.HTML(string=css_styled_html, base_url=os.getcwd()).write_pdf()
-            return pdf_bytes
+            # Generate PDF with isolated WeasyPrint to avoid fpdf conflicts
+            import importlib
+            import sys
+            
+            # Temporarily remove any conflicting modules from cache
+            modules_to_remove = [k for k in sys.modules.keys() if 'fpdf' in k.lower()]
+            removed_modules = {}
+            for mod in modules_to_remove:
+                removed_modules[mod] = sys.modules.pop(mod, None)
+            
+            try:
+                # Fresh import of weasyprint to avoid conflicts
+                wp = importlib.import_module('weasyprint')
+                html_doc = wp.HTML(string=css_styled_html, base_url=os.getcwd())
+                pdf_bytes = html_doc.write_pdf()
+                return pdf_bytes
+            except Exception as pdf_error:
+                logger.error(f"WeasyPrint PDF generation failed: {pdf_error}")
+                try:
+                    # Fallback without base_url
+                    html_doc = wp.HTML(string=css_styled_html)
+                    pdf_bytes = html_doc.write_pdf()
+                    return pdf_bytes
+                except Exception as fallback_error:
+                    logger.error(f"PDF generation completely failed: {fallback_error}")
+                    return None
+            finally:
+                # Restore removed modules
+                for mod, module_obj in removed_modules.items():
+                    if module_obj is not None:
+                        sys.modules[mod] = module_obj
         except Exception as e:
-            logger.error(f"PDF generation failed: {e}")
+            logger.error(f"PDF generation setup failed: {e}")
             return None
 
     def _clean_html_tags(self, text: str) -> str:
