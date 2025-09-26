@@ -62,8 +62,11 @@ class AuthManager:
             return {'can_proceed': False, 'error': 'Not authenticated'}
         
         try:
+            # Use website URL for cross-service communication
+            credits_url = f"{WEBSITE_URL}/api/user/check-credits"
+            
             response = requests.post(
-                f"{self.backend_url}/user/check-credits",
+                credits_url,
                 headers={'Authorization': f'Bearer {self.get_auth_token()}'},
                 json={'required_credits': required_credits},
                 timeout=10
@@ -85,8 +88,11 @@ class AuthManager:
             return None
         
         try:
+            # Use website URL for cross-service communication
+            profile_url = f"{WEBSITE_URL}/api/user/profile"
+            
             response = requests.get(
-                f"{self.backend_url}/user/profile",
+                profile_url,
                 headers={'Authorization': f'Bearer {self.get_auth_token()}'},
                 timeout=10
             )
@@ -168,8 +174,12 @@ def show_login_page():
 def attempt_login(email: str, password: str) -> Dict[str, Any]:
     """Attempt to login user with email and password via main website"""
     try:
+        # Use website URL for cross-service communication
+        login_url = f"{WEBSITE_URL}/api/login"
+        logger.info(f"SSO: Attempting login at {login_url}")
+        
         response = requests.post(
-            f"{BACKEND_URL}/login",
+            login_url,
             json={'email': email, 'password': password},
             timeout=10
         )
@@ -191,11 +201,17 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
 def validate_existing_token(token: str) -> Dict[str, Any]:
     """Validate an existing token using the cross-subdomain validation endpoint"""
     try:
+        # In production, use the website URL instead of localhost
+        validation_url = f"{WEBSITE_URL}/api/auth/validate-token"
+        logger.info(f"SSO: Validating token at {validation_url}")
+        
         response = requests.post(
-            f"{BACKEND_URL}/auth/validate-token",
+            validation_url,
             json={'token': token},
             timeout=10
         )
+        
+        logger.info(f"SSO: Validation response status: {response.status_code}")
         
         if response.ok:
             data = response.json()
@@ -204,11 +220,11 @@ def validate_existing_token(token: str) -> Dict[str, Any]:
             else:
                 return {'valid': False, 'error': data.get('error', 'Invalid token')}
         else:
-            return {'valid': False, 'error': 'Token validation failed'}
+            return {'valid': False, 'error': f'Token validation failed with status {response.status_code}'}
             
     except Exception as e:
         logger.error(f"Token validation error: {e}")
-        return {'valid': False, 'error': 'Network error during validation'}
+        return {'valid': False, 'error': f'Network error during validation: {str(e)}'}
 
 def try_cross_domain_auth():
     """Try to authenticate using tokens from URL parameters or cross-domain cookies"""
@@ -217,14 +233,26 @@ def try_cross_domain_auth():
     
     if 'auth_token' in query_params:
         token = query_params['auth_token']
+        logger.info(f"SSO: Found auth_token in URL params, attempting validation")
+        
         validation = validate_existing_token(token)
+        logger.info(f"SSO: Token validation result: {validation.get('valid', False)}")
         
         if validation.get('valid'):
             st.session_state.auth_token = token
             st.session_state.user_data = validation['user']
+            logger.info(f"SSO: Auto-login successful for user {validation['user'].get('email', 'unknown')}")
+            
             # Clear the token from URL for security
             st.query_params.clear()
+            
+            # Show success message briefly
+            st.success("🎉 Welcome back! You've been automatically signed in.")
             return True
+        else:
+            logger.warning(f"SSO: Token validation failed: {validation.get('error', 'Unknown error')}")
+            # Clear invalid token from URL
+            st.query_params.clear()
     
     return False
 
