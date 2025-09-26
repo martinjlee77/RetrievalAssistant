@@ -219,6 +219,17 @@ class AnalysisManager:
                 return
             
             # Prepare analysis data for unified endpoint
+            # Ensure we always have a valid started_at timestamp
+            started_at = analysis_record.get('start_timestamp')
+            if not started_at and 'start_time' in analysis_record:
+                # Convert Unix timestamp to ISO format
+                from datetime import datetime
+                started_at = datetime.fromtimestamp(analysis_record['start_time']).isoformat()
+            elif not started_at:
+                # Fallback to current time if no start time available
+                from datetime import datetime
+                started_at = datetime.now().isoformat()
+            
             analysis_data = {
                 'asc_standard': analysis_record.get('asc_standard'),
                 'words_count': analysis_record.get('total_words', 0),
@@ -227,7 +238,7 @@ class AnalysisManager:
                 'tier_name': analysis_record.get('tier_info', {}).get('name', 'Unknown'),
                 'is_free_analysis': analysis_record.get('cost_charged', 0) == 0,
                 'idempotency_key': f"manager_{analysis_record.get('analysis_id', 'unknown')}_{int(analysis_record.get('start_time', 0)*1000)}",
-                'started_at': analysis_record.get('start_timestamp'),
+                'started_at': started_at,
                 'duration_seconds': analysis_record.get('duration_seconds', 0)
             }
             
