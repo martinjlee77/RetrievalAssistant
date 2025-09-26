@@ -1,0 +1,86 @@
+You reached the start of the range
+Sep 25, 2025, 7:57 PM
+ 
+[Region: us-east4]
+==============
+Using Nixpacks
+==============
+
+context: 5m86-077D
+╔══════════════════════════════ Nixpacks v1.38.0 ══════════════════════════════╗
+║ setup      │ python311, postgresql_16, gcc, pkg-config, libffi, glib, cairo, ║
+║            │ pango, gobject-introspection, gobject, gdk-pixbuf, libxml2,     ║
+║            │ libxslt, harfbuzz, fribidi, fontconfig, freetype                ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ install    │ python -m venv --copies /opt/venv && . /opt/venv/bin/activate   ║
+║            │ && pip install -r requirements.txt                              ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ build      │ pip install -r streamlit-requirements.txt                       ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ start      │ streamlit run home.py --server.port $PORT --server.address      ║
+║            │ 0.0.0.0                                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+internal
+load build definition from Dockerfile
+0ms
+
+internal
+load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+47ms
+
+internal
+load .dockerignore
+0ms
+
+internal
+load build context
+0ms
+
+stage-0
+WORKDIR /app/ cached
+0ms
+
+stage-0
+COPY .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix
+78ms
+
+stage-0
+RUN nix-env -if .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix && nix-collect-garbage -d
+38s
+unpacking 'https://github.com/NixOS/nixpkgs/archive/bc8f8d1be58e8c8383e683a06e1e1e57893fff87.tar.gz' into the Git cache...
+installing 'bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env'
+error:
+
+       … while calling the 'derivationStrict' builtin
+         at <nix/derivation-internal.nix>:37:12:
+           36|
+           37|   strict = derivationStrict drvAttrs;
+             |            ^
+           38|
+       … while evaluating derivation 'bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env'
+         whose name attribute is located at /nix/store/yfvhrcz7h68gxk06hfgq78din42454ha-source/pkgs/stdenv/generic/make-derivation.nix:336:7
+       … while evaluating attribute 'passAsFile' of derivation 'bc8f8d1be58e8c8383e683a06e1e1e57893fff87-env'
+         at /nix/store/yfvhrcz7h68gxk06hfgq78din42454ha-source/pkgs/build-support/trivial-builders/default.nix:60:9:
+           59|         inherit buildCommand name;
+           60|         passAsFile = [ "buildCommand" ]
+             |         ^
+           61|           ++ (derivationArgs.passAsFile or [ ]);
+       (stack trace truncated; use '--show-trace' to show the full, detailed trace)
+       error: undefined variable 'gobject'
+
+       at /app/.nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix:19:63:
+           18|         '')
+           19|         cairo fontconfig freetype fribidi gcc gdk-pixbuf glib gobject gobject-introspection harfbuzz libffi libxml2 libxslt pango pkg-config postgresql_16 python311
+             |                                                               ^
+           20|       ];
+Dockerfile:8
+-------------------
+6 |
+7 |     COPY .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix
+8 | >>> RUN nix-env -if .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix && nix-collect-garbage -d
+9 |
+10 |
+-------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c nix-env -if .nixpacks/nixpkgs-bc8f8d1be58e8c8383e683a06e1e1e57893fff87.nix && nix-collect-garbage -d" did not complete successfully: exit code: 1
+Error: Docker build failed

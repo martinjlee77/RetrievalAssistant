@@ -10,8 +10,9 @@ nixPkgs = [
     "cairo", 
     "pango",
     "gobject-introspection",
-    # GObject runtime library (for gobject-2.0-0)
-    "gobject",
+    # Additional runtime dependencies
+    "shared-mime-info",
+    "expat",
     # WeasyPrint runtime dependencies (missing from previous attempts)
     "gdk-pixbuf",
     "libxml2",
@@ -30,3 +31,5 @@ cmds = [
     "pip install -r requirements.txt",
     "pip install -r streamlit-requirements.txt"
 ]
+
+# Note: glib provides GObject runtime libraries that WeasyPrint needs
