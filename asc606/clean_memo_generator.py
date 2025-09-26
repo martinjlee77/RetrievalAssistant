@@ -335,6 +335,9 @@ class CleanMemoGenerator:
                            customer_name: str | None = None) -> None:
         """Display clean memo content with enhanced download options."""
 
+        # STRATEGIC FIX: Store analysis_id as memo_id for PDF generation
+        self.memo_id = analysis_id or "memo_unknown"
+        
         # Validate memo content
         if not memo_content or memo_content.strip() == "":
             st.error("Memo content is empty. Please regenerate the analysis.")
