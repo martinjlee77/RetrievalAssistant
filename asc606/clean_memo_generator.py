@@ -294,6 +294,7 @@ class CleanMemoGenerator:
                         sys.modules[mod] = module_obj
         except Exception as e:
             logger.error(f"PDF generation setup failed: {e}")
+            logger.exception("Full PDF generation error traceback:")
             return None
 
     def _clean_html_tags(self, text: str) -> str:

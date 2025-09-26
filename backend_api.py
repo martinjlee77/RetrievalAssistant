@@ -1382,8 +1382,11 @@ def complete_analysis():
         cursor = conn.cursor()
         
         try:
+            logger.info(f"Starting analysis completion for user {user_id}")
+            
             # Check idempotency - prevent duplicate charges
             if idempotency_key:
+                logger.info(f"Checking idempotency for key: {idempotency_key}")
                 cursor.execute("""
                     SELECT analysis_id, memo_uuid FROM credit_transactions 
                     WHERE user_id = %s AND reason = 'analysis_charge' 
@@ -1391,6 +1394,7 @@ def complete_analysis():
                 """, (user_id, idempotency_key))
                 existing = cursor.fetchone()
                 if existing:
+                    logger.info(f"Found existing analysis (idempotent): {existing['analysis_id']}")
                     return jsonify({
                         'message': 'Analysis already recorded (idempotent)',
                         'analysis_id': existing['analysis_id'],
@@ -1400,6 +1404,7 @@ def complete_analysis():
                     }), 200
             
             # Insert analysis record with all required fields (including billed_credits for backward compatibility)
+            logger.info(f"Inserting analysis record for user {user_id}")
             cursor.execute("""
                 INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
@@ -1410,10 +1415,13 @@ def complete_analysis():
                   final_charged_credits, tier_name, memo_uuid, started_at, duration_seconds, file_count))
             
             analysis_id = cursor.fetchone()['id']
+            logger.info(f"Analysis record created with ID: {analysis_id}")
             
             # Get current balance for balance_after calculation
+            logger.info(f"Getting current balance for user {user_id}")
             cursor.execute("SELECT credits_balance FROM users WHERE id = %s", (user_id,))
             current_balance = cursor.fetchone()['credits_balance']
+            logger.info(f"Current balance: {current_balance}")
             
             if is_free_analysis:
                 # No free analyses in enterprise model - this is for backward compatibility only
@@ -1434,21 +1442,27 @@ def complete_analysis():
                 balance_after = max(current_balance - final_charged_credits, 0)
                 
                 # Deduct from credits balance
+                logger.info(f"Updating balance from {current_balance} to {balance_after}")
                 cursor.execute("""
                     UPDATE users 
                     SET credits_balance = %s
                     WHERE id = %s
                 """, (balance_after, user_id))
+                logger.info(f"Balance updated successfully")
                 
                 # Record credit transaction with full audit trail
+                logger.info(f"Recording credit transaction for analysis {analysis_id}")
                 cursor.execute("""
                     INSERT INTO credit_transactions (user_id, analysis_id, amount, reason,
                                                    balance_after, memo_uuid, metadata, created_at)
                     VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
                 """, (user_id, analysis_id, -final_charged_credits, balance_after, memo_uuid,
                       json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
+                logger.info(f"Credit transaction recorded successfully")
             
+            logger.info(f"Committing transaction for analysis {analysis_id}")
             conn.commit()
+            logger.info(f"Transaction committed successfully")
             
             logger.info(f"Analysis completed for user {user_id}: {asc_standard}, memo: {memo_uuid}, cost: {final_charged_credits}")
             
@@ -1468,7 +1482,10 @@ def complete_analysis():
             conn.close()
         
     except Exception as e:
-        logger.error(f"Complete analysis error: {e}")
+        logger.exception(f"Complete analysis error: {e}")
+        logger.error(f"Complete analysis error - Full details: {e}")
+        logger.error(f"Error type: {type(e).__name__}")
+        logger.error(f"Error args: {e.args}")
         return jsonify({'error': 'Failed to complete analysis'}), 500
 
 # Legacy endpoint - deprecated but maintained for backwards compatibility
