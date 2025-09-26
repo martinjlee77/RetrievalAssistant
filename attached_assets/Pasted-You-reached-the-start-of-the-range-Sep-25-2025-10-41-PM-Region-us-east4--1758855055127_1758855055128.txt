@@ -1,0 +1,89 @@
+You reached the start of the range
+Sep 25, 2025, 10:41 PM
+ 
+[Region: us-east4]
+=========================
+Using Detected Dockerfile
+=========================
+
+context: vb9t-ijNp
+
+internal
+load build definition from Dockerfile
+0ms
+
+internal
+load metadata for docker.io/library/python:3.11-slim
+49ms
+
+internal
+load .dockerignore
+0ms
+
+1
+FROM docker.io/library/python:3.11-slim@sha256:a0939570b38cddeb861b8e75d20b1c8218b21562b18f301171904b544e8cf228
+9ms
+
+internal
+load build context
+0ms
+
+8
+RUN chmod +x /app/start.sh cached
+0ms
+
+7
+COPY start.sh /app/ cached
+0ms
+
+6
+COPY . . cached
+0ms
+
+5
+RUN pip install --no-cache-dir --upgrade pip &&     pip install --no-cache-dir -r requirements.txt &&     pip install --no-cache-dir -r streamlit-requirements.txt &&     pip install --no-cache-dir -r analysis-requirements.txt cached
+0ms
+
+4
+COPY requirements.txt streamlit-requirements.txt analysis-requirements.txt ./ cached
+0ms
+
+3
+WORKDIR /app cached
+0ms
+
+2
+RUN apt-get update && apt-get install -y     libpq-dev     gcc     libcairo2     libpango-1.0-0     libpangocairo-1.0-0     libgdk-pixbuf-2.0-0     libffi-dev     shared-mime-info     libxml2     libxslt1.1     libharfbuzz0b     libfribidi0     libpng16-16     libjpeg62-turbo     libopenjp2-7     fonts-dejavu-core     fontconfig     && rm -rf /var/lib/apt/lists/*     && apt-get clean cached
+0ms
+
+auth
+sharing credentials for production-us-east4-eqdc4a.railway-registry.com
+0ms
+
+importing to docker
+21s
+Build time: 28.48 seconds
+ 
+====================
+Starting Healthcheck
+====================
+Path: /
+Retry window: 5m0s
+ 
+Attempt #1 failed with service unavailable. Continuing to retry for 4m49s
+Attempt #2 failed with service unavailable. Continuing to retry for 4m46s
+Attempt #3 failed with service unavailable. Continuing to retry for 4m34s
+Attempt #4 failed with service unavailable. Continuing to retry for 4m30s
+Attempt #5 failed with service unavailable. Continuing to retry for 4m22s
+Attempt #6 failed with service unavailable. Continuing to retry for 4m6s
+Attempt #7 failed with service unavailable. Continuing to retry for 3m36s
+Attempt #8 failed with service unavailable. Continuing to retry for 3m6s
+Attempt #9 failed with service unavailable. Continuing to retry for 2m36s
+Attempt #10 failed with service unavailable. Continuing to retry for 2m6s
+Attempt #11 failed with service unavailable. Continuing to retry for 1m36s
+Attempt #12 failed with service unavailable. Continuing to retry for 1m6s
+Attempt #13 failed with service unavailable. Continuing to retry for 35s
+Attempt #14 failed with service unavailable. Continuing to retry for 5s
+ 
+1/1 replicas never became healthy!
+Healthcheck failed!
