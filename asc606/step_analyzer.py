@@ -801,12 +801,14 @@ Step Conclusions:
 Instructions:
 1. Write 2-3 sentences in narrative paragraph format assessing ASC 606 compliance
 2. Format all currency as $XXX,XXX (no spaces in numbers)
-3. Be direct - if there are concerns, state them clearly
-4. Focus on compliance assessment
-5. Use professional accounting language without bullet points
-6. Use proper paragraph spacing
-7. ALWAYS format currency with single $ symbol (never $$)
-8. Include proper spacing after commas and periods"""
+3. Base your conclusion ONLY on the actual findings from the step conclusions provided above
+4. Only mention concerns if they are explicitly identified in the step analysis - do not invent or infer new issues
+5. If no significant issues are found in the steps, state compliance with ASC 606
+6. Focus on compliance assessment
+7. Use professional accounting language without bullet points
+8. Use proper paragraph spacing
+9. ALWAYS format currency with single $ symbol (never $$)
+10. Include proper spacing after commas and periods"""
 
         # Call LLM API
         try:
