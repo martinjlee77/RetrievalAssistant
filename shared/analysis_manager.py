@@ -215,7 +215,9 @@ class AnalysisManager:
             # Get auth token for database request
             token = auth_manager.get_auth_token()
             if not token:
-                logger.warning("No auth token available for database save")
+                logger.error("CRITICAL: No auth token available for database save - user not authenticated!")
+                logger.error("Analysis will complete but won't be saved to database or charge credits")
+                logger.error("Check authentication flow - user may need to re-login")
                 return
             
             # Prepare analysis data for unified endpoint
