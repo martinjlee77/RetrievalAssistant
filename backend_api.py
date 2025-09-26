@@ -26,6 +26,11 @@ from shared.postmark_client import PostmarkClient
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# DEPLOYMENT FIX: Enhanced logging for Gunicorn production environment
+veritaslogic_logger = logging.getLogger('veritaslogic.backend')
+veritaslogic_logger.setLevel(logging.INFO)
+veritaslogic_logger.info("Enhanced VeritasLogic backend logging initialized")
+
 # Configure Stripe
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
@@ -1382,10 +1387,13 @@ def complete_analysis():
         cursor = conn.cursor()
         
         try:
+            # DEPLOYMENT FIX: Use enhanced logger for production visibility
+            veritaslogic_logger.info(f"BACKEND: Starting analysis completion for user {user_id}")
             logger.info(f"Starting analysis completion for user {user_id}")
             
             # Check idempotency - prevent duplicate charges
             if idempotency_key:
+                veritaslogic_logger.info(f"BACKEND: Checking idempotency for key: {idempotency_key}")
                 logger.info(f"Checking idempotency for key: {idempotency_key}")
                 cursor.execute("""
                     SELECT analysis_id, memo_uuid FROM credit_transactions 

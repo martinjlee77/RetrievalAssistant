@@ -275,6 +275,19 @@ class CleanMemoGenerator:
                 # Fresh import of weasyprint to avoid conflicts
                 logger.info("Importing WeasyPrint with clean module cache")
                 wp = importlib.import_module('weasyprint')
+                
+                # DEPLOYMENT FIX: Streamlit pre-imports streamlit.elements.pdf.PDF which shadows weasyprint.pdf.pdf.PDF
+                # Need to explicitly restore the correct PDF class
+                try:
+                    from weasyprint.pdf import pdf as wp_pdf
+                    importlib.reload(wp_pdf)
+                    from pydyf import PDF as PydyfPDF
+                    logger.info(f"Original PDF class: {wp_pdf.PDF.__module__}")
+                    wp_pdf.PDF = PydyfPDF
+                    logger.info("Patched WeasyPrint PDF class with correct pydyf.PDF")
+                except Exception as patch_error:
+                    logger.warning(f"PDF class patching failed: {patch_error}")
+                
                 logger.info("Creating HTML document")
                 html_doc = wp.HTML(string=css_styled_html, base_url=os.getcwd())
                 logger.info("Generating PDF from HTML")
