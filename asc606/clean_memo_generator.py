@@ -264,16 +264,22 @@ class CleanMemoGenerator:
             import sys
             
             # Temporarily remove any conflicting modules from cache
-            modules_to_remove = [k for k in sys.modules.keys() if 'fpdf' in k.lower()]
+            # Remove both fpdf AND pydyf to prevent PDF class conflicts
+            modules_to_remove = [k for k in sys.modules.keys() if 'fpdf' in k.lower() or 'pydyf' in k.lower()]
             removed_modules = {}
             for mod in modules_to_remove:
                 removed_modules[mod] = sys.modules.pop(mod, None)
+            logger.info(f"Removed PDF-related modules to prevent conflicts: {list(removed_modules.keys())}")
             
             try:
                 # Fresh import of weasyprint to avoid conflicts
+                logger.info("Importing WeasyPrint with clean module cache")
                 wp = importlib.import_module('weasyprint')
+                logger.info("Creating HTML document")
                 html_doc = wp.HTML(string=css_styled_html, base_url=os.getcwd())
+                logger.info("Generating PDF from HTML")
                 pdf_bytes = html_doc.write_pdf()
+                logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
                 return pdf_bytes
             except Exception as pdf_error:
                 logger.error(f"WeasyPrint PDF generation failed: {pdf_error}")
