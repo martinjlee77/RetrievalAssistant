@@ -134,242 +134,26 @@ class CleanMemoGenerator:
         return final_memo
 
     def _generate_pdf(self, memo_content: str) -> bytes | None:
-        """Generate PDF from memo content using WeasyPrint."""
+        """Generate PDF from memo content using isolated PDF generator."""
         try:
-            import os
+            # STRATEGIC FIX: Use isolated PDF generator to avoid Streamlit module pollution
+            from shared.pdf_generator import generate_styled_pdf
             
-            # Convert markdown to HTML
-            html_content = self._convert_markdown_to_html(memo_content)
-
-            # Get absolute paths to font files
-            font_dir = os.path.abspath('assets/fonts')
+            logger.info("Generating PDF using isolated PDF generator")
+            pdf_bytes = generate_styled_pdf(memo_content, self.memo_id)
+            
+            if pdf_bytes:
+                logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
+                return pdf_bytes
+            else:
+                logger.error("PDF generation returned None")
+                return None
+        except Exception as e:
+            logger.error(f"PDF generation failed: {e}")
+            return None
             
             # Add CSS styling with @font-face declarations for DejaVu Serif
             css_styled_html = f"""
-            <html>
-            <head>
-                <style>
-                    /* DejaVu Serif font family with all variants */
-                    @font-face {{
-                        font-family: 'VLSerif';
-                        src: url('file://{font_dir}/DejaVuSerif.ttf') format('truetype');
-                        font-weight: 400;
-                        font-style: normal;
-                    }}
-                    @font-face {{
-                        font-family: 'VLSerif';
-                        src: url('file://{font_dir}/DejaVuSerif-Italic.ttf') format('truetype');
-                        font-weight: 400;
-                        font-style: italic;
-                    }}
-                    @font-face {{
-                        font-family: 'VLSerif';
-                        src: url('file://{font_dir}/DejaVuSerif-Bold.ttf') format('truetype');
-                        font-weight: 700;
-                        font-style: normal;
-                    }}
-                    @font-face {{
-                        font-family: 'VLSerif';
-                        src: url('file://{font_dir}/DejaVuSerif-BoldItalic.ttf') format('truetype');
-                        font-weight: 700;
-                        font-style: italic;
-                    }}
-                    
-                    body {{
-                        font-family: 'VLSerif', serif;
-                        margin: 10px;
-                        line-height: 1.5;
-                        font-size: 11px;
-                    }}
-                    /* Remove borders from HTML content for clean PDF */
-                    div {{
-                        border: none !important;
-                        box-shadow: none !important;
-                        border-radius: 0 !important;
-                    }}
-                    h1 {{
-                        border-bottom: 2px solid #bdc3c7;
-                        padding-bottom: 5px;
-                        margin: 20px 0 15px 0;
-                    }}
-                    h2 {{
-                        border-bottom: 1px solid #bdc3c7;
-                        padding-bottom: 3px;
-                        margin: 18px 0 12px 0;
-                    }}
-                    h3 {{
-                        margin: 16px 0 10px 0;
-                    }}
-                    h4 {{
-                        font-size: 12px;
-                        margin: 14px 0 8px 0;
-                    }}
-                    h6 {{
-                        font-size: 10px;
-                        font-weight: bold;
-                    }}
-                    p {{
-                        margin: 6px 0;
-                        font-size: 11px;
-                        line-height: 1.4;
-                    }}
-                    ul {{
-                        margin: 6px 0;
-                        padding-left: 18px;
-                    }}
-                    li {{
-                        margin: 2px 0;
-                        line-height: 1.3;
-                    }}
-                    /* Force VLSerif font family on all italic elements - WeasyPrint compatible */
-                    em, i {{
-                        font-style: italic !important;
-                        font-family: 'VLSerif', serif !important;
-                        font-size: inherit;
-                        line-height: inherit;
-                        font-weight: inherit;
-                    }}
-                    /* Bold italic combinations */
-                    h6 em, h6 i, strong em, b em {{
-                        font-style: italic !important;
-                        font-family: 'VLSerif', serif !important;
-                        font-weight: 700 !important;
-                        font-size: inherit;
-                        line-height: inherit;
-                    }}
-                    .disclaimer, small {{
-                        font-size: 8px !important;
-                    }}
-                    /* Professional table styling */
-                    table {{
-                        border-collapse: collapse;
-                        width: 100%;
-                        margin: 10px 0;
-                    }}
-                    th, td {{
-                        border: 1px solid #ddd;
-                        padding: 4px 6px;
-                        font-size: 10px;
-                    }}
-                </style>
-            </head>
-            <body>
-                {html_content}
-            </body>
-            </html>
-            """
-
-            # Generate PDF with isolated WeasyPrint to avoid fpdf conflicts
-            import importlib
-            import sys
-            
-            # Temporarily remove any conflicting modules from cache
-            # Remove both fpdf AND pydyf to prevent PDF class conflicts
-            modules_to_remove = [k for k in sys.modules.keys() if 'fpdf' in k.lower() or 'pydyf' in k.lower()]
-            removed_modules = {}
-            for mod in modules_to_remove:
-                removed_modules[mod] = sys.modules.pop(mod, None)
-            logger.info(f"Removed PDF-related modules to prevent conflicts: {list(removed_modules.keys())}")
-            
-            try:
-                # Fresh import of weasyprint to avoid conflicts
-                logger.info("Importing WeasyPrint with clean module cache")
-                wp = importlib.import_module('weasyprint')
-                
-                # DEPLOYMENT FIX: Streamlit pre-imports streamlit.elements.pdf.PDF which shadows WeasyPrint's PDF class
-                # Need to explicitly restore the correct PDF class using proper module path
-                try:
-                    # Check what PDF class is currently loaded
-                    import weasyprint.pdf
-                    logger.info(f"Current weasyprint.pdf contents: {dir(weasyprint.pdf)}")
-                    
-                    # Force correct pydyf.PDF import and patch any PDF references
-                    from pydyf import PDF as PydyfPDF
-                    logger.info(f"PydyfPDF class: {PydyfPDF} with signature: {PydyfPDF.__init__.__code__.co_varnames[:3]}")
-                    
-                    # Check if there's a PDF class in the weasyprint namespace that's wrong
-                    import weasyprint
-                    if hasattr(weasyprint, 'PDF'):
-                        logger.warning(f"Found conflicting PDF class in weasyprint: {weasyprint.PDF}")
-                        weasyprint.PDF = PydyfPDF
-                        logger.info("Patched weasyprint.PDF with correct pydyf.PDF")
-                        
-                    logger.info("PDF class environment prepared")
-                except Exception as patch_error:
-                    logger.warning(f"PDF class inspection/patching failed: {patch_error}")
-                
-                logger.info("Creating HTML document")
-                html_doc = wp.HTML(string=css_styled_html, base_url=os.getcwd())
-                logger.info("Generating PDF from HTML")
-                
-                # AGGRESSIVE PDF FIX: Monkey-patch any PDF classes that might be called with wrong signature
-                try:
-                    import sys
-                    original_classes = {}
-                    
-                    # Find and patch all PDF classes in loaded modules
-                    for module_name, module in sys.modules.items():
-                        if module and hasattr(module, 'PDF'):
-                            pdf_class = getattr(module, 'PDF')
-                            if hasattr(pdf_class, '__init__'):
-                                # Check if it expects only self parameter
-                                import inspect
-                                try:
-                                    sig = inspect.signature(pdf_class.__init__)
-                                    params = list(sig.parameters.keys())
-                                    if len(params) == 1 and params[0] == 'self':
-                                        # This is likely pydyf.PDF - keep it
-                                        logger.info(f"Keeping correct PDF class in {module_name}: {params}")
-                                    else:
-                                        # This expects more parameters - replace it with pydyf.PDF
-                                        logger.warning(f"Replacing PDF class in {module_name} (expects {params})")
-                                        original_classes[module_name] = pdf_class
-                                        from pydyf import PDF as PydyfPDF
-                                        setattr(module, 'PDF', PydyfPDF)
-                                except:
-                                    pass
-                    
-                    pdf_bytes = html_doc.write_pdf()
-                    logger.info(f"PDF generation successful: {len(pdf_bytes)} bytes")
-                    
-                    # Restore original classes
-                    for module_name, original_class in original_classes.items():
-                        if module_name in sys.modules:
-                            setattr(sys.modules[module_name], 'PDF', original_class)
-                    
-                    return pdf_bytes
-                    
-                except Exception as aggressive_error:
-                    logger.error(f"Aggressive PDF fix failed: {aggressive_error}")
-                    # Try without the monkey patching
-                    pdf_bytes = html_doc.write_pdf()
-                    logger.info(f"PDF generation successful without patching: {len(pdf_bytes)} bytes")
-                    return pdf_bytes
-            except Exception as pdf_error:
-                logger.error(f"WeasyPrint PDF generation failed: {pdf_error}")
-                try:
-                    # Fallback without base_url - ensure wp is available
-                    if 'wp' not in locals():
-                        wp = importlib.import_module('weasyprint')
-                    html_doc = wp.HTML(string=css_styled_html)
-                    pdf_bytes = html_doc.write_pdf()
-                    return pdf_bytes
-                except Exception as fallback_error:
-                    logger.error(f"PDF generation completely failed: {fallback_error}")
-                    return None
-            finally:
-                # Restore removed modules
-                for mod, module_obj in removed_modules.items():
-                    if module_obj is not None:
-                        sys.modules[mod] = module_obj
-        except Exception as e:
-            logger.error(f"PDF generation setup failed: {e}")
-            logger.exception("Full PDF generation error traceback:")
-            return None
-
-    def _clean_html_tags(self, text: str) -> str:
-        """Remove HTML tags from text for clean DOCX output."""
-        import re
         # Remove ALL HTML tags for clean Word output
         text = re.sub(r'<[^>]+>', '', text)  # Remove any HTML tag
         # Convert common HTML entities
