@@ -13,9 +13,14 @@ logger = logging.getLogger(__name__)
 
 # Backend API configuration - Use environment variables for cross-deployment support
 import os
+# For production, BACKEND_URL should point to the Flask backend service
+# e.g., 'https://www.veritaslogic.ai/api' or Railway internal service URL
 BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
+
+# Log the current configuration for debugging
+logger.info(f"Auth Utils Configuration: BACKEND_URL={BACKEND_URL}, WEBSITE_URL={WEBSITE_URL}")
 
 class AuthManager:
     """Manages user authentication and session state"""
@@ -62,8 +67,8 @@ class AuthManager:
             return {'can_proceed': False, 'error': 'Not authenticated'}
         
         try:
-            # Use website URL for cross-service communication
-            credits_url = f"{WEBSITE_URL}/api/user/check-credits"
+            # Use BACKEND_URL for API calls
+            credits_url = f"{BACKEND_URL}/user/check-credits"
             
             response = requests.post(
                 credits_url,
@@ -88,8 +93,8 @@ class AuthManager:
             return None
         
         try:
-            # Use website URL for cross-service communication
-            profile_url = f"{WEBSITE_URL}/api/user/profile"
+            # Use BACKEND_URL for API calls
+            profile_url = f"{BACKEND_URL}/user/profile"
             
             response = requests.get(
                 profile_url,
@@ -174,8 +179,8 @@ def show_login_page():
 def attempt_login(email: str, password: str) -> Dict[str, Any]:
     """Attempt to login user with email and password via main website"""
     try:
-        # Use website URL for cross-service communication
-        login_url = f"{WEBSITE_URL}/api/login"
+        # Use BACKEND_URL for API calls
+        login_url = f"{BACKEND_URL}/login"
         logger.info(f"SSO: Attempting login at {login_url}")
         
         response = requests.post(
@@ -201,8 +206,8 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
 def validate_existing_token(token: str) -> Dict[str, Any]:
     """Validate an existing token using the cross-subdomain validation endpoint"""
     try:
-        # In production, use the website URL instead of localhost
-        validation_url = f"{WEBSITE_URL}/api/auth/validate-token"
+        # Use BACKEND_URL for API calls (ensure it's set correctly for production)
+        validation_url = f"{BACKEND_URL}/auth/validate-token"
         logger.info(f"SSO: Validating token at {validation_url}")
         
         response = requests.post(
