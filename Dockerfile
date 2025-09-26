@@ -42,8 +42,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY . .
 
+# Copy and make start script executable
+COPY start.sh /app/
+RUN chmod +x /app/start.sh
+
 # Expose port
 EXPOSE 5000
 
-# Start command with PORT debugging
-CMD ["sh", "-c", "echo 'PORT env var is: '$PORT && echo 'Using port: '${PORT:-5000} && streamlit run home.py --server.port ${PORT:-5000} --server.address 0.0.0.0 --server.headless true"]
+# Use shell script entrypoint for proper PORT expansion
+ENTRYPOINT ["/app/start.sh"]
