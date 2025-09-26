@@ -46,5 +46,10 @@ pages = {
 
 pg = st.navigation(pages)
 
-# 6. Run the app.
+# 6. Auto-login check for SSO tokens before running the app
+from shared.auth_utils import try_cross_domain_auth
+# Check for SSO auto-login tokens in URL parameters
+try_cross_domain_auth()
+
+# 7. Run the app.
 pg.run()
