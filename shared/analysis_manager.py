@@ -212,8 +212,8 @@ class AnalysisManager:
             import requests
             from shared.auth_utils import auth_manager
             
-            # Get auth token for database request
-            token = auth_manager.get_auth_token()
+            # STRATEGIC FIX: Attempt token refresh before database save to handle long-running analyses
+            token = self._get_or_refresh_auth_token()
             if not token:
                 logger.error("CRITICAL: No auth token available for database save - user not authenticated!")
                 logger.error("Analysis will complete but won't be saved to database or charge credits")
@@ -283,6 +283,59 @@ class AnalysisManager:
                 
         except Exception as e:
             logger.error(f"Database save error: {e}")
+    
+    def _get_or_refresh_auth_token(self) -> Optional[str]:
+        """Get current auth token or refresh if expired"""
+        try:
+            from shared.auth_utils import auth_manager
+            import requests
+            import os
+            
+            # First try to get current token
+            token = auth_manager.get_auth_token()
+            if not token:
+                logger.warning("No auth token in session")
+                return None
+            
+            # Check if token is still valid by making a quick test call
+            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+            website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url.replace('/api', '')
+            
+            # Test current token
+            test_response = requests.get(
+                f'{api_base_url}/api/auth/validate-token',
+                headers={'Authorization': f'Bearer {token}'},
+                timeout=5
+            )
+            
+            if test_response.ok:
+                logger.info("Current auth token is valid")
+                return token
+            
+            # Token is expired, try to refresh
+            logger.info("Auth token expired, attempting refresh")
+            refresh_response = requests.post(
+                f'{api_base_url}/api/auth/refresh-token',
+                timeout=5
+            )
+            
+            if refresh_response.ok:
+                refresh_data = refresh_response.json()
+                new_token = refresh_data.get('token')
+                
+                # Update session with new token
+                import streamlit as st
+                st.session_state.auth_token = new_token
+                logger.info("Successfully refreshed auth token")
+                return new_token
+            else:
+                logger.error(f"Token refresh failed: {refresh_response.status_code}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Token refresh error: {e}")
+            return None
     
     def _log_analysis_event(self, event_type: str, analysis_data: Dict[str, Any]):
         """Log analysis events for operational monitoring"""

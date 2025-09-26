@@ -712,14 +712,26 @@ def login():
             return jsonify({'error': 'Invalid password'}), 401
         
         # Generate login token with domain information for cross-subdomain auth
-        login_token = jwt.encode({
+        # STRATEGIC FIX: Create short-lived access token + refresh token system
+        access_token = jwt.encode({
             'user_id': user['id'],
             'email': user['email'],
-            'exp': datetime.utcnow() + timedelta(days=7),
-            'purpose': 'authentication',
-            'domain': 'veritaslogic.ai',  # Allow token to work across subdomains
+            'exp': datetime.utcnow() + timedelta(minutes=10),  # Short-lived access token
+            'purpose': 'access',
+            'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()
         }, app.config['SECRET_KEY'], algorithm='HS256')
+        
+        refresh_token = jwt.encode({
+            'user_id': user['id'],
+            'email': user['email'],
+            'exp': datetime.utcnow() + timedelta(days=7),  # Long-lived refresh token
+            'purpose': 'refresh',
+            'domain': 'veritaslogic.ai',
+            'issued_at': datetime.utcnow().isoformat()
+        }, app.config['SECRET_KEY'], algorithm='HS256')
+        
+        login_token = access_token  # For backward compatibility
         
         # Create response with enhanced user data for cross-subdomain sharing
         response_data = {
@@ -742,8 +754,18 @@ def login():
             }
         }
         
-        # Create response and optionally set cross-domain cookies for better UX
+        # Create response and set refresh token cookie
         response = jsonify(response_data)
+        
+        # Set refresh token cookie (HTTP-only, secure, SameSite)
+        response.set_cookie(
+            'refresh_token',
+            refresh_token,
+            max_age=7*24*60*60,  # 7 days
+            httponly=True,
+            secure=True,
+            samesite='None'  # Allow cross-site for subdomain access
+        )
         
         # In production, set secure cookies for *.veritaslogic.ai
         if not request.host.startswith('localhost') and not request.host.startswith('127.0.0.1'):
@@ -754,7 +776,7 @@ def login():
                 secure=True,  # HTTPS only
                 httponly=False,  # Allow JS access for Streamlit
                 samesite='Lax',  # Cross-site requests allowed
-                max_age=7*24*60*60  # 7 days
+                max_age=10*60  # STRATEGIC FIX: 10 minutes instead of 7 days
             )
         
         return response, 200
@@ -762,6 +784,45 @@ def login():
     except Exception as e:
         logger.error(f"Login error: {e}")
         return jsonify({'error': 'Login failed'}), 500
+
+@app.route('/api/auth/refresh-token', methods=['POST'])
+def refresh_access_token():
+    """Generate new access token using refresh token"""
+    try:
+        # Get refresh token from HTTP-only cookie
+        refresh_token = request.cookies.get('refresh_token')
+        if not refresh_token:
+            return jsonify({'error': 'Refresh token not found'}), 401
+        
+        # Verify refresh token
+        payload = jwt.decode(refresh_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        
+        # Ensure it's a refresh token
+        if payload.get('purpose') != 'refresh':
+            return jsonify({'error': 'Invalid refresh token'}), 401
+        
+        # Generate new short-lived access token
+        new_access_token = jwt.encode({
+            'user_id': payload['user_id'],
+            'email': payload['email'],
+            'exp': datetime.utcnow() + timedelta(minutes=10),  # 10 minutes
+            'purpose': 'access',
+            'domain': 'veritaslogic.ai',
+            'issued_at': datetime.utcnow().isoformat()
+        }, app.config['SECRET_KEY'], algorithm='HS256')
+        
+        return jsonify({
+            'token': new_access_token,
+            'expires_in': 600  # 10 minutes in seconds
+        }), 200
+        
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Refresh token expired'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid refresh token'}), 401
+    except Exception as e:
+        logger.error(f"Token refresh error: {e}")
+        return jsonify({'error': 'Token refresh failed'}), 500
 
 @app.route('/api/auth/validate-token', methods=['POST'])
 def validate_cross_domain_token():
