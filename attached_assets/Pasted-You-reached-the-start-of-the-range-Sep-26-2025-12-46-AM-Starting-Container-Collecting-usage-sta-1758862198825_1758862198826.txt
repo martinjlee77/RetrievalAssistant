@@ -1,0 +1,24 @@
+You reached the start of the range
+Sep 26, 2025, 12:46 AM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:shared.preflight_pricing:Processed file 1: gemini_sow.docx - 519 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 519 words, 3K (≤10 pages) tier, $95.0
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:shared.preflight_pricing:Processed file 1: gemini_sow.docx - 519 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 519 words, 3K (≤10 pages) tier, $95.0
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-09-26T04:49:34.760485", "analysis_id": "9837d104", "asc_standard": "ASC 606", "total_words": 519, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 95.0, "user_id": 6, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis 9837d104: ASC 606 - 519 words
+INFO:shared.api_cost_tracker:API cost tracker reset
+ERROR:__main__:Analysis workflow error: unterminated string literal (detected at line 451) (clean_memo_generator.py, line 451)
+INFO:shared.analysis_manager:Auth token expired, attempting refresh
+ERROR:shared.analysis_manager:Token refresh failed: 401
+ERROR:shared.analysis_manager:CRITICAL: No auth token available for database save - user not authenticated!
+ERROR:shared.analysis_manager:Analysis will complete but won't be saved to database or charge credits
+ERROR:shared.analysis_manager:Check authentication flow - user may need to re-login
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-09-26T04:49:34.938990", "analysis_id": "9837d104", "asc_standard": "ASC 606", "total_words": 519, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 95.0, "user_id": 6, "status": "failed", "success": false, "duration": 0.005441427230834961, "error": "unterminated string literal (detected at line 451) (clean_memo_generator.py, line 451)"}
+INFO:shared.analysis_manager:Completed analysis 9837d104: failed - 0.0s

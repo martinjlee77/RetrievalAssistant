@@ -242,6 +242,13 @@ class CleanMemoGenerator:
         """
 
         return html_content
+            css_styled_html = f"""
+        # Remove ALL HTML tags for clean Word output
+        text = re.sub(r'<[^>]+>', '', text)  # Remove any HTML tag
+        # Convert common HTML entities
+        text = text.replace('&lt;', '<').replace('&gt;',
+                                                 '>').replace('&amp;', '&')
+        return text.strip()
 
     def _generate_docx(self, memo_content: str) -> bytes | None:
         """Generate DOCX from memo content using python-docx."""
@@ -366,7 +373,17 @@ class CleanMemoGenerator:
             base_filename = f"asc606_memo_{timestamp}"
 
             with col1:
-                # PDF Download
+                # Markdown download (existing)
+                st.download_button(
+                    label="📄 Markdown",
+                    data=memo_content,
+                    file_name=f"{base_filename}.md",
+                    mime="text/markdown",
+                    key=f"download_md_{hash(memo_content[:100])}",
+                    use_container_width=True)
+
+            with col2:
+                # PDF download
                 pdf_data = self._generate_pdf(memo_content)
                 if pdf_data:
                     st.download_button(
@@ -382,25 +399,16 @@ class CleanMemoGenerator:
                               use_container_width=True,
                               help="PDF generation failed")
 
-            with col2:
-                # Markdown Download (Raw Text)
-                st.download_button(
-                    label="📝 Markdown",
-                    data=memo_content.encode('utf-8'),
-                    file_name=f"{base_filename}.md",
-                    mime="text/markdown",
-                    key=f"download_md_{hash(memo_content[:100])}",
-                    use_container_width=True)
-
             with col3:
-                # DOCX Download
+                # DOCX download
                 docx_data = self._generate_docx(memo_content)
                 if docx_data:
                     st.download_button(
                         label="📄 Word (.docx)",
                         data=docx_data,
                         file_name=f"{base_filename}.docx",
-                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        mime=
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         key=f"download_docx_{hash(memo_content[:100])}",
                         use_container_width=True)
                 else:
@@ -416,7 +424,8 @@ class CleanMemoGenerator:
                              use_container_width=True,
                              key=copy_key):
                     # Escape content for JavaScript
-                    escaped_content = memo_content.replace('`', '\\`').replace('$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
+                    escaped_content = memo_content.replace('`', '\\`').replace(
+                        '$', '\\$').replace('\\', '\\\\').replace('"', '\\"')
 
                     # Create JavaScript component to copy to clipboard
                     copy_js = f"""
@@ -444,3 +453,96 @@ class CleanMemoGenerator:
                         components.html(copy_js, height=0)
                     except:
                         st.success("Content ready to copy manually")
+
+
+    def _convert_markdown_to_html(self, markdown_content: str) -> str:
+        """Convert markdown to HTML manually to preserve currency formatting."""
+
+        # Split into lines and process each one
+        lines = markdown_content.split('\n')
+        html_lines = []
+        in_list = False
+
+        for line in lines:
+            # Convert headers with better spacing
+            if line.startswith('# '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(
+                    f'<h1 style="margin: 20px 0 15px 0; font-weight: bold;">{line[2:]}</h1>'
+                )
+            elif line.startswith('## '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(
+                    f'<h2 style="margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>'
+                )
+            elif line.startswith('### '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(
+                    f'<h3 style="margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>'
+                )
+            # Handle bullet points better
+            elif line.strip().startswith('- '):
+                if not in_list:
+                    html_lines.append(
+                        '<ul style="margin: 10px 0; padding-left: 25px;">')
+                    in_list = True
+                content = line.strip()[2:].strip()
+                # Handle bold text in list items
+                if '**' in content:
+                    while '**' in content:
+                        content = content.replace('**', '<strong>', 1).replace(
+                            '**', '</strong>', 1)
+                html_lines.append(
+                    f'<li style="margin: 6px 0; line-height: 1.4;">{content}</li>'
+                )
+            # Convert bold text in paragraphs
+            elif '**' in line and line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                # Handle multiple bold sections
+                processed_line = line
+                while '**' in processed_line:
+                    processed_line = processed_line.replace(
+                        '**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(
+                    f'<p style="margin: 10px 0; line-height: 1.6;">{processed_line}</p>'
+                )
+            # Skip horizontal rules (as requested)
+            elif line.strip() == '---':
+                continue
+            # Empty lines - add small spacing
+            elif line.strip() == '':
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                continue
+            # Regular paragraphs
+            elif line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(
+                    f'<p style="margin: 10px 0; line-height: 1.6;">{line}</p>')
+
+        # Close any open lists
+        if in_list:
+            html_lines.append('</ul>')
+
+        # Join with improved styling - Original fonts for HTML, VLSerif only for PDF italics
+        html_content = f"""
+        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+        line-height: 1.6; max-width: 850px; padding: 30px; 
+        border: 1px solid #e1e5e9; 
+        border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            {''.join(html_lines)}
+        </div>
+        """
+
+        return html_content
