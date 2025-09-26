@@ -265,7 +265,19 @@ class AnalysisManager:
                 st.session_state['analysis_manager_memo_uuid'] = memo_uuid
                 logger.info(f"Analysis {analysis_record.get('analysis_id')} saved to database with memo UUID: {memo_uuid}")
             else:
-                logger.warning(f"Failed to save analysis to database: {response.status_code} - {response.text}")
+                # Enhanced error logging to capture exact issue
+                logger.error(f"Database save failed - Status: {response.status_code}")
+                logger.error(f"Response headers: {dict(response.headers)}")
+                logger.error(f"Response body: {response.text}")
+                logger.error(f"Request URL: {api_base_url}/api/analysis/complete")
+                logger.error(f"Request payload: {analysis_data}")
+                
+                # Try to parse error details
+                try:
+                    error_data = response.json()
+                    logger.error(f"Parsed error response: {error_data}")
+                except:
+                    logger.error("Could not parse error response as JSON")
                 
         except Exception as e:
             logger.error(f"Database save error: {e}")

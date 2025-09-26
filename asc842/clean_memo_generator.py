@@ -373,10 +373,10 @@ class CleanMemoGenerator:
     def _generate_simple_pdf(self, content: str) -> bytes:
         """Generate simple PDF using FPDF as fallback."""
         try:
-            # Lazy import to avoid conflicts with weasyprint
-            from fpdf import FPDF as FPDFClass
+            # Import fpdf as module to avoid namespace conflicts  
+            import fpdf
             
-            pdf = FPDFClass()
+            pdf = fpdf.FPDF()
             pdf.add_page()
             pdf.set_font('Arial', size=11)
             
