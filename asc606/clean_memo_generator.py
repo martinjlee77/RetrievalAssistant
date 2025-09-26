@@ -24,6 +24,16 @@ class CleanMemoGenerator:
         """Initialize - template_path ignored for now."""
         pass
 
+    def _clean_po_summary_blocks(self, text: str) -> str:
+        """Remove [BEGIN_PO_SUMMARY]...[END_PO_SUMMARY] blocks from analysis text."""
+        import re
+        # Remove PO summary blocks that are meant for executive summary generation only
+        pattern = r'\[BEGIN_PO_SUMMARY\].*?\[END_PO_SUMMARY\]'
+        cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
+        # Clean up any extra whitespace left behind
+        cleaned_text = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned_text)
+        return cleaned_text.strip()
+
     def combine_clean_steps(self,
                             analysis_results: Dict[str, Any],
                             analysis_id: str | None = None) -> str:
@@ -95,8 +105,9 @@ class CleanMemoGenerator:
 
             if step_data and isinstance(
                     step_data, dict) and 'markdown_content' in step_data:
-                # Add clean content directly - ZERO PROCESSING
+                # Add clean content directly - ZERO PROCESSING (but remove PO summary blocks)
                 clean_content = step_data['markdown_content']
+                clean_content = self._clean_po_summary_blocks(clean_content)
                 memo_lines.append(clean_content)
                 memo_lines.append("")
                 steps_added += 1
