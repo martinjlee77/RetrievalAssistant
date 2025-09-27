@@ -72,9 +72,52 @@ def serve_index():
 def serve_dashboard():
     return send_from_directory('veritaslogic_multipage_website', 'dashboard.html')
 
+def attempt_token_refresh(request_obj):
+    """
+    Attempt to refresh an expired token using refresh token from cookies
+    Returns new access token on success, None on failure
+    """
+    try:
+        # Get refresh token from HTTP-only cookie
+        refresh_token = request_obj.cookies.get('refresh_token')
+        if not refresh_token:
+            logger.info("No refresh token found in cookies")
+            return None
+        
+        # Verify refresh token
+        payload = jwt.decode(refresh_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        
+        # Ensure it's a refresh token
+        if payload.get('purpose') != 'refresh':
+            logger.warning("Found token but it's not a refresh token")
+            return None
+        
+        # Generate new short-lived access token
+        new_access_token = jwt.encode({
+            'user_id': payload['user_id'],
+            'email': payload['email'],
+            'exp': datetime.utcnow() + timedelta(minutes=60),  # Extended for large contracts
+            'purpose': 'access',
+            'domain': 'veritaslogic.ai',
+            'issued_at': datetime.utcnow().isoformat()
+        }, app.config['SECRET_KEY'], algorithm='HS256')
+        
+        logger.info(f"Successfully refreshed token for user {payload['email']}")
+        return new_access_token
+        
+    except jwt.ExpiredSignatureError:
+        logger.info("Refresh token has expired")
+        return None
+    except jwt.InvalidTokenError:
+        logger.info("Invalid refresh token")
+        return None
+    except Exception as e:
+        logger.error(f"Token refresh error: {e}")
+        return None
+
 @app.route('/analysis')
 def serve_streamlit_app():
-    """Redirect to Streamlit app with seamless authentication"""
+    """Redirect to Streamlit app with seamless authentication and automatic token refresh"""
     
     # Check if user is authenticated
     auth_header = request.headers.get('Authorization')
@@ -87,16 +130,33 @@ def serve_streamlit_app():
     if not token:
         token = request.cookies.get('vl_auth_token')
     
-    # Build redirect URL
+    # Build redirect URL with automatic token refresh
     if token:
         # Validate token before redirecting
         payload = verify_token(token)
         if 'error' not in payload:
+            # Token is valid, use it
             redirect_url = f"{STREAMLIT_URL}?auth_token={token}"
         else:
-            redirect_url = STREAMLIT_URL
+            # Token is expired/invalid, try to refresh it
+            logger.info(f"Token validation failed: {payload.get('error', 'Unknown error')}, attempting refresh")
+            refreshed_token = attempt_token_refresh(request)
+            if refreshed_token:
+                logger.info("Token refresh successful, redirecting with new token")
+                redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}"
+            else:
+                logger.info("Token refresh failed, redirecting without token")
+                redirect_url = STREAMLIT_URL
     else:
-        redirect_url = STREAMLIT_URL
+        # No token found, try refresh anyway (user might be logged in via dashboard session)
+        logger.info("No token found, attempting refresh from dashboard session")
+        refreshed_token = attempt_token_refresh(request)
+        if refreshed_token:
+            logger.info("Dashboard session refresh successful, redirecting with new token")
+            redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}"
+        else:
+            logger.info("No valid session found, redirecting without token")
+            redirect_url = STREAMLIT_URL
     
     # Build enhanced HTML response with error handling and status checking
     html_content = f"""
