@@ -14,7 +14,7 @@ class PostmarkClient:
     def __init__(self):
         self.api_key = os.getenv('POSTMARK_API_KEY')
         self.api_url = 'https://api.postmarkapp.com'
-        self.from_email = 'support@veritaslogic.ai'  # Use verified email address
+        self.from_email = 'admin@veritaslogic.ai'  # Use established verified email address
         
     def send_rerun_notification(self, memo_id: str, user_email: str, user_name: str, 
                                requested_changes: str) -> bool:
