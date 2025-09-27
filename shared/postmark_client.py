@@ -16,6 +16,13 @@ class PostmarkClient:
         self.api_url = 'https://api.postmarkapp.com'
         self.from_email = 'admin@veritaslogic.ai'  # Use established verified email address
         
+        # Debug: Log masked token info for troubleshooting
+        if self.api_key:
+            masked_key = f"{self.api_key[:8]}...{self.api_key[-4:]}" if len(self.api_key) > 12 else "***"
+            logger.info(f"PostmarkClient initialized with token: {masked_key} (length: {len(self.api_key)})")
+        else:
+            logger.error("POSTMARK_API_KEY environment variable not found!")
+        
     def send_rerun_notification(self, memo_id: str, user_email: str, user_name: str, 
                                requested_changes: str) -> bool:
         """
