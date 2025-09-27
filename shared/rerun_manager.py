@@ -24,10 +24,12 @@ class RerunManager:
         col1, col2 = st.columns([1, 1])
         
         with col1:
-            if st.button("📝 **Request Rerun**", key=f"rerun_btn_{memo_id}", type="secondary", use_container_width=True):
-                st.info(f"**Redirecting to Contact Form**\n\nFor memo rerun requests, please use our unified support channel:")
-                st.markdown(f"**[→ Click here to request rerun for memo {memo_id}](https://veritaslogic.ai/contact.html)**")
-                st.caption("Select 'Request Memo Rerun' from the dropdown and mention your memo ID in the message.")
+            st.link_button(
+                "📝 **Request Rerun**", 
+                f"https://veritaslogic.ai/contact.html?memo_id={memo_id}&type=rerun",
+                use_container_width=True,
+                type="secondary"
+            )
         
         with col2:
             if st.button("🔄 **Analyze Another Contract**", key=f"new_analysis_btn_{memo_id}", type="secondary", use_container_width=True):
