@@ -731,6 +731,30 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.8);
     font-size: 0.9rem;
 }
+
+@media (max-width: 768px) {
+    .review-content {
+        /* Change from two columns to a single column */
+        grid-template-columns: 1fr; 
+
+        /* Reduce the gap for a better look on mobile */
+        gap: 3rem; 
+    }
+
+    .review-text {
+        /* On mobile, center-align the text to match the section header */
+        text-align: center;
+    }
+
+    .review-benefits {
+        /* If the text is centered, the list items should be left-aligned for readability */
+        text-align: left;
+
+        /* Add some margin so it doesn't stick to the button below */
+        margin-bottom: 3rem;
+    }
+}
+
 /* ================================
    14. BLOG SECTIONS
    ================================ */
@@ -2561,7 +2585,35 @@ h1, h2, h3, h4, h5, h6 {
     .nav-container {
         padding: 0 1rem;
     }
+
+    /* 1. Stack the main feature sections */
+    .feature-content {
+        grid-template-columns: 1fr; /* Change from two columns to one */
+        gap: 3rem; /* Adjust the vertical gap */
+    }
+
+    /* 2. Stack the nested standards boxes */
+    .standards-boxes {
+        grid-template-columns: 1fr; /* Show one box per row */
+    }
+
+    /* 3. Stack the security architecture layers */
+    .security-layers {
+        /* This rule assumes .security-layers is a grid or flex container. */
+        /* It will stack the items vertically. */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* 4. Improve table readability on mobile */
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem; /* Make padding slightly smaller */
+        font-size: 0.9rem; /* Reduce font size a bit */
+    }   
 }
+
 @media (max-width: 480px) {
     .hero h1,
     .page-header h1 {
