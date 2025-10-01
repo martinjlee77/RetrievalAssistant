@@ -329,3 +329,79 @@ If you have any questions, reply to this email and we'll help.
         except Exception as e:
             logger.error(f"Error sending email verification: {e}")
             return False
+    
+    def send_new_signup_notification(self, user_email: str, first_name: str, last_name: str, 
+                                     company_name: str, job_title: str, awarded_credits: float) -> bool:
+        """
+        Send new signup notification to admin for monitoring
+        
+        Args:
+            user_email: User's email address
+            first_name: User's first name
+            last_name: User's last name
+            company_name: User's company name
+            job_title: User's job title
+            awarded_credits: Amount of credits awarded
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_domain = user_email.split('@')[1] if '@' in user_email else 'unknown'
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'🎉 New User Signup - {company_name}',
+                'HtmlBody': f"""
+                <h2>🎉 New User Signup</h2>
+                <p><strong>User Details:</strong></p>
+                <ul>
+                    <li><strong>Name:</strong> {first_name} {last_name}</li>
+                    <li><strong>Email:</strong> {user_email}</li>
+                    <li><strong>Domain:</strong> {email_domain}</li>
+                    <li><strong>Company:</strong> {company_name}</li>
+                    <li><strong>Job Title:</strong> {job_title}</li>
+                </ul>
+                <p><strong>Initial Credits Awarded:</strong> ${awarded_credits:.2f}</p>
+                <p><em>Monitor for potential abuse (multiple signups from same domain)</em></p>
+                """,
+                'TextBody': f"""
+New User Signup
+
+User Details:
+- Name: {first_name} {last_name}
+- Email: {user_email}
+- Domain: {email_domain}
+- Company: {company_name}
+- Job Title: {job_title}
+
+Initial Credits Awarded: ${awarded_credits:.2f}
+
+Monitor for potential abuse (multiple signups from same domain)
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"New signup notification sent to support for {user_email}")
+                return True
+            else:
+                logger.error(f"Failed to send signup notification: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending signup notification: {e}")
+            return False

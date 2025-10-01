@@ -696,6 +696,35 @@ def signup():
             VALUES (%s, %s, %s)
         """, (user_id, verification_token, expires_at))
         
+        # Award initial signup credits if configured and not already awarded
+        if INITIAL_SIGNUP_CREDITS > 0:
+            # Check if signup bonus already awarded (idempotency check)
+            cursor.execute("""
+                SELECT id FROM credit_transactions 
+                WHERE user_id = %s AND reason = 'signup_bonus_v1'
+            """, (user_id,))
+            
+            if not cursor.fetchone():
+                # Award signup credits
+                cursor.execute("""
+                    UPDATE users 
+                    SET credits_balance = credits_balance + %s
+                    WHERE id = %s
+                    RETURNING credits_balance
+                """, (INITIAL_SIGNUP_CREDITS, user_id))
+                
+                new_balance = cursor.fetchone()['credits_balance']
+                
+                # Record the transaction for audit trail
+                cursor.execute("""
+                    INSERT INTO credit_transactions 
+                    (user_id, amount, reason, balance_after, metadata)
+                    VALUES (%s, %s, 'signup_bonus_v1', %s, %s)
+                """, (user_id, INITIAL_SIGNUP_CREDITS, new_balance, 
+                      json.dumps({'awarded_at': datetime.utcnow().isoformat()})))
+                
+                logger.info(f"Awarded ${INITIAL_SIGNUP_CREDITS} signup bonus to user {email}")
+        
         conn.commit()
         conn.close()
         
@@ -711,6 +740,21 @@ def signup():
             logger.info(f"Email verification sent successfully to {email}")
         else:
             logger.error(f"Failed to send email verification to {email}")
+        
+        # Send admin notification for new signup (don't block on failure)
+        if INITIAL_SIGNUP_CREDITS > 0:
+            admin_notified = postmark_client.send_new_signup_notification(
+                user_email=email,
+                first_name=first_name,
+                last_name=last_name,
+                company_name=company_name,
+                job_title=job_title,
+                awarded_credits=float(INITIAL_SIGNUP_CREDITS)
+            )
+            if admin_notified:
+                logger.info(f"Admin notified of new signup: {email}")
+            else:
+                logger.warning(f"Failed to send admin notification for new signup: {email}")
         
         logger.info(f"User {email} registered successfully - pending email verification")
         
@@ -1459,7 +1503,7 @@ def check_user_credits():
         
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT credits_balance
+            SELECT credits_balance, email_verified
             FROM users 
             WHERE id = %s
         """, (user_id,))
@@ -1469,6 +1513,16 @@ def check_user_credits():
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
+        
+        # Check email verification first
+        if not user['email_verified']:
+            return jsonify({
+                'can_proceed': False,
+                'error': 'Email verification required',
+                'message': 'Please verify your email address before running analyses.',
+                'credits_balance': float(user['credits_balance'] or 0),
+                'email_verified': False
+            }), 403
         
         can_proceed = (user['credits_balance'] >= required_credits)
         
@@ -1529,6 +1583,16 @@ def complete_analysis():
             # DEPLOYMENT FIX: Use enhanced logger for production visibility
             veritaslogic_logger.info(f"BACKEND: Starting analysis completion for user {user_id}")
             logger.info(f"Starting analysis completion for user {user_id}")
+            
+            # CRITICAL: Verify email before allowing credit spending
+            cursor.execute("SELECT email_verified FROM users WHERE id = %s", (user_id,))
+            user_check = cursor.fetchone()
+            if not user_check or not user_check['email_verified']:
+                logger.warning(f"Unverified user {user_id} attempted to run analysis")
+                return jsonify({
+                    'error': 'Email verification required',
+                    'message': 'Please verify your email address before running analyses. Check your inbox for the verification link.'
+                }), 403
             
             # Check idempotency - prevent duplicate charges
             if idempotency_key:
