@@ -39,6 +39,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Enterprise Web Platform**: Professional website with unified contact system, enterprise messaging, and sophisticated user account management.
 - **Dashboard System**: Comprehensive analysis history tracking with detailed metrics for enterprise reporting.
 - **Authentication Flow**: Secure user registration, login, and password recovery with unified professional styling.
+- **Initial Credits System**: New users receive $295 in credits upon signup ("run your first analysis free" model). Credits are awarded atomically during account creation with full audit trail. Email verification required before credit spending to prevent abuse.
 - **Contact Management**: Unified inquiry system with conditional field logic for different service types.
 - **Responsive Design**: Professional mobile-first design with consistent Big 4 inspired color schemes.
 - **UI Consistency**: All forms use contact-form CSS classes for unified wide layout and dark gradient styling.
@@ -46,6 +47,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Pricing Display**: Enterprise credit packages ($500/$1000/$2000) with clear 12-month expiration policy.
 - **Dashboard Standards**: Analysis history displays date completed (latest first), ASC standard, cost charged, document size, file count, and pricing tier.
 - **Account Management**: Professional account balance display with comma formatting for thousands.
+- **Admin Notifications**: Automated email alerts to support@veritaslogic.ai for new signups to monitor for potential abuse.
 
 ### Core Components and Design Decisions
 - **Standard Development Architecture**: Follows a "Copy-Tweak-Go" methodology for rapid deployment of new accounting standards, based on proven architectural patterns from ASC 606.
