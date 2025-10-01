@@ -38,6 +38,7 @@ STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 # Environment configuration
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
+INITIAL_SIGNUP_CREDITS = Decimal(os.getenv('INITIAL_SIGNUP_CREDITS', '295.00'))
 DEVELOPMENT_URLS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000", 
