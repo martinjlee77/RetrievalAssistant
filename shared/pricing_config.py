@@ -7,7 +7,7 @@ Easy to update pricing without touching code
 PRICING_TIERS = {
     1: {
         "name": "3K (≤10 pages)",
-        "price": 95.00,
+        "price": 195.00,
         "max_words": 3000,
         "description": "Same features in every tier. For very short packages.",
         "docs_per_run": 10,
@@ -16,7 +16,7 @@ PRICING_TIERS = {
     },
     2: {
         "name": "9K (≤30 pages)",
-        "price": 195.00,
+        "price": 295.00,
         "max_words": 9000,
         "description": "Same features in every tier. For short packages.",
         "docs_per_run": 10,
@@ -25,7 +25,7 @@ PRICING_TIERS = {
     },
     3: {
         "name": "15K (≤50 pages)",
-        "price": 295.00,
+        "price": 495.00,
         "max_words": 15000,
         "description": "Same features in every tier. For shorter packages.",
         "docs_per_run": 10,
@@ -34,7 +34,7 @@ PRICING_TIERS = {
     },
     4: {
         "name": "30K (≤100 pages)",
-        "price": 495.00,
+        "price": 795.00,
         "max_words": 30000,
         "description": "Same features in every tier. For standard-length packages.",
         "docs_per_run": 10,
@@ -43,7 +43,7 @@ PRICING_TIERS = {
     },
     5: {
         "name": "60K (≤200 pages)",
-        "price": 895.00,
+        "price": 1295.00,
         "max_words": 60000,
         "description": "Same features in every tier. For long or complex packages.",
         "docs_per_run": 10,
@@ -54,9 +54,9 @@ PRICING_TIERS = {
 
 # Credit Purchase Options
 CREDIT_PACKAGES = [
-    {"amount": 500, "display": "Add $500 Credits"},
-    {"amount": 1000, "display": "Add $1,000 Credits"}, 
-    {"amount": 2000, "display": "Add $2,000 Credits"}
+    {"amount": 1000, "display": "Add $1,000 Credits"},
+    {"amount": 2000, "display": "Add $2,000 Credits"}, 
+    {"amount": 3000, "display": "Add $3,000 Credits"}
 ]
 
 # Business Email Configuration

@@ -270,7 +270,7 @@
                             <label for="customAmount">Enter amount ($95 - $3,000):</label>
                             <div class="amount-input-group">
                                 <span class="currency-symbol">$</span>
-                                <input type="number" id="customAmount" min="95" max="3000" step="1" placeholder="500">
+                                <input type="number" id="customAmount" min="195" max="3000" step="1" placeholder="1000">
                                 <button onclick="selectCustomAmount()" class="btn btn-secondary">Select</button>
                             </div>
                         </div>
@@ -1026,9 +1026,9 @@
             container.innerHTML = '';
             
             const packages = [
-                {amount: 500, display: 'Professional Package'},
-                {amount: 1000, display: 'Enterprise Package'},
-                {amount: 2000, display: 'Premium Package'}
+                {amount: 1000, display: 'Professional Package'},
+                {amount: 2000, display: 'Enterprise Package'},
+                {amount: 3000, display: 'Premium Package'}
             ];
             
             packages.forEach(pkg => {
