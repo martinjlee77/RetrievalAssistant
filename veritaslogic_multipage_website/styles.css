@@ -292,6 +292,39 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 700px;
     margin: 0 auto;
 }
+
+/* --- Signup Page Header Benefits List --- */
+.page-header .signup-benefits {
+    /* 1. Aligned left in a smaller container */
+    max-width: 800px; 
+    margin: 2.5rem auto; /* Centers the container and adds space */
+    padding-left: 0; 
+    list-style: none;
+    text-align: left;
+}
+
+.page-header .signup-benefits li {
+    position: relative;
+    padding-left: 2.25rem; /* Space for the checkmark icon */
+    margin-bottom: 1.25rem;
+
+    /* 2 & 4. Inherits font-family. Font-size is set to match your <p> tag */
+    font-size: 1.25rem; /* Matches your .page-header p rule */
+    line-height: 1;
+    color: rgba(255,255,255,0.85); /* Matches your .page-header p rule */
+
+
+}
+
+/* Specific rule for the checkmarks */
+.page-header .signup-benefits li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    color: #ffffff;
+    font-weight: bold;
+}
 /* ================================
    6. HERO SECTION - HOME PAGE
    ================================
@@ -2201,10 +2234,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 .form-group label {
     display: block;
@@ -2311,6 +2341,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 3rem;
     font-size: 1.1rem;
 }
+
 /* ================================
    15. CTA SECTIONS
    ================================ */
@@ -2727,8 +2758,8 @@ html {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 25px;
-    border-left: 4px solid #2196f3;
-    color: #1976d2;
+    border-left: 4px solid #4086bf;
+    color: #212f3c;
     font-size: 14px;
 }
 .form-row {
@@ -3908,4 +3939,56 @@ a:focus {
   .timeline::before { left: 0.7rem; }
   .timeline-item { grid-template-columns: 2.25rem 1fr; }
   .timeline-marker { width: 1.75rem; height: 1.75rem; font-size: 0.9rem; }
+}
+
+/* --- Password Helper Tooltip Styles --- */
+.password-wrapper {
+    position: relative; /* This is essential for positioning the icon */
+}
+
+.password-helper {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+}
+
+.password-helper-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    color: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.password-tooltip {
+    display: none; /* Hidden by default */
+    position: absolute;
+    bottom: 120%; /* Position above the icon */
+    right: -10px;
+    width: 280px;
+    background: #333;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* Show the tooltip on hover */
+.password-helper:hover .password-tooltip {
+    display: block;
+}
+
+.password-tooltip ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
 }

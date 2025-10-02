@@ -1,0 +1,69 @@
+Subject: Feature Request: Add Marketing Opt-in to Signup Form
+
+Hi [Developer Name],
+
+I'd like to add a marketing consent checkbox to our user signup process. The goal is to get explicit permission from new users to send them marketing emails, ensuring we are compliant with best practices from day one.
+
+Here are the requirements, broken down into backend and frontend tasks.
+
+High-Level Goal:
+A new, unchecked-by-default checkbox will be added to the signup form. The user's choice (true/false) needs to be captured and stored in the user database upon account creation.
+
+1. Backend Requirements
+a) Database Schema Update: Please add a new column to the users table (or equivalent).
+
+Column Name: marketing_opt_in
+Data Type: BOOLEAN
+Default Value: FALSE
+Notes: This field should not be nullable. A FALSE default ensures that if the field is not provided for any reason, the user is safely considered "opted-out."
+b) API Endpoint Update (/api/signup): The signup endpoint needs to be modified to accept and process this new field.
+
+The endpoint should expect a new boolean field in the incoming JSON payload, named marketing_opt_in.
+The value of this field (true or false) from the payload should be saved to the new marketing_opt_in column in the database for the new user record being created.
+2. Frontend Requirements
+a) HTML Change (signup.html): Please add the following HTML snippet to the signup form. It should be placed immediately before the existing "Terms of Service" checkbox div (<div class="terms-group">).
+
+<!-- New Marketing Opt-in Checkbox -->
+<div class="terms-group">
+    <label for="marketingOptIn">
+        <input type="checkbox" id="marketingOptIn" name="marketingOptIn">
+        <span>Send me occasional product updates and helpful content.</span>
+    </label>
+</div>
+
+Note: This checkbox is intentionally unchecked by default to comply with the "explicit opt-in" model.
+
+b) JavaScript Update (signup.html script): The main form submission script needs to be updated to capture the state of this new checkbox and include it in the API request.
+
+In the submit event listener for the signupForm, please modify the formData object to include the new value.
+
+Current formData object (example):
+
+const formData = {
+    email: ...,
+    first_name: ...,
+    // ... etc.
+};
+
+Updated formData object:
+
+const formData = {
+    email: document.getElementById('email').value.trim(),
+    first_name: document.getElementById('firstName').value.trim(),
+    last_name: document.getElementById('lastName').value.trim(),
+    company_name: document.getElementById('company').value.trim(),
+    job_title: document.getElementById('jobTitle').value,
+    password: document.getElementById('password').value,
+    terms_accepted: document.getElementById('terms').checked,
+    // ADD THIS NEW LINE:
+    marketing_opt_in: document.getElementById('marketingOptIn').checked 
+};
+
+Definition of Done:
+This task is complete when:
+
+The new checkbox appears on the signup.html page and is unchecked by default.
+A new user can successfully create an account.
+If the user signs up with the box checked, the marketing_opt_in field in the database for that user is TRUE.
+If the user signs up with the box unchecked, the marketing_opt_in field in the database for that user is FALSE.
+Please let me know if you have any questions.
