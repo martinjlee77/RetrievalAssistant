@@ -676,13 +676,16 @@ def signup():
         # Hash password before storing
         password_hash = hash_password(password)
         
+        # Get marketing opt-in preference (defaults to False if not provided)
+        marketing_opt_in = data.get('marketing_opt_in', False)
+        
         # Create unverified account that requires email verification
         cursor.execute("""
             INSERT INTO users (email, first_name, last_name, company_name, job_title, 
-                             password_hash, terms_accepted_at, email_verified)
-            VALUES (%s, %s, %s, %s, %s, %s, NOW(), FALSE)
+                             password_hash, terms_accepted_at, email_verified, marketing_opt_in)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW(), FALSE, %s)
             RETURNING id
-        """, (email, first_name, last_name, company_name, job_title, password_hash))
+        """, (email, first_name, last_name, company_name, job_title, password_hash, marketing_opt_in))
         
         user_id = cursor.fetchone()['id']
         

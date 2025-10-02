@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     terms_accepted_at TIMESTAMP DEFAULT NOW(),
     email_verified BOOLEAN DEFAULT FALSE,
     credits_balance DECIMAL(10,2) DEFAULT 0.00,
+    marketing_opt_in BOOLEAN NOT NULL DEFAULT FALSE,
     preferences JSONB,
     created_at TIMESTAMP DEFAULT NOW()
 );
