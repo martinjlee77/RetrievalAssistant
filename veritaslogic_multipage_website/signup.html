@@ -31,8 +31,10 @@
                 <li><a href="contact.html">Contact</a></li>
             </ul>
             <button class="mobile-menu-btn">☰</button>
-            <a href="signup.html" class="nav-cta primary">Start Risk Free</a>
-            <a href="login.html" class="nav-cta secondary">Log In</a>
+            <div class="nav-auth-buttons">
+                <a href="signup.html" class="nav-cta primary">Free Trial</a>
+                <a href="login.html" class="nav-cta secondary">Log In</a>
+            </div>
         </div>
     </nav>
 
@@ -87,16 +89,13 @@
                         <label for="jobTitle">Job Title <span class="required"></span></label>
                         <select id="jobTitle" name="jobTitle" required autocomplete="organization-title">
                             <option value="">Select your role</option>
-                            <option value="Controller">Controller</option>
-                            <option value="Staff Accountant">Staff Accountant</option>
-                            <option value="Senior Accountant">Senior Accountant</option>
+                            <option value="Accountant">Staff Accountant</option>
+                            <option value="Financial Analyst">Financial Analyst</option>
                             <option value="Accounting Manager">Accounting Manager</option>
                             <option value="Director of Accounting">Director of Accounting</option>
+                            <option value="Controller">Controller</option>
+                            <option value="CAO">CAO</option>
                             <option value="CFO">CFO</option>
-                            <option value="CPA">CPA</option>
-                            <option value="Financial Analyst">Financial Analyst</option>
-                            <option value="Audit Manager">Audit Manager</option>
-                            <option value="Tax Manager">Tax Manager</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -171,7 +170,7 @@
                     <a href="features.html">Features</a>
                     <a href="pricing.html">Pricing</a>
                     <a href="contact.html">Demo</a>
-                    <a href="signup.html">Start Risk Free</a>
+                    <a href="signup.html">Free Trial</a>
                 </div>
                 
                 <div class="footer-section">
@@ -312,7 +311,7 @@
                 if (response.ok) {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Account Created';
-                    showMessage('Account created successfully! Please check your email to verify your account...', 'success');
+                    showMessage('Account created successfully! Please check your email to verify your account.', 'success');
                     
                     // Redirect to email verification page after 2 seconds
                     setTimeout(() => {

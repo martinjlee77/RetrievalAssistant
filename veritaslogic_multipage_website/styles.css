@@ -2759,7 +2759,7 @@ html {
     border-radius: 8px;
     margin-bottom: 25px;
     border-left: 4px solid #4086bf;
-    color: #212f3c;
+    color: #2c3e50;
     font-size: 14px;
 }
 .form-row {
@@ -2838,7 +2838,7 @@ html {
     padding: 20px;
     background: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #2196f3;
+    border-left: 4px solid #4086bf;
 }
 .terms-group label {
     display: flex;
