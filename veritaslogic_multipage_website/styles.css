@@ -857,7 +857,7 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
 }
 .blog-layout {
-    display: grid;
+    display: block;
     grid-template-columns: 2fr 1fr;
     gap: 4rem;
     max-width: 1200px;
@@ -865,7 +865,13 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0 2rem;
 }
 .blog-main {
-    max-width: none;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.blog-filters {
+    display: flex;
+    justify-content: center; /* Center the filters on the page */
+    margin-bottom: 4rem;
 }
 .featured-post,
 .blog-post {
@@ -952,111 +958,44 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.85rem;
     border: 1px solid rgba(255,255,255,0.2);
 }
-/* Blog Sidebar */
-.blog-sidebar {
-    max-width: none;
-}
-.sidebar-widget {
-    background: rgba(255,255,255,0.05);
-    padding: 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-}
-.sidebar-widget h3 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-}
 .category-list {
     list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Allows filters to wrap on smaller screens */
+    gap: 0.75rem;
+    justify-content: center;
 }
 .category-list li {
     margin-bottom: 0.5rem;
 }
 .category-list a {
-    color: rgba(255,255,255,0.8);
+    display: block;
+    padding: 0.6rem 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
     text-decoration: none;
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    transition: color 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease-in-out;
 }
 .category-list a:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 .category-list span {
     color: rgba(255,255,255,0.6);
     font-size: 0.9rem;
 }
-.subscribe-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-.subscribe-form input {
-    padding: 0.75rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    border-radius: 6px;
-    font-family: inherit;
-}
-.subscribe-form input::placeholder {
-    color: #a0a0a0;
-}
-.subscribe-form button {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    padding: 0.75rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
+.category-list a.active {
+    background: #ffffff;
+    color: #212F3C;
+    border-color: #ffffff;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.subscribe-form button:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.4);
-}
-.popular-post {
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-.popular-post:last-child {
-    border-bottom: none;
-}
-.popular-post h4 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-.popular-post h4 a {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-.popular-post h4 a:hover {
-    color: #ffffff;
-}
-.sidebar-cta {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.2);
-    transition: all 0.3s ease;
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-}
-.sidebar-cta:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
 }
 .hidden {
     display: none;
@@ -2317,6 +2256,7 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     border-radius: 8px;
     font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
