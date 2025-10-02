@@ -1,4 +1,4 @@
-# VeritasLogic.ai - Enterprise Accounting AI Platform
+# VeritasLogic.ai - Technical Accounting AI Platform
 
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform designed for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI technology. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining the rigor and citation quality expected in professional environments, and allows professionals to focus on judgment and client advisory.
@@ -44,7 +44,8 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Responsive Design**: Professional mobile-first design with consistent Big 4 inspired color schemes.
 - **UI Consistency**: All forms use contact-form CSS classes for unified wide layout and dark gradient styling.
 - **Navigation**: Consistent enterprise-focused navigation with professional service emphasis.
-- **Pricing Display**: Enterprise credit packages ($500/$1000/$2000) with clear 12-month expiration policy.
+- **Pricing**: Pricing is per anlaysis and is tiered based on the number of words in the documents analyzed. $95 for 3000 words, $195 for 9000 words, $295 for 150000, $495 for 30000, $895 for 60000. For documents with words greater than 60000, support should be contacted.
+- **Payment**: Enterprise credit packages ($500/$1000/$2000) with clear 12-month expiration policy. Credits can also be purchase at a custom amount.
 - **Dashboard Standards**: Analysis history displays date completed (latest first), ASC standard, cost charged, document size, file count, and pricing tier.
 - **Account Management**: Professional account balance display with comma formatting for thousands.
 - **Admin Notifications**: Automated email alerts to support@veritaslogic.ai for new signups to monitor for potential abuse.

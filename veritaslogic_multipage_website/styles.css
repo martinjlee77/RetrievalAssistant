@@ -1058,6 +1058,10 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.15);
     border-color: rgba(255,255,255,0.4);
 }
+.hidden {
+    display: none;
+}
+
 /* ================================
    17. ABOUT PAGE STYLES
    ================================ */
@@ -1097,6 +1101,79 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1.5rem;
     font-size: 1.1rem;
 }
+
+/* --- Founder Section Styles --- */
+.founder-section {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr;
+    gap: 3rem;
+    /* FIX 1: Vertical alignment set to 'top' */
+    align-items: flex-start; 
+    margin: 4rem 0;
+    padding-top: 3rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    background: transparent; /* Explicitly set for clarity */
+}
+
+.founder-image img {
+    width: 100%;
+    max-width: 220px; 
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+    border: 3px solid rgba(255,255,255,0.1);
+}
+
+/* FIX 2: Styling for the new title block */
+.founder-title {
+    margin-bottom: 2rem;
+}
+.founder-title p {
+    margin: 0;
+    line-height: 1.4;
+}
+.founder-title .name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+}
+.founder-title .role {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.9);
+    margin-top: 0.25rem;
+}
+.founder-title .past-role {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.7);
+    font-style: italic;
+}
+
+/* Styling for the highlights list */
+.founder-highlights {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.founder-highlights li {
+    padding-left: 2rem;
+    position: relative;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+}
+
+.founder-highlights li::before {
+    content: '•';
+    color: #ffffff;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-weight: 600;
+}
+
+
 .differentiator-box {
     background: rgba(255,255,255,0.08);
     padding: 2.5rem;
@@ -1128,119 +1205,7 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.6;
     margin-bottom: 1rem;
 }
-.founder-image,
-/* Leadership Section Styles */
-.leadership-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-primary);
-    position: relative;
-}
-.leadership-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
-}
-.leadership-section h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 3rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-    position: relative;
-    z-index: 1;
-}
-.founder-profile {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 4rem;
-    align-items: start;
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-.founder-image {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.founder-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-.founder-bio h3 {
-    font-size: 1.8rem;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-.founder-title {
-    color: rgba(255,255,255,0.7);
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem !important;
-    font-weight: 500;
-}
-.founder-bio p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-}
-.founder-story h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.founder-story h3 {
-    font-size: 1.5rem;
-    color: rgba(255,255,255,0.95);
-    margin: 2rem 0 1rem 0;
-}
-.founder-story p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-}
-.credentials h4 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #ffffff;
-    margin-bottom: 1rem;
-}
-.credentials ul {
-    list-style: none;
-    color: rgba(255,255,255,0.8);
-}
-.credentials li {
-    padding: 0.5rem 0;
-    position: relative;
-    padding-left: 1.5rem;
-}
-.credentials li::before {
-    content: '→';
-    color: rgba(255,255,255,0.6);
-    position: absolute;
-    left: 0;
-}
-.vision-item h3 {
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
-}
-.vision-item p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.6;
-}
+
 .values-section {
     padding: var(--space-section) 0;
     background: var(--gradient-primary);
@@ -2312,25 +2277,27 @@ h1, h2, h3, h4, h5, h6 {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.55rem 1rem;
     border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
+    background: #212F3C;
     color: #ffffff;
-    border-radius: 6px;
+    border-radius: 8px;
     font-family: inherit;
+    font-size: 1rem;
     transition: all 0.3s ease;
 }
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.6);
     background: rgba(255,255,255,0.9);
     color: #2c3e50;
 }
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: #a0a0a0;
+    color: rgba(255,255,255,0.5);
+    opacity: 1;
 }
 .checkbox-group label {
     display: flex;
@@ -2354,6 +2321,7 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s ease;
     font-size: 1rem;
     width: 100%;
+    margin-top: 1rem;
 }
 .form-submit:hover {
     transform: translateY(-2px);
@@ -2573,7 +2541,6 @@ h1, h2, h3, h4, h5, h6 {
         grid-template-columns: 1fr;
     }
     .form-row {
-        grid-template-columns: 1fr;
     }
     .cta-actions {
         flex-direction: column;
@@ -2611,7 +2578,145 @@ h1, h2, h3, h4, h5, h6 {
     .comparison-table td {
         padding: 0.75rem; /* Make padding slightly smaller */
         font-size: 0.9rem; /* Reduce font size a bit */
-    }   
+    }
+
+    /* --- 1. Main Two-Column Layout Stacking --- */
+    .pricing-layout {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .features-section {
+        position: static;
+        top: auto;
+        padding: 1.5rem;
+    }
+
+    .pricing-table-section {
+        width: 100%;
+    }
+
+    /* --- 2. Pricing Table Redesign (Critical Mobile Fix) --- */
+    .pricing-compact-table {
+        background: none;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .pricing-row.header {
+        display: none;
+    }
+
+    .pricing-row {
+        display: block;
+        grid-template-columns: none;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .pricing-row:last-child {
+        margin-bottom: 0;
+    }
+
+    /* FIX: Add "Tier" label and style the card header */
+    .tier-info {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: left;
+    }
+
+    .tier-info::before {
+        content: 'Tier';
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        margin-right: 0.75rem;
+    }
+
+    /* FIX: Robust grid layout for data rows to ensure alignment */
+    .tier-price,
+    .tier-docs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        padding: 0.4rem 0;
+        text-align: right; /* Aligns the value (second column) to the right */
+    }
+
+    /* FIX: Add labels and fix font sizes/spacing */
+    .tier-price::before,
+    .tier-docs::before {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+        text-align: left;
+        font-size: 1rem; /* Consistent font size */
+    }
+
+    .tier-price::before {
+        content: 'Price per Analysis';
+    }
+
+    .tier-docs::before {
+        content: 'Document Size';
+    }
+
+    /* FIX: Consistent font size for values */
+    .tier-price, .tier-price strong,
+    .tier-docs {
+        font-size: 1rem;
+    }
+
+    .pricing-notes {
+        text-align: left;
+        padding: 0;
+        margin-top: 1.5rem;
+    }
+
+    .tier-examples ul {
+        margin: 0;
+    }
+
+    /* --- 3. Grid Layouts & Spacing --- */
+    .comparison-card, .addon-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .savings-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+        right: 10px;
+        top: -10px;
+    }
+
+    .cost-comparison p {
+        text-align: left;
+    }
+
+    .pricing-cta {
+        width: 100%;
+    }
+    .founder-section {
+        grid-template-columns: 1fr; /* Stack columns */
+        gap: 2rem;
+    }
+
+    .founder-image {
+        margin-bottom: 1rem;
+    }
+
+    /* Center the title block on mobile */
+    .founder-title {
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2693,11 +2798,12 @@ html {
 }
 .form-group {
     margin-bottom: 20px;
+    text-align: left;
 }
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
     font-weight: 500;
 }
 .form-group input,

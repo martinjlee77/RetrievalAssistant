@@ -34,7 +34,7 @@
             </ul>
             <button class="mobile-menu-btn">☰</button>
             <div class="nav-auth-buttons">
-                <a href="signup.html" class="nav-cta primary">Start Risk Free</a>
+                <a href="signup.html" class="nav-cta primary">Free Trial</a>
                 <a href="login.html" class="nav-cta secondary">Log In</a>
             </div>
         </div>
@@ -244,7 +244,7 @@
                     <div class="sidebar-widget">
                         <h3>Categories</h3>
                         <ul class="category-list" aria-label="Filter blog posts by category">
-                            <li><a href="#" data-category="all">All Posts <span>(5)</span></a></li>
+                            <li><a href="#" data-category="all" class="active">All Posts <span>(5)</span></a></li>
                             <li><a href="#" data-category="asc-606">ASC 606 <span>(1)</span></a></li>
                             <li><a href="#" data-category="asc-842">ASC 842 <span>(1)</span></a></li>
                             <li><a href="#" data-category="ai-accounting">AI & Accounting <span>(1)</span></a></li>
@@ -253,7 +253,7 @@
                         </ul>
                     </div>
 
-                    <div class="sidebar-widget">
+                   <!-- <div class="sidebar-widget">
                         <h3>Subscribe to Updates</h3>
                         <p>Get the latest insights delivered to your inbox</p>
                         <form class="subscribe-form">
@@ -280,9 +280,8 @@
                     <div class="sidebar-widget">
                         <h3>Ready to Try VeritasLogic.ai?</h3>
                         <p>Experience the future of technical accounting analysis.</p>
-                        <a href="contact.html#contact-form" class="sidebar-cta">Start Risk Free</a>
-                        <p class="microcopy">14‑day first‑memo refund; pay per analysis.</p>
-                    </div>
+                        <a href="signup.html" class="sidebar-cta">Free Trial</a>
+                    </div> -->
                 </aside>
             </div>
         </div>
@@ -328,43 +327,32 @@
 
     <script src="script.js"></script>
     <script>
-        // Blog-specific functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Subscribe form handling
-            const subscribeForm = document.querySelector('.subscribe-form');
-            if (subscribeForm) {
-                subscribeForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('Thank you for subscribing! We\'ll keep you updated with the latest insights.');
-                    this.reset();
-                });
-            }
-
-            // Category filtering (functional implementation)
             const categoryLinks = document.querySelectorAll('.category-list [data-category]');
             const posts = document.querySelectorAll('.featured-post, .blog-post');
-            
-            categoryLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const category = this.getAttribute('data-category');
-                    
-                    // Remove active class from all links
-                    categoryLinks.forEach(l => l.classList.remove('active'));
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // Filter posts
-                    posts.forEach(post => {
-                        const postCategory = post.getAttribute('data-category');
-                        if (category === 'all' || postCategory === category) {
-                            post.style.display = '';
-                        } else {
-                            post.style.display = 'none';
-                        }
+
+            if (categoryLinks.length > 0 && posts.length > 0) {
+                categoryLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const category = this.getAttribute('data-category');
+
+                        // Update active class on links
+                        categoryLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+
+                        // Filter posts by adding/removing the .hidden class
+                        posts.forEach(post => {
+                            const postCategory = post.getAttribute('data-category');
+                            if (category === 'all' || postCategory === category) {
+                                post.classList.remove('hidden');
+                            } else {
+                                post.classList.add('hidden');
+                            }
+                        });
                     });
                 });
-            });
+            }
         });
     </script>
 </body>
