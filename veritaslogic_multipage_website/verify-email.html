@@ -186,9 +186,12 @@
         
         function showMessage(message, type) {
             const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${type}-message`;
+            messageDiv.textContent = message; // Safe: prevents XSS
             
-            // Scroll to top to show message
+            container.innerHTML = '';
+            container.appendChild(messageDiv);
             container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
