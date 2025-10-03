@@ -1,0 +1,75 @@
+You reached the start of the range
+Oct 3, 2025, 11:47 AM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-03 15:48:44 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-03 15:48:44 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-03 15:48:44 +0000] [1] [INFO] Using worker: sync
+[2025-10-03 15:48:44 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-03 15:48:44 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-03 15:48:44 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-03 15:48:44 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+100.64.0.2 - - [03/Oct/2025:15:48:56 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:56 +0000] "GET /api/user/profile HTTP/1.1" 200 2747 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:56 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:57 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 93 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:57 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 2276 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:57 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.3 - - [03/Oct/2025:15:48:58 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:48:59 +0000] "GET /api/stripe/config HTTP/1.1" 200 130 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:16 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:16 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.4 - - [03/Oct/2025:15:49:16 +0000] "GET /dashboard.js HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.2 - - [03/Oct/2025:15:49:16 +0000] "GET /favicon.ico HTTP/1.1" 404 207 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:16 +0000] "GET /api/user/profile HTTP/1.1" 200 2747 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:16 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:16 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 93 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:17 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 2276 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.3 - - [03/Oct/2025:15:49:17 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.3 - - [03/Oct/2025:15:49:18 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.2 - - [03/Oct/2025:15:49:26 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.2 - - [03/Oct/2025:15:49:27 +0000] "GET /api/stripe/config HTTP/1.1" 200 130 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.5 - - [03/Oct/2025:15:51:30 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.6 - - [03/Oct/2025:15:51:33 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+INFO:backend_api:Payment intent request data: {'amount': 230}
+INFO:backend_api:Received amount: 230 (type: <class 'int'>)
+INFO:backend_api:Preset amounts: [1000, 2000, 3000]
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/payment_intents
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/payment_intents response_code=200
+INFO:backend_api:Created payment intent pi_3SEBH9Rv8INdmIMm18J0lanb for user 6, amount: $230
+100.64.0.5 - - [03/Oct/2025:15:52:07 +0000] "POST /api/stripe/create-payment-intent HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+INFO:backend_api:=== WEBHOOK RECEIVED ===
+INFO:backend_api:Headers: {'Host': 'www.veritaslogic.ai', 'User-Agent': 'Stripe/1.0 (+https://stripe.com/docs/webhooks)', 'Content-Length': '2602', 'Accept': '*/*; q=0.5, application/json', 'Accept-Encoding': 'gzip, br', 'Cache-Control': 'no-cache', 'Cdn-Loop': 'cloudflare; loops=1', 'Cf-Connecting-Ip': '52.15.183.38', 'Cf-Ipcountry': 'US', 'Cf-Ray': '988d9adcdc33ab75-YYZ', 'Cf-Visitor': '{"scheme":"https"}', 'Content-Type': 'application/json; charset=utf-8', 'Stripe-Signature': 't=1759506728,v1=34654febbb0d65c9ab39ab7aedf84f7630441304ee97cfd1d87767cb594c8ec5,v0=b7da0e8489bc39948c068e7aeca8de3bfc90db6cad3f4fbc72e5e12ec208ffd7', 'X-Forwarded-For': '52.15.183.38, 172.70.50.35', 'X-Forwarded-Host': 'www.veritaslogic.ai', 'X-Forwarded-Proto': 'https', 'X-Railway-Edge': 'railway/us-east4-eqdc4a', 'X-Railway-Request-Id': 'cmlf3DsmQ0uxTjaCezItjw', 'X-Real-Ip': '172.70.50.35', 'X-Request-Start': '1759506728596'}
+INFO:backend_api:Payload size: 2602 bytes
+INFO:backend_api:Signature header present: True
+INFO:backend_api:Webhook signature verified successfully
+INFO:backend_api:Event type: payment_intent.succeeded
+INFO:backend_api:Event ID: evt_3SEBH9Rv8INdmIMm14cdCk2D
+INFO:backend_api:Processing payment_intent.succeeded event
+INFO:backend_api:Processing payment for user 6, amount: $230, payment_id: pi_3SEBH9Rv8INdmIMm18J0lanb
+INFO:backend_api:Balance update: $105.0 -> $335.0 (+ $230)
+INFO:backend_api:Updated 1 user records
+INFO:backend_api:=== WEBHOOK SUCCESS: User 6 credited $230 ===
+INFO:backend_api:=== WEBHOOK COMPLETE ===
+100.64.0.3 - - [03/Oct/2025:15:52:08 +0000] "POST /api/stripe/webhook HTTP/1.1" 200 18 "-" "Stripe/1.0 (+https://stripe.com/docs/webhooks)"
+100.64.0.7 - - [03/Oct/2025:15:52:09 +0000] "GET /api/user/profile HTTP/1.1" 200 2748 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:11 +0000] "GET /dashboard.html HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:11 +0000] "GET /api/user/profile HTTP/1.1" 200 2748 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:11 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:11 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 93 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:11 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 2276 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+100.64.0.7 - - [03/Oct/2025:15:52:12 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.7 - - [03/Oct/2025:15:52:13 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
