@@ -1,0 +1,30 @@
+You reached the start of the range
+Oct 3, 2025, 11:21 AM
+Starting Container
+Starting Flask marketing website on port: 8080
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+ * Serving Flask app 'backend_api'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.250.16.51:8080
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with watchdog (inotify)
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 102-436-931
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:24:04] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:24:05] "GET /api/user/profile HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:24:07] "GET / HTTP/1.1" 304 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:02] "GET /login.html HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:07] "POST /api/login HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:07] "GET /dashboard.html HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:07] "GET /api/user/profile HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:07] "GET /api/user/usage-stats HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:08] "GET /api/user/analysis-history HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:08] "GET /api/credit-packages HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:09] "HEAD /analysis HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:09] "GET /api/credit-packages HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.2 - - [03/Oct/2025 15:25:11] "GET /api/stripe/config HTTP/1.1" 200 -
+INFO:werkzeug:100.64.0.3 - - [03/Oct/2025 15:26:14] "GET /api/credit-packages HTTP/1.1" 200 -
