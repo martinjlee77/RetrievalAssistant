@@ -636,8 +636,8 @@ function selectCustomAmount() {
     const customAmount = document.getElementById('customAmount').value;
     const amount = parseFloat(customAmount);
     
-    if (!amount || amount < 95 || amount > 3000) {
-        alert('Please enter an amount between $95 and $3,000');
+    if (!amount || amount < 195 || amount > 3000) {
+        alert('Please enter an amount between $195 and $3,000');
         return;
     }
     
