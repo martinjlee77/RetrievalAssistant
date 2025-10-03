@@ -64,6 +64,7 @@ function showDashboard(userData) {
     document.getElementById('verificationSection').style.display = 'none';
     document.getElementById('dashboardSidebar').style.display = 'block';
     document.getElementById('dashboardMain').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'block';
     populateDashboard(userData);
     
     // Check for hash in URL to show specific section
@@ -80,6 +81,7 @@ function showVerificationRequired(userData) {
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('dashboardSidebar').style.display = 'none';
     document.getElementById('dashboardMain').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
     
     // Display obfuscated email
     const email = userData.email;
@@ -239,6 +241,7 @@ function showNetworkError() {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('dashboardSidebar').style.display = 'none';
     document.getElementById('dashboardMain').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
     document.getElementById('loginSection').style.display = 'none';
     document.getElementById('verificationSection').style.display = 'none';
     

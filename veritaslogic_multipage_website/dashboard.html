@@ -40,36 +40,6 @@
     </nav>
 
     <div class="dashboard-container pt-fixed-nav" id="dashboardContent">
-        <!-- Dashboard Sidebar -->
-        <div class="dashboard-sidebar hidden" id="dashboardSidebar">
-            <div class="sidebar-header">
-                <h3>Dashboard</h3>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#overview" class="nav-item active" onclick="showSection('overview')">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-text">Overview</span>
-                </a>
-                <a href="#credits" class="nav-item" onclick="showSection('credits')">
-                    <span class="nav-icon">💳</span>
-                    <span class="nav-text">Credits</span>
-                </a>
-                <a href="#profile" class="nav-item" onclick="showSection('profile')">
-                    <span class="nav-icon">👤</span>
-                    <span class="nav-text">Profile</span>
-                </a>
-                <a href="#history" class="nav-item" onclick="showSection('history')">
-                    <span class="nav-icon">📈</span>
-                    <span class="nav-text">History</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="/analysis" class="btn btn-primary" target="_blank">Launch Analysis</a>
-            </div>
-        </div>
-
-        <!-- Dashboard Main Content -->
-        <div class="dashboard-main hidden" id="dashboardMain">
         <!-- Loading state -->
         <div class="loading" id="loadingState">
             <p>Loading your dashboard...</p>
@@ -156,9 +126,39 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Main dashboard content -->
-        <div id="mainContent" class="hidden">
+
+        <!-- Dashboard Sidebar (shown when authenticated) -->
+        <div class="dashboard-sidebar hidden" id="dashboardSidebar">
+            <div class="sidebar-header">
+                <h3>Dashboard</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" onclick="showSection('overview')">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Overview</span>
+                </a>
+                <a href="#credits" class="nav-item" onclick="showSection('credits')">
+                    <span class="nav-icon">💳</span>
+                    <span class="nav-text">Credits</span>
+                </a>
+                <a href="#profile" class="nav-item" onclick="showSection('profile')">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">Profile</span>
+                </a>
+                <a href="#history" class="nav-item" onclick="showSection('history')">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">History</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/analysis" class="btn btn-primary" target="_blank">Launch Analysis</a>
+            </div>
+        </div>
+
+        <!-- Dashboard Main Content (shown when authenticated) -->
+        <div class="dashboard-main hidden" id="dashboardMain">
+            <!-- Main dashboard content -->
+            <div id="mainContent" class="hidden">
             <div class="dashboard-header">
                 <div class="welcome-section">
                     <h1>Welcome back, <span id="userName">User</span>!</h1>
