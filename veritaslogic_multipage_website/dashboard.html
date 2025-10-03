@@ -369,16 +369,21 @@
                         
                         <div class="form-group">
                             <label for="newPassword">New Password</label>
-                            <input type="password" id="newPassword" name="newPassword" required placeholder="Enter your new password" autocomplete="new-password">
-                            <div class="password-requirements">
-                                <small>Password must contain at least:</small>
-                                <ul>
-                                    <li id="req-length">8 characters</li>
-                                    <li id="req-uppercase">One uppercase letter</li>
-                                    <li id="req-lowercase">One lowercase letter</li>
-                                    <li id="req-number">One number</li>
-                                    <li id="req-special">One special character</li>
-                                </ul>
+                            <div class="password-wrapper">
+                                <input type="password" id="newPassword" name="newPassword" required placeholder="Enter your new password" autocomplete="new-password">
+                                <div class="password-helper">
+                                    <span class="password-helper-icon">?</span>
+                                    <div class="password-tooltip">
+                                        <small>Password must contain at least:</small>
+                                        <ul>
+                                            <li id="req-length">8 characters</li>
+                                            <li id="req-uppercase">One uppercase letter</li>
+                                            <li id="req-lowercase">One lowercase letter</li>
+                                            <li id="req-number">One number</li>
+                                            <li id="req-special">One special character</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
