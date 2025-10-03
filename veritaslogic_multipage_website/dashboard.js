@@ -522,10 +522,15 @@ async function loadCreditPackages() {
         
         // Use event delegation for better reliability
         container.onclick = function(e) {
+            console.log('Container clicked!', e.target);
             const packageEl = e.target.closest('.credit-package');
+            console.log('Closest package element:', packageEl);
             if (packageEl && packageEl.hasAttribute('data-amount')) {
                 const amount = parseInt(packageEl.getAttribute('data-amount'));
+                console.log('Calling selectPackage with amount:', amount);
                 selectPackage(amount);
+            } else {
+                console.log('No package element found or no data-amount attribute');
             }
         };
         
@@ -562,10 +567,15 @@ function showFallbackPackages() {
     
     // Use event delegation for better reliability
     container.onclick = function(e) {
+        console.log('Fallback container clicked!', e.target);
         const packageEl = e.target.closest('.credit-package');
+        console.log('Fallback closest package element:', packageEl);
         if (packageEl && packageEl.hasAttribute('data-amount')) {
             const amount = parseInt(packageEl.getAttribute('data-amount'));
+            console.log('Fallback calling selectPackage with amount:', amount);
             selectPackage(amount);
+        } else {
+            console.log('Fallback: No package element found or no data-amount attribute');
         }
     };
 }
