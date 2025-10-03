@@ -1181,6 +1181,9 @@ window.cancelPayment = cancelPayment;
 window.submitProfileUpdate = submitProfileUpdate;
 window.showSection = showSection;
 window.handleAuthButton = handleAuthButton;
+window.logout = logout;
+window.resendVerification = resendVerification;
+window.checkVerificationStatus = checkVerificationStatus;
 
 // Initialize payment form handler
 setTimeout(() => {
