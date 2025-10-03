@@ -3815,12 +3815,46 @@ a:focus {
     .dashboard-sidebar {
         width: 100%;
         height: auto;
-        position: static;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        z-index: 100;
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        flex-direction: row;
+    }
+    .sidebar-header,
+    .sidebar-footer {
+        display: none; /* Hide on mobile for cleaner horizontal nav */
+    }
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        padding: 0;
+    }
+    .nav-item {
+        flex: 1;
+        justify-content: center;
+        padding: 0.75rem 0.5rem;
+        border-left: none;
+        border-bottom: 4px solid transparent;
+    }
+    .nav-item.active {
+        border-bottom-color: #ffffff;
+        border-left-color: transparent;
+    }
+    .nav-text {
+        display: none; /* Show icons only on mobile */
+    }
+    .nav-icon {
+        font-size: 1.5rem;
     }
     .dashboard-main {
         margin-left: 0;
+        padding-top: 80px; /* Account for fixed top nav */
     }
     .dashboard-container {
         flex-direction: column;
@@ -3828,23 +3862,8 @@ a:focus {
     .profile-grid {
         grid-template-columns: 1fr;
     }
-    .sidebar-nav {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 0;
-    }
-    .nav-item {
-        flex: 1;
-        min-width: 120px;
-        justify-content: center;
-        padding: 1rem;
-        border-left: none;
-        border-bottom: 3px solid transparent;
-    }
-    .nav-item.active {
-        border-bottom-color: #ffffff;
-        border-left-color: transparent;
+    .dashboard-grid {
+        grid-template-columns: 1fr;
     }
 }
 /* Enhanced Button Styling for Dashboard */
