@@ -66,7 +66,7 @@
     --space-section: 100px;
     --space-section-sm: 80px;
     --space-section-lg: 120px;
-    --space-content: 4rem;
+    --space-content: 4rem;f
     --space-header: 2rem;
     /* Typography */
     --font-size-h1: 3rem;
@@ -1263,6 +1263,8 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s ease;
     border: 1px solid transparent;
     cursor: pointer;
+    gap: 0.5rem;
+    font-family: inherit;
 }
 .btn--primary {
     background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
@@ -2199,21 +2201,15 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1rem;
     opacity: 0.9;
 }
-/* Sidebar Launch Analysis Button - Make it white */
+/* --- Dashboard Sidebar Footer Button --- */
 .sidebar-footer {
-    margin-top: auto;
-    padding: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto; /* This pushes the footer to the bottom */
 }
-.sidebar-footer a {
-    color: #ffffff !important;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-}
-.sidebar-footer a:hover {
-    color: #cbd5e0 !important;
-    text-decoration: underline;
+
+.sidebar-footer .btn {
+    width: 100%; /* Make the button take the full width of the sidebar */
 }
 /* Cancel Button Styling */
 .btn.btn-secondary[onclick*="cancelPayment"] {
@@ -3010,25 +3006,24 @@ html {
     background: #f7fafc;
 }
 .dashboard-header {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
+    /* We removed background, padding, border-radius, and box-shadow */
+    /* All that's left is spacing for below the header */
+    margin-bottom: 1rem;
+    padding-left: 2rem;
 }
+
 .welcome-section h1 {
-    color: #2c3e50;
-    margin-bottom: 5px;
-    font-size: 2rem;
+    /* Change the text color to white */
+    color: #ffffff;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem; /* Add a little space above the sub-text */
 }
+
 .welcome-section p {
-    color: #666;
+    /* Change the text color to a semi-transparent white for a softer look */
+    color: rgba(255, 255, 255, 0.8);
     margin: 0;
+    font-size: 1.1rem;
 }
 .dashboard-grid {
     display: grid;
@@ -3061,7 +3056,7 @@ html {
     font-weight: 600;
 }
 .credits-display {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #212F3C;
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -3075,6 +3070,7 @@ html {
 .credits-display .label {
     opacity: 0.9;
     font-weight: 500;
+    color: #9f9d9d;
 }
 .usage-stats {
     display: grid;
@@ -3085,17 +3081,17 @@ html {
 .stat-item {
     text-align: center;
     padding: 15px;
-    background: #f8fafc;
+    background: #212f3c;
     border-radius: 8px;
 }
 .stat-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: #ffffff;
     margin-bottom: 5px;
 }
 .stat-label {
-    color: #666;
+    color: #9f9d9d;
     font-size: 0.9rem;
 }
 .recent-analyses .empty-state {
@@ -3152,91 +3148,89 @@ html {
     min-height: 200px;
     color: #666;
 }
-/* Dashboard Inline Login Form */
+
+/* --- Dashboard Inline Login Form (Unified Dark Theme) --- */
 .login-form-container {
+    /* This is the key fix for centering */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 60vh;
-    padding: 40px 20px;
+    width: 100%;
+    min-height: calc(100vh - 120px); /* Fill the vertical space */
+    padding: 2rem;
 }
+
 .login-form {
-    background: white;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    /* Style the form itself to match the dark theme */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2.5rem;
     max-width: 500px;
     width: 100%;
+    text-align: center;
 }
+
 .login-form h2 {
-    color: #2c3e50;
-    margin-bottom: 15px;
+    color: #ffffff;
     font-size: 1.8rem;
+    margin-bottom: 1rem;
 }
+
 .login-form p {
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
 }
+
+/* Use the standard .form-group styles for consistency */
 .login-form .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
     text-align: left;
 }
+
 .login-form .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #2c3e50;
-    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
 }
+
+/* Use the standard dark input styles */
 .login-form .form-group input {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ffffff;
     width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e1e8ed;
+    padding: 0.85rem 1rem;
     border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
+    font-size: 1rem;
 }
+
 .login-form .form-group input:focus {
-    outline: none;
-    border-color: #667eea;
+    background: #ffffff;
+    color: #2c3e50;
+    border-color: rgba(255,255,255,0.6);
 }
-.login-form .btn {
+
+/* Use the standard .form-submit class for the button */
+.login-form .form-submit {
     width: 100%;
-    padding: 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 20px;
 }
-.login-form .btn-primary {
-    background: #667eea;
-    color: white;
-}
-.login-form .btn-primary:hover:not(:disabled) {
-    background: #5a67d8;
-}
-.login-form .btn-primary:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-}
+
 .login-links {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #e1e8ed;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.login-links p {
+    margin: 0.5rem 0;
+    color: rgba(255, 255, 255, 0.7);
+}
+
 .login-links a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 500;
-}
-.login-links a:hover {
+    color: #ffffff;
+    font-weight: 600;
     text-decoration: underline;
+    text-underline-offset: 4px;
 }
 /* Network Error */
 .network-error {
@@ -3627,6 +3621,7 @@ a:focus {
     border-left: 3px solid transparent;
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
+    gap: 0.5rem;
 }
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -3639,8 +3634,19 @@ a:focus {
     border-left-color: #ffffff;
 }
 .nav-icon {
-    margin-right: 0.75rem;
-    font-size: 1.2rem;
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }
 .nav-text {
     font-size: 0.95rem;
@@ -3700,6 +3706,13 @@ a:focus {
     margin-bottom: 1.5rem;
     font-weight: 700;
 }
+
+/* --- Dashboard Card Button Layout --- */
+.balance-card .btn {
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;
@@ -4298,9 +4311,13 @@ a:focus {
 
 /* Platform Status Styles */
 .platform-status-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
 }
 
 .platform-status {
@@ -4308,6 +4325,10 @@ a:focus {
     flex-direction: column;
     gap: 1rem;
     margin: 1.5rem 0;
+}
+
+.platform-status-card h2 {
+    color: #ffffff;
 }
 
 .status-item {

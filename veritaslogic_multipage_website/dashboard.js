@@ -3,6 +3,26 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
 });
 
+// Update auth button in navbar based on authentication state
+function updateAuthButton(isAuthenticated) {
+    const authButton = document.getElementById('authButton');
+    if (authButton) {
+        authButton.textContent = isAuthenticated ? 'Log Out' : 'Log In';
+    }
+}
+
+// Handle auth button clicks
+function handleAuthButton() {
+    const token = localStorage.getItem('authToken');
+    if (token && token !== 'null' && token !== 'undefined') {
+        // User is logged in - log them out
+        logout();
+    } else {
+        // User is not logged in - redirect to login page
+        window.location.href = '/login.html';
+    }
+}
+
 async function initializeDashboard() {
     console.log('Dashboard initializing...');
     const token = localStorage.getItem('authToken');
@@ -52,6 +72,9 @@ function showLoginForm() {
     
     // Show login form
     document.getElementById('loginSection').classList.remove('hidden');
+    
+    // Update navbar button to show "Log In"
+    updateAuthButton(false);
 }
 
 function showDashboard(userData) {
@@ -70,6 +93,10 @@ function showDashboard(userData) {
     document.getElementById('dashboardSidebar').classList.remove('hidden');
     document.getElementById('dashboardMain').classList.remove('hidden');
     document.getElementById('mainContent').classList.remove('hidden');
+    
+    // Update navbar button to show "Log Out"
+    updateAuthButton(true);
+    
     populateDashboard(userData);
     
     // Check for hash in URL to show specific section
@@ -90,6 +117,9 @@ function showVerificationRequired(userData) {
     if (document.getElementById('mainContent')) {
         document.getElementById('mainContent').classList.add('hidden');
     }
+    
+    // Update navbar button to show "Log Out" (user is authenticated, just needs verification)
+    updateAuthButton(true);
     
     // Display obfuscated email
     const email = userData.email;
@@ -373,7 +403,7 @@ async function populateDashboard(userData) {
     
     // Update credits display
     const paidCredits = parseFloat(userData.credits_balance || 0);
-    document.getElementById('creditsBalance').textContent = `$${paidCredits.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    document.getElementById('creditsBalance').textContent = `$${paidCredits.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
     
     // Load usage statistics
     await loadUsageStatistics();
@@ -420,7 +450,7 @@ async function loadUsageStatistics() {
                 // Update usage statistics
                 totalAnalysesEl.textContent = data.stats.total_analyses;
                 thisMonthEl.textContent = data.stats.analyses_this_month;
-                totalSpentEl.textContent = `$${Math.abs(data.stats.total_spent).toFixed(2)}`;
+                totalSpentEl.textContent = `$${Math.abs(data.stats.total_spent).toFixed(0)}`;
             }
         } else {
             console.error('Failed to load usage statistics');
