@@ -379,6 +379,15 @@ async function populateDashboard(userData) {
 }
 
 async function loadUsageStatistics() {
+    const totalAnalysesEl = document.getElementById('totalAnalyses');
+    const thisMonthEl = document.getElementById('thisMonth');
+    const totalSpentEl = document.getElementById('totalSpent');
+    
+    // Show loading state
+    totalAnalysesEl.textContent = '...';
+    thisMonthEl.textContent = '...';
+    totalSpentEl.textContent = '...';
+    
     try {
         const token = localStorage.getItem('authToken');
         const response = await fetch('/api/user/usage-stats', {
@@ -392,19 +401,30 @@ async function loadUsageStatistics() {
             const data = await response.json();
             if (data.success) {
                 // Update usage statistics
-                document.getElementById('totalAnalyses').textContent = data.stats.total_analyses;
-                document.getElementById('thisMonth').textContent = data.stats.analyses_this_month;
-                document.getElementById('totalSpent').textContent = `$${Math.abs(data.stats.total_spent).toFixed(2)}`;
+                totalAnalysesEl.textContent = data.stats.total_analyses;
+                thisMonthEl.textContent = data.stats.analyses_this_month;
+                totalSpentEl.textContent = `$${Math.abs(data.stats.total_spent).toFixed(2)}`;
             }
         } else {
             console.error('Failed to load usage statistics');
+            totalAnalysesEl.textContent = '0';
+            thisMonthEl.textContent = '0';
+            totalSpentEl.textContent = '$0';
         }
     } catch (error) {
         console.error('Error loading usage statistics:', error);
+        totalAnalysesEl.textContent = '0';
+        thisMonthEl.textContent = '0';
+        totalSpentEl.textContent = '$0';
     }
 }
 
 async function loadAnalysisHistory() {
+    const container = document.getElementById('recentAnalysesList');
+    
+    // Show loading state
+    container.innerHTML = '<div class="loading-history"><p>Loading analysis history...</p></div>';
+    
     try {
         const token = localStorage.getItem('authToken');
         const response = await fetch('/api/user/analysis-history', {
@@ -421,9 +441,13 @@ async function loadAnalysisHistory() {
             }
         } else {
             console.error('Failed to load analysis history');
+            // Show empty state on error
+            container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-primary" target="_blank">Run Your First Analysis</a></div>';
         }
     } catch (error) {
         console.error('Error loading analysis history:', error);
+        // Show empty state on error
+        container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-primary" target="_blank">Run Your First Analysis</a></div>';
     }
 }
 
