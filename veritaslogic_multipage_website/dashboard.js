@@ -44,16 +44,20 @@ async function initializeDashboard() {
 }
 
 function showLoginForm() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('dashboardSidebar').style.display = 'none';
-    document.getElementById('dashboardMain').style.display = 'none';
-    document.getElementById('verificationSection').style.display = 'none';
-    document.getElementById('loginSection').style.display = 'block';
+    // Hide all other sections
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('dashboardSidebar').classList.add('hidden');
+    document.getElementById('dashboardMain').classList.add('hidden');
+    document.getElementById('verificationSection').classList.add('hidden');
+    
+    // Show login form
+    document.getElementById('loginSection').classList.remove('hidden');
 }
 
 function showDashboard(userData) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('loginSection').style.display = 'none';
+    // Hide loading and login
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('loginSection').classList.add('hidden');
     
     // Check email verification status
     if (!userData.email_verified) {
@@ -61,10 +65,11 @@ function showDashboard(userData) {
         return;
     }
     
-    document.getElementById('verificationSection').style.display = 'none';
-    document.getElementById('dashboardSidebar').style.display = 'block';
-    document.getElementById('dashboardMain').style.display = 'block';
-    document.getElementById('mainContent').style.display = 'block';
+    // Hide verification, show dashboard
+    document.getElementById('verificationSection').classList.add('hidden');
+    document.getElementById('dashboardSidebar').classList.remove('hidden');
+    document.getElementById('dashboardMain').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('hidden');
     populateDashboard(userData);
     
     // Check for hash in URL to show specific section
@@ -77,11 +82,14 @@ function showDashboard(userData) {
 }
 
 function showVerificationRequired(userData) {
-    document.getElementById('verificationSection').style.display = 'block';
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('dashboardSidebar').style.display = 'none';
-    document.getElementById('dashboardMain').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'none';
+    // Show verification section, hide everything else
+    document.getElementById('verificationSection').classList.remove('hidden');
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('dashboardSidebar').classList.add('hidden');
+    document.getElementById('dashboardMain').classList.add('hidden');
+    if (document.getElementById('mainContent')) {
+        document.getElementById('mainContent').classList.add('hidden');
+    }
     
     // Display obfuscated email
     const email = userData.email;
@@ -238,12 +246,15 @@ window.addEventListener('beforeunload', () => {
 });
 
 function showNetworkError() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('dashboardSidebar').style.display = 'none';
-    document.getElementById('dashboardMain').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('verificationSection').style.display = 'none';
+    // Hide all sections
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('dashboardSidebar').classList.add('hidden');
+    document.getElementById('dashboardMain').classList.add('hidden');
+    if (document.getElementById('mainContent')) {
+        document.getElementById('mainContent').classList.add('hidden');
+    }
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('verificationSection').classList.add('hidden');
     
     const errorContainer = document.createElement('div');
     errorContainer.className = 'network-error-container';
