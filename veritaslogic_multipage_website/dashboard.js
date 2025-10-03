@@ -1174,6 +1174,14 @@ function initializePlatformStatus() {
 // Call platform status check after dashboard is loaded
 setTimeout(initializePlatformStatus, 2000);
 
+// Expose functions to global scope for inline onclick handlers
+window.selectCustomAmount = selectCustomAmount;
+window.selectPackage = selectPackage;
+window.cancelPayment = cancelPayment;
+window.submitProfileUpdate = submitProfileUpdate;
+window.showSection = showSection;
+window.handleAuthButton = handleAuthButton;
+
 // Initialize payment form handler
 setTimeout(() => {
     const paymentForm = document.getElementById('payment-form');
