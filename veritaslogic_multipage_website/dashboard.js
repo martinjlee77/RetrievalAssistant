@@ -511,7 +511,7 @@ async function loadCreditPackages() {
         packages.forEach(pkg => {
             const packageEl = document.createElement('div');
             packageEl.className = 'credit-package';
-            packageEl.onclick = () => selectPackage(pkg.amount);
+            packageEl.setAttribute('data-amount', pkg.amount);
             
             packageEl.innerHTML = `
                 <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
@@ -519,6 +519,15 @@ async function loadCreditPackages() {
             `;
             container.appendChild(packageEl);
         });
+        
+        // Use event delegation for better reliability
+        container.onclick = function(e) {
+            const packageEl = e.target.closest('.credit-package');
+            if (packageEl && packageEl.hasAttribute('data-amount')) {
+                const amount = parseInt(packageEl.getAttribute('data-amount'));
+                selectPackage(amount);
+            }
+        };
         
     } catch (error) {
         console.error('Failed to load credit packages:', error);
@@ -542,7 +551,7 @@ function showFallbackPackages() {
     packages.forEach(pkg => {
         const packageEl = document.createElement('div');
         packageEl.className = 'credit-package';
-        packageEl.onclick = () => selectPackage(pkg.amount);
+        packageEl.setAttribute('data-amount', pkg.amount);
         
         packageEl.innerHTML = `
             <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
@@ -551,7 +560,14 @@ function showFallbackPackages() {
         container.appendChild(packageEl);
     });
     
-    // Remove hardcoded packages - use dynamic loading above
+    // Use event delegation for better reliability
+    container.onclick = function(e) {
+        const packageEl = e.target.closest('.credit-package');
+        if (packageEl && packageEl.hasAttribute('data-amount')) {
+            const amount = parseInt(packageEl.getAttribute('data-amount'));
+            selectPackage(amount);
+        }
+    };
 }
 
 function loadRecentAnalyses(analyses) {
