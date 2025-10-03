@@ -65,7 +65,7 @@
                 
                 <div class="form-links">
                     <p><a href="forgot-password.html">Forgot your password?</a></p>
-                    <p>Don't have an account? <a href="signup.html">Sign up uere</a></p>
+                    <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
                     <p>Need help? <a href="contact.html">Contact support</a></p>
                     <p><a href="/">← Back to homepage</a></p>
                 </div>
@@ -83,10 +83,11 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Product</h4>
-                    <a href="about.html">About Us</a>
-                    <a href="blog.html">Blog</a>
-                    <a href="contact.html">Contact</a>
+                    <h4>Platform</h4>
+                    <a href="features.html">Features</a>
+                    <a href="pricing.html">Pricing</a>
+                    <a href="contact.html">Demo</a>
+                    <a href="signup.html">Free Trial</a>
                 </div>
                 
                 <div class="footer-section">
@@ -142,7 +143,6 @@
             // Show loading state
             submitButton.disabled = true;
             submitButton.textContent = 'Signing In...';
-            form.classList.add('loading');
             
             let succeeded = false;
             
@@ -160,15 +160,10 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    succeeded = true;
+                    succeeded = true
                     localStorage.setItem('authToken', result.token);
                     localStorage.setItem('userData', JSON.stringify(result.user));
-                    submitButton.disabled = true;
-                    submitButton.textContent = 'Redirecting...';
-                    showMessage('Login successful! Redirecting to dashboard...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1000);
+                    window.location.href = 'dashboard.html';
                     
                 } else {
                     // Use generic message to avoid revealing whether an account exists
@@ -187,7 +182,6 @@
                 if (!succeeded) {
                     submitButton.disabled = false;
                     submitButton.textContent = 'Sign In';
-                    form.classList.remove('loading');
                 }
             }
         });
