@@ -1131,7 +1131,7 @@ async function checkPlatformStatus() {
             if (statusDot) statusDot.className = 'status-dot online';
             if (launchBtn) {
                 launchBtn.disabled = false;
-                launchBtn.innerHTML = '🚀 Launch Analysis Platform';
+                launchBtn.innerHTML = '<span class="nav-icon">auto_awesome</span> Click Here to Start Analysis';
             }
             
             // Update navigation status

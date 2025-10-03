@@ -3150,21 +3150,14 @@ html {
 }
 
 /* --- Dashboard Inline Login Form (Unified Dark Theme) --- */
-#loginSection {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 80px);
-}
-
 .login-form-container {
+    /* This is the key fix for centering */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
-    max-width: 1200px;
+    min-height: calc(100vh - 120px); /* Fill the vertical space */
     padding: 2rem;
 }
 
@@ -4412,6 +4405,47 @@ a:focus {
 .platform-launch-btn:not(:disabled):hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+/* --- Support Card Styles --- */
+
+.support-card {
+    /* This horizontally centers the text content inside the card */
+    text-align: left;
+}
+
+.support-card h2 {
+    /* This fixes the vertical alignment and color of the header */
+    display: flex;
+    align-items: left;
+    justify-content: left; /* Centers the icon and text as a group */
+    gap: 0.75rem; /* Space between icon and text */
+    color: #ffffff; /* Ensures the header text is white */
+}
+
+.support-content {
+    /* Adds some space below the header */
+    margin-top: 1rem;
+}
+
+.support-content p {
+    /* Styles the main paragraph text */
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.support-content a {
+    /* Styles the email link to be prominent and clear */
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.2s ease;
+}
+
+.support-content a:hover {
+    /* Adds a subtle hover effect to the link */
+    color: #a7c5ff;
 }
 
 /* Enhanced Quick Actions */
