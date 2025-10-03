@@ -60,6 +60,45 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern for financial amounts, ensuring accuracy by using Python for calculations after AI extraction.
 - **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards.
 
+## Deployment & Production Configuration
+
+### Railway Production Deployment
+The application is deployed to Railway using a custom `start.sh` script for production configuration.
+
+**Critical File: `start.sh`**
+- Railway automatically executes `start.sh` for deployment (takes precedence over Procfile/nixpacks.toml)
+- Production server: Uses **Gunicorn** (production WSGI server) instead of Flask's development server
+- Configuration: 4 workers, binds to Railway's `$PORT` environment variable (default: 8080)
+- Access/error logs: Streamed to Railway console for monitoring
+
+**Common Issue - Development Server Warning:**
+```
+WARNING: This is a development server. Do not use it in a production deployment.
+```
+
+**Root Cause:** If you see this warning in Railway logs, check `start.sh` - it's likely calling `python backend_api.py` instead of `gunicorn backend_api:app`
+
+**Solution:**
+```bash
+# start.sh should contain:
+exec gunicorn backend_api:app --bind 0.0.0.0:$PORT --workers 4 --access-logfile - --error-logfile -
+
+# NOT:
+exec python backend_api.py --port "$PORT"  # ❌ This uses Flask dev server
+```
+
+**Deployment Checklist:**
+1. Verify `start.sh` uses Gunicorn command
+2. Ensure `gunicorn` is in `requirements.txt`
+3. Push changes to trigger Railway auto-deployment
+4. Check logs for "Starting gunicorn" instead of "Werkzeug WARNING"
+
+**File Priority on Railway:**
+1. `start.sh` (if present) ← **Always checked first**
+2. Custom Start Command (in Railway settings)
+3. `nixpacks.toml`
+4. `Procfile` (legacy, not used by Railway's Nixpacks)
+
 ## External Dependencies
 - **Streamlit**: Web application framework.
 - **pandas**: Data manipulation and analysis.

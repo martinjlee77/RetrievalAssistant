@@ -937,6 +937,7 @@ async function initializeStripe() {
 
 
 async function selectPackage(amount) {
+    console.log('selectPackage called with amount:', amount);
     selectedAmount = amount;
     
     document.getElementById('selectedPackageDisplay').innerHTML = `
@@ -946,7 +947,10 @@ async function selectPackage(amount) {
         </div>
     `;
     
-    document.getElementById('paymentFormContainer').style.display = 'block';
+    // Remove the 'hidden' class instead of trying to override with inline style
+    const paymentContainer = document.getElementById('paymentFormContainer');
+    paymentContainer.classList.remove('hidden');
+    console.log('Payment form container shown');
     
     // Initialize Stripe if not already done
     if (!stripe) {
@@ -964,11 +968,13 @@ async function selectPackage(amount) {
             showPaymentMessage('Failed to load payment form', 'error');
         }
     }
+    
+    // Scroll to payment form
+    paymentContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function cancelPayment() {
-    document.getElementById('paymentFormContainer').style.display = 'none';
-    document.getElementById('creditPurchaseSection').style.display = 'none';
+    document.getElementById('paymentFormContainer').classList.add('hidden');
     selectedAmount = 0;
 }
 
