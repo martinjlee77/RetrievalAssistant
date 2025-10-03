@@ -45,7 +45,9 @@ async function initializeDashboard() {
 
 function showLoginForm() {
     document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('dashboardSidebar').style.display = 'none';
+    document.getElementById('dashboardMain').style.display = 'none';
+    document.getElementById('verificationSection').style.display = 'none';
     document.getElementById('loginSection').style.display = 'block';
 }
 
@@ -60,7 +62,6 @@ function showDashboard(userData) {
     }
     
     document.getElementById('verificationSection').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
     document.getElementById('dashboardSidebar').style.display = 'block';
     document.getElementById('dashboardMain').style.display = 'block';
     populateDashboard(userData);
@@ -76,7 +77,7 @@ function showDashboard(userData) {
 
 function showVerificationRequired(userData) {
     document.getElementById('verificationSection').style.display = 'block';
-    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('loginSection').style.display = 'none';
     document.getElementById('dashboardSidebar').style.display = 'none';
     document.getElementById('dashboardMain').style.display = 'none';
     
@@ -236,8 +237,10 @@ window.addEventListener('beforeunload', () => {
 
 function showNetworkError() {
     document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('dashboardSidebar').style.display = 'none';
+    document.getElementById('dashboardMain').style.display = 'none';
     document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('verificationSection').style.display = 'none';
     
     const errorContainer = document.createElement('div');
     errorContainer.className = 'network-error-container';
