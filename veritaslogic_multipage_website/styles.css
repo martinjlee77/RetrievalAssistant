@@ -2148,42 +2148,32 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 0 0.5rem 0;
     color: #2c3e50;
 }
-/* Analysis Table Styling */
+
+/* --- Analysis History Table (Unified Dark Theme) --- */
 .analysis-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 1rem;
+    color: #ffffff; /* Default text color for the whole table */
 }
+
 .analysis-table th,
 .analysis-table td {
-    padding: 12px;
+    padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Use a subtle transparent border */
 }
+
 .analysis-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #333;
-    border-bottom: 2px solid #dee2e6;
-}
-.analysis-table tr:hover {
-    background-color: #f8f9fa;
-}
-.analysis-table {
+    background-color: rgba(255, 255, 255, 0.1); /* Header background */
+    font-weight: 500;
     color: #ffffff;
 }
-.analysis-table th {
-    background-color: #2d3748;
-    color: #ffffff;
-    border-bottom: 2px solid #4a5568;
+
+
+.analysis-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
-.analysis-table td {
-    color: #ffffff;
-    border-bottom: 1px solid #4a5568;
-}
-.analysis-table tr:hover {
-    background-color: #2d3748;
-}
+
 /* Credit Package Styling */
 .credit-package:hover {
     background: #2d3748;
@@ -3700,11 +3690,18 @@ a:focus {
     text-align: center;
 }
 .balance-card h2, .stats-card h2, .actions-card h2,
-.credit-purchase-card h3, .profile-info-card h3, .password-card h3 {
+.credit-purchase-card h3, .credit-purchase-card h2, .profile-info-card h3, .password-card h3 {
     font-family: 'Playfair Display', serif;
     color: #ffffff;
     margin-bottom: 1.5rem;
     font-weight: 700;
+}
+
+.credit-purchase-card h2 {
+    font-size: 2rem;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
 }
 
 /* --- Dashboard Card Button Layout --- */
@@ -3775,6 +3772,7 @@ a:focus {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
+    text-align: center;
 }
 .credit-package:hover {
     background: rgba(255, 255, 255, 0.15);
@@ -3784,6 +3782,27 @@ a:focus {
 .credit-package.selected {
     background: rgba(255, 255, 255, 0.2);
     border-color: #ffffff;
+}
+
+/* --- Add Credits Page Redesign --- */
+
+/* 2. Style the new introductory paragraph */
+.credits-policy-intro {
+    text-align: center; /* Center the intro text */
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px; /* Keep the line length readable */
+    margin: 0 auto 3rem auto; /* Center the block and add space below it */
+    line-height: 1.7;
+}
+
+/* 3. Style the subheadings ("Credit Packages", "Custom Amount") consistently */
+.credit-purchase-card h3 {
+    font-size: 1.5rem;
+    color: #ffffff;
+    font-weight: 600;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Add a separator line */
 }
 /* Profile Fields */
 .profile-fields {
@@ -3805,6 +3824,61 @@ a:focus {
 .field-value {
     color: #ffffff;
     font-weight: 600;
+}
+/* --- Profile Page Redesign --- */
+
+/* 1. Style the new main title and intro paragraph */
+.profile-main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+
+    text-align: center; /* CHANGE THIS to center */
+}
+
+.profile-intro {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 600px; /* Add a max-width for readability */
+
+    /* Center the block itself and add space below */
+    margin: 0 auto 2.5rem auto; 
+
+    text-align: center; /* CHANGE THIS to center */
+}
+
+/* 2. Style the card subheadings ("Account Information", "Change Password") */
+.profile-info-card h3,
+.password-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-top: 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- History Page Redesign --- */
+
+.history-main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center; 
+}
+
+.history-intro {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 0 auto 2.5rem auto; 
+    text-align: center;
 }
 /* Payment Form Enhancements */
 .payment-form-container {

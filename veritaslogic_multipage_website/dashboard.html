@@ -263,25 +263,23 @@
                 </div>
             </div>
 
-            <!-- Credits Section -->
-            <div id="creditsSection" class="dashboard-section">
-                <div class="section-header">
-                    <h2>💳 Manage Credits</h2>
-                    <p>Add credits to your account to continue using our analysis platform.</p>
-                    <p class="credits-policy"><strong>Credits expire 12 months from purchase</strong> and are automatically deducted per analysis based on document size. Payments are processed securely via Stripe.</p>
-                </div>
-            
-                <div class="card credit-purchase-card">
-                    <h3>💳 Credit Packages</h3>
-                    <div class="credit-packages" id="creditPackages">
-                        <!-- Credit packages will be loaded here -->
-                        <div class="loading-packages">Loading packages...</div>
-                    </div>
+                <!-- Credits Section -->
+                <div id="creditsSection" class="dashboard-section">
+
+                    <div class="card credit-purchase-card">
+                        <h2>Add Credits to Your Account</h2>
+
+                        <p class="credits-policy-intro">Select a package or enter a custom amount. Credits expire 12 months from purchase and are processed securely by Stripe.</p>
+
+                        <h3>Credit Packages</h3>
+                        <div class="credit-packages" id="creditPackages">
+                            <div class="loading-packages">Loading packages...</div>
+                        </div>
                     
-                    <h3>✏️ Custom Amount</h3>
+                    <h3>Custom Amount</h3>
                     <div class="custom-amount-section">
                         <div class="custom-amount-input">
-                            <label for="customAmount">Enter amount ($95 - $3,000):</label>
+                            <label for="customAmount">Enter amount ($195 - $3,000):</label>
                             <div class="amount-input-group">
                                 <span class="currency-symbol">$</span>
                                 <input type="number" id="customAmount" min="195" max="3000" step="1" placeholder="1000">
@@ -314,14 +312,12 @@
 
             <!-- Profile Section -->
             <div id="profileSection" class="dashboard-section">
-                <div class="section-header">
-                    <h2>👤 Profile Information</h2>
-                    <p>Manage your account settings and security.</p>
-                </div>
-            
+                <h2 class="profile-main-title">Profile & Security</h2>
+                <p class="profile-intro">Manage your account settings and update your password.</p>
+
                 <div class="profile-grid">
                     <div class="card profile-info-card">
-                        <h3>📧 Account Information</h3>
+                        <h3>Account Information</h3>
                         <div class="profile-fields">
                             <div class="profile-field">
                                 <span class="field-label">First Name:</span>
@@ -351,7 +347,7 @@
                         
                         <!-- Edit Profile Section -->
                         <div class="edit-profile-section">
-                            <h4>✏️ Edit Name</h4>
+                            <h4>Edit Name</h4>
                             <div id="editProfileMessage" aria-live="polite"></div>
                             <form id="editProfileForm" class="mt-md" onsubmit="submitProfileUpdate(event)">
                                 <div class="form-group">
@@ -373,7 +369,7 @@
 
                     <div class="card password-card">
                 
-                        <h3>🔐 Change Password</h3>
+                        <h3>Change Password</h3>
                     <div id="changePasswordMessage" aria-live="polite"></div>
                     <form id="changePasswordForm" class="mt-md">
                         <div class="form-group">
@@ -418,10 +414,9 @@
 
             <!-- History Section -->
             <div id="historySection" class="dashboard-section">
-                <div class="section-header">
-                    <h2>📈 Analysis History</h2>
-                    <p>View your recent analyses and download reports.</p>
-                </div>
+                <h2 class="history-main-title">Analysis History</h2>
+                <p class="history-intro">View your recent analyses.</p>
+
                 
                 <div class="card history-card">
                     <div id="recentAnalysesList" class="recent-analyses">
