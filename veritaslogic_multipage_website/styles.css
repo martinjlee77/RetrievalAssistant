@@ -4140,3 +4140,421 @@ a:focus {
 .verification-actions {
     text-align: center;
 }
+/* ================================
+   Dashboard Styles
+   ================================ */
+
+/* Verification Section Styles */
+.verification-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+.verification-card {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border-radius: 16px;
+    padding: 3rem;
+    max-width: 600px;
+    width: 100%;
+    color: white;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.verification-header h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.verification-header p {
+    margin: 0 0 2rem 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.email-display {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.email-label {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+}
+
+.email-address {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fbbf24;
+}
+
+.verification-instructions {
+    margin: 2rem 0;
+}
+
+.verification-instructions h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+}
+
+.verification-instructions ol {
+    padding-left: 1.5rem;
+}
+
+.verification-instructions li {
+    margin: 0.75rem 0;
+    line-height: 1.6;
+}
+
+.verification-actions {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.verification-actions .btn {
+    flex: 1;
+    min-width: 200px;
+}
+
+.verification-help {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.verification-help h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+}
+
+.verification-help ul {
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.verification-help li {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.verification-message {
+    margin: 1rem 0;
+    min-height: 1.5rem;
+}
+
+.success-message {
+    background-color: #10b981;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.error-message {
+    background-color: #ef4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.info-message {
+    background-color: #3b82f6;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* Platform Status Styles */
+.platform-status-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.platform-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.online {
+    background: #4ade80;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.checking {
+    background: #fbbf24;
+    animation: pulse 1s infinite;
+}
+
+.status-dot.offline {
+    background: #ef4444;
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.status-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.platform-actions {
+    margin-top: 1.5rem;
+}
+
+.platform-launch-btn {
+    width: 100%;
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.platform-launch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.platform-launch-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Enhanced Quick Actions */
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.action-buttons .btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+/* Enhanced Navigation Bar */
+.platform-nav-item {
+    position: relative;
+}
+
+.platform-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.platform-nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.platform-nav-link.platform-unavailable {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.platform-nav-link.platform-unavailable:hover {
+    transform: none;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.nav-status-dot.online {
+    background: #4ade80;
+    animation: nav-pulse 2s infinite;
+}
+
+.nav-status-dot.checking {
+    background: #fbbf24;
+    animation: nav-pulse 1s infinite;
+}
+
+.nav-status-dot.offline {
+    background: #ef4444;
+    animation: none;
+}
+
+@keyframes nav-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.nav-platform-text {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.nav-platform-status {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    color: #fbbf24;
+}
+
+/* Cross-platform notification system */
+.platform-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    max-width: 350px;
+}
+
+.platform-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.platform-notification .notification-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.platform-notification .notification-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Navigation enhancement for platform connectivity */
+.navbar .nav-links li:has(.platform-nav-link) {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 0.2rem;
+}
+
+/* ================================
+   Utility Classes
+   ================================ */
+
+.pt-fixed-nav {
+    padding-top: 100px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.mt-lg {
+    margin-top: 20px;
+}
+
+.mt-md {
+    margin-top: 15px;
+}
+
+/* Responsive design for platform status */
+@media (max-width: 768px) {
+    .verification-card {
+        padding: 2rem;
+        margin: 1rem;
+    }
+
+    .verification-actions {
+        flex-direction: column;
+    }
+
+    .verification-actions .btn {
+        min-width: auto;
+    }
+    
+    .platform-status {
+        gap: 0.75rem;
+    }
+    
+    .status-item {
+        padding: 0.5rem;
+    }
+    
+    .platform-launch-btn {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .platform-nav-link {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .nav-platform-status {
+        display: none;
+    }
+    
+    .platform-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
