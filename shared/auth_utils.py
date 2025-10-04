@@ -139,7 +139,7 @@ def show_login_page():
     
     with st.container(border=False):
         st.markdown("""  
-        #### To access the ASC analysis tools, please sign in with your registered email address.
+        #### To access the ASC analysis tools, please sign in with your email address.
         """)
         
     # Direct login form (with email and password)

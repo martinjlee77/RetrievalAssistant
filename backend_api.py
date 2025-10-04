@@ -166,21 +166,21 @@ def serve_streamlit_app():
     <head>
         <title>VeritasLogic Analysis Platform</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
             body {{
-                font-family: 'Inter', Arial, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 height: 100vh;
                 margin: 0;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: #36404A;
                 color: white;
             }}
             .launch-container {{
                 text-align: center;
-                background: rgba(255,255,255,0.1);
+                background: #212F3C;
                 padding: 3rem;
                 border-radius: 20px;
                 backdrop-filter: blur(10px);
@@ -229,7 +229,7 @@ def serve_streamlit_app():
             }}
             .progress-fill {{
                 height: 100%;
-                background: linear-gradient(90deg, #4ade80, #22d3ee);
+                background: linear-gradient(90deg, #ffffff, #A88A57);
                 border-radius: 4px;
                 width: 0%;
                 transition: width 0.3s ease;
@@ -237,7 +237,7 @@ def serve_streamlit_app():
             
             .btn {{
                 background: white;
-                color: #667eea;
+                color: #212F3C;
                 padding: 1rem 2rem;
                 border: none;
                 border-radius: 25px;
@@ -302,7 +302,7 @@ def serve_streamlit_app():
         <div class="launch-container">
             <div id="loadingState">
                 <div class="spinner"></div>
-                <h1>🚀 Launching Analysis Platform</h1>
+                <h1>Launching Analysis Platform</h1>
                 <p><span class="status-indicator status-checking" id="statusIndicator"></span>Connecting to your analysis platform...</p>
                 
                 <div class="progress-bar">
@@ -310,14 +310,14 @@ def serve_streamlit_app():
                 </div>
                 
                 <div class="loading-steps">
-                    <div class="step" id="step1">🔒 Verifying authentication</div>
-                    <div class="step" id="step2">🔗 Connecting to analysis platform</div>
-                    <div class="step" id="step3">📊 Loading ASC standards (606, 842, 718, 805, 340-40)</div>
-                    <div class="step" id="step4">🤖 Initializing Research Assistant</div>
+                    <div class="step" id="step1">Verifying authentication</div>
+                    <div class="step" id="step2">Connecting to analysis platform</div>
+                    <div class="step" id="step3">Loading ASC standards (606, 842, 718, 805, 340-40)</div>
+                    <div class="step" id="step4">Initializing Research Assistant</div>
                 </div>
                 
                 <p style="font-size: 14px; opacity: 0.8;">
-                    Your complete technical accounting analysis suite
+                    Your AI-powered technical accounting analysis
                 </p>
             </div>
             
