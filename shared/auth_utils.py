@@ -252,7 +252,7 @@ def try_cross_domain_auth():
             st.query_params.clear()
             
             # Show success message briefly
-            st.success("🎉 Welcome back! You've been automatically signed in.")
+            st.info ("Welcome back! You've been automatically signed in.")
             return True
         else:
             logger.warning(f"SSO: Token validation failed: {validation.get('error', 'Unknown error')}")
