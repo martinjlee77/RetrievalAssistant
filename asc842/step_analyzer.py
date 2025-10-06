@@ -51,7 +51,7 @@ class ASC842StepAnalyzer:
     def extract_entity_name_llm(self, contract_text: str) -> str:
         """Extract the lessee or tenant name using LLM analysis."""
         try:
-            logger.info("DEBUG: Extracting entity name using LLM")
+            logger.info("🏢 Extracting lessee/tenant name from lease agreement...")
             
             messages = [
                 {
@@ -97,8 +97,8 @@ Respond with ONLY the entity name, nothing else."""
             if len(entity_name) < 2 or len(entity_name) > 120:
                 logger.warning(f"LLM returned suspicious entity name: {entity_name}")
                 return "Entity"
-                
-            logger.info(f"DEBUG: LLM extracted entity name: {entity_name}")
+            
+            logger.info(f"✓ Lessee/tenant identified: {entity_name}")
             return entity_name
             
         except Exception as e:
@@ -181,6 +181,7 @@ Respond with ONLY the entity name, nothing else."""
         Returns:
             Dictionary containing analysis results for each step
         """
+        analysis_start_time = time.time()
         logger.info(f"Starting ASC 842 analysis for {entity_name}")
         
         # Add large contract warning
@@ -242,15 +243,12 @@ Respond with ONLY the entity name, nothing else."""
         logger.info(f"DEBUG: Extracted conclusions text length: {len(conclusions_text)} chars")
         
         # Generate executive summary, background, and conclusion
-        logger.info("Generating executive summary...")
         results['executive_summary'] = self.generate_executive_summary(conclusions_text, entity_name)
-        logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, entity_name)
-        logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_final_conclusion(results['steps'])
-        logger.info("DEBUG: All additional sections generated successfully")
         
-        logger.info("ASC 842 analysis completed successfully")
+        total_time = time.time() - analysis_start_time
+        logger.info(f"✓ ASC 842 analysis completed successfully in {total_time:.1f}s")
         return results
     
     def _analyze_step_with_retry(self,
@@ -262,17 +260,26 @@ Respond with ONLY the entity name, nothing else."""
         """Analyze a single step with enhanced retry logic for production scalability."""
         max_retries = 4  # Increased from 2
         base_delay = 1
+        step_start_time = time.time()
+        
+        logger.info(f"→ Step {step_num}: Starting analysis using {self.main_model}...")
         
         for attempt in range(max_retries):
             try:
-                logger.info(f"Analyzing Step {step_num} (attempt {attempt + 1})")
-                return self._analyze_step(
+                if attempt > 0:
+                    logger.info(f"Retrying Step {step_num} (attempt {attempt + 1})")
+                
+                result = self._analyze_step(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     entity_name=entity_name,
                     additional_context=additional_context
                 )
+                
+                step_time = time.time() - step_start_time
+                logger.info(f"✓ Step {step_num}: Completed in {step_time:.1f}s")
+                return result
             except openai.RateLimitError as e:
                 if attempt == max_retries - 1:
                     logger.error(f"Rate limit exceeded for Step {step_num} after {max_retries} attempts")
@@ -643,7 +650,7 @@ CRITICAL FORMATTING REQUIREMENTS:
     
     def generate_executive_summary(self, conclusions_text: str, entity_name: str) -> str:
         """Generate executive summary based on step conclusions."""
-        logger.info(f"DEBUG: Generating executive summary. Model: {self.model}")
+        logger.info("→ Generating executive summary...")
         
         try:
             request_params = {
@@ -692,9 +699,10 @@ Format as clean markdown."""
             summary = response.choices[0].message.content
             if summary is None:
                 summary = "Executive summary could not be generated."
-                
-            logger.info(f"DEBUG: Generated executive summary ({len(summary)} chars)")
-            return summary.strip()
+            
+            summary = summary.strip()
+            logger.info(f"✓ Executive summary generated ({len(summary)} chars)")
+            return summary
             
         except Exception as e:
             logger.error(f"Error generating executive summary: {str(e)}")
@@ -702,7 +710,7 @@ Format as clean markdown."""
     
     def generate_background_section(self, conclusions_text: str, entity_name: str) -> str:
         """Generate background section for the memo."""
-        logger.info(f"DEBUG: Generating background section. Model: {self.light_model}")
+        logger.info("→ Generating background section...")
         
         try:
             request_params = {
@@ -752,9 +760,10 @@ Format as clean markdown."""
             background = response.choices[0].message.content
             if background is None:
                 background = f"We have reviewed the lease agreement for {entity_name} to determine the appropriate accounting treatment under ASC 842."
-                
-            logger.info(f"DEBUG: Generated background section ({len(background)} chars)")
-            return background.strip()
+            
+            background = background.strip()
+            logger.info(f"✓ Background section generated ({len(background)} chars)")
+            return background
             
         except Exception as e:
             logger.error(f"Error generating background section: {str(e)}")
@@ -762,6 +771,7 @@ Format as clean markdown."""
     
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
+        logger.info("→ Generating final conclusion...")
 
         # Extract conclusions from each step
         conclusions = []
@@ -808,7 +818,9 @@ Format as clean markdown."""
             }
 
             response = self.client.chat.completions.create(**request_params)
-            return response.choices[0].message.content.strip()
+            conclusion = response.choices[0].message.content.strip()
+            logger.info(f"✓ Final conclusion generated ({len(conclusion)} chars)")
+            return conclusion
 
         except Exception as e:
             logger.error(f"Final conclusion generation failed: {str(e)}")

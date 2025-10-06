@@ -52,6 +52,7 @@ class ASC606StepAnalyzer:
     def extract_entity_name_llm(self, contract_text: str) -> str:
         """Extract the customer entity name using LLM analysis."""
         try:
+            logger.info("🏢 Extracting customer name from contract...")
             
             messages = [
                 {
@@ -96,7 +97,8 @@ Respond with ONLY the customer name, nothing else."""
             if len(entity_name) < 2 or len(entity_name) > 120:
                 logger.warning(f"LLM returned suspicious customer name: {entity_name}")
                 return "Customer"
-                
+            
+            logger.info(f"✓ Customer identified: {entity_name}")
             return entity_name
             
         except Exception as e:
@@ -179,6 +181,7 @@ Respond with ONLY the customer name, nothing else."""
         Returns:
             Dictionary containing analysis results for each step
         """
+        analysis_start_time = time.time()
         logger.info(f"Starting ASC 606 analysis for {customer_name}")
         
         # Add large contract warning
@@ -226,15 +229,12 @@ Respond with ONLY the customer name, nothing else."""
         conclusions_text = self._extract_conclusions_from_steps(results['steps'])
         
         # Generate executive summary, background, and conclusion
-        logger.info("Generating executive summary...")
         results['executive_summary'] = self.generate_executive_summary(conclusions_text, customer_name)
-        logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
-        logger.info("Generating conclusion...")
         results['conclusion'] = self.generate_final_conclusion(results['steps'])
-        logger.info("Generated executive summary, background, and conclusion sections")
         
-        logger.info("ASC 606 analysis completed successfully")
+        total_time = time.time() - analysis_start_time
+        logger.info(f"✓ ASC 606 analysis completed successfully in {total_time:.1f}s")
         return results
     
     def _analyze_step_with_retry(self,
@@ -246,17 +246,26 @@ Respond with ONLY the customer name, nothing else."""
         """Analyze a single step with enhanced retry logic for production scalability."""
         max_retries = 4  # Increased from 2
         base_delay = 1
+        step_start_time = time.time()
+        
+        logger.info(f"→ Step {step_num}: Starting analysis using {self.main_model}...")
         
         for attempt in range(max_retries):
             try:
-                logger.info(f"Analyzing Step {step_num} (attempt {attempt + 1})")
-                return self._analyze_step(
+                if attempt > 0:
+                    logger.info(f"Retrying Step {step_num} (attempt {attempt + 1})")
+                
+                result = self._analyze_step(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     customer_name=customer_name,
                     additional_context=additional_context
                 )
+                
+                step_time = time.time() - step_start_time
+                logger.info(f"✓ Step {step_num}: Completed in {step_time:.1f}s")
+                return result
             except openai.RateLimitError as e:
                 if attempt == max_retries - 1:
                     logger.error(f"Rate limit exceeded for Step {step_num} after {max_retries} attempts")
@@ -658,6 +667,8 @@ CRITICAL FORMATTING REQUIREMENTS:
     
     def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
         """Generate executive summary using clean LLM call."""
+        logger.info("→ Generating executive summary...")
+        
         prompt = f"""Generate a professional executive summary for an ASC 606 revenue recognition analysis for {customer_name}.
 
 Step Conclusions:
@@ -690,7 +701,7 @@ Requirements:
             content = response.choices[0].message.content
             if content:
                 content = content.strip()
-                logger.info(f"Generated executive summary ({len(content)} chars)")
+                logger.info(f"✓ Executive summary generated ({len(content)} chars)")
                 return content
             else:
                 logger.error("Empty executive summary response")
@@ -702,6 +713,8 @@ Requirements:
     
     def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
         """Generate background section using clean LLM call."""
+        logger.info("→ Generating background section...")
+        
         prompt = f"""Generate a professional 2-3 sentence background for an ASC 606 memo.
 
 Customer: {customer_name}
@@ -730,7 +743,7 @@ Instructions:
             content = response.choices[0].message.content
             if content:
                 content = content.strip()
-                logger.info(f"Generated background section ({len(content)} chars)")
+                logger.info(f"✓ Background section generated ({len(content)} chars)")
                 return content
             else:
                 logger.error("Empty background response")
@@ -742,6 +755,7 @@ Instructions:
         
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
+        logger.info("→ Generating final conclusion...")
         
         # Extract conclusions from each step
         conclusions = []
@@ -788,7 +802,9 @@ Instructions:
             }
             
             response = self.client.chat.completions.create(**request_params)
-            return response.choices[0].message.content.strip()
+            conclusion = response.choices[0].message.content.strip()
+            logger.info(f"✓ Final conclusion generated ({len(conclusion)} chars)")
+            return conclusion
             
         except Exception as e:
             logger.error(f"Final conclusion generation failed: {str(e)}")
