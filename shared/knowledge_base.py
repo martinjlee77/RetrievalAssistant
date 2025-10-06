@@ -11,6 +11,7 @@ import chromadb
 import openai
 import os
 import logging
+import time
 from typing import List, Dict, Any, Optional
 from chromadb.utils import embedding_functions
 
@@ -82,6 +83,10 @@ class SharedKnowledgeBase:
             if not self.collection:
                 raise ValueError("Knowledge base not properly initialized")
             
+            # Log query start
+            logger.info(f"🔍 Querying {self.collection_name} knowledge base...")
+            start_time = time.time()
+            
             # Perform similarity search
             results = self.collection.query(
                 query_texts=[query],
@@ -89,17 +94,20 @@ class SharedKnowledgeBase:
             )
             
             if not results or not results.get('documents') or not results['documents'] or not results['documents'][0]:
-                logger.warning(f"No results found for query: {query[:100]}...")
+                logger.warning(f"⚠️ No KB results for query: {query[:80]}... (collection: {self.collection_name})")
                 return "No relevant guidance found in the knowledge base."
             
             # Format results for LLM consumption
             formatted_context = self._format_search_results(results)
             
-            logger.info(f"Retrieved {len(results['documents'][0]) if results.get('documents') and results['documents'][0] else 0} relevant guidance chunks")
+            # Log success with timing
+            elapsed_time = time.time() - start_time
+            num_chunks = len(results['documents'][0]) if results.get('documents') and results['documents'][0] else 0
+            logger.info(f"✓ Retrieved {num_chunks} chunks from ChromaDB ({elapsed_time:.2f}s)")
             return formatted_context
             
         except Exception as e:
-            logger.error(f"Knowledge base search error: {str(e)}")
+            logger.error(f"✗ KB search failed (collection: {self.collection_name}): {str(e)}")
             return f"Error searching knowledge base: {str(e)}"
     
     def _format_search_results(self, results: Any) -> str:

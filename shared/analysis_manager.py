@@ -212,6 +212,10 @@ class AnalysisManager:
             import requests
             from shared.auth_utils import auth_manager
             
+            # Log database save attempt
+            analysis_id = analysis_record.get('analysis_id', 'unknown')
+            logger.info(f"💾 Saving analysis record: {analysis_id}")
+            
             # STRATEGIC FIX: Attempt token refresh before database save to handle long-running analyses
             token = self._get_or_refresh_auth_token()
             if not token:
@@ -265,7 +269,7 @@ class AnalysisManager:
                 # Store memo_uuid in session state for access by calling code
                 import streamlit as st
                 st.session_state['analysis_manager_memo_uuid'] = memo_uuid
-                logger.info(f"Analysis {analysis_record.get('analysis_id')} saved to database with memo UUID: {memo_uuid}")
+                logger.info(f"✓ Analysis saved to database: {analysis_record.get('analysis_id')}")
             else:
                 # Enhanced error logging to capture exact issue
                 logger.error(f"Database save failed - Status: {response.status_code}")

@@ -43,6 +43,9 @@ class BillingManager:
             actual_cost = cost_estimate['estimated_cost']
             billed_cost = min(actual_cost, cost_estimate['cost_cap'])  # Apply cap
             
+            # Log billing record start
+            logger.info(f"💰 Recording billing: {asc_standard} - {words_count} words - ${billed_cost:.2f}")
+            
             billing_data = {
                 'asc_standard': asc_standard,
                 'words_count': words_count,
@@ -61,14 +64,14 @@ class BillingManager:
             )
             
             if response.ok:
-                logger.info(f"Successfully recorded billing for {asc_standard} analysis: ${billed_cost}")
+                logger.info(f"✓ Billing recorded successfully: {asc_standard} - ${billed_cost:.2f} charged")
                 return True
             else:
-                logger.error(f"Failed to record billing: {response.status_code} - {response.text}")
+                logger.error(f"✗ Billing record failed (status {response.status_code}): {asc_standard} - ${billed_cost:.2f}")
                 return False
                 
         except Exception as e:
-            logger.error(f"Error recording analysis billing: {e}")
+            logger.error(f"✗ Error recording analysis billing: {asc_standard} - {str(e)}")
             return False
     
     def auto_credit_on_failure(self, user_token: str, cost_amount: float, analysis_id: str = None) -> bool:

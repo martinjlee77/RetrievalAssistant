@@ -45,6 +45,9 @@ class ASC842StepAnalyzer:
         # Backward compatibility
         self.model = self.main_model
         
+        # Log model selection
+        logger.info(f"🤖 Using {'GPT-5' if self.use_premium_models else 'GPT-4o'} for main analysis, {'GPT-5-mini' if self.use_premium_models else 'GPT-4o-mini'} for light tasks")
+        
         # Load step prompts (currently unused - prompts are generated dynamically in _get_step_prompt)
         self.step_prompts = self._load_step_prompts()
     
@@ -287,7 +290,7 @@ Respond with ONLY the entity name, nothing else."""
                 
                 # Exponential backoff with jitter for rate limits
                 delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
-                logger.warning(f"Rate limit hit for Step {step_num}. Waiting {delay:.1f}s before retry {attempt + 2}")
+                logger.warning(f"⚠️ Rate limit hit on Step {step_num}, waiting {delay:.1f}s before retry (attempt {attempt + 1}/{max_retries})...")
                 time.sleep(delay)
                 
             except openai.APITimeoutError as e:
@@ -323,6 +326,12 @@ Respond with ONLY the entity name, nothing else."""
                     raise RuntimeError(f"OpenAI API error: {str(e)}")
                     
             except Exception as e:
+                # Check for context length errors
+                error_str = str(e).lower()
+                if "context_length" in error_str or "token" in error_str:
+                    logger.error(f"✗ Step {step_num}: Context window exceeded - contract too large")
+                    raise RuntimeError(f"Step {step_num}: Context window exceeded - contract too large")
+                
                 if attempt == max_retries - 1:
                     logger.error(f"Unexpected error for Step {step_num} after {max_retries} attempts: {str(e)}")
                     raise RuntimeError(f"Analysis failed for Step {step_num}: {str(e)}")
@@ -342,6 +351,10 @@ Respond with ONLY the entity name, nothing else."""
 
                      additional_context: str = "") -> Dict[str, str]:
         """Analyze a single ASC 842 step - returns clean markdown."""
+        
+        # Log financial calculations for Step 3 (Measurement/ROU asset and lease liability)
+        if step_num == 3:
+            logger.info("💰 Extracting lease payment schedule and performing NPV calculations...")
         
         # Get step-specific prompt for markdown output
         prompt = self._get_step_markdown_prompt(
@@ -397,6 +410,10 @@ Respond with ONLY the entity name, nothing else."""
                 
                 # ONLY strip whitespace - NO OTHER PROCESSING
                 markdown_content = markdown_content.strip()
+                
+                # Check for suspiciously short response
+                if not markdown_content or len(markdown_content) < 50:
+                    logger.warning(f"⚠️ Step {step_num}: Received suspiciously short response ({len(markdown_content) if markdown_content else 0} chars)")
                 
                 # Log sample of clean content for verification
                 logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")

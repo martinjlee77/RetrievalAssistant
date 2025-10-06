@@ -40,12 +40,18 @@ class DocumentExtractor:
             file_content = uploaded_file.read()
             file_size_mb = len(file_content) / (1024 * 1024)  # Convert to MB
             
+            # Log document processing start
+            self.logger.info(f"📄 Processing document: {uploaded_file.name} ({file_size_mb:.2f} MB)")
+            
             # Note: Removed minimum file size check - let scanned PDF detection handle edge cases
             
             # Note: Removed file size limits for enterprise customers
             
             # Reset file pointer for actual extraction
             uploaded_file.seek(0)
+            
+            # Log extraction method
+            self.logger.info(f"→ Extracting text using {file_extension.upper()} extractor...")
             
             if file_extension == 'pdf':
                 extraction_result = self._extract_pdf_text(uploaded_file)
@@ -66,11 +72,21 @@ class DocumentExtractor:
             
             # Add page estimate for user context (≈300 words/page)
             extraction_result['estimated_pages'] = max(1, round(word_count / 300))
+            
+            # Log extraction results
+            extraction_method = extraction_result.get('extraction_method', 'unknown')
+            estimated_pages = extraction_result['estimated_pages']
+            
+            # Check for scanned PDF detection
+            if extraction_result.get('is_likely_scanned'):
+                self.logger.warning(f"⚠️ Scanned PDF detected: {uploaded_file.name} - Manual conversion required")
+            else:
+                self.logger.info(f"✓ Text extracted: {word_count} words (~{estimated_pages} pages) via {extraction_method}")
 
             return extraction_result
                 
         except Exception as e:
-            self.logger.error(f"Error extracting text from {uploaded_file.name}: {str(e)}")
+            self.logger.error(f"✗ Document extraction failed for {uploaded_file.name}: {str(e)}")
             return {
                 'text': '',
                 'filename': uploaded_file.name,
@@ -120,7 +136,7 @@ class DocumentExtractor:
                     extraction_method = "pdfplumber"
                     
         except Exception as e:
-            self.logger.warning(f"pdfplumber failed: {str(e)}, trying PyPDF2")
+            self.logger.warning(f"⚠️ pdfplumber failed, falling back to PyPDF2...")
             
         # Method 2: Fallback to PyPDF2 if pdfplumber fails
         if not text.strip():
