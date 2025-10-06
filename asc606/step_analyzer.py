@@ -148,7 +148,7 @@ Respond with ONLY the customer name, nothing else."""
                 reasoning={"effort": "medium"}
             )
             # Access response content from Responses API format
-            return response.choices[0].message.content
+            return response.output_text
         else:
             # Use Chat Completions API for GPT-4o models
             request_params = {
