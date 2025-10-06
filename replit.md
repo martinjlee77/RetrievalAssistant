@@ -59,6 +59,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Knowledge Hierarchy System**: Enhanced prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretive Guidance) and IAC framework.
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern for financial amounts, ensuring accuracy by using Python for calculations after AI extraction.
 - **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards.
+- **Unified LLM Request Architecture**: All ASC standards (606, 340-40, 718, 842, 805) implement standardized `_make_llm_request()` helper method for centralized API routing between GPT-5 (Responses API) and GPT-4o (Chat Completions API). Ensures consistent model handling and future-proof architecture for new OpenAI models.
 
 ## Deployment & Production Configuration
 
