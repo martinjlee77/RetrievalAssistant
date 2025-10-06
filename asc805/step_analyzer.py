@@ -735,15 +735,8 @@ Format as clean markdown - no headers, just paragraphs."""
         """Generate LLM-powered final conclusion from analysis results."""
         logger.info("→ Generating final conclusion...")
 
-        # Extract conclusions from each step
-        conclusions = []
-        for step_num in range(1, 6):
-            step_key = f'step_{step_num}'
-            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
-                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
-
-        # Build prompt
-        conclusions_text = "\n".join(conclusions)
+        # Extract conclusions from markdown content using the proper extraction method
+        conclusions_text = self._extract_conclusions_from_steps(analysis_results)
         prompt = f"""Generate a professional final conclusion for an ASC 805 analysis.
 
     Step Conclusions:

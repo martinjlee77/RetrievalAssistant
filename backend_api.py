@@ -1624,11 +1624,11 @@ def complete_analysis():
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
                                     started_at, completed_at, duration_seconds, file_count)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed', %s, %s, NOW(), %s, %s)
-                RETURNING analysis_id
+                RETURNING id
             """, (user_id, asc_standard, words_count, api_cost, final_charged_credits, 
                   final_charged_credits, tier_name, memo_uuid, started_at, duration_seconds, file_count))
             
-            analysis_id = cursor.fetchone()['analysis_id']
+            analysis_id = cursor.fetchone()['id']
             logger.info(f"Analysis record created with ID: {analysis_id}")
             
             # Get current balance for balance_after calculation
