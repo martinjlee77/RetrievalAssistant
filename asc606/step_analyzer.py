@@ -782,7 +782,7 @@ Step Conclusions:
 {conclusions_text}
 
 Instructions:
-1. Write 2-3 sentences in narrative paragraph format assessing ASC 606 compliance
+1. Write 2-3 sentences in narrative paragraph format assessing the contract is accounted for properly under ASC 606
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Base your conclusion ONLY on the actual findings from the step conclusions provided above
 4. Only mention concerns if they are explicitly identified in the step analysis - do not invent or infer new issues

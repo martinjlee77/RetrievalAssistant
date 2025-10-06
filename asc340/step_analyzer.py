@@ -773,14 +773,13 @@ Step Conclusions:
 {conclusions_text}
 
 Instructions:
-1. Write 2-3 sentences in narrative paragraph format assessing ASC 340-40 compliance
+1. Write 2-3 sentences in narrative paragraph format evaluating whether the costs are accounted for properly under ASC 340-40
 2. Format all currency as $XXX,XXX (no spaces in numbers)
 3. Be direct - if there are concerns, state them clearly
-4. Focus on compliance assessment
-5. Use professional accounting language without bullet points
-6. Use proper paragraph spacing
-7. ALWAYS format currency with single $ symbol (never $$)
-8. Include proper spacing after commas and periods"""
+4. Use professional accounting language without bullet points
+5. Use proper paragraph spacing
+6. ALWAYS format currency with single $ symbol (never $$)
+7. Include proper spacing after commas and periods"""
 
         # Call LLM API
         try:
