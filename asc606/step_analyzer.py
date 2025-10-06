@@ -33,7 +33,7 @@ class ASC606StepAnalyzer:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -117,13 +117,13 @@ Respond with ONLY the customer name, nothing else."""
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
-                "step_analysis": 8000,
-                "executive_summary": 8000,
-                "background": 8000,
-                "conclusion": 8000,
-                "default": 8000
+                "step_analysis": 10000,
+                "executive_summary": 10000,
+                "background": 10000,
+                "conclusion": 10000,
+                "default": 10000
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 10000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -144,7 +144,7 @@ Respond with ONLY the customer name, nothing else."""
             response = self.client.responses.create(
                 model=target_model,
                 input=messages,
-                max_output_tokens=8000,  # GPT-5 uses max_output_tokens
+                max_output_tokens=10000,  # GPT-5 uses max_output_tokens
                 reasoning={"effort": "medium"}
             )
             # Access response content from Responses API format
@@ -452,7 +452,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Identify each party\'s rights regarding the goods or services to be transferred (ASC 606-10-25-1(b))',
                     'Identify each party\'s payment terms for the transferred goods or services (ASC 606-10-25-1(c))',
                     'Assess whether the contract has commercial substance (ASC 606-10-25-1(d))',
-                    'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e))'
+                    'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e))',
                 ]
             },
             2: {

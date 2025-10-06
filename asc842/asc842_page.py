@@ -508,7 +508,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             # Generate the three additional sections
             executive_summary = analyzer.generate_executive_summary(conclusions_text, entity_name)
             background = analyzer.generate_background_section(conclusions_text, entity_name)
-            conclusion = analyzer.generate_conclusion_section(conclusions_text)
+            conclusion = analyzer.generate_final_conclusion(conclusions_text)
             
             # Combine into the expected structure for memo generator
             final_results = {

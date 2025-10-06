@@ -33,7 +33,7 @@ class ASC340StepAnalyzer:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -127,13 +127,13 @@ Respond with ONLY the company name, nothing else."""
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
-                "step_analysis": 8000,
-                "executive_summary": 8000,
-                "background": 8000,
-                "conclusion": 8000,
-                "default": 8000
+                "step_analysis": 10000,
+                "executive_summary": 10000,
+                "background": 10000,
+                "conclusion": 10000,
+                "default": 10000
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 10000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -515,13 +515,24 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific evidence from user-provided documents and ASC 340-40 citations. Quote language from user-provided documents only when the exact wording is outcome‑determinative; paraphrase ASC 340-40 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Analysis:** [Detailed analysis with supporting evidence. Include:
-- Evidence from user-provided documents with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed pinpoint citations; e.g., [Document §X.Y, p. N])
-- ASC 340-40 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 340-40-25-1])
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
+- Contract citations must reference actual text from the document:
+    Good: [Commission Plan, Incentive Payout]
+    Bad: [Commission Plan §4.2], [Commission Plan, p. 15] (unless these exact references appear in the contract text)
+- Only cite section numbers/page numbers if they are explicitly visible in the contract text
+- ASC 340-40 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 340-40-25-1])
+
 
 **Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 340-40 citation.]
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
+
+CRITICAL ANALYSIS REQUIREMENTS:
+- If information is not explicitly stated in the contract, write "Not specified in contract"
+- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
+- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
+- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Format currency as: $240,000 (with comma, no spaces)

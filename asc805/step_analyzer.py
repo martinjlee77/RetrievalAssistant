@@ -32,7 +32,7 @@ class ASC805StepAnalyzer:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -127,13 +127,13 @@ Respond with ONLY the target company name, nothing else."""
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
-                "step_analysis": 8000,
-                "executive_summary": 8000,
-                "background": 8000,
-                "conclusion": 8000,
-                "default": 8000
+                "step_analysis": 10000,
+                "executive_summary": 10000,
+                "background": 10000,
+                "conclusion": 10000,
+                "default": 10000
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 10000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -230,7 +230,7 @@ Respond with ONLY the target company name, nothing else."""
         logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
-        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        results['conclusion'] = self.generate_final_conclusion(conclusions_text)
         logger.info("DEBUG: All additional sections generated successfully")
         
         logger.info("ASC 606 analysis completed successfully")
@@ -686,65 +686,60 @@ Format as clean markdown - no headers, just paragraphs."""
             logger.error(f"Error generating background section: {str(e)}")
             return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606. This memorandum presents our analysis following the five-step ASC 606 methodology."
     
-    def generate_conclusion_section(self, conclusions_text: str) -> str:
-        """Generate conclusion section from step conclusions."""
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
+        """Generate LLM-powered final conclusion from analysis results."""
+
+        # Extract conclusions from each step
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
+
+        # Build prompt
+        conclusions_text = "\n".join(conclusions)
+        prompt = f"""Generate a professional final conclusion for an ASC 805 analysis.
+
+    Step Conclusions:
+    {conclusions_text}
+
+    Instructions:
+    1. Write 2-3 sentences in narrative paragraph format assessing ASC 805 compliance
+    2. Format all currency as $XXX,XXX (no spaces in numbers)
+    3. Base your conclusion ONLY on the actual findings from the step conclusions provided above
+    4. Only mention concerns if they are explicitly identified in the step analysis - do not invent or infer new issues
+    5. If no significant issues are found in the steps, state compliance with ASC 805
+    6. Focus on compliance assessment
+    7. Use professional accounting language without bullet points
+    8. Use proper paragraph spacing
+    9. ALWAYS format currency with single $ symbol (never $$)
+    10. Include proper spacing after commas and periods"""
+
+        # Call LLM API
         try:
-            prompt = f"""Generate a conclusion section for an ASC 606 revenue recognition memorandum.
-
-Based on these step conclusions:
-
-{conclusions_text}
-
-Requirements:
-- Synthesize the overall revenue recognition treatment
-- Highlight any key implementation considerations
-- Note any areas requiring further analysis or judgment
-- Provide clear next steps or recommendations
-- Keep professional and decisive (2-3 paragraphs)
-
-Format as clean markdown - no headers, just paragraphs."""
-
             request_params = {
                 "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert technical accountant generating conclusions for ASC 606 memos. Write clearly and professionally."
+                        "content": "You are an expert technical accountant specializing in ASC 805 business combinations."
                     },
                     {
-                        "role": "user",
+                        "role": "user", 
                         "content": prompt
                     }
                 ],
-                **self._get_max_tokens_param("conclusion", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("conclusion", self.light_model)
             }
-            
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
+
             response = self.client.chat.completions.create(**request_params)
-            
-            # Track API cost for conclusion section
-            from shared.api_cost_tracker import track_openai_request
-            track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
-                model=self.light_model,
-                request_type="conclusion_generation"
-            )
-            
-            conclusion = response.choices[0].message.content
-            
-            if conclusion is None:
-                logger.warning("LLM returned None for conclusion section")
-                return "Based on our analysis, the revenue recognition treatment should follow the methodology outlined in this memo. Management should review and implement these conclusions in consultation with external auditors."
-            
-            return conclusion.strip()
-            
+            return response.choices[0].message.content.strip()
+
         except Exception as e:
-            logger.error(f"Error generating conclusion section: {str(e)}")
-            return "Based on our analysis, the revenue recognition treatment should follow the methodology outlined in this memo. Management should review and implement these conclusions in consultation with external auditors."
+            logger.error(f"Final conclusion generation failed: {str(e)}")
+            # Fallback to simple conclusion
+            return "Based on our comprehensive analysis under ASC 805, the proposed business combination accounting treatment is appropriate and complies with the authoritative guidance."
     
     def _extract_conclusions_from_steps(self, steps_data: Dict[str, Any]) -> str:
         """Extract conclusion text from all step analyses for summary generation."""

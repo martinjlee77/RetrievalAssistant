@@ -32,7 +32,7 @@ class ASC718StepAnalyzer:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -127,13 +127,13 @@ Respond with ONLY the granting company name, nothing else."""
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
-                "step_analysis": 8000,
-                "executive_summary": 8000,
-                "background": 8000,
-                "conclusion": 8000,
-                "default": 8000
+                "step_analysis": 10000,
+                "executive_summary": 10000,
+                "background": 10000,
+                "conclusion": 10000,
+                "default": 10000
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 10000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {
@@ -145,26 +145,51 @@ Respond with ONLY the granting company name, nothing else."""
             }
             return {"max_tokens": token_limits.get(request_type, 2000)}
     
+    def _make_llm_request(self, messages, model=None, request_type="default"):
+        """Helper method to route between Responses API (GPT-5) and Chat Completions API (GPT-4o)."""
+        target_model = model or self.model
+        
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # Use Responses API for GPT-5 models
+            response = self.client.responses.create(
+                model=target_model,
+                input=messages,
+                max_output_tokens=10000,  # GPT-5 uses max_output_tokens
+                reasoning={"effort": "medium"}
+            )
+            # Access response content from Responses API format
+            return response.choices[0].message.content
+        else:
+            # Use Chat Completions API for GPT-4o models
+            request_params = {
+                "model": target_model,
+                "messages": messages,
+                "temperature": self._get_temperature(target_model),
+                **self._get_max_tokens_param(request_type, target_model)
+            }
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content
+    
     def analyze_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
-                        customer_name: str,
+                        entity_name: str,
                         analysis_title: str,
                         additional_context: str = "") -> Dict[str, Any]:
         """
-        Perform complete 5-step ASC 805 analysis.
+        Perform complete 5-step ASC 718 analysis.
         
         Args:
             contract_text: The transaction document text
-            authoritative_context: Retrieved ASC 805 guidance
-            customer_name: Target company name
+            authoritative_context: Retrieved ASC 718 guidance
+            entity_name: Target company name
             analysis_title: Analysis title
             additional_context: Optional user-provided context
             
         Returns:
             Dictionary containing analysis results for each step
         """
-        logger.info(f"Starting ASC 805 analysis for {customer_name}")
+        logger.info(f"Starting ASC 718 analysis for {entity_name}")
         
         # Add large contract warning
         word_count = len(contract_text.split())
@@ -172,7 +197,7 @@ Respond with ONLY the granting company name, nothing else."""
             logger.warning(f"Large contract ({word_count} words). Consider splitting if analysis fails.")
         
         results = {
-            'customer_name': customer_name,
+            'entity_name': entity_name,
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y"),
             'steps': {}
@@ -187,7 +212,7 @@ Respond with ONLY the granting company name, nothing else."""
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    entity_name=entity_name,
                     additional_context=additional_context
                 ): step_num
                 for step_num in range(1, 6)
@@ -226,21 +251,21 @@ Respond with ONLY the granting company name, nothing else."""
         
         # Generate executive summary, background, and conclusion
         logger.info("Generating executive summary...")
-        results['executive_summary'] = self.generate_executive_summary(conclusions_text, customer_name)
+        results['executive_summary'] = self.generate_executive_summary(conclusions_text, entity_name)
         logger.info("Generating background...")
-        results['background'] = self.generate_background_section(conclusions_text, customer_name)
+        results['background'] = self.generate_background_section(conclusions_text, entity_name)
         logger.info("Generating conclusion...")
-        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        results['conclusion'] = self.generate_final_conclusion(conclusions_text)
         logger.info("DEBUG: All additional sections generated successfully")
         
-        logger.info("ASC 606 analysis completed successfully")
+        logger.info("ASC 718 analysis completed successfully")
         return results
     
     def _analyze_step_with_retry(self,
                                step_num: int,
                                contract_text: str,
                                authoritative_context: str,
-                               customer_name: str,
+                               entity_name: str,
                                additional_context: str = "") -> Dict[str, str]:
         """Analyze a single step with enhanced retry logic for production scalability."""
         max_retries = 4  # Increased from 2
@@ -253,7 +278,7 @@ Respond with ONLY the granting company name, nothing else."""
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    entity_name=entity_name,
                     additional_context=additional_context
                 )
             except openai.RateLimitError as e:
@@ -314,16 +339,16 @@ Respond with ONLY the granting company name, nothing else."""
                      step_num: int,
                      contract_text: str,
                      authoritative_context: str,
-                     customer_name: str,
+                     entity_name: str,
                      additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single ASC 606 step - returns clean markdown."""
+        """Analyze a single ASC 718 step - returns clean markdown."""
         
         # Get step-specific prompt for markdown output
         prompt = self._get_step_markdown_prompt(
             step_num=step_num,
             contract_text=contract_text,
             authoritative_context=authoritative_context,
-            customer_name=customer_name,
+            entity_name=entity_name,
             additional_context=additional_context
         )
         
@@ -411,7 +436,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         step_num: int,
                         contract_text: str, 
                         authoritative_context: str,
-                        customer_name: str,
+                        entity_name: str,
                         additional_context: str = "") -> str:
         """Generate markdown prompt for a specific step."""
         
@@ -431,47 +456,47 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 2: Grant-date measurement (valuation by award type)',
                 'focus': 'Measure grant-date fair value using an appropriate model and well-supported inputs; apply permitted nonpublic expedients where applicable',
                 'key_points': [
-                    'Options and share-settled SARs (equity): Use a recognized option-pricing model (e.g., Black-Scholes, lattice). Document current price, expected term, volatility, risk-free rate, and dividends; reflect relevant features (e.g., market conditions, restrictions). [ASC 718-10-30; 718-20-55]',
-                    'RSUs/restricted stock: Measure at grant-date FV of the underlying equity; incorporate non-vesting conditions in FV (e.g., post-vesting sale restrictions). [ASC 718-10-30]',
-                    'PSUs: Non-market performance conditions: exclude from grant-date FV; recognition based on probable outcome/quantity expected to vest. Market conditions: include in grant-date FV (e.g., Monte Carlo); subsequent recognition is not adjusted for (non)achievement of the market condition, subject to service requirements. [ASC 718-10-20; 718-10-35; 718-20-55; 718-10-30]',
-                    'Liability-classified awards (e.g., cash-settled SARs): Measure at FV each reporting date until settlement (remeasure through earnings). [ASC 718-30-35]',
-                    'Nonpublic expedients: Consider permitted expedients (e.g., determining current price input; use of peer-group volatility when appropriate). Document judgments and sources. [ASC 718-10-30]'
+                    'Options and share-settled SARs (equity): Explain that ASC 718 requires grant-date fair value to be measured using a recognized option-pricing model (e.g., Black-Scholes, lattice model). The memo should list the required inputs (current share price, expected term, volatility, risk-free rate, dividend yield) and generate clear placeholders for management to provide each input, its value, and the source/justification. [ASC 718-10-30; 718-20-55]',
+                    'RSUs/restricted stock: State that the grant-date fair value is determined based on the fair value of the underlying equity on the grant date. The analysis should note that non-vesting conditions, such as post-vesting sales restrictions, must be factored into the fair value measurement and prompt for management to describe if any such conditions exist and how they were considered. [ASC 718-10-30]',
+                    'PSUs: Clearly differentiate the accounting treatment based on the condition type. For non-market performance conditions, explain that they are excluded from the grant-date fair value measurement and instead affect the timing and amount of expense recognized (i.e., recognized only if the condition is probable of achievement). For market conditions, explain that their effect must be included in the grant-date fair value (e.g., via a Monte Carlo simulation) and that compensation cost is recognized regardless of whether the market condition is achieved, provided the service condition is met. [ASC 718-10-20; 718-10-35; 718-20-55; 718-10-30]',
+                    'Liability-classified awards (e.g., cash-settled SARs): Explain the requirement to classify the award as a liability and to remeasure its fair value at each reporting date until settlement. State that changes in fair value are recorded in earnings and prompt for management to confirm the process for this recurring valuation. [ASC 718-30-35]',
+                    'Nonpublic expedients: If the entity is nonpublic, describe the permitted practical expedients available under ASC 718, such as the simplified method for estimating the expected term. Prompt the user to specify if they are electing any expedients and to provide the necessary justification. [ASC 718-10-30]'
                 ]
             },
             3: {
                 'title': 'Step 3: Requisite service period, attribution, forfeitures, and condition assessments',
                 'focus': 'Determine the period/pattern of recognition and apply condition-specific rules',
                 'key_points': [
-                    'Requisite service period: Evaluate explicit, implicit, and derived service periods (including for market conditions and retirement eligibility). [ASC 718-10-20; 718-10-35]',
-                    'Attribution: Apply straight-line or graded attribution consistent with policy and award terms. [ASC 718-10-35]',
-                    'Forfeitures: Elect to estimate forfeitures or account for them as they occur; apply consistently and true-up. [ASC 718-10-35]',
-                    'Non-market performance conditions: Recognize expense only when achievement is probable; update cumulative expense as probabilities change; reverse if no longer probable before vesting. [ASC 718-10-35; 718-20-55]',
-                    'Market conditions: Recognition driven by service requirements; market effect is incorporated in grant-date FV. [ASC 718-10-30; 718-20-55]',
-                    'Non-vesting conditions: Do not assess for "probable"; reflect in grant-date FV. [ASC 718-10-30]',
-                    'Dividends/dividend equivalents: If forfeitable, recognize as compensation cost over the requisite service; if non-forfeitable prior to vesting, adjust accounting consistent with guidance. [ASC 718-10-35; 718-20]',
-                    'Employer payroll taxes: Accrue when the taxable event occurs (typically at vesting/settlement). [ASC 718-10-25/35]'
+                    'Requisite service period: Analyze the award terms to identify the explicit, implicit, or derived service period. The analysis should state the determined service period based on the vesting conditions, including any specific considerations for market conditions or retirement eligibility. [ASC 718-10-20; 718-10-35]',
+                    'Attribution: Based on the vesting schedule identified in the terms, describe the permissible attribution methods. For awards with graded vesting, explain that the entity can elect, as an accounting policy, to use either the straight-line method for the entire award or the accelerated (graded) method for each tranche. Prompt for management to state its accounting policy. [ASC 718-10-35]',
+                    'Forfeitures: Explain that an entity must make an accounting policy election to either (a) estimate the number of awards expected to be forfeited and update the estimate, or (b) account for forfeitures as they occur. Prompt for management to state its policy election. [ASC 718-10-35]',
+                    'Non-market performance conditions: Explain that for these conditions, compensation cost is recognized only if and when it is probable the condition will be achieved. The analysis must generate a placeholder for management to document its assessment of probability for each performance condition and the basis for that judgment. [ASC 718-10-35; 718-20-55]',
+                    'Market conditions: State that the impact of a market condition is included in the award’s grant-date fair value, and therefore compensation cost is recognized as long as the requisite service is rendered, regardless of whether the market condition is ultimately met. [ASC 718-10-30; 718-20-55]',
+                    'Non-vesting conditions: State that these conditions do not affect vesting or the requisite service period, but their financial impact should be reflected in the grant-date fair value of the award. [ASC 718-10-30]',
+                    'Dividends/dividend equivalents: Describe the accounting treatment based on the award terms. If dividends are forfeitable with the award, they are accrued as compensation cost. If non-forfeitable, they are accounted for differently. The analysis should reflect the specific terms of the award. [ASC 718-10-35; 718-20]',
+                    'Employer payroll taxes: State the requirement to recognize a liability for employer payroll taxes when the underlying taxable event occurs (typically at vesting or exercise/settlement). [ASC 718-10-25/35]'
                 ]
             },
             4: {
                 'title': 'Step 4: Subsequent measurement, modifications, classification changes, settlements, and special transactions',
                 'focus': 'Remeasure liabilities, account for changes in terms/classification, and record exercises, cancellations, and business-combination effects',
                 'key_points': [
-                    'Liability-classified awards: Remeasure FV at each reporting date through settlement; recognize changes in earnings. [ASC 718-30-35]',
-                    'Equity-classified awards: No remeasurement after grant date except for modifications; continue to apply forfeiture policy and performance-probability updates. [ASC 718-20-35]',
-                    'Modifications (repricing, acceleration, extension, settlement-method change, performance condition changes): Identify a modification; measure incremental FV and recognize over remaining requisite service (or immediately if vested). Treat equity↔liability classification changes as modifications. [ASC 718-20-35; 718-20-55]',
-                    'Cancellations/forfeitures/expirations: Reverse unrecognized cost for unvested awards; vested expirations generally do not create additional expense/benefit. [ASC 718-20-35]',
-                    'Settlements/exercises: Record share issuance or cash settlement; handle net share withholding and any cash remitted for taxes appropriately. [ASC 718-20-35; 718-10-25]',
-                    'Business combinations (replacement awards): Allocate the replacement award FV between pre-combination service (consideration transferred) and post-combination service (compensation expense); then account under the modified terms going forward. [ASC 805-30; ASC 718-20-35]'
+                    'Liability-classified awards: Explain the requirement to remeasure the fair value of liability-classified awards at each reporting date until settlement. State that the change in fair value is recognized in earnings and generate a placeholder for management to document its periodic remeasurement calculations. [ASC 718-30-35]',
+                    'Equity-classified awards: State that equity-classified awards are not remeasured after the grant date, except in the case of a modification. The analysis should note that accounting continues to be subject to the entity\'s policies for forfeitures and assessments of non-market performance conditions. [ASC 718-20-35]',
+                    'Modifications: Describe what constitutes a modification under ASC 718 (e.g., repricing, acceleration). Explain the accounting requirement to measure any incremental fair value granted and recognize it over the remaining service period. Generate placeholders for management to input the fair value immediately before and after the modification and the resulting incremental cost. [ASC 718-20-35; 718-20-55]',
+                    'Cancellations/forfeitures/expirations: Explain the accounting treatment for these events. For cancellations or forfeitures of unvested awards, state the requirement to reverse any previously recognized compensation cost. For vested awards that expire unexercised, explain that no cost is reversed. [ASC 718-20-35]',
+                    'Settlements/exercises: Describe the accounting entries required upon settlement or exercise. The analysis should cover the pattern for issuing shares, paying cash, and accounting for net-share withholding for taxes based on the award’s terms and classification. [ASC 718-20-35; 718-10-25]',
+                    'Business combinations (replacement awards): Explain the requirement to allocate the fair value of replacement awards between pre-combination service (accounted for as part of the business combination consideration) and post-combination service (recognized as post-combination compensation cost). Prompt for management to document its valuation and allocation methodology. [ASC 805-30; ASC 718-20-35]'
                 ]
             },
             5: {
                 'title': 'Step 5: Income tax accounting and core journal entries (no disclosures)',
                 'focus': 'Record current/deferred taxes and the core financial statement effects; exclude disclosures',
                 'key_points': [
-                    'Deferred taxes: Recognize DTAs for deductible temporary differences arising from compensation cost; adjust DTAs as expense is recognized and expected tax deductions change. Assess valuation allowance as needed. [ASC 718-740; ASC 740-10]',
-                    'Excess tax benefits/shortfalls: Recognize in income tax expense when they occur; adjust DTAs accordingly. Track by jurisdiction. [ASC 718-740-25]',
-                    'Tax deduction measurement: For equity awards, the tax deduction typically equals intrinsic value at settlement; for liability awards, follows cash paid. Align with local tax law. [ASC 718-740]',
-                    'Core entries: Equity-classified: Dr compensation expense / Cr APIC during vesting; at settlement, record common stock/APIC and any net share withholding cash remittance; record DTA activity and any excess/shortfall to tax expense. Liability-classified: Dr compensation expense / Cr liability during vesting and remeasurement; settle liability in cash at payment and release related DTA. [ASC 718-10-45; 718-740; 718-30-35]'
+                    'Deferred taxes: Explain the requirement to recognize a Deferred Tax Asset (DTA) for the deductible temporary difference created by the cumulative book compensation cost recognized. State that management must assess this DTA for realizability and determine if a valuation allowance is necessary, consistent with ASC 740. [ASC 718-740; ASC 740-10]',
+                    'Excess tax benefits/shortfalls: Explain that any difference between the tax deduction realized upon settlement and the cumulative compensation cost recognized for book purposes is recorded as an excess tax benefit or shortfall. State that this amount is recognized as a discrete item in income tax expense in the period of settlement. [ASC 718-740-25]',
+                    'Tax deduction measurement: Describe how the tax deduction is typically measured, noting it is based on the intrinsic value of an equity award at settlement or the cash paid for a liability award. The analysis should note this is subject to local tax law. [ASC 718-740]',
+                    'Illustrative entries: Describe the pattern of typical journal entries, using placeholders for amounts. Equity-classified: Dr compensation expense / Cr APIC during vesting; at settlement, record common stock/APIC and any net share withholding cash remittance; record DTA activity and any excess/shortfall to tax expense. Liability-classified: Dr compensation expense / Cr liability during vesting and remeasurement; settle liability in cash at payment and release related DTA. [ASC 718-10-45; 718-740; 718-30-35]'
                 ]
             }
         }
@@ -484,9 +509,9 @@ STEP {step_num}: {step['title'].upper()}
 OBJECTIVE: {step['focus']}
 
 TRANSACTION INFORMATION:
-Business Combination Analysis: Analyze the transaction involving {customer_name} to determine the appropriate business combination accounting treatment under ASC 805 for the acquirer.
+Share-based Payment Analysis: Analyze the transaction involving {entity_name} to determine the appropriate share-based payment accounting treatment under ASC 718.
 
-Instructions: Analyze this transaction from the acquirer's perspective. {customer_name} is the target company being acquired.
+Instructions: Analyze this transaction from the entity's perspective.
 
 TRANSACTION DOCUMENTS:
 {contract_text}"""
@@ -512,9 +537,30 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific award evidence and ASC 718 citations. Quote award language only when the exact wording is outcome-determinative; paraphrase ASC 718 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
-**Conclusion:** [Write single paragraph conclusion stating the specific outcome for this step]
+**Analysis:** [Detailed analysis with supporting evidence. Include:
+- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
+- Contract citations must reference actual text from the document:
+    Good: [Stock Plan, Vesting Conditions]
+    Bad: [Stock Plan §4.2], [Stock Plan, p. 15] (unless these exact references appear in the contract text)
+- Only cite section numbers/page numbers if they are explicitly visible in the contract text
+- ASC 718 guidance paraphrased with citations; include only brief decisive phrases when directly supportive
 
-END OUTPUT"""
+**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 718 citation.]
+
+CRITICAL ANALYSIS REQUIREMENTS:
+- If information is not explicitly stated in the contract, write "Not specified in contract"
+- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
+- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
+- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Format currency as: $240,000 (with comma, no spaces)
+- Use proper spacing after periods and commas
+- Use professional accounting language
+- Double-check all currency amounts for correct formatting
+
+"""
 
         return prompt
     
@@ -558,23 +604,26 @@ END OUTPUT"""
         """Load step-specific prompts (placeholder for future use)."""
         return {}
     
-    def generate_executive_summary(self, conclusions_text: str, customer_name: str) -> str:
+    def generate_executive_summary(self, conclusions_text: str, entity_name: str) -> str:
         """Generate executive summary from step conclusions."""
         try:
-            prompt = f"""Generate an executive summary for an ASC 718 stock compensation memorandum for {customer_name}.
+            prompt = f"""Generate an executive summary for an ASC 718 stock compensation memorandum for {entity_name}.
 
 Based on these step conclusions:
 
 {conclusions_text}
 
 Requirements:
-- Start with the overall stock compensation accounting conclusion (classification, measurement, and recognition)
-- Summarize the key findings from each step in 2-3 bullet points
-- Keep professional but concise (3-4 paragraphs maximum)
-- Focus on business impact and implementation guidance
-- Use the exact entity name: {customer_name}
-
-Format as clean markdown - no headers, just paragraphs and bullet points."""
+1. Write 3-5 sentences with proper paragraph breaks
+2. Format all currency as $XXX,XXX (no spaces in numbers)
+3. Use professional accounting language
+4. State whether the nature of the contract costs described in the documents reviewed are incremental and quality for capitalization
+5. State compliance conclusion clearly
+6. Highlight any significant findings or issues
+7. Use double line breaks between paragraphs for readability
+8. ALWAYS format currency with $ symbol (e.g., $240,000, not 240,000)
+9. Include proper spacing after commas and periods
+10. DO NOT include any title or header like "Executive Summary:" - only provide the summary content"""
 
             request_params = {
                 "model": self.light_model,
@@ -610,18 +659,18 @@ Format as clean markdown - no headers, just paragraphs and bullet points."""
             
             if summary is None:
                 logger.warning("LLM returned None for executive summary")
-                return f"Executive summary for {customer_name} stock compensation analysis could not be generated."
+                return f"Executive summary for {entity_name} stock compensation analysis could not be generated."
             
             return summary.strip()
             
         except Exception as e:
             logger.error(f"Error generating executive summary: {str(e)}")
-            return f"Executive summary for {customer_name} stock compensation analysis could not be generated due to an error."
+            return f"Executive summary for {entity_name} stock compensation analysis could not be generated due to an error."
     
-    def generate_background_section(self, conclusions_text: str, customer_name: str) -> str:
+    def generate_background_section(self, conclusions_text: str, entity_name: str) -> str:
         """Generate background section from step conclusions."""
         try:
-            prompt = f"""Generate a background section for an ASC 718 stock compensation memorandum for {customer_name}.
+            prompt = f"""Generate a 2-3 sentence background section for an ASC 718 stock compensation memorandum for {entity_name}.
 
 Based on these step conclusions:
 
@@ -632,7 +681,7 @@ Requirements:
 - Briefly describe the nature of the share-based payment arrangement (award type and terms)
 - State the purpose of this memo (ASC 718 stock compensation analysis)
 - Keep it factual and professional (2-3 paragraphs)
-- Use the exact entity name: {customer_name}
+- Use the exact entity name: {entity_name}
 
 Format as clean markdown - no headers, just paragraphs."""
 
@@ -670,73 +719,68 @@ Format as clean markdown - no headers, just paragraphs."""
             
             if background is None:
                 logger.warning("LLM returned None for background section")
-                return f"We have reviewed the stock compensation award documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the five-step ASC 718 methodology."
+                return f"We have reviewed the stock compensation award documents provided by {entity_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the five-step ASC 718 methodology."
             
             return background.strip()
             
         except Exception as e:
             logger.error(f"Error generating background section: {str(e)}")
-            return f"We have reviewed the stock compensation award documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the five-step ASC 718 methodology."
+            return f"We have reviewed the stock compensation award documents provided by {entity_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the five-step ASC 718 methodology."
     
-    def generate_conclusion_section(self, conclusions_text: str) -> str:
-        """Generate conclusion section from step conclusions."""
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
+        """Generate LLM-powered final conclusion from analysis results."""
+
+        # Extract conclusions from each step
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
+
+        # Build prompt
+        conclusions_text = "\n".join(conclusions)
+        prompt = f"""Generate a professional final conclusion for an ASC 718 analysis.
+
+    Step Conclusions:
+    {conclusions_text}
+
+    Instructions:
+    1. Write 2-3 sentences in narrative paragraph format assessing ASC 718 compliance
+    2. Format all currency as $XXX,XXX (no spaces in numbers)
+    3. Base your conclusion ONLY on the actual findings from the step conclusions provided above
+    4. Only mention concerns if they are explicitly identified in the step analysis - do not invent or infer new issues
+    5. If no significant issues are found in the steps, state compliance with ASC 718
+    6. Focus on compliance assessment
+    7. Use professional accounting language without bullet points
+    8. Use proper paragraph spacing
+    9. ALWAYS format currency with single $ symbol (never $$)
+    10. Include proper spacing after commas and periods"""
+
+        # Call LLM API
         try:
-            prompt = f"""Generate a conclusion section for an ASC 718 stock compensation memorandum.
-
-Based on these step conclusions:
-
-{conclusions_text}
-
-Requirements:
-- Synthesize the overall stock compensation accounting treatment
-- Highlight any key implementation considerations
-- Note any areas requiring further analysis or judgment
-- Provide clear next steps or recommendations
-- Keep professional and decisive (2-3 paragraphs)
-
-Format as clean markdown - no headers, just paragraphs."""
-
             request_params = {
                 "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are an expert technical accountant generating conclusions for ASC 606 memos. Write clearly and professionally."
+                        "content": "You are an expert technical accountant specializing in ASC 718 stock compensation."
                     },
                     {
-                        "role": "user",
+                        "role": "user", 
                         "content": prompt
                     }
                 ],
-                **self._get_max_tokens_param("conclusion", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("conclusion", self.light_model)
             }
-            
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
+
             response = self.client.chat.completions.create(**request_params)
-            
-            # Track API cost for conclusion section
-            from shared.api_cost_tracker import track_openai_request
-            track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
-                model=self.light_model,
-                request_type="conclusion_generation"
-            )
-            
-            conclusion = response.choices[0].message.content
-            
-            if conclusion is None:
-                logger.warning("LLM returned None for conclusion section")
-                return "Based on our analysis, the revenue recognition treatment should follow the methodology outlined in this memo. Management should review and implement these conclusions in consultation with external auditors."
-            
-            return conclusion.strip()
-            
+            return response.choices[0].message.content.strip()
+
         except Exception as e:
-            logger.error(f"Error generating conclusion section: {str(e)}")
-            return "Based on our analysis, the revenue recognition treatment should follow the methodology outlined in this memo. Management should review and implement these conclusions in consultation with external auditors."
+            logger.error(f"Final conclusion generation failed: {str(e)}")
+            # Fallback to simple conclusion
+            return "Based on our comprehensive analysis under ASC 718, the proposed stock compensation treatment is appropriate and complies with the authoritative guidance."
     
     def _extract_conclusions_from_steps(self, steps_data: Dict[str, Any]) -> str:
         """Extract conclusion text from all step analyses for summary generation."""

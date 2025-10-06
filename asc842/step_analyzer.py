@@ -230,7 +230,7 @@ Respond with ONLY the entity name, nothing else."""
         logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, entity_name)
         logger.info("Generating conclusion...")
-        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        results['conclusion'] = self.generate_final_conclusion(conclusions_text)
         logger.info("DEBUG: All additional sections generated successfully")
         
         logger.info("ASC 842 analysis completed successfully")
@@ -743,62 +743,60 @@ Format as clean markdown."""
             logger.error(f"Error generating background section: {str(e)}")
             return f"We have reviewed the lease agreement for {entity_name} to determine the appropriate accounting treatment under ASC 842. This memorandum presents our analysis following the five-step ASC 842 methodology."
     
-    def generate_conclusion_section(self, conclusions_text: str) -> str:
-        """Generate overall conclusion section for the memo."""
-        logger.info(f"DEBUG: Generating conclusion section. Model: {self.light_model}")
-        
+    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
+        """Generate LLM-powered final conclusion from analysis results."""
+
+        # Extract conclusions from each step
+        conclusions = []
+        for step_num in range(1, 6):
+            step_key = f'step_{step_num}'
+            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
+                conclusions.append(f"Step {step_num}: {analysis_results[step_key]['conclusion']}")
+
+        # Build prompt
+        conclusions_text = "\n".join(conclusions)
+        prompt = f"""Generate a professional final conclusion for an ASC 842 analysis.
+
+    Step Conclusions:
+    {conclusions_text}
+
+    Instructions:
+    1. Write 2-3 sentences in narrative paragraph format assessing ASC 842 compliance
+    2. Format all currency as $XXX,XXX (no spaces in numbers)
+    3. Base your conclusion ONLY on the actual findings from the step conclusions provided above
+    4. Only mention concerns if they are explicitly identified in the step analysis - do not invent or infer new issues
+    5. If no significant issues are found in the steps, state compliance with ASC 842
+    6. Focus on compliance assessment
+    7. Use professional accounting language without bullet points
+    8. Use proper paragraph spacing
+    9. ALWAYS format currency with single $ symbol (never $$)
+    10. Include proper spacing after commas and periods"""
+
+        # Call LLM API
         try:
             request_params = {
                 "model": self.light_model,
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are generating a conclusion section for an ASC 842 lease accounting memorandum. Create a professional conclusion that synthesizes the analysis findings."
+                        "content": "You are an expert technical accountant specializing in ASC 842 lease accounting."
                     },
                     {
-                        "role": "user",
-                        "content": f"""Based on the following step conclusions, generate a professional conclusion section for an ASC 842 lease accounting memorandum.
-
-Step Conclusions:
-{conclusions_text}
-
-Write a conclusion section (2-3 paragraphs) that:
-1. Synthesizes the key findings from all steps
-2. States the final accounting treatment determination
-3. Notes any areas requiring management judgment or future monitoring
-4. Provides clear direction for implementation
-
-Format as clean markdown."""
+                        "role": "user", 
+                        "content": prompt
                     }
                 ],
-                **self._get_max_tokens_param("conclusion", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
+                "temperature": self._get_temperature(self.light_model),
+                **self._get_max_tokens_param("conclusion", self.light_model)
             }
-            
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
+
             response = self.client.chat.completions.create(**request_params)
-            
-            # Track API cost for conclusion section
-            from shared.api_cost_tracker import track_openai_request
-            track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
-                model=self.light_model,
-                request_type="conclusion_generation"
-            )
-            
-            conclusion = response.choices[0].message.content
-            if conclusion is None:
-                conclusion = "Based on our analysis, the arrangement should be accounted for under ASC 842."
-                
-            logger.info(f"DEBUG: Generated conclusion section ({len(conclusion)} chars)")
-            return conclusion.strip()
-            
+            return response.choices[0].message.content.strip()
+
         except Exception as e:
-            logger.error(f"Error generating conclusion section: {str(e)}")
-            return f"Based on our analysis of the lease agreement under ASC 842, we have determined the appropriate accounting treatment and classification."
+            logger.error(f"Final conclusion generation failed: {str(e)}")
+            # Fallback to simple conclusion
+            return "Based on our comprehensive analysis under ASC 842, the proposed lease accounting treatment is appropriate and complies with the authoritative guidance."
     
     def _load_step_prompts(self):
         """Load step prompts - placeholder for future use."""
