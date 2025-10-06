@@ -53,16 +53,14 @@ class ASC805StepAnalyzer:
         try:
             logger.info("DEBUG: Extracting target company entity name using LLM")
             
-            request_params = {
-                "model": self.light_model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert at identifying target company names in business combination transactions. Your task is to identify the name of the target company being acquired from the transaction documents."
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""Based on this business combination transaction, what is the name of the target company being acquired?
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying target company names in business combination transactions. Your task is to identify the name of the target company being acquired from the transaction documents."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Based on this business combination transaction, what is the name of the target company being acquired?
 
 Please identify:
 - The company that is being acquired/purchased (the target, not the acquirer)
@@ -73,27 +71,21 @@ Transaction Documents:
 {contract_text[:4000]}
 
 Respond with ONLY the target company name, nothing else."""
-                    }
-                ],
-                **self._get_max_tokens_param("default", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
-            }
+                }
+            ]
             
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
-            response = self.client.chat.completions.create(**request_params)
+            response_content = self._make_llm_request(messages, self.light_model, "default")
             
             # Track API cost for entity extraction
             from shared.api_cost_tracker import track_openai_request
             track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
+                messages=messages,
+                response_text=response_content or "",
                 model=self.light_model,
                 request_type="entity_extraction"
             )
             
-            entity_name = response.choices[0].message.content
+            entity_name = response_content
             if entity_name is None:
                 logger.warning("LLM returned None for customer name")
                 return "Customer"
@@ -255,7 +247,7 @@ Respond with ONLY the target company name, nothing else."""
         logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
-        results['conclusion'] = self.generate_final_conclusion(conclusions_text)
+        results['conclusion'] = self.generate_final_conclusion(results['steps'])
         logger.info("DEBUG: All additional sections generated successfully")
         
         logger.info("ASC 606 analysis completed successfully")

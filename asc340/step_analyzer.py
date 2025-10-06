@@ -53,16 +53,14 @@ class ASC340StepAnalyzer:
         try:
             logger.info("Extracting company name using LLM")
             
-            request_params = {
-                "model": self.light_model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert at identifying the company name in sales commissions or service contracts. Your task is to identify the name of the company that is paying the costs to botain a contract from the user-uploaded documents."
-                    },
-                    {
-                        "role": "user",
-                        "content": f"""Based on the user-provided documents, what is the name of the company paying the costs to obtain a contract (e.g., commissions)?
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying the company name in sales commissions or service contracts. Your task is to identify the name of the company that is paying the costs to botain a contract from the user-uploaded documents."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Based on the user-provided documents, what is the name of the company paying the costs to obtain a contract (e.g., commissions)?
 
 Please identify:
 - The company that is responsible for the costs to obtain a contract
@@ -73,27 +71,21 @@ Contract Text:
 {contract_text[:4000]}
 
 Respond with ONLY the company name, nothing else."""
-                    }
-                ],
-                **self._get_max_tokens_param("default", self.light_model),
-                "temperature": self._get_temperature(self.light_model)
-            }
+                }
+            ]
             
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
-            response = self.client.chat.completions.create(**request_params)
+            response_content = self._make_llm_request(messages, self.light_model, "default")
             
             # Track API cost for entity extraction
             from shared.api_cost_tracker import track_openai_request
             track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
+                messages=messages,
+                response_text=response_content or "",
                 model=self.light_model,
                 request_type="entity_extraction"
             )
             
-            entity_name = response.choices[0].message.content
+            entity_name = response_content
             if entity_name is None:
                 logger.warning("LLM returned None for company entity name")
                 return "Company"
@@ -255,7 +247,7 @@ Respond with ONLY the company name, nothing else."""
         logger.info("Generating background...")
         results['background'] = self.generate_background_section(conclusions_text, customer_name)
         logger.info("Generating conclusion...")
-        results['conclusion'] = self.generate_conclusion_section(conclusions_text)
+        results['conclusion'] = self.generate_final_conclusion(results['steps'])
         logger.info("All additional sections generated successfully")
         
         logger.info("ASC 340-40 analysis completed successfully")
@@ -744,55 +736,6 @@ Instructions:
             logger.error(f"Error generating background: {str(e)}")
             return f"We have reviewed the contract cost documents provided by {customer_name} to determine the appropriate accounting treatment under ASC 340-40."
     
-    def generate_conclusion_section(self, conclusions_text: str) -> str:
-        """Generate conclusion section using clean LLM call."""
-        prompt = f"""Generate a professional final conclusion for an ASC 340-40 analysis.
-
-Step Conclusions:
-{conclusions_text}
-
-Instructions:
-1. Write 2-3 sentences assessing ASC 340-40 compliance
-2. Do not include specific dollar amounts or placeholders
-3. Be direct - if there are concerns, state them clearly
-4. Focus on compliance assessment
-5. Use professional accounting language
-6. Use proper paragraph spacing"""
-
-        try:
-            params = {
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": "You are a senior accounting analyst preparing final conclusions for ASC 340-40 analyses. Provide clean, professional content with proper currency formatting."},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": self._get_temperature()
-            }
-            params.update(self._get_max_tokens_param("conclusion"))
-            
-            response = self.client.chat.completions.create(**params)
-            
-            # Track API cost for conclusion section
-            from shared.api_cost_tracker import track_openai_request
-            track_openai_request(
-                messages=params["messages"],
-                response_text=response.choices[0].message.content or "",
-                model=params["model"],
-                request_type="conclusion_generation"
-            )
-            
-            content = response.choices[0].message.content
-            if content:
-                content = content.strip()
-                logger.info(f"Generated conclusion section ({len(content)} chars)")
-                return content
-            else:
-                logger.error("Empty conclusion response")
-                return "The analysis indicates compliance with ASC 340-40 requirements. Implementation should proceed as outlined in the step-by-step analysis above."
-            
-        except Exception as e:
-            logger.error(f"Error generating conclusion: {str(e)}")
-            return "The analysis indicates compliance with ASC 340-40 requirements. Implementation should proceed as outlined in the step-by-step analysis above."
     
     def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
         """Generate LLM-powered final conclusion from analysis results."""
@@ -856,69 +799,6 @@ Instructions:
             logger.error(f"Final conclusion generation failed: {str(e)}")
             # Fallback to simple conclusion
             return "Based on our comprehensive analysis under ASC 340-40, the proposed accounting treatment is appropriate and complies with the authoritative guidance."
-    
-    def generate_background_section_old(self, analysis_results: Dict[str, Any], customer_name: str) -> str:
-        """Generate LLM-powered background section from analysis results."""
-        
-        # Extract key conclusions for contract overview
-        conclusions = []
-        for step_num in range(1, 6):
-            step_key = f'step_{step_num}'
-            if step_key in analysis_results and analysis_results[step_key].get('conclusion'):
-                conclusions.append(analysis_results[step_key]['conclusion'])
-        
-        # Build prompt
-        conclusions_text = "\n".join(conclusions[:2])  # Use first 2 steps for contract overview
-        
-        prompt = f"""Generate a professional 2-3 sentence background for an ASC 340-40 memo.
-
-Company: {customer_name}
-Contract Summary: {conclusions_text}
-
-Instructions:
-1. Describe what type of arrangement was reviewed (high-level)
-2. Mention key cost elements if evident
-3. State the purpose of the ASC 340-40 analysis
-4. Professional accounting language
-5. Keep it high-level, no specific amounts or detailed terms"""
-
-        # Call LLM API
-        try:
-            request_params = {
-                "model": self.light_model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert technical accountant specializing in ASC 340-40 contract costs."
-                    },
-                    {
-                        "role": "user", 
-                        "content": prompt
-                    }
-                ],
-                "temperature": self._get_temperature(self.light_model),
-                **self._get_max_tokens_param("background", self.light_model)
-            }
-            
-            response = self.client.chat.completions.create(**request_params)
-            
-            # Track API cost for background section (old)
-            from shared.api_cost_tracker import track_openai_request
-            track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
-                model=self.light_model,
-                request_type="background_generation_old"
-            )
-            
-            return response.choices[0].message.content.strip()
-            
-        except Exception as e:
-            logger.error(f"Background section generation failed: {str(e)}")
-            # Fallback to simple background
-            clean_customer_name = customer_name.split('\n')[0].strip() if customer_name else "the client"
-            return f"We have reviewed the contract cost documents provided by {clean_customer_name} to determine the appropriate accounting treatment under ASC 340-40. This memorandum presents our analysis following the ASC 340-40 methodology.."
-    
 
     
     def _load_step_prompts(self) -> Dict[str, str]:

@@ -483,7 +483,7 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
                 executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
                 background = analyzer.generate_background_section(conclusions_text, customer_name) 
-                final_conclusion = analyzer.generate_final_conclusion(analysis_results)
+                final_conclusion = analyzer.generate_final_conclusion(conclusions_text)
                 
                 # Prepare analysis_results dict with all components for CleanMemoGenerator
                 memo_analysis_results = {
@@ -561,193 +561,6 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
         st.info("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
 
 
-def perform_asc340_analysis(contract_text: str, filename: str, additional_context: str = ""):
-    """Perform the complete ASC 340-40 analysis and display results with session isolation."""
-    
-    # Session isolation - create unique session ID for this user
-    if 'user_session_id' not in st.session_state:
-        st.session_state.user_session_id = str(uuid.uuid4())
-        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
-    
-    session_id = st.session_state.user_session_id
-    
-    # Create placeholder for the in-progress message
-    progress_message_placeholder = st.empty()
-    progress_message_placeholder.error(
-        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE OR SWITCH TABS!**\n\n"
-        "Your analysis is running and will take up to 3-5 minutes. "
-        "Switching to another tab or closing this browser will stop the analysis and forfeit your progress."
-    )
-    
-    # Initialize analysis complete status with session isolation
-    analysis_key = f'asc340_analysis_complete_{session_id}'
-    if analysis_key not in st.session_state:
-        st.session_state[analysis_key] = False
-    
-    # Generate analysis title
-    analysis_title = _generate_analysis_title()
-
-    try:
-        # Initialize components
-        with st.spinner("Initializing analysis components..."):
-            try:
-                analyzer = ASC340StepAnalyzer()
-                knowledge_search = ASC340KnowledgeSearch()
-                from asc340.clean_memo_generator import CleanMemoGenerator
-                memo_generator = CleanMemoGenerator(
-                    template_path="asc340/templates/memo_template.md")
-                from shared.ui_components import SharedUIComponents
-                ui = SharedUIComponents()
-            except RuntimeError as e:
-                st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 340-40 knowledge base is not available. Try again and contact support if this persists.")
-                st.stop()
-                return
-
-        # Extract entity name using LLM (with regex fallback) 
-        with st.spinner("🏢 Extracting the company name..."):
-            try:
-                customer_name = analyzer.extract_entity_name_llm(contract_text)
-                logger.info(f"LLM extracted company name: {customer_name}")
-            except Exception as e:
-                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
-                customer_name = _extract_customer_name(contract_text)
-                logger.info(f"Regex fallback company name: {customer_name}")
-
-        # Display progress (match ASC 606 - no memo generation step shown)
-        steps = [
-            "Processing", "Step 1", "Step 2"
-        ]
-        progress_placeholder = st.empty()
-
-        # Step-by-step analysis with progress indicators
-        analysis_results = {}
-        
-        # Create a separate placeholder for progress indicators that can be cleared
-        progress_indicator_placeholder = st.empty()
-        
-        # Run 2 ASC 340-40 steps with progress
-        for step_num in range(1, 3):
-            # Show progress indicators in clearable placeholder
-            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
-
-            with st.spinner(f"Analyzing Step {step_num}..."):
-                # Get relevant guidance from knowledge base
-                authoritative_context = knowledge_search.search_for_step(
-                    step_num, contract_text)
-
-                # Analyze the step with additional context
-                step_result = analyzer._analyze_step(
-                    step_num=step_num,
-                    contract_text=contract_text,
-                    authoritative_context=authoritative_context,
-                    customer_name=customer_name,
-                    additional_context=additional_context)
-
-                analysis_results[f'step_{step_num}'] = step_result
-                logger.info(f"DEBUG: Completed step {step_num}")
-
-        # Generate additional sections (Executive Summary, Background, Conclusion)
-        # Don't show memo generation step indicator to match ASC 606
-
-        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Extract conclusions from the 2 steps
-            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
-            
-            # Generate the three additional sections
-            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
-            background = analyzer.generate_background_section(conclusions_text, customer_name)
-            conclusion = analyzer.generate_conclusion_section(conclusions_text)
-            
-            # Combine into the expected structure for memo generator
-            final_results = {
-                'customer_name': customer_name,
-                'analysis_title': analysis_title,
-                'analysis_date': datetime.now().strftime("%B %d, %Y"),
-                'filename': filename,
-                'steps': analysis_results,
-                'executive_summary': executive_summary,
-                'background': background,
-                'conclusion': conclusion
-            }
-            
-            
-            # Generate memo directly from complete analysis results
-            memo_content = memo_generator.combine_clean_steps(final_results)
-
-        # Store memo data in session state and clear progress messages
-        progress_message_placeholder.empty()  # Clears the in-progress message
-        progress_placeholder.empty()  # Clears the step headers
-        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
-        
-        # Create clearable completion message
-        completion_message_placeholder = st.empty()
-        completion_message_placeholder.success(
-            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 340-40 policy memo is ready. Scroll down to view the results."
-        )
-        
-        # Signal completion with session isolation
-        st.session_state[analysis_key] = True
-        
-        # Store memo data with session isolation
-        memo_key = f'asc340_memo_data_{session_id}'
-        st.session_state[memo_key] = {
-            'memo_content': memo_content,
-            'customer_name': customer_name,
-            'analysis_title': analysis_title,
-            'analysis_date': datetime.now().strftime("%B %d, %Y")
-        }
-             
-        # Display memo inline instead of switching pages
-        st.markdown("---")
-
-        with st.container(border=True):
-            st.markdown("""Your ASC 340-40 policy memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
-                """)
-        
-        # Display the memo using CleanMemoGenerator
-        memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
-        
-        # Clear completion message immediately after memo displays
-        completion_message_placeholder.empty()
-        
-        if st.button("🔄 Analyze Another Plan", type="primary", use_container_width=True):
-            # Clear analysis state for fresh start with session isolation
-            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-            
-            # Clean up session-specific data
-            memo_key = f'asc340_memo_data_{session_id}'
-            if memo_key in st.session_state:
-                del st.session_state[memo_key]
-            if analysis_key in st.session_state:
-                del st.session_state[analysis_key]
-            
-            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
-            st.rerun()
-
-    except Exception as e:
-        # Clear the progress message even on error
-        progress_message_placeholder.empty()
-        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 340-40 analysis error for session {session_id[:8]}...: {str(e)}")
-        st.session_state[analysis_key] = True  # Signal completion (even on error)
-
-# OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
-
-
-# Executive summary generation moved to ASC340StepAnalyzer class
-
-
-# Final conclusion generation moved to ASC340StepAnalyzer class
-
-
-# Issues collection removed - issues are already included in individual step analyses
-
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -756,10 +569,7 @@ logging.basicConfig(level=logging.INFO)
 def main():
     """Main function called by Streamlit navigation."""
     render_asc340_page()
-
-
-
-
+    
 def _extract_customer_name(contract_text: str) -> str:
     """Extract the customer/recipient party name from typical contract preambles or headings."""
     try:
