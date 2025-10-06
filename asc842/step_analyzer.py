@@ -145,6 +145,31 @@ Respond with ONLY the entity name, nothing else."""
             }
             return {"max_tokens": token_limits.get(request_type, 2000)}
     
+    def _make_llm_request(self, messages, model=None, request_type="default"):
+        """Helper method to route between Responses API (GPT-5) and Chat Completions API (GPT-4o)."""
+        target_model = model or self.model
+        
+        if target_model in ["gpt-5", "gpt-5-mini"]:
+            # Use Responses API for GPT-5 models
+            response = self.client.responses.create(
+                model=target_model,
+                input=messages,
+                max_output_tokens=10000,  # GPT-5 uses max_output_tokens
+                reasoning={"effort": "medium"}
+            )
+            # Access response content from Responses API format
+            return response.choices[0].message.content
+        else:
+            # Use Chat Completions API for GPT-4o models
+            request_params = {
+                "model": target_model,
+                "messages": messages,
+                "temperature": self._get_temperature(target_model),
+                **self._get_max_tokens_param(request_type, target_model)
+            }
+            response = self.client.chat.completions.create(**request_params)
+            return response.choices[0].message.content
+    
     def analyze_lease_contract(self, 
                         contract_text: str,
                         authoritative_context: str,
