@@ -367,7 +367,7 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
             # Generate the three additional sections
             executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
             background = analyzer.generate_background_section(conclusions_text, customer_name)
-            conclusion = analyzer.generate_final_conclusion(conclusions_text)
+            conclusion = analyzer.generate_final_conclusion(analysis_results)
             
             # Combine into the expected structure for memo generator
             final_results = {
@@ -608,7 +608,7 @@ def perform_asc805_analysis(contract_text: str, additional_context: str = ""):
             # Generate the three additional sections
             executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
             background = analyzer.generate_background_section(conclusions_text, customer_name)
-            conclusion = analyzer.generate_final_conclusion(conclusions_text)
+            conclusion = analyzer.generate_final_conclusion(analysis_results)
             
             # Combine into the expected structure for memo generator
             final_results = {
