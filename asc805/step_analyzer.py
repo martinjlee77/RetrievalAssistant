@@ -397,33 +397,45 @@ Respond with ONLY the target company name, nothing else."""
             
             markdown_content = response.choices[0].message.content
             
-            if markdown_content is None:
-                logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
-                markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
-            else:
-                # Content received successfully
+            if markdown_content is None or not markdown_content.strip():
+                error_msg = f"GPT-5 returned empty/None content for Step {step_num}"
+                logger.error(f"ERROR: {error_msg}")
+                raise ValueError(error_msg)  # Raise exception to trigger retry
+            
+            # Content received successfully - strip whitespace
+            markdown_content = markdown_content.strip()
+            
+            # Check for suspiciously short response (< 100 chars likely indicates incomplete response)
+            if len(markdown_content) < 100:
+                error_msg = f"Step {step_num}: Response too short ({len(markdown_content)} chars) - likely incomplete"
+                logger.warning(f"⚠️ {error_msg}")
+                raise ValueError(error_msg)  # Raise exception to trigger retry
+            
+            # Validate the output for quality assurance
+            validation_result = self.validate_step_output(markdown_content, step_num)
+            if not validation_result["valid"]:
+                logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
                 
-                # ONLY strip whitespace - NO OTHER PROCESSING
-                markdown_content = markdown_content.strip()
+                # Check for critical missing sections (Analysis or Conclusion)
+                critical_issues = [issue for issue in validation_result['issues'] 
+                                 if 'Missing Analysis section' in issue or 'Missing Conclusion section' in issue]
                 
-                # Check for suspiciously short response
-                if not markdown_content or len(markdown_content) < 50:
-                    logger.warning(f"⚠️ Step {step_num}: Received suspiciously short response ({len(markdown_content) if markdown_content else 0} chars)")
+                if critical_issues:
+                    # Critical sections missing - trigger retry
+                    error_msg = f"Step {step_num}: Critical sections missing - {'; '.join(critical_issues)}"
+                    logger.error(f"⚠️ {error_msg}")
+                    raise ValueError(error_msg)  # Raise exception to trigger retry
                 
-                # Validate the output for quality assurance
-                validation_result = self.validate_step_output(markdown_content, step_num)
-                if not validation_result["valid"]:
-                    logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
-                    # Append validation issues to the Issues section
-                    if "**Issues or Uncertainties:**" in markdown_content:
-                        issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
-                        markdown_content = markdown_content.replace(
-                            "**Issues or Uncertainties:**", 
-                            "**Issues or Uncertainties:**" + issues_section + "\n\n"
-                        )
-                
-                # Log sample of clean content for verification
-                logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
+                # For non-critical issues, append validation notes
+                if "**Issues or Uncertainties:**" in markdown_content:
+                    issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
+                    markdown_content = markdown_content.replace(
+                        "**Issues or Uncertainties:**", 
+                        "**Issues or Uncertainties:**" + issues_section + "\n\n"
+                    )
+            
+            # Log sample of clean content for verification
+            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
             
             # Return clean markdown content - NO PROCESSING
             return {
