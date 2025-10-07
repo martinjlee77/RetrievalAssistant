@@ -1412,7 +1412,7 @@ def get_user_profile():
         # Get user data
         cursor.execute("""
             SELECT id, email, first_name, last_name, company_name, job_title,
-                   credits_balance, created_at, email_verified
+                   credits_balance, created_at, email_verified, research_assistant_access
             FROM users 
             WHERE id = %s
         """, (user_id,))
@@ -1457,7 +1457,8 @@ def get_user_profile():
                 'credits_balance': float(user['credits_balance'] or 0),
                 'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
                 'member_since': user['created_at'].isoformat(),
-                'email_verified': bool(user['email_verified'])
+                'email_verified': bool(user['email_verified']),
+                'research_assistant_access': bool(user['research_assistant_access'])
             },
             'recent_analyses': [
                 {

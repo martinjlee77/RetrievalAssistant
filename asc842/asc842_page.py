@@ -597,18 +597,6 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
             analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
 
 
-# OLD PARSING SYSTEM REMOVED - Using direct markdown approach only
-
-
-# Executive summary generation moved to ASC842StepAnalyzer class
-
-
-# Final conclusion generation moved to ASC842StepAnalyzer class
-
-
-# Issues collection removed - issues are already included in individual step analyses
-
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
