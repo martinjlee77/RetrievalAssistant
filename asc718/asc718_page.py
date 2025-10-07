@@ -96,11 +96,15 @@ def render_asc718_page():
     pricing_result = None
     pricing_container = st.empty()  # Create clearable container FIRST (before if block)
     if uploaded_files:
+        st.write(f"DEBUG 1: uploaded_files = {len(uploaded_files)} files")
         # Process files for pricing - dynamic cost updating with progress indicator
         with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
             pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
-
-        if pricing_result['success']:
+        
+        st.write(f"DEBUG 2: pricing_result['success'] = {pricing_result.get('success')}")
+        st.write(f"DEBUG 3: pricing_result keys = {list(pricing_result.keys())}")
+        
+        if pricing_result.get('success'):
             with pricing_container.container():  # Put EVERYTHING inside
                 st.markdown("### :primary[Analysis Pricing]")
                 st.info(pricing_result['billing_summary'])
