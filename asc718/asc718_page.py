@@ -395,7 +395,7 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
-                    customer_name=customer_name,
+                    entity_name=customer_name,
                     additional_context=additional_context)
 
                 analysis_results[f'step_{step_num}'] = step_result
