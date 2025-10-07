@@ -260,10 +260,10 @@ def render_research_assistant():
         st.info("""
         The ASC Research Assistant is currently available to approved users only.
         
-        📧 **Interested in access?** Contact us at **support@veritaslogic.ai** to request approval.
+        **Interested in access?** Contact us at **support@veritaslogic.ai** to request approval.
         
         This feature provides instant answers to complex accounting questions with authoritative 
-        citations across all ASC standards (606, 340-40, 718, 842, 805).
+        citations across the following accounting standards: ASC 606, ASC 340-40, ASC 718, ASC 842, and ASC 805).
         """)
         return  # Exit early - nothing else renders
     
