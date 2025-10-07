@@ -452,11 +452,12 @@ Respond with ONLY the company name, nothing else."""
         """Validate step output for required sections and formatting issues."""
         issues = []
         
-        # Check for required sections
-        if "**Analysis:**" not in markdown_content:
+        # Check for required sections - accept both bold and non-bold formats at line start
+        # Pattern matches: **Analysis:** or Analysis: at the start of a line
+        if not re.search(r'^(\*\*)?Analysis:\s*(\*\*)?', markdown_content, re.MULTILINE):
             issues.append(f"Missing Analysis section in Step {step_num}")
         
-        if "**Conclusion:**" not in markdown_content:
+        if not re.search(r'^(\*\*)?Conclusion:\s*(\*\*)?', markdown_content, re.MULTILINE):
             issues.append(f"Missing Conclusion section in Step {step_num}")
         
         # Check currency formatting - flag numbers that look like currency but missing $
@@ -640,8 +641,13 @@ FORMATTING:
                     if marker_match:
                         conclusion = marker_match.group(1).strip()
                     else:
-                        # Fallback to improved regex that captures until next bold section or end
+                        # Try both formats: **Conclusion:** (bold) OR Conclusion: (plain)
+                        # Pattern 1: Bold format
                         conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if not conclusion_match:
+                            # Pattern 2: Plain text format (no bold)
+                            conclusion_match = re.search(r'^Conclusion:\s*(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        
                         if conclusion_match:
                             conclusion = conclusion_match.group(1).strip()
                         else:

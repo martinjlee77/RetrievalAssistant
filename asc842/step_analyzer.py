@@ -619,13 +619,15 @@ FORMATTING:
     
     def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
         """Validate step output for required structural sections only."""
+        import re
         issues = []
         
-        # Check for required sections
-        if "**Analysis:**" not in markdown_content:
+        # Check for required sections - accept both bold and non-bold formats at line start
+        # Pattern matches: **Analysis:** or Analysis: at the start of a line
+        if not re.search(r'^(\*\*)?Analysis:\s*(\*\*)?', markdown_content, re.MULTILINE):
             issues.append(f"Missing Analysis section in Step {step_num}")
         
-        if "**Conclusion:**" not in markdown_content:
+        if not re.search(r'^(\*\*)?Conclusion:\s*(\*\*)?', markdown_content, re.MULTILINE):
             issues.append(f"Missing Conclusion section in Step {step_num}")
         
         return {"valid": len(issues) == 0, "issues": issues}
@@ -665,8 +667,13 @@ FORMATTING:
                         conclusions.append(f"Step {step_num}: {conclusion_text}")
                         logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
                     else:
-                        # Fallback to improved regex that captures until next bold section or end
+                        # Try both formats: **Conclusion:** (bold) OR Conclusion: (plain)
+                        # Pattern 1: Bold format
                         conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if not conclusion_match:
+                            # Pattern 2: Plain text format (no bold)
+                            conclusion_match = re.search(r'^Conclusion:\s*(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        
                         if conclusion_match:
                             conclusion_text = conclusion_match.group(1).strip()
                             conclusions.append(f"Step {step_num}: {conclusion_text}")
