@@ -99,6 +99,9 @@ def render_asc718_page():
         # Process files for pricing - dynamic cost updating with progress indicator
         with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
             pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        
+        # DEBUG: Show what pricing_result contains
+        st.write("DEBUG - pricing_result:", pricing_result)
 
         if pricing_result['success']:
             with pricing_container.container():  # Put EVERYTHING inside
