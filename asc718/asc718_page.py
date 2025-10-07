@@ -96,14 +96,10 @@ def render_asc718_page():
     pricing_result = None
     pricing_container = st.empty()  # Create clearable container FIRST (before if block)
     if uploaded_files:
-        st.write(f"DEBUG 1: uploaded_files = {len(uploaded_files)} files")
         # Process files for pricing - dynamic cost updating with progress indicator
         with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
             pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
-        
-        st.write(f"DEBUG 2: pricing_result['success'] = {pricing_result.get('success')}")
-        st.write(f"DEBUG 3: pricing_result keys = {list(pricing_result.keys())}")
-        
+
         if pricing_result.get('success'):
             with pricing_container.container():  # Put EVERYTHING inside
                 st.markdown("### :primary[Analysis Pricing]")
@@ -289,11 +285,23 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         st.error("❌ Authentication required.")
         return
     
-    # Get processed file content from pricing result 
-    combined_text = pricing_result.get('combined_text', '')
-    filename_string = pricing_result.get('filename_summary', 'Uploaded Documents')
+    # Reconstruct combined text from file details (same pattern as ASC 606)
+    combined_text = ""
+    filename_list = []
     
-    if not combined_text or not combined_text.strip():
+    for file_detail in pricing_result['file_details']:
+        if 'text_content' in file_detail and file_detail['text_content'].strip():
+            combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
+            filename_list.append(file_detail['filename'])
+        else:
+            # Fallback if text_content is missing
+            combined_text += f"\n\n=== {file_detail['filename']} ===\n\n[File content extraction failed]"
+            filename_list.append(file_detail['filename'])
+    
+    filename_string = ", ".join(filename_list) if filename_list else "Uploaded Documents"
+    
+    # Check if we have valid content
+    if not combined_text.strip() or "[File content extraction failed]" in combined_text:
         st.error("❌ No readable content found in uploaded files.")
         return
         
