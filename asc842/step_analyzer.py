@@ -32,7 +32,7 @@ class ASC842StepAnalyzer:
         
         # ===== MODEL CONFIGURATION (CHANGE HERE TO SWITCH MODELS) =====
         # Set use_premium_models to True for GPT-5/GPT-5-mini, False for GPT-4o/GPT-4o-mini
-        self.use_premium_models = False
+        self.use_premium_models = True
         
         # Model selection based on configuration
         if self.use_premium_models:
@@ -456,7 +456,7 @@ Your analysis must be:
 - Support your analysis with specific contract text and authoritative citations
 - Use direct quotes from the lease contract only when the exact wording is outcome-determinative
 - Paraphrase ASC 842 with pinpoint citations; brief decisive phrases may be quoted when directly supportive
-- Make reasonable assumptions for missing data (e.g., market discount rates) and clearly identify these assumptions
+- Flag missing data as "Not specified" or create management input placeholders for external judgments
 - Acknowledge any limitations or gaps in information
 - Formatted as clean, ready-to-display markdown
 
@@ -476,61 +476,53 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scope, identify a lease, and determine the enforceable period and lease term',
                 'focus': 'Confirm the arrangement is (or contains) a lease and establish the enforceable period and lease term',
                 'key_points': [
-                    'A contract contains a lease if it conveys the right to control the use of an identified asset for a period of time in exchange for consideration [ASC 842-10-15-3; 842-10-15-9 through 15-16]',
-                    'Scope exclusions include leases of certain intangible assets, biological assets, and inventory [ASC 842-10-15-2]',
-                    'Enforceable period: a contract is no longer enforceable when both parties can terminate without more than an insignificant penalty; assess lease term only within the enforceable period [Master Glossary: Enforceable; Lease Term; Noncancellable]',
-                    'Substitution rights: if the supplier\'s substitution right is substantive, the asset is not identified [ASC 842-10-15-9 through 15-14]',
-                    'Embedded derivatives may require bifurcation under ASC 815; the lease itself is not a derivative [ASC 815-10-15; 815-15]',
-                    'Lease term: noncancellable period plus periods covered by options to extend (if reasonably certain to exercise), options to terminate (if reasonably certain not to exercise), and specified lessor-controlled periods [Master Glossary: Lease Term; ASC 842-10-35-1 through 35-3; 842-10-55-23 through 55-26]',
-                    'Reassess lease term upon specified events (e.g., significant event/change in circumstances within the lessee\'s control affecting option assessments) [ASC 842-10-35-1 through 35-3]',
-                    'Both‑party termination rights generally cap the enforceable period at the earliest date either party can terminate without more than an insignificant penalty [Master Glossary: Enforceable]',
-                    'If only the lessee has a termination right, treat it as a lessee termination option when determining the lease term [ASC 842-10-55-24]'
+                    'Confirm lease definition: right to control use of identified asset for a period in exchange for consideration. Check scope exclusions (intangibles, biologicals, inventory). [ASC 842-10-15-2, 15-3, 15-9 to 15-16]',
+                    'Identify the asset: If supplier has substantive substitution rights → asset not identified. [ASC 842-10-15-9 to 15-14]',
+                    'Determine enforceable period: Contract enforceable until both parties can terminate without more than insignificant penalty. [Master Glossary: Enforceable]',
+                    'Determine lease term within enforceable period: Noncancellable period + extension options (if reasonably certain to exercise) + lessor-controlled periods. For lessee-only termination rights → treat as termination option. [ASC 842-10-35-1 to 35-3; 842-10-55-23 to 55-26]',
+                    'Note reassessment triggers: Significant event/change in circumstances within lessee's control affecting option assessments. [ASC 842-10-35-1 to 35-3]'
                 ]
             },
             2: {
                 'title': 'Step 2: Identify components and determine lease payments',
                 'focus': 'Separate lease vs nonlease components (or elect not to separate) and determine payments included in the lease liability',
                 'key_points': [
-                    'Identify lease components (right to use each underlying asset) and nonlease components (e.g., services, CAM); administrative tasks are not components [ASC 842-10-15-28 through 15-31]',
-                    'Allocation: If not electing the practical expedient, allocate consideration to components based on relative standalone prices [ASC 842-10-15-32 through 15-36]',
-                    'Practical expedient: By class of underlying asset, you may elect to not separate nonlease components; account for combined consideration as a single lease component [ASC 842-10-15-37 through 15-38]',
-                    'Ownership-level costs paid by the lessor (e.g., property taxes/insurance) that are reimbursed by the lessee are typically nonlease components unless in‑substance fixed lease payments [ASC 842-10-15-30]',
-                    'Include in lease payments: fixed payments (including in‑substance fixed), variable payments that depend on an index or a rate (measured using the index/rate at commencement), amounts probable under residual value guarantees, purchase option price if reasonably certain to exercise, and termination penalties consistent with lease‑term assessment; reduce for lease incentives receivable [ASC 842-20-30-5]',
-                    'Exclude usage/performance‑based variable payments that are not in‑substance fixed; expense as incurred [ASC 842-20-25]'
+                    'Identify lease components (right to use each asset) vs nonlease components (services, CAM). Note: administrative tasks are not components. [ASC 842-10-15-28 to 15-31]',
+                    'Note practical expedient election: By asset class, lessee may elect not to separate nonlease components → account as single lease component. Flag as [Management Input Required: Non-separation expedient election by asset class per ASC 842-10-15-37]. [ASC 842-10-15-37 to 15-38]',
+                    'Determine lease payments to include: Fixed (including in-substance fixed), index/rate-based variable (at commencement index/rate), RVG amounts (if probable), purchase option (if reasonably certain), termination penalties (per lease term assessment), less lease incentives receivable. [ASC 842-20-30-5]',
+                    'Exclude usage/performance-based variable payments → expense as incurred. [ASC 842-20-25]'
                 ]
             },
             3: {
                 'title': 'Step 3: Classify the lease and measure at commencement',
-                'focus': 'Decide finance vs operating classification and measure the lease liability and ROU asset on the commencement date (using the user‑provided discount rate)',
+                'focus': 'Classify the lease (finance vs operating) and identify measurement requirements for initial recognition',
                 'key_points': [
-                    'Classification: Finance if any of the five criteria are met (transfer of ownership, reasonably certain purchase option, lease term is a major part of remaining economic life, PV of payments is substantially all of fair value, or no alternative use); otherwise operating [ASC 842-10-25-2]',
-                    'Classification is not reassessed after commencement unless certain modifications/remeasurements occur [ASC 842-10-25-8]',
-                    'Commencement date is when the asset is made available for use; measure and recognize at that date [ASC 842-10-55]',
-                    'Recognize a lease liability at the present value of lease payments (use the user‑provided rate) and an ROU asset measured as: lease liability + prepaid lease payments + initial direct costs – lease incentives received/receivable [ASC 842-20-25-1; 842-20-30-1; 842-20-30-5]',
-                    'Initial direct costs are narrowly defined as incremental costs that would not have been incurred if the lease had not been obtained [Master Glossary; ASC 842-10-30]',
-                    'Include asset retirement obligations (if any) in the ROU asset per ASC 410 (not in the lease liability) [ASC 410; ASC 842-20-30-1]',
-                    'Short‑term lease policy: if elected and criteria met (12 months or less and no purchase option), do not recognize ROU asset/liability; recognize lease cost generally straight‑line [ASC 842-20-25-2]'
+                    'Classify as finance or operating: Finance if any criteria met (ownership transfer, purchase option reasonably certain, lease term = major part of economic life, PV = substantially all FV, or no alternative use to lessor). Otherwise → operating. Not reassessed post-commencement except for modifications. [ASC 842-10-25-2, 25-8]',
+                    'Determine commencement date (asset available for use) → measure and recognize at that date. [ASC 842-10-55]',
+                    'Measure lease liability: PV of lease payments using discount rate. Flag as [Management Input Required: Incremental borrowing rate or rate implicit in lease per ASC 842-20-30-3]. [ASC 842-20-30-5]',
+                    'Measure ROU asset: Lease liability + prepaid + initial direct costs (narrowly defined: incremental costs) – lease incentives + AROs (if any). [ASC 842-20-25-1; 842-20-30-1; ASC 410]',
+                    'Note short-term lease policy election (if applicable): ≤12 months, no purchase option → expense straight-line, no ROU/liability. Flag policy election as management input. [ASC 842-20-25-2]'
                 ]
             },
             4: {
                 'title': 'Step 4: Produce initial accounting outputs',
                 'focus': 'Document and output the initial recognition, classification, calculations, and required notes',
                 'key_points': [
-                    'Provide classification conclusion and rationale with citations [ASC 842-10-25-2]',
-                    'Show the lease payments included in the liability by category and the present value calculation [ASC 842-20-30-5]',
-                    'Provide commencement‑date journal entries (ROU asset, lease liability, and any prepaid/incentive/initial direct cost effects) [ASC 842-20-25-1; 842-20-30-1]',
-                    'Identify initial presentation and disclosure data points (policy elections such as short‑term and non‑separation expedient; significant judgments such as "reasonably certain") [ASC 842-20-45-1; 842-20-50-1]'
+                    'State classification conclusion (finance/operating) with rationale and citations. [ASC 842-10-25-2]',
+                    'Detail lease payments by category and show PV calculation. [ASC 842-20-30-5]',
+                    'Provide commencement-date journal entries: ROU asset, lease liability, prepaid/incentives/IDC effects. [ASC 842-20-25-1; 842-20-30-1]',
+                    'Flag policy elections and significant judgments for disclosure: short-term expedient, non-separation expedient, "reasonably certain" assessments. [ASC 842-20-45-1; 842-20-50-1]'
                 ]
             },
             5: {
                 'title': 'Step 5: Reminders beyond initial recognition (no computations)',
                 'focus': 'Keep in view subsequent accounting, remeasurement triggers, modifications, subleases, and disclosures for later periods',
                 'key_points': [
-                    'Subsequent accounting: finance leases recognize interest on the liability and amortization of the ROU asset; operating leases recognize a single lease cost generally straight‑line; variable payments excluded from the liability are expensed when incurred [ASC 842-20-25; ASC 842-10-55-229]',
-                    'Remeasurement triggers: change in lease term or purchase option assessment; change in expected RVG amounts; resolution of contingencies that make payments fixed; modifications not accounted for as separate. Do not remeasure solely for changes in an index or a rate; under ASC 842 such changes are expensed as variable lease cost unless remeasurement is required for another reason [ASC 842-10-35-1 through 35-3; 842-10-25-8 through 25-10]',
-                    'Modifications: assess whether separate contract; if not separate, remeasure, reallocate, and reassess classification [ASC 842-10-25-8 through 25-10]',
-                    'Subleases/assignments: a sublease creates an intermediate lessor; classify the sublease by reference to the head‑lease ROU asset; derecognize the head lease only upon legal release/novation (termination) [ASC 842-10 (Subleases); ASC 842-20-40]',
-                    'Presentation/disclosures: separate presentation (or disclosure) of operating vs finance ROU assets and lease liabilities, maturity analysis, lease cost components, and significant judgments [ASC 842-20-45-1; 842-20-50-1]'
+                    'Note subsequent accounting pattern: Finance → interest + ROU amortization. Operating → single straight-line lease cost. Variable payments (excluded from liability) → expense as incurred. [ASC 842-20-25; 842-10-55-229]',
+                    'Remeasurement triggers: Lease term/purchase option change, RVG amount change, contingency resolution making payments fixed, non-separate modifications. Note: index/rate changes → expensed as variable cost (no remeasurement unless another trigger occurs). [ASC 842-10-35-1 to 35-3; 842-10-25-8 to 25-10]',
+                    'For modifications: Assess if separate contract. If not → remeasure, reallocate, reassess classification. [ASC 842-10-25-8 to 25-10]',
+                    'For subleases: Intermediate lessor created. Classify sublease by reference to head-lease ROU asset. Derecognize head lease only upon legal release. [ASC 842-10; 842-20-40]',
+                    'Note presentation/disclosure requirements: Operating vs finance separation, maturity analysis, lease cost components, significant judgments. [ASC 842-20-45-1; 842-20-50-1]'
                 ]
             }
         }
@@ -556,17 +548,6 @@ LEASE CONTRACT TEXT:
 ADDITIONAL CONTEXT:
 {additional_context}"""
 
-        # Add analysis instructions for document-only approach
-        prompt += f"""
-
-ANALYSIS INSTRUCTIONS:
-- Make reasonable assumptions where specific data is missing (e.g., assume 6-8% discount rate for market transactions)
-- Extract dates, rates, and terms directly from the contract when available
-- For missing information, state assumptions clearly (e.g., "Assuming a market discount rate of 7%...")
-- Use the "Issues or Uncertainties" section to highlight assumptions and missing information requiring confirmation
-- This is a preliminary analysis - emphasize areas needing follow-up
-
-"""
 
         prompt += f"""
 
@@ -581,7 +562,7 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 ### {step['title']}
 
-[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 842 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 842 with pinpoint citations and use only brief decisive phrases when directly supportive. Make reasonable assumptions for missing data and clearly identify these assumptions.]
+[Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 842 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 842 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
 **Analysis:** [Detailed analysis with supporting evidence. Include:
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion
@@ -591,21 +572,30 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
     Bad: [Lease Agreement, §4.2], [Lease Agreement, p. 15] (unless these exact references appear in the contract text)
 - ASC 842 guidance paraphrased with citations; include only brief decisive phrases when directly supportive (e.g., [ASC 842-10-25-2])
 - Only cite section numbers/page numbers if they are explicitly visible in the contract text
-- ASC 842 guidance paraphrased with citations; include only brief
-decisive phrases when directly supportive
 
 **Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 842 citation.]
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL ANALYSIS REQUIREMENTS:
-- If information is not explicitly stated in the contract, write "Not specified in contract"
-- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
-- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
-- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
-- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+CRITICAL ANALYSIS REQUIREMENTS - CONTRACT VS EXTERNAL DATA:
 
-CRITICAL FORMATTING REQUIREMENTS:
+1. CONTRACT FACTS (dates, terms, amounts explicitly in the document):
+   - If present: Quote or paraphrase with citation
+   - If missing: State "Not specified in contract"
+   - NEVER invent or guess these
+
+2. EXTERNAL INPUTS (accounting policies, valuations, judgments NOT in contract):
+   - Always state the ASC 842 requirement
+   - Create management placeholder: "[Management Input Required: Specify IBR per ASC 842-20-30-3]"
+   - Examples: discount rate, practical expedient elections, "reasonably certain" assessments
+
+3. CITATION RULES:
+   - Contract: Only cite what's visible - [Lease Agreement, Payment Terms] ✓  |  [Lease §3.1] ✗ (unless §3.1 appears)
+   - ASC 842: Paraphrase + pinpoint cite - [ASC 842-10-25-2]
+
+Use assertive language ("We conclude...") when evidence supports it; flag gaps explicitly.
+
+FORMATTING:
 - Format currency as: $240,000 (with comma, no spaces)
 - Use proper spacing after periods and commas
 - Use professional accounting language

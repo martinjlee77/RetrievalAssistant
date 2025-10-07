@@ -473,58 +473,54 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scope, terms, grant date, and classification',
                 'focus': 'Confirm the arrangement is within ASC 718 and determine equity vs liability classification based on settlement features and own-stock criteria',
                 'key_points': [
-                    'Scope: Confirm the award is a compensatory share-based payment within ASC 718 (exclude ESPPs/ESOPs, standalone derivatives under ASC 815, ASC 480 instruments, and customer/vendor incentives under ASC 606). [ASC 718-10-15; ASC 815; ASC 480; ASC 606]',
-                    'Parties: Identify employee vs nonemployee; post-ASU 2018-07, core recognition/measurement principles are largely aligned (with attribution nuances). [ASC 718-10-15; 718-10-30; 718-10-35]',
-                    'Terms inventory: Capture all substantive terms—award type (option/RSU/PSU/SAR), vesting (service vs performance vs market; cliff vs graded), non-vesting conditions (e.g., post-vesting sale restrictions), post-termination/retirement, clawbacks, repurchase/put/call features, reloads, dividend/dividend-equivalent features, settlement alternatives (cash vs shares), and tax withholding/net-share settlement. [ASC 718-10-20; 718-10-30]',
-                    'Grant date: Establish grant date (mutual understanding and approval of key terms). If service inception precedes grant date, recognize compensation using FV measured at each reporting date until grant date, then true-up to grant-date FV. [ASC 718-10-20 (definitions); 718-10-25; 718-10-55]',
-                    'Classification: Determine equity vs liability. Cash-settled or obligating features → liability (remeasured each period). Share-settled that qualify as equity → equity (no post–grant-date remeasurement). Apply own-stock guidance (indexation and settlement) to confirm equity classification. Net share withholding up to the maximum statutory rate generally retains equity classification. Consider features that could force cash settlement or fail own-stock criteria (may require liability classification). [ASC 718-30; 718-20; 815-40; 718-10-25]'
+                    'Confirm ASC 718 scope: compensatory share-based payment (exclude ASC 815 derivatives, ASC 480 instruments, ASC 606 customer incentives). Note that ESPPs/ESOPs are not covered in this analysis. Note employee vs nonemployee. [ASC 718-10-15]',
+                    'Extract award terms: type (option/RSU/PSU/SAR), vesting conditions (service/performance/market; cliff/graded), settlement features (cash/shares), and special provisions (retirement, clawbacks, dividends, net-share withholding). [ASC 718-10-20; 718-10-30]',
+                    'Determine grant date: mutual understanding + approval of key terms. If service precedes grant date, flag interim remeasurement requirement. [ASC 718-10-25]',
+                    'Classify as equity or liability: Cash settlement or obligating features → liability (remeasured). Share settlement meeting own-stock criteria → equity (no remeasurement). Net-share withholding ≤ max statutory rate retains equity classification. [ASC 718-30; 815-40]'
                 ]
             },
             2: {
                 'title': 'Step 2: Grant-date measurement (valuation by award type)',
                 'focus': 'Measure grant-date fair value using an appropriate model and well-supported inputs; apply permitted nonpublic expedients where applicable',
                 'key_points': [
-                    'Options and share-settled SARs (equity): Explain that ASC 718 requires grant-date fair value to be measured using a recognized option-pricing model (e.g., Black-Scholes, lattice model). The memo should list the required inputs (current share price, expected term, volatility, risk-free rate, dividend yield) and generate clear placeholders for management to provide each input, its value, and the source/justification. [ASC 718-10-30; 718-20-55]',
-                    'RSUs/restricted stock: State that the grant-date fair value is determined based on the fair value of the underlying equity on the grant date. The analysis should note that non-vesting conditions, such as post-vesting sales restrictions, must be factored into the fair value measurement and prompt for management to describe if any such conditions exist and how they were considered. [ASC 718-10-30]',
-                    'PSUs: Clearly differentiate the accounting treatment based on the condition type. For non-market performance conditions, explain that they are excluded from the grant-date fair value measurement and instead affect the timing and amount of expense recognized (i.e., recognized only if the condition is probable of achievement). For market conditions, explain that their effect must be included in the grant-date fair value (e.g., via a Monte Carlo simulation) and that compensation cost is recognized regardless of whether the market condition is achieved, provided the service condition is met. [ASC 718-10-20; 718-10-35; 718-20-55; 718-10-30]',
-                    'Liability-classified awards (e.g., cash-settled SARs): Explain the requirement to classify the award as a liability and to remeasure its fair value at each reporting date until settlement. State that changes in fair value are recorded in earnings and prompt for management to confirm the process for this recurring valuation. [ASC 718-30-35]',
-                    'Nonpublic expedients: If the entity is nonpublic, describe the permitted practical expedients available under ASC 718, such as the simplified method for estimating the expected term. Prompt the user to specify if they are electing any expedients and to provide the necessary justification. [ASC 718-10-30]'
+                    'Identify award type (option/RSU/PSU/SAR) and determine the applicable valuation approach under ASC 718. [ASC 718-10-30; 718-20-55]',
+                    'For options/SARs: Flag that fair value requires option-pricing model inputs (share price, expected term, volatility, risk-free rate, dividend yield). Create management placeholders for missing inputs.',
+                    'For RSUs: Use grant-date stock price as fair value; flag any non-vesting conditions (e.g., post-vest restrictions) requiring fair value adjustment.',
+                    'For PSUs: Distinguish market conditions (included in grant-date FV via Monte Carlo) from performance conditions (excluded from FV; affects expense timing only).',
+                    'For liability awards: Note remeasurement requirement at each period. [ASC 718-30-35]',
+                    'Nonpublic expedients: For nonpublic entities, describe the permitted practical expedients available under ASC 718, such as the simplified method for estimating the expected term. [ASC 718-10-30]'
                 ]
             },
             3: {
                 'title': 'Step 3: Requisite service period, attribution, forfeitures, and condition assessments',
                 'focus': 'Determine the period/pattern of recognition and apply condition-specific rules',
                 'key_points': [
-                    'Requisite service period: Analyze the award terms to identify the explicit, implicit, or derived service period. The analysis should state the determined service period based on the vesting conditions, including any specific considerations for market conditions or retirement eligibility. [ASC 718-10-20; 718-10-35]',
-                    'Attribution: Based on the vesting schedule identified in the terms, describe the permissible attribution methods. For awards with graded vesting, explain that the entity can elect, as an accounting policy, to use either the straight-line method for the entire award or the accelerated (graded) method for each tranche. Prompt for management to state its accounting policy. [ASC 718-10-35]',
-                    'Forfeitures: Explain that an entity must make an accounting policy election to either (a) estimate the number of awards expected to be forfeited and update the estimate, or (b) account for forfeitures as they occur. Prompt for management to state its policy election. [ASC 718-10-35]',
-                    'Non-market performance conditions: Explain that for these conditions, compensation cost is recognized only if and when it is probable the condition will be achieved. The analysis must generate a placeholder for management to document its assessment of probability for each performance condition and the basis for that judgment. [ASC 718-10-35; 718-20-55]',
-                    'Market conditions: State that the impact of a market condition is included in the award’s grant-date fair value, and therefore compensation cost is recognized as long as the requisite service is rendered, regardless of whether the market condition is ultimately met. [ASC 718-10-30; 718-20-55]',
-                    'Non-vesting conditions: State that these conditions do not affect vesting or the requisite service period, but their financial impact should be reflected in the grant-date fair value of the award. [ASC 718-10-30]',
-                    'Dividends/dividend equivalents: Describe the accounting treatment based on the award terms. If dividends are forfeitable with the award, they are accrued as compensation cost. If non-forfeitable, they are accounted for differently. The analysis should reflect the specific terms of the award. [ASC 718-10-35; 718-20]',
-                    'Employer payroll taxes: State the requirement to recognize a liability for employer payroll taxes when the underlying taxable event occurs (typically at vesting or exercise/settlement). [ASC 718-10-25/35]'
+                    'Determine requisite service period from vesting conditions (explicit, implicit, or derived). Note any retirement/death provisions. [ASC 718-10-20; 718-10-35]',
+                    'Identify attribution method from vesting schedule. For graded vesting, note straight-line vs accelerated policy election → flag as [Management Input Required: State attribution policy per ASC 718-10-35].',
+                    'State forfeiture accounting policy → flag as [Management Input Required: Estimate-forfeitures or as-incurred election per ASC 718-10-35].',
+                    'For performance conditions: Assess from contract if achievability is determinable; otherwise flag probability assessment as management input.',
+                    'Note that market conditions affect grant-date FV (Step 2) but not expense recognition pattern. [ASC 718-10-30]',
                 ]
             },
             4: {
                 'title': 'Step 4: Subsequent measurement, modifications, classification changes, settlements, and special transactions',
                 'focus': 'Remeasure liabilities, account for changes in terms/classification, and record exercises, cancellations, and business-combination effects',
                 'key_points': [
-                    'Liability-classified awards: Explain the requirement to remeasure the fair value of liability-classified awards at each reporting date until settlement. State that the change in fair value is recognized in earnings and generate a placeholder for management to document its periodic remeasurement calculations. [ASC 718-30-35]',
-                    'Equity-classified awards: State that equity-classified awards are not remeasured after the grant date, except in the case of a modification. The analysis should note that accounting continues to be subject to the entity\'s policies for forfeitures and assessments of non-market performance conditions. [ASC 718-20-35]',
-                    'Modifications, if applicable: Describe what constitutes a modification under ASC 718 (e.g., repricing, acceleration). Explain the accounting requirement to measure any incremental fair value granted and recognize it over the remaining service period. Generate placeholders for management to input the fair value immediately before and after the modification and the resulting incremental cost. [ASC 718-20-35; 718-20-55]',
-                    'Cancellations/forfeitures/expirations: Explain the accounting treatment for these events. For cancellations or forfeitures of unvested awards, state the requirement to reverse any previously recognized compensation cost. For vested awards that expire unexercised, explain that no cost is reversed. [ASC 718-20-35]',
-                    'Settlements/exercises: Describe the accounting entries required upon settlement or exercise. The analysis should cover the pattern for issuing shares, paying cash, and accounting for net-share withholding for taxes based on the award’s terms and classification. [ASC 718-20-35; 718-10-25]',
-                    'Business combinations (replacement awards): Explain the requirement to allocate the fair value of replacement awards between pre-combination service (accounted for as part of the business combination consideration) and post-combination service (recognized as post-combination compensation cost). Prompt for management to document its valuation and allocation methodology. [ASC 805-30; ASC 718-20-35]'
+                    'For liability awards: Note remeasurement requirement each period until settlement (change in FV → earnings). Flag as [Management Input Required: Periodic remeasurement methodology]. [ASC 718-30-35]',
+                    'For modifications (if applicable): Identify change type (repricing, acceleration, etc.). Measure incremental FV and recognize over remaining service period. Flag pre/post-modification FV as management input. [ASC 718-20-35; 718-20-55]',
+                    'For cancellations/forfeitures: Unvested → reverse prior expense. Vested expirations → no reversal. [ASC 718-20-35]',
+                    'For settlements/exercises: Describe entries for share issuance, cash payment, and tax withholding per award terms and classification. [ASC 718-20-35]',
+                    'For business combinations (if replacement awards exist): Note allocation requirement between pre/post-combination service. Flag valuation methodology as management input. [ASC 805-30]'
                 ]
             },
             5: {
                 'title': 'Step 5: Income tax accounting and core journal entries (no disclosures)',
                 'focus': 'Record current/deferred taxes and the core financial statement effects; exclude disclosures',
                 'key_points': [
-                    'Deferred taxes: Explain the requirement to recognize a Deferred Tax Asset (DTA) for the deductible temporary difference created by the cumulative book compensation cost recognized. State that management must assess this DTA for realizability and determine if a valuation allowance is necessary, consistent with ASC 740. [ASC 718-740; ASC 740-10]',
-                    'Excess tax benefits/shortfalls: Explain that any difference between the tax deduction realized upon settlement and the cumulative compensation cost recognized for book purposes is recorded as an excess tax benefit or shortfall. State that this amount is recognized as a discrete item in income tax expense in the period of settlement. [ASC 718-740-25]',
-                    'Tax deduction measurement: Describe how the tax deduction is typically measured, noting it is based on the intrinsic value of an equity award at settlement or the cash paid for a liability award. The analysis should note this is subject to local tax law. [ASC 718-740]',
-                    'Illustrative entries: Describe the pattern of typical journal entries, using placeholders for amounts. Equity-classified: Dr compensation expense / Cr APIC during vesting; at settlement, record common stock/APIC and any net share withholding cash remittance; record DTA activity and any excess/shortfall to tax expense. Liability-classified: Dr compensation expense / Cr liability during vesting and remeasurement; settle liability in cash at payment and release related DTA. [ASC 718-10-45; 718-740; 718-30-35]'
+                    'Recognize DTA for cumulative book compensation cost (deductible temporary difference). Flag DTA realizability assessment and valuation allowance determination as management input per ASC 740. [ASC 718-740; ASC 740-10]',
+                    'Excess tax benefits/shortfalls: Difference between tax deduction realized vs book compensation cost → discrete item in tax expense at settlement. [ASC 718-740-25]',
+                    'Tax deduction measurement: Intrinsic value at settlement (equity awards) or cash paid (liability awards), subject to local tax law. [ASC 718-740]',
+                    'Illustrative entries: Describe typical journal entry patterns for equity vs liability awards (vesting, settlement, tax effects) using placeholders for amounts. [ASC 718-10-45; 718-740]'
                 ]
             }
         }
@@ -568,9 +564,6 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 **Analysis:** [Detailed analysis with supporting evidence. Include:
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
 - Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
-- Contract citations must reference actual text from the document:
-    Good: [Stock Plan, Vesting Conditions]
-    Bad: [Stock Plan §4.2], [Stock Plan, p. 15] (unless these exact references appear in the contract text)
 - Only cite section numbers/page numbers if they are explicitly visible in the contract text
 - ASC 718 guidance paraphrased with citations; include only brief decisive phrases when directly supportive
 
@@ -578,19 +571,25 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL ANALYSIS REQUIREMENTS:
-- If information is not explicitly stated in the contract, write "Not specified in contract"
-- For required accounting policies, management judgments, or valuation inputs that are external to the contract (e.g., forfeiture policy, probability assessments, fair value inputs), do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
-- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
-- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
-- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+CRITICAL ANALYSIS REQUIREMENTS - CONTRACT VS EXTERNAL DATA:
+1. CONTRACT FACTS (dates, terms, amounts explicitly in the document):
+   - If present: Quote or paraphrase with citation
+   - If missing: State "Not specified in contract"
+   - NEVER invent or guess these
+2. EXTERNAL INPUTS (accounting policies, valuations, judgments NOT in contract):
+   - Always state the ASC 718 requirement
+   - Create management placeholder: "[Management Input Required: Describe forfeiture policy per ASC 718-10-35]"
+   - Examples: forfeiture policy, fair value inputs, probability assessments, tax rates
+3. CITATION RULES:
+   - Contract: Only cite what's visible - [Stock Plan, Vesting Terms] ✓  |  [Stock Plan §4.2] ✗ (unless §4.2 appears in doc)
+   - ASC 718: Paraphrase + pinpoint cite - [ASC 718-10-30-2]
+Use assertive language ("We conclude...") when evidence supports it; flag gaps explicitly.
 
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Format currency as: $240,000 (with comma, no spaces)
-- Use proper spacing after periods and commas
-- Use professional accounting language
-- Double-check all currency amounts for correct formatting
+FORMATTING:
+- Currency: $240,000 (comma-separated, no spaces)
+- Spacing: Proper spacing after periods/commas
+- Tone: Professional Big 4 language, assertive where evidence supports ("We conclude...")
 
 """
 

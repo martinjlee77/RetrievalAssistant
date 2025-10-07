@@ -437,7 +437,7 @@ Respond with ONLY the company name, nothing else."""
             raise
     
     def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
-        """Validate step output for required structural sections only."""
+        """Validate step output for required sections and formatting issues."""
         issues = []
         
         # Check for required sections
@@ -446,6 +446,18 @@ Respond with ONLY the company name, nothing else."""
         
         if "**Conclusion:**" not in markdown_content:
             issues.append(f"Missing Conclusion section in Step {step_num}")
+        
+        # Check currency formatting - flag numbers that look like currency but missing $
+        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
+        # Filter out obvious non-currency (years, quantities, etc.)
+        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
+        if suspicious_currency:
+            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
+        
+        # Flag potentially fabricated citations (section numbers, page numbers)
+        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
+        if fake_citations:
+            issues.append(f"Potentially fabricated citations: {fake_citations}")
         
         return {"valid": len(issues) == 0, "issues": issues}
     
@@ -484,18 +496,18 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'key_points': [
                     'Determine based on the uploaded documents whether there is any consideration payable to a customer (ASC 606-10-32-25 through 32-27), which is outside the scope of ASC 340-40. Examples include rebates, credits, referral, or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is an employee or agent (third party) or a customer to aid this determination.',
                     'IMPORTANT: This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-5 to 25-8). It only covers costs to obtain a contract.',
-                    'Evaluate whether the cost (for example, commission) can be capitalized (i.e., recognize an asset) under ASC 340. It is capitalizable if and only if incremental, that is, the cost is incurred solely because a specific contract is obtained and recovery is expected (ASC 340-40-25-1 to 25-3).',
+                    'Evaluate incremental test: Costs incurred solely because contract obtained + recovery expected → capitalize. Otherwise → expense. (ASC 340-40-25-1 to 25-3).',
                     'If not incremental or recovery not expected (ASC 340-40-25-3), expense the cost.',
-                    'Common capitalizable costs (assuming recovery expected): commissions paid on execution, booking or activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract), recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions.',
-                    'Common expense (typically not incremental): base salary, contests based on aggregate metrics not tied to specific contracts, nonrecoverable draws/guarantees, training, recruiting, enablement stipends, SPIFFs not contingent on a specific contract or that can be earned absent a specific contract.'
+                    'Common capitalizable (if incremental): Contract-specific commissions, success-based agent fees, accelerators attributable to specific contract, employer payroll taxes on capitalized amounts.',
+                    'Common expense (not incremental): Base salary, aggregate-based contests, nonrecoverable draws, training, recruiting, general SPIFFs.'
                 ]
             },
             2: {
                 'title': 'Step 2: Guidance for Amortization, Practical Expedient, and Impairment',
-                'focus': 'Provide policy boilerplate and guidance only; no calculations or anlaysis.',
+                'focus': 'Provide policy boilerplate and guidance only; no calculations or analysis.',
                 'key_points': [
                     'Explain that capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. Also explain that if renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. Explain that the period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
-                    'Mention the practical expedient in whcih the cost is expensed as incurred if the amortization period would be one year or less. Application can be by portfolio but the policy should be documented.',
+                    'Mention the practical expedient in which the cost is expensed as incurred if the amortization period would be one year or less. Application can be by portfolio but the policy should be documented.',
                     'Explain that changes in estimates result in adjusting amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
                     'Explain that at each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.',
                     'Note that a portfolio approach can be applied if it would not materially differ from a contract-by-contract approach (e.g., for determining amortization periods and impairment).'
@@ -553,14 +565,25 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL ANALYSIS REQUIREMENTS:
-- If information is not explicitly stated in the contract, write "Not specified in contract"
-- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
-- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
-- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
-- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+CRITICAL ANALYSIS REQUIREMENTS - CONTRACT VS EXTERNAL DATA:
 
-CRITICAL FORMATTING REQUIREMENTS:
+1. CONTRACT FACTS (dates, terms, amounts explicitly in the document):
+   - If present: Quote or paraphrase with citation
+   - If missing: State "Not specified in contract"
+   - NEVER invent or guess these
+
+2. EXTERNAL INPUTS (accounting policies, valuations, judgments NOT in contract):
+   - Always state the ASC 340-40 requirement
+   - Create management placeholder: "[Management Input Required: Expected period of benefit per ASC 340-40-35-1]"
+   - Examples: amortization period, practical expedient elections, impairment assessments
+
+3. CITATION RULES:
+   - Contract: Only cite what's visible - [Commission Plan, Payout Terms] ✓  |  [Plan §3.1] ✗ (unless §3.1 appears)
+   - ASC 340-40: Paraphrase + pinpoint cite - [ASC 340-40-25-1]
+
+Use assertive language ("We conclude...") when evidence supports it; flag gaps explicitly.
+
+FORMATTING:
 - Format currency as: $240,000 (with comma, no spaces)
 - Use proper spacing after periods and commas
 - Use professional accounting language

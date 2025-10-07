@@ -468,14 +468,14 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Identify the Contract',
                 'focus': 'Determine if a valid contract exists under ASC 606-10-25-1 criteria',
                 'key_points': [
-                    'Confirm that the arrangement is within ASC 606 (and not a lease, insurance, financial instrument, or a collaboration (ASC 606-10-15-2 to 15-5))'
+                    'Confirm that the arrangement is within ASC 606 (and not a lease, insurance, financial instrument, or a collaboration (ASC 606-10-15-2 to 15-5))',
                     'Verify that the parties have approved the contract and are committed to perform (ASC 606-10-25-1(a))',
                     'Identify each party\'s rights regarding the goods or services to be transferred (ASC 606-10-25-1(b))',
                     'Identify each party\'s payment terms for the transferred goods or services (ASC 606-10-25-1(c))',
                     'Assess whether the contract has commercial substance (ASC 606-10-25-1(d))',
                     'Evaluate whether it is probable that the entity will collect the consideration (ASC 606-10-25-1(e)). Explain that the collectibility assessment would require external information (customer\'s credit/intent) and management should perform this evaluation separate from this analysis.',
                     'If the criteria in ASC 606-10-25-1 are not met, ASC 606-10-25-6 to 25-8 should be applied to deter revenue, recognize a liability and reassess',
-                    'If there are any modification of the pre-existing contract, explain that ASC 606-10-25-10 to 25-13 should be applied to determine if the modification is a new contract or an extension of the existing contract. Note that such evaluation is not in the scope of this analysis andn should be performed separately.'
+                    'If there are any modification of the pre-existing contract, explain that ASC 606-10-25-10 to 25-13 should be applied to determine if the modification is a new contract or an extension of the existing contract. Note that such evaluation is not in the scope of this analysis and should be performed separately.',
                     
                 ]
             },
@@ -486,9 +486,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Identify all promised goods and services in the contract (ASC 606-10-25-16)',
                     'Separately evaluate whether each promised good or service is capable of being distinct per ASC 606-10-25-20 (can the customer benefit from the good or service either on its own or with other readily available resources?)',
                     'Separately evaluate whether each promised good or service is distinct within the context of the contract (or also called separately identifiable) per ASC 606-10-25-21(a-c):',
-                    '   a. The entity provides a significant service of integrating goods or services with other goods or services promised in the contract into a bundle of goods or services that represent the combined output or outputs for which the customer has contracted. In other words, the entity is using the goods or services as inputs to produce or deliver the combined output or outputs specified by the customer. A combined output or outputs might include more than one phase, element, or unit.',
-                    '   b. One or more of the goods or services significantly modifies or customizes, or are significantly modified or customized by, one or more of the other goods or services promised in the contract.',
-                    '   c. The goods or services are highly interdependent or highly interrelated with other promises in the contract. In other words, each of the goods or services is significantly affected by one or more of the other goods or services in the contract. For example, in some cases, two or more goods or services are significantly affected by each other because the entity would not be able to fulfill its promise by transferring each of the goods or services independently.',
+                    'Evaluate "distinct within context" per ASC 606-10-25-21: (a) significant integration service, (b) significant modification/customization, or (c) highly interdependent/interrelated goods/services.',
                     'Evaluate the “series” criterion (a series of distinct goods or services that are substantially the same and have the same pattern of transfer) (ASC 606-10-25-14(b))',
                     'Assess warranties (assurance-type vs service-type), since service-type warranties are separate POs (ASC 606-10-55-30 through 55-35)',
                     'Consider consignment indicators when relevant (affects control and timing, not a separate PO) (ASC 606-10-55-80 through 55-84)',
@@ -515,7 +513,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Explain that constraints on variable consideration require separate management evaluation per ASC 606-10-32-11 to 32-13 as it requires information and judgment not available in the uploaded contract documents.',
                     'Calculate and present the total transaction price',
                     'Determine if any significant financing components are present',
-                    'Determine if any concash consideration is present',
+                    'Determine if any noncash consideration is present',
                     'Determine if any consideration paid or payable to a customer is present'
     
                 ]
@@ -526,7 +524,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'key_points': [
                     'Summarize the performance obligations determined in Step 2',
                     'State that standalone selling prices (SSPs) should be determined by management separately based on observable data (ASC 606-10-32-31 to 32-34)',
-                    'Describe the allocation methodology to allowed by ASC 606 in ASC 10-32-24 (aAdjusted market assessment approach, expected cost plus a margin approach, and residual approach)',
+                    'Describe the allocation methodology to allowed by ASC 606 in ASC 10-32-24 (adjusted market assessment approach, expected cost plus a margin approach, and residual approach)',
                     'Note any discount allocation considerations (ASC 606-10-32-36)',
                     'Provide the final allocation approach (subject to SSP determination)'
                 ]
@@ -535,7 +533,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 5: Recognize Revenue',
                 'focus': 'Determine when revenue should be recognized for each performance obligation',
                 'key_points': [
-                    'Determine over-time vs. point-in-time recognition for each performance obligation. Over time if one of the three criteria is met (simultaneous receipt/consumption, customer controls the asset as created, or no alternative use and enforceable right to payment (ASC 606-10-25-27)), otherwise poit in time (ASC 606-10-25-30)',
+                    'Determine over-time vs. point-in-time recognition for each performance obligation. Over time if one of the three criteria is met (simultaneous receipt/consumption, customer controls the asset as created, or no alternative use and enforceable right to payment (ASC 606-10-25-27)), otherwise point in time (ASC 606-10-25-30)',
                     'Analyze when control transfers to the customer',
                     'Specify revenue recognition timing for each obligation',
                     'Identify any measurement methods for over-time recognition'
@@ -593,14 +591,25 @@ decisive phrases when directly supportive (e.g., [ASC 606-10-25-19])
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL ANALYSIS REQUIREMENTS:
-- If information is not explicitly stated in the contract, write "Not specified in contract"
-- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
-- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
-- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
-- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+CRITICAL ANALYSIS REQUIREMENTS - CONTRACT VS EXTERNAL DATA:
 
-CRITICAL FORMATTING REQUIREMENTS:
+1. CONTRACT FACTS (dates, terms, amounts explicitly in the document):
+   - If present: Quote or paraphrase with citation
+   - If missing: State "Not specified in contract"
+   - NEVER invent or guess these
+
+2. EXTERNAL INPUTS (accounting policies, valuations, judgments NOT in contract):
+   - Always state the ASC 606 requirement
+   - Create management placeholder: "[Management Input Required: SSP determination per ASC 606-10-32-33]"
+   - Examples: SSP estimates, variable consideration constraints, collectibility assessments
+
+3. CITATION RULES:
+   - Contract: Only cite what's visible - [Contract, Payment Terms] ✓  |  [Contract §4.2] ✗ (unless §4.2 appears)
+   - ASC 606: Paraphrase + pinpoint cite - [ASC 606-10-25-1]
+
+Use assertive language ("We conclude...") when evidence supports it; flag gaps explicitly.
+
+FORMATTING:
 - Format currency as: $240,000 (with comma, no spaces)
 - Use proper spacing after periods and commas
 - Use professional accounting language

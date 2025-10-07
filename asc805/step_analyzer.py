@@ -469,66 +469,60 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scope, "business" assessment, acquirer, and acquisition date',
                 'focus': 'Confirm ASC 805 acquisition method applies, determine if the acquired set is a business, identify the acquirer, and establish the acquisition date',
                 'key_points': [
-                    'Determine scope: ASC 805 acquisition method vs (a) asset acquisition or common control under ASC 805-50, (b) joint venture formation under ASC 805-60, (c) not-for-profit combinations under ASC 958-805.',
-                    'Assess whether the acquired set is a business using the optional screen test and the full "substantive processes" framework; document judgment using implementation examples (ASC 805-10-55).',
-                    'Identify the acquirer (including VIE primary-beneficiary considerations) and assess whether there is a reverse acquisition (ASC 805-10; ASC 810 cross-reference).',
-                    'Determine the acquisition date (when control transfers) and document the specific control-transfer event(s) (ASC 805-10).',
-                    'If achieved in stages, identify a step acquisition and plan to remeasure the previously held interest at fair value on the acquisition date (ASC 805-10).',
-                    'If preparing separate acquiree financial statements, evaluate optional pushdown accounting and related disclosures (ASC 805-50).'
+                    'Confirm scope: ASC 805 acquisition method vs asset acquisition (ASC 805-50), joint venture (ASC 805-60), or NFP combination (ASC 958-805).',
+                    'Assess if acquired set is a business: Apply optional screen test or substantive processes framework. Document judgment with reference to implementation examples. [ASC 805-10-55]',
+                    'Identify acquirer (consider VIE primary beneficiary) and assess reverse acquisition possibility. [ASC 805-10; ASC 810]',
+                    'Determine acquisition date (control transfer) and document specific control-transfer events. [ASC 805-10]',
+                    'For step acquisitions: Note requirement to remeasure previously held interest at FV on acquisition date. [ASC 805-10]',
+                    'For acquiree standalone statements (if applicable): Evaluate pushdown accounting election. [ASC 805-50]'
                 ]
             },
             2: {
                 'title': 'Step 2: Consideration and items not part of the exchange',
                 'focus': 'Measure consideration at fair value, classify contingent consideration, and separate transactions that are not part of the business combination exchange',
                 'key_points': [
-                    'Compile and measure consideration transferred at fair value: cash, liabilities incurred, assets transferred, equity instruments issued, and contingent consideration (ASC 805-30).',
-                    'Measure any noncontrolling interest at acquisition-date fair value (full goodwill method) (ASC 805-30).',
-                    'For step acquisitions, remeasure the previously held interest to fair value, recognize the gain or loss in earnings, and recycle related AOCI amounts as if the interest were disposed (ASC 805-10; ASC 220/815/320 cross-references).',
-                    'Identify and account separately for items not part of the exchange: settlement of preexisting relationships, compensation for future services, and other side arrangements (ASC 805-10).',
-                    'Expense acquisition-related costs as incurred; apply other guidance only for debt/equity issuance costs (ASC 805-10; ASC 340/470 and equity guidance).',
-                    'Evaluate replacement share-based payment awards and allocate between precombination consideration and postcombination compensation cost (ASC 718; ASC 805-30).',
-                    'Identify indemnification arrangements and recognize indemnification assets on the same basis as the related indemnified items (ASC 805-20).',
-                    'Classify contingent consideration under ASC 480/815 (equity vs liability/derivative) and apply the corresponding subsequent measurement model (ASC 805-30-35; ASC 480/815).'
+                    'Identify consideration transferred components: cash, liabilities incurred, assets transferred, equity issued, contingent consideration. Flag fair value measurements as [Management Input Required: FV of consideration per ASC 805-30]. [ASC 805-30]',
+                    'Note NCI measurement: Acquisition-date FV (full goodwill method). Flag as management input. [ASC 805-30]',
+                    'For step acquisitions: Note requirement to remeasure previously held interest to FV → recognize gain/loss + recycle AOCI. Flag FV measurement as management input. [ASC 805-10; ASC 220/815/320]',
                 ]
             },
             3: {
                 'title': 'Step 3: Recognize and measure identifiable assets and liabilities; compute goodwill or bargain purchase',
-                'focus': 'Recognize identifiable assets and liabilities as of the acquisition date, apply ASC 805 measurement principles and exceptions, then compute goodwill or a bargain purchase gain',
+                'focus': 'Identify assets acquired and liabilities assumed, document measurement requirements and exceptions, and establish goodwill calculation framework',
                 'key_points': [
-                    'Recognize 100% of identifiable assets acquired, liabilities assumed, and any NCI as of the acquisition date (ASC 805-20).',
-                    'Measure recognized items at acquisition-date fair value, documenting valuation approaches and key assumptions (ASC 805-20; ASC 820 cross-reference).',
-                    'Apply key measurement exceptions to fair value: a. Revenue contracts: measure contract assets and contract liabilities under ASC 606 as if the acquirer originated the contracts at the acquisition date (ASU 2021-08; ASC 805-20/606). b. Leases: apply ASC 842 classification and measurement for lessee and lessor arrangements; do not create separate lessee favorable/unfavorable lease intangibles (ASC 842; ASC 805-20 cross-reference). c. Financial assets: identify purchased financial assets with credit deterioration and apply CECL measurement (ASC 326; ASC 805-20).',
-                    'Identify intangible assets that meet separability or contractual-legal criteria and recognize them separately from goodwill; explicitly exclude assembled workforce (ASC 805-20-25/-55).',
-                    'Address special intangibles: recognize reacquired rights and amortize over the remaining contractual term (ignore renewals), and capitalize in-process R&D as an indefinite-lived intangible subject to impairment (ASC 805-20; ASC 350).',
-                    'Recognize and measure contingencies at acquisition-date fair value when they meet the asset/liability definition; apply ASC 450/460 or other relevant Topics thereafter (ASC 805-20; ASC 450/460).',
-                    'Record income tax effects: recognize DTAs/DTLs for basis differences, evaluate uncertain tax positions, and assess valuation allowances (ASC 740).',
-                    'Compute goodwill or bargain purchase: Goodwill = FV of consideration transferred + FV of NCI + FV of previously held interest − FV of identifiable net assets; if negative, reassess measurements and recognize a bargain purchase gain with required disclosures if still negative (ASC 805-30).'
+                    'Identify 100% of assets acquired and liabilities assumed at acquisition date (list from transaction documents). [ASC 805-20]',
+                    'Note measurement requirement: Acquisition-date FV per ASC 820. Flag as [Management Input Required: Fair value measurements and valuation approaches for identified items per ASC 805-20/820]. [ASC 805-20; ASC 820]',
+                    'Apply measurement exceptions: Revenue contracts → measure per ASC 606 as if acquirer originated (ASU 2021-08). Leases → apply ASC 842 (no separate favorable/unfavorable intangibles). Financial assets with credit deterioration → CECL (ASC 326). [ASC 805-20]',
+                    'Identify intangible assets meeting separability or contractual-legal criteria → recognize separately from goodwill. Exclude assembled workforce. [ASC 805-20-25/-55]',
+                    'For special intangibles: Reacquired rights → amortize over remaining contractual term (ignore renewals). IPR&D → capitalize as indefinite-lived, subject to impairment. [ASC 805-20; ASC 350]',
+                    'Recognize contingencies at acquisition-date FV when meeting asset/liability definition. [ASC 805-20; ASC 450/460]',
+                    'Record tax effects: DTAs/DTLs for basis differences, UTPs, valuation allowances. [ASC 740]',
+                    'Goodwill calculation framework: FV consideration + FV NCI + FV previously held − FV identifiable net assets. If result is negative → reassess measurements; if still negative → recognize bargain purchase gain with disclosures. [Management Input Required: Fair value amounts for goodwill calculation]. [ASC 805-30]'
                 ]
             },
             4: {
                 'title': 'Step 4: Record the acquisition, apply the measurement period, and handle subsequent measurement',
                 'focus': 'Post acquisition-date entries, manage provisional amounts within the measurement period, and perform required remeasurements',
                 'key_points': [
-                    'Record acquisition-date journal entries for all recognized items, including goodwill or bargain purchase gain (ASC 805-30).',
-                    'Use provisional amounts where initial accounting is incomplete; during the measurement period (up to one year), record retrospective adjustments for acquisition-date facts with corresponding goodwill adjustments and revise comparative periods as required; disclose (ASC 805-10).',
-                    'Distinguish measurement period adjustments from normal subsequent changes in estimates or events; retain evidence supporting acquisition-date assumptions (ASC 805-10).',
-                    'Remeasure contingent consideration through earnings each period if liability-/derivative-classified; do not remeasure equity-classified arrangements; account for settlements (ASC 805-30-35; ASC 480/815).',
-                    'Remeasure indemnification assets consistent with the related indemnified items and assess collectibility (ASC 805-20).',
-                    'Apply postcombination accounting under other Topics: amortize finite-lived intangibles and test goodwill/indefinite-lived intangibles for impairment (ASC 350); apply CECL to acquired financial assets (ASC 326); continue lease accounting (ASC 842); address hedge relationships (ASC 815); and account for exit/disposal activities (ASC 420).',
-                    'If applicable for acquiree standalone reporting, assess and elect pushdown accounting and provide required disclosures (ASC 805-50).'
+                    'Record acquisition-date journal entries for all recognized items (including goodwill or bargain purchase gain). [ASC 805-30]',
+                    'Use provisional amounts if initial accounting incomplete. Within measurement period (≤1 year): Record retrospective adjustments for acquisition-date facts → adjust goodwill + revise comparatives. Disclose. [ASC 805-10]',
+                    'Distinguish measurement period adjustments from subsequent estimate changes or events. Retain acquisition-date assumption evidence. [ASC 805-10]',
+                    'Remeasure contingent consideration: Liability/derivative-classified → through earnings each period. Equity-classified → no remeasurement. [ASC 805-30-35; ASC 480/815]',
+                    'Apply postcombination accounting: Amortize finite-lived intangibles, test goodwill/indefinite-lived for impairment (ASC 350), CECL (ASC 326), lease accounting (ASC 842), hedge relationships (ASC 815). [Multiple Topics]',
+                    'For acquiree standalone reporting (if applicable): Assess and elect pushdown accounting with required disclosures. [ASC 805-50]'
                 ]
             },
             5: {
                 'title': 'Step 5: Prepare required disclosures and the technical memo',
                 'focus': 'Provide complete ASC 805 disclosures and document judgments, measurements, and conclusions supporting the acquisition method',
                 'key_points': [
-                    'Prepare required ASC 805 disclosures: acquisition date and primary reasons; qualitative factors giving rise to goodwill; fair value of consideration by major class; recognized amounts for each major class of assets acquired and liabilities assumed; contingent consideration and indemnification details; acquiree revenue and earnings since acquisition; and pro forma information as if the acquisition occurred at the beginning of the periods presented (ASC 805-10-50; ASC 805-30-50).',
-                    'Disclose individually immaterial business combinations that are material in the aggregate (ASC 805-10-50).',
-                    'For step acquisitions, disclose the fair value of the previously held interest, the resulting gain or loss recognized, and any related AOCI reclassifications (ASC 805-10; ASC 220).',
-                    'For bargain purchases, disclose the amount of the gain and the reasons why the transaction resulted in a gain (ASC 805-30-50).',
-                    'Disclose the nature and amounts of measurement period adjustments and, if applicable, that initial accounting is incomplete (ASC 805-10-50).',
-                    'For SEC registrants, consider Article 11 pro forma requirements and Regulation S-X Rule 3-05 significance testing (outside ASC 805).',
-                    'Draft the technical memo: scope and "business" assessment; acquirer and acquisition date; consideration and items not part of the exchange (including contingent consideration classification and OCI recycling); identification and measurement of assets and liabilities (including exceptions for revenue contracts, leases, CECL PCD, and held-for-sale); intangible assets (including IPR&D and reacquired rights); goodwill/bargain purchase; measurement period plan; and a disclosure checklist (ASC 805-10-50).'
+                    'Prepare ASC 805 disclosures: Acquisition date + reasons; goodwill qualitative factors; consideration by major class; assets/liabilities by major class; contingent consideration + indemnification details; acquiree revenue/earnings since acquisition; pro forma information as if acquired at period start. [ASC 805-10-50; ASC 805-30-50]',
+                    'For immaterial combinations material in aggregate: Disclose combined amounts. [ASC 805-10-50]',
+                    'For step acquisitions: Disclose FV of previously held interest, gain/loss recognized, AOCI reclassifications. [ASC 805-10; ASC 220]',
+                    'For bargain purchases: Disclose gain amount and reasons. [ASC 805-30-50]',
+                    'Disclose measurement period adjustments or note if initial accounting incomplete. [ASC 805-10-50]',
+                    'For SEC registrants: Consider Article 11 pro forma and Rule 3-05 significance testing (outside ASC 805).',
+                    'Technical memo structure: Scope/"business" assessment, acquirer/acquisition date, consideration breakdown, asset/liability measurements (including exceptions), intangibles, goodwill/bargain purchase, measurement period plan, disclosure checklist. [ASC 805-10-50]'
                 ]
             }
         }
@@ -573,24 +567,34 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 - Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
 - Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
 - Contract citations must reference actual text from the document:
-    Good: [Purchase Agreement, Assets Aquired], [Purchase Agreement, 'purchase price of']
+    Good: [Purchase Agreement, Assets Acquired], [Purchase Agreement, 'purchase price of']
     Bad: [Purchase Agreement, §4.2], [Purchase Agreement, p. 15] (unless these exact references appear in the contract text)
 - Only cite section numbers/page numbers if they are explicitly visible in the contract text
-- ASC 805 guidance paraphrased with citations; include only brief
-decisive phrases when directly supportive.
+- ASC 805 guidance paraphrased with citations; include only brief decisive phrases when directly supportive.
 
 **Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 805 citation.]
 
 **Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
 
-CRITICAL ANALYSIS REQUIREMENTS:
-- If information is not explicitly stated in the contract, write "Not specified in contract"
-- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
-- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
-- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
-- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+CRITICAL ANALYSIS REQUIREMENTS - CONTRACT VS EXTERNAL DATA:
 
-CRITICAL FORMATTING REQUIREMENTS:
+1. CONTRACT FACTS (dates, terms, amounts explicitly in the document):
+   - If present: Quote or paraphrase with citation
+   - If missing: State "Not specified in contract"
+   - NEVER invent or guess these
+
+2. EXTERNAL INPUTS (accounting policies, valuations, judgments NOT in contract):
+   - Always state the ASC 805 requirement
+   - Create management placeholder: "[Management Input Required: Provide fair value measurement for X per ASC 805-30]"
+   - Examples: fair value measurements, NCI measurement election, acquisition-date assessments
+
+3. CITATION RULES:
+   - Contract: Only cite what's visible - [Purchase Agreement, Assets Acquired] ✓  |  [Agreement §3.1] ✗ (unless §3.1 appears)
+   - ASC 805: Paraphrase + pinpoint cite - [ASC 805-30-25-2]
+
+Use assertive language ("We conclude...") when evidence supports it; flag gaps explicitly.
+
+FORMATTING:
 - Format currency as: $240,000 (with comma, no spaces)
 - Use proper spacing after periods and commas
 - Use professional accounting language
