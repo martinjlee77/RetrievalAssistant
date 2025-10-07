@@ -187,7 +187,7 @@ def render_asc718_page():
         warning_placeholder = st.empty()
         if can_proceed:
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-5 minutes**. Please don't close this tab until complete"
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             if st.button("3️⃣ Confirm & Analyze",
                        type="primary",
@@ -318,7 +318,7 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
     progress_message_placeholder = st.empty()
     progress_message_placeholder.error(
         "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TABS!**\n\n"
-        "Your analysis is running and will take up to 3-5 minutes. "
+        "Your analysis is running and will take up to 3-15 minutes. "
         "Closing this browser will stop the analysis and forfeit your progress."
     )
     

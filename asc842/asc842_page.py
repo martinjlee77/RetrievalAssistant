@@ -190,7 +190,7 @@ def render_asc842_page():
         if can_proceed:
             warning_placeholder = st.empty()  # Create a placeholder for the warning
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-5 minutes**. Please don't close this tab until complete"
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             
             if st.button("3️⃣ Confirm & Analyze",
@@ -352,7 +352,7 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
     progress_message_placeholder = st.empty()
     progress_message_placeholder.error(
         "🚨 **IMPORTANT: ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
-        "Your analysis is running and will take up to 3-5 minutes. "
+        "Your analysis is running and will take up to 3-15 minutes. "
         "Closing this browser will stop the analysis and forfeit your progress."
     )
     

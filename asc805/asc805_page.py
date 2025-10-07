@@ -186,7 +186,7 @@ def render_asc805_page():
         if can_proceed:
             warning_placeholder = st.empty()  # Create a placeholder for the warning
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-5 minutes**. Please don't close this tab until complete"
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             
             if st.button("3️⃣ Confirm & Analyze",
@@ -288,9 +288,13 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         # Step 2: Payment will be processed when analysis completes (no upfront charging)
             
-        # Progress message that will be cleared later
+        # Add the important warning box that users should not leave the page
         progress_message_placeholder = st.empty()
-        progress_message_placeholder.info("🔄 **Analysis in progress...** Please stay on this tab.")
+        progress_message_placeholder.error(
+            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
+            "Your analysis is running and will take up to 3-15 minutes. "
+            "Closing this browser will stop the analysis and forfeit your progress."
+        )
         
         # Get contract text from pricing result
         contract_text = pricing_result.get('combined_text', '')
