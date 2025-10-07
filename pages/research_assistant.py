@@ -241,7 +241,7 @@ def render_research_assistant():
     if not require_authentication():
         return  # User will see login page
     
-    # Page header
+    # Page header (always shown)
     st.title("🔍 ASC Research Assistant")
     with st.container(border=True):
         st.markdown("""
@@ -249,6 +249,23 @@ def render_research_assistant():
         
         Select your standard and ask anything - from basic concepts to complex implementation scenarios.
         """)
+    
+    # Check research assistant access
+    user_data = st.session_state.get('user_data', {})
+    has_research_access = user_data.get('research_assistant_access', False)
+    
+    # Gate the functionality for non-approved users
+    if not has_research_access:
+        st.warning("⚠️ **Research Assistant Access Required**")
+        st.info("""
+        The ASC Research Assistant is currently available to approved users only.
+        
+        📧 **Interested in access?** Contact us at **support@veritaslogic.ai** to request approval.
+        
+        This feature provides instant answers to complex accounting questions with authoritative 
+        citations across all ASC standards (606, 340-40, 718, 842, 805).
+        """)
+        return  # Exit early - nothing else renders
     
     # Initialize session state for chat history
     if 'chat_history' not in st.session_state:
