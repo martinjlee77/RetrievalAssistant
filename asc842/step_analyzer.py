@@ -480,7 +480,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Identify the asset: If supplier has substantive substitution rights → asset not identified. [ASC 842-10-15-9 to 15-14]',
                     'Determine enforceable period: Contract enforceable until both parties can terminate without more than insignificant penalty. [Master Glossary: Enforceable]',
                     'Determine lease term within enforceable period: Noncancellable period + extension options (if reasonably certain to exercise) + lessor-controlled periods. For lessee-only termination rights → treat as termination option. [ASC 842-10-35-1 to 35-3; 842-10-55-23 to 55-26]',
-                    'Note reassessment triggers: Significant event/change in circumstances within lessee's control affecting option assessments. [ASC 842-10-35-1 to 35-3]'
+                    'Note reassessment triggers: Significant event/change in circumstances within control of the lessee affecting option assessments. [ASC 842-10-35-1 to 35-3]'
                 ]
             },
             2: {

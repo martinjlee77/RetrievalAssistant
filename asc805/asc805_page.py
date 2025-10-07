@@ -94,23 +94,24 @@ def render_asc805_page():
 
     # Show pricing information immediately when files are uploaded (regardless of is_ready)
     pricing_result = None
+    pricing_container = st.empty()  # Create clearable container FIRST (before if block)
     if uploaded_files:
         # Process files for pricing - dynamic cost updating with progress indicator
         with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
             pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
         
         if pricing_result['success']:
-            # Display pricing information dynamically
-            st.markdown("### :primary[Analysis Pricing]")
-            st.info(pricing_result['billing_summary'])
-            
-            # Show file processing details
-            if pricing_result.get('processing_errors'):
-                st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
-            
-            # Display document quality feedback
-            if pricing_result.get('file_details'):
-                SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])
+            with pricing_container.container():  # Put EVERYTHING inside
+                st.markdown("### :primary[Analysis Pricing]")
+                st.info(pricing_result['billing_summary'])
+
+                # Show file processing details
+                if pricing_result.get('processing_errors'):
+                    st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
+
+                # Display document quality feedback
+                if pricing_result.get('file_details'):
+                    SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])
         else:
             # Handle different error types
             if pricing_result.get('error') == 'scanned_pdf_detected':
@@ -188,7 +189,7 @@ def render_asc805_page():
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-5 minutes**. Please don't close this tab until complete"
             )
             
-            if st.button("3️⃣ Confirm, Start Analysis & Generate Memo",
+            if st.button("3️⃣ Confirm & Analyze",
                        type="primary",
                        use_container_width=True,
                        key="asc805_analyze"):
@@ -207,7 +208,7 @@ def render_asc805_page():
                      key="asc805_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
-        st.button("3️⃣ Analyze Contract & Generate Memo", 
+        st.button("3️⃣ Confirm & Analyze", 
                  disabled=True, 
                  use_container_width=True,
                  key="asc805_analyze_disabled")
