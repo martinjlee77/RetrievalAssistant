@@ -288,7 +288,7 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         # Step 2: Payment will be processed when analysis completes (no upfront charging)
             
-        # Add the important warning box that users should not leave the page
+        # Progress message that will be cleared later
         progress_message_placeholder = st.empty()
         progress_message_placeholder.error(
             "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
