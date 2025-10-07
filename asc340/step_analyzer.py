@@ -419,7 +419,7 @@ Respond with ONLY the company name, nothing else."""
                         issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
                         markdown_content = markdown_content.replace(
                             "**Issues or Uncertainties:**", 
-                            "**Issues or Uncertainties:**" + issues_section + "\n\n**Original Issues:**"
+                            "**Issues or Uncertainties:**" + issues_section + "\n\n"
                         )
                 
                 # Log sample of clean content for verification
@@ -437,7 +437,7 @@ Respond with ONLY the company name, nothing else."""
             raise
     
     def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
-        """Validate step output for required sections and formatting issues."""
+        """Validate step output for required structural sections only."""
         issues = []
         
         # Check for required sections
@@ -446,18 +446,6 @@ Respond with ONLY the company name, nothing else."""
         
         if "**Conclusion:**" not in markdown_content:
             issues.append(f"Missing Conclusion section in Step {step_num}")
-        
-        # Check currency formatting - flag numbers that look like currency but missing $
-        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
-        # Filter out obvious non-currency (years, quantities, etc.)
-        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
-        if suspicious_currency:
-            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
-        
-        # Flag potentially fabricated citations (section numbers, page numbers)
-        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
-        if fake_citations:
-            issues.append(f"Potentially fabricated citations: {fake_citations}")
         
         return {"valid": len(issues) == 0, "issues": issues}
     
@@ -494,10 +482,10 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 1: Scoping and Incremental Test',
                 'focus': 'Determine whether the commission plan is within the scope and capitalizable under ASC 340-40',
                 'key_points': [
-                    'Any consideration payable to a customer (ASC 606-10-32-25 through 32-27) is outside the scope of ASC 340-40, for example rebates, credits, referral or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is an employee or agent (third party) or a customer.',
-                    'This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-5 to 25-8)',
-                    'Capitalize (i.e., recognize an asset) if and only if incremental: the cost is incurred solely because a specific contract is obtained, and recovery is expected (ASC 340-40-25-1 to 25-3).',
-                    'Expense if not incremental or recovery not expected (ASC 340-40-25-3).',
+                    'Determine based on the uploaded documents whether there is any consideration payable to a customer (ASC 606-10-32-25 through 32-27), which is outside the scope of ASC 340-40. Examples include rebates, credits, referral, or marketing fees paid to a customer or the customer’s customer. Evaluate whether the recipient of the commission is an employee or agent (third party) or a customer to aid this determination.',
+                    'IMPORTANT: This analysis does not cover the costs incurred in fulfilling a contract with a customer (ASC 340-40-25-5 to 25-8). It only covers costs to obtain a contract.',
+                    'Evaluate whether the cost (for example, commission) can be capitalized (i.e., recognize an asset) under ASC 340. It is capitalizable if and only if incremental, that is, the cost is incurred solely because a specific contract is obtained and recovery is expected (ASC 340-40-25-1 to 25-3).',
+                    'If not incremental or recovery not expected (ASC 340-40-25-3), expense the cost.',
                     'Common capitalizable costs (assuming recovery expected): commissions paid on execution, booking or activation of a specific contract,  third-party agent commissions success-based on a specific contract, accelerators triggered by the specific contract crossing a threshold (capitalize the incremental portion attributable to that contract), recoverable draws when they settle into a commission on a specific contract (capitalize at the point the commission is earned/incurred), employer payroll taxes on capitalized commissions.',
                     'Common expense (typically not incremental): base salary, contests based on aggregate metrics not tied to specific contracts, nonrecoverable draws/guarantees, training, recruiting, enablement stipends, SPIFFs not contingent on a specific contract or that can be earned absent a specific contract.'
                 ]
@@ -506,11 +494,11 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 2: Guidance for Amortization, Practical Expedient, and Impairment',
                 'focus': 'Provide policy boilerplate and guidance only; no calculations or anlaysis.',
                 'key_points': [
-                    'Capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. If renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. The period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
-                    'Practical expedient: expense the cost as incurred if the amortization period would be one year or less. Application can be by portfolio; document the policy.',
-                    'Changes in estimates: adjust amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
-                    'At each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.',
-                'Note that a portfolio approach can be applied if it would not materially differ from a contract-by-contract approach (e.g., for determining amortization periods and impairment).'
+                    'Explain that capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. Also explain that if renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. Explain that the period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
+                    'Mention the practical expedient in whcih the cost is expensed as incurred if the amortization period would be one year or less. Application can be by portfolio but the policy should be documented.',
+                    'Explain that changes in estimates result in adjusting amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
+                    'Explain that at each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.',
+                    'Note that a portfolio approach can be applied if it would not materially differ from a contract-by-contract approach (e.g., for determining amortization periods and impairment).'
                 ]
             }
         }
@@ -567,6 +555,7 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 CRITICAL ANALYSIS REQUIREMENTS:
 - If information is not explicitly stated in the contract, write "Not specified in contract"
+- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
 - NEVER infer, guess, or invent contract terms, dates, amounts, or section references
 - If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
 - Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material

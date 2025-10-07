@@ -127,10 +127,10 @@ class ASCResearchAssistant:
         if target_model in ["gpt-5", "gpt-5-mini"]:
             # GPT-5 models need much higher token counts for complex research tasks
             token_limits = {
-                "main": 8000,        # Main research answers - increased for complex prompts
-                "suggestions": 800   # Follow-up suggestions
+                "main": 20000,        # Main research answers - increased for complex prompts
+                "suggestions": 20000   # Follow-up suggestions
             }
-            return {"max_completion_tokens": token_limits.get(request_type, 8000)}
+            return {"max_completion_tokens": token_limits.get(request_type, 20000)}
         else:
             # GPT-4o models use standard limits
             token_limits = {

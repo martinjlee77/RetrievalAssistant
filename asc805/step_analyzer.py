@@ -410,6 +410,18 @@ Respond with ONLY the target company name, nothing else."""
                 if not markdown_content or len(markdown_content) < 50:
                     logger.warning(f"⚠️ Step {step_num}: Received suspiciously short response ({len(markdown_content) if markdown_content else 0} chars)")
                 
+                # Validate the output for quality assurance
+                validation_result = self.validate_step_output(markdown_content, step_num)
+                if not validation_result["valid"]:
+                    logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
+                    # Append validation issues to the Issues section
+                    if "**Issues or Uncertainties:**" in markdown_content:
+                        issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
+                        markdown_content = markdown_content.replace(
+                            "**Issues or Uncertainties:**", 
+                            "**Issues or Uncertainties:**" + issues_section + "\n\n"
+                        )
+                
                 # Log sample of clean content for verification
                 logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
             
@@ -557,14 +569,37 @@ REQUIRED OUTPUT FORMAT (Clean Markdown):
 
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific transaction evidence and ASC 805 citations. Quote transaction language only when the exact wording is outcome‑determinative; paraphrase ASC 805 with pinpoint citations and use only brief decisive phrases when directly supportive.]
 
-**Conclusion:** [Write single paragraph conclusion stating the specific outcome for this step]
+**Analysis:** [Detailed analysis with supporting evidence. Include:
+- Explicit reasoning with "Because..." statements that connect the evidence to the conclusion]
+- Contract evidence with direct quotes only when specific terms drive the conclusion (use "quotation marks" and bracketed citations)
+- Contract citations must reference actual text from the document:
+    Good: [Purchase Agreement, Assets Aquired], [Purchase Agreement, 'purchase price of']
+    Bad: [Purchase Agreement, §4.2], [Purchase Agreement, p. 15] (unless these exact references appear in the contract text)
+- Only cite section numbers/page numbers if they are explicitly visible in the contract text
+- ASC 805 guidance paraphrased with citations; include only brief
+decisive phrases when directly supportive.
 
-END OUTPUT"""
+**Conclusion:** [2–3 sentence conclusion summarizing the findings for this step, with at least one bracketed ASC 805 citation.]
+
+**Issues or Uncertainties:** [If any significant issues exist, list them clearly and explain potential impact. Otherwise, state "None identified."]
+
+CRITICAL ANALYSIS REQUIREMENTS:
+- If information is not explicitly stated in the contract, write "Not specified in contract"
+- For required accounting policies, management judgments, or valuation inputs that are external to the contract, do not state 'Not specified'. Instead, state the accounting requirement and create a clear, bracketed placeholder prompting management for the necessary information, such as '[Placeholder for Management: Describe...]'.
+- NEVER infer, guess, or invent contract terms, dates, amounts, or section references
+- If a required fact is not provided in the contract, state "Not specified in contract" rather than guessing
+- Use concise, assertive language ("We conclude...") rather than hedging ("It appears...") unless a gap is material
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Format currency as: $240,000 (with comma, no spaces)
+- Use proper spacing after periods and commas
+- Use professional accounting language
+- Double-check all currency amounts for correct formatting"""
 
         return prompt
     
     def validate_step_output(self, markdown_content: str, step_num: int) -> Dict[str, Any]:
-        """Validate step output for required sections and formatting issues."""
+        """Validate step output for required structural sections only."""
         issues = []
         
         # Check for required sections
@@ -573,18 +608,6 @@ END OUTPUT"""
         
         if "**Conclusion:**" not in markdown_content:
             issues.append(f"Missing Conclusion section in Step {step_num}")
-        
-        # Check currency formatting - flag numbers that look like currency but missing $
-        bad_currency = re.findall(r'\b\d{1,3}(?:,\d{3})*\b(?!\.\d)', markdown_content)
-        # Filter out obvious non-currency (years, quantities, etc.)
-        suspicious_currency = [num for num in bad_currency if int(num.replace(',', '')) > 1000]
-        if suspicious_currency:
-            issues.append(f"Currency potentially missing $ symbol: {suspicious_currency}")
-        
-        # Flag potentially fabricated citations (section numbers, page numbers)
-        fake_citations = re.findall(r'\[Contract\s*§|\bp\.\s*\d+\]', markdown_content)
-        if fake_citations:
-            issues.append(f"Potentially fabricated citations: {fake_citations}")
         
         return {"valid": len(issues) == 0, "issues": issues}
     
