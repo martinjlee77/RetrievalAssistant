@@ -1,0 +1,68 @@
+POST #4: Hybrid RAG for Technical Accounting
+
+Accuracy and clarity
+
+“Guaranteed” citations: Where you say metadata filters “guarantee” ASC 606/current version/right topic, that’s only true if metadata quality is perfect. Suggest softening to “ensures, assuming accurate metadata,” and pair with a verification step to prevent overstatement.
+Versioning of codification: Effective dating is more nuanced than “current vs old.” ASC content changes via ASUs with effective_from/effective_to and transition provisions. Add bi-temporal versioning (effective and publication dates) to avoid citing content not yet effective or content applicable only under transition.
+Authoritative hierarchy: Treat codification as authoritative; implementation guides, basis for conclusions, and firm manuals are non-authoritative. Make clear that non-authoritative sources are secondary and should never override codification.
+Licensing: If you imply storing codification text, note licensed access or that you index user-provided/authorized text. Avoid implying redistribution of full ASC content if you do not have a license.
+Constructive improvements (significant impact)
+
+Strengthen metadata schema
+Add: topic-subtopic-section (e.g., Topic 606, Subtopic 10, Section 25), authoritative_level (authoritative/non-authoritative), effective_from, effective_to, ASU_reference, transition_scope (early adoption, retrospective/modified), doc_id, page/para anchors, source_url, jurisdiction (US GAAP vs IFRS).
+Maintain redirects/mappings for superseded paragraphs (old → new references) to support time-travel queries.
+Retrieval quality upgrades
+Add reciprocal rank fusion (RRF) to blend dense and BM25 results robustly.
+Add a cross-encoder reranker for the final top-k to improve precision on near-duplicate paragraphs.
+Use query decomposition for multi-part questions and aggregate evidence across sub-queries.
+Verification and guardrails
+Include span-level quote extraction with offsets and “claim-to-evidence” alignment. Track citation accuracy and abstention rates; return “insufficient evidence” when filtered corpus lacks coverage.
+Add prompt-injection defenses: sanitize retrieved text (strip instructions), enforce cite-only-retrieved policies.
+Point-in-time analyses
+Support “as of” dates to respect effective dating and transition guidance (e.g., “as of 12/31/2024”). This is critical for restatements and historical memos.
+Cross-standard links without contamination
+Allow controlled cross-references (e.g., ASC 606 ↔ ASC 340-40) using a whitelist of sanctioned linkages, labeled as “related guidance” with lower weight.
+Evaluation framework
+Add end-to-end metrics: citation-level faithfulness (percentage of claims with evidence), exact pin-cite accuracy, hallucination rate, abstention correctness, reviewer time saved. These resonate with audit leaders and buyers.
+If you adopt the above, your post’s claims about precision and auditability will align tightly with how high-quality hybrid RAG is actually built and governed.
+
+POST #5: ASC 842 Lease Classification
+
+Accuracy corrections (must-fix)
+
+Near end of economic life exception
+When a lease commences at or near the end of the underlying asset’s economic life, do not apply the “major part of economic life” test or the “substantially all of fair value” test. Only apply the ownership transfer and purchase option tests.
+Classification reassessment
+Do not reassess classification solely because a purchase option becomes (or ceases to be) reasonably certain. Lessees reassess classification only upon a lease modification that is not accounted for as a separate contract. Changes in option assessments trigger remeasurement (not reclassification).
+Incremental borrowing rate (IBR)
+The IBR is a secured borrowing rate for a similar term and amount. The risk-free rate is not a general reference for IBR and may only be used if the private-company risk-free rate practical expedient is elected (by class of underlying asset). Clarify this to avoid misuse.
+Finance lease amortization period
+For finance leases, amortize the ROU asset over the asset’s useful life if ownership transfers or a purchase option is reasonably certain; otherwise, amortize over the lease term. Your current text omits this key distinction.
+Constructive improvements (significant impact)
+
+Clarify thresholds are not bright lines
+75% (“major part”) and 90% (“substantially all”) are common benchmarks, not codified rules. Encourage documenting rationale when near thresholds.
+Lease term definition
+State explicitly: noncancelable period plus renewal options the lessee is reasonably certain to exercise minus periods covered by termination options reasonably certain to exercise. This affects both Test 3 and measurement.
+In-substance fixed and variable payments
+Call out in-substance fixed payments (e.g., minima in variable structures) are included in lease payments; usage- or performance-based variable payments are expensed as incurred (unless they create in-substance fixed amounts).
+Remeasurement triggers (without reclassification)
+Index/rate changes (revised lease payments), changes in assessment of options, and changes in residual value guarantee amounts probable—all can trigger remeasurement of the lease liability/ROU asset.
+Practical expedients (lessee)
+Mention two high-value elections: short-term lease exemption (≤12 months, no purchase option reasonably certain) and the practical expedient to use the risk-free rate (private companies, by asset class). Also note the package of transition expedients (if relevant for readers doing adoptions/acquisitions).
+Lessor vs lessee distinction (brief)
+A short paragraph noting that lessor classification uses similar criteria but different accounting outcomes helps prevent cross-application errors.
+Examples and edge cases
+Add one short vignette on “near end of life” (e.g., 2-year lease of an asset with 2.5 years remaining—apply only ownership/purchase option tests).
+Add a quick example of reassessment without reclassification (option now reasonably certain → remeasure liability; classification unchanged).
+Suggested targeted wording (you can paste)
+
+Near end of economic life:
+“If the lease commences at or near the end of the asset’s economic life, do not apply the ‘major part’ or ‘substantially all’ tests. Only the ownership transfer and purchase option tests apply.”
+Reassessment:
+“Reassess classification only if the lease is modified and the modification is not accounted for as a separate contract. Changes in option assessments trigger remeasurement, not reclassification.”
+IBR:
+“Use a secured incremental borrowing rate for a similar term and amount. A risk-free rate may be used only if the private company practical expedient is elected (by class of underlying asset).”
+Finance lease amortization period:
+“Amortize the ROU asset over the asset’s useful life if ownership transfers or a purchase option is reasonably certain; otherwise, amortize over the lease term.”
+If you incorporate the above, both posts will be technically solid for practitioners and decision-useful for executives. If you want, I can return clean edits of #5 with the corrected exception, reassessment, IBR language, and amortization detail while keeping the current tone and length.

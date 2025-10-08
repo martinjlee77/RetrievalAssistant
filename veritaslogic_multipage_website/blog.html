@@ -72,8 +72,59 @@
                 <!-- Main Content -->
                 <main class="blog-main">
                     
+                    <!-- Long Contracts - October 2025 - FEATURED -->
+                    <article class="featured-post" id="long-contracts" data-category="best-practices">
+                        <div class="post-meta">
+                            <time class="post-date" datetime="2025-10-05">October 5, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
+                            <span class="post-category">Best Practices & Workflows</span>
+                            <span class="post-read-time">6 min read</span>
+                        </div>
+                        <h2>Analyzing 60,000-Word Contracts: Why Traditional Approaches Fail</h2>
+                        <div class="post-excerpt">
+                            <p>Large enterprise contracts present unique challenges for technical accounting analysis. Traditional manual review is time-intensive and error-prone; standard AI tools hit context limits. Here's why long-form contract analysis is hard and how advanced techniques solve the problem.</p>
+                        </div>
+                        <div class="post-content">
+                            <p>Large enterprise contracts—60,000 words or more—present unique challenges for technical accounting analysis. Traditional manual review is time-intensive and error-prone; standard AI tools hit context limits and miss critical details.</p>
+                            
+                            <h3>The Scale Challenge</h3>
+                            <p><strong>What Does 60,000 Words Look Like?</strong></p>
+                            <ul>
+                                <li>Typical SaaS enterprise MSA: 40,000-80,000 words</li>
+                                <li>Complex construction contracts: 50,000-100,000 words</li>
+                                <li>M&A purchase agreements with exhibits: 60,000-150,000 words</li>
+                            </ul>
+                            <p>This is 120-200 pages of dense legal and commercial language, with critical accounting details scattered throughout multiple sections and exhibits.</p>
+
+                            <h3>Why Manual Analysis Fails</h3>
+                            <p>Reading 60,000 words takes 4-6 hours of focused time. Human limitations include attention fatigue after 2-3 hours, pattern recognition degradation, and difficulty maintaining a mental model of the entire contract.</p>
+
+                            <h3>Why Standard AI Tools Fail</h3>
+                            <p><strong>Context Window Limitations:</strong> Even GPT-4 Turbo (128k tokens) struggles when Contract (60,000 words) + Authoritative Guidance (20,000 words) + Prompts (2,000 words) = 110k tokens.</p>
+                            <p><strong>Lost in the Middle:</strong> AI models perform well on information at the beginning and end of long contexts, but miss critical details in middle sections.</p>
+                            <p><strong>No Citation Precision:</strong> Generic responses lack the section-level citations needed for professional analysis.</p>
+
+                            <h3>The Map-Reduce Solution</h3>
+                            <p><strong>Strategic Chunking:</strong> Divide contracts into ~5,000-word chunks with overlapping windows. Preserve section boundaries and maintain heading context.</p>
+                            <p><strong>Parallel Analysis:</strong> Each chunk analyzed independently with full authoritative guidance, standard-specific prompts, and section-level citation tracking.</p>
+                            <p><strong>Synthesis:</strong> Consolidate findings across chunks, identify relationships, resolve contradictions, and flag items for professional review.</p>
+                            <p><strong>Cross-Reference Handling:</strong> When cross-references are detected, we temporarily widen the analysis window and pull the referenced section and its surrounding paragraphs to avoid missing dependent obligations.</p>
+
+                            <h3>Real-World Impact</h3>
+                            <p><strong>Traditional Approach:</strong> 8 days (64 hours) for 85,000-word SaaS agreement</p>
+                            <p><strong>Map-Reduce AI:</strong> 15 minutes AI analysis + 3 hours professional review = 4 hours total (93% time reduction)</p>
+                            <p><strong>Quality:</strong> AI found 2 performance obligations missed in manual review, with consistent application and complete citations.</p>
+                        </div>
+                        <div class="post-tags">
+                            <span class="tag">Contract Analysis</span>
+                            <span class="tag">Large Documents</span>
+                            <span class="tag">Map-Reduce</span>
+                            <span class="tag">Efficiency</span>
+                        </div>
+                    </article>
+
                     <!-- ASC 805 - August 2025 -->
-                    <article class="featured-post" id="asc805-ppa" data-category="technical-standards">
+                    <article class="blog-post" id="asc805-ppa" data-category="technical-standards">
                         <div class="post-meta">
                             <time class="post-date" datetime="2025-08-20">August 20, 2025</time>
                             <span class="post-author">by VeritasLogic.ai Accounting Team</span>
@@ -87,61 +138,65 @@
                         <div class="post-content">
                             <p>Purchase price allocation (PPA) under ASC 805 is one of the most complex and judgment-intensive areas of technical accounting. The process of identifying and measuring acquired assets and liabilities requires deep technical knowledge, consistent application, and comprehensive documentation.</p>
                             
-                            <h3>The PPA Framework: A Systematic Approach</h3>
-                            <p>Purchase price allocation follows a structured process:</p>
+                            <h3>The PPA Framework</h3>
                             <ol>
-                                <li><strong>Determine the acquisition date</strong> - When control transfers to the acquirer</li>
-                                <li><strong>Measure consideration transferred at fair value</strong> - Cash, equity issued, contingent consideration (note: liabilities assumed are part of identifiable net assets, not consideration)</li>
-                                <li><strong>Recognize identifiable assets acquired and liabilities assumed</strong> at acquisition-date fair value (subject to specific exceptions)</li>
-                                <li><strong>Recognize noncontrolling interests (NCI) at fair value</strong> at the acquisition date; in a step acquisition, remeasure previously held interest to fair value with gain/loss in earnings</li>
-                                <li><strong>Record goodwill as the residual</strong>: Consideration + NCI + fair value of previously held interest − fair value of identifiable net assets</li>
+                                <li>Determine the acquisition date</li>
+                                <li>Measure consideration transferred at fair value</li>
+                                <li>Recognize identifiable assets acquired and liabilities assumed at fair value</li>
+                                <li>Recognize noncontrolling interests (NCI) at fair value</li>
+                                <li>Record goodwill as the residual</li>
                             </ol>
 
-                            <p><strong>Measurement Period:</strong> Acquirers can record provisional amounts and adjust them within one year of the acquisition date as new information about facts and circumstances that existed at the acquisition date becomes available. These measurement-period adjustments change goodwill retrospectively.</p>
-
-                            <h3>Intangible Asset Identification</h3>
-                            <p>Many acquired intangible assets are not recorded on the seller's books but must be recognized separately:</p>
-                            
-                            <p><strong>Customer Relationships:</strong> Value based on expected customer retention and future revenue. Multi-period excess earnings method (MPEEM) commonly used. Document attrition assumptions and contributory asset charges.</p>
-
-                            <p><strong>Technology Assets:</strong> Developed technology, software platforms, and in-process R&D. <em>IPR&D treatment:</em> Recognized as an indefinite-lived intangible asset at acquisition. It is not amortized until completion (then amortized over its useful life); if abandoned, the carrying amount is expensed.</p>
-
-                            <p><strong>Trade Names:</strong> Relief-from-royalty method frequently used. Determine if definite-lived (amortize) or indefinite-lived (impairment testing only) based on brand strength and expected use period.</p>
-
-                            <p><strong>Non-Compete Agreements:</strong> Often valued using with-and-without method. Useful lives typically align with contract term and enforceability.</p>
-
-                            <p><strong>Key Consideration:</strong> An intangible asset must be separable OR arise from contractual/legal rights to be recognized separately from goodwill.</p>
-
-                            <h3>Contingent Consideration</h3>
-                            <p><strong>Initial Measurement:</strong> Recognize at fair value as of acquisition date using probability-weighted scenarios.</p>
-                            
-                            <p><strong>Subsequent Measurement:</strong> Liability-classified contingent consideration is remeasured at fair value through earnings each period. Equity-classified contingent consideration is not remeasured. Measurement-period adjustments (within one year) that relate to facts and circumstances at the acquisition date adjust provisional amounts and goodwill.</p>
-
-                            <h3>Income Tax Implications</h3>
-                            <p>Recognize deferred taxes on temporary differences created by fair value step-ups (e.g., customer relationships with no tax basis). This often increases goodwill.</p>
-                            
-                            <p><strong>Tax-Deductible Goodwill:</strong> Deductibility depends on tax form. Asset acquisitions (including stock deals with a Section 338/336 election) generally create tax-deductible goodwill; stock acquisitions without such an election generally do not.</p>
-
-                            <h3>Acquisition-Related Costs</h3>
-                            <p>Acquisition-related costs (investment banker fees, legal fees, due diligence costs) are expensed as incurred and are not included in consideration or recognized assets.</p>
-
-                            <h3>Goodwill and Impairment</h3>
-                            <p><strong>Public entities:</strong> Test goodwill for impairment annually (or upon triggering events) using a one-step test (fair value vs carrying value).</p>
-                            <p><strong>Private company alternative:</strong> May elect to amortize goodwill (generally over 10 years) and test for impairment only upon triggering events.</p>
-
-                            <h3>Common Pitfalls</h3>
-                            <ul>
-                                <li>Incomplete intangible identification - Leads to overstated goodwill</li>
-                                <li>Inappropriate valuation methods - Results in unreliable measurements</li>
-                                <li>Inadequate contingent consideration analysis - Causes earnings volatility</li>
-                                <li>Confusing measurement-period vs subsequent adjustments - Improper treatment</li>
-                            </ul>
+                            <h3>Key Considerations</h3>
+                            <p><strong>Intangible Assets:</strong> Customer relationships, technology assets, trade names, and non-compete agreements must be recognized separately from goodwill.</p>
+                            <p><strong>Tax-Deductible Goodwill:</strong> Deductibility depends on tax form. Asset acquisitions generally create tax-deductible goodwill; stock acquisitions without Section 338/336 election generally do not.</p>
+                            <p><strong>Common Pitfalls:</strong> Incomplete intangible identification, inappropriate valuation methods, and inadequate contingent consideration analysis.</p>
                         </div>
                         <div class="post-tags">
                             <span class="tag">ASC 805</span>
                             <span class="tag">Business Combinations</span>
                             <span class="tag">Purchase Price Allocation</span>
-                            <span class="tag">Fair Value</span>
+                        </div>
+                    </article>
+
+                    <!-- Inside VeritasLogic - July 2025 -->
+                    <article class="blog-post" id="inside-veritaslogic" data-category="product-platform">
+                        <div class="post-meta">
+                            <time class="post-date" datetime="2025-07-10">July 10, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
+                            <span class="post-category">Product & Platform</span>
+                            <span class="post-read-time">7 min read</span>
+                        </div>
+                        <h2>Inside VeritasLogic: How We Built AI for Technical Accounting</h2>
+                        <div class="post-excerpt">
+                            <p>Building AI for technical accounting requires deep domain expertise, architectural decisions that prioritize accuracy, and verification systems that meet professional standards. Here's how we built VeritasLogic for Big 4 and enterprise teams.</p>
+                        </div>
+                        <div class="post-content">
+                            <h3>The Core Challenge</h3>
+                            <p>Technical accounting requires citation-level accuracy, professional judgment support, audit-ready output, reproducibility, and no hallucinations. Generic AI tools can't deliver this.</p>
+
+                            <h3>Our Architecture</h3>
+                            <p><strong>Hybrid RAG with Metadata Filtering:</strong> Every authoritative source tagged with standard, topic, effective dates. ASC 606 analyses cite only ASC 606 guidance.</p>
+                            <p><strong>Two-Stage Citation:</strong> Retrieve with evidence tracking, then verify citations against knowledge base. Abstain when evidence is insufficient.</p>
+                            <p><strong>Map-Reduce Processing:</strong> Split 60,000-word contracts into overlapping chunks, analyze in parallel, synthesize with consistency checks.</p>
+                            <p><strong>Extract-Then-Calculate:</strong> AI extracts terms, Python performs calculations with unit tests. AI describes, code computes.</p>
+
+                            <h3>Technical Stack</h3>
+                            <p><strong>AI Models:</strong> GPT-5 for primary analysis with pinned versions and fixed temperature for reproducibility.</p>
+                            <p><strong>Data Protection:</strong> OpenAI API where your data isn't used to train models. Enterprise zero-retention options available on request.</p>
+                            <p><strong>Infrastructure:</strong> Hosted on SOC 2 Type II certified infrastructure with industry-standard encryption, session-based processing with minimal retention.</p>
+
+                            <h3>What We Don't Do</h3>
+                            <p>No black box analysis. No mock data. No calculation hallucinations. No cross-standard leakage. Every conclusion is traceable and verifiable.</p>
+
+                            <h3>The Result</h3>
+                            <p>Professional quality memos with Big 4 formatting, comprehensive analysis, supporting calculations, and authoritative citations. From weeks to minutes, with hours for professional review instead of days for initial analysis.</p>
+                        </div>
+                        <div class="post-tags">
+                            <span class="tag">Product</span>
+                            <span class="tag">Architecture</span>
+                            <span class="tag">AI Technology</span>
+                            <span class="tag">Reproducibility</span>
                         </div>
                     </article>
 
@@ -158,62 +213,25 @@
                             <p>Stock-based compensation requires careful analysis of grant date, classification, valuation methods, and vesting schedules. Understanding key policy elections and modification accounting is essential for accurate financial reporting.</p>
                         </div>
                         <div class="post-content">
-                            <p>Stock-based compensation under ASC 718 presents unique challenges for technical accounting teams. From grant date valuation to complex vesting schedules, the standard requires careful analysis and consistent application. Understanding the distinction between equity-classified and liability-classified awards, along with key policy elections, is foundational to accurate accounting.</p>
-
-                            <h3>Grant Date Valuation</h3>
-                            <p>Grant date occurs when all key terms are fixed and mutually understood and there is a substantive award with no remaining discretion (ASC 718-10-20). If service begins before grant date (service inception date), recognize expense from service inception using preliminary fair value estimates and true up to grant-date fair value at grant date.</p>
-
-                            <h3>Equity vs Liability Classification</h3>
-                            <p><strong>Why it matters:</strong> Classification fundamentally changes the accounting model.</p>
-                            
-                            <p><strong>Equity-Classified:</strong> Measured at grant-date fair value; not remeasured in subsequent periods.</p>
-                            <p><strong>Liability-Classified:</strong> Remeasured at fair value each reporting period; changes recognized in earnings, creating P&L volatility.</p>
-
-                            <p><strong>Classification Drivers:</strong> Cash settlement features, mandatory net cash settlement provisions, certain indexed features. Net settlement for taxes generally remains equity-classified (post-ASU 2016-09).</p>
+                            <h3>Grant Date and Classification</h3>
+                            <p>Grant date occurs when all key terms are fixed and mutually understood. Equity-classified awards are measured at grant-date fair value; liability-classified awards are remeasured each period.</p>
 
                             <h3>Valuation Methods</h3>
-                            <p><strong>Stock Options:</strong> Use a Black-Scholes or lattice model. Document expected term (simplified method per SAB Topic 14/SAB 110 if appropriate), volatility (historical/implied/blended with documented rationale), dividend yield, and risk-free rate aligned to expected term.</p>
-
-                            <p><strong>RSUs:</strong> With only a service condition, measure at grant-date fair value of the underlying equity. Use Monte Carlo simulation only if a market condition (e.g., relative TSR) exists. Nonforfeitable dividends on unvested awards are typically recognized outside compensation cost; forfeitable dividend equivalents are recognized as additional compensation cost.</p>
-
-                            <p><strong>Performance Share Awards:</strong> Exclude performance conditions from grant-date fair value. Recognize expense based on the number of awards expected to vest (probable threshold), with catch-up adjustments if expectations change.</p>
-
-                            <p><strong>Market Conditions:</strong> Incorporated into grant-date fair value (often via Monte Carlo). Expense is recognized if the requisite service is rendered, even if the market condition is ultimately not achieved—no reversal solely for missing the market condition.</p>
-
-                            <h3>Vesting Attribution</h3>
-                            <p><strong>Graded Vesting:</strong> You may attribute cost tranche-by-tranche (accelerated expense pattern) or on a straight-line basis for awards with only a service condition, provided straight-line does not result in less than the vested portion recognized at any point.</p>
+                            <p><strong>Stock Options:</strong> Black-Scholes or lattice models with documented assumptions for expected term, volatility, dividends, and risk-free rate.</p>
+                            <p><strong>RSUs:</strong> Grant-date fair value of underlying equity. Use Monte Carlo only for market conditions.</p>
+                            <p><strong>Performance Awards:</strong> Exclude performance conditions from grant-date value. Recognize expense based on probable vesting.</p>
 
                             <h3>Forfeitures: Policy Election</h3>
-                            <p>ASC 718 allows a policy election to account for forfeitures as they occur or to estimate forfeitures.</p>
-                            
                             <p><strong>As-Incurred Approach:</strong> Recognize expense as if no forfeitures are expected; when an actual forfeiture occurs, reverse previously recognized expense for that award. Do not estimate forfeitures upfront.</p>
-
-                            <p><strong>Estimation Approach:</strong> Reduce compensation cost for expected forfeitures; requires periodic reassessment and true-ups.</p>
-
-                            <h3>Modification Accounting</h3>
-                            <p>Incremental compensation cost equals the fair value of the modified award immediately after modification minus the fair value of the original award immediately before. If the award becomes probable to vest as a result of the modification, recognize the original grant-date fair value plus any incremental fair value over the remaining service period; recognize immediately if already vested.</p>
-
-                            <p>Reassess classification (equity vs liability) and requisite service period at modification date.</p>
-
-                            <h3>Income Tax Effects</h3>
-                            <p>Deferred tax asset based on cumulative compensation cost for equity awards; excess tax benefits or deficiencies flow through income tax expense (ASU 2016-09).</p>
+                            <p><strong>Estimation Approach:</strong> Reduce compensation cost for expected forfeitures with periodic reassessment.</p>
 
                             <h3>Common Pitfalls</h3>
-                            <ul>
-                                <li>Incorrect grant date identification</li>
-                                <li>Classification errors (equity vs liability)</li>
-                                <li>Outdated forfeiture assumptions</li>
-                                <li>Improper modification accounting</li>
-                                <li>Inadequate performance vs market condition assessment</li>
-                            </ul>
-
-                            <p><strong>Why This Matters to CFOs:</strong> Policy choices (graded attribution method, forfeiture policy, equity vs liability classification) directly affect earnings timing and volatility. Strong documentation and periodic reassessment reduce restatement risk.</p>
+                            <p>Incorrect grant date identification, classification errors, outdated forfeiture assumptions, improper modification accounting, and inadequate performance vs market condition assessment.</p>
                         </div>
                         <div class="post-tags">
                             <span class="tag">ASC 718</span>
                             <span class="tag">Stock Compensation</span>
                             <span class="tag">Valuation</span>
-                            <span class="tag">Vesting</span>
                         </div>
                     </article>
 
@@ -230,86 +248,81 @@
                             <p>Retrieval-Augmented Generation (RAG) makes AI cite its sources by looking up trusted documents before answering. Learn how RAG reduces hallucinations and enables audit-ready analysis in technical accounting.</p>
                         </div>
                         <div class="post-content">
-                            <p>If you've wondered how modern AI systems can provide accurate, source-cited responses instead of fabricating information, you're asking about RAG—Retrieval-Augmented Generation. This technology is transforming how AI handles specialized knowledge, particularly in fields like technical accounting where accuracy and citations are non-negotiable.</p>
-
                             <h3>The Problem with Traditional AI</h3>
-                            <p>Large Language Models (LLMs) like GPT-4 are trained on vast amounts of text and can generate remarkably human-like responses. But they have critical limitations:</p>
+                            <p>LLMs can fabricate sources or misattribute facts. Without retrieval from trusted materials, citations are not reliably verifiable. Training data may be stale.</p>
 
-                            <p><strong>The Reliability Problem:</strong> LLMs can produce fluent answers but may fabricate sources or misattribute facts. Without retrieval from trusted materials, citations are not reliably verifiable. Training data may be stale (knowledge cutoff dates).</p>
+                            <h3>Enter RAG</h3>
+                            <p>RAG adds a critical step: retrieval from trusted sources before generating responses.</p>
+                            <p><strong>The Process:</strong> Question → Search knowledge base → AI receives question AND retrieved guidance → Generate response based on actual sources → Verify claims and format citations → Refuse to answer when evidence is insufficient</p>
 
-                            <p><strong>Why This Matters in Accounting:</strong> In technical accounting, you can't use analysis that lacks proper citations to authoritative guidance, cannot trace reasoning back to source standards, or fails audit-level scrutiny.</p>
-
-                            <h3>Enter RAG: Retrieval-Augmented Generation</h3>
-                            <p>RAG fundamentally changes how AI systems work by adding a critical step: retrieval from trusted sources.</p>
-
-                            <p><strong>The RAG Process:</strong></p>
-                            <ol>
-                                <li><strong>Question Comes In</strong> - User asks about ASC 606 performance obligations</li>
-                                <li><strong>Retrieval Step</strong> - System searches curated knowledge base of authoritative sources</li>
-                                <li><strong>Augmented Generation</strong> - AI receives question AND retrieved guidance; generates response based on actual source material</li>
-                                <li><strong>Verification</strong> - System validates claims are supported; formats pin-cites (e.g., ASC 606-10-25-14); refuses to answer when evidence is insufficient</li>
-                            </ol>
-
-                            <p><strong>The Key Difference:</strong> RAG systems look up evidence before responding and cite only what they retrieved—like a skilled professional who researches first.</p>
-
-                            <h3>How RAG Differs from Alternatives</h3>
-                            <p><strong>vs Fine-Tuning:</strong> Fine-tuning teaches style and patterns but doesn't inject up-to-date facts. Fine-tuned models still hallucinate on factual questions.</p>
-
-                            <p><strong>vs Web Search:</strong> Web search lacks controlled, authoritative corpora and doesn't provide structured pin-citations needed for professional use.</p>
-
-                            <p><strong>RAG's Advantage:</strong> Brings curated, trusted sources directly into the AI's context with traceable citations and controlled quality.</p>
-
-                            <h3>How RAG Works: Technical Basics</h3>
-                            <p><strong>1. Knowledge Base Creation:</strong> Authoritative sources are processed and indexed. Text is broken into semantic chunks using paragraph-aware splitting. Each chunk is converted to a "vector embedding" (mathematical representation). Stored in specialized vector databases (ChromaDB, FAISS, Milvus, Elasticsearch kNN).</p>
-
-                            <p><strong>2. Query Processing:</strong> User question converted to vector embedding. System performs hybrid retrieval: dense semantic search + keyword/BM25. May use reranking with cross-encoder for precision. Query rewriting expands acronyms and adds synonyms.</p>
-
-                            <p><strong>3. Context-Aware Generation:</strong> Retrieved passages become part of AI's context. Citations attached from retrieved chunks' metadata. Verification pass helps prevent fabricated cites.</p>
+                            <h3>How RAG Works</h3>
+                            <p><strong>Knowledge Base Creation:</strong> Authoritative sources processed and indexed. Text broken into semantic chunks. Converted to vector embeddings. Stored in vector databases.</p>
+                            <p><strong>Query Processing:</strong> Question converted to embedding. Hybrid retrieval (semantic + keyword). Optional reranking for precision.</p>
+                            <p><strong>Context-Aware Generation:</strong> Retrieved passages become AI's context. Citations attached from metadata. Verification pass prevents fabrication.</p>
 
                             <h3>Guardrails for Professional Use</h3>
-                            <p><strong>Citation Discipline:</strong> Cite only retrieved sources with pin-cites and quotes for critical assertions. Maintain source governance: curate and version authoritative content.</p>
+                            <p><strong>Citation Discipline:</strong> Cite only retrieved sources with pin-cites. Maintain source governance.</p>
+                            <p><strong>Abstention Policy:</strong> Return "insufficient evidence" rather than improvise.</p>
+                            <p><strong>Source Integrity:</strong> Use licensed/authorized sources. Document provenance.</p>
 
-                            <p><strong>Abstention Policy:</strong> Return "insufficient evidence found" rather than improvise. Better to defer than fabricate.</p>
-
-                            <p><strong>Source Integrity:</strong> Use licensed/authorized sources (e.g., official ASC codification) or user-provided content. Document source provenance and update cycles.</p>
-
-                            <h3>Benefits Over Traditional AI</h3>
-                            <p><strong>Accuracy:</strong> Grounds answers in retrieved, trusted documents; reduces—though does not eliminate—hallucinations. Quality depends on knowledge base completeness.</p>
-
-                            <p><strong>Transparency:</strong> Every claim can be traced to a source. Citations enable verification. Audit trail for decision-making.</p>
-
-                            <p><strong>Currency:</strong> Keep the knowledge base updated to reflect new guidance without retraining the model.</p>
-
-                            <h3>Evaluation Metrics</h3>
-                            <p><strong>Retrieval:</strong> Recall@k, Precision@k, Mean Reciprocal Rank, coverage</p>
-                            <p><strong>Generation:</strong> Faithfulness (claims supported by sources), answer relevancy, citation accuracy</p>
-                            <p><strong>User Experience:</strong> Time-to-answer, deferral rate, user satisfaction</p>
-
-                            <h3>Security for Regulated Use</h3>
-                            <ul>
-                                <li>Data isolation by client/engagement</li>
-                                <li>Encryption at rest and in transit</li>
-                                <li>Access controls and audit logs</li>
-                                <li>Controls to prevent model providers from training on customer data</li>
-                            </ul>
-
-                            <h3>Limitations to Understand</h3>
-                            <p><strong>Retrieval Challenges:</strong> Lost-in-the-middle in long contexts, chunking that splits related concepts, out-of-distribution queries</p>
-                            
-                            <p><strong>Generation Issues:</strong> Citation hallucination (rare but possible), prompt injection from retrieved content</p>
-
-                            <p><strong>Not a Replacement:</strong> AI assists, doesn't replace professionals. Judgment and experience remain essential.</p>
-
-                            <h3>The Future of AI-Assisted Work</h3>
-                            <p>RAG represents a shift from "AI that knows everything" to "AI that knows where to look." For professional services, this is the difference between a tool that creates liability and one that enhances productivity.</p>
-
-                            <p><strong>The Bottom Line:</strong> RAG enables AI trustworthy enough for professional use by ensuring every response can be verified against authoritative sources.</p>
+                            <h3>Limitations</h3>
+                            <p>Retrieval challenges (lost-in-the-middle, chunking issues), citation hallucination (rare but possible), and prompt injection risks. AI assists but doesn't replace professionals.</p>
                         </div>
                         <div class="post-tags">
                             <span class="tag">RAG</span>
                             <span class="tag">AI Technology</span>
                             <span class="tag">Citations</span>
-                            <span class="tag">Professional Services</span>
+                        </div>
+                    </article>
+
+                    <!-- Data Security - April 2025 -->
+                    <article class="blog-post" id="data-security" data-category="ai-technology">
+                        <div class="post-meta">
+                            <time class="post-date" datetime="2025-04-20">April 20, 2025</time>
+                            <span class="post-author">by VeritasLogic.ai Accounting Team</span>
+                            <span class="post-category">AI & Technology</span>
+                            <span class="post-read-time">8 min read</span>
+                        </div>
+                        <h2>Data Security in AI-Powered Accounting Tools: What CFOs Need to Know</h2>
+                        <div class="post-excerpt">
+                            <p>As AI tools become integral to technical accounting workflows, understanding security implications is critical for protecting sensitive financial data and maintaining compliance. CFOs must ask the right questions about data handling, access controls, and regulatory alignment.</p>
+                        </div>
+                        <div class="post-content">
+                            <h3>The Security Challenge</h3>
+                            <p>Contracts contain material non-public information (MNPI), strategic business details, and confidential terms. Regulatory context includes SOX compliance, industry regulations (HIPAA BAAs for PHI), and data privacy laws.</p>
+
+                            <h3>Core Security Requirements</h3>
+                            <p><strong>Data Encryption:</strong> TLS 1.3 in transit, AES-256 at rest, optional customer-managed keys (CMEK), and client-side encryption for highly sensitive use cases.</p>
+                            <p><strong>Access Controls:</strong> Multi-factor authentication (MFA), SSO/SAML 2.0 integration, SCIM provisioning, role-based access control (RBAC), and session management.</p>
+                            <p><strong>Data Isolation:</strong> Logical database separation, VPC isolation, and private connectivity (AWS PrivateLink, Azure Private Link).</p>
+                            <p><strong>AI Model Data Usage:</strong> Verify contractual "no-training" commitments. OpenAI API does not use data to train models by default; Azure OpenAI provides enterprise SLA. Document retention windows.</p>
+
+                            <h3>Audit Trails and Monitoring</h3>
+                            <p>Comprehensive logging with immutable storage (WORM), SIEM integration, real-time anomaly detection, and retention per company policy (1-7 years).</p>
+
+                            <h3>Data Loss Prevention</h3>
+                            <p>Egress restrictions, contextual download controls, optional watermarking, and export activity logging.</p>
+
+                            <h3>RAG and Prompt Injection Defenses</h3>
+                            <p>Sanitize retrieved content, block model-executable instructions, URL/SSRF safety, file sandboxing, and virus/malware scanning.</p>
+
+                            <h3>Vendor Assessment</h3>
+                            <p>Require SOC 2 Type II certification, penetration testing reports, secure SDLC practices (SAST/DAST, SBOM), and subprocessor due diligence.</p>
+
+                            <h3>Questions to Ask Vendors</h3>
+                            <ol>
+                                <li>Show me your contractual commitment not to train on my data. What's the retention window?</li>
+                                <li>How is my data isolated? Do you support VPC isolation or private endpoints?</li>
+                                <li>Can I use customer-managed keys (CMEK)? Can I specify data residency?</li>
+                                <li>Show me your latest SOC 2 Type II report and penetration test summary</li>
+                                <li>Do you support SSO/SAML and SCIM provisioning?</li>
+                            </ol>
+                        </div>
+                        <div class="post-tags">
+                            <span class="tag">Security</span>
+                            <span class="tag">Data Protection</span>
+                            <span class="tag">Compliance</span>
+                            <span class="tag">CFO Guide</span>
                         </div>
                     </article>
 
@@ -327,54 +340,26 @@
                         </div>
                         <div class="post-content">
                             <h3>1. Inadequate Contract Identification</h3>
-                            <p>Many companies struggle with properly identifying what constitutes a contract under ASC 606. The standard requires that contracts have commercial substance, are approved by parties, identify rights and payment terms, and have probable collection.</p>
-                            
-                            <h4>Common Mistake:</h4>
-                            <p>Treating all purchase orders or statements of work as separate contracts without considering the broader commercial arrangement.</p>
-                            
-                            <h4>Solution:</h4>
-                            <p>Implement a systematic contract review process that considers the substance of arrangements, not just the legal form. Use AI-powered analysis to identify patterns and ensure consistency across similar arrangements.</p>
+                            <p>Treating all purchase orders as separate contracts without considering the broader commercial arrangement.</p>
+                            <p><strong>Solution:</strong> Implement systematic contract review considering substance over form.</p>
 
                             <h3>2. Performance Obligation Bundling Errors</h3>
-                            <p>Determining when goods or services should be bundled versus treated as separate performance obligations is crucial for accurate revenue recognition timing.</p>
-                            
-                            <h4>Common Mistake:</h4>
-                            <p>Automatically treating each line item in a contract as a separate performance obligation without considering whether customers can benefit from goods/services independently.</p>
-                            
-                            <h4>Solution:</h4>
-                            <p>Apply the "distinct" criteria systematically: goods/services must be capable of being distinct AND distinct within the context of the contract.</p>
+                            <p>Automatically treating each line item as separate without considering if customers can benefit independently.</p>
+                            <p><strong>Solution:</strong> Apply the "distinct" criteria: capable of being distinct AND distinct within context.</p>
 
                             <h3>3. Stand-Alone Selling Price Estimation</h3>
-                            <p>When observable prices aren't available, companies often struggle with reliable estimation methods for transaction price allocation.</p>
-                            
-                            <h4>Best Practice:</h4>
-                            <p>Use a combination of cost-plus margin, market assessment, and residual approaches. Document your methodology thoroughly for consistency and audit trail.</p>
+                            <p>Use cost-plus margin, market assessment, and residual approaches. Document methodology thoroughly.</p>
 
                             <h3>4. Variable Consideration Complexity</h3>
-                            <p>Bonuses, penalties, discounts, and other variable elements require careful constraint analysis to avoid revenue reversals.</p>
-                            
-                            <h4>Key Considerations:</h4>
-                            <ul>
-                                <li>Estimate probability-weighted amounts</li>
-                                <li>Apply constraint for uncertainty</li>
-                                <li>Update estimates each reporting period</li>
-                                <li>Consider the likelihood of significant revenue reversal</li>
-                            </ul>
+                            <p>Estimate probability-weighted amounts, apply constraint for uncertainty, update each period, consider likelihood of reversal.</p>
 
-                            <h3>5. Inadequate Documentation and Controls</h3>
-                            <p>Poor documentation of judgments and decisions creates audit risks and inconsistent application across similar transactions.</p>
-                            
-                            <h4>Solution Framework:</h4>
-                            <p>Implement standardized templates and automated analysis tools to ensure consistent documentation and reduce manual errors. AI-powered platforms can help maintain consistency across large transaction volumes.</p>
-
-                            <h3>Conclusion</h3>
-                            <p>ASC 606 implementation success depends on systematic processes, clear documentation, and consistent application of judgment. Technology solutions can significantly reduce complexity while improving accuracy and efficiency.</p>
+                            <h3>5. Inadequate Documentation</h3>
+                            <p>Implement standardized templates and automated analysis tools for consistency and audit trail.</p>
                         </div>
                         <div class="post-tags">
                             <span class="tag">ASC 606</span>
                             <span class="tag">Revenue Recognition</span>
                             <span class="tag">Implementation</span>
-                            <span class="tag">Best Practices</span>
                         </div>
                     </article>
 
