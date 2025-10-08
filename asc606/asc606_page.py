@@ -78,6 +78,17 @@ def render_asc606_page():
             analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
             memo_generator.display_clean_memo(memo_content, analysis_id)
             
+            # Re-run policy note and "Analyze Another" button
+            st.markdown("---")
+            st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
+            
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_existing"):
+                # Clear session state for new analysis
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+            
             return  # Exit early, don't show file upload interface
     
     # Get user inputs with progressive disclosure - wrap in container to allow clearing
@@ -623,18 +634,16 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                         # Use the CleanMemoGenerator's display method with analysis_id
                         memo_generator.display_clean_memo(memo_result, analysis_id, filename, customer_name)
                         
-                        # Add rerun functionality
-                        from shared.rerun_manager import RerunManager
-                        rerun_manager = RerunManager()
-                        rerun_manager.add_rerun_button(analysis_id)
+                        # Re-run policy note and "Analyze Another" button
+                        st.markdown("---")
+                        st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
                         
-                        # Add sidebar rerun access
-                        with st.sidebar:
-                            st.markdown("---")
-                            st.markdown("### 🔄 Request Changes")
-                            if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
-                                st.session_state[f'show_rerun_form_{analysis_id}'] = True
-                                st.rerun()
+                        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
+                            # Clear session state for new analysis
+                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                            for key in keys_to_clear:
+                                del st.session_state[key]
+                            st.rerun()
                         
                     else:
                         st.error("❌ Memo generation produced empty content")

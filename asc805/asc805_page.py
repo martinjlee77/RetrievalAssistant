@@ -79,11 +79,16 @@ def render_asc805_page():
             customer_name = memo_data.get('customer_name') if isinstance(memo_data, dict) else None
             memo_generator.display_clean_memo(memo_content, analysis_id, filename, customer_name)
             
-            # Add rerun functionality for existing completed memo
-            from shared.rerun_manager import RerunManager
-            rerun_manager = RerunManager()
-            if analysis_id:
-                rerun_manager.add_rerun_button(str(analysis_id))
+            # Re-run policy note and "Analyze Another" button
+            st.markdown("---")
+            st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
+            
+            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_existing"):
+                # Clear session state for new analysis
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
             
             return  # Exit early, don't show file upload interface
     
@@ -440,6 +445,17 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
         memo_generator_display.display_clean_memo(memo_content)
+        
+        # Re-run policy note and "Analyze Another" button
+        st.markdown("---")
+        st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
+        
+        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
+            # Clear session state for new analysis
+            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
+            for key in keys_to_clear:
+                del st.session_state[key]
+            st.rerun()
         
         # Clear completion message immediately after memo displays
         completion_message_placeholder.empty()
