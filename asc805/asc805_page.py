@@ -52,7 +52,7 @@ def render_asc805_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!**")
-            st.markdown("📄 **Your ASC 805 memo is ready below.**")
+            st.markdown("📄 **Your ASC 805 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             
             # Quick action buttons
             col1, col2 = st.columns(2)

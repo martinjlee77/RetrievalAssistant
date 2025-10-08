@@ -52,7 +52,7 @@ def render_asc842_page():
         if analysis_key in st.session_state and st.session_state[analysis_key]:
             # Show completed analysis and download options
             st.success("✅ **Analysis Complete!**")
-            st.markdown("📄 **Your ASC 842 memo is ready below.**")
+            st.markdown("📄 **Your ASC 842 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             
             # Quick action buttons
             col1, col2 = st.columns(2)
