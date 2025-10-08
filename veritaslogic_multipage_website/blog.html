@@ -476,28 +476,44 @@
         document.addEventListener('DOMContentLoaded', function() {
             const categoryLinks = document.querySelectorAll('.category-list [data-category]');
             const posts = document.querySelectorAll('.featured-post, .blog-post');
+            let currentCategory = 'all';
 
             if (categoryLinks.length > 0 && posts.length > 0) {
+                // Function to apply filter
+                function applyFilter(category) {
+                    currentCategory = category;
+                    
+                    // Update active class on links
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    categoryLinks.forEach(l => {
+                        if (l.getAttribute('data-category') === category) {
+                            l.classList.add('active');
+                        }
+                    });
+
+                    // Filter posts
+                    posts.forEach(post => {
+                        const postCategory = post.getAttribute('data-category');
+                        if (category === 'all' || postCategory === category) {
+                            post.style.display = 'block';
+                        } else {
+                            post.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Add click handlers
                 categoryLinks.forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
+                        e.stopPropagation();
                         const category = this.getAttribute('data-category');
-
-                        // Update active class on links
-                        categoryLinks.forEach(l => l.classList.remove('active'));
-                        this.classList.add('active');
-
-                        // Filter posts - use style.display instead of hidden class
-                        posts.forEach(post => {
-                            const postCategory = post.getAttribute('data-category');
-                            if (category === 'all' || postCategory === category) {
-                                post.style.display = 'block';
-                            } else {
-                                post.style.display = 'none';
-                            }
-                        });
+                        applyFilter(category);
                     });
                 });
+
+                // Initialize with 'all' filter
+                applyFilter('all');
             }
         });
     </script>
