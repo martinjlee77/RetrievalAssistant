@@ -158,17 +158,16 @@ def render_asc718_page():
         # Check if user has sufficient credits
         credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
         
-        # Credit balance display - store in variable so we can clear it
-        credit_container = st.empty()       
+        # Credit balance display
         if credit_check['can_proceed']:
             msg = (
                 f"{credit_check['message']}\n"
                 f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
             )
-            credit_container.info(msg)
+            st.info(msg)
             can_proceed = True
         else:
-            credit_container.error(credit_check['message'])
+            st.error(credit_check['message'])
             
             # Show wallet top-up options
             selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
@@ -190,30 +189,16 @@ def render_asc718_page():
 
         # Analysis button with pricing integration
         if can_proceed:
-            # Check if analysis is currently running
-            analysis_running = st.session_state.get('asc718_analysis_running', False)
-            
-            warning_placeholder = st.empty()
-            warning_placeholder.info(
+            st.info(
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             
             if st.button("3️⃣ Confirm & Analyze",
                        type="primary",
                        use_container_width=True,
-                       disabled=analysis_running,
                        key="asc718_analyze"):
-                # Set flag to disable button during analysis
-                st.session_state['asc718_analysis_running'] = True
-                
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()      # Clear the warning
-                pricing_container.empty()        # Clear pricing information
-                credit_container.empty()         # Clear credit balance info
-                upload_form_container.empty()    # Clear the upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    st.session_state['asc718_analysis_running'] = False
                     return
                 perform_asc718_analysis(pricing_result, additional_context, user_token)
         else:
@@ -459,9 +444,6 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
-        # Clear analysis running flag
-        st.session_state['asc718_analysis_running'] = False
-        
         # Complete analysis for database capture  
         if analysis_id:
             analysis_manager.complete_analysis(analysis_id, success=True)
@@ -521,7 +503,6 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
     except Exception as e:
         # Clear the progress message even on error
         progress_message_placeholder.empty()
-        st.session_state['asc718_analysis_running'] = False
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 718 analysis error for session {session_id[:8]}...: {str(e)}")
         st.session_state[analysis_key] = True  # Signal completion (even on error)
