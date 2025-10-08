@@ -849,12 +849,18 @@ Format as clean markdown - no headers, just paragraphs."""
                         conclusions.append(f"Step {step_num}: {conclusion_text}")
                         logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_text[:100]}...")
                     else:
-                        # Try both formats: **Conclusion:** (bold) OR Conclusion: (plain)
-                        # Pattern 1: Bold format
+                        # Try all four conclusion patterns for maximum robustness
+                        # Pattern 1: **Conclusion:** (bold with colon)
                         conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', content, re.IGNORECASE | re.DOTALL)
                         if not conclusion_match:
-                            # Pattern 2: Plain text format (no bold)
+                            # Pattern 2: Conclusion: (plain text with colon)
                             conclusion_match = re.search(r'^Conclusion:\s*(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        if not conclusion_match:
+                            # Pattern 3: **Conclusion** (bold without colon)
+                            conclusion_match = re.search(r'\*\*Conclusion\*\*\s+(.+?)(?:\n\s*\*\*|$)', content, re.IGNORECASE | re.DOTALL)
+                        if not conclusion_match:
+                            # Pattern 4: Conclusion (plain text without colon)
+                            conclusion_match = re.search(r'^Conclusion\s+(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
                         
                         if conclusion_match:
                             conclusion_text = conclusion_match.group(1).strip()

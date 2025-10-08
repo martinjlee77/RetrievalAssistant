@@ -656,8 +656,19 @@ FORMATTING:
                     if marker_match:
                         conclusion = marker_match.group(1).strip()
                     else:
-                        # Fallback to improved regex that captures until next bold section or end
+                        # Try all four conclusion patterns for maximum robustness
+                        # Pattern 1: **Conclusion:** (bold with colon)
                         conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if not conclusion_match:
+                            # Pattern 2: Conclusion: (plain text with colon)
+                            conclusion_match = re.search(r'^Conclusion:\s*(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        if not conclusion_match:
+                            # Pattern 3: **Conclusion** (bold without colon)
+                            conclusion_match = re.search(r'\*\*Conclusion\*\*\s+(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
+                        if not conclusion_match:
+                            # Pattern 4: Conclusion (plain text without colon)
+                            conclusion_match = re.search(r'^Conclusion\s+(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        
                         if conclusion_match:
                             conclusion = conclusion_match.group(1).strip()
                         else:
