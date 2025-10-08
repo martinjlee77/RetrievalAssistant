@@ -563,7 +563,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         }
         
         st.success("✅ **Analysis Complete!**")
-        st.markdown("📄 **Your ASC 842 memo is ready below.**")
+        st.markdown("📄 **Your ASC 842 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
         
         # Quick action buttons
         col1, col2 = st.columns(2)

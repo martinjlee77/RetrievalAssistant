@@ -596,7 +596,7 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                     # Display results
                     st.success("✅ **Analysis Complete!**")
-                    st.markdown("📄 **Your ASC 606 memo is ready below.**")
+                    st.markdown("📄 **Your ASC 606 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
                     
                     # Quick action buttons
                     col1, col2 = st.columns(2)

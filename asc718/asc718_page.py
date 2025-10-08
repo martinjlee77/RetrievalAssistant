@@ -466,7 +466,7 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         }
         
         st.success("✅ **Analysis Complete!**")
-        st.markdown("📄 **Your ASC 718 memo is ready below.**")
+        st.markdown("📄 **Your ASC 718 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
         
         # Quick action buttons
         col1, col2 = st.columns(2)
