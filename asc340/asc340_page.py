@@ -194,6 +194,9 @@ def render_asc340_page():
         
         # Analysis section
         if can_proceed:
+            # Check if analysis is currently running
+            analysis_running = st.session_state.get('asc340_analysis_running', False)
+            
             warning_placeholder = st.empty()
             warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
@@ -202,7 +205,11 @@ def render_asc340_page():
             if st.button("3️⃣ Confirm & Analyze",
                        type="primary",
                        use_container_width=True,
+                       disabled=analysis_running,
                        key="asc340_analyze"):
+                # Set flag to disable button during analysis
+                st.session_state['asc340_analysis_running'] = True
+                
                 # Clear all UI elements that should disappear during analysis
                 warning_placeholder.empty()      # Clear the warning
                 pricing_container.empty()        # Clear pricing information
@@ -210,6 +217,7 @@ def render_asc340_page():
                 upload_form_container.empty()    # Clear the upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    st.session_state['asc340_analysis_running'] = False
                     return
                 perform_asc340_analysis_new(pricing_result, additional_context, user_token)
         else:
@@ -527,6 +535,9 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     st.session_state[memo_key] = memo_result
                     st.session_state[analysis_key] = True
                     
+                    # Clear analysis running flag
+                    st.session_state['asc340_analysis_running'] = False
+                    
                     st.success("✅ **Analysis Complete!**")
                     st.markdown("📄 **Your ASC 340-40 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
                     
@@ -566,10 +577,12 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                 else:
                     st.error("❌ Memo generation produced empty content")
+                    st.session_state['asc340_analysis_running'] = False
                 
             except Exception as e:
                 logger.error(f"Memo generation failed: {str(e)}")
                 analysis_manager.complete_analysis(analysis_id, success=False, error_message=f"Memo generation failed: {str(e)}")
+                st.session_state['asc340_analysis_running'] = False
                 st.error(f"❌ **Memo Generation Failed**: {str(e)}")
                 return
                 
@@ -581,6 +594,7 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
             billing_manager.auto_credit_on_failure(user_token, pricing_result['tier_info']['price'], analysis_id)
             analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
         
+        st.session_state['asc340_analysis_running'] = False
         st.error(f"❌ **Analysis Failed**: {str(e)}")
         st.info("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
 
