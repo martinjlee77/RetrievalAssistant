@@ -18,8 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smooth Scrolling for Anchor Links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            // Skip if href is just "#" (used for buttons/filters)
+            if (href === '#' || href.length <= 1) {
+                return;
+            }
+            
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = document.querySelector(href);
             if (target) {
                 const navbarHeight = document.querySelector('.navbar').offsetHeight;
                 const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
