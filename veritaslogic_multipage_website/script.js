@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Category Filtering (Blog Page)
-    const categoryLinks = document.querySelectorAll('[data-category]');
+    const categoryLinks = document.querySelectorAll('.blog-filters [data-category]');
     if (categoryLinks.length > 0) {
         categoryLinks.forEach(link => {
             link.addEventListener('click', function(e) {

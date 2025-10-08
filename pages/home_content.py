@@ -196,8 +196,6 @@ st.divider()
 # Footer with help links
 # ---------------------------
 st.markdown("## :primary[Help & Resources]")
-st.page_link("pages/faq.py", label="Frequently Asked Questions", use_container_width=True)
-
 st.page_link("pages/gethelp.py",
                  label="Get Help",
                  use_container_width=True)
