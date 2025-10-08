@@ -52,7 +52,7 @@ def render_asc842_page():
         if analysis_key in st.session_state and st.session_state[analysis_key]:
             # Show completed analysis and download options
             st.success("✅ **Analysis Complete!**")
-            st.markdown("📄 **Your ASC 842 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
+            st.markdown("📄 **Your ASC 842 memo is ready below.**")
             
             # Quick action buttons
             col1, col2 = st.columns(2)
@@ -161,15 +161,16 @@ def render_asc842_page():
         credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
         
         # Credit balance display
+        credit_container = st.empty()       
         if credit_check['can_proceed']:
             msg = (
                 f"{credit_check['message']}\n"
                 f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
             )
-            st.info(msg)
+            credit_container.info(msg)
             can_proceed = True
         else:
-            st.error(credit_check['message'])
+            credit_container.error(credit_check['message'])
             
             # Show wallet top-up options
             selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
@@ -191,7 +192,8 @@ def render_asc842_page():
         
         # Analysis section
         if can_proceed:
-            st.info(
+            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             
@@ -199,6 +201,11 @@ def render_asc842_page():
                        type="primary",
                        use_container_width=True,
                        key="asc842_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
+                upload_form_container.empty()  # Clear upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
@@ -556,7 +563,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         }
         
         st.success("✅ **Analysis Complete!**")
-        st.markdown("📄 **Your ASC 842 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
+        st.markdown("📄 **Your ASC 842 memo is ready below.**")
         
         # Quick action buttons
         col1, col2 = st.columns(2)

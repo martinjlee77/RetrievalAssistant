@@ -52,7 +52,7 @@ def render_asc805_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!**")
-            st.markdown("📄 **Your ASC 805 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
+            st.markdown("📄 **Your ASC 805 memo is ready below.**")
             
             # Quick action buttons
             col1, col2 = st.columns(2)
@@ -157,16 +157,17 @@ def render_asc805_page():
         # Check if user has sufficient credits
         credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
         
-        # Credit balance display
+        # Credit balance display - store in variable so we can clear it
+        credit_container = st.empty()       
         if credit_check['can_proceed']:
             msg = (
                 f"{credit_check['message']}\n"
                 f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
             )
-            st.info(msg)
+            credit_container.info(msg)
             can_proceed = True
         else:
-            st.error(credit_check['message'])
+            credit_container.error(credit_check['message'])
             
             # Show wallet top-up options
             selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
@@ -188,7 +189,8 @@ def render_asc805_page():
         
         # Analysis section
         if can_proceed:
-            st.info(
+            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
             )
             
@@ -196,6 +198,11 @@ def render_asc805_page():
                        type="primary",
                        use_container_width=True,
                        key="asc805_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()  # Clear the warning 
+                pricing_container.empty()    # Clear pricing information
+                credit_container.empty()     # Clear credit balance info
+                upload_form_container.empty()  # Clear upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
@@ -271,13 +278,6 @@ def get_asc805_inputs_new():
 def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
     """Perform ASC 805 analysis with new billing system integration."""
     
-    # Session isolation - create unique session ID for this user
-    if 'user_session_id' not in st.session_state:
-        st.session_state.user_session_id = str(uuid.uuid4())
-        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
-    
-    session_id = st.session_state.user_session_id
-    analysis_key = f'asc805_analysis_complete_{session_id}'
     analysis_id = None
     
     try:
@@ -420,7 +420,7 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         }
         
         st.success("✅ **Analysis Complete!**")
-        st.markdown("📄 **Your ASC 805 memo is ready below.** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
+        st.markdown("📄 **Your ASC 805 memo is ready below.**")
         
         # Quick action buttons
         col1, col2 = st.columns(2)
