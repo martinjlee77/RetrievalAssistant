@@ -1,0 +1,34 @@
+INFO:shared.auth_utils:SSO: Found auth_token in URL params, attempting validation
+INFO:shared.auth_utils:SSO: Validating token at https://www.veritaslogic.ai/api/auth/validate-token
+INFO:shared.auth_utils:SSO: Validation response status: 200
+INFO:shared.auth_utils:SSO: Token validation result: True
+INFO:shared.auth_utils:SSO: Auto-login successful for user support@veritaslogic.ai
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processed file 1: ASC_606_Sample_InnovateTech.docx - 2712 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 2712 words, 3K (≤10 pages) tier, $195.0
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processed file 1: ASC_606_Sample_InnovateTech.docx - 2712 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 2712 words, 3K (≤10 pages) tier, $195.0
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-10-08T14:30:01.024577", "analysis_id": "6a5334e7", "asc_standard": "ASC 606", "total_words": 2712, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis 6a5334e7: ASC 606 - 2712 words
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:asc606.step_analyzer:🤖 Using GPT-5 for main analysis, GPT-5-mini for light tasks
+INFO:shared.knowledge_base:ChromaDB client initialized for asc606_knowledge_base
+INFO:shared.knowledge_base:Embedding function initialized successfully
+INFO:shared.knowledge_base:Collection 'asc606_guidance' loaded successfully
+INFO:asc606.knowledge_search:ASC 606 knowledge search initialized successfully
+INFO:asc606.step_analyzer:🏢 Extracting customer name from contract...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
