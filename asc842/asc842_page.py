@@ -35,7 +35,7 @@ def render_asc842_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 842 Analyzer & Memo Generator]")
+    st.title(":primary[ASC 842: Leases (Lessee)]")
     with st.container(border=True):
         st.markdown(":primary[**Purpose:**] Automatically analyze lease contracts and generate a professional ASC 842 memo. Simply upload your lease documents to begin.")
     

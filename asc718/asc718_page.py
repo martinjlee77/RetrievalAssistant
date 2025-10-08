@@ -36,7 +36,8 @@ def render_asc718_page():
 
     # Page header
     st.title(":primary[ASC 718: Stock Compensation]")
-    st.info("**Purpose:** Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
+    with st.container(border=True):
+        st.markdown(":primary[**Purpose:**] Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():

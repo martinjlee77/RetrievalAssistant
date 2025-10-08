@@ -277,25 +277,11 @@ def show_user_sidebar(auth_manager: AuthManager):
         # Action buttons
         col1, col2 = st.columns(2)
         with col1:
-            st.link_button("Dashboard", f"{WEBSITE_URL}/dashboard.html")
+            st.link_button("My Account", f"{WEBSITE_URL}/dashboard.html", width="stretch")
         
         with col2:
-            if st.button("Logout", use_container_width=True):
+            if st.button("Logout", width="stretch"):
                 auth_manager.logout()
-        
-        # Help section
-        st.markdown("---")
-        st.markdown("### 🆘 Get Help")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.link_button("Request Rerun", 
-                          f"{WEBSITE_URL}/request-memo-rerun.html", 
-                          use_container_width=True)
-        with col2:
-            st.link_button("Contact Support", 
-                          f"{WEBSITE_URL}/contact.html", 
-                          use_container_width=True)
 
 def show_credits_warning(required_credits: float, auth_manager: AuthManager):
     """Show warning if user doesn't have sufficient credits"""

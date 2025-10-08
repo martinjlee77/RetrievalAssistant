@@ -36,7 +36,7 @@ def render_asc340_page():
         st.session_state.file_uploader_key = 0
 
     # Page header
-    st.title(":primary[ASC 340-40 Commission Cost Analyzer]")
+    st.title(":primary[ASC 340-40: Cost to Obtain]")
     with st.container(border=True):
         st.markdown("""
         :primary[**Purpose:**] Automatically analyze commission and related documents and generate a professional policy memo. Simply upload your documents to begin. 

@@ -1,0 +1,75 @@
+Great start. Clear, approachable for execs, and useful for practitioners. I see a few technical corrections and several high‑impact additions that will materially improve accuracy and credibility for ASC 718 readers.
+
+Accuracy corrections and clarifications (must-fix)
+
+Grant date vs service inception date
+Grant date is when there is a mutual understanding of key terms and a substantive award is approved with no remaining discretion (ASC 718-10-20). Individual “employee acceptance” is not always required if terms are fixed and communicated.
+The requisite service period can start before the grant date (service inception date). If so, you begin recognizing expense from service inception using then-current fair value estimates and true up to grant-date fair value at grant date.
+RSUs and Monte Carlo
+RSUs with only a service condition are valued at the grant-date fair value of the underlying equity; no Monte Carlo is needed.
+Monte Carlo simulation is used when there is a market condition (e.g., relative TSR), whether the award is an option, PSU, or RSU.
+Dividends/dividend equivalents affect valuation and accounting. Nonforfeitable dividends on unvested awards are typically recognized outside compensation cost (as dividends), while forfeitable dividends are recognized as additional compensation cost. Clarify your policy treatment at a high level.
+Performance awards measurement vs recognition
+Under ASC 718, performance conditions are not incorporated into grant-date fair value. You do not “probability-weight expected outcomes” for fair value measurement.
+Instead, recognize compensation cost based on the number of awards expected to vest (probable threshold), updating each period. If probability changes, record catch-up adjustments.
+Market conditions
+Market conditions are incorporated into grant-date fair value (e.g., via Monte Carlo). Expense is recognized if the requisite service is rendered, even if the market condition is ultimately not achieved (no reversal solely for missing the market condition).
+Graded vesting attribution
+ASC 718 permits either tranche-by-tranche attribution (accelerated) or straight-line attribution for awards with only a service condition if straight-line does not result in recognizing less than the vested portion. Your draft implies tranche-only; add the straight-line policy option.
+Forfeitures policy election
+ASC 718 allows a policy election to account for forfeitures as they occur or to estimate forfeitures. Your draft assumes estimation; add the policy election and implications.
+Modification accounting nuances
+Incremental compensation cost equals the fair value of the modified award immediately after the modification minus the fair value of the original award immediately before.
+If an award was not probable to vest pre-modification but becomes probable post-modification, recognize compensation cost for the original grant-date fair value plus any incremental fair value over the remaining service period.
+Modifications can affect classification (equity vs liability) and requisite service period; mention reassessment at modification date. If vested at modification, recognize incremental cost immediately.
+Classification matters
+Equity-classified vs liability-classified awards are foundational. Liability awards (e.g., cash-settled) are remeasured at fair value each reporting date with P&L true-ups; equity awards are measured at grant date and not remeasured (except for certain features).
+Expected term and volatility
+For employee options, expected term often uses the “simplified method” (SAB Topic 14/SAB 110) when there isn’t sufficient history. Volatility may use historical, implied, or a blend, with documented rationale.
+Constructive improvements (high impact, executive-friendly with deeper-dive hooks)
+
+Add a short “Equity vs Liability Classification” section
+Why it matters: remeasurement vs fixed grant-date measurement, P&L volatility, and disclosure differences.
+Quick cues: cash settlement features, mandatory net cash settlement, or certain indexed features may drive liability classification; net settlement for taxes generally still equity-classified post-ASU 2016-09.
+Add “Grant Date vs Service Inception (Timing)” box
+Outline when expense starts if service begins before grant date and the true-up at grant date. This addresses a common pitfall.
+Vesting attribution policy
+Briefly describe the policy choice for graded vesting (tranche vs straight-line) and its impact on front-loaded expense patterns.
+Performance vs Market conditions tablelet (text bullets)
+Performance: not in fair value; recognize when probable; reversals if later not probable.
+Market: embedded in fair value; recognize over service if rendered; no reversal solely for missing market hurdle.
+Forfeitures policy callout
+State the policy election and its impact on processes and volatility.
+Option valuation “deep dive” snippet
+Expected term: behavior data vs simplified method.
+Volatility: historical vs implied vs blended with back-testing.
+Dividends: dividend yield assumption and dividend protections on awards.
+Risk-free rate: matched to expected term (continuous compounding assumptions should be consistent across models).
+Modifications quick guide
+Common scenarios (repricing, extending term post-termination, adding accelerations on change-in-control, converting targets from performance to market).
+Note the need to reassess classification and service period; include immediate recognition if vested.
+Liability awards and remeasurement
+If you issue cash-settled RSUs or SARs, emphasize period-end remeasurement and its effect on earnings.
+Income tax effects (short, high value)
+Deferred tax asset based on cumulative compensation cost for equity awards; excess tax benefits/deficits flow through income tax expense (ASU 2016-09); windfall/shortfall mechanics and when to record.
+Disclosures
+Summarize required disclosures: description of awards, valuation assumptions (range/weighted-average), activity table (grants, exercises, forfeitures, expirations), intrinsic value, and cash flow effects.
+Targeted wording fixes you can paste in
+
+Grant Date Valuation: Replace the “Key Consideration” paragraph with:
+“Grant date occurs when all key terms are fixed and mutually understood and there is a substantive award with no remaining discretion. If service begins before grant date (service inception date), recognize expense from service inception using preliminary fair value estimates and true up to grant-date fair value at grant date.”
+Valuation Methods:
+Stock Options: “Use a Black-Scholes or lattice model. Document expected term (simplified method if appropriate), volatility (historical/implied/blended), dividend yield, and risk-free rate aligned to expected term.”
+RSUs: “With only a service condition, measure at the grant-date fair value of the underlying equity. Use Monte Carlo only if a market condition (e.g., TSR) exists. Reflect dividend or dividend-equivalent features appropriately.”
+Performance Share Awards: “Exclude performance conditions from grant-date fair value. Recognize expense based on the number of awards expected to vest (probable threshold), with catch-up adjustments if expectations change.”
+Vesting Schedules:
+Graded Vesting: “You may attribute cost tranche-by-tranche (accelerated) or on a straight-line basis for awards with only a service condition, provided straight-line does not result in less than the vested portion recognized.”
+Modification Accounting:
+“Incremental compensation cost equals the fair value of the modified award immediately after modification minus the fair value of the original award immediately before. If the award becomes probable to vest as a result of the modification, recognize the original grant-date fair value plus any incremental fair value over the remaining service period; recognize immediately if already vested.”
+Practical Tips:
+“Forfeitures: Disclose and apply your policy election—estimate forfeitures or recognize as they occur—and ensure systems support it.”
+Optional short additions for exec readers
+
+Why this matters to CFOs: “Policy choices (graded attribution, forfeiture policy, equity vs liability classification) directly affect earnings timing and volatility. Strong documentation and periodic reassessment reduce restatement risk.”
+Technology angle: “Automated extraction of vesting conditions, performance targets, and modification terms, plus standardized valuation assumption libraries, materially reduce cycle time and errors.”
+If you want, I can return a clean, edited version of your post with these corrections incorporated and the small “deep dive” boxes inserted, keeping the 7‑minute read time.

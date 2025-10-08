@@ -36,7 +36,8 @@ def render_asc805_page():
 
     # Page header
     st.title(":primary[ASC 805: Business Combinations]")
-    st.info("**Purpose:** Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
+    with st.container(border=True):
+        st.markdown(":primary[**Purpose:**] Automatically analyze business combination transactions and generate a first draft of professional ASC 805 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():

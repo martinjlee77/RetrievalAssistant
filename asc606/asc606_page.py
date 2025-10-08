@@ -36,7 +36,8 @@ def render_asc606_page():
 
     # Page header
     st.title(":primary[ASC 606: Revenue Recognition]")
-    st.info("**Purpose:** Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
+    with st.container(border=True):
+        st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():

@@ -28,17 +28,17 @@ pages = {
     ],
     
     "TAS Platform": [
-        st.Page("asc606/asc606_page.py", title="ASC 606: Rev Rec", icon=":material/expand_circle_right:"),
+        st.Page("asc606/asc606_page.py", title="ASC 606: Revenue Recognition", icon=":material/expand_circle_right:"),
         st.Page("asc340/asc340_page.py", title="ASC 340-40: Cost to Obtain", icon=":material/expand_circle_right:"),
         st.Page("asc842/asc842_page.py", title="ASC 842: Leases (Lessee)", icon=":material/expand_circle_right:"),
-        st.Page("asc718/asc718_page.py", title="ASC 718: Stock Comp", icon=":material/expand_circle_right:"),
-        st.Page("asc805/asc805_page.py", title="ASC 805: Bus Com", icon=":material/expand_circle_right:"),
+        st.Page("asc718/asc718_page.py", title="ASC 718: Stock Compensation", icon=":material/expand_circle_right:"),
+        st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon=":material/expand_circle_right:"),
         ],
     "Tools": [
         st.Page("pages/research_assistant.py", title="ASC Research Assistant", icon=":material/search:"),
         ],
     "Get Help": [
-        st.Page("pages/gethelp.py", title="Get Help", icon=":material/contact_support:"),
+        st.Page("pages/gethelp.py", title="Contact Support", icon=":material/contact_support:"),
     ],
 }
 

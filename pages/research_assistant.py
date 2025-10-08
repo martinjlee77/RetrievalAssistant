@@ -242,7 +242,7 @@ def render_research_assistant():
         return  # User will see login page
     
     # Page header (always shown)
-    st.title("🔍 ASC Research Assistant")
+    st.title(":primary[:material/search_insights: ASC Research Assistant]")
     with st.container(border=True):
         st.markdown("""
         :primary[**Ask questions about ASC standards and get instant answers with authoritative citations.**]
