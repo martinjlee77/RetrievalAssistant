@@ -52,7 +52,21 @@ def render_asc606_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!**")
-            st.markdown("### 📄 Generated ASC 606 Memo")
+            st.markdown("📄 **Your ASC 606 memo is ready below.**")
+            
+            # Quick action buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+            with col2:
+                if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_existing"):
+                    # Clear session state for new analysis
+                    keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                    for key in keys_to_clear:
+                        del st.session_state[key]
+                    st.rerun()
+            
+            st.markdown("---")
             
             # Display the existing memo with enhanced downloads
             from asc606.clean_memo_generator import CleanMemoGenerator
@@ -64,15 +78,12 @@ def render_asc606_page():
             analysis_id = memo_data.get('analysis_id') if isinstance(memo_data, dict) else f"memo_{session_id}"
             memo_generator.display_clean_memo(memo_content, analysis_id)
             
-            # Add rerun functionality for existing completed memo
-            from shared.rerun_manager import RerunManager
-            rerun_manager = RerunManager()
-            if analysis_id:
-                rerun_manager.add_rerun_button(str(analysis_id))
             return  # Exit early, don't show file upload interface
     
-    # Get user inputs with progressive disclosure  
-    uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
+    # Get user inputs with progressive disclosure - wrap in container to allow clearing
+    upload_form_container = st.empty()
+    with upload_form_container.container():
+        uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
 
     # Show pricing information immediately when files are uploaded (regardless of is_ready)
     pricing_result = None
@@ -180,6 +191,7 @@ def render_asc606_page():
                 warning_placeholder.empty()  # Clear the warning 
                 pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
+                upload_form_container.empty()  # Clear the upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
@@ -572,7 +584,22 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     progress_message_placeholder.empty()  # Remove the warning
                     
                     # Display results
-                    # st.success("✅ **Analysis Complete!**")
+                    st.success("✅ **Analysis Complete!**")
+                    st.markdown("📄 **Your ASC 606 memo is ready below.**")
+                    
+                    # Quick action buttons
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+                    with col2:
+                        if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis"):
+                            # Clear session state for new analysis
+                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                            for key in keys_to_clear:
+                                del st.session_state[key]
+                            st.rerun()
+                    
+                    st.markdown("---")
                     
                     # memo_result is a string (markdown content), not a dict
                     if memo_result:
@@ -592,13 +619,6 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                             'completion_timestamp': datetime.now().isoformat()
                         }
                         st.session_state[analysis_key] = True
-                                                
-                        with st.container(border=True):
-                            st.info("""**IMPORTANT:** Your ASC 606 memo is displayed below. To save the results, you can either:
-                            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
-                                """)
                         
                         # Use the CleanMemoGenerator's display method with analysis_id
                         memo_generator.display_clean_memo(memo_result, analysis_id, filename, customer_name)

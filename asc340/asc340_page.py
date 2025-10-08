@@ -57,7 +57,20 @@ def render_asc340_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!**")
-            st.markdown("### 📄 Generated ASC 340-40 Memo")
+            st.markdown("📄 **Your ASC 340-40 memo is ready below.**")
+            
+            # Quick action buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+            with col2:
+                if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_existing"):
+                    keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
+                    for key in keys_to_clear:
+                        del st.session_state[key]
+                    st.rerun()
+            
+            st.markdown("---")
             
             # Display the existing memo with enhanced downloads
             from asc340.clean_memo_generator import CleanMemoGenerator
@@ -76,26 +89,12 @@ def render_asc340_page():
             rerun_manager = RerunManager()
             rerun_manager.add_rerun_button(analysis_id)
             
-            # Add sidebar rerun access
-            with st.sidebar:
-                st.markdown("---")
-                st.markdown("### 🔄 Request Changes")
-                if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
-                    st.session_state[f'show_rerun_form_{analysis_id}'] = True
-                    st.rerun()
-            
-            # Add "Analyze Another Contract" button
-            st.markdown("---")
-            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                # Reset analysis state for new analysis including file uploaders
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc340' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
-                for key in keys_to_clear:
-                    del st.session_state[key]
-                st.rerun()
             return  # Exit early, don't show file upload interface
     
-    # Get user inputs with progressive disclosure  
-    uploaded_files, additional_context, is_ready = get_asc340_inputs_new()
+    # Get user inputs with progressive disclosure - wrap in container to allow clearing
+    upload_form_container = st.empty()
+    with upload_form_container.container():
+        uploaded_files, additional_context, is_ready = get_asc340_inputs_new()
 
     # Show pricing information immediately when files are uploaded (regardless of is_ready)
     pricing_result = None
@@ -202,6 +201,7 @@ def render_asc340_page():
                 warning_placeholder.empty()  # Clear the warning 
                 pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
+                upload_form_container.empty()  # Clear upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
@@ -520,6 +520,22 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     # Store memo data and completion state
                     st.session_state[memo_key] = memo_result
                     st.session_state[analysis_key] = True
+                    
+                    st.success("✅ **Analysis Complete!**")
+                    st.markdown("📄 **Your ASC 340-40 memo is ready below.**")
+                    
+                    # Quick action buttons
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+                    with col2:
+                        if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_fresh"):
+                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
+                            for key in keys_to_clear:
+                                del st.session_state[key]
+                            st.rerun()
+                    
+                    st.markdown("---")
                                             
                     with st.container(border=True):
                         st.info("""**IMPORTANT:** Your ASC 340-40 memo is displayed below. To save the results, you can either:
@@ -530,15 +546,6 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                     # Use the CleanMemoGenerator's display method
                     memo_generator.display_clean_memo(memo_result)
-                    
-                    # Add "Analyze Another Contract" button
-                    st.markdown("---")
-                    if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                        # Reset analysis state for new analysis including file uploaders
-                        keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc340' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
-                        for key in keys_to_clear:
-                            del st.session_state[key]
-                        st.rerun()
                     
                 else:
                     st.error("❌ Memo generation produced empty content")

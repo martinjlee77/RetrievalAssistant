@@ -52,7 +52,20 @@ def render_asc805_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!**")
-            st.markdown("### 📄 Generated ASC 805 Memo")
+            st.markdown("📄 **Your ASC 805 memo is ready below.**")
+            
+            # Quick action buttons
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+            with col2:
+                if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_existing"):
+                    keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
+                    for key in keys_to_clear:
+                        del st.session_state[key]
+                    st.rerun()
+            
+            st.markdown("---")
             
             # Display the existing memo with enhanced downloads
             from asc805.clean_memo_generator import CleanMemoGenerator
@@ -72,26 +85,12 @@ def render_asc805_page():
             if analysis_id:
                 rerun_manager.add_rerun_button(str(analysis_id))
             
-            # Add sidebar rerun access
-            with st.sidebar:
-                st.markdown("---")
-                st.markdown("### 🔄 Request Changes")
-                if st.button("Request Memo Rerun", type="secondary", use_container_width=True, key="sidebar_rerun"):
-                    st.session_state[f'show_rerun_form_{analysis_id}'] = True
-                    st.rerun()
-            
-            # Add "Analyze Another Contract" button
-            st.markdown("---")
-            if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True):
-                # Reset analysis state for new analysis including file uploaders
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and ('asc805' in k.lower() or 'upload' in k.lower() or 'file' in k.lower())]
-                for key in keys_to_clear:
-                    del st.session_state[key]
-                st.rerun()
             return  # Exit early, don't show file upload interface
     
-    # Get user inputs with progressive disclosure  
-    uploaded_files, additional_context, is_ready = get_asc805_inputs_new()
+    # Get user inputs with progressive disclosure - wrap in container to allow clearing
+    upload_form_container = st.empty()
+    with upload_form_container.container():
+        uploaded_files, additional_context, is_ready = get_asc805_inputs_new()
 
     # Show pricing information immediately when files are uploaded (regardless of is_ready)
     pricing_result = None
@@ -198,6 +197,7 @@ def render_asc805_page():
                 warning_placeholder.empty()  # Clear the warning 
                 pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
+                upload_form_container.empty()  # Clear upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
@@ -413,8 +413,21 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
             'analysis_title': analysis_title,
             'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
-             
-        # Display memo inline instead of switching pages
+        
+        st.success("✅ **Analysis Complete!**")
+        st.markdown("📄 **Your ASC 805 memo is ready below.**")
+        
+        # Quick action buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
+        with col2:
+            if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_fresh"):
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+        
         st.markdown("---")
 
         with st.container(border=True):
@@ -430,20 +443,6 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         # Clear completion message immediately after memo displays
         completion_message_placeholder.empty()
-        
-        if st.button("🔄 Analyze Another Contract", type="primary", use_container_width=True):
-            # Clear analysis state for fresh start with session isolation
-            st.session_state.file_uploader_key = st.session_state.get('file_uploader_key', 0) + 1
-            
-            # Clean up session-specific data
-            memo_key = f'asc805_memo_data_{session_id}'
-            if memo_key in st.session_state:
-                del st.session_state[memo_key]
-            if analysis_key in st.session_state:
-                del st.session_state[analysis_key]
-            
-            logger.info(f"Cleaned up session data for user: {session_id[:8]}...")
-            st.rerun()
 
     except Exception as e:
         # Clear the progress message even on error
