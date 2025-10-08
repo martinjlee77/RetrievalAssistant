@@ -477,11 +477,18 @@
             const categoryLinks = document.querySelectorAll('.category-list [data-category]');
             const posts = document.querySelectorAll('.featured-post, .blog-post');
 
+            console.log('Blog filter initialized:', {
+                categoryLinks: categoryLinks.length,
+                posts: posts.length
+            });
+
             if (categoryLinks.length > 0 && posts.length > 0) {
                 categoryLinks.forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
                         const category = this.getAttribute('data-category');
+                        
+                        console.log('Filter clicked:', category);
 
                         // Update active class on links
                         categoryLinks.forEach(l => l.classList.remove('active'));
@@ -492,12 +499,16 @@
                             const postCategory = post.getAttribute('data-category');
                             if (category === 'all' || postCategory === category) {
                                 post.classList.remove('hidden');
+                                console.log('Showing post:', postCategory);
                             } else {
                                 post.classList.add('hidden');
+                                console.log('Hiding post:', postCategory);
                             }
                         });
                     });
                 });
+            } else {
+                console.error('Blog filter setup failed - missing elements');
             }
         });
     </script>
