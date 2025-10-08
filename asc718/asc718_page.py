@@ -189,24 +189,27 @@ def render_asc718_page():
             can_proceed = False
 
         # Analysis button with pricing integration
-        warning_placeholder = st.empty()
         if can_proceed:
-            warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
-            )
-            if st.button("3️⃣ Confirm & Analyze",
-                       type="primary",
-                       use_container_width=True,
-                       key="asc718_analyze"):
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
-                credit_container.empty()     # Clear credit balance info
-                upload_form_container.empty()  # Clear upload form
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                perform_asc718_analysis(pricing_result, additional_context, user_token)
+            # Wrap button section in container so we can clear it
+            button_container = st.empty()
+            with button_container.container():
+                st.info(
+                    "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
+                )
+                
+                if st.button("3️⃣ Confirm & Analyze",
+                           type="primary",
+                           use_container_width=True,
+                           key="asc718_analyze"):
+                    # Clear all UI elements that should disappear during analysis
+                    button_container.empty()       # Clear the button and warning
+                    pricing_container.empty()      # Clear pricing information
+                    credit_container.empty()       # Clear credit balance info
+                    upload_form_container.empty()  # Clear the upload form
+                    if not user_token:
+                        st.error("❌ Authentication required. Please refresh the page and log in again.")
+                        return
+                    perform_asc718_analysis(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 

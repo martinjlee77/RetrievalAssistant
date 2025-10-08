@@ -189,24 +189,26 @@ def render_asc805_page():
         
         # Analysis section
         if can_proceed:
-            warning_placeholder = st.empty()  # Create a placeholder for the warning
-            warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
-            )
-            
-            if st.button("3️⃣ Confirm & Analyze",
-                       type="primary",
-                       use_container_width=True,
-                       key="asc805_analyze"):
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
-                credit_container.empty()     # Clear credit balance info
-                upload_form_container.empty()  # Clear upload form
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                perform_asc805_analysis_new(pricing_result, additional_context, user_token)
+            # Wrap button section in container so we can clear it
+            button_container = st.empty()
+            with button_container.container():
+                st.info(
+                    "⚠️ **IMPORTANT:** Analysis takes up to **3-15 minutes**. Please don't close this tab until complete"
+                )
+                
+                if st.button("3️⃣ Confirm & Analyze",
+                           type="primary",
+                           use_container_width=True,
+                           key="asc805_analyze"):
+                    # Clear all UI elements that should disappear during analysis
+                    button_container.empty()       # Clear the button and warning
+                    pricing_container.empty()      # Clear pricing information
+                    credit_container.empty()       # Clear credit balance info
+                    upload_form_container.empty()  # Clear the upload form
+                    if not user_token:
+                        st.error("❌ Authentication required. Please refresh the page and log in again.")
+                        return
+                    perform_asc805_analysis_new(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -278,6 +280,13 @@ def get_asc805_inputs_new():
 def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
     """Perform ASC 805 analysis with new billing system integration."""
     
+    # Session isolation - create unique session ID for this user
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
+    session_id = st.session_state.user_session_id
+    analysis_key = f'asc805_analysis_complete_{session_id}'
     analysis_id = None
     
     try:
