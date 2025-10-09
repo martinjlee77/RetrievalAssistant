@@ -1,0 +1,114 @@
+You reached the start of the range
+Oct 8, 2025, 3:52 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processed file 1: ASC_606_Sample_InnovateTech.docx - 2712 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 2712 words, 3K (≤10 pages) tier, $195.0
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processing 1 uploaded files
+INFO:utils.document_extractor:📄 Processing document: ASC_606_Sample_InnovateTech.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2712 words (~9 pages) via python-docx
+INFO:shared.preflight_pricing:Processed file 1: ASC_606_Sample_InnovateTech.docx - 2712 words
+INFO:shared.preflight_pricing:Preflight pricing complete: 2712 words, 3K (≤10 pages) tier, $195.0
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-10-09T01:24:40.113311", "analysis_id": "147900f4", "asc_standard": "ASC 606", "total_words": 2712, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis 147900f4: ASC 606 - 2712 words
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:asc606.step_analyzer:🤖 Using GPT-5 for main analysis, GPT-5-mini for light tasks
+INFO:chromadb.telemetry.product.posthog:Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+INFO:shared.knowledge_base:ChromaDB client initialized for asc606_knowledge_base
+INFO:shared.knowledge_base:Embedding function initialized successfully
+INFO:shared.knowledge_base:Collection 'asc606_guidance' loaded successfully
+INFO:asc606.knowledge_search:ASC 606 knowledge search initialized successfully
+INFO:asc606.step_analyzer:🏢 Extracting customer name from contract...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5-mini, Input tokens: 890, Output tokens: 4, Cost: $0.0009
+INFO:shared.api_cost_tracker:Tracked entity_extraction request: $0.0009 (Total: $0.0009)
+INFO:asc606.step_analyzer:✓ Customer identified: Global Dynamics Corp.
+INFO:__main__:LLM extracted customer: Global Dynamics Corp.
+INFO:shared.knowledge_base:🔍 Querying asc606_guidance knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.97s)
+INFO:asc606.knowledge_search:Retrieved guidance for Step 1
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 5735, Output tokens: 2146, Cost: $0.1217
+INFO:shared.api_cost_tracker:Tracked step_1_analysis request: $0.1217 (Total: $0.1226)
+INFO:__main__:Completed ASC 606 Step 1
+INFO:shared.knowledge_base:🔍 Querying asc606_guidance knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.79s)
+INFO:asc606.knowledge_search:Retrieved guidance for Step 2
+INFO:asc606.step_analyzer:💰 Extracting transaction price components and variable consideration...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 5773, Output tokens: 0, Cost: $0.0577
+INFO:shared.api_cost_tracker:Tracked step_2_analysis request: $0.0577 (Total: $0.1804)
+WARNING:asc606.step_analyzer:⚠️ Step 2: Received suspiciously short response (0 chars)
+WARNING:asc606.step_analyzer:Step 2 validation issues: ['Missing Analysis section in Step 2', 'Missing Conclusion section in Step 2']
+INFO:__main__:Completed ASC 606 Step 2
+INFO:shared.knowledge_base:🔍 Querying asc606_guidance knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (1.26s)
+INFO:asc606.knowledge_search:Retrieved guidance for Step 3
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 5652, Output tokens: 2880, Cost: $0.1429
+INFO:shared.api_cost_tracker:Tracked step_3_analysis request: $0.1429 (Total: $0.3233)
+INFO:__main__:Completed ASC 606 Step 3
+INFO:shared.knowledge_base:🔍 Querying asc606_guidance knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.77s)
+INFO:asc606.knowledge_search:Retrieved guidance for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 5458, Output tokens: 2143, Cost: $0.1189
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.1189 (Total: $0.4422)
+INFO:__main__:Completed ASC 606 Step 4
+INFO:shared.knowledge_base:🔍 Querying asc606_guidance knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.85s)
+INFO:asc606.knowledge_search:Retrieved guidance for Step 5
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 5607, Output tokens: 3285, Cost: $0.1546
+INFO:shared.api_cost_tracker:Tracked step_5_analysis request: $0.1546 (Total: $0.5968)
+INFO:__main__:Completed ASC 606 Step 5
+INFO:asc606.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc606.step_analyzer:Extracted conclusion for Step 1: We conclude the SOW with Global Dynamics Corp. is ...
+WARNING:asc606.step_analyzer:Could not extract conclusion from Step 2 content
+INFO:asc606.step_analyzer:Extracted conclusion for Step 3: The fixed minimum transaction price, excluding var...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 4: We conclude the transaction price (determined in S...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 5: We conclude the SaaS and support promises are sati...
+INFO:asc606.step_analyzer:Total conclusions extracted: 4, text length: 2619
+INFO:asc606.step_analyzer:→ Generating executive summary...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc606.step_analyzer:✓ Executive summary generated (1421 chars)
+INFO:asc606.step_analyzer:→ Generating background section...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc606.step_analyzer:✓ Background section generated (537 chars)
+INFO:asc606.step_analyzer:→ Generating final conclusion...
+INFO:asc606.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc606.step_analyzer:Extracted conclusion for Step 1: We conclude the SOW with Global Dynamics Corp. is ...
+WARNING:asc606.step_analyzer:Could not extract conclusion from Step 2 content
+INFO:asc606.step_analyzer:Extracted conclusion for Step 3: The fixed minimum transaction price, excluding var...
+INFO:asc606.step_analyzer:Extracted conclusion for Step 4: We conclude the transaction price (determined in S...

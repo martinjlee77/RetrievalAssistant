@@ -385,30 +385,45 @@ Respond with ONLY the customer name, nothing else."""
             
             markdown_content = response.choices[0].message.content
             
-            if markdown_content is None:
-                logger.error(f"ERROR: GPT-5 returned None content for Step {step_num}")
-                markdown_content = f"## Step {step_num}: Analysis Error\n\nError: GPT-5 returned empty response. Please try with GPT-4o instead."
-            else:
-                # Content received successfully
+            if markdown_content is None or (markdown_content and len(markdown_content.strip()) < 50):
+                # Handle empty or very short response - retry once
+                logger.warning(f"⚠️ Step {step_num}: Received empty/short response ({len(markdown_content) if markdown_content else 0} chars). Retrying...")
                 
-                # ONLY strip whitespace - NO OTHER PROCESSING
-                markdown_content = markdown_content.strip()
+                # Retry the API call once
+                time.sleep(2)  # Brief pause before retry
+                retry_response = self.client.chat.completions.create(**request_params)
                 
-                # Check for suspiciously short response
-                if not markdown_content or len(markdown_content) < 50:
-                    logger.warning(f"⚠️ Step {step_num}: Received suspiciously short response ({len(markdown_content) if markdown_content else 0} chars)")
+                # Track retry API cost
+                track_openai_request(
+                    messages=request_params["messages"],
+                    response_text=retry_response.choices[0].message.content or "",
+                    model=self.model,
+                    request_type=f"step_{step_num}_analysis_retry"
+                )
                 
-                # Validate the output for quality assurance
-                validation_result = self.validate_step_output(markdown_content, step_num)
-                if not validation_result["valid"]:
-                    logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
-                    # Append validation issues to the Issues section
-                    if "**Issues or Uncertainties:**" in markdown_content:
-                        issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
-                        markdown_content = markdown_content.replace(
-                            "**Issues or Uncertainties:**", 
-                            "**Issues or Uncertainties:**" + issues_section + "\n\n"
-                        )
+                markdown_content = retry_response.choices[0].message.content
+                
+                if markdown_content is None or (markdown_content and len(markdown_content.strip()) < 50):
+                    # Retry also failed - generate error message
+                    logger.error(f"ERROR: Step {step_num} - Both attempts returned empty/short response")
+                    markdown_content = f"## Step {step_num}: Analysis Error\n\n**Error:** The AI model returned an empty response after multiple attempts. This is a known intermittent issue with GPT-5.\n\n**Recommended Action:** Please retry this analysis or switch to GPT-4o model.\n\n**Issues or Uncertainties:** Analysis could not be completed due to model response failure."
+                else:
+                    logger.info(f"✓ Step {step_num}: Retry successful, received {len(markdown_content)} chars")
+            
+            # ONLY strip whitespace - NO OTHER PROCESSING
+            markdown_content = markdown_content.strip()
+            
+            # Validate the output for quality assurance
+            validation_result = self.validate_step_output(markdown_content, step_num)
+            if not validation_result["valid"]:
+                logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
+                # Append validation issues to the Issues section
+                if "**Issues or Uncertainties:**" in markdown_content:
+                    issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
+                    markdown_content = markdown_content.replace(
+                        "**Issues or Uncertainties:**", 
+                        "**Issues or Uncertainties:**" + issues_section + "\n\n"
+                    )
                 
             
             # Return clean markdown content - NO PROCESSING
