@@ -788,7 +788,26 @@ def signup():
         }), 201
             
     except Exception as e:
-        logger.error(f"Signup error: {e}")
+        error_type = type(e).__name__
+        error_msg = str(e)
+        logger.error(f"Signup error: {error_type} - {error_msg}")
+        
+        # Send database error alert for signup failures (critical operation)
+        try:
+            from shared.postmark_client import PostmarkClient
+            postmark = PostmarkClient()
+            # Get user email if available in locals
+            affected_user = email if 'email' in locals() else 'Unknown'
+            postmark.send_database_error_alert(
+                operation="user signup",
+                error_type=error_type,
+                error_details=error_msg,
+                affected_user=affected_user
+            )
+            logger.info("Database error alert sent to support")
+        except Exception as alert_error:
+            logger.error(f"Failed to send database error alert: {alert_error}")
+        
         return jsonify({'error': 'Registration failed'}), 500
 
 
@@ -1941,6 +1960,22 @@ def stripe_webhook():
             conn = get_db_connection()
             if not conn:
                 logger.error("Database connection failed in webhook")
+                
+                # Send database error alert for webhook DB failures (critical for revenue)
+                try:
+                    from shared.postmark_client import PostmarkClient
+                    postmark = PostmarkClient()
+                    user_email = payment_intent['metadata'].get('user_email', f"User ID {user_id}")
+                    postmark.send_database_error_alert(
+                        operation="stripe webhook payment processing",
+                        error_type="DatabaseConnectionError",
+                        error_details="Failed to connect to database during Stripe payment webhook processing",
+                        affected_user=user_email
+                    )
+                    logger.info("Database error alert sent to support")
+                except Exception as alert_error:
+                    logger.error(f"Failed to send database error alert: {alert_error}")
+                
                 return jsonify({'error': 'Database error'}), 500
             
             cursor = conn.cursor()
