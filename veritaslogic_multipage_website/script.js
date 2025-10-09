@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Analytics Tracking (placeholder for future implementation)
     function trackEvent(eventName, properties = {}) {
         // Placeholder for analytics tracking
-        console.log('Event tracked:', eventName, properties);
+        // When ready, implement with Google Analytics 4 or Mixpanel
         
         // Example: Google Analytics 4
         // gtag('event', eventName, properties);
@@ -540,8 +540,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 16); // ~60fps
 
     window.addEventListener('scroll', debouncedScrollHandler);
-
-    console.log('VeritasLogic.ai website initialized successfully');
 });
 
 // Helper function to get cookie value

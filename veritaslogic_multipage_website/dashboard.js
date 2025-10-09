@@ -24,19 +24,15 @@ function handleAuthButton() {
 }
 
 async function initializeDashboard() {
-    console.log('Dashboard initializing...');
     const token = localStorage.getItem('authToken');
-    console.log('Token found:', token ? 'Yes' : 'No');
     
     if (!token || token === 'null' || token === 'undefined') {
         // No valid token - show login form immediately
-        console.log('No valid token, showing login form');
         showLoginForm();
         return;
     }
     
     // Have valid token - try to fetch user data
-    console.log('Valid token found, fetching user data...');
     try {
         const response = await fetch('/api/user/profile', {
             headers: {
@@ -47,18 +43,15 @@ async function initializeDashboard() {
 
         if (response.ok) {
             const profileData = await response.json();
-            console.log('Profile data received:', profileData);
             showDashboard(profileData.user);
         } else {
             // Token invalid - clear and show login
-            console.log('Token invalid, clearing and showing login');
             localStorage.removeItem('authToken');
             showLoginForm();
         }
     } catch (error) {
         console.error('Network error:', error);
         // Only show network error if we actually had a token (real network issue)
-        console.log('Network error occurred, showing network error');
         showNetworkError();
     }
 }
@@ -384,8 +377,6 @@ function showLoginMessage(message, type) {
 }
 
 async function populateDashboard(userData) {
-    console.log('Populating dashboard with user data:', userData);
-    
     // Update welcome section (backend returns snake_case fields)
     document.getElementById('userName').textContent = userData.first_name || 'User';
     document.getElementById('memberSince').textContent = userData.member_since ? `Member since ${new Date(userData.member_since).toLocaleDateString()}` : 'Member since —';
@@ -412,14 +403,12 @@ async function populateDashboard(userData) {
     await loadAnalysisHistory();
     
     // Load credit packages for Credits section
-    console.log('Initial load of credit packages...');
     await loadCreditPackages();
     
     // Force fallback packages as backup
     setTimeout(() => {
         const container = document.getElementById('creditPackages');
         if (container && container.innerHTML.trim() === '') {
-            console.log('Container still empty, forcing fallback packages');
             showFallbackPackages();
         }
     }, 2000);
@@ -499,8 +488,6 @@ async function loadAnalysisHistory() {
 }
 
 async function loadCreditPackages() {
-    console.log('Loading credit packages...');
-    
     try {
         const response = await fetch('/api/credit-packages');
         const { packages } = await response.json();
@@ -634,12 +621,9 @@ function showSection(sectionName) {
     }
     
     // Load section-specific data
-    console.log('Switching to section:', sectionName);
     if (sectionName === 'credits') {
-        console.log('Loading credit packages for credits section...');
         loadCreditPackages();
     } else if (sectionName === 'history') {
-        console.log('Loading analysis history for history section...');
         loadAnalysisHistory();
     }
     
