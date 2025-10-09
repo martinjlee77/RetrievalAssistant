@@ -1646,11 +1646,11 @@ def complete_analysis():
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
                                     started_at, completed_at, duration_seconds, file_count)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed', %s, %s, NOW(), %s, %s)
-                RETURNING id
+                RETURNING analysis_id
             """, (user_id, asc_standard, words_count, api_cost, final_charged_credits, 
                   final_charged_credits, tier_name, memo_uuid, started_at, duration_seconds, file_count))
             
-            analysis_id = cursor.fetchone()['id']
+            analysis_id = cursor.fetchone()['analysis_id']
             logger.info(f"Analysis record created with ID: {analysis_id}")
             
             # Get current balance for balance_after calculation
@@ -1713,16 +1713,27 @@ def complete_analysis():
             
         except Exception as e:
             conn.rollback()
+            logger.error(f"Database transaction failed - rolling back: {e}")
             raise e
         finally:
             conn.close()
         
     except Exception as e:
-        logger.exception(f"Complete analysis error: {e}")
-        logger.error(f"Complete analysis error - Full details: {e}")
-        logger.error(f"Error type: {type(e).__name__}")
-        logger.error(f"Error args: {e.args}")
-        return jsonify({'error': 'Failed to complete analysis'}), 500
+        error_type = type(e).__name__
+        error_msg = str(e)
+        
+        # Enhanced error logging with full context
+        logger.exception(f"BILLING ERROR - Analysis completion failed for user {user_id}")
+        logger.error(f"Error Type: {error_type}")
+        logger.error(f"Error Details: {error_msg}")
+        logger.error(f"ASC Standard: {asc_standard}, Words: {words_count}, Credits to charge: {final_charged_credits}")
+        
+        # Return detailed error for debugging (safe for production since it doesn't expose sensitive data)
+        return jsonify({
+            'error': 'Analysis billing failed',
+            'details': f'{error_type}: {error_msg}',
+            'message': 'The analysis could not be saved. Please contact support if this persists.'
+        }), 500
 
 # Legacy endpoint - deprecated but maintained for backwards compatibility
 @app.route('/api/user/record-analysis', methods=['POST'])
