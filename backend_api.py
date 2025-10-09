@@ -478,7 +478,23 @@ def serve_streamlit_app():
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('veritaslogic_multipage_website', path)
+    """Serve static files with clean URL support (e.g., /about instead of /about.html)"""
+    import os
+    
+    # Try serving the exact path first
+    file_path = os.path.join('veritaslogic_multipage_website', path)
+    if os.path.isfile(file_path):
+        return send_from_directory('veritaslogic_multipage_website', path)
+    
+    # If not found and doesn't end with .html, try adding .html extension
+    if not path.endswith('.html'):
+        html_path = f'{path}.html'
+        html_file_path = os.path.join('veritaslogic_multipage_website', html_path)
+        if os.path.isfile(html_file_path):
+            return send_from_directory('veritaslogic_multipage_website', html_path)
+    
+    # Return 404 if neither worked
+    return "Page not found", 404
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'veritaslogic-secret-key-change-in-production')
