@@ -1980,11 +1980,59 @@ def stripe_webhook():
             
             logger.info(f"=== WEBHOOK SUCCESS: User {user_id} credited ${credit_amount} ===")
             
+            # Send payment success notification to support for revenue tracking
+            try:
+                from shared.postmark_client import PostmarkClient
+                postmark = PostmarkClient()
+                user_email = payment_intent['metadata'].get('user_email', f"User ID {user_id}")
+                postmark.send_payment_success_notification(
+                    user_email=user_email,
+                    amount=float(credit_amount),
+                    credits_added=float(credit_amount),
+                    payment_id=payment_id
+                )
+                logger.info("Payment success notification sent to support")
+            except Exception as notif_error:
+                logger.error(f"Failed to send payment success notification: {notif_error}")
+            
         except Exception as e:
             logger.error(f"Webhook processing error: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return jsonify({'error': 'Processing failed'}), 500
+    
+    # Handle payment failure
+    elif event['type'] == 'payment_intent.payment_failed':
+        logger.info("Processing payment_intent.payment_failed event")
+        payment_intent = event['data']['object']
+        
+        try:
+            user_email = payment_intent['metadata'].get('user_email', 'Unknown')
+            credit_amount = Decimal(payment_intent['metadata'].get('credit_amount', '0'))
+            payment_intent_id = payment_intent['id']
+            error_message = payment_intent.get('last_payment_error', {}).get('message', 'Unknown error')
+            
+            logger.warning(f"Payment failed for {user_email}, amount: ${credit_amount}, error: {error_message}")
+            
+            # Send payment failure alert to support
+            try:
+                from shared.postmark_client import PostmarkClient
+                postmark = PostmarkClient()
+                postmark.send_payment_failure_alert(
+                    user_email=user_email,
+                    amount=float(credit_amount),
+                    error_message=error_message,
+                    payment_intent_id=payment_intent_id
+                )
+                logger.info("Payment failure alert sent to support")
+            except Exception as notif_error:
+                logger.error(f"Failed to send payment failure alert: {notif_error}")
+                
+        except Exception as e:
+            logger.error(f"Error processing payment failure event: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+    
     else:
         logger.info(f"Ignoring event type: {event['type']}")
     
