@@ -405,3 +405,320 @@ Monitor for potential abuse (multiple signups from same domain)
         except Exception as e:
             logger.error(f"Error sending signup notification: {e}")
             return False
+    
+    def send_billing_error_alert(self, user_id: int, user_email: str, asc_standard: str, 
+                                 error_type: str, error_details: str, words_count: int, 
+                                 credits_to_charge: float) -> bool:
+        """
+        Send critical billing error alert to support
+        
+        Args:
+            user_id: User ID
+            user_email: User's email
+            asc_standard: ASC standard being analyzed
+            error_type: Type of error (e.g., DatabaseError)
+            error_details: Detailed error message
+            words_count: Number of words in analysis
+            credits_to_charge: Credits that should have been charged
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'[CRITICAL] Billing Error - User {user_id}',
+                'HtmlBody': f"""
+                <h2>🚨 CRITICAL BILLING ERROR</h2>
+                <p><strong style="color: red;">Analysis completed but billing failed!</strong></p>
+                
+                <p><strong>User Details:</strong></p>
+                <ul>
+                    <li><strong>User ID:</strong> {user_id}</li>
+                    <li><strong>Email:</strong> {user_email}</li>
+                </ul>
+                
+                <p><strong>Analysis Details:</strong></p>
+                <ul>
+                    <li><strong>ASC Standard:</strong> {asc_standard}</li>
+                    <li><strong>Word Count:</strong> {words_count:,}</li>
+                    <li><strong>Credits to Charge:</strong> ${credits_to_charge:.2f}</li>
+                </ul>
+                
+                <p><strong>Error Details:</strong></p>
+                <ul>
+                    <li><strong>Error Type:</strong> {error_type}</li>
+                    <li><strong>Error Message:</strong> {error_details}</li>
+                </ul>
+                
+                <p><strong style="color: red;">ACTION REQUIRED:</strong></p>
+                <ul>
+                    <li>User received analysis without being charged</li>
+                    <li>Manually charge user ${credits_to_charge:.2f} or provide as free analysis</li>
+                    <li>Check database and system logs for root cause</li>
+                </ul>
+                """,
+                'TextBody': f"""
+CRITICAL BILLING ERROR
+
+Analysis completed but billing failed!
+
+User Details:
+- User ID: {user_id}
+- Email: {user_email}
+
+Analysis Details:
+- ASC Standard: {asc_standard}
+- Word Count: {words_count:,}
+- Credits to Charge: ${credits_to_charge:.2f}
+
+Error Details:
+- Error Type: {error_type}
+- Error Message: {error_details}
+
+ACTION REQUIRED:
+- User received analysis without being charged
+- Manually charge user ${credits_to_charge:.2f} or provide as free analysis
+- Check database and system logs for root cause
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Billing error alert sent to support for user {user_id}")
+                return True
+            else:
+                logger.error(f"Failed to send billing error alert: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending billing error alert: {e}")
+            return False
+    
+    def send_payment_success_notification(self, user_email: str, amount: float, 
+                                         credits_added: float, payment_id: str) -> bool:
+        """
+        Send payment success notification to support for revenue tracking
+        
+        Args:
+            user_email: User's email
+            amount: Payment amount in dollars
+            credits_added: Credits added to account
+            payment_id: Stripe payment ID
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'[PAYMENT] ${amount:.2f} - {user_email}',
+                'HtmlBody': f"""
+                <h2>💰 Payment Received</h2>
+                
+                <p><strong>Customer:</strong> {user_email}</p>
+                <p><strong>Amount:</strong> ${amount:.2f}</p>
+                <p><strong>Credits Added:</strong> ${credits_added:.2f}</p>
+                <p><strong>Payment ID:</strong> {payment_id}</p>
+                
+                <p><em>Revenue tracking - No action required</em></p>
+                """,
+                'TextBody': f"""
+Payment Received
+
+Customer: {user_email}
+Amount: ${amount:.2f}
+Credits Added: ${credits_added:.2f}
+Payment ID: {payment_id}
+
+Revenue tracking - No action required
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Payment success notification sent to support for {user_email}")
+                return True
+            else:
+                logger.error(f"Failed to send payment success notification: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending payment success notification: {e}")
+            return False
+    
+    def send_payment_failure_alert(self, user_email: str, amount: float, 
+                                   error_message: str, payment_intent_id: str = None) -> bool:
+        """
+        Send payment failure alert to support
+        
+        Args:
+            user_email: User's email
+            amount: Attempted payment amount
+            error_message: Stripe error message
+            payment_intent_id: Stripe payment intent ID (optional)
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'[PAYMENT FAILED] ${amount:.2f} - {user_email}',
+                'HtmlBody': f"""
+                <h2>❌ Payment Failed</h2>
+                
+                <p><strong>Customer:</strong> {user_email}</p>
+                <p><strong>Attempted Amount:</strong> ${amount:.2f}</p>
+                <p><strong>Error:</strong> {error_message}</p>
+                {f'<p><strong>Payment Intent ID:</strong> {payment_intent_id}</p>' if payment_intent_id else ''}
+                
+                <p><strong>Possible Actions:</strong></p>
+                <ul>
+                    <li>User may try again with different card</li>
+                    <li>Check if card was declined or insufficient funds</li>
+                    <li>Contact user if pattern of failures</li>
+                </ul>
+                """,
+                'TextBody': f"""
+Payment Failed
+
+Customer: {user_email}
+Attempted Amount: ${amount:.2f}
+Error: {error_message}
+{f'Payment Intent ID: {payment_intent_id}' if payment_intent_id else ''}
+
+Possible Actions:
+- User may try again with different card
+- Check if card was declined or insufficient funds
+- Contact user if pattern of failures
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Payment failure alert sent to support for {user_email}")
+                return True
+            else:
+                logger.error(f"Failed to send payment failure alert: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending payment failure alert: {e}")
+            return False
+    
+    def send_database_error_alert(self, operation: str, error_type: str, 
+                                  error_details: str, affected_user: str = None) -> bool:
+        """
+        Send database error alert to support for critical system failures
+        
+        Args:
+            operation: Database operation that failed (e.g., "user signup", "credit charge")
+            error_type: Type of error
+            error_details: Detailed error message
+            affected_user: User email if applicable
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'[SYSTEM ERROR] Database Failure - {operation}',
+                'HtmlBody': f"""
+                <h2>⚠️ Database Error</h2>
+                
+                <p><strong>Operation:</strong> {operation}</p>
+                <p><strong>Error Type:</strong> {error_type}</p>
+                {f'<p><strong>Affected User:</strong> {affected_user}</p>' if affected_user else ''}
+                
+                <p><strong>Error Details:</strong></p>
+                <pre>{error_details}</pre>
+                
+                <p><strong>Action Required:</strong></p>
+                <ul>
+                    <li>Check database connection and status</li>
+                    <li>Review recent schema changes</li>
+                    <li>Check Railway/production logs</li>
+                </ul>
+                """,
+                'TextBody': f"""
+Database Error
+
+Operation: {operation}
+Error Type: {error_type}
+{f'Affected User: {affected_user}' if affected_user else ''}
+
+Error Details:
+{error_details}
+
+Action Required:
+- Check database connection and status
+- Review recent schema changes
+- Check Railway/production logs
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Database error alert sent to support for {operation}")
+                return True
+            else:
+                logger.error(f"Failed to send database error alert: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending database error alert: {e}")
+            return False
