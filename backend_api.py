@@ -1610,7 +1610,7 @@ def complete_analysis():
             logger.info(f"Starting analysis completion for user {user_id}")
             
             # CRITICAL: Verify email before allowing credit spending
-            cursor.execute("SELECT email_verified FROM users WHERE id = %s", (user_id,))
+            cursor.execute("SELECT email, email_verified FROM users WHERE id = %s", (user_id,))
             user_check = cursor.fetchone()
             if not user_check or not user_check['email_verified']:
                 logger.warning(f"Unverified user {user_id} attempted to run analysis")
@@ -1618,6 +1618,9 @@ def complete_analysis():
                     'error': 'Email verification required',
                     'message': 'Please verify your email address before running analyses. Check your inbox for the verification link.'
                 }), 403
+            
+            # Store user email for potential error notifications
+            user_email = user_check['email']
             
             # Check idempotency - prevent duplicate charges
             if idempotency_key:
@@ -1727,6 +1730,25 @@ def complete_analysis():
         logger.error(f"Error Type: {error_type}")
         logger.error(f"Error Details: {error_msg}")
         logger.error(f"ASC Standard: {asc_standard}, Words: {words_count}, Credits to charge: {final_charged_credits}")
+        
+        # Send critical billing error alert to support team
+        try:
+            from shared.postmark_client import PostmarkClient
+            postmark = PostmarkClient()
+            # Get user email safely (might not be set if error occurred early)
+            email_for_alert = user_email if 'user_email' in locals() else f"User ID {user_id}"
+            postmark.send_billing_error_alert(
+                user_id=user_id,
+                user_email=email_for_alert,
+                asc_standard=asc_standard,
+                error_type=error_type,
+                error_details=error_msg,
+                words_count=words_count,
+                credits_to_charge=float(final_charged_credits)
+            )
+            logger.info("Billing error alert sent to support team")
+        except Exception as alert_error:
+            logger.error(f"Failed to send billing error alert: {alert_error}")
         
         # Return detailed error for debugging (safe for production since it doesn't expose sensitive data)
         return jsonify({
