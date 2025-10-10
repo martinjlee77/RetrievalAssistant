@@ -200,7 +200,7 @@ Respond with ONLY the entity name, nothing else."""
         }
         
         # Analyze steps in parallel with error recovery
-        with ThreadPoolExecutor(max_workers=2) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             # Submit all step analyses
             futures = {
                 executor.submit(

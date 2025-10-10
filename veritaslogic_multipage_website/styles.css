@@ -310,7 +310,7 @@ h1, h2, h3, h4, h5, h6 {
 
     /* 2 & 4. Inherits font-family. Font-size is set to match your <p> tag */
     font-size: 1.25rem; /* Matches your .page-header p rule */
-    line-height: 1;
+    line-height: 1.2;
     color: rgba(255,255,255,0.85); /* Matches your .page-header p rule */
 
 

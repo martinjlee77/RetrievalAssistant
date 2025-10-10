@@ -105,7 +105,7 @@
                             <p><strong>3. Inconsistency Risk:</strong> Same reviewer analyzing similar contracts on different days may reach different conclusions due to: Fatigue levels; Time pressure; Recall of prior similar analyses; Evolving interpretation of guidance</p>
 
                             <h3>Why Standard AI Tools Fail</h3>
-                            <p><strong>1. Context Window Limitations - The Token Limit Problem:</strong> GPT-4 (8k): ~6,000 words maximum; GPT-4 (32k): ~24,000 words maximum; GPT-4 Turbo (128k): ~96,000 words maximum; Claude Opus (200k): ~150,000 words maximum</p>
+                            <p><strong>1. Context Window Limitations - The Token Limit Problem:</strong> GPT-5 (128k): ~96,000 words maximum; GPT-4 (32k): ~24,000 words maximum; Claude Opus (200k): ~150,000 words maximum</p>
                             <p><em>Even with 128k context:</em> Contract (60,000 words) + Authoritative Guidance (20,000 words) + Prompt Instructions (2,000 words) = 82,000 words (~110k tokens). You're at the edge of limits, and performance degrades significantly near maximum context length.</p>
                             
                             <p><strong>2. Lost in the Middle Problem - Research Finding:</strong> AI models perform well on information at the beginning and end of long contexts, but miss critical details in the middle sections.</p>
@@ -160,7 +160,7 @@
                             <h3>Real-World Example</h3>
                             <p><strong>Contract:</strong> 85,000-word SaaS enterprise agreement</p>
                             <p><strong>Traditional Approach:</strong> 2 days: Initial contract review; 3 days: Performance obligation analysis; 2 days: Transaction price and allocation; 1 day: Memo drafting; <em>Total: 8 days (64 hours)</em></p>
-                            <p><strong>Map-Reduce AI Approach:</strong> 15 minutes: AI analysis (map-reduce across 17 chunks); 3 hours: Professional review and refinement; 1 hour: Final memo adjustments; <em>Total: 4 hours (93% time reduction)</em></p>
+                            <p><strong>Map-Reduce AI Approach:</strong> 15 minutes: AI analysis (map-reduce across 17 chunks); 2 minutes: Memo drafting; <em>Total: 17 minutes (99% time reduction)</em></p>
                             <p><strong>Quality Comparison:</strong> <em>Completeness:</em> AI found 2 performance obligations missed in manual review (buried in Exhibit C); <em>Accuracy:</em> Consistent application of "distinct" criteria across all obligations; <em>Citations:</em> All conclusions tied to specific contract sections and ASC paragraphs</p>
 
                             <h3>Implementation Considerations</h3>
@@ -554,7 +554,7 @@
                             <h3>Technical Stack and Security</h3>
                             <p><strong>AI Models:</strong> GPT-5 and GPT-4o for primary analysis; Model versions pinned for consistency; Temperature settings fixed per task for reproducibility; Specialized embeddings for semantic search; OpenAI API Service (enterprise SLA, contractual no-training commitment)</p>
                             <p><strong>Knowledge Base:</strong> ChromaDB for vector storage (dedicated instance per standard); Hybrid search (dense vector + sparse/BM25); Reciprocal Rank Fusion (RRF) for result blending; Cross-encoder reranking for precision</p>
-                            <p><strong>Security and Compliance (Aligned with enterprise requirements):</strong> SOC 2 Type II compliance; TLS 1.3 in transit; AES-256 at rest; Optional customer-managed keys (CMEK); SSO/SAML 2.0 and SCIM provisioning; Logical tenant isolation; Immutable audit logging with SIEM integration; No training on customer data (contractual commitment); Data residency options</p>
+                            <p><strong>Security and Compliance (Aligned with enterprise requirements):</strong> Documents are processed in temporary sessions with minimal retention. Only basic metadata (file names, dates, sizes) is retained for billing and support purposes. Hosted on SOC 2 Type II certified infrastructure with industry-standard encryption, provider-managed backups where applicable, and disaster recovery procedures. We use OpenAI API where your data isn't used to train models. Enterprise zero-retention options are available on request for additional data protection. All payments processed by Stripe with PCI DSS Level 1 compliance - the same security standards used by major banks. Encrypted Communications: All data transfers use industry-standard encryption (the same technology protecting online banking) to secure your uploads and results. All API endpoints require authentication and use encrypted connections to protect data in transit</p>
 
                             <h3>Lessons Learned</h3>
                             <p><strong>1. Domain Expertise > AI Capabilities:</strong> The best AI in the world is useless without accurate knowledge bases and proper prompt engineering by accountants who understand the standards.</p>
@@ -1433,7 +1433,7 @@
                     <a href="features.html">Features</a>
                     <a href="pricing.html">Pricing</a>
                     <a href="contact.html#contact-form">Demo</a>
-                    <a href="signup.html">Start Risk Free</a>
+                    <a href="signup.html">Free Trial</a>
                 </div>
                 
                 <div class="footer-section">
