@@ -54,8 +54,8 @@ def render_asc718_page():
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             st.markdown("""📄 **Your ASC 718 memo is ready below.** To save the results, you can either:
 
-                        - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-                        - **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
+- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
                         """)
             
             # Quick action buttons
@@ -468,8 +468,12 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
             'analysis_id': analysis_id
         }
         
-        st.success("✅ **Analysis Complete!**")
-        st.markdown("📄 **Your ASC 718 memo is ready below.**")
+        st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
+        st.markdown("""📄 **Your ASC 718 memo is ready below.** To save the results, you can either:
+
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
+- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.   
+        """)
         
         # Quick action buttons
         col1, col2 = st.columns(2)

@@ -54,8 +54,8 @@ def render_asc606_page():
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
 
-                        - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-                        - **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
+- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
                         """)
             
             # Quick action buttons
@@ -599,8 +599,12 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     progress_message_placeholder.empty()  # Remove the warning
                     
                     # Display results
-                    st.success("✅ **Analysis Complete!**")
-                    st.markdown("📄 **Your ASC 606 memo is ready below.**")
+                    st.success("✅ **Analysis Complete! This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.**")
+                    st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
+
+- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
+- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
+                        """)
                     
                     # Quick action buttons
                     col1, col2 = st.columns(2)
