@@ -4736,3 +4736,217 @@ a:focus {
         max-width: none;
     }
 }
+
+/* ========================================
+   Research Assistant Mockup Styles
+   ======================================== */
+
+.research-assistant-preview {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.research-assistant-preview h4 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.assistant-mockup {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Standard selector section */
+.mockup-selector {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mockup-selector label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.mockup-dropdown {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.mockup-info {
+    background: rgba(102, 126, 234, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+    font-size: 0.9rem;
+}
+
+/* Question input section */
+.mockup-question {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mockup-question label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.mockup-textarea {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
+    min-height: 80px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.mockup-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.mockup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Conversation section */
+.mockup-conversation {
+    margin-top: 1rem;
+}
+
+.mockup-conversation-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.mockup-user-question {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.mockup-user-question strong {
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.mockup-timestamp {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+.mockup-response {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mockup-response p {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.mockup-citation {
+    color: rgba(102, 126, 234, 0.9) !important;
+    font-size: 0.9rem !important;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem !important;
+}
+
+.mockup-suggestions {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mockup-suggestions strong {
+    color: rgba(255, 255, 255, 0.9);
+    display: block;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.mockup-suggestion-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.mockup-suggestion-buttons button {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.mockup-suggestion-buttons button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateX(4px);
+}
+
+/* Responsive adjustments for mockup */
+@media (max-width: 768px) {
+    .research-assistant-preview {
+        padding: 1.5rem;
+    }
+    
+    .assistant-mockup {
+        padding: 1rem;
+    }
+    
+    .mockup-selector,
+    .mockup-question {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+}
