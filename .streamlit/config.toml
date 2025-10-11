@@ -5,7 +5,7 @@ address = "0.0.0.0"
 
 [theme]
 base = "dark"
-primaryColor = "#A88A57" # Lighter blue
+primaryColor = "#A88A57" # Gold
 backgroundColor = "#212F3C" # Very dark navy blue, also secondaryBackgroundColor for sidebar
 secondaryBackgroundColor = "#36404A" # Darker gray, also backgroundColor for sidebar
 # textColor = "#FFFFFF"
