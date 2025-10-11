@@ -1,0 +1,97 @@
+Great question! Let me search for Stripe's official guidance on transitioning from test mode to live mode to give you the most accurate and up-to-date information.
+
+
+Searched the web for "Stripe transition from test mode to live production mode checklist 2025"
+
+Decided on live mode transition guide
+Excellent question! Based on Stripe's official documentation, here's your complete guide to going live:
+
+Steps to Convert from Test to Live Mode
+1. Activate Your Stripe Account (First!)
+Go to your Stripe Dashboard and complete account activation
+Provide business information, KYC details, and banking info
+You can accept live payments immediately after activation completes
+2. Get Your Live API Keys
+Navigate to Developers → API keys in Stripe Dashboard
+You'll see your live keys: sk_live_... (secret) and pk_live_... (publishable)
+⚠️ Important: Live secret keys are shown ONLY ONCE at creation - copy them immediately!
+3. Update Your Backend Environment Variables
+Replace your test keys with live keys in your environment:
+
+Current (Test):
+
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+Production (Live):
+
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
+4. Configure Live Webhooks ⚠️ CRITICAL
+Your test webhooks won't work in live mode!
+
+Go to Developers → Webhooks in Stripe Dashboard
+Add new endpoint for live mode: https://veritaslogic.ai/api/stripe/webhook
+Select the same events you're using in test mode: payment_intent.succeeded, payment_intent.payment_failed
+Copy the live webhook secret (starts with whsec_...)
+Update your environment: STRIPE_WEBHOOK_SECRET=
+5. Recreate Products in Live Mode 🔄
+Important: Test and live modes are completely separate!
+
+Objects that DON'T transfer:
+
+Products
+Prices
+Customers
+Subscriptions
+You need to recreate your credit packages in live mode (currently you have $500/$1000/$2000 packages).
+
+Can You Trust Sandbox → Production?
+✅ What Will Work
+Payment processing logic
+Webhook handling
+API integration code
+Error handling
+User flows
+⚠️ What Needs Verification
+Webhook endpoints - Must be HTTPS with valid TLS certificate
+Product IDs - Recreate with identical IDs/structure in live mode
+3D Secure flows - Test with real cards (some banks behave differently)
+Statement descriptors - Verify how your business name appears on customer statements
+Testing Strategy for Live Mode
+DO NOT use real cards for testing in production! Stripe flags this as suspicious activity.
+
+Instead:
+
+Monitor first real transactions closely
+Use small amounts initially (if needed, refund immediately)
+Check webhook delivery in live Dashboard
+Review error logs for any new edge cases
+Verify email notifications are working (you just set these up!)
+Your Pre-Launch Checklist
+Before switching to live:
+
+✅ 1. Rotate API keys - Generate fresh live keys (in case test keys were exposed)
+✅ 2. Activate Stripe account - Complete business verification
+✅ 3. Set up live webhooks - Different endpoint secret required
+✅ 4. Recreate products - $500/$1000/$2000 credit packages in live mode
+✅ 5. Update environment variables - Switch to sk_live_... keys
+✅ 6. Test webhook delivery - Send test event from Stripe Dashboard
+✅ 7. Enable 2FA - Secure your Stripe account
+✅ 8. Configure statement descriptor - So customers recognize charges
+
+Deployment Day
+Update Railway environment variables with live keys
+Deploy updated environment
+Test one small real transaction ($5 credit purchase?)
+Monitor Stripe Dashboard for successful webhook delivery
+Check your new email notification system is working!
+Post-Launch Monitoring
+Watch these for the first few days:
+
+Webhook success rates in Stripe Dashboard
+Payment success/failure email alerts (you just built this!)
+Any error spikes in Railway logs
+Customer disputes/chargebacks
+Bottom line: If it works well in sandbox, it will work in production - BUT you need to recreate products, configure live webhooks, and update API keys. The code itself is solid, just environmental configuration changes needed!
+
+Would you like help with any specific step, like recreating your credit packages in live mode or updating the Railway environment variables?

@@ -9,6 +9,7 @@ import hashlib
 # 1. Set the page configuration
 st.set_page_config(
     page_title="Welcome to VeritasLogic.ai",
+    page_icon="assets/images/favicon.png",
     layout="wide",
     initial_sidebar_state="expanded")
 
