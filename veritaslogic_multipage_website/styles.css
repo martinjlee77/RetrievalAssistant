@@ -1381,16 +1381,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 /* New styles for standards boxes in right column */
 .standards-grid-visual {
-    padding: 2rem;
-    background: rgba(255,255,255,0.05);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
+    /* Remove outer box - just container for spacing */
+    padding: 0;
 }
 .standards-grid-visual h4 {
     color: #ffffff;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     font-size: 1.5rem;
 }
 .standards-boxes {
@@ -4886,6 +4883,7 @@ a:focus {
     cursor: pointer;
     transition: all 0.3s ease;
     width: 100%;
+    font-family: inherit;
 }
 
 .mockup-suggestion-buttons button:hover {
