@@ -916,7 +916,7 @@ async function selectPackage(amount) {
     document.getElementById('selectedPackageDisplay').innerHTML = `
         <div class="selected-package-info">
             <h4>Selected Package: $${amount.toLocaleString()} Credits</h4>
-            <p>You will be charged $${amount.toLocaleString()} USD. Credits expire 12 months from purchase.</p>
+            <p>You will be charged $${amount.toLocaleString()} USD.</p>
         </div>
     `;
     
