@@ -561,7 +561,7 @@ function loadRecentAnalyses(analyses) {
     const container = document.getElementById('recentAnalysesList');
     
     if (analyses.length === 0) {
-        // Keep the empty state
+        container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-primary" target="_blank">Run Your First Analysis</a></div>';
         return;
     }
     
