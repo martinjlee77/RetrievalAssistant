@@ -114,6 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
+            // Skip unified-contact-form (it has its own handler in contact.html)
+            if (this.id === 'unified-contact-form') {
+                return;
+            }
+            
             if (!validateForm(this)) {
                 e.preventDefault();
                 return false;
