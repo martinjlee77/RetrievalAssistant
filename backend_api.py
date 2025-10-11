@@ -327,7 +327,7 @@ def serve_streamlit_app():
                     <p>Your analysis platform is ready. Opening now...</p>
                 </div>
                 <button class="btn" onclick="openStreamlit()">
-                    Open Analysis Platform
+                    Opening Analysis Platform
                 </button>
             </div>
             
