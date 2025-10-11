@@ -4742,10 +4742,8 @@ a:focus {
    ======================================== */
 
 .assistant-mockup {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* Remove outer box - just container for spacing */
+    padding: 0;
 }
 
 .assistant-mockup h4 {
