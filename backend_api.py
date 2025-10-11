@@ -794,7 +794,6 @@ def signup():
         
         # Send database error alert for signup failures (critical operation)
         try:
-            from shared.postmark_client import PostmarkClient
             postmark = PostmarkClient()
             # Get user email if available in locals
             affected_user = email if 'email' in locals() else 'Unknown'
@@ -1080,6 +1079,7 @@ def forgot_password():
         user = cursor.fetchone()
         
         if not user:
+            conn.close()
             # Return success even if user doesn't exist for security
             return jsonify({
                 'message': 'If an account with that email exists, you will receive a password reset email.'
@@ -1397,6 +1397,7 @@ def change_password():
         
         # All users are now enterprise users - verify current password required
         if not current_password:
+            conn.close()
             return jsonify({'error': 'Current password is required'}), 400
         
         if not user['password_hash'] or not verify_password(current_password, user['password_hash']):
@@ -1752,7 +1753,6 @@ def complete_analysis():
         
         # Send critical billing error alert to support team
         try:
-            from shared.postmark_client import PostmarkClient
             postmark = PostmarkClient()
             # Get user email safely (might not be set if error occurred early)
             email_for_alert = user_email if 'user_email' in locals() else f"User ID {user_id}"
@@ -1963,7 +1963,6 @@ def stripe_webhook():
                 
                 # Send database error alert for webhook DB failures (critical for revenue)
                 try:
-                    from shared.postmark_client import PostmarkClient
                     postmark = PostmarkClient()
                     user_email = payment_intent['metadata'].get('user_email', f"User ID {user_id}")
                     postmark.send_database_error_alert(
@@ -2017,7 +2016,6 @@ def stripe_webhook():
             
             # Send payment success notification to support for revenue tracking
             try:
-                from shared.postmark_client import PostmarkClient
                 postmark = PostmarkClient()
                 user_email = payment_intent['metadata'].get('user_email', f"User ID {user_id}")
                 postmark.send_payment_success_notification(
@@ -2051,7 +2049,6 @@ def stripe_webhook():
             
             # Send payment failure alert to support
             try:
-                from shared.postmark_client import PostmarkClient
                 postmark = PostmarkClient()
                 postmark.send_payment_failure_alert(
                     user_email=user_email,
