@@ -478,12 +478,12 @@ async function loadAnalysisHistory() {
         } else {
             console.error('Failed to load analysis history');
             // Show empty state on error
-            container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-primary" target="_blank">Run Your First Analysis</a></div>';
+            container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-secondary" target="_blank">Run Your First Analysis</a></div>';
         }
     } catch (error) {
         console.error('Error loading analysis history:', error);
         // Show empty state on error
-        container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-primary" target="_blank">Run Your First Analysis</a></div>';
+        container.innerHTML = '<div class="empty-state"><div>📄</div><p>No analyses yet. Ready to get started?</p><a href="/analysis" class="btn btn-secondary" target="_blank">Run Your First Analysis</a></div>';
     }
 }
 
