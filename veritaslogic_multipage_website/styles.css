@@ -1282,6 +1282,14 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(255,255,255,0.3);
 }
+.btn--primary a{
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+    font-weight: 600;
+}
+.btn--primary a:hover {
+    color: #ffffff;
+}
 .btn--secondary {
     background: rgba(255,255,255,0.1);
     color: #ffffff;
