@@ -2694,10 +2694,10 @@ h1, h2, h3, h4, h5, h6 {
     .hero h1,
     .page-header h1 {
         font-size: 2.2rem;
-        line-height: 1.15;
+        line-height: 1.2;
     }
     .section-header h2 {
-        font-size: 1.65rem;
+        font-size: 1.8rem;
     }
     .founder-story h2,
     .trial-info h2,
