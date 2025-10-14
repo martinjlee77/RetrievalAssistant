@@ -1668,16 +1668,19 @@ def complete_analysis():
             # CRITICAL FIX: Set status based on success flag
             analysis_status = 'completed' if success else 'failed'
             logger.info(f"Inserting analysis record for user {user_id} with status: {analysis_status}")
+            
+            # Store error_message in metadata for now (until production DB has error_message column)
+            # TODO: Add error_message column to production DB, then include it in INSERT
             cursor.execute("""
                 INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
-                                    started_at, completed_at, duration_seconds, file_count, error_message)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s)
+                                    started_at, completed_at, duration_seconds, file_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s)
                 RETURNING analysis_id
             """, (user_id, asc_standard, words_count, api_cost, 
                   final_charged_credits if success else 0,  # Only set charged amount if successful
                   final_charged_credits if success else 0,  # Only set billed amount if successful
-                  tier_name, analysis_status, memo_uuid, started_at, duration_seconds, file_count, error_message))
+                  tier_name, analysis_status, memo_uuid, started_at, duration_seconds, file_count))
             
             analysis_id = cursor.fetchone()['analysis_id']
             logger.info(f"Analysis record created with ID: {analysis_id}, status: {analysis_status}")
