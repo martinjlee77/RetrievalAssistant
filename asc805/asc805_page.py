@@ -442,13 +442,6 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 st.rerun()
         
         st.markdown("---")
-
-        with st.container(border=True):
-            st.markdown("""Your ASC 805 memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download as Markdown:**  Download the memo as a Markdown file for later use (download link below).
-                """)
         
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
