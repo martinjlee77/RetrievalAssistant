@@ -586,14 +586,6 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 st.rerun()
         
         st.markdown("---")
-             
-        # Add the important persistent message before memo display (like ASC 606)
-        with st.container(border=True):
-            st.info("""**IMPORTANT:** Your ASC 842 memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
-                """)
         
         # Display the memo using CleanMemoGenerator (like ASC 606)
         memo_generator_display = CleanMemoGenerator()

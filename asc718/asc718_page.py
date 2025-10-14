@@ -487,14 +487,6 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
                 st.rerun()
         
         st.markdown("---")
-
-        # Add the important persistent message before memo display (like ASC 606/842)
-        with st.container(border=True):
-            st.info("""**IMPORTANT:** Your ASC 718 memo is displayed below. To save the results, you can either:
-            
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).
-- **Download:**  Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
-                """)
         
         # Display the memo using CleanMemoGenerator
         memo_generator_display = CleanMemoGenerator()
