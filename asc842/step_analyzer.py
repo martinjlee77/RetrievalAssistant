@@ -520,10 +520,9 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 4: Produce initial accounting outputs',
                 'focus': 'Document and output the initial recognition, classification, calculations, and required notes',
                 'key_points': [
-                    'State classification conclusion (finance/operating) with rationale and citations. [ASC 842-10-25-2]',
-                    'Detail lease payments by category and show PV calculation. [ASC 842-20-30-5]',
-                    'Provide commencement-date journal entries: ROU asset, lease liability, prepaid/incentives/IDC effects. [ASC 842-20-25-1; 842-20-30-1]',
-                    'Flag policy elections and significant judgments for disclosure: short-term expedient, non-separation expedient, "reasonably certain" assessments. [ASC 842-20-45-1; 842-20-50-1]'
+                    'Summarize the lease classification (finance vs operating) with supporting rationale. [ASC 842-10-25-2]',
+                    'Document the initial recognition amounts for the ROU asset and lease liability. [842-20-30-1]',
+                    'Identify significant judgments or policy elections that require disclosure. [ASC 842-20-45-1; 842-20-50-1]'
                 ]
             },
             5: {
