@@ -393,14 +393,14 @@ class CleanMemoGenerator:
                     html_lines.append('</ul>')
                     in_list = False
                 html_lines.append(
-                    f'<h2 style="margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>'
+                    f'<h2 style="color: #ffffff; margin: 18px 0 12px 0; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px;">{line[3:]}</h2>'
                 )
             elif line.startswith('### '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
                 html_lines.append(
-                    f'<h3 style="margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>'
+                    f'<h3 style="color: #ffffff; margin: 16px 0 10px 0; font-weight: 600;">{line[4:]}</h3>'
                 )
             # Handle bullet points better
             elif line.strip().startswith('- '):

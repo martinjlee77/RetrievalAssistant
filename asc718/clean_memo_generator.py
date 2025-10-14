@@ -222,8 +222,8 @@ class CleanMemoGenerator:
         
         # Convert markdown headers to HTML with styling
         content = re.sub(r'^# (.+)$', r'<h1 style="color: #1f77b4; border-bottom: 2px solid #1f77b4; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px;">\1</h1>', content, flags=re.MULTILINE)
-        content = re.sub(r'^## (.+)$', r'<h2 style="color: #333; margin-top: 25px; margin-bottom: 15px; font-size: 1.3em;">\1</h2>', content, flags=re.MULTILINE)
-        content = re.sub(r'^### (.+)$', r'<h3 style="color: #555; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">\1</h3>', content, flags=re.MULTILINE)
+        content = re.sub(r'^## (.+)$', r'<h2 style="color: #ffffff; margin-top: 25px; margin-bottom: 15px; font-size: 1.3em;">\1</h2>', content, flags=re.MULTILINE)
+        content = re.sub(r'^### (.+)$', r'<h3 style="color: #ffffff; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">\1</h3>', content, flags=re.MULTILINE)
         
         # Style bold text
         content = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color: #2c3e50;">\1</strong>', content)

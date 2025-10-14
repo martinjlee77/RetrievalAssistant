@@ -187,12 +187,12 @@ class CleanMemoGenerator:
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h2>{line[3:]}</h2>')
+                html_lines.append(f'<h2 style="color: #ffffff;">{line[3:]}</h2>')
             elif line.startswith('### '):
                 if in_list:
                     html_lines.append('</ul>')
                     in_list = False
-                html_lines.append(f'<h3>{line[4:]}</h3>')
+                html_lines.append(f'<h3 style="color: #ffffff;">{line[4:]}</h3>')
             # Lists
             elif line.strip().startswith('- '):
                 if not in_list:
