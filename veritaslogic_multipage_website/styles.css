@@ -2439,10 +2439,11 @@ h1, h2, h3, h4, h5, h6 {
     }
     .hero h1,
     .page-header h1 {
-        font-size: 2.8rem;
+        font-size: 2.6rem;
+        line-height: 1.15;
     }
     .section-header h2 {
-        font-size: 1.9rem;
+        font-size: 1.8rem;
     }
     .hero-actions {
         flex-direction: column;
@@ -2692,10 +2693,11 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 480px) {
     .hero h1,
     .page-header h1 {
-        font-size: 2.3rem;
+        font-size: 2.2rem;
+        line-height: 1.15;
     }
     .section-header h2 {
-        font-size: 1.7rem;
+        font-size: 1.65rem;
     }
     .founder-story h2,
     .trial-info h2,
