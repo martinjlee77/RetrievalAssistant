@@ -2693,16 +2693,21 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 480px) {
     .hero h1,
     .page-header h1 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         line-height: 1.2;
     }
     .section-header h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     .founder-story h2,
+    .cta-content h2,
+    .feature-content h2,
+    .feature-comparison h2,
     .trial-info h2,
+    .story-content h2,
+    .values-section h2,
     .form-container h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
 }
 /* Utility Classes */
