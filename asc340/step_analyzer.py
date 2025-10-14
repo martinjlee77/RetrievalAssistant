@@ -519,7 +519,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 2: Guidance for Amortization, Practical Expedient, and Impairment',
                 'focus': 'Provide policy boilerplate and guidance only; no calculations or analysis.',
                 'key_points': [
-                    'Explain that capitalized costs to obtain are amortized on a systematic basis consistent with the transfer of the goods or services to which the asset relates. Also explain that if renewals are commensurate with initial commissions, entities often amortize each commission over the related contract term; otherwise, amortize initial commission over the expected period of benefit. Explain that the period of benefit should reflect the expected duration the asset provides benefit, considering customer life, churn/renewal rates, and economic factors.',
+                    'Describe the amortization approach for capitalized costs (systematic basis, period of benefit considerations, renewal commissions commensurate with initial commissions).',
                     'Mention the practical expedient in which the cost is expensed as incurred if the amortization period would be one year or less. Application can be by portfolio but the policy should be documented.',
                     'Explain that changes in estimates result in adjusting amortization prospectively when the expected period of benefit changes (e.g., churn/renewal assumptions).',
                     'Explain that at each reporting date, recognize impairment if the carrying amount exceeds the remaining amount of consideration expected to be received (less costs related to providing those goods/services). Reversals are not permitted.',

@@ -501,7 +501,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'focus': 'Measure grant-date fair value using an appropriate model and well-supported inputs; apply permitted nonpublic expedients where applicable',
                 'key_points': [
                     'Identify award type (option/RSU/PSU/SAR) and determine the applicable valuation approach under ASC 718. [ASC 718-10-30; 718-20-55]',
-                    'For options/SARs: Flag that fair value requires option-pricing model inputs (share price, expected term, volatility, risk-free rate, dividend yield). Create management placeholders for missing inputs.',
+                    'For options/SARs: Note that fair value requires option-pricing model inputs (share price, expected term, volatility, risk-free rate, dividend yield). Note where management judgment or input is required.',
                     'For RSUs: Use grant-date stock price as fair value; flag any non-vesting conditions (e.g., post-vest restrictions) requiring fair value adjustment.',
                     'For PSUs: Distinguish market conditions (included in grant-date FV via Monte Carlo) from performance conditions (excluded from FV; affects expense timing only).',
                     'For liability awards: Note remeasurement requirement at each period. [ASC 718-30-35]',
@@ -513,9 +513,9 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'focus': 'Determine the period/pattern of recognition and apply condition-specific rules',
                 'key_points': [
                     'Determine requisite service period from vesting conditions (explicit, implicit, or derived). Note any retirement/death provisions. [ASC 718-10-20; 718-10-35]',
-                    'Identify attribution method from vesting schedule. For graded vesting, note straight-line vs accelerated policy election → flag as [Management Input Required: State attribution policy per ASC 718-10-35].',
+                    'Identify attribution method from vesting schedule. For graded vesting, note straight-line vs accelerated policy election → Note where management judgment or input is required: State attribution policy per ASC 718-10-35].',
                     'State forfeiture accounting policy → flag as [Management Input Required: Estimate-forfeitures or as-incurred election per ASC 718-10-35].',
-                    'For performance conditions: Assess from contract if achievability is determinable; otherwise flag probability assessment as management input.',
+                    'For performance conditions: Assess from contract if achievability is determinable; otherwise note probability assessment as management input.',
                     'Note that market conditions affect grant-date FV (Step 2) but not expense recognition pattern. [ASC 718-10-30]',
                 ]
             },
@@ -523,7 +523,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 4: Subsequent measurement, modifications, classification changes, settlements, and special transactions',
                 'focus': 'Remeasure liabilities, account for changes in terms/classification, and record exercises, cancellations, and business-combination effects',
                 'key_points': [
-                    'For liability awards: Note remeasurement requirement each period until settlement (change in FV → earnings). Flag as [Management Input Required: Periodic remeasurement methodology]. [ASC 718-30-35]',
+                    'For liability awards: Note remeasurement requirement each period until settlement (change in FV → earnings). Note where management judgment or input is required. [ASC 718-30-35]',
                     'For modifications (if applicable): Identify change type (repricing, acceleration, etc.). Measure incremental FV and recognize over remaining service period. Flag pre/post-modification FV as management input. [ASC 718-20-35; 718-20-55]',
                     'For cancellations/forfeitures: Unvested → reverse prior expense. Vested expirations → no reversal. [ASC 718-20-35]',
                     'For settlements/exercises: Describe entries for share issuance, cash payment, and tax withholding per award terms and classification. [ASC 718-20-35]',

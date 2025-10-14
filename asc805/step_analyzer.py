@@ -509,7 +509,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'For special intangibles: Reacquired rights → amortize over remaining contractual term (ignore renewals). IPR&D → capitalize as indefinite-lived, subject to impairment. [ASC 805-20; ASC 350]',
                     'Recognize contingencies at acquisition-date FV when meeting asset/liability definition. [ASC 805-20; ASC 450/460]',
                     'Record tax effects: DTAs/DTLs for basis differences, UTPs, valuation allowances. [ASC 740]',
-                    'Goodwill calculation framework: FV consideration + FV NCI + FV previously held − FV identifiable net assets. If result is negative → reassess measurements; if still negative → recognize bargain purchase gain with disclosures. [Management Input Required: Fair value amounts for goodwill calculation]. [ASC 805-30]'
+                    'Describe the goodwill calculation framework. Note where management judgment or input is required. [ASC 805-30]'
                 ]
             },
             4: {
@@ -528,7 +528,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                 'title': 'Step 5: Prepare required disclosures and the technical memo',
                 'focus': 'Provide complete ASC 805 disclosures and document judgments, measurements, and conclusions supporting the acquisition method',
                 'key_points': [
-                    'Prepare ASC 805 disclosures: Acquisition date + reasons; goodwill qualitative factors; consideration by major class; assets/liabilities by major class; contingent consideration + indemnification details; acquiree revenue/earnings since acquisition; pro forma information as if acquired at period start. [ASC 805-10-50; ASC 805-30-50]',
+                    'Describe the ASC 805 disclosures requirements specific to this business combination as applicable: Acquisition date + reasons; goodwill qualitative factors; consideration by major class; assets/liabilities by major class; contingent consideration + indemnification details; acquiree revenue/earnings since acquisition; pro forma information as if acquired at period start. [ASC 805-10-50; ASC 805-30-50]',
                     'For immaterial combinations material in aggregate: Disclose combined amounts. [ASC 805-10-50]',
                     'For step acquisitions: Disclose FV of previously held interest, gain/loss recognized, AOCI reclassifications. [ASC 805-10; ASC 220]',
                     'For bargain purchases: Disclose gain amount and reasons. [ASC 805-30-50]',
