@@ -495,8 +495,8 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 authoritative_context = knowledge_search.search_for_step(
                     step_num, contract_text)
 
-                # Analyze the step with additional context
-                step_result = analyzer._analyze_step(
+                # Analyze the step with additional context (using retry wrapper)
+                step_result = analyzer._analyze_step_with_retry(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
