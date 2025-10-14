@@ -1,0 +1,115 @@
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.18s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 2
+INFO:asc842.step_analyzer:→ Step 2: Starting analysis using gpt-5...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 2
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2670, Output tokens: 1747, Cost: $0.0791
+INFO:shared.api_cost_tracker:Tracked step_2_analysis request: $0.0791 (Total: $0.1602)
+INFO:asc842.step_analyzer:✓ Step 2: Completed in 101.5s
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 2 (length: 7351) sample: ### Step 2: Identify components and determine lease payments
+INFO:__main__:DEBUG: Completed step 2
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+**Analysis:**  
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+- Lease vs. nonlease c...
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.15s)
+INFO:asc842.step_analyzer:💰 Extracting lease payment schedule and performing NPV calculations...
+INFO:asc842.knowledge_search:Retrieved guidance for Step 3
+INFO:asc842.step_analyzer:→ Step 3: Starting analysis using gpt-5...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 3
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2838, Output tokens: 2286, Cost: $0.0970
+INFO:shared.api_cost_tracker:Tracked step_3_analysis request: $0.0970 (Total: $0.2571)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 3 (length: 9805) sample: ### Step 3: Classify the lease and measure at commencement
+**Analysis:**
+- Lease identification an...
+INFO:asc842.step_analyzer:✓ Step 3: Completed in 141.1s
+INFO:__main__:DEBUG: Completed step 3
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.22s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 4
+INFO:asc842.step_analyzer:→ Step 4: Starting analysis using gpt-5...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2518, Output tokens: 2392, Cost: $0.0969
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0969 (Total: $0.3541)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 4 (length: 9723) sample: ### Step 4: Produce initial accounting outputs
+**Analysis:**
+Lease identification and scope. Innov...
+INFO:asc842.step_analyzer:✓ Step 4: Completed in 146.6s
+INFO:__main__:DEBUG: Completed step 4
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.66s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 5
+INFO:asc842.step_analyzer:→ Step 5: Starting analysis using gpt-5...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 5
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2939, Output tokens: 2220, Cost: $0.0960
+INFO:shared.api_cost_tracker:Tracked step_5_analysis request: $0.0960 (Total: $0.4501)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 5 (length: 9823) sample: ### Step 5: Reminders beyond initial recognition (no computations)
+**Analysis:**  
+- Subsequent exp...
+INFO:asc842.step_analyzer:✓ Step 5: Completed in 118.6s
+INFO:__main__:DEBUG: Completed step 5
+INFO:asc842.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc842.step_analyzer:DEBUG: steps_data keys: ['step_1', 'step_2', 'step_3', 'step_4', 'step_5']
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 1: We conclude the arrangement contains a lease under ASC 842 because it conveys the right to control t...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 2: We conclude there is a single lease component (the office space) and no identifiable nonlease compon...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 3: We conclude the office lease is an operating lease because there is no ownership transfer, no purcha...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 4: We conclude the agreement is an operating lease with a five‑year lease term; the 5‑year renewal opti...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 5: We conclude InnovateTech should recognize lease expense after commencement based on the ultimate lea...
+INFO:asc842.step_analyzer:DEBUG: Combined conclusions length: 3297
+INFO:asc842.step_analyzer:→ Generating executive summary...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5-mini, Input tokens: 976, Output tokens: 412, Cost: $0.0022
+INFO:shared.api_cost_tracker:Tracked executive_summary request: $0.0022 (Total: $0.4523)
+INFO:asc842.step_analyzer:✓ Executive summary generated (2073 chars)
+INFO:asc842.step_analyzer:→ Generating background section...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5-mini, Input tokens: 149, Output tokens: 166, Cost: $0.0006
+INFO:shared.api_cost_tracker:Tracked background_generation request: $0.0006 (Total: $0.4529)
+INFO:asc842.step_analyzer:✓ Background section generated (959 chars)
+INFO:asc842.step_analyzer:→ Generating final conclusion...
+INFO:asc842.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc842.step_analyzer:DEBUG: steps_data keys: ['step_1', 'step_2', 'step_3', 'step_4', 'step_5']
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 1: We conclude the arrangement contains a lease under ASC 842 because it conveys the right to control t...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 2: We conclude there is a single lease component (the office space) and no identifiable nonlease compon...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 3: We conclude the office lease is an operating lease because there is no ownership transfer, no purcha...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 4: We conclude the agreement is an operating lease with a five‑year lease term; the 5‑year renewal opti...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 5: We conclude InnovateTech should recognize lease expense after commencement based on the ultimate lea...
+INFO:asc842.step_analyzer:DEBUG: Combined conclusions length: 3297
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:asc842.step_analyzer:✓ Final conclusion generated (868 chars)
+INFO:asc842.clean_memo_generator:Added clean step 1 content (7575 chars)
+INFO:asc842.clean_memo_generator:Added clean step 2 content (7351 chars)
+INFO:asc842.clean_memo_generator:Added clean step 3 content (9805 chars)
+INFO:asc842.clean_memo_generator:Added clean step 4 content (9723 chars)
+INFO:asc842.clean_memo_generator:Added clean step 5 content (9823 chars)
+INFO:asc842.clean_memo_generator:Clean memo generated: 56352 chars, 5/5 steps
+INFO:shared.analysis_manager:💾 Saving analysis record: 117c9f72
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: 117c9f72
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-10-14T05:01:50.942400", "analysis_id": "117c9f72", "asc_standard": "ASC 842", "total_words": 586, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "completed", "success": true, "duration": 685.8330562114716, "error": null}
+INFO:shared.analysis_manager:Completed analysis 117c9f72: success - 685.8s
+INFO:asc842.clean_memo_generator:Prepended memo ID 117c9f72 to memo content
+INFO:asc842.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 117c9f72\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by Veritas'
+INFO:asc842.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 45288 bytes
+INFO:asc842.clean_memo_generator:PDF generation successful: 45288 bytes

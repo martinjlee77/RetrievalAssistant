@@ -69,6 +69,7 @@ class CleanMemoGenerator:
         
         # Add Background
         memo_lines.extend([
+            "## BACKGROUND",
             ""
         ])
         
@@ -116,6 +117,8 @@ class CleanMemoGenerator:
         # Add Conclusion Section
         if 'conclusion' in analysis_results:
             memo_lines.extend([
+                "",
+                "## CONCLUSION",
                 "",
                 analysis_results['conclusion'],
                 "",
