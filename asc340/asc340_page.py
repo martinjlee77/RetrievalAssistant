@@ -550,13 +550,6 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                             st.rerun()
                     
                     st.markdown("---")
-                                            
-                    with st.container(border=True):
-                        st.info("""**IMPORTANT:** Your ASC 340-40 memo is displayed below. To save the results, you can either:
-
-• **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-• **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use (scroll down to the end for download buttons).
-                            """)
                     
                     # Use the CleanMemoGenerator's display method
                     memo_generator.display_clean_memo(memo_result)
