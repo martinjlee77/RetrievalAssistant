@@ -282,6 +282,17 @@ def get_asc805_inputs_new():
 def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
     """Perform ASC 805 analysis with new billing system integration."""
     
+    # Session isolation - create unique session ID for this user
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
+    session_id = st.session_state.user_session_id
+    
+    # Create session-specific keys
+    analysis_key = f'asc805_analysis_complete_{session_id}'
+    memo_key = f'asc805_memo_data_{session_id}'
+    
     analysis_id = None
     
     try:
@@ -465,11 +476,12 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         completion_message_placeholder.empty()
 
     except Exception as e:
-        # Clear the progress message even on error
-        progress_message_placeholder.empty()
+        # Clear the progress message even on error (if it exists)
+        if 'progress_message_placeholder' in locals():
+            progress_message_placeholder.empty()
         
         # CRITICAL FIX: Mark analysis as failed - NO CHARGE
-        if 'analysis_id' in locals():
+        if 'analysis_id' in locals() and analysis_id:
             analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
         
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")

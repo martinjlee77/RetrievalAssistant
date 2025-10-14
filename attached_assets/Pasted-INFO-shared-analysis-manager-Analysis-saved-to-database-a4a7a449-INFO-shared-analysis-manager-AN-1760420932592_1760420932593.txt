@@ -1,0 +1,62 @@
+INFO:shared.analysis_manager:✓ Analysis saved to database: a4a7a449
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-10-14T05:47:32.004293", "analysis_id": "a4a7a449", "asc_standard": "ASC 805", "total_words": 996, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "failed", "success": false, "duration": 576.2212870121002, "error": "name 'analysis_key' is not defined"}
+INFO:shared.analysis_manager:Completed analysis a4a7a449: failed - 576.2s
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  /app/asc805/asc805_page.py:415 in perform_asc805_analysis_new                         
+                                                                                        
+    412 │   │   )                                                                       
+    413 │   │                                                                           
+    414 │   │   # Signal completion with session isolation                              
+  ❱ 415 │   │   st.session_state[analysis_key] = True                                   
+    416 │   │                                                                           
+    417 │   │   # CRITICAL FIX: Mark analysis as successful and charge customer         
+    418 │   │   analysis_manager.complete_analysis(analysis_id, success=True)           
+────────────────────────────────────────────────────────────────────────────────────────
+NameError: name 'analysis_key' is not defined
+During handling of the above exception, another exception occurred:
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py:  
+  128 in exec_func_with_error_handling                                                  
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner  
+  .py:669 in code_to_exec                                                               
+                                                                                        
+  /app/home.py:54 in <module>                                                           
+                                                                                        
+    51 try_cross_domain_auth()                                                          
+    52                                                                                  
+    53 # 7. Run the app.                                                                
+  ❱ 54 pg.run()                                                                         
+    55                                                                                  
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/navigation/page.py:300 in run       
+                                                                                        
+  /app/asc805/asc805_page.py:637 in <module>                                            
+                                                                                        
+    634                                                                                 
+    635 # For direct execution/testing                                                  
+    636 if __name__ == "__main__":                                                      
+  ❱ 637 │   render_asc805_page()                                                        
+    638                                                                                 
+                                                                                        
+  /app/asc805/asc805_page.py:213 in render_asc805_page                                  
+                                                                                        
+    210 │   │   │   │   if not user_token:                                              
+    211 │   │   │   │   │   st.error("❌ Authentication required. Please refresh the p  
+    212 │   │   │   │   │   return                                                      
+  ❱ 213 │   │   │   │   perform_asc805_analysis_new(pricing_result, additional_context  
+    214 │   │   else:                                                                   
+    215 │   │   │   st.button("3️⃣ Insufficient Credits",                                 
+    216 │   │   │   │   │    disabled=True,                                             
+                                                                                        
+  /app/asc805/asc805_page.py:476 in perform_asc805_analysis_new                         
+                                                                                        
+    473 │   │   │   analysis_manager.complete_analysis(analysis_id, success=False, err  
+    474 │   │                                                                           
+    475 │   │   st.error("❌ Analysis failed. Please try again. Contact support if thi  
+  ❱ 476 │   │   logger.error(f"ASC 805 analysis error for session {session_id[:8]}...:  
+    477                                                                                 
+    478                                                                                 
+    479 def _upload_and_process_asc805():                                               
+────────────────────────────────────────────────────────────────────────────────────────
+NameError: name 'session_id' is not defined
