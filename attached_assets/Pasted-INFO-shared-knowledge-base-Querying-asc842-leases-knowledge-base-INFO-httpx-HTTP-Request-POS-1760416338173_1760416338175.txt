@@ -1,0 +1,51 @@
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.10s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 4
+INFO:asc842.step_analyzer:→ Step 4: Starting analysis using gpt-5...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2575, Output tokens: 0, Cost: $0.0258
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0258 (Total: $0.2934)
+ERROR:asc842.step_analyzer:ERROR: GPT-5 returned empty/None content for Step 4
+WARNING:asc842.step_analyzer:Unexpected error for Step 4. Retrying in 1.0s: GPT-5 returned empty/None content for Step 4
+INFO:asc842.step_analyzer:Retrying Step 4 (attempt 2)
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2575, Output tokens: 0, Cost: $0.0258
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0258 (Total: $0.3191)
+ERROR:asc842.step_analyzer:ERROR: GPT-5 returned empty/None content for Step 4
+WARNING:asc842.step_analyzer:Unexpected error for Step 4. Retrying in 1.2s: GPT-5 returned empty/None content for Step 4
+INFO:asc842.step_analyzer:Retrying Step 4 (attempt 3)
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2575, Output tokens: 0, Cost: $0.0258
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0258 (Total: $0.3449)
+ERROR:asc842.step_analyzer:ERROR: GPT-5 returned empty/None content for Step 4
+WARNING:asc842.step_analyzer:Unexpected error for Step 4. Retrying in 1.4s: GPT-5 returned empty/None content for Step 4
+INFO:asc842.step_analyzer:Retrying Step 4 (attempt 4)
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2575, Output tokens: 0, Cost: $0.0258
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0258 (Total: $0.3706)
+ERROR:asc842.step_analyzer:ERROR: GPT-5 returned empty/None content for Step 4
+ERROR:asc842.step_analyzer:Unexpected error for Step 4 after 4 attempts: GPT-5 returned empty/None content for Step 4
+ERROR:__main__:ASC 842 analysis error for session abe71569...: Analysis failed for Step 4: GPT-5 returned empty/None content for Step 4
+INFO:shared.analysis_manager:💾 Saving analysis record: 51d82af1
+INFO:shared.analysis_manager:Current auth token is valid
+ERROR:shared.analysis_manager:Database save failed - Status: 500
+ERROR:shared.analysis_manager:Response headers: {'Date': 'Tue, 14 Oct 2025 04:30:29 GMT', 'Content-Type': 'application/json', 'Content-Length': '459', 'Connection': 'keep-alive', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://127.0.0.1:3000', 'access-control-expose-headers': 'Authorization, Content-Type', 'Server': 'cloudflare', 'vary': 'Origin', 'x-railway-edge': 'railway/us-east4-eqdc4a', 'x-railway-request-id': '2u2GmYlyT8S7qT3sCx5-qw', 'cf-cache-status': 'DYNAMIC', 'Nel': '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}', 'Report-To': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=zFkV7Y5A%2FCDeHywUoqme9SjtvrEMnewqz56wubLKLCXV7SnBFLyn%2FfkoILtr6I3sYRbJ9P5UhFuYGaM6Ug3lQ8ihVJStvsA5eR7sAXQZK0Mo8Tk%3D"}]}', 'CF-RAY': '98e45776ec77d6e5-IAD', 'alt-svc': 'h3=":443"; ma=86400'}
+ERROR:shared.analysis_manager:Response body: {"details":"CheckViolation: new row for relation \"credit_transactions\" violates check constraint \"credit_transactions_reason_check\"\nDETAIL:  Failing row contains (39, 7, 20, 0.00, analysis_failed, 10025.00, e8d21da3, {\"error\": \"Analysis failed for Step 4 GPT-5 returned emptyNone c..., null, null, 2025-10-14 04:30:28.998816).\n","error":"Analysis billing failed","message":"The analysis could not be saved. Please contact support if this persists."}
+ERROR:shared.analysis_manager:Request URL: https://www.veritaslogic.ai/api/analysis/complete
+ERROR:shared.analysis_manager:Request payload: {'asc_standard': 'ASC 842', 'words_count': 586, 'api_cost': 0.37064699999999995, 'file_count': 1, 'tier_name': '3K (≤10 pages)', 'is_free_analysis': False, 'idempotency_key': 'manager_51d82af1_1760415324752', 'started_at': '2025-10-14T04:15:24.752252', 'duration_seconds': 903.9852690696716, 'success': False, 'error_message': 'Analysis failed for Step 4: GPT-5 returned empty/None content for Step 4'}
+ERROR:shared.analysis_manager:Parsed error response: {'details': 'CheckViolation: new row for relation "credit_transactions" violates check constraint "credit_transactions_reason_check"\nDETAIL:  Failing row contains (39, 7, 20, 0.00, analysis_failed, 10025.00, e8d21da3, {"error": "Analysis failed for Step 4 GPT-5 returned emptyNone c..., null, null, 2025-10-14 04:30:28.998816).\n', 'error': 'Analysis billing failed', 'message': 'The analysis could not be saved. Please contact support if this persists.'}
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-10-14T04:30:29.185776", "analysis_id": "51d82af1", "asc_standard": "ASC 842", "total_words": 586, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "failed", "success": false, "duration": 903.9852690696716, "error": "Analysis failed for Step 4: GPT-5 returned empty/None content for Step 4"}
+INFO:shared.analysis_manager:Completed analysis 51d82af1: failed - 904.0s

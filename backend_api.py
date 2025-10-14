@@ -1697,13 +1697,8 @@ def complete_analysis():
                 balance_after = current_balance  # Balance unchanged
                 logger.info(f"Analysis failed - no credits charged. Balance remains: {current_balance}")
                 
-                # Record zero-amount transaction for audit trail
-                cursor.execute("""
-                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason, 
-                                                   balance_after, memo_uuid, metadata, created_at)
-                    VALUES (%s, %s, %s, 'analysis_failed', %s, %s, %s, NOW())
-                """, (user_id, analysis_id, 0, balance_after, memo_uuid, 
-                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost), 'error': error_message}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost), 'error': error_message})))
+                # No credit transaction needed - analysis record already tracks failure with status='failed'
+                # Error details stored in analysis metadata
                 
             elif is_free_analysis:
                 # No free analyses in enterprise model - this is for backward compatibility only
