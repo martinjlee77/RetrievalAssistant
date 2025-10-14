@@ -245,7 +245,9 @@ class AnalysisManager:
                 'is_free_analysis': analysis_record.get('cost_charged', 0) == 0,
                 'idempotency_key': f"manager_{analysis_record.get('analysis_id', 'unknown')}_{int(analysis_record.get('start_time', 0)*1000)}",
                 'started_at': started_at,
-                'duration_seconds': analysis_record.get('duration_seconds', 0)
+                'duration_seconds': analysis_record.get('duration_seconds', 0),
+                'success': analysis_record.get('success', False),  # CRITICAL: Only charge if True
+                'error_message': analysis_record.get('error_message', None)
             }
             
             # Save to database via new unified API endpoint - use environment variable
