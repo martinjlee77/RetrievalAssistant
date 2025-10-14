@@ -1608,6 +1608,8 @@ def complete_analysis():
         idempotency_key = sanitize_string(data.get('idempotency_key', ''), 100)
         started_at = data.get('started_at')
         duration_seconds = max(0, int(data.get('duration_seconds', 0)))
+        success = data.get('success', False)  # CRITICAL: Only charge if True
+        error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
         
         # Server-side cost calculation (no more client-provided billing amounts)
         from shared.pricing_config import get_price_tier
@@ -1663,18 +1665,22 @@ def complete_analysis():
                     }), 200
             
             # Insert analysis record with all required fields (including billed_credits for backward compatibility)
-            logger.info(f"Inserting analysis record for user {user_id}")
+            # CRITICAL FIX: Set status based on success flag
+            analysis_status = 'completed' if success else 'failed'
+            logger.info(f"Inserting analysis record for user {user_id} with status: {analysis_status}")
             cursor.execute("""
                 INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
-                                    started_at, completed_at, duration_seconds, file_count)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, 'completed', %s, %s, NOW(), %s, %s)
+                                    started_at, completed_at, duration_seconds, file_count, error_message)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s)
                 RETURNING analysis_id
-            """, (user_id, asc_standard, words_count, api_cost, final_charged_credits, 
-                  final_charged_credits, tier_name, memo_uuid, started_at, duration_seconds, file_count))
+            """, (user_id, asc_standard, words_count, api_cost, 
+                  final_charged_credits if success else 0,  # Only set charged amount if successful
+                  final_charged_credits if success else 0,  # Only set billed amount if successful
+                  tier_name, analysis_status, memo_uuid, started_at, duration_seconds, file_count, error_message))
             
             analysis_id = cursor.fetchone()['analysis_id']
-            logger.info(f"Analysis record created with ID: {analysis_id}")
+            logger.info(f"Analysis record created with ID: {analysis_id}, status: {analysis_status}")
             
             # Get current balance for balance_after calculation
             logger.info(f"Getting current balance for user {user_id}")
@@ -1682,7 +1688,21 @@ def complete_analysis():
             current_balance = cursor.fetchone()['credits_balance']
             logger.info(f"Current balance: {current_balance}")
             
-            if is_free_analysis:
+            # CRITICAL FIX: Only charge credits if analysis succeeded
+            if not success:
+                # Failed analysis - record but DON'T charge
+                balance_after = current_balance  # Balance unchanged
+                logger.info(f"Analysis failed - no credits charged. Balance remains: {current_balance}")
+                
+                # Record zero-amount transaction for audit trail
+                cursor.execute("""
+                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason, 
+                                                   balance_after, memo_uuid, metadata, created_at)
+                    VALUES (%s, %s, %s, 'analysis_failed', %s, %s, %s, NOW())
+                """, (user_id, analysis_id, 0, balance_after, memo_uuid, 
+                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost), 'error': error_message}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost), 'error': error_message})))
+                
+            elif is_free_analysis:
                 # No free analyses in enterprise model - this is for backward compatibility only
                 pass  # No database update needed since free_analyses_remaining field was removed
                 
@@ -1697,11 +1717,12 @@ def complete_analysis():
                       json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
                 
             else:
+                # Successful analysis - charge credits
                 # Calculate new balance after charge
                 balance_after = max(current_balance - final_charged_credits, 0)
                 
                 # Deduct from credits balance
-                logger.info(f"Updating balance from {current_balance} to {balance_after}")
+                logger.info(f"Successful analysis - updating balance from {current_balance} to {balance_after}")
                 cursor.execute("""
                     UPDATE users 
                     SET credits_balance = %s
