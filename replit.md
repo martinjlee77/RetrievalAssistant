@@ -3,6 +3,12 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform designed for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI technology. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining the rigor and citation quality expected in professional environments, and allows professionals to focus on judgment and client advisory.
 
+## Recent Changes
+
+### October 14, 2025
+- **ASC 805 Bug Fix**: Fixed NameError for undefined variables (`analysis_key`, `session_id`, `memo_key`) that caused memo generation to fail at final step. Added session initialization code matching ASC 842 pattern.
+- **Header Visibility Fix**: Updated all ASC standards (606, 718, 842, 805, 340-40) to use white (#ffffff) text for h2/h3 headers in PDF memos for better contrast on dark backgrounds.
+
 ## User Preferences
 - **Communication Style**: Simple, everyday language for technical explanations
 - **Business Focus**: Enterprise-grade professional service targeting Big 4 and large enterprise teams
