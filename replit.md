@@ -100,6 +100,21 @@ exec python backend_api.py --port "$PORT"  # ❌ This uses Flask dev server
 3. `nixpacks.toml`
 4. `Procfile` (legacy, not used by Railway's Nixpacks)
 
+### Database Schema Updates Needed
+
+**IMPORTANT: Production Database Migration Required**
+
+The production Railway database is missing the `error_message` column in the `analyses` table. This column is needed to track failure reasons for the "no charge on failure" policy.
+
+**Migration SQL (to be run on Railway production database):**
+```sql
+ALTER TABLE analyses ADD COLUMN error_message TEXT;
+```
+
+**Temporary Workaround:** The backend code (backend_api.py line 1677) currently excludes this column from INSERT statements to prevent errors. Once the production database is updated, uncomment the error_message field in the INSERT statement.
+
+**Status:** Development database has this column. Production database needs update.
+
 ## External Dependencies
 - **Streamlit**: Web application framework.
 - **pandas**: Data manipulation and analysis.
