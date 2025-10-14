@@ -360,8 +360,8 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 authoritative_context = knowledge_search.search_for_step(
                     step_num, contract_text)
 
-                # Analyze the step with additional context
-                step_result = analyzer._analyze_step(
+                # Analyze the step with additional context (using retry wrapper)
+                step_result = analyzer._analyze_step_with_retry(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
@@ -414,6 +414,9 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Signal completion with session isolation
         st.session_state[analysis_key] = True
         
+        # CRITICAL FIX: Mark analysis as successful and charge customer
+        analysis_manager.complete_analysis(analysis_id, success=True)
+        
         # Store memo data with session isolation
         memo_key = f'asc805_memo_data_{session_id}'
         st.session_state[memo_key] = {
@@ -464,6 +467,11 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
     except Exception as e:
         # Clear the progress message even on error
         progress_message_placeholder.empty()
+        
+        # CRITICAL FIX: Mark analysis as failed - NO CHARGE
+        if 'analysis_id' in locals():
+            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
+        
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
         logger.error(f"ASC 805 analysis error for session {session_id[:8]}...: {str(e)}")
 
