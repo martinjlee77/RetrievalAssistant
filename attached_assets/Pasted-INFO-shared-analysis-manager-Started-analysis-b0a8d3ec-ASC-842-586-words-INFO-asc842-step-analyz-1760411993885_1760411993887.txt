@@ -1,0 +1,75 @@
+INFO:shared.analysis_manager:Started analysis b0a8d3ec: ASC 842 - 586 words
+INFO:asc842.step_analyzer:🤖 Using GPT-5 for main analysis, GPT-5-mini for light tasks
+INFO:chromadb.telemetry.product.posthog:Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+INFO:shared.knowledge_base:ChromaDB client initialized for asc842_knowledge_base
+INFO:shared.knowledge_base:Embedding function initialized successfully
+INFO:shared.knowledge_base:Collection 'asc842_leases' loaded successfully
+INFO:asc842.knowledge_search:ASC 842 knowledge search initialized successfully
+INFO:asc842.step_analyzer:🏢 Extracting lessee/tenant name from lease agreement...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5-mini, Input tokens: 953, Output tokens: 8, Cost: $0.0010
+INFO:shared.api_cost_tracker:Tracked entity_extraction request: $0.0010 (Total: $0.0010)
+INFO:asc842.step_analyzer:✓ Lessee/tenant identified: InnovateTech Solutions, Inc.
+INFO:__main__:LLM extracted entity name: InnovateTech Solutions, Inc.
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.45s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 1
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 1
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2979, Output tokens: 1714, Cost: $0.0812
+INFO:shared.api_cost_tracker:Tracked step_1_analysis request: $0.0812 (Total: $0.0822)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 1 (length: 7814) sample: ### Step 1: Scope, identify a lease, and determine the enforceable period and lease term
+**Analysis...
+INFO:__main__:DEBUG: Completed step 1
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.28s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 2
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 2
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2670, Output tokens: 1714, Cost: $0.0781
+INFO:shared.api_cost_tracker:Tracked step_2_analysis request: $0.0781 (Total: $0.1603)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 2 (length: 7236) sample: ### Step 2: Identify components and determine lease payments
+**Analysis:**  
+- Lease vs. nonlease c...
+INFO:__main__:DEBUG: Completed step 2
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.29s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 3
+INFO:asc842.step_analyzer:💰 Extracting lease payment schedule and performing NPV calculations...
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 3
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2838, Output tokens: 1893, Cost: $0.0852
+INFO:shared.api_cost_tracker:Tracked step_3_analysis request: $0.0852 (Total: $0.2455)
+INFO:asc842.step_analyzer:DEBUG: Clean markdown for Step 3 (length: 8215) sample: ### Step 3: Classify the lease and measure at commencement
+**Analysis:**
+- Lease identification an...
+INFO:__main__:DEBUG: Completed step 3
+INFO:shared.knowledge_base:🔍 Querying asc842_leases knowledge base...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:shared.knowledge_base:✓ Retrieved 8 chunks from ChromaDB (0.18s)
+INFO:asc842.knowledge_search:Retrieved guidance for Step 4
+INFO:asc842.step_analyzer:DEBUG: Making API call to gpt-5 for Step 4
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5, Input tokens: 2575, Output tokens: 0, Cost: $0.0258
+INFO:shared.api_cost_tracker:Tracked step_4_analysis request: $0.0258 (Total: $0.2712)
+ERROR:asc842.step_analyzer:ERROR: GPT-5 returned empty/None content for Step 4
+ERROR:asc842.step_analyzer:API error in step 4: GPT-5 returned empty/None content for Step 4
+ERROR:__main__:ASC 842 analysis error for session 1888e6d2...: GPT-5 returned empty/None content for Step 4
+INFO:shared.analysis_manager:💾 Saving analysis record: b0a8d3ec
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: b0a8d3ec
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-10-14T03:16:38.207033", "analysis_id": "b0a8d3ec", "asc_standard": "ASC 842", "total_words": 586, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "failed", "success": false, "duration": 415.0338182449341, "error": "GPT-5 returned empty/None content for Step 4"}
+INFO:shared.analysis_manager:Completed analysis b0a8d3ec: failed - 415.0s

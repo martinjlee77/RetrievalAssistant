@@ -450,7 +450,7 @@ Respond with ONLY the entity name, nothing else."""
             }
             
         except Exception as e:
-            logger.error(f"API error in step {step_num}: {str(e)}")
+            # Let exceptions propagate to retry logic in _analyze_step_with_retry
             raise
     
     def _get_markdown_system_prompt(self) -> str:
