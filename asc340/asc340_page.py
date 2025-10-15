@@ -90,7 +90,7 @@ def render_asc340_page():
             
             # Re-run policy note and "Analyze Another" button
             st.markdown("---")
-            st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
+            st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. Contact Support to request a re-run.")
             
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_existing"):
                 # Clear session state for new analysis
@@ -556,7 +556,7 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                     # Re-run policy note and "Analyze Another" button
                     st.markdown("---")
-                    st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. [Contact us](contact.html) to request a revision.")
+                    st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. Contact Support to request a re-run.")
                     
                     if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
                         # Clear session state for new analysis
