@@ -226,7 +226,7 @@ class CleanMemoGenerator:
         content = re.sub(r'^### (.+)$', r'<h3 style="color: #ffffff; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">\1</h3>', content, flags=re.MULTILINE)
         
         # Style bold text
-        content = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color: #2c3e50;">\1</strong>', content)
+        content = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color: #ffffff;">\1</strong>', content)
         
         # Convert bullet points
         content = re.sub(r'^- (.+)$', r'<li style="margin-bottom: 5px;">\1</li>', content, flags=re.MULTILINE)

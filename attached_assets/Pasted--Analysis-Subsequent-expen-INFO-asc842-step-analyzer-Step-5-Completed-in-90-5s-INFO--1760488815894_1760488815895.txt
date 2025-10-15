@@ -1,0 +1,58 @@
+**Analysis:**  
+Subsequent expen...
+INFO:asc842.step_analyzer:✓ Step 5: Completed in 90.5s
+INFO:__main__:DEBUG: Completed step 5
+INFO:asc842.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc842.step_analyzer:DEBUG: steps_data keys: ['step_1', 'step_2', 'step_3', 'step_4', 'step_5']
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 1: We conclude the contract contains a lease under ASC 842 because it conveys to InnovateTech the right...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 2: We conclude there is a single lease component (the right to use Suite 200) and no nonlease component...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 3: We conclude the lease is an operating lease because there is no transfer of ownership, no purchase o...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 4: We conclude the arrangement is an operating lease with a five‑year lease term. Initial measurement a...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 5: We conclude that subsequent accounting will follow the classification pattern: finance leases recogn...
+INFO:asc842.step_analyzer:DEBUG: Combined conclusions length: 3422
+INFO:asc842.step_analyzer:→ Generating executive summary...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.384194 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.810912 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+ERROR:asc842.step_analyzer:Error generating executive summary: Error code: 500 - {'error': {'message': 'The server had an error while processing your request. Sorry about that!', 'type': 'server_error', 'param': None, 'code': None}}
+INFO:asc842.step_analyzer:→ Generating background section...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.488583 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.760164 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+ERROR:asc842.step_analyzer:Error generating background section: Error code: 500 - {'error': {'message': 'The server had an error while processing your request. Sorry about that!', 'type': 'server_error', 'param': None, 'code': None}}
+INFO:asc842.step_analyzer:→ Generating final conclusion...
+INFO:asc842.step_analyzer:Extracting conclusions from 5 steps
+INFO:asc842.step_analyzer:DEBUG: steps_data keys: ['step_1', 'step_2', 'step_3', 'step_4', 'step_5']
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 1: We conclude the contract contains a lease under ASC 842 because it conveys to InnovateTech the right...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 2: We conclude there is a single lease component (the right to use Suite 200) and no nonlease component...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 3: We conclude the lease is an operating lease because there is no transfer of ownership, no purchase o...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 4: We conclude the arrangement is an operating lease with a five‑year lease term. Initial measurement a...
+INFO:asc842.step_analyzer:DEBUG: Extracted conclusion for step 5: We conclude that subsequent accounting will follow the classification pattern: finance leases recogn...
+INFO:asc842.step_analyzer:DEBUG: Combined conclusions length: 3422
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.482368 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+INFO:openai._base_client:Retrying request to /chat/completions in 0.911189 seconds
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 500 Internal Server Error"
+ERROR:asc842.step_analyzer:Final conclusion generation failed: Error code: 500 - {'error': {'message': 'The server had an error while processing your request. Sorry about that!', 'type': 'server_error', 'param': None, 'code': None}}
+INFO:asc842.clean_memo_generator:Added clean step 1 content (6725 chars)
+INFO:asc842.clean_memo_generator:Added clean step 2 content (6389 chars)
+INFO:asc842.clean_memo_generator:Added clean step 3 content (9258 chars)
+INFO:asc842.clean_memo_generator:Added clean step 4 content (10686 chars)
+INFO:asc842.clean_memo_generator:Added clean step 5 content (10777 chars)
+INFO:asc842.clean_memo_generator:Clean memo generated: 52612 chars, 5/5 steps
+INFO:shared.analysis_manager:💾 Saving analysis record: 3ba065a7
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: 3ba065a7
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-10-15T00:37:45.456238", "analysis_id": "3ba065a7", "asc_standard": "ASC 842", "total_words": 586, "file_count": 1, "tier": "3K (\u226410 pages)", "cost": 195.0, "user_id": 7, "status": "completed", "success": true, "duration": 549.7828915119171, "error": null}
+INFO:shared.analysis_manager:Completed analysis 3ba065a7: success - 549.8s
+INFO:asc842.clean_memo_generator:Prepended memo ID 3ba065a7 to memo content
+INFO:asc842.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 3ba065a7\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by Veritas'
+INFO:asc842.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 42132 bytes
+INFO:asc842.clean_memo_generator:PDF generation successful: 42132 bytes
