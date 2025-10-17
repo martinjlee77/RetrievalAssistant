@@ -376,6 +376,14 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     gap: 2rem; /* ← Change this value to adjust spacing */
 }
+.hero p.hero-footnote {
+    font-size: 0.9rem; 
+    font-style: italic; 
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 3rem; 
+    margin-bottom: 0;
+    max-width: 800px;
+}
 /* Use .btn.btn--primary instead */
 .demo-link,
 .secondary-cta {
