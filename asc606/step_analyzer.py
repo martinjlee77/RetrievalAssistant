@@ -198,6 +198,9 @@ Respond with ONLY a JSON object in this exact format:
     def deidentify_contract_text(self, contract_text: str, vendor_name: Optional[str], customer_name: Optional[str]) -> str:
         """
         Replace both party names with generic terms for privacy.
+        Handles whitespace variations, line breaks, hyphenated line wraps, and punctuation differences.
+        
+        Strategy: Normalize both text and party names consistently, then do pattern matching.
         
         Args:
             contract_text: Original contract text
@@ -206,38 +209,118 @@ Respond with ONLY a JSON object in this exact format:
             
         Returns:
             De-identified contract text with party names replaced
+            
+        Raises:
+            ValueError: If de-identification fails (no replacements made) to prevent privacy leakage
         """
         if not vendor_name and not customer_name:
-            logger.warning("No party names to de-identify, returning original text")
+            logger.warning("⚠️ No party names to de-identify, returning original text")
             return contract_text
         
-        deidentified_text = contract_text
+        # Helper function for text normalization
+        def normalize_text(text: str) -> str:
+            """
+            Normalize text to handle PDF extraction artifacts.
+            - Removes soft hyphens (Unicode U+00AD)
+            - Collapses hyphen + newline (line wraps) into space
+            - Normalizes multiple whitespace to single space
+            """
+            # Remove Unicode soft hyphen character
+            text = text.replace('\u00AD', '')
+            
+            # Replace hyphen + newline/whitespace with single space
+            # This handles line-wrapped text like "Smith-\nJones LLC" → "Smith Jones LLC"
+            text = re.sub(r'-\s*\n\s*', ' ', text)
+            
+            # Normalize multiple whitespace to single space
+            text = re.sub(r'\s+', ' ', text)
+            
+            return text
+        
+        # STEP 1: Normalize contract text
+        normalized_text = normalize_text(contract_text)
+        
+        # STEP 2: Normalize extracted party names
+        normalized_vendor = normalize_text(vendor_name) if vendor_name else None
+        normalized_customer = normalize_text(customer_name) if customer_name else None
+        
+        deidentified_text = normalized_text
         replacements_made = []
+        replacement_count = {}
+        
+        # Helper function to create flexible pattern
+        def create_flexible_pattern(name: str) -> str:
+            """
+            Create regex pattern that handles:
+            - Whitespace variations (spaces, tabs, newlines)
+            - Hyphen/space equivalence (handles line-wrapped hyphenated names)
+            - Punctuation variations (periods, commas)
+            """
+            # Escape the name
+            escaped = re.escape(name)
+            
+            # Replace escaped hyphens with pattern matching hyphen OR space
+            # This handles: "Smith-Jones" matching "Smith Jones" or "Smith-Jones"
+            escaped = escaped.replace(r'\-', r'(?:-|\s)')
+            
+            # Replace escaped spaces with pattern matching space OR hyphen
+            # This handles: "Smith Jones" matching "Smith-Jones" or "Smith Jones"
+            escaped = escaped.replace(r'\ ', r'(?:\s+|-)')
+            
+            # Make periods optional (handles "Inc." vs "Inc")
+            escaped = escaped.replace(r'\.', r'\.?')
+            
+            # Make commas optional (handles "Corp," vs "Corp")
+            escaped = escaped.replace(r'\,', r'\,?\s*')
+            
+            # Word boundary at start and end
+            return r'\b' + escaped + r'\b'
         
         # Replace vendor with "the Company"
-        if vendor_name:
-            # Create pattern for case-insensitive whole-word matching
-            # Handle variations like "Company Inc.", "Company, Inc.", "Company Inc"
-            pattern = re.escape(vendor_name)
-            pattern = pattern.replace(r'\.', r'\.?')  # Make periods optional
-            pattern = pattern.replace(r'\,', r'\,?')  # Make commas optional
-            pattern = r'\b' + pattern + r'\b'
+        if normalized_vendor:
+            pattern = create_flexible_pattern(normalized_vendor)
             
-            deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
-            replacements_made.append(f"vendor '{vendor_name}' → 'the Company'")
+            # Count matches before replacement for logging
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"vendor '{vendor_name}' → 'the Company' ({match_count} occurrences)")
+                replacement_count['vendor'] = match_count
+            else:
+                logger.warning(f"⚠️ Vendor name '{vendor_name}' (normalized: '{normalized_vendor}') not found in contract text")
+                replacement_count['vendor'] = 0
         
         # Replace customer with "the Customer"
-        if customer_name:
-            pattern = re.escape(customer_name)
-            pattern = pattern.replace(r'\.', r'\.?')
-            pattern = pattern.replace(r'\,', r'\,?')
-            pattern = r'\b' + pattern + r'\b'
+        if normalized_customer:
+            pattern = create_flexible_pattern(normalized_customer)
             
-            deidentified_text = re.sub(pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
-            replacements_made.append(f"customer '{customer_name}' → 'the Customer'")
+            # Count matches before replacement
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"customer '{customer_name}' → 'the Customer' ({match_count} occurrences)")
+                replacement_count['customer'] = match_count
+            else:
+                logger.warning(f"⚠️ Customer name '{customer_name}' (normalized: '{normalized_customer}') not found in contract text")
+                replacement_count['customer'] = 0
         
-        if replacements_made:
-            logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
+        # CRITICAL: Hard stop if no replacements were made to prevent privacy leakage
+        if not replacements_made:
+            error_msg = (
+                f"❌ PRIVACY PROTECTION FAILURE: Could not de-identify contract text. "
+                f"Extracted party names (vendor: '{vendor_name}', customer: '{customer_name}') "
+                f"were not found in the contract. Analysis cannot proceed to prevent sending "
+                f"un-de-identified data to AI provider."
+            )
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+        
+        # Log success
+        logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
         
         return deidentified_text
     

@@ -526,12 +526,34 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     
                     # De-identify contract text by replacing party names
                     if vendor_name or customer_name_extracted:
-                        combined_text = analyzer.deidentify_contract_text(
-                            combined_text, 
-                            vendor_name, 
-                            customer_name_extracted
-                        )
-                        logger.info("✓ Contract text de-identified for privacy")
+                        try:
+                            combined_text = analyzer.deidentify_contract_text(
+                                combined_text, 
+                                vendor_name, 
+                                customer_name_extracted
+                            )
+                            logger.info("✓ Contract text de-identified for privacy")
+                        except ValueError as ve:
+                            # De-identification failed - hard stop to prevent privacy leakage
+                            logger.error(f"De-identification failed: {str(ve)}")
+                            st.error(
+                                "❌ **Privacy Protection Error**\n\n"
+                                "We were unable to de-identify the party names in your contract before analysis. "
+                                "This is a safety feature to protect your data privacy.\n\n"
+                                "**What happened:** The system extracted party names but couldn't find them in the "
+                                "contract text to replace them with generic terms.\n\n"
+                                "**What to do:** Please try uploading the contract again. If the issue persists, "
+                                "contact support@veritaslogic.ai."
+                            )
+                            # Mark analysis as failed (no charge)
+                            if analysis_id:
+                                analysis_manager.complete_analysis(
+                                    analysis_id, 
+                                    success=False, 
+                                    error_message="De-identification failure - privacy protection"
+                                )
+                            st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed safely, you were not charged.")
+                            return
                     else:
                         logger.warning("No party names extracted, proceeding without de-identification")
                     
@@ -539,8 +561,9 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     customer_name = "the Customer"
                     
                 except Exception as e:
-                    logger.error(f"Party extraction/de-identification failed: {str(e)}")
-                    # Safe fallback - proceed without de-identification
+                    logger.error(f"Party extraction failed: {str(e)}")
+                    # If extraction itself fails, proceed without de-identification
+                    # (extraction is best-effort, de-identification has hard stop)
                     customer_name = "the Customer"
                     
             # Setup progress tracking

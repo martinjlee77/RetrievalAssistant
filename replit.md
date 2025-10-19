@@ -5,6 +5,10 @@ VeritasLogic.ai is a premium enterprise AI platform designed for accounting firm
 
 ## Recent Changes
 
+### October 19, 2025
+- **Privacy Enhancement - Contract De-identification (ASC 606)**: Implemented automated dual-party extraction and de-identification system for ASC 606 revenue contracts. Uses GPT-5-mini to extract both vendor/seller (primary party) and customer/buyer (counterparty) names, then replaces them with generic terms ("the Company" and "the Customer") before analysis. Provides enhanced privacy protection by preventing party names from being sent to OpenAI API. Enabled by default with safe fallback handling if extraction fails.
+- **Privacy Documentation Updates**: Updated privacy.html and terms.html to accurately reflect OpenAI's 30-day data retention policy for abuse monitoring (replacing previous "data retention turned off" language). Added de-identification disclosure as privacy enhancement feature.
+
 ### October 14, 2025
 - **ASC 805 Bug Fix**: Fixed NameError for undefined variables (`analysis_key`, `session_id`, `memo_key`) that caused memo generation to fail at final step. Added session initialization code matching ASC 842 pattern.
 - **Header Visibility Fix**: Updated all ASC standards (606, 718, 842, 805, 340-40) to use white (#ffffff) text for h2/h3 headers in PDF memos for better contrast on dark backgrounds.
@@ -66,6 +70,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Hybrid Financial Calculation System**: Implemented "Extract-Then-Calculate" pattern for financial amounts, ensuring accuracy by using Python for calculations after AI extraction.
 - **Modular Standard Modules**: Designed with re-usable architectural patterns across different accounting standards.
 - **Unified LLM Request Architecture**: All ASC standards (606, 340-40, 718, 842, 805) implement standardized `_make_llm_request()` helper method for centralized API routing between GPT-5 (Responses API) and GPT-4o (Chat Completions API). Ensures consistent model handling and future-proof architecture for new OpenAI models.
+- **Privacy Protection - Contract De-identification**: Automated dual-party extraction and text replacement system implemented for ASC 606 (planned rollout to other standards). Extracts both contract parties using GPT-5-mini JSON output, replaces names with generic identifiers before analysis. Safe fallback handling ensures analysis proceeds even if extraction fails. Standard-specific party mappings: ASC 606 (vendor/customer), ASC 842 (lessee/lessor), ASC 718 (granting company/recipient), ASC 805 (acquirer/target), ASC 340-40 (company/employee or third party).
 
 ## Deployment & Production Configuration
 
