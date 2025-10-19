@@ -1,0 +1,37 @@
+Overall: Your plan is sensible and lean. I agree with most of the de-scoping. A few low-effort safeguards are still worth adding now to avoid hidden risks and to be ready if ZDR is denied.
+
+What I agree with
+
+Do immediately: Turn off payload logging + add sanitize_for_log(). Biggest win.
+Quick wins: “Delete Analysis” button, public subprocessor page.
+Wait on heavy pseudonymization and complex routing until we hear back on ZDR.
+No need for local embeddings now (you don’t embed customer docs).
+JIT support access controls can wait.
+Where I’d tighten (small changes, high value)
+
+Don’t claim “files processed in memory” unless verified. Many libs (unstructured, pdfplumber, Camelot/Tabula, WeasyPrint) write temp files.
+Action: Audit temp paths; force TemporaryDirectory + explicit cleanup; ensure TMPDIR is ephemeral; add a simple sweeper for temp dirs in case of crashes. This is a light cron/thread, not a complex scheduler.
+Safe analysis history: Stop storing raw file names (often client-identifying).
+Action: Store hashed names or generic labels (Doc 1, Doc 2). Low effort, good privacy optics.
+“error_message” hygiene: That DB column must be scrubbed.
+Action: Sanitize exceptions so error_message never contains content snippets or PII.
+Minimal masking (even if ZDR approved): Stateless masking for rare, high-risk identifiers won’t hurt accuracy.
+Action: Regex-mask SSN/EIN, bank/IBAN/routing, credit cards, emails/phone numbers when present in prompts; keep amounts, dates, names intact. No token mapping, no rehydration—just masking. Toggle-able.
+If OpenAI ZDR is denied
+
+Primary path: Switch to Azure OpenAI (no training, regional control; disclose 30-day retention).
+Secondary mitigation (if sticking with OpenAI): Turn on the minimal masking above + aggressive context minimization (send only relevant excerpts). Full pseudonymization stays optional last resort.
+Add a provider switch: Since you already have a unified _make_llm_request(), add a simple env/tenant flag to flip between OpenAI and Azure. Not full routing—just a clean switch so we can pivot quickly.
+Document and prove it
+
+Purge language: “Deleted on completion; verified by periodic cleanup.” Keep logs of deletion events (IDs/timestamps, not content).
+Subprocessor page: Include retention/training stance (e.g., “OpenAI: no training; retention 0 days if ZDR enabled, otherwise up to 30 days”).
+Metadata retention: Cap at 12 months (as you suggested), configurable per enterprise if needed.
+Net: Keep your lean plan, plus
+
+Temp-file audit + simple sweeper
+Safe file names in history
+Sanitized error_message
+Lightweight stateless masking for high-risk identifiers
+One-flag provider switch if ZDR is denied
+These additions are low effort, won’t break analysis quality, and cover the main diligence questions you’ll get.

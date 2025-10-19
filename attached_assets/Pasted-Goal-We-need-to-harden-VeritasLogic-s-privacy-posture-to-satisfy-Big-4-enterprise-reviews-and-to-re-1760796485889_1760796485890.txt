@@ -1,0 +1,186 @@
+Goal We need to harden VeritasLogic’s privacy posture to satisfy Big 4/enterprise reviews, and to reduce risk if OpenAI doesn’t grant Zero Data Retention (ZDR). Below is a prioritized implementation plan, concrete requirements, and open questions for you to raise.
+
+Assumptions and constraints
+
+Current state: We use OpenAI API; ZDR is not enabled. We do not persist uploaded files post‑analysis; we do store analysis metadata (incl. file names) for billing/history.
+Risk to mitigate: If OpenAI retains prompts for abuse monitoring, our payloads (docs, prompts) could sit in their logs for a period. We should minimize what we send and strip direct identifiers.
+Architecture hooks: All standards route LLM calls via _make_llm_request(). We can add a preprocessing step here with minimal blast radius.
+Workstream 0 (immediate): Stop payload leakage in logs What to build
+
+Disable all request/response body logging everywhere:
+Streamlit: ensure no debug logs with content; set STREAMLIT_LOG_LEVEL=warning in prod.
+Gunicorn: keep access logs; ensure error logs do not include payloads; add a logging.Filter that redacts any string matching PII patterns if exceptions include variables.
+OpenAI SDK: set logging to WARN; never log request objects.
+Any APM/trace tool: disable body capture and “record HTTP bodies” features.
+Add a sanitize_for_log() utility used by all exception handlers. Redact:
+Names, emails, phone, addresses, account/IBAN, tax IDs, invoice/contract numbers.
+13–19 digit sequences, SSN/EIN formats, and common token patterns.
+Verify that backend_api.py never logs prompt or chunk text. Replace with structured metrics only.
+Acceptance criteria
+
+Grep or log scanning for high-entropy/PII patterns on staging shows zero prompt/body leakage after running seeded tests with fake SSN, IBAN, emails, etc.
+Exceptions show analysis_id, user_id, model name, duration, but no raw text.
+Open questions
+
+Do we have any middleware or reverse proxy that could log bodies (e.g., dev servers, API gateways)? If yes, we need to disable that.
+Workstream 1: Pre‑send pseudonymization (“Privacy Mode”) Goal: Remove direct identifiers before any LLM/embedding call; rehydrate originals in the final output. This mitigates retained logs at OpenAI and other vendors.
+
+What to build
+
+Deterministic pseudonymization module:
+Detect direct identifiers via regex + NLP:
+People names, organization names, emails, phone numbers, street addresses.
+Account/IBAN, routing numbers, credit card numbers (Luhn), tax IDs (SSN/EIN), invoice/contract numbers, purchase order numbers.
+Deterministic tokens with types: PERSON_3, ORG_1, EMAIL_2, TAXID_1, ACCT_4, DOCID_7, ADDRESS_2.
+Implementation: HMAC-SHA256(secret_salt, raw_value) → first 8 chars; token = TYPE + "_" + suffix. Store raw->token and token->raw in a session map.
+Allowlist and preserve_terms per standard/engagement:
+Some terms must not be redacted (e.g., SKU names critical to ASC 606 analysis). Provide an allowlist per run and per tenant.
+Apply pseudonymization at the right points:
+Immediately after extraction/OCR and before chunking or embedding.
+Use the same mapping for: LLM prompts, any embeddings, and intermediate summaries.
+Rehydrate before final DOCX/HTML/Markdown export and before displaying citations/quotes to the user.
+Memory and lifecycle:
+Mapping lives only in memory for the analysis session (or in an encrypted, expiring cache keyed by analysis_id).
+Destroy mapping when the analysis completes or on failure cleanup.
+UI/API:
+Add a Privacy Mode toggle to the analysis form; default ON for enterprise tenants and new signups.
+Add a stricter “Privacy Mode: Strict” that redacts organization names as well (tokenize client names).
+Suggested tools
+
+Microsoft Presidio, spaCy NER, plus regex. Start with regex + simple NER and iterate.
+HMAC via Python’s hmac/sha256 with a rotating server-side secret.
+Acceptance criteria
+
+Unit tests: Given a seeded sample contract with PII, the LLM sees only tokens; the final memo restores originals accurately.
+Benchmarks: Redaction does not degrade key tasks > acceptable threshold (we’ll define after initial tests).
+Privacy Mode is enforced for embeddings and generation alike.
+Open questions
+
+Which identifier types are absolutely required to preserve for accuracy in each standard (e.g., ASC 606 product names)? We need your view to seed allowlists.
+Workstream 1b: Keep customer embeddings ephemeral/local Goal: Avoid sending raw customer text to external embedding APIs, especially if ZDR is not granted.
+
+Options
+
+Preferred: Use a local embedding model (e.g., BAAI/bge-small-en or sentence-transformers/all-MiniLM-L6-v2) for customer documents. Store vectors in a session-scoped in-memory index (e.g., FAISS) and purge with the same SLA.
+If we must use OpenAI embeddings:
+Only embed pseudonymized text.
+Add “Privacy Mode: Strict” to force local embeddings.
+Acceptance criteria
+
+For customer docs, no plaintext leaves our box for embeddings.
+Index is destroyed automatically at session end and by a periodic sweeper job.
+Open questions
+
+Are we currently embedding customer content or sending full chunks directly to the LLM? Please confirm the flow so we scope this correctly.
+Workstream 2: Concrete purge SLAs + self-serve deletion Goal: Codify and enforce deletion timelines and give users control.
+
+What to build
+
+Purge scheduler:
+Default auto-delete for source files, extracted text, temporary embeddings, token maps, and intermediate artifacts within 24–72 hours post-completion.
+“Delete on completion” immediate purge option (no grace window).
+Retry-safe cleanup job that re-attempts deletions.
+Backups:
+Document what lands in backups (DB only?). Ensure no Customer Content is ever in backups—only metadata.
+If any ephemeral store can hit disk, ensure it writes to a tmp path excluded from backups, or mount tmpfs.
+Self-serve deletion:
+“Delete analysis” button that removes the analysis history entry and triggers deletion of any remaining artifacts for that analysis_id.
+File names:
+Add tenant policy to avoid storing raw file names (store Doc 1/Doc 2 or hashed names). Existing records remain but new entries follow policy.
+Metadata retention:
+Keep minimal metadata (word counts, cost, model, durations) for 12–24 months; configurable per tenant if needed.
+Acceptance criteria
+
+A scheduled job removes artifacts reliably; manual “delete analysis” works immediately.
+We can produce logs showing deletion events per analysis_id, without revealing content.
+Open questions
+
+Confirm where temp files live today (local FS on Railway, S3, other?). We need specifics to wire deletion correctly.
+Do we ever cache chunks or prompts in any store (Redis, DB, analytics)?
+Workstream 3: Model/vendor routing and controls (in case ZDR is not granted) Goal: Flexibly route by tenant/policy to minimize exposure.
+
+What to build
+
+Central model policy in _make_llm_request():
+Tenant-level config: allowed models, provider preference, region pinning (US/EU), and privacy mode enforcement.
+If ZDR off: enforce Privacy Mode and either
+Use Azure OpenAI (data not used for training; 30-day logging by default; can explore no-log options) with regional deployment, or
+Use OpenAI but only with pseudonymized prompts, and limit context size via aggressive snippet selection.
+Strict mode tasks:
+Convert long-form analysis into “extract-then-analyze”: extract structured facts locally (amounts, dates, terms) and send only structure + small pseudonymized excerpts to the LLM.
+Add guardrails: max characters per request, chunk budget, and “evidence excerpt only” prompts.
+Provider failover:
+If a provider is unavailable or policy-disallowed, degrade gracefully with a safer alternative (e.g., smaller local model for preliminary parsing; notify user of potential quality impact).
+Acceptance criteria
+
+Per-tenant policy effective at runtime; logged at policy level (not payload).
+With ZDR disabled, no raw PII sent; only pseudonymized tokens and minimal context.
+Open questions
+
+Do we have interest in Azure OpenAI region pinning (US/EU) soon? If yes, we’ll need infra changes and a brief POC.
+Workstream 4: Subprocessor registry and change notifications What to build
+
+Public JSON/HTML page listing subprocessors:
+Vendor, purpose, data categories, location/regions, transfer mechanism (SCCs), and whether they train or retain data.
+Admin notification mechanism:
+Email enterprise admins 30 days prior to material vendor additions.
+Acceptance criteria
+
+Page is live and versioned (include last updated).
+Change notice workflow tested with a staging vendor entry.
+Workstream 5: Support access controls and audit Goal: Make internal access rare, approved, and auditable.
+
+What to build
+
+Just-in-time (JIT) support access:
+A customer must grant a time-boxed support window for Veritas staff to view analysis metadata (not content) or to request a re-upload.
+Access scoped to tenant and analysis_id; approval stored and auto-expires.
+Audit logs:
+Record who accessed what, when, and why; exportable on request.
+No content in tickets:
+Block copy/paste of Customer Content into ticketing; link to analysis_id instead.
+Acceptance criteria
+
+Support cannot access any content by default; JIT request + approval required.
+Audit log shows all admin/support access events.
+Open questions
+
+What support tooling do we use now (email only?) and how will we gate access?
+Technical notes and suggestions
+
+Pseudonymization hooks:
+Insert directly before any call to _make_llm_request() and before creating embeddings.
+Ensure quoting/citation code rehydrates tokens inside quotes taken from client docs.
+OCR/Scans:
+Redaction must run on OCR output as well; include language-specific patterns if needed (en-US first).
+Performance:
+Pseudonymization and local embeddings add small CPU cost; on typical 10–60k word docs this is minor compared to LLM time.
+Testing:
+Build golden test files with synthetic PII. Verify that:
+No PII reaches model inputs.
+Outputs match original (rehydrated) text in all places where tokens were inserted.
+Deletion jobs nuke artifacts on time.
+Developer questions I need your input on
+
+Current data flow: For full-document analyses, do we send entire chunks to the LLM, or do we perform any local retrieval/minimization first?
+Temporary storage: Where exactly do extracted text, intermediate chunks, and tables live (FS paths, memory, DB)? Any accidental persistence we should fix?
+Embeddings: Do we currently embed customer text with OpenAI, or only use RAG over our authoritative KB? If we embed, which provider?
+Failure handling: On LLM/API errors, do we write any payloads to error logs or crash dumps? Can we centralize exception handling to ensure sanitization?
+Backups: Confirm that only analysis metadata is in DB backups, not any content. Any services creating shadow backups we should be aware of?
+Model routing: How hard would it be to add a provider flag (openai/azure-openai/local) to our unified _make_llm_request() and a tenant policy table to drive it?
+UI: Where should we place the Privacy Mode and “Delete on completion” toggles? Can we surface tenant defaults in account settings?
+File names in history: Can we replace file names with generic labels or hashes without breaking existing reports? Any downstream dependency on file names?
+If OpenAI does not grant ZDR
+
+We will:
+Enforce Privacy Mode for all analyses.
+Switch customer embeddings to local only.
+Aggressively minimize context (send small pseudonymized excerpts + structured facts).
+Offer Azure OpenAI as a regional alternative for enterprise tenants.
+Update our Security page to disclose the posture and technical mitigations.
+Target sequence and rough effort
+
+Week 1: Workstream 0, begin 1; add tenant flags and UI toggles; simple pseudonymization with regex; disable payload logs.
+Week 2: Deterministic token mapping + rehydration; local embeddings + in-memory FAISS; purge scheduler; “delete analysis.”
+Week 3: Provider routing; tenant policy; subprocessor page; support JIT access; tests and docs.
+I’m available to refine detection patterns, choose embedding models, and test accuracy impacts once you have a first pass. Please reply with the answers to the open questions and any blockers you see.

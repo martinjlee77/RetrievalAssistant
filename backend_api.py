@@ -21,6 +21,7 @@ import uuid
 import requests
 from shared.pricing_config import is_business_email
 from shared.postmark_client import PostmarkClient
+from shared.log_sanitizer import sanitize_for_log, sanitize_exception_for_db
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -113,7 +114,7 @@ def attempt_token_refresh(request_obj):
         logger.info("Invalid refresh token")
         return None
     except Exception as e:
-        logger.error(f"Token refresh error: {e}")
+        logger.error(f"Token refresh error: {sanitize_for_log(e)}")
         return None
 
 @app.route('/analysis')
@@ -528,7 +529,7 @@ def get_db_connection():
         )
         return conn
     except Exception as e:
-        logger.error(f"Database connection error: {e}")
+        logger.error(f"Database connection error: {sanitize_for_log(e)}")
         return None
 
 # Helper functions
@@ -942,7 +943,7 @@ def login():
         return response, 200
         
     except Exception as e:
-        logger.error(f"Login error: {e}")
+        logger.error(f"Login error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Login failed'}), 500
 
 @app.route('/api/auth/refresh-token', methods=['POST'])
@@ -1122,7 +1123,7 @@ def forgot_password():
         }), 200
         
     except Exception as e:
-        logger.error(f"Forgot password error: {e}")
+        logger.error(f"Forgot password error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Password reset request failed'}), 500
 
 @app.route('/api/reset-password', methods=['POST'])
@@ -1755,14 +1756,14 @@ def complete_analysis():
             
         except Exception as e:
             conn.rollback()
-            logger.error(f"Database transaction failed - rolling back: {e}")
+            logger.error(f"Database transaction failed - rolling back: {sanitize_for_log(e)}")
             raise e
         finally:
             conn.close()
         
     except Exception as e:
         error_type = type(e).__name__
-        error_msg = str(e)
+        error_msg = sanitize_for_log(e, max_length=300)
         
         # Enhanced error logging with full context
         logger.exception(f"BILLING ERROR - Analysis completion failed for user {user_id}")
@@ -1786,7 +1787,7 @@ def complete_analysis():
             )
             logger.info("Billing error alert sent to support team")
         except Exception as alert_error:
-            logger.error(f"Failed to send billing error alert: {alert_error}")
+            logger.error(f"Failed to send billing error alert: {sanitize_for_log(alert_error)}")
         
         # Return detailed error for debugging (safe for production since it doesn't expose sensitive data)
         return jsonify({
@@ -1918,10 +1919,10 @@ def create_payment_intent():
         }), 200
         
     except stripe.StripeError as e:
-        logger.error(f"Stripe error: {e}")
+        logger.error(f"Stripe error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Payment processing error'}), 500
     except Exception as e:
-        logger.error(f"Create payment intent error: {e}")
+        logger.error(f"Create payment intent error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Failed to create payment intent'}), 500
 
 @app.route('/api/stripe/webhook', methods=['POST'])
@@ -1945,10 +1946,10 @@ def stripe_webhook():
             )
             logger.info("Webhook signature verified successfully")
         except ValueError as e:
-            logger.error(f"Invalid payload: {e}")
+            logger.error(f"Invalid payload: {sanitize_for_log(e)}")
             return jsonify({'error': 'Invalid payload'}), 400
         except stripe.SignatureVerificationError as e:
-            logger.error(f"Invalid signature: {e}")
+            logger.error(f"Invalid signature: {sanitize_for_log(e)}")
             return jsonify({'error': 'Invalid signature'}), 400
     else:
         # For development without signature verification
