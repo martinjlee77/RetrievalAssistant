@@ -161,6 +161,48 @@ class PreflightPricing:
 
         """.strip()
     
+    def calculate_pricing_from_word_count(self, total_words: int, file_count: int) -> Dict[str, Any]:
+        """
+        Calculate pricing based on word count without extracting files
+        Used when files have already been extracted separately
+        
+        Args:
+            total_words: Total word count across all files
+            file_count: Number of files
+            
+        Returns:
+            Dict containing tier info, price, and billing summary
+        """
+        if total_words == 0:
+            return {
+                'success': False,
+                'error': 'No text available for pricing',
+                'total_words': 0,
+                'tier_info': None,
+            }
+        
+        # Get tier information based on total words
+        tier_info = get_price_tier(total_words)
+        
+        # Calculate estimated pages for user display
+        estimated_total_pages = max(1, round(total_words / 300))
+        
+        result = {
+            'success': True,
+            'total_words': total_words,
+            'estimated_total_pages': estimated_total_pages,
+            'tier_info': tier_info,
+            'file_count': file_count,
+            'billing_summary': self._format_billing_summary(tier_info, total_words, estimated_total_pages, file_count)
+        }
+        
+        if tier_info.get('contact_support'):
+            logger.info(f"Pricing calculated: {total_words} words, {tier_info['name']} - contact support required")
+        else:
+            logger.info(f"Pricing calculated: {total_words} words, {tier_info['name']} tier, ${tier_info['price']}")
+        
+        return result
+    
     def check_sufficient_credits(self, required_price: float, user_credits: float) -> Dict[str, Any]:
         """
         Check if user has sufficient credits for the analysis

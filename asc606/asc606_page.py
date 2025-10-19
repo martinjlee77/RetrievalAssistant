@@ -263,6 +263,7 @@ def render_asc606_page():
         privacy_hash_key = f'asc606_privacy_hash_{session_id}'
         cached_text_key = f'asc606_cached_text_{session_id}'
         cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
+        cached_word_count_key = f'asc606_cached_word_count_{session_id}'
         
         # Check if we need to re-process (files changed)
         if st.session_state.get(privacy_hash_key) != file_hash:
@@ -270,6 +271,8 @@ def render_asc606_page():
                 del st.session_state[cached_text_key]
             if cached_deidentify_key in st.session_state:
                 del st.session_state[cached_deidentify_key]
+            if cached_word_count_key in st.session_state:
+                del st.session_state[cached_word_count_key]
             st.session_state[privacy_hash_key] = file_hash
         
         # Extract and de-identify if not cached
@@ -290,6 +293,9 @@ def render_asc606_page():
                     
                     combined_text = "\n\n---\n\n".join(all_texts)
                     
+                    # Calculate word count for pricing
+                    word_count = len(combined_text.split())
+                    
                     # Extract party names and de-identify
                     analyzer = ASC606StepAnalyzer()
                     party_names = analyzer.extract_party_names_llm(combined_text)
@@ -305,6 +311,7 @@ def render_asc606_page():
                     # Cache results
                     st.session_state[cached_text_key] = combined_text
                     st.session_state[cached_deidentify_key] = deidentify_result
+                    st.session_state[cached_word_count_key] = word_count
                     st.session_state[f'asc606_failed_files_{session_id}'] = failed_files
                     
                 except Exception as e:
@@ -366,45 +373,17 @@ def render_asc606_page():
                         key="original_preview"
                     )
         
-        # Step 2: Process files for pricing
-        with st.spinner("📊 Calculating analysis costs..."):
-            pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        # Step 2: Calculate pricing from cached word count (no re-extraction)
+        if cached_word_count_key in st.session_state:
+            word_count = st.session_state[cached_word_count_key]
+            pricing_result = preflight_pricing.calculate_pricing_from_word_count(word_count, len(uploaded_files))
 
-        if pricing_result['success']:
-            with pricing_container.container():
-                st.markdown("### :primary[Analysis Pricing]")
-                st.info(pricing_result['billing_summary'])
-
-                # Show file processing details
-                if pricing_result.get('processing_errors'):
-                    st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
-
-                # Display document quality feedback
-                if pricing_result.get('file_details'):
-                    SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])  
-        
-        else:
-            # Handle different error types
-            if pricing_result.get('error') == 'scanned_pdf_detected':
-                st.error(pricing_result.get('user_message', 'Scanned PDF detected'))
-                
-                # Add helpful expandable section
-                with st.expander("💡 Detailed Instructions"):
-                    st.markdown("""
-                    **Using ChatGPT-4 Vision:**
-                    1. Go to ChatGPT-4 with Vision
-                    2. Upload your scanned PDF
-                    3. Ask: "Please convert this document to clean, searchable text"
-                    4. Copy the text and create a new Word/PDF document
-                    5. Upload the new text-based document here
-                    
-                    **Alternative Tools:**
-                    - Adobe Acrobat (OCR feature)
-                    - Google Docs (automatically OCRs uploaded PDFs)
-                    - Microsoft Word (Insert > Object > Text from File)
-                    """)
+            if pricing_result['success']:
+                with pricing_container.container():
+                    st.markdown("### :primary[Analysis Pricing]")
+                    st.info(pricing_result['billing_summary'])
             else:
-                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+                st.error(f"❌ **Pricing Calculation Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
