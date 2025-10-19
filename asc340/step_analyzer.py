@@ -435,7 +435,7 @@ Respond with ONLY the company name, nothing else."""
                     )
             
             # Log sample of clean content for verification
-            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
+            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)} chars)")
             
             # Return clean markdown content - NO PROCESSING
             return {
@@ -661,11 +661,11 @@ FORMATTING:
                     
                     if conclusion:
                         conclusions.append(f"Step {step_num}: {conclusion}")
-                        logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
+                        logger.info(f"Extracted conclusion for Step {step_num} (length: {len(conclusion)} chars)")
                     else:
                         logger.info(f"DEBUG: Failed to extract conclusion from Step {step_num}")
                         logger.info(f"DEBUG: Step {step_num} content contains '**Conclusion:**': {'**Conclusion:**' in markdown_content}")
-                        logger.info(f"DEBUG: Step {step_num} content sample: {markdown_content[:100]}...")
+                        logger.info(f"DEBUG: Step {step_num} content length: {len(markdown_content)} chars")
                 else:
                     logger.warning(f"Step {step_num} data structure: {type(step_data)}, keys: {step_data.keys() if isinstance(step_data, dict) else 'N/A'}")
         

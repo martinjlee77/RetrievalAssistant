@@ -440,7 +440,7 @@ Respond with ONLY the entity name, nothing else."""
                     )
             
             # Log sample of clean content for verification
-            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
+            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)} chars)")
             
             # Return clean markdown content - NO PROCESSING
             return {
@@ -664,7 +664,7 @@ FORMATTING:
                     if marker_match:
                         conclusion_text = marker_match.group(1).strip()
                         conclusions.append(f"Step {step_num}: {conclusion_text}")
-                        logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
+                        logger.info(f"DEBUG: Extracted conclusion for step {step_num} (length: {len(conclusion_text)} chars)")
                     else:
                         # Try all four conclusion patterns for maximum robustness
                         # Pattern 1: **Conclusion:** (bold with colon)
@@ -682,7 +682,7 @@ FORMATTING:
                         if conclusion_match:
                             conclusion_text = conclusion_match.group(1).strip()
                             conclusions.append(f"Step {step_num}: {conclusion_text}")
-                            logger.info(f"DEBUG: Extracted conclusion for step {step_num}: {conclusion_text[:100]}...")
+                            logger.info(f"DEBUG: Extracted conclusion for step {step_num} (length: {len(conclusion_text)} chars)")
                         else:
                             logger.warning(f"DEBUG: No conclusion found in step {step_num} markdown")
                 else:

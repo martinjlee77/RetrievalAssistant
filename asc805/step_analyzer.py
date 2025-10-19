@@ -435,7 +435,7 @@ Respond with ONLY the target company name, nothing else."""
                     )
             
             # Log sample of clean content for verification
-            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)}) sample: {markdown_content[:100]}...")
+            logger.info(f"DEBUG: Clean markdown for Step {step_num} (length: {len(markdown_content)} chars)")
             
             # Return clean markdown content - NO PROCESSING
             return {
@@ -847,7 +847,7 @@ Format as clean markdown - no headers, just paragraphs."""
                     if marker_match:
                         conclusion_text = marker_match.group(1).strip()
                         conclusions.append(f"Step {step_num}: {conclusion_text}")
-                        logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_text[:100]}...")
+                        logger.info(f"DEBUG: Extracted conclusion for {step_key} (length: {len(conclusion_text)} chars)")
                     else:
                         # Try all four conclusion patterns for maximum robustness
                         # Pattern 1: **Conclusion:** (bold with colon)
@@ -865,14 +865,14 @@ Format as clean markdown - no headers, just paragraphs."""
                         if conclusion_match:
                             conclusion_text = conclusion_match.group(1).strip()
                             conclusions.append(f"Step {step_num}: {conclusion_text}")
-                            logger.info(f"DEBUG: Extracted conclusion for {step_key}: {conclusion_text[:100]}...")
+                            logger.info(f"DEBUG: Extracted conclusion for {step_key} (length: {len(conclusion_text)} chars)")
                         else:
                             # Final fallback: use last paragraph as conclusion
                             paragraphs = [p.strip() for p in content.split('\n\n') if p.strip()]
                             if paragraphs:
                                 last_paragraph = paragraphs[-1]
                                 conclusions.append(f"Step {step_num}: {last_paragraph}")
-                                logger.info(f"DEBUG: Used last paragraph as conclusion for {step_key}: {last_paragraph[:100]}...")
+                                logger.info(f"DEBUG: Used last paragraph as conclusion for {step_key} (length: {len(last_paragraph)} chars)")
                             else:
                                 logger.warning(f"DEBUG: No content found for {step_key}")
                 else:
