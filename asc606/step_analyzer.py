@@ -195,7 +195,7 @@ Respond with ONLY a JSON object in this exact format:
             logger.error(f"Error extracting party names: {str(e)}")
             return {"vendor": None, "customer": None}
     
-    def deidentify_contract_text(self, contract_text: str, vendor_name: Optional[str], customer_name: Optional[str]) -> str:
+    def deidentify_contract_text(self, contract_text: str, vendor_name: Optional[str], customer_name: Optional[str]) -> dict:
         """
         Replace both party names with generic terms for privacy.
         Handles whitespace variations, line breaks, hyphenated line wraps, and punctuation differences.
@@ -208,14 +208,24 @@ Respond with ONLY a JSON object in this exact format:
             customer_name: Customer/buyer company name to replace
             
         Returns:
-            De-identified contract text with party names replaced
-            
-        Raises:
-            ValueError: If de-identification fails (no replacements made) to prevent privacy leakage
+            Dict with keys:
+                - success (bool): Whether de-identification succeeded
+                - text (str): De-identified text (or original if failed)
+                - vendor_name (str): Original vendor name
+                - customer_name (str): Original customer name
+                - replacements (list): List of replacement descriptions
+                - error (str): Error message if failed, None otherwise
         """
         if not vendor_name and not customer_name:
             logger.warning("⚠️ No party names to de-identify, returning original text")
-            return contract_text
+            return {
+                "success": False,
+                "text": contract_text,
+                "vendor_name": vendor_name,
+                "customer_name": customer_name,
+                "replacements": [],
+                "error": "No party names were extracted for de-identification"
+            }
         
         # Helper function for text normalization
         def normalize_text(text: str) -> str:
@@ -308,21 +318,34 @@ Respond with ONLY a JSON object in this exact format:
                 logger.warning(f"⚠️ Customer name '{customer_name}' (normalized: '{normalized_customer}') not found in contract text")
                 replacement_count['customer'] = 0
         
-        # CRITICAL: Hard stop if no replacements were made to prevent privacy leakage
+        # Check if de-identification succeeded
         if not replacements_made:
             error_msg = (
-                f"❌ PRIVACY PROTECTION FAILURE: Could not de-identify contract text. "
-                f"Extracted party names (vendor: '{vendor_name}', customer: '{customer_name}') "
-                f"were not found in the contract. Analysis cannot proceed to prevent sending "
-                f"un-de-identified data to AI provider."
+                f"Privacy extraction did not detect party names in the contract text. "
+                f"Extracted names (vendor: '{vendor_name}', customer: '{customer_name}') "
+                f"were not found in the contract."
             )
-            logger.error(error_msg)
-            raise ValueError(error_msg)
+            logger.warning(f"⚠️ {error_msg}")
+            return {
+                "success": False,
+                "text": contract_text,  # Return original text
+                "vendor_name": vendor_name,
+                "customer_name": customer_name,
+                "replacements": [],
+                "error": error_msg
+            }
         
         # Log success
         logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
         
-        return deidentified_text
+        return {
+            "success": True,
+            "text": deidentified_text,
+            "vendor_name": vendor_name,
+            "customer_name": customer_name,
+            "replacements": replacements_made,
+            "error": None
+        }
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
