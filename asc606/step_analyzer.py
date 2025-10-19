@@ -11,6 +11,7 @@ import logging
 import time
 import re
 import random
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -107,6 +108,138 @@ Respond with ONLY the customer name, nothing else."""
         except Exception as e:
             logger.error(f"Error extracting customer name with LLM: {str(e)}")
             return "Customer"
+    
+    def extract_party_names_llm(self, contract_text: str) -> Dict[str, Optional[str]]:
+        """
+        Extract BOTH party names from revenue contract for de-identification.
+        
+        Returns:
+            dict: {
+                'vendor': str,      # The vendor/seller (company running analysis)
+                'customer': str     # The customer/buyer (counterparty)
+            }
+        """
+        try:
+            logger.info("🔒 Extracting both party names for de-identification...")
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying party names in revenue contracts. Extract both the vendor/seller and customer/buyer names."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Based on this revenue contract, identify BOTH parties:
+
+1. VENDOR/SELLER: The company providing/selling goods or services
+2. CUSTOMER/BUYER: The company purchasing goods or services
+
+Include full legal names with suffixes (Inc., LLC, Corp., etc.)
+Ignore addresses, reference numbers, or other identifiers.
+
+Contract Text:
+{contract_text[:4000]}
+
+Respond with ONLY a JSON object in this exact format:
+{{"vendor": "Vendor Company Name Inc.", "customer": "Customer Company Name LLC"}}"""
+                }
+            ]
+            
+            response_content = self._make_llm_request(messages, self.light_model, "default")
+            
+            # Track API cost
+            track_openai_request(
+                messages=messages,
+                response_text=response_content or "",
+                model=self.light_model,
+                request_type="party_extraction"
+            )
+            
+            if not response_content:
+                logger.warning("LLM returned empty response for party extraction")
+                return {"vendor": None, "customer": None}
+            
+            # Parse JSON response
+            response_content = response_content.strip()
+            
+            # Handle code block formatting if present
+            if response_content.startswith("```"):
+                response_content = re.sub(r'^```(?:json)?\s*|\s*```$', '', response_content, flags=re.MULTILINE)
+            
+            party_data = json.loads(response_content)
+            
+            # Validate and clean
+            vendor = party_data.get("vendor", "").strip().strip('"').strip("'").strip()
+            customer = party_data.get("customer", "").strip().strip('"').strip("'").strip()
+            
+            # Validation checks
+            vendor_valid = vendor and 2 <= len(vendor) <= 120
+            customer_valid = customer and 2 <= len(customer) <= 120
+            
+            if not vendor_valid:
+                logger.warning(f"Invalid vendor name extracted: {vendor}")
+                vendor = None
+            
+            if not customer_valid:
+                logger.warning(f"Invalid customer name extracted: {customer}")
+                customer = None
+            
+            logger.info(f"✓ Parties extracted - Vendor: {vendor}, Customer: {customer}")
+            
+            return {"vendor": vendor, "customer": customer}
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error in party extraction: {str(e)}")
+            return {"vendor": None, "customer": None}
+        except Exception as e:
+            logger.error(f"Error extracting party names: {str(e)}")
+            return {"vendor": None, "customer": None}
+    
+    def deidentify_contract_text(self, contract_text: str, vendor_name: Optional[str], customer_name: Optional[str]) -> str:
+        """
+        Replace both party names with generic terms for privacy.
+        
+        Args:
+            contract_text: Original contract text
+            vendor_name: Vendor/seller company name to replace
+            customer_name: Customer/buyer company name to replace
+            
+        Returns:
+            De-identified contract text with party names replaced
+        """
+        if not vendor_name and not customer_name:
+            logger.warning("No party names to de-identify, returning original text")
+            return contract_text
+        
+        deidentified_text = contract_text
+        replacements_made = []
+        
+        # Replace vendor with "the Company"
+        if vendor_name:
+            # Create pattern for case-insensitive whole-word matching
+            # Handle variations like "Company Inc.", "Company, Inc.", "Company Inc"
+            pattern = re.escape(vendor_name)
+            pattern = pattern.replace(r'\.', r'\.?')  # Make periods optional
+            pattern = pattern.replace(r'\,', r'\,?')  # Make commas optional
+            pattern = r'\b' + pattern + r'\b'
+            
+            deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+            replacements_made.append(f"vendor '{vendor_name}' → 'the Company'")
+        
+        # Replace customer with "the Customer"
+        if customer_name:
+            pattern = re.escape(customer_name)
+            pattern = pattern.replace(r'\.', r'\.?')
+            pattern = pattern.replace(r'\,', r'\,?')
+            pattern = r'\b' + pattern + r'\b'
+            
+            deidentified_text = re.sub(pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
+            replacements_made.append(f"customer '{customer_name}' → 'the Customer'")
+        
+        if replacements_made:
+            logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
+        
+        return deidentified_text
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""

@@ -516,14 +516,32 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             from shared.ui_components import SharedUIComponents
             ui = SharedUIComponents()
             
-            # Extract customer name
-            with st.spinner("🏢 Extracting customer name..."):
+            # Extract party names and de-identify contract text for privacy
+            with st.spinner("🔒 Extracting party names and de-identifying contract..."):
                 try:
-                    customer_name = analyzer.extract_entity_name_llm(combined_text)
-                    logger.info(f"LLM extracted customer: {customer_name}")
+                    # Extract both vendor and customer names
+                    party_names = analyzer.extract_party_names_llm(combined_text)
+                    vendor_name = party_names.get('vendor')
+                    customer_name_extracted = party_names.get('customer')
+                    
+                    # De-identify contract text by replacing party names
+                    if vendor_name or customer_name_extracted:
+                        combined_text = analyzer.deidentify_contract_text(
+                            combined_text, 
+                            vendor_name, 
+                            customer_name_extracted
+                        )
+                        logger.info("✓ Contract text de-identified for privacy")
+                    else:
+                        logger.warning("No party names extracted, proceeding without de-identification")
+                    
+                    # Use generic "Customer" for memo since we've de-identified
+                    customer_name = "the Customer"
+                    
                 except Exception as e:
-                    logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
-                    customer_name = "Unknown Customer"  # Simple fallback
+                    logger.error(f"Party extraction/de-identification failed: {str(e)}")
+                    # Safe fallback - proceed without de-identification
+                    customer_name = "the Customer"
                     
             # Setup progress tracking
             steps = [
