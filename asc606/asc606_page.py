@@ -252,16 +252,126 @@ def render_asc606_page():
     with upload_form_container.container():
         uploaded_files, additional_context, is_ready = get_asc606_inputs_new()
 
-    # Show pricing information immediately when files are uploaded (regardless of is_ready)
+    # Process files when uploaded - extract, de-identify, and price
     pricing_result = None
-    pricing_container = st.empty()  # Create clearable container FIRST (before if block)
+    processing_container = st.empty()
+    pricing_container = st.empty()
+    
     if uploaded_files:
-        # Process files for pricing - dynamic cost updating with progress indicator
-        with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
+        # Step 1: Extract and de-identify for Document Processing section
+        file_hash = create_file_hash(uploaded_files)
+        privacy_hash_key = f'asc606_privacy_hash_{session_id}'
+        cached_text_key = f'asc606_cached_text_{session_id}'
+        cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
+        
+        # Check if we need to re-process (files changed)
+        if st.session_state.get(privacy_hash_key) != file_hash:
+            if cached_text_key in st.session_state:
+                del st.session_state[cached_text_key]
+            if cached_deidentify_key in st.session_state:
+                del st.session_state[cached_deidentify_key]
+            st.session_state[privacy_hash_key] = file_hash
+        
+        # Extract and de-identify if not cached
+        if cached_text_key not in st.session_state:
+            with st.spinner("📄 Extracting and processing contract text..."):
+                try:
+                    extractor = DocumentExtractor()
+                    all_texts = []
+                    failed_files = []
+                    
+                    for uploaded_file in uploaded_files:
+                        uploaded_file.seek(0)
+                        result = extractor.extract_text(uploaded_file)
+                        if result and isinstance(result, dict) and result.get('success'):
+                            all_texts.append(result['text'])
+                        else:
+                            failed_files.append(uploaded_file.name)
+                    
+                    combined_text = "\n\n---\n\n".join(all_texts)
+                    
+                    # Extract party names and de-identify
+                    analyzer = ASC606StepAnalyzer()
+                    party_names = analyzer.extract_party_names_llm(combined_text)
+                    vendor_name = party_names.get('vendor')
+                    customer_name = party_names.get('customer')
+                    
+                    deidentify_result = analyzer.deidentify_contract_text(
+                        combined_text,
+                        vendor_name,
+                        customer_name
+                    )
+                    
+                    # Cache results
+                    st.session_state[cached_text_key] = combined_text
+                    st.session_state[cached_deidentify_key] = deidentify_result
+                    st.session_state[f'asc606_failed_files_{session_id}'] = failed_files
+                    
+                except Exception as e:
+                    logger.error(f"Error in document processing: {str(e)}")
+                    st.error(f"❌ Error processing contract: {str(e)}")
+        
+        # Show Document Processing section
+        if cached_deidentify_key in st.session_state:
+            deidentify_result = st.session_state[cached_deidentify_key]
+            failed_files = st.session_state.get(f'asc606_failed_files_{session_id}', [])
+            
+            with processing_container.container():
+                st.markdown("### :primary[Document Processing]")
+                
+                # Show extraction warnings if any
+                if failed_files:
+                    st.warning(
+                        f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+                        f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+                    )
+                
+                if deidentify_result['success']:
+                    st.success("✓ Privacy protection applied successfully")
+                    
+                    with st.container(border=True):
+                        st.markdown("**Party names replaced:**")
+                        if deidentify_result['vendor_name']:
+                            st.markdown(f"• Vendor: **\"{deidentify_result['vendor_name']}\"** → **\"the Company\"**")
+                        if deidentify_result['customer_name']:
+                            st.markdown(f"• Customer: **\"{deidentify_result['customer_name']}\"** → **\"the Customer\"**")
+                    
+                    # Show 4000-char preview
+                    preview_text = deidentify_result['text'][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="De-identified contract text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="deidentified_preview"
+                    )
+                else:
+                    st.warning("⚠️ " + deidentify_result['error'])
+                    st.info(
+                        "**Your choice:** The system was unable to automatically detect and replace party names. "
+                        "The analysis will proceed using the original text."
+                    )
+                    
+                    # Show original text preview
+                    preview_text = st.session_state[cached_text_key][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="Original contract text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="original_preview"
+                    )
+        
+        # Step 2: Process files for pricing
+        with st.spinner("📊 Calculating analysis costs..."):
             pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
 
         if pricing_result['success']:
-            with pricing_container.container():  # Put EVERYTHING inside
+            with pricing_container.container():
                 st.markdown("### :primary[Analysis Pricing]")
                 st.info(pricing_result['billing_summary'])
 
@@ -345,44 +455,38 @@ def render_asc606_page():
         
         # Analysis section
         if can_proceed:
-            # Check if we need to show confirmation screen
-            file_hash = create_file_hash(uploaded_files)
-            privacy_hash_key = f'asc606_privacy_hash_{session_id}'
-            preview_confirmed_key = f'asc606_preview_confirmed_{session_id}'
-            cached_text_key = f'asc606_cached_text_{session_id}'
-            cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
+            warning_placeholder = st.empty()
+            warning_placeholder.info(
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
+            )
             
-            # Check if files changed (invalidate cache)
-            show_review_screen_key = f'asc606_show_review_{session_id}'
-            
-            if st.session_state.get(privacy_hash_key) != file_hash:
-                # Clear all cached data when files change
-                st.session_state[preview_confirmed_key] = False
-                st.session_state[show_review_screen_key] = False
-                if cached_text_key in st.session_state:
-                    del st.session_state[cached_text_key]
-                if cached_deidentify_key in st.session_state:
-                    del st.session_state[cached_deidentify_key]
-                st.session_state[privacy_hash_key] = file_hash
-                logger.info(f"Files changed - cache invalidated for session {session_id}")
-            
-            # If not showing review screen yet, show button to trigger it
-            if not st.session_state.get(show_review_screen_key, False):
-                warning_placeholder = st.empty()
-                warning_placeholder.info(
-                    "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
-                )
+            if st.button("3️⃣ Confirm & Analyze",
+                       type="primary",
+                       use_container_width=True,
+                       key="asc606_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()
+                processing_container.empty()
+                pricing_container.empty()
+                credit_container.empty()
+                upload_form_container.empty()
                 
-                if st.button("3️⃣ Review & Confirm Analysis",
-                           type="primary",
-                           use_container_width=True,
-                           key="asc606_review"):
-                    # Set flag to show confirmation screen
-                    st.session_state[show_review_screen_key] = True
-                    st.rerun()
-            else:
-                # Show confirmation screen with preview and final run button
-                show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                
+                # Get cached de-identified text
+                cached_text_key = f'asc606_cached_text_{session_id}'
+                cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
+                
+                if cached_deidentify_key in st.session_state:
+                    deidentify_result = st.session_state[cached_deidentify_key]
+                    cached_text = deidentify_result['text']
+                else:
+                    cached_text = None
+                
+                # Run analysis with cached text
+                perform_asc606_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
