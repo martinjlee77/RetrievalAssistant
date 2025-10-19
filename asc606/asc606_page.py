@@ -48,8 +48,10 @@ def show_confirmation_screen(uploaded_files, pricing_result, additional_context,
                 failed_files = []
                 
                 for uploaded_file in uploaded_files:
+                    # Reset file pointer to beginning
+                    uploaded_file.seek(0)
                     result = extractor.extract_text(uploaded_file)
-                    if result['success']:
+                    if result and isinstance(result, dict) and result.get('success'):
                         all_texts.append(result['text'])
                     else:
                         logger.warning(f"Failed to extract text from {uploaded_file.name}")
