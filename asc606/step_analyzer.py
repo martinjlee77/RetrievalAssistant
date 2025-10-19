@@ -292,11 +292,32 @@ Respond with ONLY a JSON object in this exact format:
             # Word boundary at start and end
             return r'\b' + escaped + r'\b'
         
+        # Helper function to extract short forms from company names
+        def extract_short_forms(company_name: str) -> list:
+            """
+            Extract potential short forms from company name.
+            E.g., "InnovateTech Solutions Inc." → ["InnovateTech", "InnovateTech Solutions"]
+            """
+            # Remove common suffixes
+            name_clean = re.sub(r'\s+(Inc\.|LLC|Corp\.|Ltd\.|Co\.|Corporation|Limited|Company)\.?$', '', company_name, flags=re.IGNORECASE)
+            
+            short_forms = []
+            words = name_clean.split()
+            
+            # Add first word if it's long enough (likely company identifier)
+            if words and len(words[0]) > 3:
+                short_forms.append(words[0])
+            
+            # Add first two words if multi-word
+            if len(words) >= 2:
+                short_forms.append(f"{words[0]} {words[1]}")
+            
+            return short_forms
+        
         # Replace vendor with "the Company"
         if normalized_vendor:
+            # First replace the full name
             pattern = create_flexible_pattern(normalized_vendor)
-            
-            # Count matches before replacement for logging
             matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
             match_count = len(matches)
             
@@ -307,12 +328,20 @@ Respond with ONLY a JSON object in this exact format:
             else:
                 logger.warning(f"⚠️ Vendor name '{vendor_name}' (normalized: '{normalized_vendor}') not found in contract text")
                 replacement_count['vendor'] = 0
+            
+            # Also replace short forms (e.g., "InnovateTech" from "InnovateTech Solutions Inc.")
+            short_forms = extract_short_forms(normalized_vendor)
+            for short_form in short_forms:
+                short_pattern = create_flexible_pattern(short_form)
+                short_matches = list(re.finditer(short_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(short_matches) > 0:
+                    deidentified_text = re.sub(short_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced vendor short form '{short_form}' ({len(short_matches)} occurrences)")
         
         # Replace customer with "the Customer"
         if normalized_customer:
+            # First replace the full name
             pattern = create_flexible_pattern(normalized_customer)
-            
-            # Count matches before replacement
             matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
             match_count = len(matches)
             
@@ -323,6 +352,15 @@ Respond with ONLY a JSON object in this exact format:
             else:
                 logger.warning(f"⚠️ Customer name '{customer_name}' (normalized: '{normalized_customer}') not found in contract text")
                 replacement_count['customer'] = 0
+            
+            # Also replace short forms
+            short_forms = extract_short_forms(normalized_customer)
+            for short_form in short_forms:
+                short_pattern = create_flexible_pattern(short_form)
+                short_matches = list(re.finditer(short_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(short_matches) > 0:
+                    deidentified_text = re.sub(short_pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced customer short form '{short_form}' ({len(short_matches)} occurrences)")
         
         # Check if de-identification succeeded
         if not replacements_made:
