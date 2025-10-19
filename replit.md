@@ -6,7 +6,14 @@ VeritasLogic.ai is a premium enterprise AI platform designed for accounting firm
 ## Recent Changes
 
 ### October 19, 2025
-- **Privacy Enhancement - Contract De-identification (ASC 606)**: Implemented automated dual-party extraction and de-identification system for ASC 606 revenue contracts. Uses GPT-5-mini to extract both vendor/seller (primary party) and customer/buyer (counterparty) names, then replaces them with generic terms ("the Company" and "the Customer") before analysis. Provides enhanced privacy protection by preventing party names from being sent to OpenAI API. Enabled by default with safe fallback handling if extraction fails.
+- **Privacy Confirmation Screen (ASC 606)**: Implemented mandatory privacy review and confirmation step before analysis begins. After file upload, users see a confirmation screen showing:
+  - Info box displaying party name replacements (e.g., "Acme Corp" → "the Company")
+  - 4000-character preview of de-identified text that will be analyzed
+  - Warning messages if de-identification fails, allowing user to proceed with original text if desired
+  - File extraction failure warnings if some files couldn't be processed
+  - Session-state caching with file-hash based cache invalidation to prevent stale data
+  - "Go Back" and "Run Analysis" buttons for user control
+- **Privacy Enhancement - Contract De-identification (ASC 606)**: Implemented automated dual-party extraction and de-identification system for ASC 606 revenue contracts. Uses GPT-5-mini to extract both vendor/seller (primary party) and customer/buyer (counterparty) names, then replaces them with generic terms ("the Company" and "the Customer") before analysis. De-identification now returns result dict instead of raising ValueError, enabling graceful fallback when extraction fails.
 - **Privacy Documentation Updates**: Updated privacy.html and terms.html to accurately reflect OpenAI's 30-day data retention policy for abuse monitoring (replacing previous "data retention turned off" language). Added de-identification disclosure as privacy enhancement feature.
 
 ### October 14, 2025
