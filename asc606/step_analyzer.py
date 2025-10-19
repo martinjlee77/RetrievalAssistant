@@ -691,7 +691,7 @@ FORMATTING:
                     
                     if conclusion:
                         conclusions.append(f"Step {step_num}: {conclusion}")
-                        logger.info(f"Extracted conclusion for Step {step_num}: {conclusion[:50]}...")
+                        logger.info(f"Extracted conclusion for Step {step_num} (length: {len(conclusion)} chars)")
                     else:
                         logger.warning(f"Could not extract conclusion from Step {step_num} content")
                 else:
