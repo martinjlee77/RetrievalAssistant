@@ -6,7 +6,7 @@ import streamlit as st
 import logging
 import uuid
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
@@ -22,6 +22,154 @@ from asc606.knowledge_search import ASC606KnowledgeSearch
 from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
+
+def create_file_hash(uploaded_files):
+    """Create a hash of uploaded files to detect changes."""
+    if not uploaded_files:
+        return None
+    file_info = [(f.name, f.size) for f in uploaded_files]
+    return hash(tuple(file_info))
+
+def show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id):
+    """Show privacy protection confirmation screen with de-identified text preview."""
+    
+    # Cache keys
+    cached_text_key = f'asc606_cached_text_{session_id}'
+    cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
+    preview_confirmed_key = f'asc606_preview_confirmed_{session_id}'
+    
+    # If not already cached, extract and de-identify text
+    if cached_text_key not in st.session_state:
+        with st.spinner("📄 Extracting and processing contract text..."):
+            try:
+                # Extract text from all files
+                extractor = DocumentExtractor()
+                all_texts = []
+                failed_files = []
+                
+                for uploaded_file in uploaded_files:
+                    result = extractor.extract_text(uploaded_file)
+                    if result['success']:
+                        all_texts.append(result['text'])
+                    else:
+                        logger.warning(f"Failed to extract text from {uploaded_file.name}")
+                        failed_files.append(uploaded_file.name)
+                
+                combined_text = "\n\n---\n\n".join(all_texts)
+                
+                # Store failed files list for UI display
+                st.session_state[f'asc606_failed_files_{session_id}'] = failed_files
+                
+                # Extract party names and de-identify
+                analyzer = ASC606StepAnalyzer()
+                party_names = analyzer.extract_party_names_llm(combined_text)
+                vendor_name = party_names.get('vendor')
+                customer_name = party_names.get('customer')
+                
+                # Run de-identification
+                deidentify_result = analyzer.deidentify_contract_text(
+                    combined_text,
+                    vendor_name,
+                    customer_name
+                )
+                
+                # Cache results
+                st.session_state[cached_text_key] = combined_text
+                st.session_state[cached_deidentify_key] = deidentify_result
+                
+            except Exception as e:
+                logger.error(f"Error in privacy processing: {str(e)}")
+                st.error(f"❌ Error processing contract: {str(e)}")
+                return
+    
+    # Get cached results
+    combined_text = st.session_state[cached_text_key]
+    deidentify_result = st.session_state[cached_deidentify_key]
+    failed_files = st.session_state.get(f'asc606_failed_files_{session_id}', [])
+    
+    # Show confirmation UI
+    st.markdown("### 🔒 Privacy Protection Review")
+    
+    # Show warning if some files failed to extract
+    if failed_files:
+        st.warning(
+            f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+            f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+        )
+    
+    if deidentify_result['success']:
+        # Success case - show what was replaced
+        st.success("✓ Privacy protection applied successfully")
+        
+        # Info box with replacements
+        with st.container(border=True):
+            st.markdown("**Party names replaced:**")
+            vendor_name = deidentify_result['vendor_name']
+            customer_name = deidentify_result['customer_name']
+            
+            if vendor_name:
+                st.markdown(f"• Vendor: **\"{vendor_name}\"** → **\"the Company\"**")
+            if customer_name:
+                st.markdown(f"• Customer: **\"{customer_name}\"** → **\"the Customer\"**")
+        
+        # Show preview of de-identified text
+        preview_text = deidentify_result['text'][:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="De-identified contract text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+        
+    else:
+        # Failure case - show warning
+        st.warning("⚠️ " + deidentify_result['error'])
+        st.info(
+            "**Your choice:** The system was unable to automatically detect and replace party names. "
+            "You can still proceed with the analysis using the original text."
+        )
+        
+        # Show preview of original text
+        preview_text = combined_text[:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="Original contract text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+    
+    # Confirmation and run button
+    st.markdown("---")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.button("◀️ Go Back", use_container_width=True, key="asc606_go_back"):
+            # Clear confirmation state to go back
+            st.session_state[preview_confirmed_key] = False
+            st.rerun()
+    
+    with col2:
+        if st.button("▶️ Run Analysis", type="primary", use_container_width=True, key="asc606_run_final"):
+            # Mark as confirmed and run analysis
+            st.session_state[preview_confirmed_key] = True
+            
+            # Clear the UI and run analysis
+            st.empty()
+            
+            # Use cached de-identified text
+            final_text = deidentify_result['text']
+            
+            # Run the analysis with the confirmed text
+            perform_asc606_analysis_new(
+                pricing_result, 
+                additional_context, 
+                user_token,
+                cached_combined_text=final_text
+            )
 
 def render_asc606_page():
     """Render the ASC 606 analysis page."""
@@ -193,24 +341,40 @@ def render_asc606_page():
         
         # Analysis section
         if can_proceed:
-            warning_placeholder = st.empty()  # Create a placeholder for the warning
-            warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
-            )
+            # Check if we need to show confirmation screen
+            file_hash = create_file_hash(uploaded_files)
+            privacy_hash_key = f'asc606_privacy_hash_{session_id}'
+            preview_confirmed_key = f'asc606_preview_confirmed_{session_id}'
+            cached_text_key = f'asc606_cached_text_{session_id}'
+            cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
             
-            if st.button("3️⃣ Confirm & Analyze",
-                       type="primary",
-                       use_container_width=True,
-                       key="asc606_analyze"):
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
-                credit_container.empty()     # Clear credit balance info
-                upload_form_container.empty()  # Clear the upload form
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                perform_asc606_analysis_new(pricing_result, additional_context, user_token)
+            # Check if files changed (invalidate cache)
+            if st.session_state.get(privacy_hash_key) != file_hash:
+                # Clear all cached data when files change
+                st.session_state[preview_confirmed_key] = False
+                if cached_text_key in st.session_state:
+                    del st.session_state[cached_text_key]
+                if cached_deidentify_key in st.session_state:
+                    del st.session_state[cached_deidentify_key]
+                st.session_state[privacy_hash_key] = file_hash
+                logger.info(f"Files changed - cache invalidated for session {session_id}")
+            
+            # If not yet confirmed, show review button and handle confirmation flow
+            if not st.session_state.get(preview_confirmed_key, False):
+                warning_placeholder = st.empty()
+                warning_placeholder.info(
+                    "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
+                )
+                
+                if st.button("3️⃣ Review & Confirm Analysis",
+                           type="primary",
+                           use_container_width=True,
+                           key="asc606_review"):
+                    # Extract text and run de-identification
+                    show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
+            else:
+                # Show confirmation screen with final run button
+                show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -439,7 +603,7 @@ def _generate_analysis_title() -> str:
     """Generate analysis title with timestamp."""
     return f"ASC606_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
 
-def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
+def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None):
     """Perform ASC 606 analysis with new billing system integration."""
     
     analysis_id = None
@@ -458,32 +622,38 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
         
         # Step 2: Payment will be processed when analysis completes (no upfront charging)
         
-        # Step 3: Reconstruct combined text from file details
-        combined_text = ""
-        filename_list = []
-        
-        for file_detail in pricing_result['file_details']:
-            if 'text_content' in file_detail and file_detail['text_content'].strip():
-                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n{file_detail['text_content']}"
-                filename_list.append(file_detail['filename'])
-            else:
-                # Fallback if text_content is missing
-                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content extraction failed]"
-                filename_list.append(file_detail['filename'])
-        
-        filename = ", ".join(filename_list)
-        
-        # Check if we have valid content
-        if not combined_text.strip() or "[File content extraction failed]" in combined_text:
-            st.error("❌ **Technical Implementation Note**: Full file content reconstruction not yet implemented.")
-            st.info("🔄 **Temporary Workaround**: This integration is in progress. The preflight pricing system is working, but the analysis part needs the file content to be properly passed through.")
+        # Step 3: Use cached text if provided, otherwise reconstruct from file details
+        if cached_combined_text:
+            combined_text = cached_combined_text
+            filename = "Contract Documents"
+            logger.info("Using cached de-identified contract text from confirmation screen")
+        else:
+            # Reconstruct combined text from file details
+            combined_text = ""
+            filename_list = []
             
-            # Mark analysis as failed (no refund needed since payment happens on completion)
-            if analysis_id:
-                analysis_manager.complete_analysis(analysis_id, success=False, error_message="File content reconstruction not implemented")
+            for file_detail in pricing_result['file_details']:
+                if 'text_content' in file_detail and file_detail['text_content'].strip():
+                    combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n{file_detail['text_content']}"
+                    filename_list.append(file_detail['filename'])
+                else:
+                    # Fallback if text_content is missing
+                    combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content extraction failed]"
+                    filename_list.append(file_detail['filename'])
             
-            st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
-            return
+            filename = ", ".join(filename_list)
+            
+            # Check if we have valid content
+            if not combined_text.strip() or "[File content extraction failed]" in combined_text:
+                st.error("❌ **Technical Implementation Note**: Full file content reconstruction not yet implemented.")
+                st.info("🔄 **Temporary Workaround**: This integration is in progress. The preflight pricing system is working, but the analysis part needs the file content to be properly passed through.")
+                
+                # Mark analysis as failed (no refund needed since payment happens on completion)
+                if analysis_id:
+                    analysis_manager.complete_analysis(analysis_id, success=False, error_message="File content reconstruction not implemented")
+                
+                st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
+                return
         
         # Step 4: Reset API cost tracking for new analysis
         from shared.api_cost_tracker import reset_cost_tracking
@@ -516,40 +686,40 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
             from shared.ui_components import SharedUIComponents
             ui = SharedUIComponents()
             
-            # Extract party names and de-identify contract text for privacy
-            # NOTE: This will be moved to earlier confirmation step in future update
-            with st.spinner("🔒 Extracting party names and de-identifying contract..."):
-                try:
-                    # Extract both vendor and customer names
-                    party_names = analyzer.extract_party_names_llm(combined_text)
-                    vendor_name = party_names.get('vendor')
-                    customer_name_extracted = party_names.get('customer')
-                    
-                    # De-identify contract text by replacing party names
-                    if vendor_name or customer_name_extracted:
-                        deidentify_result = analyzer.deidentify_contract_text(
-                            combined_text, 
-                            vendor_name, 
-                            customer_name_extracted
-                        )
+            # Skip de-identification if using cached text (already done in confirmation screen)
+            if not cached_combined_text:
+                # Extract party names and de-identify contract text for privacy
+                # (Legacy path - will be removed once all flows use confirmation screen)
+                with st.spinner("🔒 Extracting party names and de-identifying contract..."):
+                    try:
+                        # Extract both vendor and customer names
+                        party_names = analyzer.extract_party_names_llm(combined_text)
+                        vendor_name = party_names.get('vendor')
+                        customer_name_extracted = party_names.get('customer')
                         
-                        if deidentify_result['success']:
-                            combined_text = deidentify_result['text']
-                            logger.info(f"✓ Contract text de-identified: {', '.join(deidentify_result['replacements'])}")
+                        # De-identify contract text by replacing party names
+                        if vendor_name or customer_name_extracted:
+                            deidentify_result = analyzer.deidentify_contract_text(
+                                combined_text, 
+                                vendor_name, 
+                                customer_name_extracted
+                            )
+                            
+                            if deidentify_result['success']:
+                                combined_text = deidentify_result['text']
+                                logger.info(f"✓ Contract text de-identified: {', '.join(deidentify_result['replacements'])}")
+                            else:
+                                # De-identification failed - log warning but proceed with original text
+                                logger.warning(f"⚠️ De-identification failed: {deidentify_result['error']}")
+                                logger.info("Proceeding with original contract text")
                         else:
-                            # De-identification failed - log warning but proceed with original text
-                            logger.warning(f"⚠️ De-identification failed: {deidentify_result['error']}")
-                            logger.info("Proceeding with original contract text")
-                    else:
-                        logger.warning("No party names extracted, proceeding without de-identification")
-                    
-                    # Use generic "Customer" for memo since we've de-identified
-                    customer_name = "the Customer"
-                    
-                except Exception as e:
-                    logger.error(f"Party extraction failed: {str(e)}")
-                    # If extraction itself fails, proceed without de-identification
-                    customer_name = "the Customer"
+                            logger.warning("No party names extracted, proceeding without de-identification")
+                        
+                    except Exception as e:
+                        logger.error(f"Party extraction failed: {str(e)}")
+            
+            # Use generic "Customer" for memo since we've de-identified
+            customer_name = "the Customer"
                     
             # Setup progress tracking
             steps = [
