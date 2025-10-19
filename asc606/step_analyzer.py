@@ -162,6 +162,9 @@ Respond with ONLY a JSON object in this exact format:
                 logger.warning("LLM returned empty response for party extraction")
                 return {"vendor": None, "customer": None}
             
+            # Log raw response for debugging
+            logger.info(f"Raw LLM response for party extraction: {response_content[:200]}")
+            
             # Parse JSON response
             response_content = response_content.strip()
             

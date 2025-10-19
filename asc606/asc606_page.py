@@ -286,10 +286,20 @@ def render_asc606_page():
                     for uploaded_file in uploaded_files:
                         uploaded_file.seek(0)
                         result = extractor.extract_text(uploaded_file)
-                        if result and isinstance(result, dict) and result.get('success'):
+                        # Check if extraction succeeded (no error and has text)
+                        if result and isinstance(result, dict) and not result.get('error') and result.get('text'):
                             all_texts.append(result['text'])
                         else:
                             failed_files.append(uploaded_file.name)
+                    
+                    # Check if we have any successfully extracted text
+                    if not all_texts:
+                        st.error(
+                            f"❌ **File extraction failed**\n\n"
+                            f"Could not extract text from any uploaded files. "
+                            f"Please ensure your files are text-based (not scanned images) and try again."
+                        )
+                        return
                     
                     combined_text = "\n\n---\n\n".join(all_texts)
                     
