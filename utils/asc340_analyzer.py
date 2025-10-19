@@ -292,7 +292,7 @@ Return the extracted terms as a JSON object with this structure:
             contract_text = self._extract_contract_text(contract_data.documents)
             
             # DEBUG: Step 2 - Verify text combination
-            self.logger.info(f"COMBINED contract_text length is {len(contract_text)}. Preview: {contract_text[:500]}")
+            self.logger.info(f"COMBINED contract_text length is {len(contract_text)} chars")
             
             # Run all 4 steps concurrently
             step_tasks = []
