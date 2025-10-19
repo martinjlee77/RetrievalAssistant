@@ -149,6 +149,8 @@ def show_confirmation_screen(uploaded_files, pricing_result, additional_context,
     with col1:
         if st.button("◀️ Go Back", use_container_width=True, key="asc606_go_back"):
             # Clear confirmation state to go back
+            show_review_screen_key = f'asc606_show_review_{session_id}'
+            st.session_state[show_review_screen_key] = False
             st.session_state[preview_confirmed_key] = False
             st.rerun()
     
@@ -349,9 +351,12 @@ def render_asc606_page():
             cached_deidentify_key = f'asc606_cached_deidentify_{session_id}'
             
             # Check if files changed (invalidate cache)
+            show_review_screen_key = f'asc606_show_review_{session_id}'
+            
             if st.session_state.get(privacy_hash_key) != file_hash:
                 # Clear all cached data when files change
                 st.session_state[preview_confirmed_key] = False
+                st.session_state[show_review_screen_key] = False
                 if cached_text_key in st.session_state:
                     del st.session_state[cached_text_key]
                 if cached_deidentify_key in st.session_state:
@@ -359,8 +364,8 @@ def render_asc606_page():
                 st.session_state[privacy_hash_key] = file_hash
                 logger.info(f"Files changed - cache invalidated for session {session_id}")
             
-            # If not yet confirmed, show review button and handle confirmation flow
-            if not st.session_state.get(preview_confirmed_key, False):
+            # If not showing review screen yet, show button to trigger it
+            if not st.session_state.get(show_review_screen_key, False):
                 warning_placeholder = st.empty()
                 warning_placeholder.info(
                     "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
@@ -370,10 +375,11 @@ def render_asc606_page():
                            type="primary",
                            use_container_width=True,
                            key="asc606_review"):
-                    # Extract text and run de-identification
-                    show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
+                    # Set flag to show confirmation screen
+                    st.session_state[show_review_screen_key] = True
+                    st.rerun()
             else:
-                # Show confirmation screen with final run button
+                # Show confirmation screen with preview and final run button
                 show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
         else:
             st.button("3️⃣ Insufficient Credits", 
