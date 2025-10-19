@@ -149,7 +149,7 @@ class CleanMemoGenerator:
             return
             
         # Log what we're about to display
-        logger.info(f"Displaying clean memo sample: {repr(memo_content[:150])}")
+        logger.info(f"Displaying clean memo (length: {len(memo_content)} chars)")
         
         # Convert markdown to HTML manually to bypass Streamlit's markdown processor
         html_content = self._convert_markdown_to_html(memo_content)

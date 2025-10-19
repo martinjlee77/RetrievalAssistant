@@ -362,7 +362,7 @@ class SharedMemoGenerator:
         st.markdown("## 📋 Generated Memo")
         
         # Debug: Log the actual content being displayed
-        logger.info(f"DEBUG: Displaying memo content sample: {repr(memo_content[:200])}")
+        logger.info(f"DEBUG: Displaying memo content (length: {len(memo_content)} chars)")
         
         # Display memo content with explicit unsafe_allow_html=False to prevent any HTML processing
         st.markdown(memo_content, unsafe_allow_html=False)
