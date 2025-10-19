@@ -236,13 +236,20 @@ Respond with ONLY a JSON object in this exact format:
         # Helper function for text normalization
         def normalize_text(text: str) -> str:
             """
-            Normalize text to handle PDF extraction artifacts.
+            Normalize text to handle PDF/Word extraction artifacts.
             - Removes soft hyphens (Unicode U+00AD)
+            - Converts smart quotes to ASCII quotes
             - Collapses hyphen + newline (line wraps) into space
             - Normalizes multiple whitespace to single space
             """
             # Remove Unicode soft hyphen character
             text = text.replace('\u00AD', '')
+            
+            # Convert smart quotes (Word/PDF) to regular ASCII quotes
+            # Opening/closing double quotes → "
+            text = text.replace('\u201C', '"').replace('\u201D', '"')
+            # Opening/closing single quotes → '
+            text = text.replace('\u2018', "'").replace('\u2019', "'")
             
             # Replace hyphen + newline/whitespace with single space
             # This handles line-wrapped text like "Smith-\nJones LLC" → "Smith Jones LLC"
@@ -292,27 +299,39 @@ Respond with ONLY a JSON object in this exact format:
             # Word boundary at start and end
             return r'\b' + escaped + r'\b'
         
-        # Helper function to extract short forms from company names
-        def extract_short_forms(company_name: str) -> list:
+        # Helper function to extract aliases from text patterns
+        def extract_aliases_from_text(company_name: str, text: str) -> list:
             """
-            Extract potential short forms from company name.
-            E.g., "InnovateTech Solutions Inc." → ["InnovateTech", "InnovateTech Solutions"]
+            Find actual aliases used in the text for this company.
+            Looks for patterns like: 
+            - Company Name Inc. ("ShortName")
+            - Company Name Inc. ('ShortName')
+            - Company Name Inc. (ShortName)
             """
-            # Remove common suffixes
-            name_clean = re.sub(r'\s+(Inc\.|LLC|Corp\.|Ltd\.|Co\.|Corporation|Limited|Company)\.?$', '', company_name, flags=re.IGNORECASE)
+            aliases = []
             
-            short_forms = []
-            words = name_clean.split()
+            # Escape company name for regex
+            escaped_name = re.escape(company_name)
             
-            # Add first word if it's long enough (likely company identifier)
-            if words and len(words[0]) > 3:
-                short_forms.append(words[0])
+            # Combined pattern: Company Name (optional quotes)Alias(optional quotes)
+            # Handles: ("Alias"), ('Alias'), (Alias), "Alias", 'Alias'
+            pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
             
-            # Add first two words if multi-word
-            if len(words) >= 2:
-                short_forms.append(f"{words[0]} {words[1]}")
+            # More specific pattern for parenthetical aliases
+            paren_pattern = escaped_name + r'\s*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
             
-            return short_forms
+            matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
+            for match in matches:
+                alias = match.group(1).strip()
+                # Strip any remaining quotes
+                alias = alias.strip('"').strip("'").strip()
+                
+                # Only accept if it looks like an alias (not numbers-only, dates, or too generic)
+                if alias and 2 <= len(alias) <= 50:
+                    if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
+                        aliases.append(alias)
+            
+            return list(set(aliases))  # Remove duplicates
         
         # Replace vendor with "the Company"
         if normalized_vendor:
@@ -329,14 +348,14 @@ Respond with ONLY a JSON object in this exact format:
                 logger.warning(f"⚠️ Vendor name '{vendor_name}' (normalized: '{normalized_vendor}') not found in contract text")
                 replacement_count['vendor'] = 0
             
-            # Also replace short forms (e.g., "InnovateTech" from "InnovateTech Solutions Inc.")
-            short_forms = extract_short_forms(normalized_vendor)
-            for short_form in short_forms:
-                short_pattern = create_flexible_pattern(short_form)
-                short_matches = list(re.finditer(short_pattern, deidentified_text, flags=re.IGNORECASE))
-                if len(short_matches) > 0:
-                    deidentified_text = re.sub(short_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
-                    logger.info(f"  → Also replaced vendor short form '{short_form}' ({len(short_matches)} occurrences)")
+            # Also replace aliases found in the text (e.g., "InnovateTech" from "InnovateTech Solutions Inc. ('InnovateTech')")
+            aliases = extract_aliases_from_text(normalized_vendor, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced vendor alias '{alias}' ({len(alias_matches)} occurrences)")
         
         # Replace customer with "the Customer"
         if normalized_customer:
@@ -353,14 +372,14 @@ Respond with ONLY a JSON object in this exact format:
                 logger.warning(f"⚠️ Customer name '{customer_name}' (normalized: '{normalized_customer}') not found in contract text")
                 replacement_count['customer'] = 0
             
-            # Also replace short forms
-            short_forms = extract_short_forms(normalized_customer)
-            for short_form in short_forms:
-                short_pattern = create_flexible_pattern(short_form)
-                short_matches = list(re.finditer(short_pattern, deidentified_text, flags=re.IGNORECASE))
-                if len(short_matches) > 0:
-                    deidentified_text = re.sub(short_pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
-                    logger.info(f"  → Also replaced customer short form '{short_form}' ({len(short_matches)} occurrences)")
+            # Also replace aliases found in the text
+            aliases = extract_aliases_from_text(normalized_customer, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced customer alias '{alias}' ({len(alias_matches)} occurrences)")
         
         # Check if de-identification succeeded
         if not replacements_made:
