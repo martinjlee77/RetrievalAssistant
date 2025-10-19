@@ -125,23 +125,26 @@ Respond with ONLY the customer name, nothing else."""
             messages = [
                 {
                     "role": "system",
-                    "content": "You are an expert at identifying party names in revenue contracts. Extract both the vendor/seller and customer/buyer names."
+                    "content": "You are an expert at identifying the two main parties in commercial contracts, including revenue contracts, SOWs, MSAs, service agreements, and license agreements."
                 },
                 {
                     "role": "user",
-                    "content": f"""Based on this revenue contract, identify BOTH parties:
+                    "content": f"""Analyze this commercial contract and identify the TWO main contracting parties:
 
-1. VENDOR/SELLER: The company providing/selling goods or services
-2. CUSTOMER/BUYER: The company purchasing goods or services
+1. FIRST PARTY: The company providing/selling goods or services (may be called vendor, seller, provider, licensor, consultant, contractor, or just "Party A")
+2. SECOND PARTY: The company receiving/purchasing goods or services (may be called customer, buyer, client, licensee, or just "Party B")
 
-Include full legal names with suffixes (Inc., LLC, Corp., etc.)
-Ignore addresses, reference numbers, or other identifiers.
+INSTRUCTIONS:
+- Look for language like "by and between [Company X] and [Company Y]", "Party A/Party B", or companies mentioned in signature blocks
+- Extract full legal names with suffixes (Inc., LLC, Corp., Ltd., etc.)
+- Ignore addresses, reference numbers, contact names, or other non-company identifiers
+- If the contract uses neutral terminology (Party A/B), identify which one is providing vs receiving based on the obligations described
 
 Contract Text:
 {contract_text[:4000]}
 
 Respond with ONLY a JSON object in this exact format:
-{{"vendor": "Vendor Company Name Inc.", "customer": "Customer Company Name LLC"}}"""
+{{"vendor": "First Party Company Name Inc.", "customer": "Second Party Company Name LLC"}}"""
                 }
             ]
             
