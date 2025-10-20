@@ -11,10 +11,50 @@ import PyPDF2
 import pdfplumber
 import docx
 from docx import Document
+from docx.document import Document as _Document
+from docx.oxml.text.paragraph import CT_P
+from docx.oxml.table import CT_Tbl
+from docx.oxml.ns import qn
+from docx.table import _Cell, Table
+from docx.text.paragraph import Paragraph
 try:
     import fitz  # PyMuPDF - preferred for text extraction
 except ImportError:
     fitz = None
+
+def iter_block_items(parent):
+    """
+    Yield each paragraph and table child within *parent*, in document order.
+    
+    This is an enhanced python-docx recipe that iterates through documents
+    while preserving the order of paragraphs and tables as they appear,
+    INCLUDING content inside Word content controls (SDT elements).
+    
+    Each returned value is an instance of either Table or Paragraph.
+    *parent* would most commonly be a reference to a main Document object,
+    but also works for a _Cell object, which itself can contain paragraphs and tables.
+    """
+    if isinstance(parent, _Document):
+        parent_elm = parent.element.body
+    elif isinstance(parent, _Cell):
+        parent_elm = parent._tc
+    else:
+        # For SDT content elements and other containers, use the element directly
+        parent_elm = parent
+    
+    for child in parent_elm.iterchildren():
+        if isinstance(child, CT_P):
+            yield Paragraph(child, parent if isinstance(parent, (_Document, _Cell)) else None)
+        elif isinstance(child, CT_Tbl):
+            yield Table(child, parent if isinstance(parent, (_Document, _Cell)) else None)
+        # Handle content controls (SDT elements) - recurse into their content
+        elif child.tag == qn('w:sdt'):
+            # Find sdtContent child and recursively process it
+            sdt_content = child.find(qn('w:sdtContent'))
+            if sdt_content is not None:
+                # Recursively yield items from inside the content control
+                for item in iter_block_items(sdt_content):
+                    yield item
 
 class DocumentExtractor:
     """Extract text from various document formats"""
@@ -194,25 +234,29 @@ class DocumentExtractor:
         }
     
     def _extract_word_text(self, uploaded_file) -> Dict[str, Any]:
-        """Extract text from Word document"""
+        """Extract text from Word document preserving document order"""
         try:
             doc = Document(uploaded_file)
             text_parts = []
             
-            # Extract text from paragraphs
-            for paragraph in doc.paragraphs:
-                if paragraph.text.strip():
-                    text_parts.append(paragraph.text)
-            
-            # Extract text from tables
-            for table in doc.tables:
-                for row in table.rows:
-                    row_text = []
-                    for cell in row.cells:
-                        if cell.text.strip():
-                            row_text.append(cell.text.strip())
-                    if row_text:
-                        text_parts.append(" | ".join(row_text))
+            # Use iter_block_items to preserve document order and handle content controls
+            # This properly handles paragraphs and tables in the order they appear,
+            # without skipping content wrapped in SDT or other containers
+            for block in iter_block_items(doc):
+                if isinstance(block, Paragraph):
+                    # Extract paragraph text
+                    if block.text.strip():
+                        text_parts.append(block.text)
+                
+                elif isinstance(block, Table):
+                    # Extract table content row by row
+                    for row in block.rows:
+                        row_text = []
+                        for cell in row.cells:
+                            if cell.text.strip():
+                                row_text.append(cell.text.strip())
+                        if row_text:
+                            text_parts.append(" | ".join(row_text))
             
             text = "\n\n".join(text_parts)
             text = self._clean_text(text)
