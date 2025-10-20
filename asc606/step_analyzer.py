@@ -333,6 +333,60 @@ Respond with ONLY a JSON object in this exact format:
             
             return list(set(aliases))  # Remove duplicates
         
+        # Helper function to extract base company name
+        def extract_base_company_name(company_name: str) -> str | None:
+            """
+            Extract base company name by removing legal suffixes.
+            Examples:
+            - "Netflix, Inc." → "Netflix"
+            - "Acme Corporation" → "Acme"
+            - "Smith & Associates LLC" → "Smith & Associates"
+            
+            Returns None if base name would be too short/generic or same as input.
+            """
+            # Common legal suffixes (case-insensitive)
+            suffixes = [
+                r',?\s+Inc\.?',
+                r',?\s+LLC\.?',
+                r',?\s+L\.?L\.?C\.?',
+                r',?\s+Corp\.?',
+                r',?\s+Corporation',
+                r',?\s+Ltd\.?',
+                r',?\s+Limited',
+                r',?\s+Co\.?',
+                r',?\s+Company',
+                r',?\s+L\.?P\.?',
+                r',?\s+LLP\.?',
+                r',?\s+P\.?L\.?L\.?C\.?',
+                r',?\s+S\.?A\.?',
+                r',?\s+N\.?V\.?',
+                r',?\s+A\.?G\.?',
+                r',?\s+GmbH',
+                r',?\s+PLC'
+            ]
+            
+            base_name = company_name
+            
+            # Try removing each suffix
+            for suffix_pattern in suffixes:
+                # Match suffix at end of string
+                pattern = suffix_pattern + r'$'
+                base_name = re.sub(pattern, '', base_name, flags=re.IGNORECASE).strip()
+            
+            # Also remove trailing commas/periods if left over
+            base_name = base_name.rstrip('.,').strip()
+            
+            # Only return if:
+            # 1. It's different from original (we actually removed something)
+            # 2. It's at least 3 characters (avoid overly generic like "A", "XY")
+            # 3. It contains at least one letter (not just numbers/symbols)
+            if (base_name != company_name and 
+                len(base_name) >= 3 and 
+                re.search(r'[A-Za-z]', base_name)):
+                return base_name
+            
+            return None
+        
         # Replace vendor with "the Company"
         if normalized_vendor:
             # First replace the full name
@@ -347,6 +401,15 @@ Respond with ONLY a JSON object in this exact format:
             else:
                 logger.warning(f"⚠️ Vendor name '{vendor_name}' (normalized: '{normalized_vendor}') not found in contract text")
                 replacement_count['vendor'] = 0
+            
+            # Also replace base company name (e.g., "Netflix" from "Netflix, Inc.")
+            base_vendor_name = extract_base_company_name(normalized_vendor)
+            if base_vendor_name:
+                base_pattern = create_flexible_pattern(base_vendor_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced vendor base name '{base_vendor_name}' ({len(base_matches)} occurrences)")
             
             # Also replace aliases found in the text (e.g., "InnovateTech" from "InnovateTech Solutions Inc. ('InnovateTech')")
             aliases = extract_aliases_from_text(normalized_vendor, normalized_text)
@@ -371,6 +434,15 @@ Respond with ONLY a JSON object in this exact format:
             else:
                 logger.warning(f"⚠️ Customer name '{customer_name}' (normalized: '{normalized_customer}') not found in contract text")
                 replacement_count['customer'] = 0
+            
+            # Also replace base company name (e.g., "Martin" from "Martin, LLC")
+            base_customer_name = extract_base_company_name(normalized_customer)
+            if base_customer_name:
+                base_pattern = create_flexible_pattern(base_customer_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Customer", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced customer base name '{base_customer_name}' ({len(base_matches)} occurrences)")
             
             # Also replace aliases found in the text
             aliases = extract_aliases_from_text(normalized_customer, normalized_text)
