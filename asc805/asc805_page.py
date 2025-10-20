@@ -448,7 +448,7 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
                 return
 
         # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🏢 Extracting entity name..."):
+        with st.spinner("🔁 Starting..."):
             try:
                 customer_name = analyzer.extract_entity_name_llm(contract_text)
                 logger.info(f"LLM extracted customer : {customer_name}")

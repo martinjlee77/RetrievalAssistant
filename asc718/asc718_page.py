@@ -477,7 +477,7 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
                 return
 
         # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🔁 Extracting customer name..."):
+        with st.spinner("🔁 Starting..."):
             try:
                 customer_name = analyzer.extract_entity_name_llm(contract_text)
                 logger.info(f"LLM extracted customer : {customer_name}")

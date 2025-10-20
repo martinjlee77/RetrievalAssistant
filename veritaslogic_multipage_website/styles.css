@@ -1599,6 +1599,30 @@ h1, h2, h3, h4, h5, h6 {
 .pricing-table-section {
     position: relative;
 }
+
+.first-time-banner {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    border-left: 4px solid rgba(255,255,255,0.4);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: var(--border-radius-sm);
+}
+.first-time-banner h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+.first-time-banner p {
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
 /* New Compact Pricing Table Styles */
 .pricing-compact-table {
     background: rgba(255,255,255,0.08);
