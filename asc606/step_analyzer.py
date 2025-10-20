@@ -318,7 +318,8 @@ Respond with ONLY a JSON object in this exact format:
             pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
             
             # More specific pattern for parenthetical aliases
-            paren_pattern = escaped_name + r'\s*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
+            # Allow optional punctuation (commas, periods) between company name and parenthesis
+            paren_pattern = escaped_name + r'[,\.\s]*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
             
             matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
             for match in matches:

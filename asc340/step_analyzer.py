@@ -368,6 +368,42 @@ OR if it's a third-party contractor:
             
             return None
         
+        # Helper function to extract aliases from text patterns
+        def extract_aliases_from_text(company_name: str, text: str) -> list:
+            """
+            Find actual aliases used in the text for this company.
+            Looks for patterns like: 
+            - Company Name Inc. ("ShortName")
+            - Company Name Inc. ('ShortName')
+            - Company Name Inc. (ShortName)
+            - Company Name Inc., ("ShortName")
+            """
+            aliases = []
+            
+            # Escape company name for regex
+            escaped_name = re.escape(company_name)
+            
+            # Combined pattern: Company Name (optional quotes)Alias(optional quotes)
+            # Handles: ("Alias"), ('Alias'), (Alias), "Alias", 'Alias'
+            pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
+            
+            # More specific pattern for parenthetical aliases
+            # Allow optional punctuation (commas, periods) between company name and parenthesis
+            paren_pattern = escaped_name + r'[,\.\s]*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
+            
+            matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
+            for match in matches:
+                alias = match.group(1).strip()
+                # Strip any remaining quotes
+                alias = alias.strip('"').strip("'").strip()
+                
+                # Only accept if it looks like an alias (not numbers-only, dates, or too generic)
+                if alias and 2 <= len(alias) <= 50:
+                    if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
+                        aliases.append(alias)
+            
+            return list(set(aliases))  # Remove duplicates
+        
         # Replace company with "the Company"
         if normalized_company:
             # First replace the full name
@@ -391,6 +427,15 @@ OR if it's a third-party contractor:
                 if len(base_matches) > 0:
                     deidentified_text = re.sub(base_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
                     logger.info(f"  → Also replaced company base name '{base_company_name}' ({len(base_matches)} occurrences)")
+            
+            # Also replace aliases found in the text (e.g., "InnovateTech" from "InnovateTech Solutions Inc., ('InnovateTech')")
+            aliases = extract_aliases_from_text(normalized_company, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced company alias '{alias}' ({len(alias_matches)} occurrences)")
         
         # Replace counterparty with "the Employee" or "the Third Party"
         counterparty_replacement = "the Employee" if counterparty_type == "employee" else "the Third Party"
@@ -408,6 +453,24 @@ OR if it's a third-party contractor:
             else:
                 logger.warning(f"⚠️ Counterparty name '{counterparty_name}' (normalized: '{normalized_counterparty}') not found in contract text")
                 replacement_count['counterparty'] = 0
+            
+            # Also replace base counterparty name if it's a company
+            base_counterparty_name = extract_base_company_name(normalized_counterparty)
+            if base_counterparty_name:
+                base_pattern = create_flexible_pattern(base_counterparty_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, counterparty_replacement, deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced counterparty base name '{base_counterparty_name}' ({len(base_matches)} occurrences)")
+            
+            # Also replace aliases found in the text
+            aliases = extract_aliases_from_text(normalized_counterparty, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, counterparty_replacement, deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced counterparty alias '{alias}' ({len(alias_matches)} occurrences)")
         
         # Check if de-identification succeeded
         if not replacements_made:
