@@ -1583,6 +1583,118 @@ def check_user_credits():
         logger.error(f"Check credits error: {e}")
         return jsonify({'error': 'Failed to check credits'}), 500
 
+@app.route('/api/analysis/save', methods=['POST'])
+def save_analysis():
+    """Save completed analysis from background worker with memo content"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        
+        # Extract data
+        analysis_id = sanitize_string(data.get('analysis_id', ''), 50)
+        memo_content = data.get('memo_content', '')  # Full memo text
+        api_cost = Decimal(str(data.get('api_cost', 0)))
+        success = data.get('success', False)
+        error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
+        
+        # For successful analysis, we need full details
+        asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
+        words_count = max(0, int(data.get('words_count', 0)))
+        tier_name = sanitize_string(data.get('tier_name', ''), 100)
+        file_count = max(0, int(data.get('file_count', 0)))
+        cost_charged = Decimal(str(data.get('cost_charged', 0)))
+        
+        # Generate customer-facing memo UUID
+        import uuid
+        memo_uuid = str(uuid.uuid4())[:8]
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        try:
+            # Verify email
+            cursor.execute("SELECT email, email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
+            user_check = cursor.fetchone()
+            if not user_check or not user_check['email_verified']:
+                logger.warning(f"Unverified user {user_id} attempted to save analysis")
+                return jsonify({'error': 'Email verification required'}), 403
+            
+            current_balance = user_check['credits_balance']
+            analysis_status = 'completed' if success else 'failed'
+            
+            # Insert analysis record with memo content
+            cursor.execute("""
+                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
+                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
+                                    started_at, completed_at, duration_seconds, file_count, memo_content, error_message)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), 0, %s, %s, %s)
+                RETURNING analysis_id
+            """, (user_id, asc_standard, words_count, api_cost, 
+                  cost_charged if success else 0,
+                  cost_charged if success else 0,
+                  tier_name, analysis_status, memo_uuid, file_count, 
+                  memo_content if success else None,
+                  error_message))
+            
+            db_analysis_id = cursor.fetchone()['analysis_id']
+            logger.info(f"Analysis saved: {db_analysis_id}, status: {analysis_status}")
+            
+            # Only charge credits if successful
+            if success and cost_charged > 0:
+                balance_after = max(current_balance - cost_charged, 0)
+                
+                # Deduct credits
+                cursor.execute("""
+                    UPDATE users 
+                    SET credits_balance = %s
+                    WHERE id = %s
+                """, (balance_after, user_id))
+                
+                # Record transaction
+                cursor.execute("""
+                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason,
+                                                   balance_after, memo_uuid, metadata, created_at)
+                    VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
+                """, (user_id, db_analysis_id, -cost_charged, balance_after, memo_uuid,
+                      json.dumps({'est_api_cost': float(api_cost), 'worker_job': analysis_id})))
+                
+                logger.info(f"Credits charged: {cost_charged}, new balance: {balance_after}")
+            else:
+                balance_after = current_balance
+                logger.info(f"No credits charged (success={success})")
+            
+            conn.commit()
+            
+            return jsonify({
+                'message': 'Analysis saved successfully',
+                'analysis_id': db_analysis_id,
+                'memo_uuid': memo_uuid,
+                'balance_remaining': float(balance_after)
+            }), 200
+            
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Failed to save analysis: {sanitize_for_log(e)}")
+            raise e
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Save analysis error: {sanitize_for_log(e)}")
+        return jsonify({'error': 'Failed to save analysis'}), 500
+
 @app.route('/api/analysis/complete', methods=['POST'])
 def complete_analysis():
     """Unified endpoint for analysis completion - handles both recording and billing atomically"""
