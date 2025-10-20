@@ -158,8 +158,30 @@ class CleanMemoGenerator:
             st.info("""**IMPORTANT:** Choose your preferred format to save this memo before navigating away. The analysis results will be lost if you leave this page without saving.""")
             
             col1, col2, col3, col4 = st.columns(4)
-            
+
+
             with col1:
+                # DOCX download
+                try:
+                    docx_bytes = self._generate_docx(memo_content)
+                    if docx_bytes:
+                        st.download_button(
+                            label="📋 Word (.docx)",
+                            data=docx_bytes,
+                            file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
+                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            use_container_width=True
+                        )
+                    else:
+                        st.button("📋 DOCX Error", disabled=True, use_container_width=True,
+                                 help="Word document generation failed")
+                except Exception as e:
+                    logger.error(f"DOCX generation failed: {e}")
+                    st.button("📋 DOCX Error", disabled=True, use_container_width=True,
+                             help="Word document generation temporarily unavailable")
+
+            
+            with col2:
                 # Markdown download
                 md_content = self._clean_markdown_content(memo_content)
                 st.download_button(
@@ -170,7 +192,7 @@ class CleanMemoGenerator:
                     use_container_width=True
                 )
             
-            with col2:
+            with col3:
                 # PDF download
                 try:
                     pdf_bytes = self._generate_pdf(memo_content)
@@ -189,26 +211,6 @@ class CleanMemoGenerator:
                     logger.error(f"PDF generation failed: {e}")
                     st.button("📄 PDF Error", disabled=True, use_container_width=True, 
                              help="PDF generation temporarily unavailable")
-            
-            with col3:
-                # DOCX download
-                try:
-                    docx_bytes = self._generate_docx(memo_content)
-                    if docx_bytes:
-                        st.download_button(
-                            label="📋 Word",
-                            data=docx_bytes,
-                            file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
-                            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                            use_container_width=True
-                        )
-                    else:
-                        st.button("📋 DOCX Error", disabled=True, use_container_width=True,
-                                 help="Word document generation failed")
-                except Exception as e:
-                    logger.error(f"DOCX generation failed: {e}")
-                    st.button("📋 DOCX Error", disabled=True, use_container_width=True,
-                             help="Word document generation temporarily unavailable")
             
             with col4:
                 # Copy to clipboard button

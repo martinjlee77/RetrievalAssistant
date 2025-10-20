@@ -126,13 +126,13 @@ Respond with ONLY the company name, nothing else."""
             messages = [
                 {
                     "role": "system",
-                    "content": "You are an expert at identifying parties in commission capitalization agreements, employment contracts, and contractor agreements."
+                    "content": "You are an expert at identifying parties in commission agreements, employment contracts, and contractor agreements."
                 },
                 {
                     "role": "user",
-                    "content": f"""Analyze this commission capitalization agreement and identify the TWO main parties:
+                    "content": f"""Analyze this commission agreement and identify the TWO main parties:
 
-1. COMPANY: The organization capitalizing sales commissions (paying commissions to obtain contracts)
+1. COMPANY: The organization capitalizing sales commissions (paying commissions to obtain customer contracts)
 2. COUNTERPARTY: The individual or entity receiving the commissions (may be an employee or third-party contractor/agent)
 
 INSTRUCTIONS:

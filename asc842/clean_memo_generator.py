@@ -173,34 +173,8 @@ class CleanMemoGenerator:
             # Generate timestamp for consistent filenames
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             base_filename = f"asc842_memo_{timestamp}"
-            
+
             with col1:
-                # Markdown download (existing)
-                st.download_button(
-                    label="📄 Markdown",
-                    data=memo_content,
-                    file_name=f"{base_filename}.md",
-                    mime="text/markdown",
-                    key=f"download_md_{hash(memo_content[:100])}",
-                    use_container_width=True
-                )
-            
-            with col2:
-                # PDF download
-                pdf_data = self._generate_pdf(memo_content)
-                if pdf_data:
-                    st.download_button(
-                        label="📄 PDF",
-                        data=pdf_data,
-                        file_name=f"{base_filename}.pdf",
-                        mime="application/pdf",
-                        key=f"download_pdf_{hash(memo_content[:100])}",
-                        use_container_width=True
-                    )
-                else:
-                    st.button("📄 PDF", disabled=True, use_container_width=True, help="PDF generation failed")
-            
-            with col3:
                 # DOCX download
                 docx_data = self._generate_docx(memo_content)
                 if docx_data:
@@ -214,7 +188,34 @@ class CleanMemoGenerator:
                     )
                 else:
                     st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
+
             
+            with col2:
+                # Markdown download (existing)
+                st.download_button(
+                    label="📄 Markdown",
+                    data=memo_content,
+                    file_name=f"{base_filename}.md",
+                    mime="text/markdown",
+                    key=f"download_md_{hash(memo_content[:100])}",
+                    use_container_width=True
+                )
+            
+            with col3:
+                # PDF download
+                pdf_data = self._generate_pdf(memo_content)
+                if pdf_data:
+                    st.download_button(
+                        label="📄 PDF",
+                        data=pdf_data,
+                        file_name=f"{base_filename}.pdf",
+                        mime="application/pdf",
+                        key=f"download_pdf_{hash(memo_content[:100])}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("📄 PDF", disabled=True, use_container_width=True, help="PDF generation failed")
+                        
             with col4:
                 # One-click copy button with JavaScript
                 copy_key = f"copy_{hash(memo_content[:100])}"

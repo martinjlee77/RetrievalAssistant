@@ -101,7 +101,7 @@ def show_confirmation_screen(uploaded_files, pricing_result, additional_context,
     
     if deidentify_result['success']:
         # Success case - show what was replaced
-        st.success("✓ Privacy protection applied successfully")
+        st.success("✓ Privacy protection applied successfully. Please contact support@veritaslogic.ai if you need any assistance.")
         
         # Info box with replacements
         with st.container(border=True):
@@ -243,7 +243,7 @@ def render_asc842_page():
                 
                 # Re-run policy note and "Analyze Another" button
                 st.markdown("---")
-                st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. Contact Support to request a re-run.")
+                st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
                 
                 if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_existing"):
                     # Clear session state for new analysis
@@ -351,7 +351,7 @@ def render_asc842_page():
                     )
                 
                 if deidentify_result['success']:
-                    st.success("✓ Privacy protection applied successfully")
+                    st.success("✓ Privacy protection applied successfully. Please contact support@veritaslogic.ai if you need any assistance.")
                     
                     with st.container(border=True):
                         st.markdown("**Party names replaced:**")
@@ -740,7 +740,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
                 return
 
         # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🏢 Extracting entity name..."):
+        with st.spinner("🔁 Starting..."):
             try:
                 entity_name = analyzer.extract_entity_name_llm(contract_text)
                 logger.info(f"LLM extracted entity name: {entity_name}")
@@ -870,7 +870,7 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         
         # Re-run policy note and "Analyze Another" button
         st.markdown("---")
-        st.info("📋 **Need changes to this memo?** Due to resource costs, re-runs require pre-approval. Contact SUpport to request a re-run.")
+        st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
         
         if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
             # Clear session state for new analysis
