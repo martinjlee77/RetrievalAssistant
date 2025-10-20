@@ -11,6 +11,7 @@ import logging
 import time
 import re
 import random
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -107,6 +108,366 @@ Respond with ONLY the granting company name, nothing else."""
         except Exception as e:
             logger.error(f"Error extracting granting entity name with LLM: {str(e)}")
             return "Granting Entity"
+    
+    def extract_party_names_llm(self, contract_text: str) -> Dict[str, Optional[str]]:
+        """
+        Extract BOTH party names from stock compensation agreement for de-identification.
+        
+        Returns:
+            dict: {
+                'granting_company': str,  # The company granting stock/options
+                'recipient': str          # The employee/service provider receiving stock
+            }
+        """
+        try:
+            logger.info("🔒 Extracting both party names for de-identification...")
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying the two main parties in stock compensation agreements, including stock option plans, RSU grants, equity incentive plans, and employee stock purchase plans."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Analyze this stock compensation agreement and identify the TWO main parties:
+
+1. GRANTING COMPANY: The company issuing/granting the stock compensation (may be called grantor, employer, company, issuer, or just "Party A")
+2. RECIPIENT: The individual or entity receiving the stock compensation (may be called grantee, employee, service provider, recipient, or just "Party B")
+
+INSTRUCTIONS:
+- Look for language like "by and between [Company X] and [Employee/Recipient Y]", "Party A/Party B", or parties mentioned in signature blocks
+- Extract full legal names with suffixes for the company (Inc., LLC, Corp., Ltd., etc.)
+- For the recipient, extract the full name as it appears (may be an individual name or entity name)
+- Ignore addresses, reference numbers, contact details, or other non-party identifiers
+- If the agreement uses neutral terminology (Party A/B), identify which one is granting vs receiving based on the obligations described
+
+Stock Compensation Agreement Text:
+{contract_text[:4000]}
+
+Respond with ONLY a JSON object in this exact format:
+{{"granting_company": "Company Name Inc.", "recipient": "John Doe"}}"""
+                }
+            ]
+            
+            response_content = self._make_llm_request(messages, self.light_model, "default")
+            
+            # Track API cost
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=messages,
+                response_text=response_content or "",
+                model=self.light_model,
+                request_type="party_extraction"
+            )
+            
+            if not response_content:
+                logger.warning("LLM returned empty response for party extraction")
+                return {"granting_company": None, "recipient": None}
+            
+            # Log raw response for debugging
+            logger.info(f"Raw LLM response for party extraction: {response_content[:200]}")
+            
+            # Parse JSON response
+            response_content = response_content.strip()
+            
+            # Handle code block formatting if present
+            if response_content.startswith("```"):
+                response_content = re.sub(r'^```(?:json)?\s*|\s*```$', '', response_content, flags=re.MULTILINE)
+            
+            party_data = json.loads(response_content)
+            
+            # Validate and clean
+            granting_company = party_data.get("granting_company", "").strip().strip('"').strip("'").strip()
+            recipient = party_data.get("recipient", "").strip().strip('"').strip("'").strip()
+            
+            # Validation checks
+            granting_company_valid = granting_company and 2 <= len(granting_company) <= 120
+            recipient_valid = recipient and 2 <= len(recipient) <= 120
+            
+            if not granting_company_valid:
+                logger.warning(f"Invalid granting company name extracted: {granting_company}")
+                granting_company = None
+            
+            if not recipient_valid:
+                logger.warning(f"Invalid recipient name extracted: {recipient}")
+                recipient = None
+            
+            logger.info(f"✓ Parties extracted - Granting Company: {granting_company}, Recipient: {recipient}")
+            
+            return {"granting_company": granting_company, "recipient": recipient}
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error in party extraction: {str(e)}")
+            return {"granting_company": None, "recipient": None}
+        except Exception as e:
+            logger.error(f"Error extracting party names: {str(e)}")
+            return {"granting_company": None, "recipient": None}
+    
+    def deidentify_contract_text(self, contract_text: str, granting_company_name: Optional[str], recipient_name: Optional[str]) -> dict:
+        """
+        Replace both party names with generic terms for privacy.
+        Handles whitespace variations, line breaks, hyphenated line wraps, and punctuation differences.
+        
+        Strategy: Normalize both text and party names consistently, then do pattern matching.
+        
+        Args:
+            contract_text: Original contract text
+            granting_company_name: Granting company name to replace
+            recipient_name: Recipient/employee name to replace
+            
+        Returns:
+            Dict with keys:
+                - success (bool): Whether de-identification succeeded
+                - text (str): De-identified text (or original if failed)
+                - granting_company_name (str): Original granting company name
+                - recipient_name (str): Original recipient name
+                - replacements (list): List of replacement descriptions
+                - error (str): Error message if failed, None otherwise
+        """
+        if not granting_company_name and not recipient_name:
+            logger.warning("⚠️ No party names to de-identify, returning original text")
+            return {
+                "success": False,
+                "text": contract_text,
+                "granting_company_name": granting_company_name,
+                "recipient_name": recipient_name,
+                "replacements": [],
+                "error": "No party names were extracted for de-identification"
+            }
+        
+        # Helper function for text normalization
+        def normalize_text(text: str) -> str:
+            """
+            Normalize text to handle PDF/Word extraction artifacts.
+            - Removes soft hyphens (Unicode U+00AD)
+            - Converts smart quotes to ASCII quotes
+            - Collapses hyphen + newline (line wraps) into space
+            - Normalizes multiple whitespace to single space
+            """
+            # Remove Unicode soft hyphen character
+            text = text.replace('\u00AD', '')
+            
+            # Convert smart quotes (Word/PDF) to regular ASCII quotes
+            # Opening/closing double quotes → "
+            text = text.replace('\u201C', '"').replace('\u201D', '"')
+            # Opening/closing single quotes → '
+            text = text.replace('\u2018', "'").replace('\u2019', "'")
+            
+            # Replace hyphen + newline/whitespace with single space
+            # This handles line-wrapped text like "Smith-\nJones LLC" → "Smith Jones LLC"
+            text = re.sub(r'-\s*\n\s*', ' ', text)
+            
+            # Normalize multiple whitespace to single space
+            text = re.sub(r'\s+', ' ', text)
+            
+            return text
+        
+        # STEP 1: Normalize contract text
+        normalized_text = normalize_text(contract_text)
+        
+        # STEP 2: Normalize extracted party names
+        normalized_granting_company = normalize_text(granting_company_name) if granting_company_name else None
+        normalized_recipient = normalize_text(recipient_name) if recipient_name else None
+        
+        deidentified_text = normalized_text
+        replacements_made = []
+        replacement_count = {}
+        
+        # Helper function to create flexible pattern
+        def create_flexible_pattern(name: str) -> str:
+            """
+            Create regex pattern that handles:
+            - Whitespace variations (spaces, tabs, newlines)
+            - Hyphen/space equivalence (handles line-wrapped hyphenated names)
+            - Punctuation variations (periods, commas)
+            """
+            # Escape the name
+            escaped = re.escape(name)
+            
+            # Replace escaped hyphens with pattern matching hyphen OR space
+            # This handles: "Smith-Jones" matching "Smith Jones" or "Smith-Jones"
+            escaped = escaped.replace(r'\-', r'(?:-|\s)')
+            
+            # Replace escaped spaces with pattern matching space OR hyphen
+            # This handles: "Smith Jones" matching "Smith-Jones" or "Smith Jones"
+            escaped = escaped.replace(r'\ ', r'(?:\s+|-)')
+            
+            # Make periods optional (handles "Inc." vs "Inc")
+            escaped = escaped.replace(r'\.', r'\.?')
+            
+            # Make commas optional (handles "Corp," vs "Corp")
+            escaped = escaped.replace(r'\,', r'\,?\s*')
+            
+            # Word boundary at start and end
+            return r'\b' + escaped + r'\b'
+        
+        # Helper function to extract aliases from text patterns
+        def extract_aliases_from_text(company_name: str, text: str) -> list:
+            """
+            Find actual aliases used in the text for this company.
+            Looks for patterns like: 
+            - Company Name Inc. ("ShortName")
+            - Company Name Inc. ('ShortName')
+            - Company Name Inc. (ShortName)
+            """
+            aliases = []
+            
+            # Escape company name for regex
+            escaped_name = re.escape(company_name)
+            
+            # Combined pattern: Company Name (optional quotes)Alias(optional quotes)
+            # Handles: ("Alias"), ('Alias'), (Alias), "Alias", 'Alias'
+            pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
+            
+            # More specific pattern for parenthetical aliases
+            paren_pattern = escaped_name + r'\s*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
+            
+            matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
+            for match in matches:
+                alias = match.group(1).strip()
+                # Strip any remaining quotes
+                alias = alias.strip('"').strip("'").strip()
+                
+                # Only accept if it looks like an alias (not numbers-only, dates, or too generic)
+                if alias and 2 <= len(alias) <= 50:
+                    if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
+                        aliases.append(alias)
+            
+            return list(set(aliases))  # Remove duplicates
+        
+        # Helper function to extract base company name
+        def extract_base_company_name(company_name: str) -> str | None:
+            """
+            Extract base company name by removing legal suffixes.
+            Examples:
+            - "Netflix, Inc." → "Netflix"
+            - "Acme Corporation" → "Acme"
+            - "Smith & Associates LLC" → "Smith & Associates"
+            
+            Returns None if base name would be too short/generic or same as input.
+            """
+            # Common legal suffixes (case-insensitive)
+            suffixes = [
+                r',?\s+Inc\.?',
+                r',?\s+LLC\.?',
+                r',?\s+L\.?L\.?C\.?',
+                r',?\s+Corp\.?',
+                r',?\s+Corporation',
+                r',?\s+Ltd\.?',
+                r',?\s+Limited',
+                r',?\s+Co\.?',
+                r',?\s+Company',
+                r',?\s+L\.?P\.?',
+                r',?\s+LLP\.?',
+                r',?\s+P\.?L\.?L\.?C\.?',
+                r',?\s+S\.?A\.?',
+                r',?\s+N\.?V\.?',
+                r',?\s+A\.?G\.?',
+                r',?\s+GmbH',
+                r',?\s+PLC'
+            ]
+            
+            base_name = company_name
+            
+            # Try removing each suffix
+            for suffix_pattern in suffixes:
+                # Match suffix at end of string
+                pattern = suffix_pattern + r'$'
+                base_name = re.sub(pattern, '', base_name, flags=re.IGNORECASE).strip()
+            
+            # Also remove trailing commas/periods if left over
+            base_name = base_name.rstrip('.,').strip()
+            
+            # Only return if:
+            # 1. It's different from original (we actually removed something)
+            # 2. It's at least 3 characters (avoid overly generic like "A", "XY")
+            # 3. It contains at least one letter (not just numbers/symbols)
+            if (base_name != company_name and 
+                len(base_name) >= 3 and 
+                re.search(r'[A-Za-z]', base_name)):
+                return base_name
+            
+            return None
+        
+        # Replace granting company with "the Company"
+        if normalized_granting_company:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_granting_company)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"granting company '{granting_company_name}' → 'the Company' ({match_count} occurrences)")
+                replacement_count['granting_company'] = match_count
+            else:
+                logger.warning(f"⚠️ Granting company name '{granting_company_name}' (normalized: '{normalized_granting_company}') not found in contract text")
+                replacement_count['granting_company'] = 0
+            
+            # Also replace base company name (e.g., "Netflix" from "Netflix, Inc.")
+            base_company_name = extract_base_company_name(normalized_granting_company)
+            if base_company_name:
+                base_pattern = create_flexible_pattern(base_company_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced granting company base name '{base_company_name}' ({len(base_matches)} occurrences)")
+            
+            # Also replace aliases found in the text (e.g., "InnovateTech" from "InnovateTech Solutions Inc. ('InnovateTech')")
+            aliases = extract_aliases_from_text(normalized_granting_company, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced granting company alias '{alias}' ({len(alias_matches)} occurrences)")
+        
+        # Replace recipient with "the Employee"
+        if normalized_recipient:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_recipient)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Employee", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"recipient '{recipient_name}' → 'the Employee' ({match_count} occurrences)")
+                replacement_count['recipient'] = match_count
+            else:
+                logger.warning(f"⚠️ Recipient name '{recipient_name}' (normalized: '{normalized_recipient}') not found in contract text")
+                replacement_count['recipient'] = 0
+            
+            # Note: We don't extract base name for recipients since they're typically individuals
+            # and don't have legal suffixes like companies do
+        
+        # Check if de-identification succeeded
+        if not replacements_made:
+            error_msg = (
+                f"Privacy extraction did not detect party names in the stock compensation agreement text. "
+                f"Extracted names (granting company: '{granting_company_name}', recipient: '{recipient_name}') "
+                f"were not found in the contract."
+            )
+            logger.warning(f"⚠️ {error_msg}")
+            return {
+                "success": False,
+                "text": contract_text,  # Return original text
+                "granting_company_name": granting_company_name,
+                "recipient_name": recipient_name,
+                "replacements": [],
+                "error": error_msg
+            }
+        
+        # Log success
+        logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
+        
+        return {
+            "success": True,
+            "text": deidentified_text,
+            "granting_company_name": granting_company_name,
+            "recipient_name": recipient_name,
+            "replacements": replacements_made,
+            "error": None
+        }
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""

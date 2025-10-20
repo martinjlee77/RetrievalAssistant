@@ -6,7 +6,7 @@ import streamlit as st
 import logging
 import uuid
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
@@ -22,6 +22,161 @@ from asc718.step_analyzer import ASC718StepAnalyzer
 from asc718.knowledge_search import ASC718KnowledgeSearch
 
 logger = logging.getLogger(__name__)
+
+def create_file_hash(uploaded_files):
+    """Create a hash of uploaded files to detect changes."""
+    if not uploaded_files:
+        return None
+    file_info = [(f.name, f.size) for f in uploaded_files]
+    return hash(tuple(file_info))
+
+def show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id):
+    """Show privacy protection confirmation screen with de-identified text preview."""
+    
+    # Cache keys
+    cached_text_key = f'asc718_cached_text_{session_id}'
+    cached_deidentify_key = f'asc718_cached_deidentify_{session_id}'
+    preview_confirmed_key = f'asc718_preview_confirmed_{session_id}'
+    
+    # If not already cached, extract and de-identify text
+    if cached_text_key not in st.session_state:
+        with st.spinner("📄 Extracting and processing stock compensation documents..."):
+            try:
+                # Extract text from all files
+                extractor = DocumentExtractor()
+                all_texts = []
+                failed_files = []
+                
+                for uploaded_file in uploaded_files:
+                    # Reset file pointer to beginning
+                    uploaded_file.seek(0)
+                    result = extractor.extract_text(uploaded_file)
+                    if result and isinstance(result, dict) and result.get('success'):
+                        all_texts.append(result['text'])
+                    else:
+                        logger.warning(f"Failed to extract text from {uploaded_file.name}")
+                        failed_files.append(uploaded_file.name)
+                
+                combined_text = "\n\n---\n\n".join(all_texts)
+                
+                # Store failed files list for UI display
+                st.session_state[f'asc718_failed_files_{session_id}'] = failed_files
+                
+                # Extract party names and de-identify
+                analyzer = ASC718StepAnalyzer()
+                party_names = analyzer.extract_party_names_llm(combined_text)
+                granting_company = party_names.get('granting_company')
+                recipient = party_names.get('recipient')
+                
+                # Run de-identification
+                deidentify_result = analyzer.deidentify_contract_text(
+                    combined_text,
+                    granting_company,
+                    recipient
+                )
+                
+                # Cache results
+                st.session_state[cached_text_key] = combined_text
+                st.session_state[cached_deidentify_key] = deidentify_result
+                
+            except Exception as e:
+                logger.error(f"Error in privacy processing: {str(e)}")
+                st.error(f"❌ Error processing stock compensation documents: {str(e)}")
+                return
+    
+    # Get cached results
+    combined_text = st.session_state[cached_text_key]
+    deidentify_result = st.session_state[cached_deidentify_key]
+    failed_files = st.session_state.get(f'asc718_failed_files_{session_id}', [])
+    
+    # Show confirmation UI
+    st.markdown("### 🔒 Privacy Protection Review")
+    
+    # Show warning if some files failed to extract
+    if failed_files:
+        st.warning(
+            f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+            f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+        )
+    
+    if deidentify_result['success']:
+        # Success case - show what was replaced
+        st.success("✓ Privacy protection applied successfully")
+        
+        # Info box with replacements
+        with st.container(border=True):
+            st.markdown("**Party names replaced:**")
+            granting_company = deidentify_result['granting_company_name']
+            recipient = deidentify_result['recipient_name']
+            
+            if granting_company:
+                st.markdown(f"• Granting Company: **\"{granting_company}\"** → **\"the Company\"**")
+            if recipient:
+                st.markdown(f"• Recipient: **\"{recipient}\"** → **\"the Employee\"**")
+        
+        # Show preview of de-identified text
+        preview_text = deidentify_result['text'][:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="De-identified agreement text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+        
+    else:
+        # Failure case - show warning
+        st.warning("⚠️ " + deidentify_result['error'])
+        st.info(
+            "**Your choice:** The system was unable to automatically detect and replace party names. "
+            "You can still proceed with the analysis using the original text."
+        )
+        
+        # Show preview of original text
+        preview_text = combined_text[:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="Original agreement text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+    
+    # Confirmation and run button
+    st.markdown("---")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.button("◀️ Go Back", use_container_width=True, key="asc718_go_back"):
+            # Clear confirmation state to go back
+            show_review_screen_key = f'asc718_show_review_{session_id}'
+            st.session_state[show_review_screen_key] = False
+            st.session_state[preview_confirmed_key] = False
+            st.rerun()
+    
+    with col2:
+        if st.button("▶️ Run Analysis", type="primary", use_container_width=True, key="asc718_run_final"):
+            # Mark as confirmed and run analysis
+            st.session_state[preview_confirmed_key] = True
+            
+            # Clear the UI and run analysis
+            st.empty()
+            
+            # Use cached de-identified text
+            final_text = deidentify_result['text']
+            
+            # Run the analysis with the confirmed text
+            # Pass uploaded filenames for memo header
+            uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+            perform_asc718_analysis(
+                pricing_result, 
+                additional_context, 
+                user_token,
+                cached_combined_text=final_text,
+                uploaded_filenames=uploaded_filenames
+            )
 
 def render_asc718_page():
     """Render the ASC 718 analysis page."""
@@ -192,25 +347,32 @@ def render_asc718_page():
             
             can_proceed = False
 
-        # Analysis button with pricing integration
-        warning_placeholder = st.empty()
+        # Show confirmation screen or button based on state
+        show_review_screen_key = f'asc718_show_review_{session_id}'
+        
         if can_proceed:
-            warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
-            )
-            if st.button("3️⃣ Confirm & Analyze",
-                       type="primary",
-                       use_container_width=True,
-                       key="asc718_analyze"):
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
-                credit_container.empty()     # Clear credit balance info
-                upload_form_container.empty()  # Clear upload form
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                perform_asc718_analysis(pricing_result, additional_context, user_token)
+            # Check if we should show the confirmation screen
+            if st.session_state.get(show_review_screen_key, False):
+                # Clear the pricing and credit containers before showing confirmation
+                pricing_container.empty()
+                credit_container.empty()
+                upload_form_container.empty()
+                
+                # Show the privacy protection confirmation screen
+                show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
+            else:
+                # Show the button to proceed to confirmation screen
+                st.info(
+                    "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
+                )
+                
+                if st.button("3️⃣ Review Privacy & Analyze",
+                           type="primary",
+                           use_container_width=True,
+                           key="asc718_show_confirmation"):
+                    # Set flag to show confirmation screen
+                    st.session_state[show_review_screen_key] = True
+                    st.rerun()
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -283,7 +445,8 @@ def get_asc718_inputs_new():
     return uploaded_files, additional_context, is_ready
 
 
-def perform_asc718_analysis(pricing_result, additional_context: str = "", user_token: str = ""):
+def perform_asc718_analysis(pricing_result, additional_context: str = "", user_token: str = "", 
+                           cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
     """Perform the complete ASC 718 analysis and display results with session isolation."""
     
     # Validate pricing result and user token
@@ -295,27 +458,32 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
         st.error("❌ Authentication required.")
         return
     
-    # Reconstruct combined text from file details (same pattern as ASC 606)
-    combined_text = ""
-    filename_list = []
-    
-    for file_detail in pricing_result['file_details']:
-        if 'text_content' in file_detail and file_detail['text_content'].strip():
-            combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
-            filename_list.append(file_detail['filename'])
-        else:
-            # Fallback if text_content is missing
-            combined_text += f"\n\n=== {file_detail['filename']} ===\n\n[File content extraction failed]"
-            filename_list.append(file_detail['filename'])
-    
-    filename_string = ", ".join(filename_list) if filename_list else "Uploaded Documents"
-    
-    # Check if we have valid content
-    if not combined_text.strip() or "[File content extraction failed]" in combined_text:
-        st.error("❌ No readable content found in uploaded files.")
-        return
+    # Use cached text if provided (from privacy screen), otherwise extract from pricing result
+    if cached_combined_text:
+        contract_text = cached_combined_text
+        filename_string = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
+    else:
+        # Reconstruct combined text from file details (same pattern as ASC 606)
+        combined_text = ""
+        filename_list = []
         
-    contract_text = combined_text.strip()
+        for file_detail in pricing_result['file_details']:
+            if 'text_content' in file_detail and file_detail['text_content'].strip():
+                combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
+                filename_list.append(file_detail['filename'])
+            else:
+                # Fallback if text_content is missing
+                combined_text += f"\n\n=== {file_detail['filename']} ===\n\n[File content extraction failed]"
+                filename_list.append(file_detail['filename'])
+        
+        filename_string = ", ".join(filename_list) if filename_list else "Uploaded Documents"
+        
+        # Check if we have valid content
+        if not combined_text.strip() or "[File content extraction failed]" in combined_text:
+            st.error("❌ No readable content found in uploaded files.")
+            return
+            
+        contract_text = combined_text.strip()
     
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:
