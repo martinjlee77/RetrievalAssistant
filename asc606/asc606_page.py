@@ -168,11 +168,14 @@ def show_confirmation_screen(uploaded_files, pricing_result, additional_context,
             final_text = deidentify_result['text']
             
             # Run the analysis with the confirmed text
+            # Pass uploaded filenames for memo header
+            uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
             perform_asc606_analysis_new(
                 pricing_result, 
                 additional_context, 
                 user_token,
-                cached_combined_text=final_text
+                cached_combined_text=final_text,
+                uploaded_filenames=uploaded_filenames
             )
 
 def render_asc606_page():
@@ -474,8 +477,9 @@ def render_asc606_page():
                 else:
                     cached_text = None
                 
-                # Run analysis with cached text
-                perform_asc606_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text)
+                # Run analysis with cached text and pass uploaded filenames
+                uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+                perform_asc606_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -704,7 +708,7 @@ def _generate_analysis_title() -> str:
     """Generate analysis title with timestamp."""
     return f"ASC606_Analysis_{datetime.now().strftime('%m%d_%H%M%S')}"
 
-def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None):
+def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
     """Perform ASC 606 analysis with new billing system integration."""
     
     analysis_id = None
@@ -726,9 +730,14 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Step 3: Use cached text if provided, otherwise reconstruct from file details
         if cached_combined_text:
             combined_text = cached_combined_text
-            # Extract filenames from pricing_result even when using cached text
-            filename_list = [file_detail['filename'] for file_detail in pricing_result['file_details']]
-            filename = ", ".join(filename_list)
+            # Extract filenames from uploaded_filenames parameter (cached flow) or file_details (legacy flow)
+            if uploaded_filenames:
+                filename = ", ".join(uploaded_filenames)
+            elif 'file_details' in pricing_result:
+                filename_list = [file_detail['filename'] for file_detail in pricing_result['file_details']]
+                filename = ", ".join(filename_list)
+            else:
+                filename = "Uploaded Documents"
             logger.info("Using cached de-identified contract text from confirmation screen")
         else:
             # Reconstruct combined text from file details
