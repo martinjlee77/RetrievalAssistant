@@ -55,6 +55,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Privacy Protection - Contract De-identification**: Automated dual-party extraction and text replacement system across ALL ASC standards.
   - Extracts both contract parties using GPT-5-mini JSON output, replaces names with generic identifiers (e.g., "the Company", "the Customer").
   - Includes comprehensive text normalization and base name extraction (removing legal suffixes) to catch standalone references.
+  - **Alias Extraction**: Automatically detects and replaces parenthetical aliases in contracts (e.g., "InnovateTech Solutions Inc., ('InnovateTech')" → both full name and "InnovateTech" are replaced). Pattern handles punctuation between company name and alias parenthesis.
   - Graceful Fallback: If extraction fails, users can still proceed with original text, making de-identification an enhancement rather than a blocking requirement.
 - **Deployment**: Production deployment uses Gunicorn via `start.sh` on Railway. The `analyses` table in the production database requires an `error_message` column for failure tracking.
 
