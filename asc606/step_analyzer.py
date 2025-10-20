@@ -1107,12 +1107,13 @@ Instructions:
             logger.error(f"Error generating background: {str(e)}")
             return f"We have reviewed the contract documents provided by {customer_name} to determine the appropriate revenue recognition treatment under ASC 606."
         
-    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
-        """Generate LLM-powered final conclusion from analysis results."""
-        logger.info("→ Generating final conclusion...")
+    def generate_final_conclusion(self, conclusions_text: str) -> str:
+        """Generate LLM-powered final conclusion from step conclusions.
         
-        # Extract conclusions from markdown content using the proper extraction method
-        conclusions_text = self._extract_conclusions_from_steps(analysis_results)
+        Args:
+            conclusions_text: Pre-extracted conclusions from all 5 steps
+        """
+        logger.info("→ Generating final conclusion...")
         prompt = f"""Generate a professional final conclusion for an ASC 606 analysis.
 
 Step Conclusions:
