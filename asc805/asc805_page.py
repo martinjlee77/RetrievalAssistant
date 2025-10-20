@@ -6,7 +6,7 @@ import streamlit as st
 import logging
 import uuid
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
@@ -22,6 +22,161 @@ from asc805.knowledge_search import ASC805KnowledgeSearch
 from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
+
+def create_file_hash(uploaded_files):
+    """Create a hash of uploaded files to detect changes."""
+    if not uploaded_files:
+        return None
+    file_info = [(f.name, f.size) for f in uploaded_files]
+    return hash(tuple(file_info))
+
+def show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id):
+    """Show privacy protection confirmation screen with de-identified text preview."""
+    
+    # Cache keys
+    cached_text_key = f'asc805_cached_text_{session_id}'
+    cached_deidentify_key = f'asc805_cached_deidentify_{session_id}'
+    preview_confirmed_key = f'asc805_preview_confirmed_{session_id}'
+    
+    # If not already cached, extract and de-identify text
+    if cached_text_key not in st.session_state:
+        with st.spinner("📄 Extracting and processing transaction documents..."):
+            try:
+                # Extract text from all files
+                extractor = DocumentExtractor()
+                all_texts = []
+                failed_files = []
+                
+                for uploaded_file in uploaded_files:
+                    # Reset file pointer to beginning
+                    uploaded_file.seek(0)
+                    result = extractor.extract_text(uploaded_file)
+                    if result and isinstance(result, dict) and result.get('success'):
+                        all_texts.append(result['text'])
+                    else:
+                        logger.warning(f"Failed to extract text from {uploaded_file.name}")
+                        failed_files.append(uploaded_file.name)
+                
+                combined_text = "\n\n---\n\n".join(all_texts)
+                
+                # Store failed files list for UI display
+                st.session_state[f'asc805_failed_files_{session_id}'] = failed_files
+                
+                # Extract party names and de-identify
+                analyzer = ASC805StepAnalyzer()
+                party_names = analyzer.extract_party_names_llm(combined_text)
+                acquirer_name = party_names.get('acquirer')
+                target_name = party_names.get('target')
+                
+                # Run de-identification
+                deidentify_result = analyzer.deidentify_contract_text(
+                    combined_text,
+                    acquirer_name,
+                    target_name
+                )
+                
+                # Cache results
+                st.session_state[cached_text_key] = combined_text
+                st.session_state[cached_deidentify_key] = deidentify_result
+                
+            except Exception as e:
+                logger.error(f"Error in privacy processing: {str(e)}")
+                st.error(f"❌ Error processing transaction documents: {str(e)}")
+                return
+    
+    # Get cached results
+    combined_text = st.session_state[cached_text_key]
+    deidentify_result = st.session_state[cached_deidentify_key]
+    failed_files = st.session_state.get(f'asc805_failed_files_{session_id}', [])
+    
+    # Show confirmation UI
+    st.markdown("### 🔒 Privacy Protection Review")
+    
+    # Show warning if some files failed to extract
+    if failed_files:
+        st.warning(
+            f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+            f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+        )
+    
+    if deidentify_result['success']:
+        # Success case - show what was replaced
+        st.success("✓ Privacy protection applied successfully")
+        
+        # Info box with replacements
+        with st.container(border=True):
+            st.markdown("**Party names replaced:**")
+            acquirer_name = deidentify_result['acquirer_name']
+            target_name = deidentify_result['target_name']
+            
+            if acquirer_name:
+                st.markdown(f"• Acquirer: **\"{acquirer_name}\"** → **\"the Company\"**")
+            if target_name:
+                st.markdown(f"• Target: **\"{target_name}\"** → **\"the Target\"**")
+        
+        # Show preview of de-identified text
+        preview_text = deidentify_result['text'][:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="De-identified transaction text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+        
+    else:
+        # Failure case - show warning
+        st.warning("⚠️ " + deidentify_result['error'])
+        st.info(
+            "**Your choice:** The system was unable to automatically detect and replace party names. "
+            "You can still proceed with the analysis using the original text."
+        )
+        
+        # Show preview of original text
+        preview_text = combined_text[:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="Original transaction text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+    
+    # Confirmation and run button
+    st.markdown("---")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.button("◀️ Go Back", use_container_width=True, key="asc805_go_back"):
+            # Clear confirmation state to go back
+            show_review_screen_key = f'asc805_show_review_{session_id}'
+            st.session_state[show_review_screen_key] = False
+            st.session_state[preview_confirmed_key] = False
+            st.rerun()
+    
+    with col2:
+        if st.button("▶️ Run Analysis", type="primary", use_container_width=True, key="asc805_run_final"):
+            # Mark as confirmed and run analysis
+            st.session_state[preview_confirmed_key] = True
+            
+            # Clear the UI and run analysis
+            st.empty()
+            
+            # Use cached de-identified text
+            final_text = deidentify_result['text']
+            
+            # Run the analysis with the confirmed text
+            # Pass uploaded filenames for memo header
+            uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+            perform_asc805_analysis_new(
+                pricing_result, 
+                additional_context, 
+                user_token,
+                cached_combined_text=final_text,
+                uploaded_filenames=uploaded_filenames
+            )
 
 def render_asc805_page():
     """Render the ASC 805 analysis page."""
@@ -147,6 +302,16 @@ def render_asc805_page():
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
         
+        # Check if we should show the privacy review screen
+        show_review_screen_key = f'asc805_show_review_{session_id}'
+        if st.session_state.get(show_review_screen_key, False):
+            # Show privacy confirmation screen (clears all other UI)
+            pricing_container.empty()
+            upload_form_container.empty()
+            user_token = auth_manager.get_auth_token()
+            show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
+            return
+        
         # Get required price and check wallet balance
         required_price = pricing_result['tier_info']['price']
         user_token = auth_manager.get_auth_token()
@@ -198,19 +363,13 @@ def render_asc805_page():
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
             )
             
-            if st.button("3️⃣ Confirm & Analyze",
+            if st.button("3️⃣ Review Privacy & Analyze",
                        type="primary",
                        use_container_width=True,
-                       key="asc805_analyze"):
-                # Clear all UI elements that should disappear during analysis
-                warning_placeholder.empty()  # Clear the warning 
-                pricing_container.empty()    # Clear pricing information
-                credit_container.empty()     # Clear credit balance info
-                upload_form_container.empty()  # Clear upload form
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                perform_asc805_analysis_new(pricing_result, additional_context, user_token)
+                       key="asc805_review_privacy"):
+                # Show privacy review screen instead of running analysis directly
+                st.session_state[show_review_screen_key] = True
+                st.rerun()
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -218,7 +377,7 @@ def render_asc805_page():
                      key="asc805_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
-        st.button("3️⃣ Confirm & Analyze", 
+        st.button("3️⃣ Review Privacy & Analyze", 
                  disabled=True, 
                  use_container_width=True,
                  key="asc805_analyze_disabled")
@@ -279,7 +438,7 @@ def get_asc805_inputs_new():
     
     return uploaded_files, additional_context, is_ready
 
-def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str):
+def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
     """Perform ASC 805 analysis with new billing system integration."""
     
     # Session isolation - create unique session ID for this user
@@ -317,9 +476,15 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
             "Closing this browser will stop the analysis and forfeit your progress."
         )
         
-        # Get contract text from pricing result
-        contract_text = pricing_result.get('combined_text', '')
-        filename = pricing_result.get('filename', 'Business Combination Documents')
+        # Get contract text from cached text or pricing result
+        contract_text = cached_combined_text if cached_combined_text else pricing_result.get('combined_text', '')
+        
+        # Get filename from uploaded_filenames or pricing result
+        if uploaded_filenames:
+            filename = ', '.join(uploaded_filenames) if len(uploaded_filenames) > 1 else uploaded_filenames[0]
+        else:
+            filename = pricing_result.get('filename', 'Business Combination Documents')
+        
         customer_name = pricing_result.get('customer_name', 'Entity')
         analysis_title = f"Business Combination Analysis for {customer_name}"
 
