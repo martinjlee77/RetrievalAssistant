@@ -23,161 +23,6 @@ from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
 
-def create_file_hash(uploaded_files):
-    """Create a hash of uploaded files to detect changes."""
-    if not uploaded_files:
-        return None
-    file_info = [(f.name, f.size) for f in uploaded_files]
-    return hash(tuple(file_info))
-
-def show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id):
-    """Show privacy protection confirmation screen with de-identified text preview."""
-    
-    # Cache keys
-    cached_text_key = f'asc805_cached_text_{session_id}'
-    cached_deidentify_key = f'asc805_cached_deidentify_{session_id}'
-    preview_confirmed_key = f'asc805_preview_confirmed_{session_id}'
-    
-    # If not already cached, extract and de-identify text
-    if cached_text_key not in st.session_state:
-        with st.spinner("📄 Extracting and processing transaction documents..."):
-            try:
-                # Extract text from all files
-                extractor = DocumentExtractor()
-                all_texts = []
-                failed_files = []
-                
-                for uploaded_file in uploaded_files:
-                    # Reset file pointer to beginning
-                    uploaded_file.seek(0)
-                    result = extractor.extract_text(uploaded_file)
-                    if result and isinstance(result, dict) and result.get('success'):
-                        all_texts.append(result['text'])
-                    else:
-                        logger.warning(f"Failed to extract text from {uploaded_file.name}")
-                        failed_files.append(uploaded_file.name)
-                
-                combined_text = "\n\n---\n\n".join(all_texts)
-                
-                # Store failed files list for UI display
-                st.session_state[f'asc805_failed_files_{session_id}'] = failed_files
-                
-                # Extract party names and de-identify
-                analyzer = ASC805StepAnalyzer()
-                party_names = analyzer.extract_party_names_llm(combined_text)
-                acquirer_name = party_names.get('acquirer')
-                target_name = party_names.get('target')
-                
-                # Run de-identification
-                deidentify_result = analyzer.deidentify_contract_text(
-                    combined_text,
-                    acquirer_name,
-                    target_name
-                )
-                
-                # Cache results
-                st.session_state[cached_text_key] = combined_text
-                st.session_state[cached_deidentify_key] = deidentify_result
-                
-            except Exception as e:
-                logger.error(f"Error in privacy processing: {str(e)}")
-                st.error(f"❌ Error processing transaction documents: {str(e)}")
-                return
-    
-    # Get cached results
-    combined_text = st.session_state[cached_text_key]
-    deidentify_result = st.session_state[cached_deidentify_key]
-    failed_files = st.session_state.get(f'asc805_failed_files_{session_id}', [])
-    
-    # Show confirmation UI
-    st.markdown("### 🔒 Privacy Protection Review")
-    
-    # Show warning if some files failed to extract
-    if failed_files:
-        st.warning(
-            f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
-            f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
-        )
-    
-    if deidentify_result['success']:
-        # Success case - show what was replaced
-        st.success("✓ Privacy protection applied successfully. Please contact support@veritaslogic.ai if you need any assistance.")
-        
-        # Info box with replacements
-        with st.container(border=True):
-            st.markdown("**Party names replaced:**")
-            acquirer_name = deidentify_result['acquirer_name']
-            target_name = deidentify_result['target_name']
-            
-            if acquirer_name:
-                st.markdown(f"• Acquirer: **\"{acquirer_name}\"** → **\"the Company\"**")
-            if target_name:
-                st.markdown(f"• Target: **\"{target_name}\"** → **\"the Target\"**")
-        
-        # Show preview of de-identified text
-        preview_text = deidentify_result['text'][:4000]
-        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
-        st.text_area(
-            label="De-identified transaction text",
-            value=preview_text,
-            height=300,
-            disabled=True,
-            label_visibility="collapsed"
-        )
-        
-    else:
-        # Failure case - show warning
-        st.warning("⚠️ " + deidentify_result['error'])
-        st.info(
-            "**Your choice:** The system was unable to automatically detect and replace party names. "
-            "You can still proceed with the analysis using the original text."
-        )
-        
-        # Show preview of original text
-        preview_text = combined_text[:4000]
-        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
-        st.text_area(
-            label="Original transaction text",
-            value=preview_text,
-            height=300,
-            disabled=True,
-            label_visibility="collapsed"
-        )
-    
-    # Confirmation and run button
-    st.markdown("---")
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        if st.button("◀️ Go Back", use_container_width=True, key="asc805_go_back"):
-            # Clear confirmation state to go back
-            show_review_screen_key = f'asc805_show_review_{session_id}'
-            st.session_state[show_review_screen_key] = False
-            st.session_state[preview_confirmed_key] = False
-            st.rerun()
-    
-    with col2:
-        if st.button("▶️ Run Analysis", type="primary", use_container_width=True, key="asc805_run_final"):
-            # Mark as confirmed and run analysis
-            st.session_state[preview_confirmed_key] = True
-            
-            # Clear the UI and run analysis
-            st.empty()
-            
-            # Use cached de-identified text
-            final_text = deidentify_result['text']
-            
-            # Run the analysis with the confirmed text
-            # Pass uploaded filenames for memo header
-            uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
-            perform_asc805_analysis_new(
-                pricing_result, 
-                additional_context, 
-                user_token,
-                cached_combined_text=final_text,
-                uploaded_filenames=uploaded_filenames
-            )
-
 def render_asc805_page():
     """Render the ASC 805 analysis page."""
     
@@ -256,61 +101,139 @@ def render_asc805_page():
     with upload_form_container.container():
         uploaded_files, additional_context, is_ready = get_asc805_inputs_new()
 
-    # Show pricing information immediately when files are uploaded (regardless of is_ready)
+    # Process files when uploaded - extract, de-identify, and price
     pricing_result = None
-    pricing_container = st.empty()  # Create clearable container FIRST (before if block)
+    processing_container = st.empty()
+    pricing_container = st.empty()
+    
     if uploaded_files:
-        # Process files for pricing - dynamic cost updating with progress indicator
-        with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
-            pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        # Step 1: Extract and de-identify for Document Processing section
+        cached_text_key = f'asc805_cached_text_{session_id}'
+        cached_deidentify_key = f'asc805_cached_deidentify_{session_id}'
+        cached_word_count_key = f'asc805_cached_word_count_{session_id}'
         
-        if pricing_result['success']:
-            with pricing_container.container():  # Put EVERYTHING inside
-                st.markdown("### :primary[Analysis Pricing]")
-                st.info(pricing_result['billing_summary'])
-
-                # Show file processing details
-                if pricing_result.get('processing_errors'):
-                    st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
-
-                # Display document quality feedback
-                if pricing_result.get('file_details'):
-                    SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])
-        else:
-            # Handle different error types
-            if pricing_result.get('error') == 'scanned_pdf_detected':
-                st.error(pricing_result.get('user_message', 'Scanned PDF detected'))
-                
-                # Add helpful expandable section
-                with st.expander("💡 Detailed Instructions"):
-                    st.markdown("""
-                    **Using ChatGPT-4 Vision:**
-                    1. Go to ChatGPT-4 with Vision
-                    2. Upload your scanned PDF
-                    3. Ask: "Please convert this document to clean, searchable text"
-                    4. Copy the text and create a new Word/PDF document
-                    5. Upload the new text-based document here
+        # Extract and de-identify if not cached
+        if cached_text_key not in st.session_state:
+            with st.spinner("📄 Extracting and processing transaction documents..."):
+                try:
+                    extractor = DocumentExtractor()
+                    all_texts = []
+                    failed_files = []
                     
-                    **Alternative Tools:**
-                    - Adobe Acrobat (OCR feature)
-                    - Google Docs (automatically OCRs uploaded PDFs)
-                    - Microsoft Word (Insert > Object > Text from File)
-                    """)
+                    for uploaded_file in uploaded_files:
+                        uploaded_file.seek(0)
+                        result = extractor.extract_text(uploaded_file)
+                        # Check if extraction succeeded (no error and has text)
+                        if result and isinstance(result, dict) and not result.get('error') and result.get('text'):
+                            all_texts.append(result['text'])
+                        else:
+                            failed_files.append(uploaded_file.name)
+                    
+                    # Check if we have any successfully extracted text
+                    if not all_texts:
+                        st.error(
+                            f"❌ **File extraction failed**\n\n"
+                            f"Could not extract text from any uploaded files. "
+                            f"Please ensure your files are text-based (not scanned images) and try again."
+                        )
+                        return
+                    
+                    combined_text = "\n\n---\n\n".join(all_texts)
+                    
+                    # Calculate word count for pricing
+                    word_count = len(combined_text.split())
+                    
+                    # Extract party names and de-identify
+                    analyzer = ASC805StepAnalyzer()
+                    party_names = analyzer.extract_party_names_llm(combined_text)
+                    acquirer_name = party_names.get('acquirer')
+                    target_name = party_names.get('target')
+                    
+                    deidentify_result = analyzer.deidentify_contract_text(
+                        combined_text,
+                        acquirer_name,
+                        target_name
+                    )
+                    
+                    # Cache results
+                    st.session_state[cached_text_key] = combined_text
+                    st.session_state[cached_deidentify_key] = deidentify_result
+                    st.session_state[cached_word_count_key] = word_count
+                    st.session_state[f'asc805_failed_files_{session_id}'] = failed_files
+                    
+                except Exception as e:
+                    logger.error(f"Error in document processing: {str(e)}")
+                    st.error(f"❌ Error processing transaction documents: {str(e)}")
+        
+        # Show Document Processing section
+        if cached_deidentify_key in st.session_state:
+            deidentify_result = st.session_state[cached_deidentify_key]
+            failed_files = st.session_state.get(f'asc805_failed_files_{session_id}', [])
+            
+            with processing_container.container():
+                st.markdown("### :primary[Document Processing]")
+                
+                # Show extraction warnings if any
+                if failed_files:
+                    st.warning(
+                        f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+                        f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+                    )
+                
+                if deidentify_result['success']:
+                    st.success("✓ Privacy protection applied successfully. Please contact support@veritaslogic.ai if you need any assistance.")
+                    
+                    with st.container(border=True):
+                        st.markdown("**Party names replaced:**")
+                        if deidentify_result['acquirer_name']:
+                            st.markdown(f"• Acquirer: **\"{deidentify_result['acquirer_name']}\"** → **\"the Company\"**")
+                        if deidentify_result['target_name']:
+                            st.markdown(f"• Target: **\"{deidentify_result['target_name']}\"** → **\"the Target\"**")
+                    
+                    # Show 4000-char preview
+                    preview_text = deidentify_result['text'][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="De-identified transaction text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="deidentified_preview"
+                    )
+                else:
+                    st.warning("⚠️ " + deidentify_result['error'])
+                    st.info(
+                        "**Your choice:** The system was unable to automatically detect and replace party names. "
+                        "The analysis will proceed using the original text."
+                    )
+                    
+                    # Show original text preview
+                    preview_text = st.session_state[cached_text_key][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="Original transaction text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="original_preview"
+                    )
+        
+        # Step 2: Calculate pricing from cached word count (no re-extraction)
+        if cached_word_count_key in st.session_state:
+            word_count = st.session_state[cached_word_count_key]
+            pricing_result = preflight_pricing.calculate_pricing_from_word_count(word_count, len(uploaded_files))
+
+            if pricing_result['success']:
+                with pricing_container.container():
+                    st.markdown("### :primary[Analysis Pricing]")
+                    st.info(pricing_result['billing_summary'])
             else:
-                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+                st.error(f"❌ **Pricing Calculation Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
-        
-        # Check if we should show the privacy review screen
-        show_review_screen_key = f'asc805_show_review_{session_id}'
-        if st.session_state.get(show_review_screen_key, False):
-            # Show privacy confirmation screen (clears all other UI)
-            pricing_container.empty()
-            upload_form_container.empty()
-            user_token = auth_manager.get_auth_token()
-            show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id)
-            return
         
         # Get required price and check wallet balance
         required_price = pricing_result['tier_info']['price']
@@ -358,18 +281,39 @@ def render_asc805_page():
         
         # Analysis section
         if can_proceed:
-            warning_placeholder = st.empty()  # Create a placeholder for the warning
+            warning_placeholder = st.empty()
             warning_placeholder.info(
                 "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
             )
             
-            if st.button("3️⃣ Review Privacy & Analyze",
+            if st.button("3️⃣ Confirm & Analyze",
                        type="primary",
                        use_container_width=True,
-                       key="asc805_review_privacy"):
-                # Show privacy review screen instead of running analysis directly
-                st.session_state[show_review_screen_key] = True
-                st.rerun()
+                       key="asc805_analyze"):
+                # Clear all UI elements that should disappear during analysis
+                warning_placeholder.empty()
+                processing_container.empty()
+                pricing_container.empty()
+                credit_container.empty()
+                upload_form_container.empty()
+                
+                if not user_token:
+                    st.error("❌ Authentication required. Please refresh the page and log in again.")
+                    return
+                
+                # Get cached de-identified text
+                cached_text_key = f'asc805_cached_text_{session_id}'
+                cached_deidentify_key = f'asc805_cached_deidentify_{session_id}'
+                
+                if cached_deidentify_key in st.session_state:
+                    deidentify_result = st.session_state[cached_deidentify_key]
+                    cached_text = deidentify_result['text']
+                else:
+                    cached_text = None
+                
+                # Run analysis with cached text and pass uploaded filenames
+                uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+                perform_asc805_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -377,7 +321,7 @@ def render_asc805_page():
                      key="asc805_analyze_disabled")
     else:
         # Show disabled button with helpful message when not ready
-        st.button("3️⃣ Review Privacy & Analyze", 
+        st.button("3️⃣ Confirm & Analyze", 
                  disabled=True, 
                  use_container_width=True,
                  key="asc805_analyze_disabled")
