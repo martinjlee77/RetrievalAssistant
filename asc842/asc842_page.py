@@ -511,13 +511,13 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         ui.analysis_progress(steps, 6, progress_indicator_placeholder)
 
         with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Extract conclusions from the 5 steps
+            # Extract conclusions once from the 5 steps
             conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
             
             # Generate the three additional sections
             executive_summary = analyzer.generate_executive_summary(conclusions_text, entity_name)
             background = analyzer.generate_background_section(conclusions_text, entity_name)
-            conclusion = analyzer.generate_final_conclusion(analysis_results)
+            conclusion = analyzer.generate_final_conclusion(conclusions_text)
             
             # Combine into the expected structure for memo generator
             final_results = {

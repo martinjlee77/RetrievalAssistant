@@ -771,12 +771,13 @@ Format as clean markdown - no headers, just paragraphs."""
             logger.error(f"Error generating background section: {str(e)}")
             return f"We have reviewed the stock compensation award documents provided by {entity_name} to determine the appropriate accounting treatment under ASC 718. This memorandum presents our analysis following the five-step ASC 718 methodology."
     
-    def generate_final_conclusion(self, analysis_results: Dict[str, Any]) -> str:
-        """Generate LLM-powered final conclusion from analysis results."""
+    def generate_final_conclusion(self, conclusions_text: str) -> str:
+        """Generate LLM-powered final conclusion from step conclusions.
+        
+        Args:
+            conclusions_text: Pre-extracted conclusions from all steps
+        """
         logger.info("→ Generating final conclusion...")
-
-        # Extract conclusions from markdown content using the proper extraction method
-        conclusions_text = self._extract_conclusions_from_steps(analysis_results)
         prompt = f"""Generate a professional final conclusion for an ASC 718 analysis.
 
     Step Conclusions:

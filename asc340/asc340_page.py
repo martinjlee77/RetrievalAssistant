@@ -489,11 +489,11 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Generate memo
         with st.spinner("📄 Generating professional memo..."):
             try:
-                # Extract conclusions and generate additional sections
+                # Extract conclusions once and generate additional sections
                 conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
                 executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
                 background = analyzer.generate_background_section(conclusions_text, customer_name) 
-                final_conclusion = analyzer.generate_final_conclusion(analysis_results)
+                final_conclusion = analyzer.generate_final_conclusion(conclusions_text)
                 
                 # Prepare analysis_results dict with all components for CleanMemoGenerator
                 memo_analysis_results = {
