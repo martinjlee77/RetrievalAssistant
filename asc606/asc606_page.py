@@ -726,7 +726,9 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
         # Step 3: Use cached text if provided, otherwise reconstruct from file details
         if cached_combined_text:
             combined_text = cached_combined_text
-            filename = "Contract Documents"
+            # Extract filenames from pricing_result even when using cached text
+            filename_list = [file_detail['filename'] for file_detail in pricing_result['file_details']]
+            filename = ", ".join(filename_list)
             logger.info("Using cached de-identified contract text from confirmation screen")
         else:
             # Reconstruct combined text from file details
