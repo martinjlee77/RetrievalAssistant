@@ -11,6 +11,7 @@ import logging
 import time
 import re
 import random
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -107,6 +108,337 @@ Respond with ONLY the company name, nothing else."""
         except Exception as e:
             logger.error(f"Error extracting company entity name with LLM: {str(e)}")
             return "Company"
+    
+    def extract_party_names_llm(self, contract_text: str) -> Dict[str, Optional[str]]:
+        """
+        Extract party names from commission capitalization agreement for de-identification.
+        
+        Returns:
+            dict: {
+                'company': str,              # The company capitalizing commissions
+                'counterparty': str,         # The employee or third-party receiving commissions
+                'counterparty_type': str     # 'employee' or 'third_party'
+            }
+        """
+        try:
+            logger.info("🔒 Extracting party names for de-identification...")
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying parties in commission capitalization agreements, employment contracts, and contractor agreements."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Analyze this commission capitalization agreement and identify the TWO main parties:
+
+1. COMPANY: The organization capitalizing sales commissions (paying commissions to obtain contracts)
+2. COUNTERPARTY: The individual or entity receiving the commissions (may be an employee or third-party contractor/agent)
+
+INSTRUCTIONS:
+- Identify the company name with full legal suffixes (Inc., LLC, Corp., Ltd., etc.)
+- Identify the counterparty (person or company receiving commissions)
+- Determine if the counterparty is an "employee" or "third_party" based on the relationship described
+- Look for language like employment agreement, contractor agreement, commission plan, sales compensation
+- Ignore addresses, reference numbers, contact details
+
+Contract Text:
+{contract_text[:4000]}
+
+Respond with ONLY a JSON object in this exact format:
+{{"company": "Company Name Inc.", "counterparty": "John Doe", "counterparty_type": "employee"}}
+
+OR if it's a third-party contractor:
+{{"company": "Company Name Inc.", "counterparty": "Sales Agency LLC", "counterparty_type": "third_party"}}"""
+                }
+            ]
+            
+            response_content = self._make_llm_request(messages, self.light_model, "default")
+            
+            # Track API cost
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=messages,
+                response_text=response_content or "",
+                model=self.light_model,
+                request_type="party_extraction"
+            )
+            
+            if not response_content:
+                logger.warning("LLM returned empty response for party extraction")
+                return {"company": None, "counterparty": None, "counterparty_type": None}
+            
+            # Log raw response for debugging
+            logger.info(f"Raw LLM response for party extraction: {response_content[:200]}")
+            
+            # Parse JSON response
+            response_content = response_content.strip()
+            
+            # Handle code block formatting if present
+            if response_content.startswith("```"):
+                response_content = re.sub(r'^```(?:json)?\s*|\s*```$', '', response_content, flags=re.MULTILINE)
+            
+            party_data = json.loads(response_content)
+            
+            # Validate and clean
+            company = party_data.get("company", "").strip().strip('"').strip("'").strip()
+            counterparty = party_data.get("counterparty", "").strip().strip('"').strip("'").strip()
+            counterparty_type = party_data.get("counterparty_type", "").strip().lower()
+            
+            # Validation checks
+            company_valid = company and 2 <= len(company) <= 120
+            counterparty_valid = counterparty and 2 <= len(counterparty) <= 120
+            type_valid = counterparty_type in ["employee", "third_party"]
+            
+            if not company_valid:
+                logger.warning(f"Invalid company name extracted: {company}")
+                company = None
+            
+            if not counterparty_valid:
+                logger.warning(f"Invalid counterparty name extracted: {counterparty}")
+                counterparty = None
+            
+            if not type_valid:
+                logger.warning(f"Invalid counterparty type extracted: {counterparty_type}, defaulting to 'employee'")
+                counterparty_type = "employee"
+            
+            logger.info(f"✓ Parties extracted - Company: {company}, Counterparty: {counterparty} ({counterparty_type})")
+            
+            return {"company": company, "counterparty": counterparty, "counterparty_type": counterparty_type}
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error in party extraction: {str(e)}")
+            return {"company": None, "counterparty": None, "counterparty_type": None}
+        except Exception as e:
+            logger.error(f"Error extracting party names: {str(e)}")
+            return {"company": None, "counterparty": None, "counterparty_type": None}
+    
+    def deidentify_contract_text(self, contract_text: str, company_name: Optional[str], counterparty_name: Optional[str], counterparty_type: Optional[str] = "employee") -> dict:
+        """
+        Replace party names with generic terms for privacy.
+        Handles whitespace variations, line breaks, hyphenated line wraps, and punctuation differences.
+        
+        Strategy: Normalize both text and party names consistently, then do pattern matching.
+        
+        Args:
+            contract_text: Original contract text
+            company_name: Company name to replace with "the Company"
+            counterparty_name: Counterparty name to replace with "the Employee" or "the Third Party"
+            counterparty_type: 'employee' or 'third_party' to determine replacement term
+            
+        Returns:
+            Dict with keys:
+                - success (bool): Whether de-identification succeeded
+                - text (str): De-identified text (or original if failed)
+                - company_name (str): Original company name
+                - counterparty_name (str): Original counterparty name
+                - counterparty_type (str): Type of counterparty
+                - replacements (list): List of replacement descriptions
+                - error (str): Error message if failed, None otherwise
+        """
+        if not company_name and not counterparty_name:
+            logger.warning("⚠️ No party names to de-identify, returning original text")
+            return {
+                "success": False,
+                "text": contract_text,
+                "company_name": company_name,
+                "counterparty_name": counterparty_name,
+                "counterparty_type": counterparty_type,
+                "replacements": [],
+                "error": "No party names were extracted for de-identification"
+            }
+        
+        # Helper function for text normalization
+        def normalize_text(text: str) -> str:
+            """
+            Normalize text to handle PDF/Word extraction artifacts.
+            - Removes soft hyphens (Unicode U+00AD)
+            - Converts smart quotes to ASCII quotes
+            - Collapses hyphen + newline (line wraps) into space
+            - Normalizes multiple whitespace to single space
+            """
+            # Remove Unicode soft hyphen character
+            text = text.replace('\u00AD', '')
+            
+            # Convert smart quotes (Word/PDF) to regular ASCII quotes
+            # Opening/closing double quotes → "
+            text = text.replace('\u201C', '"').replace('\u201D', '"')
+            # Opening/closing single quotes → '
+            text = text.replace('\u2018', "'").replace('\u2019', "'")
+            
+            # Replace hyphen + newline/whitespace with single space
+            # This handles line-wrapped text like "Smith-\nJones LLC" → "Smith Jones LLC"
+            text = re.sub(r'-\s*\n\s*', ' ', text)
+            
+            # Normalize multiple whitespace to single space
+            text = re.sub(r'\s+', ' ', text)
+            
+            return text
+        
+        # STEP 1: Normalize contract text
+        normalized_text = normalize_text(contract_text)
+        
+        # STEP 2: Normalize extracted party names
+        normalized_company = normalize_text(company_name) if company_name else None
+        normalized_counterparty = normalize_text(counterparty_name) if counterparty_name else None
+        
+        deidentified_text = normalized_text
+        replacements_made = []
+        replacement_count = {}
+        
+        # Helper function to create flexible pattern
+        def create_flexible_pattern(name: str) -> str:
+            """
+            Create regex pattern that handles:
+            - Whitespace variations (spaces, tabs, newlines)
+            - Hyphen/space equivalence (handles line-wrapped hyphenated names)
+            - Punctuation variations (periods, commas)
+            """
+            # Escape the name
+            escaped = re.escape(name)
+            
+            # Replace escaped hyphens with pattern matching hyphen OR space
+            # This handles: "Smith-Jones" matching "Smith Jones" or "Smith-Jones"
+            escaped = escaped.replace(r'\-', r'(?:-|\s)')
+            
+            # Replace escaped spaces with pattern matching space OR hyphen
+            # This handles: "Smith Jones" matching "Smith-Jones" or "Smith Jones"
+            escaped = escaped.replace(r'\ ', r'(?:\s+|-)')
+            
+            # Make periods optional (handles "Inc." vs "Inc")
+            escaped = escaped.replace(r'\.', r'\.?')
+            
+            # Make commas optional (handles "Corp," vs "Corp")
+            escaped = escaped.replace(r'\,', r'\,?\s*')
+            
+            # Word boundary at start and end
+            return r'\b' + escaped + r'\b'
+        
+        # Helper function to extract base company name
+        def extract_base_company_name(company_name: str) -> str | None:
+            """
+            Extract base company name by removing legal suffixes.
+            Examples:
+            - "Netflix, Inc." → "Netflix"
+            - "Acme Corporation" → "Acme"
+            - "Smith & Associates LLC" → "Smith & Associates"
+            
+            Returns None if base name would be too short/generic or same as input.
+            """
+            # Common legal suffixes (case-insensitive)
+            suffixes = [
+                r',?\s+Inc\.?',
+                r',?\s+LLC\.?',
+                r',?\s+L\.?L\.?C\.?',
+                r',?\s+Corp\.?',
+                r',?\s+Corporation',
+                r',?\s+Ltd\.?',
+                r',?\s+Limited',
+                r',?\s+Co\.?',
+                r',?\s+Company',
+                r',?\s+L\.?P\.?',
+                r',?\s+LLP\.?',
+                r',?\s+P\.?L\.?L\.?C\.?',
+                r',?\s+S\.?A\.?',
+                r',?\s+N\.?V\.?',
+                r',?\s+A\.?G\.?',
+                r',?\s+GmbH',
+                r',?\s+PLC'
+            ]
+            
+            base_name = company_name
+            
+            # Try removing each suffix
+            for suffix_pattern in suffixes:
+                # Match suffix at end of string
+                pattern = suffix_pattern + r'$'
+                base_name = re.sub(pattern, '', base_name, flags=re.IGNORECASE).strip()
+            
+            # Also remove trailing commas/periods if left over
+            base_name = base_name.rstrip('.,').strip()
+            
+            # Only return if:
+            # 1. It's different from original (we actually removed something)
+            # 2. It's at least 3 characters (avoid overly generic like "A", "XY")
+            # 3. It contains at least one letter (not just numbers/symbols)
+            if (base_name != company_name and 
+                len(base_name) >= 3 and 
+                re.search(r'[A-Za-z]', base_name)):
+                return base_name
+            
+            return None
+        
+        # Replace company with "the Company"
+        if normalized_company:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_company)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"company '{company_name}' → 'the Company' ({match_count} occurrences)")
+                replacement_count['company'] = match_count
+            else:
+                logger.warning(f"⚠️ Company name '{company_name}' (normalized: '{normalized_company}') not found in contract text")
+                replacement_count['company'] = 0
+            
+            # Also replace base company name (e.g., "Netflix" from "Netflix, Inc.")
+            base_company_name = extract_base_company_name(normalized_company)
+            if base_company_name:
+                base_pattern = create_flexible_pattern(base_company_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced company base name '{base_company_name}' ({len(base_matches)} occurrences)")
+        
+        # Replace counterparty with "the Employee" or "the Third Party"
+        counterparty_replacement = "the Employee" if counterparty_type == "employee" else "the Third Party"
+        
+        if normalized_counterparty:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_counterparty)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, counterparty_replacement, deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"counterparty '{counterparty_name}' → '{counterparty_replacement}' ({match_count} occurrences)")
+                replacement_count['counterparty'] = match_count
+            else:
+                logger.warning(f"⚠️ Counterparty name '{counterparty_name}' (normalized: '{normalized_counterparty}') not found in contract text")
+                replacement_count['counterparty'] = 0
+        
+        # Check if de-identification succeeded
+        if not replacements_made:
+            error_msg = (
+                f"Privacy extraction did not detect party names in the contract text. "
+                f"Extracted names (company: '{company_name}', counterparty: '{counterparty_name}') "
+                f"were not found in the contract."
+            )
+            logger.warning(f"⚠️ {error_msg}")
+            return {
+                "success": False,
+                "text": contract_text,  # Return original text
+                "company_name": company_name,
+                "counterparty_name": counterparty_name,
+                "counterparty_type": counterparty_type,
+                "replacements": [],
+                "error": error_msg
+            }
+        
+        # Log success
+        logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
+        
+        return {
+            "success": True,
+            "text": deidentified_text,
+            "company_name": company_name,
+            "counterparty_name": counterparty_name,
+            "counterparty_type": counterparty_type,
+            "replacements": replacements_made,
+            "error": None
+        }
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
