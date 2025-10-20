@@ -207,7 +207,7 @@ def render_asc606_page():
             st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
 
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
+- **Download:** Download the memo as a Word (.docx), Markdown, or PDF file for later use.
                         """)
             
             # Quick action buttons
@@ -900,7 +900,7 @@ def perform_asc606_analysis_new(pricing_result: Dict[str, Any], additional_conte
                     st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
 
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
+- **Download:** Download the memo as a Word (.docx), Markdown or PDF file for later use.
                         """)
                     
                     # Quick action buttons
