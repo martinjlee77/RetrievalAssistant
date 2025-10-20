@@ -11,6 +11,7 @@ import logging
 import time
 import re
 import random
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
@@ -107,6 +108,380 @@ Respond with ONLY the entity name, nothing else."""
         except Exception as e:
             logger.error(f"Error extracting entity name with LLM: {str(e)}")
             return "Entity"
+    
+    def extract_party_names_llm(self, contract_text: str) -> Dict[str, Optional[str]]:
+        """
+        Extract BOTH party names from lease agreement for de-identification.
+        
+        Returns:
+            dict: {
+                'lessor': str,      # The lessor/landlord (property owner)
+                'lessee': str       # The lessee/tenant (company leasing space)
+            }
+        """
+        try:
+            logger.info("🔒 Extracting both party names for de-identification...")
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at identifying the two main parties in lease agreements, including office leases, equipment leases, ground leases, and sublease agreements."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Analyze this lease agreement and identify the TWO main contracting parties:
+
+1. LESSOR: The company or entity owning/providing the leased property or equipment (may be called lessor, landlord, owner, sublessor, or just "Party A")
+2. LESSEE: The company receiving/leasing the property or equipment (may be called lessee, tenant, renter, sublessee, or just "Party B")
+
+INSTRUCTIONS:
+- Look for language like "by and between [Company X] and [Company Y]", "Party A/Party B", or companies mentioned in signature blocks
+- Extract full legal names with suffixes (Inc., LLC, Corp., Ltd., etc.)
+- Ignore addresses, reference numbers, contact names, or other non-company identifiers
+- If the contract uses neutral terminology (Party A/B), identify which one is providing vs receiving based on the obligations described
+
+Lease Agreement Text:
+{contract_text[:4000]}
+
+Respond with ONLY a JSON object in this exact format:
+{{"lessor": "First Party Company Name Inc.", "lessee": "Second Party Company Name LLC"}}"""
+                }
+            ]
+            
+            response_content = self._make_llm_request(messages, self.light_model, "default")
+            
+            # Track API cost
+            from shared.api_cost_tracker import track_openai_request
+            track_openai_request(
+                messages=messages,
+                response_text=response_content or "",
+                model=self.light_model,
+                request_type="party_extraction"
+            )
+            
+            if not response_content:
+                logger.warning("LLM returned empty response for party extraction")
+                return {"lessor": None, "lessee": None}
+            
+            # Log raw response for debugging
+            logger.info(f"Raw LLM response for party extraction: {response_content[:200]}")
+            
+            # Parse JSON response
+            response_content = response_content.strip()
+            
+            # Handle code block formatting if present
+            if response_content.startswith("```"):
+                response_content = re.sub(r'^```(?:json)?\s*|\s*```$', '', response_content, flags=re.MULTILINE)
+            
+            party_data = json.loads(response_content)
+            
+            # Validate and clean
+            lessor = party_data.get("lessor", "").strip().strip('"').strip("'").strip()
+            lessee = party_data.get("lessee", "").strip().strip('"').strip("'").strip()
+            
+            # Validation checks
+            lessor_valid = lessor and 2 <= len(lessor) <= 120
+            lessee_valid = lessee and 2 <= len(lessee) <= 120
+            
+            if not lessor_valid:
+                logger.warning(f"Invalid lessor name extracted: {lessor}")
+                lessor = None
+            
+            if not lessee_valid:
+                logger.warning(f"Invalid lessee name extracted: {lessee}")
+                lessee = None
+            
+            logger.info(f"✓ Parties extracted - Lessor: {lessor}, Lessee: {lessee}")
+            
+            return {"lessor": lessor, "lessee": lessee}
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error in party extraction: {str(e)}")
+            return {"lessor": None, "lessee": None}
+        except Exception as e:
+            logger.error(f"Error extracting party names: {str(e)}")
+            return {"lessor": None, "lessee": None}
+    
+    def deidentify_contract_text(self, contract_text: str, lessor_name: Optional[str], lessee_name: Optional[str]) -> dict:
+        """
+        Replace both party names with generic terms for privacy.
+        Handles whitespace variations, line breaks, hyphenated line wraps, and punctuation differences.
+        
+        Strategy: Normalize both text and party names consistently, then do pattern matching.
+        
+        Args:
+            contract_text: Original contract text
+            lessor_name: Lessor/landlord company name to replace
+            lessee_name: Lessee/tenant company name to replace
+            
+        Returns:
+            Dict with keys:
+                - success (bool): Whether de-identification succeeded
+                - text (str): De-identified text (or original if failed)
+                - lessor_name (str): Original lessor name
+                - lessee_name (str): Original lessee name
+                - replacements (list): List of replacement descriptions
+                - error (str): Error message if failed, None otherwise
+        """
+        if not lessor_name and not lessee_name:
+            logger.warning("⚠️ No party names to de-identify, returning original text")
+            return {
+                "success": False,
+                "text": contract_text,
+                "lessor_name": lessor_name,
+                "lessee_name": lessee_name,
+                "replacements": [],
+                "error": "No party names were extracted for de-identification"
+            }
+        
+        # Helper function for text normalization
+        def normalize_text(text: str) -> str:
+            """
+            Normalize text to handle PDF/Word extraction artifacts.
+            - Removes soft hyphens (Unicode U+00AD)
+            - Converts smart quotes to ASCII quotes
+            - Collapses hyphen + newline (line wraps) into space
+            - Normalizes multiple whitespace to single space
+            """
+            # Remove Unicode soft hyphen character
+            text = text.replace('\u00AD', '')
+            
+            # Convert smart quotes (Word/PDF) to regular ASCII quotes
+            # Opening/closing double quotes → "
+            text = text.replace('\u201C', '"').replace('\u201D', '"')
+            # Opening/closing single quotes → '
+            text = text.replace('\u2018', "'").replace('\u2019', "'")
+            
+            # Replace hyphen + newline/whitespace with single space
+            # This handles line-wrapped text like "Smith-\nJones LLC" → "Smith Jones LLC"
+            text = re.sub(r'-\s*\n\s*', ' ', text)
+            
+            # Normalize multiple whitespace to single space
+            text = re.sub(r'\s+', ' ', text)
+            
+            return text
+        
+        # STEP 1: Normalize contract text
+        normalized_text = normalize_text(contract_text)
+        
+        # STEP 2: Normalize extracted party names
+        normalized_lessor = normalize_text(lessor_name) if lessor_name else None
+        normalized_lessee = normalize_text(lessee_name) if lessee_name else None
+        
+        deidentified_text = normalized_text
+        replacements_made = []
+        replacement_count = {}
+        
+        # Helper function to create flexible pattern
+        def create_flexible_pattern(name: str) -> str:
+            """
+            Create regex pattern that handles:
+            - Whitespace variations (spaces, tabs, newlines)
+            - Hyphen/space equivalence (handles line-wrapped hyphenated names)
+            - Punctuation variations (periods, commas)
+            """
+            # Escape the name
+            escaped = re.escape(name)
+            
+            # Replace escaped hyphens with pattern matching hyphen OR space
+            # This handles: "Smith-Jones" matching "Smith Jones" or "Smith-Jones"
+            escaped = escaped.replace(r'\-', r'(?:-|\s)')
+            
+            # Replace escaped spaces with pattern matching space OR hyphen
+            # This handles: "Smith Jones" matching "Smith-Jones" or "Smith Jones"
+            escaped = escaped.replace(r'\ ', r'(?:\s+|-)')
+            
+            # Make periods optional (handles "Inc." vs "Inc")
+            escaped = escaped.replace(r'\.', r'\.?')
+            
+            # Make commas optional (handles "Corp," vs "Corp")
+            escaped = escaped.replace(r'\,', r'\,?\s*')
+            
+            # Word boundary at start and end
+            return r'\b' + escaped + r'\b'
+        
+        # Helper function to extract aliases from text patterns
+        def extract_aliases_from_text(company_name: str, text: str) -> list:
+            """
+            Find actual aliases used in the text for this company.
+            Looks for patterns like: 
+            - Company Name Inc. ("ShortName")
+            - Company Name Inc. ('ShortName')
+            - Company Name Inc. (ShortName)
+            """
+            aliases = []
+            
+            # Escape company name for regex
+            escaped_name = re.escape(company_name)
+            
+            # Combined pattern: Company Name (optional quotes)Alias(optional quotes)
+            # Handles: ("Alias"), ('Alias'), (Alias), "Alias", 'Alias'
+            pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
+            
+            # More specific pattern for parenthetical aliases
+            paren_pattern = escaped_name + r'\s*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
+            
+            matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
+            for match in matches:
+                alias = match.group(1).strip()
+                # Strip any remaining quotes
+                alias = alias.strip('"').strip("'").strip()
+                
+                # Only accept if it looks like an alias (not numbers-only, dates, or too generic)
+                if alias and 2 <= len(alias) <= 50:
+                    if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
+                        aliases.append(alias)
+            
+            return list(set(aliases))  # Remove duplicates
+        
+        # Helper function to extract base company name
+        def extract_base_company_name(company_name: str) -> str | None:
+            """
+            Extract base company name by removing legal suffixes.
+            Examples:
+            - "Netflix, Inc." → "Netflix"
+            - "Acme Corporation" → "Acme"
+            - "Smith & Associates LLC" → "Smith & Associates"
+            
+            Returns None if base name would be too short/generic or same as input.
+            """
+            # Common legal suffixes (case-insensitive)
+            suffixes = [
+                r',?\s+Inc\.?',
+                r',?\s+LLC\.?',
+                r',?\s+L\.?L\.?C\.?',
+                r',?\s+Corp\.?',
+                r',?\s+Corporation',
+                r',?\s+Ltd\.?',
+                r',?\s+Limited',
+                r',?\s+Co\.?',
+                r',?\s+Company',
+                r',?\s+L\.?P\.?',
+                r',?\s+LLP\.?',
+                r',?\s+P\.?L\.?L\.?C\.?',
+                r',?\s+S\.?A\.?',
+                r',?\s+N\.?V\.?',
+                r',?\s+A\.?G\.?',
+                r',?\s+GmbH',
+                r',?\s+PLC'
+            ]
+            
+            base_name = company_name
+            
+            # Try removing each suffix
+            for suffix_pattern in suffixes:
+                # Match suffix at end of string
+                pattern = suffix_pattern + r'$'
+                base_name = re.sub(pattern, '', base_name, flags=re.IGNORECASE).strip()
+            
+            # Also remove trailing commas/periods if left over
+            base_name = base_name.rstrip('.,').strip()
+            
+            # Only return if:
+            # 1. It's different from original (we actually removed something)
+            # 2. It's at least 3 characters (avoid overly generic like "A", "XY")
+            # 3. It contains at least one letter (not just numbers/symbols)
+            if (base_name != company_name and 
+                len(base_name) >= 3 and 
+                re.search(r'[A-Za-z]', base_name)):
+                return base_name
+            
+            return None
+        
+        # Replace lessee with "the Company"
+        if normalized_lessee:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_lessee)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"lessee '{lessee_name}' → 'the Company' ({match_count} occurrences)")
+                replacement_count['lessee'] = match_count
+            else:
+                logger.warning(f"⚠️ Lessee name '{lessee_name}' (normalized: '{normalized_lessee}') not found in contract text")
+                replacement_count['lessee'] = 0
+            
+            # Also replace base company name (e.g., "Netflix" from "Netflix, Inc.")
+            base_lessee_name = extract_base_company_name(normalized_lessee)
+            if base_lessee_name:
+                base_pattern = create_flexible_pattern(base_lessee_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced lessee base name '{base_lessee_name}' ({len(base_matches)} occurrences)")
+            
+            # Also replace aliases found in the text (e.g., "InnovateTech" from "InnovateTech Solutions Inc. ('InnovateTech')")
+            aliases = extract_aliases_from_text(normalized_lessee, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Company", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced lessee alias '{alias}' ({len(alias_matches)} occurrences)")
+        
+        # Replace lessor with "the Lessor"
+        if normalized_lessor:
+            # First replace the full name
+            pattern = create_flexible_pattern(normalized_lessor)
+            matches = list(re.finditer(pattern, deidentified_text, flags=re.IGNORECASE))
+            match_count = len(matches)
+            
+            if match_count > 0:
+                deidentified_text = re.sub(pattern, "the Lessor", deidentified_text, flags=re.IGNORECASE)
+                replacements_made.append(f"lessor '{lessor_name}' → 'the Lessor' ({match_count} occurrences)")
+                replacement_count['lessor'] = match_count
+            else:
+                logger.warning(f"⚠️ Lessor name '{lessor_name}' (normalized: '{normalized_lessor}') not found in contract text")
+                replacement_count['lessor'] = 0
+            
+            # Also replace base company name (e.g., "Martin" from "Martin, LLC")
+            base_lessor_name = extract_base_company_name(normalized_lessor)
+            if base_lessor_name:
+                base_pattern = create_flexible_pattern(base_lessor_name)
+                base_matches = list(re.finditer(base_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(base_matches) > 0:
+                    deidentified_text = re.sub(base_pattern, "the Lessor", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced lessor base name '{base_lessor_name}' ({len(base_matches)} occurrences)")
+            
+            # Also replace aliases found in the text
+            aliases = extract_aliases_from_text(normalized_lessor, normalized_text)
+            for alias in aliases:
+                alias_pattern = create_flexible_pattern(alias)
+                alias_matches = list(re.finditer(alias_pattern, deidentified_text, flags=re.IGNORECASE))
+                if len(alias_matches) > 0:
+                    deidentified_text = re.sub(alias_pattern, "the Lessor", deidentified_text, flags=re.IGNORECASE)
+                    logger.info(f"  → Also replaced lessor alias '{alias}' ({len(alias_matches)} occurrences)")
+        
+        # Check if de-identification succeeded
+        if not replacements_made:
+            error_msg = (
+                f"Privacy extraction did not detect party names in the lease agreement text. "
+                f"Extracted names (lessor: '{lessor_name}', lessee: '{lessee_name}') "
+                f"were not found in the contract."
+            )
+            logger.warning(f"⚠️ {error_msg}")
+            return {
+                "success": False,
+                "text": contract_text,  # Return original text
+                "lessor_name": lessor_name,
+                "lessee_name": lessee_name,
+                "replacements": [],
+                "error": error_msg
+            }
+        
+        # Log success
+        logger.info(f"✓ De-identification complete: {', '.join(replacements_made)}")
+        
+        return {
+            "success": True,
+            "text": deidentified_text,
+            "lessor_name": lessor_name,
+            "lessee_name": lessee_name,
+            "replacements": replacements_made,
+            "error": None
+        }
     
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""

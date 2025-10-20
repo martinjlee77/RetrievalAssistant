@@ -23,6 +23,161 @@ from asc842.knowledge_search import ASC842KnowledgeSearch
 
 logger = logging.getLogger(__name__)
 
+def create_file_hash(uploaded_files):
+    """Create a hash of uploaded files to detect changes."""
+    if not uploaded_files:
+        return None
+    file_info = [(f.name, f.size) for f in uploaded_files]
+    return hash(tuple(file_info))
+
+def show_confirmation_screen(uploaded_files, pricing_result, additional_context, user_token, session_id):
+    """Show privacy protection confirmation screen with de-identified text preview."""
+    
+    # Cache keys
+    cached_text_key = f'asc842_cached_text_{session_id}'
+    cached_deidentify_key = f'asc842_cached_deidentify_{session_id}'
+    preview_confirmed_key = f'asc842_preview_confirmed_{session_id}'
+    
+    # If not already cached, extract and de-identify text
+    if cached_text_key not in st.session_state:
+        with st.spinner("📄 Extracting and processing lease agreement text..."):
+            try:
+                # Extract text from all files
+                extractor = DocumentExtractor()
+                all_texts = []
+                failed_files = []
+                
+                for uploaded_file in uploaded_files:
+                    # Reset file pointer to beginning
+                    uploaded_file.seek(0)
+                    result = extractor.extract_text(uploaded_file)
+                    if result and isinstance(result, dict) and result.get('success'):
+                        all_texts.append(result['text'])
+                    else:
+                        logger.warning(f"Failed to extract text from {uploaded_file.name}")
+                        failed_files.append(uploaded_file.name)
+                
+                combined_text = "\n\n---\n\n".join(all_texts)
+                
+                # Store failed files list for UI display
+                st.session_state[f'asc842_failed_files_{session_id}'] = failed_files
+                
+                # Extract party names and de-identify
+                analyzer = ASC842StepAnalyzer()
+                party_names = analyzer.extract_party_names_llm(combined_text)
+                lessor_name = party_names.get('lessor')
+                lessee_name = party_names.get('lessee')
+                
+                # Run de-identification
+                deidentify_result = analyzer.deidentify_contract_text(
+                    combined_text,
+                    lessor_name,
+                    lessee_name
+                )
+                
+                # Cache results
+                st.session_state[cached_text_key] = combined_text
+                st.session_state[cached_deidentify_key] = deidentify_result
+                
+            except Exception as e:
+                logger.error(f"Error in privacy processing: {str(e)}")
+                st.error(f"❌ Error processing lease agreement: {str(e)}")
+                return
+    
+    # Get cached results
+    combined_text = st.session_state[cached_text_key]
+    deidentify_result = st.session_state[cached_deidentify_key]
+    failed_files = st.session_state.get(f'asc842_failed_files_{session_id}', [])
+    
+    # Show confirmation UI
+    st.markdown("### 🔒 Privacy Protection Review")
+    
+    # Show warning if some files failed to extract
+    if failed_files:
+        st.warning(
+            f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+            f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+        )
+    
+    if deidentify_result['success']:
+        # Success case - show what was replaced
+        st.success("✓ Privacy protection applied successfully")
+        
+        # Info box with replacements
+        with st.container(border=True):
+            st.markdown("**Party names replaced:**")
+            lessor_name = deidentify_result['lessor_name']
+            lessee_name = deidentify_result['lessee_name']
+            
+            if lessor_name:
+                st.markdown(f"• Lessor: **\"{lessor_name}\"** → **\"the Lessor\"**")
+            if lessee_name:
+                st.markdown(f"• Lessee: **\"{lessee_name}\"** → **\"the Company\"**")
+        
+        # Show preview of de-identified text
+        preview_text = deidentify_result['text'][:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="De-identified lease text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+        
+    else:
+        # Failure case - show warning
+        st.warning("⚠️ " + deidentify_result['error'])
+        st.info(
+            "**Your choice:** The system was unable to automatically detect and replace party names. "
+            "You can still proceed with the analysis using the original text."
+        )
+        
+        # Show preview of original text
+        preview_text = combined_text[:4000]
+        st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+        st.text_area(
+            label="Original lease text",
+            value=preview_text,
+            height=300,
+            disabled=True,
+            label_visibility="collapsed"
+        )
+    
+    # Confirmation and run button
+    st.markdown("---")
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        if st.button("◀️ Go Back", use_container_width=True, key="asc842_go_back"):
+            # Clear confirmation state to go back
+            show_review_screen_key = f'asc842_show_review_{session_id}'
+            st.session_state[show_review_screen_key] = False
+            st.session_state[preview_confirmed_key] = False
+            st.rerun()
+    
+    with col2:
+        if st.button("▶️ Run Analysis", type="primary", use_container_width=True, key="asc842_run_final"):
+            # Mark as confirmed and run analysis
+            st.session_state[preview_confirmed_key] = True
+            
+            # Clear the UI and run analysis
+            st.empty()
+            
+            # Use cached de-identified text
+            final_text = deidentify_result['text']
+            
+            # Run the analysis with the confirmed text
+            # Pass uploaded filenames for memo header
+            uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+            perform_asc842_analysis_new(
+                pricing_result, 
+                additional_context, 
+                user_token,
+                cached_combined_text=final_text,
+                uploaded_filenames=uploaded_filenames
+            )
+
 def render_asc842_page():
     """Render the ASC 842 analysis page."""
     
@@ -104,48 +259,148 @@ def render_asc842_page():
     with upload_form_container.container():
         uploaded_files, additional_context, is_ready = get_asc842_inputs_new()
 
-    # Show pricing information immediately when files are uploaded (regardless of is_ready)
+    # Process files when uploaded - extract, de-identify, and price
     pricing_result = None
-    pricing_container = st.empty()  # Create clearable container FIRST (before if block)
+    processing_container = st.empty()
+    pricing_container = st.empty()
+    
     if uploaded_files:
-        # Process files for pricing - dynamic cost updating with progress indicator
-        with st.spinner("📄 Analyzing document content and calculating costs. Please be patient for large files."):
-            pricing_result = preflight_pricing.process_files_for_pricing(uploaded_files)
+        # Step 1: Extract and de-identify for Document Processing section
+        file_hash = create_file_hash(uploaded_files)
+        privacy_hash_key = f'asc842_privacy_hash_{session_id}'
+        cached_text_key = f'asc842_cached_text_{session_id}'
+        cached_deidentify_key = f'asc842_cached_deidentify_{session_id}'
+        cached_word_count_key = f'asc842_cached_word_count_{session_id}'
         
-        if pricing_result['success']:
-            with pricing_container.container():  # Put EVERYTHING inside
-                st.markdown("### :primary[Analysis Pricing]")
-                st.info(pricing_result['billing_summary'])
-
-                # Show file processing details
-                if pricing_result.get('processing_errors'):
-                    st.warning(f"⚠️ **Some files had issues:** {'; '.join(pricing_result['processing_errors'])}")
-
-                # Display document quality feedback
-                if pricing_result.get('file_details'):
-                    SharedUIComponents.display_document_quality_feedback(pricing_result['file_details'])
-        else:
-            # Handle different error types
-            if pricing_result.get('error') == 'scanned_pdf_detected':
-                st.error(pricing_result.get('user_message', 'Scanned PDF detected'))
-                
-                # Add helpful expandable section
-                with st.expander("💡 Detailed Instructions"):
-                    st.markdown("""
-                    **Using ChatGPT-4 Vision:**
-                    1. Go to ChatGPT-4 with Vision
-                    2. Upload your scanned PDF
-                    3. Ask: "Please convert this document to clean, searchable text"
-                    4. Copy the text and create a new Word/PDF document
-                    5. Upload the new text-based document here
+        # Check if we need to re-process (files changed)
+        if st.session_state.get(privacy_hash_key) != file_hash:
+            if cached_text_key in st.session_state:
+                del st.session_state[cached_text_key]
+            if cached_deidentify_key in st.session_state:
+                del st.session_state[cached_deidentify_key]
+            if cached_word_count_key in st.session_state:
+                del st.session_state[cached_word_count_key]
+            st.session_state[privacy_hash_key] = file_hash
+        
+        # Extract and de-identify if not cached
+        if cached_text_key not in st.session_state:
+            with st.spinner("📄 Extracting and processing lease agreement text..."):
+                try:
+                    extractor = DocumentExtractor()
+                    all_texts = []
+                    failed_files = []
                     
-                    **Alternative Tools:**
-                    - Adobe Acrobat (OCR feature)
-                    - Google Docs (automatically OCRs uploaded PDFs)
-                    - Microsoft Word (Insert > Object > Text from File)
-                    """)
+                    for uploaded_file in uploaded_files:
+                        uploaded_file.seek(0)
+                        result = extractor.extract_text(uploaded_file)
+                        # Check if extraction succeeded (no error and has text)
+                        if result and isinstance(result, dict) and not result.get('error') and result.get('text'):
+                            all_texts.append(result['text'])
+                        else:
+                            failed_files.append(uploaded_file.name)
+                    
+                    # Check if we have any successfully extracted text
+                    if not all_texts:
+                        st.error(
+                            f"❌ **File extraction failed**\n\n"
+                            f"Could not extract text from any uploaded files. "
+                            f"Please ensure your files are text-based (not scanned images) and try again."
+                        )
+                        return
+                    
+                    combined_text = "\n\n---\n\n".join(all_texts)
+                    
+                    # Calculate word count for pricing
+                    word_count = len(combined_text.split())
+                    
+                    # Extract party names and de-identify
+                    analyzer = ASC842StepAnalyzer()
+                    party_names = analyzer.extract_party_names_llm(combined_text)
+                    lessor_name = party_names.get('lessor')
+                    lessee_name = party_names.get('lessee')
+                    
+                    deidentify_result = analyzer.deidentify_contract_text(
+                        combined_text,
+                        lessor_name,
+                        lessee_name
+                    )
+                    
+                    # Cache results
+                    st.session_state[cached_text_key] = combined_text
+                    st.session_state[cached_deidentify_key] = deidentify_result
+                    st.session_state[cached_word_count_key] = word_count
+                    st.session_state[f'asc842_failed_files_{session_id}'] = failed_files
+                    
+                except Exception as e:
+                    logger.error(f"Error in document processing: {str(e)}")
+                    st.error(f"❌ Error processing lease agreement: {str(e)}")
+        
+        # Show Document Processing section
+        if cached_deidentify_key in st.session_state:
+            deidentify_result = st.session_state[cached_deidentify_key]
+            failed_files = st.session_state.get(f'asc842_failed_files_{session_id}', [])
+            
+            with processing_container.container():
+                st.markdown("### :primary[Document Processing]")
+                
+                # Show extraction warnings if any
+                if failed_files:
+                    st.warning(
+                        f"⚠️ **File extraction issues:** {len(failed_files)} file(s) could not be processed: "
+                        f"{', '.join(failed_files)}. The analysis will proceed with the remaining files only."
+                    )
+                
+                if deidentify_result['success']:
+                    st.success("✓ Privacy protection applied successfully")
+                    
+                    with st.container(border=True):
+                        st.markdown("**Party names replaced:**")
+                        if deidentify_result['lessor_name']:
+                            st.markdown(f"• Lessor: **\"{deidentify_result['lessor_name']}\"** → **\"the Lessor\"**")
+                        if deidentify_result['lessee_name']:
+                            st.markdown(f"• Lessee: **\"{deidentify_result['lessee_name']}\"** → **\"the Company\"**")
+                    
+                    # Show 4000-char preview
+                    preview_text = deidentify_result['text'][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="De-identified lease text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="deidentified_preview"
+                    )
+                else:
+                    st.warning("⚠️ " + deidentify_result['error'])
+                    st.info(
+                        "**Your choice:** The system was unable to automatically detect and replace party names. "
+                        "The analysis will proceed using the original text."
+                    )
+                    
+                    # Show original text preview
+                    preview_text = st.session_state[cached_text_key][:4000]
+                    st.markdown("**Preview of text to be analyzed (first 4,000 characters):**")
+                    st.text_area(
+                        label="Original lease text",
+                        value=preview_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed",
+                        key="original_preview"
+                    )
+        
+        # Step 2: Calculate pricing from cached word count (no re-extraction)
+        if cached_word_count_key in st.session_state:
+            word_count = st.session_state[cached_word_count_key]
+            pricing_result = preflight_pricing.calculate_pricing_from_word_count(word_count, len(uploaded_files))
+
+            if pricing_result['success']:
+                with pricing_container.container():
+                    st.markdown("### :primary[Analysis Pricing]")
+                    st.info(pricing_result['billing_summary'])
             else:
-                st.error(f"❌ **File Processing Failed**\n\n{pricing_result['error']}")
+                st.error(f"❌ **Pricing Calculation Failed**\n\n{pricing_result['error']}")
 
     # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
     if is_ready and pricing_result and pricing_result['success']:
@@ -207,13 +462,30 @@ def render_asc842_page():
                        key="asc842_analyze"):
                 # Clear all UI elements that should disappear during analysis
                 warning_placeholder.empty()  # Clear the warning 
+                processing_container.empty()  # Clear document processing preview
                 pricing_container.empty()    # Clear pricing information
                 credit_container.empty()     # Clear credit balance info
                 upload_form_container.empty()  # Clear upload form
                 if not user_token:
                     st.error("❌ Authentication required. Please refresh the page and log in again.")
                     return
-                perform_asc842_analysis_new(pricing_result, additional_context, user_token)
+                
+                # Use cached de-identified text if available
+                cached_deidentify_key = f'asc842_cached_deidentify_{session_id}'
+                if cached_deidentify_key in st.session_state:
+                    deidentify_result = st.session_state[cached_deidentify_key]
+                    final_text = deidentify_result['text']
+                    uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
+                    perform_asc842_analysis_new(
+                        pricing_result, 
+                        additional_context, 
+                        user_token,
+                        cached_combined_text=final_text,
+                        uploaded_filenames=uploaded_filenames
+                    )
+                else:
+                    # Fallback to original flow if no cached text
+                    perform_asc842_analysis_new(pricing_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -347,7 +619,7 @@ def _upload_and_process_asc842():
         return None, None
 
 
-def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, user_token: str):
+def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, user_token: str, cached_combined_text: str = None, uploaded_filenames: list = None):
     """Perform the complete ASC 842 analysis using new file processing system."""
     
     # Session isolation - create unique session ID for this user
@@ -385,16 +657,21 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         
         # Payment will be processed when analysis completes (no upfront charging)
         
-        # Extract combined text from file details (like ASC 340-40)
-        combined_text = ""
-        filename_list = []
-        
-        for file_detail in pricing_result.get('file_details', []):
-            if 'text_content' in file_detail and file_detail['text_content'].strip():
-                combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
-                filename_list.append(file_detail['filename'])
-        
-        filename_string = ", ".join(filename_list)
+        # Use cached text if available, otherwise extract from file details
+        if cached_combined_text:
+            combined_text = cached_combined_text
+            filename_string = ", ".join(uploaded_filenames) if uploaded_filenames else "lease_contract.txt"
+        else:
+            # Extract combined text from file details (like ASC 340-40)
+            combined_text = ""
+            filename_list = []
+            
+            for file_detail in pricing_result.get('file_details', []):
+                if 'text_content' in file_detail and file_detail['text_content'].strip():
+                    combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
+                    filename_list.append(file_detail['filename'])
+            
+            filename_string = ", ".join(filename_list)
         
         if not combined_text.strip():
             st.error("❌ No readable content found in uploaded files. Please check your documents and try again.")
