@@ -306,31 +306,31 @@ Respond with ONLY a JSON object in this exact format:
             Looks for patterns like: 
             - Company Name Inc. ("ShortName")
             - Company Name Inc. ('ShortName')
-            - Company Name Inc. (ShortName)
+            - Company Name Inc. ("Alias1" or "Alias2")
             """
             aliases = []
             
             # Escape company name for regex
             escaped_name = re.escape(company_name)
             
-            # Combined pattern: Company Name (optional quotes)Alias(optional quotes)
-            # Handles: ("Alias"), ('Alias'), (Alias), "Alias", 'Alias'
-            pattern = escaped_name + r'\s*\(?\s*["\']?\s*([A-Za-z0-9][A-Za-z0-9\s\-&]{1,49})\s*["\']?\s*\)?'
-            
             # More specific pattern for parenthetical aliases
             # Allow optional punctuation (commas, periods) between company name and parenthesis
-            paren_pattern = escaped_name + r'[,\.\s]*\(\s*["\']?([^)"\']{2,50})["\']?\s*\)'
+            paren_pattern = escaped_name + r'[,\.\s]*\(([^)]{2,200})\)'
             
             matches = re.finditer(paren_pattern, text, flags=re.IGNORECASE)
             for match in matches:
-                alias = match.group(1).strip()
-                # Strip any remaining quotes
-                alias = alias.strip('"').strip("'").strip()
+                content = match.group(1).strip()
                 
-                # Only accept if it looks like an alias (not numbers-only, dates, or too generic)
-                if alias and 2 <= len(alias) <= 50:
-                    if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
-                        aliases.append(alias)
+                # Extract all quoted strings from the parenthetical content
+                # This focuses on actual aliases and avoids false positives from descriptive clauses
+                quoted_aliases = re.findall(r'["\']([A-Za-z0-9\s\-&]{2,50})["\']', content)
+                
+                for alias in quoted_aliases:
+                    alias = alias.strip()
+                    # Only accept if it looks like an alias (not numbers-only)
+                    if alias and 2 <= len(alias) <= 50:
+                        if re.match(r'^[A-Za-z0-9\s\-&]+$', alias) and not re.match(r'^\d+$', alias):
+                            aliases.append(alias)
             
             return list(set(aliases))  # Remove duplicates
         
