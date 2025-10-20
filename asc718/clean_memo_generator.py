@@ -4,7 +4,6 @@ ASC 718 Clean Memo Generator
 
 import streamlit as st
 import streamlit.components.v1 as components
-import weasyprint
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 import tempfile
@@ -142,15 +141,11 @@ class CleanMemoGenerator:
     def display_clean_memo(self, memo_content: str, analysis_id: Optional[str] = None, filename: Optional[str] = None, customer_name: Optional[str] = None):
         """Display clean memo with enhanced formatting and download options."""
         
-        # Apply HTML styling for better readability
-        styled_memo = self._apply_html_styling(memo_content)
+        # Convert markdown to HTML with professional styling
+        html_content = self._convert_markdown_to_html(memo_content)
         
-        # Create a container with max width for better readability
-        with st.container():
-            st.markdown(
-                f'<div style="max-width: 800px;">{styled_memo}</div>',
-                unsafe_allow_html=True
-            )
+        # Display the HTML memo
+        st.markdown(html_content, unsafe_allow_html=True)
         
         # Add download section
         st.markdown("---")
@@ -183,10 +178,9 @@ class CleanMemoGenerator:
             
             with col2:
                 # Markdown download
-                md_content = self._clean_markdown_content(memo_content)
                 st.download_button(
                     label="📝 Markdown",
-                    data=md_content,
+                    data=memo_content,
                     file_name=f"ASC718_Analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                     mime="text/markdown",
                     use_container_width=True
@@ -219,54 +213,87 @@ class CleanMemoGenerator:
                     st.info("Copy functionality requires manual selection and Ctrl+C")
             
     
-    def _apply_html_styling(self, content: str) -> str:
-        """Apply HTML styling to markdown content for better display."""
-        
-        # Convert markdown headers to HTML with styling
-        content = re.sub(r'^# (.+)$', r'<h1 style="color: #1f77b4; border-bottom: 2px solid #1f77b4; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px;">\1</h1>', content, flags=re.MULTILINE)
-        content = re.sub(r'^## (.+)$', r'<h2 style="color: #ffffff; margin-top: 25px; margin-bottom: 15px; font-size: 1.3em;">\1</h2>', content, flags=re.MULTILINE)
-        content = re.sub(r'^### (.+)$', r'<h3 style="color: #ffffff; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">\1</h3>', content, flags=re.MULTILINE)
-        
-        # Style bold text
-        content = re.sub(r'\*\*(.+?)\*\*', r'<strong style="color: #ffffff;">\1</strong>', content)
-        
-        # Convert bullet points
-        content = re.sub(r'^- (.+)$', r'<li style="margin-bottom: 5px;">\1</li>', content, flags=re.MULTILINE)
-        content = re.sub(r'(<li.*?>.*?</li>\s*)+', r'<ul style="margin: 10px 0; padding-left: 20px;">\g<0></ul>', content, flags=re.DOTALL)
-        
-        # Add paragraph styling
-        lines = content.split('\n')
-        styled_lines = []
-        for line in lines:
-            line = line.strip()
-            if line and not line.startswith('<') and not line.startswith('|'):
-                if not any(marker in line for marker in ['<h1', '<h2', '<h3', '<li', '<ul', '</ul>']):
-                    line = f'<p style="margin-bottom: 15px; line-height: 1.6;">{line}</p>'
-            styled_lines.append(line)
-        
-        return '\n'.join(styled_lines)
-    
-    def _clean_markdown_content(self, content: str) -> str:
-        """Clean and format markdown content for download."""
-        
-        # Remove any HTML tags that might have been added
-        content = re.sub(r'<[^>]+>', '', content)
-        
-        # Clean up extra whitespace
-        content = re.sub(r'\n\s*\n\s*\n', '\n\n', content)
-        
-        # Ensure proper markdown formatting
-        lines = content.split('\n')
-        cleaned_lines = []
+    def _convert_markdown_to_html(self, markdown_content: str) -> str:
+        """Convert memo markdown to clean HTML for display."""
+        lines = markdown_content.split('\n')
+        html_lines = []
+        in_list = False
         
         for line in lines:
-            line = line.strip()
-            if line:
-                cleaned_lines.append(line)
-            elif cleaned_lines and cleaned_lines[-1]:  # Only add blank line if previous line wasn't blank
-                cleaned_lines.append('')
-        
-        return '\n'.join(cleaned_lines)
+            # Headers
+            if line.startswith('# '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h1>{line[2:]}</h1>')
+            elif line.startswith('## '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h2 style="color: #ffffff;">{line[3:]}</h2>')
+            elif line.startswith('### '):
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<h3 style="color: #ffffff;">{line[4:]}</h3>')
+            # Lists
+            elif line.strip().startswith('- '):
+                if not in_list:
+                    html_lines.append('<ul>')
+                    in_list = True
+                html_lines.append(f'<li>{line.strip()[2:]}</li>')
+            # Tables (simple conversion)
+            elif '|' in line and line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                # Simple table handling
+                cells = [cell.strip() for cell in line.split('|')[1:-1]]
+                if cells:
+                    if line.strip().startswith('|'):
+                        row_html = '<tr>' + ''.join(f'<td>{cell}</td>' for cell in cells) + '</tr>'
+                        html_lines.append(row_html)
+            # Bold text (enhanced handling for multiple ** pairs)
+            elif '**' in line and line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                # Handle multiple bold sections
+                processed_line = line
+                while '**' in processed_line:
+                    processed_line = processed_line.replace('**', '<strong>', 1).replace('**', '</strong>', 1)
+                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{processed_line}</p>')
+            # Skip horizontal rules (as requested)
+            elif line.strip() == '---':
+                continue
+            # Empty lines - add small spacing
+            elif line.strip() == '':
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                continue
+            # Regular paragraphs
+            elif line.strip():
+                if in_list:
+                    html_lines.append('</ul>')
+                    in_list = False
+                html_lines.append(f'<p style="margin: 10px 0; line-height: 1.6;">{line}</p>')
+
+        # Close any open lists
+        if in_list:
+            html_lines.append('</ul>')
+
+        # Join with improved styling - matches ASC 606 format
+        html_content = f"""
+        <div style="font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+        line-height: 1.6; max-width: 850px; padding: 30px; 
+        border: 1px solid #e1e5e9; 
+        border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            {''.join(html_lines)}
+        </div>
+        """
+
+        return html_content
     
     def _generate_pdf(self, content: str) -> Optional[bytes]:
         """Generate PDF using ReportLab"""
@@ -382,72 +409,3 @@ class CleanMemoGenerator:
             else:
                 # Regular text
                 paragraph.add_run(part)
-    
-    def _markdown_to_html(self, content: str) -> str:
-        """Convert markdown content to HTML."""
-        
-        # Simple markdown to HTML conversion
-        html_content = content
-        
-        # Headers
-        html_content = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html_content, flags=re.MULTILINE)
-        html_content = re.sub(r'^## (.+)$', r'<h2>\1</h2>', html_content, flags=re.MULTILINE)
-        html_content = re.sub(r'^### (.+)$', r'<h3>\1</h3>', html_content, flags=re.MULTILINE)
-        
-        # Bold text
-        html_content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html_content)
-        
-        # Lists
-        html_content = re.sub(r'^- (.+)$', r'<li>\1</li>', html_content, flags=re.MULTILINE)
-        html_content = re.sub(r'(<li>.*</li>\s*)+', r'<ul>\g<0></ul>', html_content, flags=re.DOTALL)
-        
-        # Paragraphs
-        lines = html_content.split('\n')
-        processed_lines = []
-        
-        for line in lines:
-            line = line.strip()
-            if line and not line.startswith('<'):
-                line = f'<p>{line}</p>'
-            processed_lines.append(line)
-        
-        return '\n'.join(processed_lines)
-    
-    def _convert_markdown_to_html(self, content: str) -> str:
-        """Convert markdown content to HTML for display."""
-        
-        # Convert headers
-        content = re.sub(r'^# (.+)$', r'<h1>\1</h1>', content, flags=re.MULTILINE)
-        content = re.sub(r'^## (.+)$', r'<h2>\1</h2>', content, flags=re.MULTILINE)
-        content = re.sub(r'^### (.+)$', r'<h3>\1</h3>', content, flags=re.MULTILINE)
-        content = re.sub(r'^#### (.+)$', r'<h4>\1</h4>', content, flags=re.MULTILINE)
-        content = re.sub(r'^##### (.+)$', r'<h5>\1</h5>', content, flags=re.MULTILINE)
-        content = re.sub(r'^###### (.+)$', r'<h6>\1</h6>', content, flags=re.MULTILINE)
-        
-        # Convert bold text
-        content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', content)
-        
-        # Convert italic text
-        content = re.sub(r'\*(.+?)\*', r'<em>\1</em>', content)
-        
-        # Convert bullet points
-        content = re.sub(r'^- (.+)$', r'<li>\1</li>', content, flags=re.MULTILINE)
-        
-        # Wrap consecutive list items in <ul> tags
-        content = re.sub(r'(<li>.*</li>\s*)+', r'<ul>\g<0></ul>', content, flags=re.DOTALL)
-        
-        # Convert line breaks to paragraphs
-        paragraphs = content.split('\n\n')
-        html_paragraphs = []
-        
-        for paragraph in paragraphs:
-            paragraph = paragraph.strip()
-            if paragraph:
-                # Don't wrap headers or lists in paragraph tags
-                if not (paragraph.startswith('<h') or paragraph.startswith('<ul>') or paragraph.startswith('<li>')):
-                    # Handle multi-line paragraphs
-                    paragraph = paragraph.replace('\n', '<br>')
-                    paragraph = f'<p>{paragraph}</p>'
-                html_paragraphs.append(paragraph)
-        
-        return '\n'.join(html_paragraphs)
