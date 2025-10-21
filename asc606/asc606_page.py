@@ -31,6 +31,137 @@ def create_file_hash(uploaded_files):
     file_info = [(f.name, f.size) for f in uploaded_files]
     return hash(tuple(file_info))
 
+def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
+    """
+    Fetch analysis from backend and load into session state.
+    
+    Args:
+        analysis_id: Database analysis_id to fetch
+        source: 'url' for URL parameter, 'recent' for auto-load
+    
+    Returns:
+        Tuple of (success: bool, message: str, timestamp: str or None)
+    """
+    import requests
+    from datetime import datetime
+    
+    try:
+        # Get auth token
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, "Authentication required", None
+        
+        # Fetch analysis from backend
+        backend_url = os.getenv('BACKEND_URL', 'http://localhost:3000')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{backend_url}/api/analysis/status/{analysis_id}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            return False, "Analysis not found", None
+        elif response.status_code != 200:
+            return False, f"Failed to fetch analysis: {response.status_code}", None
+        
+        data = response.json()
+        
+        # Verify it's completed
+        if data.get('status') != 'completed':
+            return False, f"Analysis is {data.get('status')}", None
+        
+        memo_content = data.get('memo_content')
+        if not memo_content:
+            return False, "No memo content found", None
+        
+        # Load into session state
+        session_id = st.session_state.get('user_session_id', '')
+        analysis_key = f'asc606_analysis_complete_{session_id}'
+        memo_key = f'asc606_memo_data_{session_id}'
+        
+        # Store memo data with metadata
+        st.session_state[analysis_key] = True
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'analysis_id': analysis_id,
+            'loaded_from': source,
+            'completed_at': data.get('completed_at')
+        }
+        
+        # Clear URL parameter after loading
+        if source == 'url' and 'analysis_id' in st.query_params:
+            st.query_params.clear()
+        
+        timestamp = data.get('completed_at')
+        return True, "Analysis loaded successfully", timestamp
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch analysis {analysis_id}: {str(e)}")
+        return False, f"Error loading analysis: {str(e)}", None
+
+def check_for_analysis_to_load():
+    """
+    Check for analysis to auto-load on page load.
+    Priority: 1) URL parameter, 2) Recent analysis (within 24 hours)
+    
+    Returns:
+        Tuple of (loaded: bool, source: str, timestamp: str or None)
+    """
+    import requests
+    
+    # Skip if already have memo in session
+    session_id = st.session_state.get('user_session_id', '')
+    memo_key = f'asc606_memo_data_{session_id}'
+    if st.session_state.get(memo_key):
+        return False, None, None
+    
+    # Priority 1: Check URL parameter ?analysis_id=X
+    query_params = st.query_params
+    if 'analysis_id' in query_params:
+        try:
+            analysis_id = int(query_params['analysis_id'])
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='url')
+            if success:
+                return True, 'url', timestamp
+            else:
+                st.warning(f"Could not load analysis from URL: {message}")
+        except ValueError:
+            st.warning("Invalid analysis_id in URL")
+        return False, None, None
+    
+    # Priority 2: Check for recent completed analysis (within 24 hours)
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, None, None
+        
+        backend_url = os.getenv('BACKEND_URL', 'http://localhost:3000')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{backend_url}/api/analysis/recent/asc606',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_id = data.get('analysis_id')
+            
+            # Load this analysis into session state
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='recent')
+            if success:
+                return True, 'recent', timestamp
+        elif response.status_code != 404:
+            logger.warning(f"Failed to check for recent analysis: {response.status_code}")
+        
+    except Exception as e:
+        logger.error(f"Error checking for recent analysis: {str(e)}")
+    
+    return False, None, None
+
 def render_asc606_page():
     """Render the ASC 606 analysis page."""
     
@@ -50,6 +181,34 @@ def render_asc606_page():
     # Check for active analysis first
     if analysis_manager.show_active_analysis_warning():
         return  # User has active analysis, show warning and exit
+    
+    # Check for analysis to auto-load (URL parameter or recent analysis)
+    loaded, source, timestamp = check_for_analysis_to_load()
+    if loaded:
+        # Display notice about loaded analysis
+        if source == 'recent':
+            from datetime import datetime
+            try:
+                completed_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')) if timestamp else None
+                if completed_time:
+                    time_diff = datetime.now(completed_time.tzinfo) - completed_time
+                    hours = int(time_diff.total_seconds() // 3600)
+                    minutes = int((time_diff.total_seconds() % 3600) // 60)
+                    
+                    if hours == 0:
+                        time_str = f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+                    elif hours < 24:
+                        time_str = f"{hours} hour{'s' if hours != 1 else ''} ago"
+                    else:
+                        time_str = "earlier today"
+                    
+                    st.info(f"📋 Your analysis from {time_str} is ready below. To view older analyses, visit your **History** tab.")
+                else:
+                    st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
+            except Exception as e:
+                logger.warning(f"Failed to parse timestamp: {e}")
+                st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
+        # No notice for URL-loaded analyses (user clicked from History intentionally)
     
     # Check for existing completed analysis in session state (restore persistence)
     session_id = st.session_state.get('user_session_id', '')
