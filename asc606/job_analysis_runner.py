@@ -99,13 +99,12 @@ def submit_and_monitor_asc606_job(
         # Poll for job completion
         st.markdown("### 🔄 Analysis Progress")
         st.info("""
-        ✅ **Your analysis is running. Upon completion, the page will refresh with your memo. Thank you for your patience!**
+        ✅ **Your analysis is running. Upon completion, the page will refresh with your memo.**
         """)
         
         # Create progress display components
         progress_bar = st.progress(0)
-        status_text = st.empty()
-        step_details = st.empty()
+        status_container = st.empty()
         
         # Polling loop
         max_polls = 180  # 30 minutes max (10 second intervals)
@@ -121,7 +120,7 @@ def submit_and_monitor_asc606_job(
             if job_status == 'finished':
                 # Job completed successfully!
                 progress_bar.progress(100)
-                status_text.success("✅ Analysis complete!")
+                status_container.success("✅ Analysis complete!")
                 
                 # Fetch memo from database via backend API
                 st.info("📥 Retrieving completed analysis...")
@@ -157,10 +156,6 @@ def submit_and_monitor_asc606_job(
                                 'completion_timestamp': analysis_data.get('completed_at')
                             }
                             
-                            # Clear skip_auto_load flag now that new analysis is complete
-                            if 'skip_auto_load' in st.session_state:
-                                del st.session_state['skip_auto_load']
-                            
                             logger.info(f"✓ Session state stored. Keys in session: {list(st.session_state.keys())}")
                             
                             st.info("📄 **Memo ready!** Refreshing page to display results...")
@@ -182,7 +177,7 @@ def submit_and_monitor_asc606_job(
             elif job_status == 'failed':
                 # Job failed
                 progress_bar.empty()
-                status_text.error("❌ Analysis failed")
+                status_container.error("❌ Analysis failed")
                 
                 error_msg = status_info.get('error', 'Unknown error')
                 st.error(f"❌ **Analysis Failed**: {error_msg}")
@@ -191,7 +186,7 @@ def submit_and_monitor_asc606_job(
                 return
                 
             elif job_status == 'started':
-                # Job is running - show progress
+                # Job is running - show progress with animated spinner
                 progress = status_info.get('progress', {})
                 current_step = progress.get('current_step', 1)
                 total_steps = progress.get('total_steps', 5)
@@ -201,21 +196,28 @@ def submit_and_monitor_asc606_job(
                 progress_pct = int((current_step / total_steps) * 100)
                 progress_bar.progress(progress_pct)
                 
-                # Update status text
-                status_text.info(f"🔄 Processing: {step_name} ({current_step}/{total_steps})")
+                # Show animated spinner with current step (replaces static status_text)
+                with status_container:
+                    with st.spinner(f"Processing: {step_name} ({current_step}/{total_steps})"):
+                        time.sleep(10)  # Poll every 10 seconds
+                        poll_count += 1
+                        continue
                 
             elif job_status == 'queued':
-                # Job is queued, waiting to start
-                status_text.info("⏳ Job queued - waiting for processing to begin...")
-                # step_details.markdown("Your analysis is in the queue and will start shortly.")
+                # Job is queued, waiting to start with animated spinner
+                with status_container:
+                    with st.spinner("Waiting in queue..."):
+                        time.sleep(10)  # Poll every 10 seconds
+                        poll_count += 1
+                        continue
                 
             else:
-                # Unknown status
-                status_text.warning(f"⚠️ Unknown status: {job_status}")
-            
-            # Wait before next poll
-            poll_count += 1
-            time.sleep(10)  # Poll every 10 seconds
+                # Unknown status - show spinner while waiting
+                with status_container:
+                    with st.spinner(f"Status: {job_status}"):
+                        time.sleep(10)  # Poll every 10 seconds
+                        poll_count += 1
+                        continue
         
         # If we exit the loop, job timed out
         st.error("⏱️ **Analysis timed out** - The job took longer than expected. Please contact support.")
