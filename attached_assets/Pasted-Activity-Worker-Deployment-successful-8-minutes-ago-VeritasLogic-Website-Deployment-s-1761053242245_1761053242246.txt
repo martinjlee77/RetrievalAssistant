@@ -1,0 +1,176 @@
+Activity
+
+Worker
+
+Deployment successful
+
+8 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+8 minutes ago
+
+Worker
+
+Deployment successful
+
+19 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+19 minutes ago
+
+
+2 changes across 2 services
+
+mlee08648
+
+·
+19 minutes ago
+Worker
+
+Deployment successful
+
+22 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+22 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+32 minutes ago
+
+Worker
+
+Deployment successful
+
+32 minutes ago
+
+
+2 changes across 2 services
+
+mlee08648
+
+·
+32 minutes ago
+Worker
+
+Deployment created
+
+43 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+43 minutes ago
+
+VeritasLogic Website
+
+Deployment successful
+
+3 hours ago
+
+Scroll to load more
+
+VeritasLogic Website
+Deployments
+Variables
+Metrics
+Settings
+www.veritaslogic.ai
+us-east4-eqdc4a
+1 Replica
+
+
+
+
+History
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VeritasLogic Website
+/
+42d92512
+Active
+
+Oct 21, 2025, 9:19 AM
+www.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 9:19 AM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 13:20:30 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 13:20:30 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 13:20:30 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 13:20:30 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 13:20:30 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 13:20:30 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 13:20:30 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.2 - - [21/Oct/2025:13:21:00 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:13:21:07 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:13:21:11 +0000] "GET /api/analysis/recent/asc606 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.5 - - [21/Oct/2025:13:21:15 +0000] "GET /api/analysis/recent/asc606 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:13:21:19 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:13:21:22 +0000] "GET /api/analysis/recent/asc606 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:13:21:22 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.7 - - [21/Oct/2025:13:21:22 +0000] "POST /api/analysis/create HTTP/1.1" 200 381 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 50, status: completed
+INFO:backend_api:Credits charged: 195.00, new balance: 5540.00
+100.64.0.3 - - [21/Oct/2025:13:22:42 +0000] "POST /api/analysis/save HTTP/1.1" 200 109 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:13:22:52 +0000] "GET /api/analysis/status/50 HTTP/1.1" 200 26680 "-" "python-requests/2.31.0"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.6 - - [21/Oct/2025:13:23:33 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:13:23:40 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.2 - - [21/Oct/2025:13:23:42 +0000] "GET /api/analysis/recent/asc606 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.6 - - [21/Oct/2025:13:23:46 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:13:24:04 +0000] "GET /.well-known/acme-challenge/about.php HTTP/1.1" 404 14 "-" "-"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.7 - - [21/Oct/2025:13:26:33 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:13:26:40 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:13:26:41 +0000] "GET /api/analysis/recent/asc606 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"

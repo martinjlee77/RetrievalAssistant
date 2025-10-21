@@ -1,0 +1,109 @@
+VeritasLogic Analysis
+/
+bb0a8242
+Active
+
+Oct 21, 2025, 9:19 AM
+tas.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 9:19 AM
+Starting Container
+  URL: http://0.0.0.0:8080
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+INFO:__main__:Created new user session: 61307016...
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'user_session_id', 'file_uploader_key', 'user_data', 'auth_token']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=False, has_memo_key=False
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'user_session_id', 'user_data', 'auth_token', 'file_uploader_key', 'asc606_uploader_0', 'asc606_analyze_disabled']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=False, has_memo_key=False
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:asc606.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc606.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 952, Output tokens: 24, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc606.step_analyzer:Raw LLM response for party extraction: ```json
+```
+INFO:asc606.step_analyzer:✓ Parties extracted - Vendor: InnovateTech Solutions Inc., Customer: Global Dynamics Corp.
+INFO:asc606.step_analyzer:  → Also replaced vendor alias 'InnovateTech' (5 occurrences)
+INFO:asc606.step_analyzer:  → Also replaced customer alias 'Customer' (10 occurrences)
+INFO:asc606.step_analyzer:✓ De-identification complete: vendor 'InnovateTech Solutions Inc.' → 'the Company' (1 occurrences), customer 'Global Dynamics Corp.' → 'the Customer' (1 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'user_data', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'api_cost_tracker', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63', 'user_session_id', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'file_uploader_key', 'auth_token', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'deidentified_preview', 'asc606_uploader_0', 'asc606_analyze']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=False, has_memo_key=False
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
+INFO:asc606.job_analysis_runner:✓ Analysis record created with database ID: 50
+INFO:shared.job_manager:✓ Job submitted: 50 for analysis 50
+INFO:asc606.job_analysis_runner:Job submitted: 50
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.QUEUED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 50 status: JobStatus.FINISHED
+INFO:asc606.job_analysis_runner:✓ Status API response: status=completed, has_memo=True
+INFO:asc606.job_analysis_runner:✓ Storing memo in session state: session_id=61307016-7269-417c-b518-403484759a63, analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63
+INFO:asc606.job_analysis_runner:✓ Session state stored. Keys in session: ['show_whats_new', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'user_data', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63', 'user_session_id', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'file_uploader_key', 'auth_token', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'deidentified_preview', 'asc606_uploader_0', 'asc606_analyze']
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'user_data', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63', 'user_session_id', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'file_uploader_key', 'auth_token', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'deidentified_preview', 'asc606_uploader_0', 'asc606_analyze']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=True, has_memo_key=True
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 50\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by VeritasLogic.'
+INFO:asc606.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 22681 bytes
+INFO:asc606.clean_memo_generator:PDF generation successful: 22681 bytes
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'top_new_analysis_existing', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'download_pdf_-4829544922453706869', 'user_data', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'bottom_new_analysis_existing', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'copy_-4829544922453706869', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63', 'user_session_id', 'download_md_-4829544922453706869', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'file_uploader_key', 'auth_token', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'download_docx_-4829544922453706869']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=True, has_memo_key=True
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 50\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by VeritasLogic.'
+INFO:asc606.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 22681 bytes
+INFO:asc606.clean_memo_generator:PDF generation successful: 22681 bytes
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'top_new_analysis_existing', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'download_pdf_-4829544922453706869', 'user_data', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'bottom_new_analysis_existing', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'copy_-4829544922453706869', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63', 'user_session_id', 'download_md_-4829544922453706869', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'file_uploader_key', 'auth_token', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'download_docx_-4829544922453706869']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=True, has_memo_key=True
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 50\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by VeritasLogic.'
+INFO:asc606.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 22681 bytes
+INFO:asc606.clean_memo_generator:PDF generation successful: 22681 bytes
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'user_session_id', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'user_data', 'auth_token', 'file_uploader_key', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=True, has_memo_key=True
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 50\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by VeritasLogic.'
+INFO:asc606.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 22681 bytes
+INFO:asc606.clean_memo_generator:PDF generation successful: 22681 bytes
+INFO:__main__:🔍 Page load - session_id: 61307016-7269-417c-b518-403484759a63, session keys: ['show_whats_new', 'user_session_id', 'asc606_cached_word_count_61307016-7269-417c-b518-403484759a63', 'asc606_cached_deidentify_61307016-7269-417c-b518-403484759a63', 'user_data', 'auth_token', 'file_uploader_key', 'asc606_privacy_hash_61307016-7269-417c-b518-403484759a63', 'asc606_memo_data_61307016-7269-417c-b518-403484759a63', 'asc606_cached_text_61307016-7269-417c-b518-403484759a63', 'api_cost_tracker', 'asc606_analysis_complete_61307016-7269-417c-b518-403484759a63', 'asc606_failed_files_61307016-7269-417c-b518-403484759a63']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_61307016-7269-417c-b518-403484759a63, has_analysis_key=True, has_memo_key=True
+INFO:asc606.clean_memo_generator:Displaying clean memo sample: '**MEMO ID:** 50\n\n<small><em>Disclaimer Version: v1.0 (Effective 08/23/2025)</em></small><br>\n<small><em>This memorandum was generated by VeritasLogic.'
+INFO:asc606.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 22681 bytes
+INFO:asc606.clean_memo_generator:PDF generation successful: 22681 bytes
+INFO:shared.auth_utils:SSO: Found auth_token in URL params, attempting validation
+INFO:shared.auth_utils:SSO: Validating token at https://www.veritaslogic.ai/api/auth/validate-token
+INFO:shared.auth_utils:SSO: Validation response status: 200
+INFO:shared.auth_utils:SSO: Token validation result: True
+INFO:shared.auth_utils:SSO: Auto-login successful for user support@veritaslogic.ai
+INFO:__main__:Created new user session: d7c8ee76...
+INFO:__main__:🔍 Page load - session_id: d7c8ee76-ad93-420f-b4d9-99e9f05432f4, session keys: ['show_whats_new', 'user_session_id', 'file_uploader_key', 'user_data', 'auth_token']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_d7c8ee76-ad93-420f-b4d9-99e9f05432f4, has_analysis_key=False, has_memo_key=False

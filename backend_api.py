@@ -1983,8 +1983,13 @@ def get_recent_analysis(asc_standard):
         
         user_id = payload['user_id']
         
-        # Validate ASC standard format
-        asc_standard_clean = sanitize_string(asc_standard, 50)
+        # Normalize ASC standard format (handle 'asc606' and 'ASC 606')
+        asc_standard_clean = sanitize_string(asc_standard, 50).upper().replace(' ', '')
+        # Convert 'ASC606' to 'ASC 606' format for database match
+        if asc_standard_clean.startswith('ASC') and len(asc_standard_clean) > 3:
+            asc_standard_db = f"ASC {asc_standard_clean[3:]}"
+        else:
+            asc_standard_db = asc_standard
         
         conn = get_db_connection()
         if not conn:
@@ -1995,17 +2000,18 @@ def get_recent_analysis(asc_standard):
         try:
             # Query most recent completed analysis for this user and ASC standard
             # Only return analyses completed within the last 24 hours
+            # Use ILIKE for case-insensitive match
             cursor.execute("""
                 SELECT analysis_id, memo_uuid, status, memo_content, completed_at, 
                        asc_standard, words_count, tier_name, file_count, final_charged_credits
                 FROM analyses 
                 WHERE user_id = %s
-                AND asc_standard = %s
+                AND asc_standard ILIKE %s
                 AND status = 'completed'
                 AND completed_at > NOW() - INTERVAL '24 hours'
                 ORDER BY completed_at DESC
                 LIMIT 1
-            """, (user_id, asc_standard_clean))
+            """, (user_id, asc_standard_db))
             
             analysis = cursor.fetchone()
             
