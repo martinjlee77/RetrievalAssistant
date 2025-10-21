@@ -1901,6 +1901,73 @@ def get_analysis_status(analysis_id):
         logger.error(f"Get analysis status error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Failed to retrieve analysis status'}), 500
 
+@app.route('/api/analysis/recent/<asc_standard>', methods=['GET'])
+def get_recent_analysis(asc_standard):
+    """Get user's most recent completed analysis for a specific ASC standard (within 24 hours)"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        # Validate ASC standard format
+        asc_standard_clean = sanitize_string(asc_standard, 50)
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        try:
+            # Query most recent completed analysis for this user and ASC standard
+            # Only return analyses completed within the last 24 hours
+            cursor.execute("""
+                SELECT analysis_id, memo_uuid, status, memo_content, completed_at, 
+                       asc_standard, words_count, tier_name, file_count, final_charged_credits
+                FROM analyses 
+                WHERE user_id = %s
+                AND asc_standard = %s
+                AND status = 'completed'
+                AND completed_at > NOW() - INTERVAL '24 hours'
+                ORDER BY completed_at DESC
+                LIMIT 1
+            """, (user_id, asc_standard_clean))
+            
+            analysis = cursor.fetchone()
+            
+            if not analysis:
+                return jsonify({'message': 'No recent analysis found'}), 404
+            
+            # Return the analysis data
+            response = {
+                'analysis_id': analysis['analysis_id'],
+                'memo_uuid': analysis['memo_uuid'],
+                'status': analysis['status'],
+                'memo_content': analysis['memo_content'],
+                'completed_at': analysis['completed_at'].isoformat() if analysis['completed_at'] else None,
+                'asc_standard': analysis['asc_standard'],
+                'words_count': analysis['words_count'],
+                'tier_name': analysis['tier_name'],
+                'file_count': analysis['file_count'],
+                'credits_charged': float(analysis['final_charged_credits']) if analysis['final_charged_credits'] else 0
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Get recent analysis error: {sanitize_for_log(e)}")
+        return jsonify({'error': 'Failed to retrieve recent analysis'}), 500
+
 @app.route('/api/analysis/complete', methods=['POST'])
 def complete_analysis():
     """Unified endpoint for analysis completion - handles both recording and billing atomically"""
