@@ -156,19 +156,19 @@ def serve_streamlit_app():
                 asc_standard = result['asc_standard']
                 logger.info(f"Found asc_standard: {asc_standard}")
                 
-                # Map ASC standards to Streamlit page titles (URL-encoded for path)
+                # Map ASC standards to Streamlit page file names (used in URLs)
                 page_mapping = {
-                    'ASC 606': 'ASC%20606%3A%20Revenue%20Recognition',
-                    'ASC 340-40': 'ASC%20340-40%3A%20Cost%20to%20Obtain',
-                    'ASC 842': 'ASC%20842%3A%20Leases%20(Lessee)',
-                    'ASC 718': 'ASC%20718%3A%20Stock%20Compensation',
-                    'ASC 805': 'ASC%20805%3A%20Business%20Combinations',
+                    'ASC 606': 'asc606_page',
+                    'ASC 340-40': 'asc340_page',
+                    'ASC 842': 'asc842_page',
+                    'ASC 718': 'asc718_page',
+                    'ASC 805': 'asc805_page',
                 }
-                page_title = page_mapping.get(asc_standard)
-                logger.info(f"Mapped to page_title: {page_title}")
+                page_name = page_mapping.get(asc_standard)
+                logger.info(f"Mapped to page_name: {page_name}")
                 
-                if page_title:
-                    page_path = f"/{page_title}"
+                if page_name:
+                    page_path = f"/{page_name}"
                     logger.info(f"Set page_path: {page_path}")
             else:
                 logger.warning(f"No analysis found for analysis_id {analysis_id}")
