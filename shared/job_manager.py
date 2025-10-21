@@ -22,7 +22,8 @@ class JobManager:
         redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
         
         try:
-            self.redis_conn = Redis.from_url(redis_url, decode_responses=True)
+            # Don't decode_responses for RQ - it uses pickle (binary data)
+            self.redis_conn = Redis.from_url(redis_url, decode_responses=False)
             self.queue = Queue('analysis', connection=self.redis_conn)
             logger.info(f"Job manager initialized with Redis: {redis_url}")
         except Exception as e:
