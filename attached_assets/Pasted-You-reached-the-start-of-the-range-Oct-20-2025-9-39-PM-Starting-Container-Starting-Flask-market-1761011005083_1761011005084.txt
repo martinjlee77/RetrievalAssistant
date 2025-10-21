@@ -1,0 +1,31 @@
+You reached the start of the range
+Oct 20, 2025, 9:39 PM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 01:41:16 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 01:41:16 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 01:41:16 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 01:41:17 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 01:41:17 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 01:41:17 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 01:41:17 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /api/user/profile HTTP/1.1" 200 2732 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:01:41:42 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 3932 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:42 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:44 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:45 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 3932 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:01:41:57 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:01:42:04 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:01:42:14 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.5 - - [21/Oct/2025:01:42:17 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+ERROR:backend_api:Failed to create pending analysis: there is no unique or exclusion constraint matching the ON CONFLICT specification
+ERROR:backend_api:Create pending analysis error: there is no unique or exclusion constraint matching the ON CONFLICT specification
+100.64.0.6 - - [21/Oct/2025:01:42:17 +0000] "POST /api/analysis/create HTTP/1.1" 500 45 "-" "python-requests/2.31.0"

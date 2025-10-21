@@ -1637,15 +1637,11 @@ def create_pending_analysis():
                                     final_charged_credits, billed_credits, tier_name, status, memo_uuid,
                                     started_at, file_count)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
-                ON CONFLICT (memo_uuid) DO NOTHING
                 RETURNING analysis_id
             """, (user_id, asc_standard, words_count, 0,
                   cost_to_charge, cost_to_charge, tier_name, 'processing', memo_uuid, file_count))
             
             result = cursor.fetchone()
-            if not result:
-                return jsonify({'error': 'Duplicate analysis'}), 409
-            
             db_analysis_id = result['analysis_id']
             
             conn.commit()
