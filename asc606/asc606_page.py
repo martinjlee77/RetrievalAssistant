@@ -199,31 +199,7 @@ def render_asc606_page():
     
     # Check for analysis to auto-load (URL parameter or recent analysis)
     loaded, source, timestamp = check_for_analysis_to_load()
-    if loaded:
-        # Display notice about loaded analysis
-        if source == 'recent':
-            from datetime import datetime
-            try:
-                completed_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')) if timestamp else None
-                if completed_time:
-                    time_diff = datetime.now(completed_time.tzinfo) - completed_time
-                    hours = int(time_diff.total_seconds() // 3600)
-                    minutes = int((time_diff.total_seconds() % 3600) // 60)
-                    
-                    if hours == 0:
-                        time_str = f"{minutes} minute{'s' if minutes != 1 else ''} ago"
-                    elif hours < 24:
-                        time_str = f"{hours} hour{'s' if hours != 1 else ''} ago"
-                    else:
-                        time_str = "earlier today"
-                    
-                    st.info(f"📋 Your analysis from {time_str} is ready below. To view older analyses, visit your **History** tab.")
-                else:
-                    st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
-            except Exception as e:
-                logger.warning(f"Failed to parse timestamp: {e}")
-                st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
-        # No notice for URL-loaded analyses (user clicked from History intentionally)
+    # Note: Banner will be displayed in memo display section below (to avoid duplication)
     
     # Check for existing completed analysis in session state (restore persistence)
     session_id = st.session_state.get('user_session_id', '')

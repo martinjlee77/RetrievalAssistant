@@ -245,16 +245,18 @@ def try_cross_domain_auth():
             st.session_state.user_data = validation['user']
             logger.info(f"SSO: Auto-login successful for user {validation['user'].get('email', 'unknown')}")
             
-            # Clear the token from URL for security
-            st.query_params.clear()
+            # Clear only the auth_token from URL for security, preserve other params like analysis_id
+            if 'auth_token' in st.query_params:
+                del st.query_params['auth_token']
             
             # Show success message briefly
             st.info ("Welcome back! You've been automatically signed in.")
             return True
         else:
             logger.warning(f"SSO: Token validation failed: {validation.get('error', 'Unknown error')}")
-            # Clear invalid token from URL
-            st.query_params.clear()
+            # Clear only the invalid auth_token from URL, preserve other params
+            if 'auth_token' in st.query_params:
+                del st.query_params['auth_token']
     
     return False
 
