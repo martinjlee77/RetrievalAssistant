@@ -1699,14 +1699,9 @@ def save_worker_analysis():
                 SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
                        file_count, final_charged_credits, billed_credits, status
                 FROM analyses 
-                WHERE memo_uuid = (
-                    SELECT memo_uuid FROM analyses 
-                    WHERE user_id = %s 
-                    ORDER BY started_at DESC 
-                    LIMIT 1
-                )
+                WHERE analysis_id = %s
                 AND user_id = %s
-            """, (user_id, user_id))
+            """, (analysis_id, user_id))
             
             existing_record = cursor.fetchone()
             
@@ -1840,23 +1835,17 @@ def get_analysis_status(analysis_id):
         cursor = conn.cursor()
         
         try:
-            # Query analysis by analysis_id (the job ID)
-            # Use memo_uuid from the latest analysis to find it
+            # Query analysis by analysis_id directly
             cursor.execute("""
                 SELECT analysis_id, memo_uuid, status, memo_content, error_message, 
                        completed_at, asc_standard, words_count, tier_name, file_count,
                        final_charged_credits
                 FROM analyses 
-                WHERE user_id = %s
-                AND memo_uuid = (
-                    SELECT memo_uuid FROM analyses 
-                    WHERE user_id = %s 
-                    ORDER BY started_at DESC 
-                    LIMIT 1
-                )
+                WHERE analysis_id = %s
+                AND user_id = %s
                 ORDER BY started_at DESC
                 LIMIT 1
-            """, (user_id, user_id))
+            """, (analysis_id, user_id))
             
             analysis = cursor.fetchone()
             
