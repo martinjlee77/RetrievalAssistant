@@ -45,7 +45,6 @@ def submit_and_monitor_asc606_job(
         # CRITICAL: Create analysis record FIRST with status='processing'
         # This stores authoritative pricing info that backend will use for billing
         # Backend will generate the database INTEGER analysis_id
-        st.info("📝 Creating analysis record...")
         import requests
         
         backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
@@ -71,9 +70,7 @@ def submit_and_monitor_asc606_job(
         
         logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
-        # Submit job to Redis queue
-        st.info("📤 Submitting analysis for processing...")
-        
+        # Submit job to Redis queue        
         try:
             job_id = job_manager.submit_analysis_job(
                 asc_standard='ASC 606',
@@ -86,7 +83,6 @@ def submit_and_monitor_asc606_job(
                 uploaded_filenames=uploaded_filenames
             )
             
-            st.success(f"✅ Job submitted successfully! Job ID: {job_id}")
             logger.info(f"Job submitted: {job_id}")
             
         except Exception as e:
@@ -95,7 +91,6 @@ def submit_and_monitor_asc606_job(
             return
         
         # Poll for job completion
-        st.markdown("---")
         st.markdown("### 🔄 Analysis Progress")
         st.info("""
         ✅ **Your analysis is running. Upon completion, the page will refresh with your memo. Thank you for your patience!**
