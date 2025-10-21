@@ -609,7 +609,7 @@ def _upload_and_process_asc340():
 
 def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
     """
-    Perform ASC 340-40 analysis with new billing system integration.
+    Perform ASC 340-40 analysis with background job processing.
     
     Args:
         pricing_result: Pricing information dict
@@ -619,64 +619,41 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
         uploaded_filenames: List of uploaded filenames (optional)
     """
     
-    analysis_id = None
+    # Use cached text if available, otherwise reconstruct from file details
+    if cached_combined_text:
+        combined_text = cached_combined_text
+    else:
+        # Fallback: Reconstruct from file details (legacy path)
+        combined_text = ""
+        
+        for file_detail in pricing_result['file_details']:
+            if 'text_content' in file_detail and file_detail['text_content'].strip():
+                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n{file_detail['text_content']}"
+            else:
+                # Fallback if text_content is missing
+                combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content extraction failed]"
     
-    try:
-        # Step 1: Start analysis tracking
-        analysis_details = {
-            'asc_standard': 'ASC 340-40',
-            'total_words': pricing_result['total_words'],
-            'file_count': pricing_result['file_count'],
-            'tier_info': pricing_result['tier_info'],
-            'cost_charged': pricing_result['tier_info']['price']
-        }
-        
-        analysis_id = analysis_manager.start_analysis(analysis_details)
-        
-        # Step 2: Payment will be processed when analysis completes (no upfront charging)
-        
-        # Step 3: Use cached text if available, otherwise reconstruct from file details
-        if cached_combined_text:
-            combined_text = cached_combined_text
-            filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
-        else:
-            # Fallback: Reconstruct from file details (legacy path)
-            combined_text = ""
-            filename_list = []
-            
-            for file_detail in pricing_result['file_details']:
-                if 'text_content' in file_detail and file_detail['text_content'].strip():
-                    combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n{file_detail['text_content']}"
-                    filename_list.append(file_detail['filename'])
-                else:
-                    # Fallback if text_content is missing
-                    combined_text += f"\\n\\n=== {file_detail['filename']} ===\\n\\n[File content extraction failed]"
-                    filename_list.append(file_detail['filename'])
-            
-            filename = ", ".join(filename_list)
-        
-        # Check if we have valid content
-        if not combined_text or not combined_text.strip():
-            st.error("❌ **Error**: No valid contract text available for analysis.")
-            
-            # Mark analysis as failed (no refund needed since payment happens on completion)
-            if analysis_id:
-                analysis_manager.complete_analysis(analysis_id, success=False, error_message="No valid contract text available")
-            
-            st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
-            return
-        
-        
-        # Submit background job for analysis
-        user_token = st.session_state.get('auth_token', '')
-        submit_and_monitor_asc340_job(
-            pricing_result=pricing_result,
-            additional_context=additional_context,
-            user_token=user_token,
-            cached_combined_text=combined_text,
-            uploaded_filenames=uploaded_filenames,
-            session_id=st.session_state.user_session_id
-        )
+    # Check if we have valid content
+    if not combined_text or not combined_text.strip():
+        st.error("❌ **Error**: No valid contract text available for analysis.")
+        st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
+        return
+    
+    # Initialize session completion key
+    session_id = st.session_state.get('user_session_id', str(uuid.uuid4()))
+    analysis_key = f'asc340_analysis_complete_{session_id}'
+    if analysis_key not in st.session_state:
+        st.session_state[analysis_key] = False
+    
+    # Submit background job for analysis
+    submit_and_monitor_asc340_job(
+        pricing_result=pricing_result,
+        additional_context=additional_context,
+        user_token=user_token,
+        cached_combined_text=combined_text,
+        uploaded_filenames=uploaded_filenames,
+        session_id=session_id
+    )
 
 
 # Configure logging
