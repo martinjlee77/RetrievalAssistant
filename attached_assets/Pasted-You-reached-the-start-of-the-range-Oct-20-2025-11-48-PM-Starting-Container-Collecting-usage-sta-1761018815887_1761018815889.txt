@@ -1,0 +1,51 @@
+You reached the start of the range
+Oct 20, 2025, 11:48 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:__main__:🔍 Page load - session_id: , session keys: ['file_uploader_key', 'show_whats_new', 'auth_token', 'user_data']
+INFO:__main__:🔍 Page load - session_id: , session keys: ['auth_token', 'show_whats_new', 'asc606_uploader_0', 'asc606_analyze_disabled', 'file_uploader_key', 'user_data']
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:asc606.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc606.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:asc606.step_analyzer:✓ De-identification complete: vendor 'InnovateTech Solutions Inc.' → 'the Company' (1 occurrences), customer 'Global Dynamics Corp.' → 'the Customer' (1 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 952, Output tokens: 24, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc606.step_analyzer:Raw LLM response for party extraction: ```json
+```
+INFO:asc606.step_analyzer:✓ Parties extracted - Vendor: InnovateTech Solutions Inc., Customer: Global Dynamics Corp.
+INFO:asc606.step_analyzer:  → Also replaced vendor alias 'InnovateTech' (5 occurrences)
+INFO:asc606.step_analyzer:  → Also replaced customer alias 'Customer' (10 occurrences)
+INFO:__main__:🔍 Page load - session_id: , session keys: ['asc606_cached_text_', 'asc606_uploader_0', 'api_cost_tracker', 'asc606_privacy_hash_', 'asc606_failed_files_', 'auth_token', 'show_whats_new', 'asc606_analyze', 'deidentified_preview', 'asc606_cached_deidentify_', 'file_uploader_key', 'user_data', 'asc606_cached_word_count_']
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
+INFO:asc606.job_analysis_runner:✓ Analysis record created with database ID: 44
+INFO:shared.job_manager:✓ Job submitted: 44 for analysis 44
+INFO:asc606.job_analysis_runner:Job submitted: 44
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.QUEUED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.STARTED
+INFO:asc606.job_analysis_runner:Job 44 status: JobStatus.FINISHED
+INFO:asc606.job_analysis_runner:✓ Status API response: status=completed, has_memo=True
+INFO:asc606.job_analysis_runner:✓ Storing memo in session state: session_id=, analysis_key=asc606_analysis_complete_
+INFO:asc606.job_analysis_runner:✓ Session state stored. Keys in session: ['asc606_cached_text_', 'asc606_uploader_0', 'api_cost_tracker', 'asc606_privacy_hash_', 'asc606_failed_files_', 'auth_token', 'show_whats_new', 'asc606_analyze', 'asc606_memo_data_', 'deidentified_preview', 'asc606_analysis_complete_', 'asc606_cached_deidentify_', 'file_uploader_key', 'user_data', 'asc606_cached_word_count_']
+INFO:__main__:🔍 Page load - session_id: , session keys: ['asc606_cached_text_', 'asc606_uploader_0', 'api_cost_tracker', 'asc606_privacy_hash_', 'asc606_failed_files_', 'auth_token', 'show_whats_new', 'asc606_analyze', 'asc606_memo_data_', 'deidentified_preview', 'asc606_analysis_complete_', 'asc606_cached_deidentify_', 'file_uploader_key', 'user_data', 'asc606_cached_word_count_']
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
