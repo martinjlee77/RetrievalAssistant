@@ -586,17 +586,8 @@ function loadRecentAnalyses(analyses) {
     
     const tbody = document.getElementById('analysisTableBody');
     analyses.forEach(analysis => {
-        // Map ASC standard to Streamlit page title (URL will be generated from title)
-        const standardToPageTitle = {
-            'ASC 606': 'ASC 606: Revenue Recognition',
-            'ASC 842': 'ASC 842: Leases (Lessee)',
-            'ASC 718': 'ASC 718: Stock Compensation',
-            'ASC 805': 'ASC 805: Business Combinations',
-            'ASC 340-40': 'ASC 340-40: Cost to Obtain'
-        };
-        
-        const pageTitle = standardToPageTitle[analysis.asc_standard] || 'ASC 606: Revenue Recognition';
-        const viewUrl = `/analysis/${encodeURIComponent(pageTitle)}?analysis_id=${analysis.analysis_id}`;
+        // Backend /analysis route will query DB and redirect to correct page
+        const viewUrl = `/analysis?analysis_id=${analysis.analysis_id}`;
         
         const row = document.createElement('tr');
         row.innerHTML = `
