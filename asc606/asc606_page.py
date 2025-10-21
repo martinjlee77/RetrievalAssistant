@@ -14,6 +14,7 @@ from shared.billing_manager import billing_manager
 from shared.preflight_pricing import preflight_pricing
 from shared.wallet_manager import wallet_manager
 from shared.analysis_manager import analysis_manager
+from shared.job_manager import job_manager
 # CleanMemoGenerator import moved to initialization section
 import tempfile
 import os
@@ -329,9 +330,21 @@ def render_asc606_page():
                 else:
                     cached_text = None
                 
-                # Run analysis with cached text and pass uploaded filenames
+                # Submit analysis to background job queue
                 uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
-                perform_asc606_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames)
+                
+                # Import job runner
+                from asc606.job_analysis_runner import submit_and_monitor_asc606_job
+                
+                # Submit job and monitor progress
+                submit_and_monitor_asc606_job(
+                    pricing_result=pricing_result,
+                    additional_context=additional_context,
+                    user_token=user_token,
+                    cached_combined_text=cached_text,
+                    uploaded_filenames=uploaded_filenames,
+                    session_id=session_id
+                )
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
