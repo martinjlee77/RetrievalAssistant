@@ -1,0 +1,105 @@
+You reached the start of the range
+Oct 20, 2025, 11:55 PM
+Starting Container
+2025-10-21 03:56:21,976 - rq.worker - INFO - Worker e33a271bd2e14d8581557d75381e1326: cleaning registries for queue: analysis
+2025-10-21 03:56:21,967 - rq.worker - INFO - Worker e33a271bd2e14d8581557d75381e1326: started with PID 1, version 2.6.0
+2025-10-21 03:56:21,967 - rq.worker - INFO - Worker e33a271bd2e14d8581557d75381e1326: subscribing to channel rq:pubsub:e33a271bd2e14d8581557d75381e1326
+2025-10-21 03:56:21,898 - __main__ - INFO - Connecting to Redis: redis://default:caASCJiqLuOysPZqbElpmjCYEfHmSylU@redis.railway.internal:6379
+2025-10-21 03:56:21,972 - rq.worker - INFO - *** Listening on analysis...
+2025-10-21 03:56:21,962 - __main__ - INFO - 🚀 RQ Worker started. Waiting for jobs...
+2025-10-21 03:57:17,430 - rq.worker - INFO - analysis: workers.analysis_worker.run_asc606_analysis({'analysis_id': 45, 'user_id': 7, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5cC...) (45)
+2025-10-21 03:57:19,567 - workers.analysis_worker - INFO - 🚀 Worker starting ASC 606 analysis: 45
+2025-10-21 03:57:19.568 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:19.568 WARNING streamlit.runtime.state.session_state_proxy: Session state does not function when running a script without `streamlit run`
+2025-10-21 03:57:19.568 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:19.568 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:19.568 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:19,568 - shared.api_cost_tracker - INFO - API cost tracker reset
+2025-10-21 03:57:19,606 - asc606.step_analyzer - INFO - 🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+2025-10-21 03:57:19,633 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-10-21 03:57:19,744 - shared.knowledge_base - INFO - ChromaDB client initialized for asc606_knowledge_base
+2025-10-21 03:57:19,753 - shared.knowledge_base - INFO - Embedding function initialized successfully
+2025-10-21 03:57:19,756 - shared.knowledge_base - INFO - Collection 'asc606_guidance' loaded successfully
+2025-10-21 03:57:19,756 - asc606.knowledge_search - INFO - ASC 606 knowledge search initialized successfully
+2025-10-21 03:57:19,757 - workers.analysis_worker - INFO - 📊 Processing Step 1/5
+2025-10-21 03:57:19,757 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 03:57:20,139 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 03:57:20,267 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.51s)
+2025-10-21 03:57:20,267 - asc606.knowledge_search - INFO - Retrieved guidance for Step 1
+2025-10-21 03:57:29,803 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 03:57:29.827 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:29.828 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:29,828 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:30,735 - shared.api_cost_tracker - INFO - Tracked step_1_analysis request: $0.0237 (Total: $0.0237)
+2025-10-21 03:57:30,735 - workers.analysis_worker - INFO - ✓ Completed Step 1
+2025-10-21 03:57:30,736 - workers.analysis_worker - INFO - 📊 Processing Step 2/5
+2025-10-21 03:57:30,736 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 03:57:30,734 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:30,735 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 2741, Output tokens: 668, Cost: $0.0237
+2025-10-21 03:57:30,949 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 03:57:30,953 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.22s)
+2025-10-21 03:57:30,953 - asc606.knowledge_search - INFO - Retrieved guidance for Step 2
+2025-10-21 03:57:30,954 - asc606.step_analyzer - INFO - 💰 Extracting transaction price components and variable consideration...
+2025-10-21 03:57:43,306 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 03:57:43.315 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:43.316 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:43,316 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:43,319 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:43,320 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 2823, Output tokens: 687, Cost: $0.0244
+2025-10-21 03:57:43,320 - shared.api_cost_tracker - INFO - Tracked step_2_analysis request: $0.0244 (Total: $0.0481)
+2025-10-21 03:57:43,321 - workers.analysis_worker - INFO - ✓ Completed Step 2
+2025-10-21 03:57:43,322 - workers.analysis_worker - INFO - 📊 Processing Step 3/5
+2025-10-21 03:57:43,322 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 03:57:43,511 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 03:57:43,516 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.19s)
+2025-10-21 03:57:43,517 - asc606.knowledge_search - INFO - Retrieved guidance for Step 3
+2025-10-21 03:57:52,019 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 03:57:52.021 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:52.022 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:52,022 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:52,025 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:52,025 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 2590, Output tokens: 676, Cost: $0.0231
+2025-10-21 03:57:52,026 - shared.api_cost_tracker - INFO - Tracked step_3_analysis request: $0.0231 (Total: $0.0712)
+2025-10-21 03:57:52,026 - workers.analysis_worker - INFO - ✓ Completed Step 3
+2025-10-21 03:57:52,028 - workers.analysis_worker - INFO - 📊 Processing Step 4/5
+2025-10-21 03:57:52,029 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 03:57:52,446 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 03:57:52,450 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.42s)
+2025-10-21 03:57:52,450 - asc606.knowledge_search - INFO - Retrieved guidance for Step 4
+2025-10-21 03:57:59,698 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 03:57:59.699 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:59.700 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:57:59,700 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:59,703 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:57:59,703 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 2370, Output tokens: 492, Cost: $0.0192
+2025-10-21 03:57:59,703 - shared.api_cost_tracker - INFO - Tracked step_4_analysis request: $0.0192 (Total: $0.0905)
+2025-10-21 03:57:59,704 - workers.analysis_worker - INFO - ✓ Completed Step 4
+2025-10-21 03:57:59,705 - workers.analysis_worker - INFO - 📊 Processing Step 5/5
+2025-10-21 03:57:59,705 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 03:57:59,990 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 03:57:59,998 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.29s)
+2025-10-21 03:57:59,999 - asc606.knowledge_search - INFO - Retrieved guidance for Step 5
+2025-10-21 03:58:08,855 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 03:58:08.863 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:58:08.863 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:58:08,864 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:58:08,866 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 03:58:08,867 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 2455, Output tokens: 692, Cost: $0.0227
+2025-10-21 03:58:08,867 - shared.api_cost_tracker - INFO - Tracked step_5_analysis request: $0.0227 (Total: $0.1131)
+2025-10-21 03:58:08,867 - workers.analysis_worker - INFO - ✓ Completed Step 5
+2025-10-21 03:58:08,867 - workers.analysis_worker - INFO - 📝 Generating final memo...
+2025-10-21 03:58:08,868 - asc606.clean_memo_generator - INFO - Added clean step 1 content (3244 chars)
+2025-10-21 03:58:08,868 - asc606.clean_memo_generator - INFO - Added clean step 2 content (3342 chars)
+2025-10-21 03:58:08,868 - asc606.clean_memo_generator - INFO - Added clean step 3 content (3333 chars)
+2025-10-21 03:58:08,868 - asc606.clean_memo_generator - INFO - Added clean step 4 content (2492 chars)
+2025-10-21 03:58:08,869 - asc606.clean_memo_generator - INFO - Added clean step 5 content (3410 chars)
+2025-10-21 03:58:08,869 - asc606.clean_memo_generator - INFO - Clean memo generated: 24222 chars, 5/5 steps
+2025-10-21 03:58:08.869 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:58:08.869 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 03:58:08,869 - workers.analysis_worker - INFO - 💾 Saving analysis to database...
+2025-10-21 03:58:08,869 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-10-21 03:58:08,947 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-10-21 03:58:08,949 - workers.analysis_worker - INFO - ✓ Analysis saved successfully: 61a57110
+2025-10-21 03:58:08,955 - rq.worker - INFO - Successfully completed workers.analysis_worker.run_asc606_analysis({'analysis_id': 45, 'user_id': 7, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5cC...) job in 0:00:51.450239s on worker e33a271bd2e14d8581557d75381e1326
+2025-10-21 03:58:08,955 - rq.worker - INFO - analysis: Job OK (45)
+2025-10-21 03:58:08,956 - rq.worker - INFO - Result is kept for 86400 seconds

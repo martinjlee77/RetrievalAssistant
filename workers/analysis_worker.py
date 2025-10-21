@@ -180,6 +180,20 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             }
             job.save_meta()
         
+        # Generate executive summary, background, and conclusion
+        logger.info("→ Generating executive summary, background, and conclusion...")
+        conclusions_text = "\n\n".join([
+            analysis_results['steps']['step_1']['conclusion'],
+            analysis_results['steps']['step_2']['conclusion'],
+            analysis_results['steps']['step_3']['conclusion'],
+            analysis_results['steps']['step_4']['conclusion'],
+            analysis_results['steps']['step_5']['conclusion']
+        ])
+        
+        analysis_results['executive_summary'] = analyzer.generate_executive_summary(conclusions_text, customer_name)
+        analysis_results['background'] = analyzer.generate_background_section(conclusions_text, customer_name)
+        analysis_results['conclusion'] = analyzer.generate_final_conclusion(analysis_results['steps'])
+        
         memo_generator = CleanMemoGenerator()
         filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
         
