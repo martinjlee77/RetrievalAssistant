@@ -13,20 +13,17 @@ logger = logging.getLogger(__name__)
 
 # Backend API configuration - Use environment variables for cross-deployment support
 import os
-# For production, BACKEND_URL should point to the Flask backend service (without /api suffix)
-# e.g., 'https://www.veritaslogic.ai' or Railway internal service URL
-BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000')
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
 
 # Log the current configuration for debugging
-logger.info(f"Auth Utils Configuration: BACKEND_URL={BACKEND_URL}, WEBSITE_URL={WEBSITE_URL}")
+logger.info(f"Auth Utils Configuration: WEBSITE_URL={WEBSITE_URL}")
 
 class AuthManager:
     """Manages user authentication and session state"""
     
     def __init__(self):
-        self.backend_url = BACKEND_URL
+        self.backend_url = WEBSITE_URL
         
     def is_authenticated(self) -> bool:
         """Check if user is currently authenticated"""
@@ -67,8 +64,8 @@ class AuthManager:
             return {'can_proceed': False, 'error': 'Not authenticated'}
         
         try:
-            # Use BACKEND_URL for API calls
-            credits_url = f"{BACKEND_URL}/api/user/check-credits"
+            # Use WEBSITE_URL for API calls
+            credits_url = f"{WEBSITE_URL}/api/user/check-credits"
             
             response = requests.post(
                 credits_url,
@@ -93,8 +90,8 @@ class AuthManager:
             return None
         
         try:
-            # Use BACKEND_URL for API calls
-            profile_url = f"{BACKEND_URL}/api/user/profile"
+            # Use WEBSITE_URL for API calls
+            profile_url = f"{WEBSITE_URL}/api/user/profile"
             
             response = requests.get(
                 profile_url,
@@ -179,8 +176,8 @@ def show_login_page():
 def attempt_login(email: str, password: str) -> Dict[str, Any]:
     """Attempt to login user with email and password via main website"""
     try:
-        # Use BACKEND_URL for API calls
-        login_url = f"{BACKEND_URL}/api/login"
+        # Use WEBSITE_URL for API calls
+        login_url = f"{WEBSITE_URL}/api/login"
         logger.info(f"SSO: Attempting login at {login_url}")
         
         response = requests.post(
@@ -206,8 +203,8 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
 def validate_existing_token(token: str) -> Dict[str, Any]:
     """Validate an existing token using the cross-subdomain validation endpoint"""
     try:
-        # Use BACKEND_URL for API calls (ensure it's set correctly for production)
-        validation_url = f"{BACKEND_URL}/api/auth/validate-token"
+        # Use WEBSITE_URL for API calls
+        validation_url = f"{WEBSITE_URL}/api/auth/validate-token"
         logger.info(f"SSO: Validating token at {validation_url}")
         
         response = requests.post(
