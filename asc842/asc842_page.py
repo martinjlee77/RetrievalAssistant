@@ -627,14 +627,6 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
     
     session_id = st.session_state.user_session_id
     
-    # Create placeholder for the in-progress message
-    progress_message_placeholder = st.empty()
-    progress_message_placeholder.error(
-        "🚨 **IMPORTANT: ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
-        "Your analysis is running and will take up to 3-20 minutes. "
-        "Closing this browser will stop the analysis and forfeit your progress."
-    )
-    
     # Initialize analysis complete status with session isolation
     analysis_key = f'asc842_analysis_complete_{session_id}'
     memo_key = f'asc842_memo_data_{session_id}'
@@ -682,13 +674,8 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         # Proceed with background job submission
         perform_asc842_analysis(combined_text, additional_context, pricing_result, uploaded_filenames)
         
-        # Clear the progress message after analysis
-        progress_message_placeholder.empty()
-        
     except Exception as e:
         logger.error(f"ASC 842 analysis error for session {session_id[:8]}: {str(e)}")
-        # Clear the progress message on error
-        progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
 def perform_asc842_analysis(contract_text: str, additional_context: str, pricing_result: Dict[str, Any], uploaded_filenames: List[str]):

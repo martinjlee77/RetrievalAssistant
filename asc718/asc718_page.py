@@ -569,14 +569,6 @@ def perform_asc718_analysis(pricing_result, additional_context: str = "", user_t
     
     session_id = st.session_state.user_session_id
     
-    # Create placeholder for the in-progress message
-    progress_message_placeholder = st.empty()
-    progress_message_placeholder.error(
-        "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TABS!**\n\n"
-        "Your analysis is running and will take up to 3-20 minutes. "
-        "Closing this browser will stop the analysis and forfeit your progress."
-    )
-    
     # Initialize analysis complete status with session isolation
     analysis_key = f'asc718_analysis_complete_{session_id}'
     if analysis_key not in st.session_state:
