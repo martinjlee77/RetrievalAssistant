@@ -1584,7 +1584,7 @@ def check_user_credits():
         return jsonify({'error': 'Failed to check credits'}), 500
 
 @app.route('/api/analysis/save', methods=['POST'])
-def save_analysis():
+def save_worker_analysis():
     """Save completed analysis from background worker with memo content"""
     try:
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -1611,7 +1611,11 @@ def save_analysis():
         words_count = max(0, int(data.get('words_count', 0)))
         tier_name = sanitize_string(data.get('tier_name', ''), 100)
         file_count = max(0, int(data.get('file_count', 0)))
-        cost_charged = Decimal(str(data.get('cost_charged', 0)))
+        
+        # CRITICAL: SERVER-SIDE PRICING - Never trust client/worker provided costs
+        from shared.pricing_config import get_price_tier
+        tier_info = get_price_tier(words_count)
+        cost_charged = Decimal(str(tier_info['price']))  # Recalculate server-side
         
         # Generate customer-facing memo UUID
         import uuid
@@ -1633,6 +1637,25 @@ def save_analysis():
             
             current_balance = user_check['credits_balance']
             analysis_status = 'completed' if success else 'failed'
+            
+            # IDEMPOTENCY CHECK - Prevent duplicate charges
+            cursor.execute("""
+                SELECT analysis_id, memo_uuid, final_charged_credits 
+                FROM analyses 
+                WHERE user_id = %s AND memo_uuid LIKE %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (user_id, f"{analysis_id[:10]}%"))
+            
+            existing_analysis = cursor.fetchone()
+            if existing_analysis:
+                logger.warning(f"Duplicate save attempt for analysis {analysis_id}")
+                return jsonify({
+                    'message': 'Analysis already saved (idempotent)',
+                    'analysis_id': existing_analysis['analysis_id'],
+                    'memo_uuid': existing_analysis['memo_uuid'],
+                    'balance_remaining': float(current_balance)
+                }), 200
             
             # Insert analysis record with memo content
             cursor.execute("""

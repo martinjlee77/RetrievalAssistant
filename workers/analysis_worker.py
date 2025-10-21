@@ -65,6 +65,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         analysis_results = {}
         
         # Run 5 ASC 606 steps with progress reporting
+        step_failures = []
         for step_num in range(1, 6):
             # Update job progress
             if job:
@@ -96,12 +97,9 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 
             except Exception as e:
                 logger.error(f"Error in Step {step_num}: {str(e)}")
-                # Continue with other steps
-                analysis_results[f'step_{step_num}'] = {
-                    'markdown_content': f"Error in Step {step_num}: {str(e)}",
-                    'title': f"Step {step_num}: Error",
-                    'step_num': str(step_num)
-                }
+                step_failures.append(f"Step {step_num}: {str(e)}")
+                # CRITICAL: If step fails, raise exception to prevent billing
+                raise Exception(f"Step {step_num} failed: {str(e)}")
         
         # Generate final memo
         logger.info("📝 Generating final memo...")
@@ -131,6 +129,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         logger.info("💾 Saving analysis to database...")
         backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         
+        # NOTE: Server will recalculate cost_charged from words_count for security
         save_response = requests.post(
             f'{backend_url}/api/analysis/save',
             headers={'Authorization': f'Bearer {user_token}'},
@@ -142,8 +141,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 'asc_standard': 'ASC 606',
                 'words_count': pricing_result['total_words'],
                 'tier_name': pricing_result['tier_info']['name'],
-                'file_count': pricing_result['file_count'],
-                'cost_charged': pricing_result['tier_info']['price']
+                'file_count': pricing_result['file_count']
             },
             timeout=30
         )
@@ -181,8 +179,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     'asc_standard': 'ASC 606',
                     'words_count': pricing_result['total_words'],
                     'tier_name': pricing_result['tier_info']['name'],
-                    'file_count': pricing_result['file_count'],
-                    'cost_charged': 0  # Don't charge for failed analysis
+                    'file_count': pricing_result['file_count']
                 },
                 timeout=30
             )

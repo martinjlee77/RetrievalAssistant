@@ -88,7 +88,7 @@ def submit_and_monitor_asc606_job(
         step_details = st.empty()
         
         # Polling loop
-        max_polls = 120  # 20 minutes max (10 second intervals)
+        max_polls = 180  # 30 minutes max (10 second intervals)
         poll_count = 0
         
         while poll_count < max_polls:

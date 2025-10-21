@@ -330,6 +330,11 @@ def render_asc606_page():
                 else:
                     cached_text = None
                 
+                # Ensure we have cached text
+                if not cached_text:
+                    st.error("❌ Contract text not found. Please re-upload your documents.")
+                    return
+                
                 # Submit analysis to background job queue
                 uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
                 

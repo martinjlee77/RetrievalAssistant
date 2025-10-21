@@ -8,7 +8,7 @@ import os
 import sys
 import logging
 from redis import Redis
-from rq import Worker, Queue, Connection
+from rq import Worker, Queue
 
 # Set up logging
 logging.basicConfig(
@@ -28,10 +28,9 @@ def main():
     redis_conn = Redis.from_url(redis_url)
     
     # Create worker with the 'analysis' queue
-    with Connection(redis_conn):
-        worker = Worker(['analysis'], connection=redis_conn)
-        logger.info("🚀 RQ Worker started. Waiting for jobs...")
-        worker.work()
+    worker = Worker(['analysis'], connection=redis_conn)
+    logger.info("🚀 RQ Worker started. Waiting for jobs...")
+    worker.work()
 
 if __name__ == '__main__':
     main()
