@@ -1,0 +1,84 @@
+VeritasLogic Website
+/
+52ce0f30
+Active
+
+Oct 21, 2025, 10:35 AM
+www.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 10:35 AM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 14:37:12 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 14:37:12 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 14:37:12 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 14:37:12 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 14:37:12 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 14:37:12 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 14:37:12 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+100.64.0.2 - - [21/Oct/2025:14:38:12 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /dashboard.js HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:14:38:13 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:14:38:13 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJlbWFpbCI6InN1cHBvcnRAdmVyaXRhc2xvZ2ljLmFpIiwiZXhwIjoxNzYxMDcxNTE4LCJwdXJwb3NlIjoiYWNjZXNzIiwiZG9tYWluIjoidmVyaXRhc2xvZ2ljLmFpIiwiaXNzdWVkX2F0IjoiMjAyNS0xMC0yMVQxNDozMTo1OC41ODM3NDIifQ.ZXtKdofEBeL_Yixyqmuvl2R9TGCkLW_JokgrZBpTvrQ
+100.64.0.3 - - [21/Oct/2025:14:38:15 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:13 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+100.64.0.3 - - [21/Oct/2025:14:38:15 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=51
+INFO:backend_api:Database query result for analysis_id 51: RealDictRow([('asc_standard', 'ASC 606')])
+INFO:backend_api:Found asc_standard: ASC 606
+INFO:backend_api:Mapped to page_title: ASC%20606%3A%20Revenue%20Recognition
+INFO:backend_api:Set page_path: /ASC%20606%3A%20Revenue%20Recognition
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai/ASC%20606%3A%20Revenue%20Recognition?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJlbWFpbCI6InN1cHBvcnRAdmVyaXRhc2xvZ2ljLmFpIiwiZXhwIjoxNzYxMDcxNTE4LCJwdXJwb3NlIjoiYWNjZXNzIiwiZG9tYWluIjoidmVyaXRhc2xvZ2ljLmFpIiwiaXNzdWVkX2F0IjoiMjAyNS0xMC0yMVQxNDozMTo1OC41ODM3NDIifQ.ZXtKdofEBeL_Yixyqmuvl2R9TGCkLW_JokgrZBpTvrQ&analysis_id=51
+100.64.0.3 - - [21/Oct/2025:14:38:17 +0000] "GET /analysis?analysis_id=51 HTTP/1.1" 200 12231 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:14:38:24 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /dashboard.js HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:14:38:35 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:14:38:35 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:35 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.js HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:14:38:36 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.js HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:14:38:36 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 304 0 "https://www.veritaslogic.ai/dashboard.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /dashboard.js HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:14:38:36 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:36 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:37 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:37 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:37 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4483 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:14:38:37 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJlbWFpbCI6InN1cHBvcnRAdmVyaXRhc2xvZ2ljLmFpIiwiZXhwIjoxNzYxMDcxNTE4LCJwdXJwb3NlIjoiYWNjZXNzIiwiZG9tYWluIjoidmVyaXRhc2xvZ2ljLmFpIiwiaXNzdWVkX2F0IjoiMjAyNS0xMC0yMVQxNDozMTo1OC41ODM3NDIifQ.ZXtKdofEBeL_Yixyqmuvl2R9TGCkLW_JokgrZBpTvrQ
+100.64.0.3 - - [21/Oct/2025:14:38:38 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
