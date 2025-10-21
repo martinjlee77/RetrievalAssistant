@@ -101,6 +101,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         Dictionary with analysis results including memo content
     """
     analysis_id = job_data['analysis_id']
+    memo_uuid = job_data['memo_uuid']  # Get memo_uuid from job data
     user_id = job_data['user_id']
     user_token = job_data['user_token']
     pricing_result = job_data['pricing_result']
@@ -199,13 +200,13 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         logger.info("💾 Saving analysis to database...")
         backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         
-        # NOTE: Server will recalculate cost_charged from analysis_id for security
-        # Worker only sends memo_content, api_cost, and success flag
+        # NOTE: Server will look up analysis by memo_uuid for security
+        # Worker only sends memo_uuid, memo_content, api_cost, and success flag
         save_result = _save_analysis_with_retry(
             backend_url=backend_url,
             user_token=user_token,
             save_data={
-                'analysis_id': analysis_id,
+                'memo_uuid': memo_uuid,  # Use memo_uuid for lookup
                 'memo_content': memo_content,
                 'api_cost': api_cost,
                 'success': True
@@ -238,12 +239,12 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
             
             # Use retry helper to ensure failure is persisted
-            # NOTE: Server will look up pricing from analysis_id, not from worker data
+            # NOTE: Server will look up analysis by memo_uuid
             _save_analysis_with_retry(
                 backend_url=backend_url,
                 user_token=user_token,
                 save_data={
-                    'analysis_id': analysis_id,
+                    'memo_uuid': memo_uuid,  # Use memo_uuid for lookup
                     'success': False,
                     'error_message': str(e)[:500],  # Truncate to 500 chars
                     'api_cost': api_cost

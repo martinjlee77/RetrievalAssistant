@@ -69,7 +69,11 @@ def submit_and_monitor_asc606_job(
             st.error(f"❌ Failed to create analysis record: {create_response.text}")
             return
         
-        logger.info(f"✓ Analysis record created: {analysis_id}")
+        # Extract memo_uuid from response for worker to use
+        create_data = create_response.json()
+        memo_uuid = create_data.get('memo_uuid')
+        
+        logger.info(f"✓ Analysis record created: {analysis_id}, memo_uuid: {memo_uuid}")
         
         # Submit job to Redis queue
         st.info("📤 Submitting analysis to background queue...")
@@ -78,6 +82,7 @@ def submit_and_monitor_asc606_job(
             job_id = job_manager.submit_analysis_job(
                 asc_standard='ASC 606',
                 analysis_id=analysis_id,
+                memo_uuid=memo_uuid,  # Pass memo_uuid to worker
                 user_id=user_id,
                 user_token=user_token,
                 pricing_result=pricing_result,
@@ -138,7 +143,7 @@ def submit_and_monitor_asc606_job(
                     import requests
                     
                     status_response = requests.get(
-                        f'{backend_url}/api/analysis/status/{analysis_id}',
+                        f'{backend_url}/api/analysis/status/{memo_uuid}',  # Use memo_uuid for lookup
                         headers={'Authorization': f'Bearer {user_token}'},
                         timeout=10
                     )
