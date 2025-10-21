@@ -72,7 +72,7 @@ def submit_and_monitor_asc606_job(
         logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
         # Submit job to Redis queue
-        st.info("📤 Submitting analysis to background queue...")
+        st.info("📤 Submitting analysis for processing...")
         
         try:
             job_id = job_manager.submit_analysis_job(
@@ -98,15 +98,7 @@ def submit_and_monitor_asc606_job(
         st.markdown("---")
         st.markdown("### 🔄 Analysis Progress")
         st.info("""
-        ✅ **Your analysis is running in the background!**
-        
-        You can now:
-        - Close this tab safely
-        - Switch to other tabs
-        - Lock your screen
-        - Come back later
-        
-        **Your analysis will continue running** and results will be saved automatically.
+        ✅ **Your analysis is running. Upon completion, the page will refresh with your memo. Thank you for your patience!**
         """)
         
         # Create progress display components
@@ -206,11 +198,10 @@ def submit_and_monitor_asc606_job(
                 
                 # Update status text
                 status_text.info(f"🔄 Processing: {step_name} ({current_step}/{total_steps})")
-                step_details.markdown(f"**Current Step:** {step_name}  \n**Progress:** {current_step} of {total_steps} steps")
                 
             elif job_status == 'queued':
                 # Job is queued, waiting to start
-                status_text.info("⏳ Job queued - waiting for worker...")
+                status_text.info("⏳ Job queued - waiting for processing to begin...")
                 step_details.markdown("Your analysis is in the queue and will start shortly.")
                 
             else:
