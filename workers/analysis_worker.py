@@ -129,8 +129,11 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         except:
             customer_name = "the Customer"  # Fallback on error
         
-        # Initialize results storage
-        analysis_results = {}
+        # Initialize results storage with proper structure matching analyze_contract
+        analysis_results = {
+            'steps': {},  # Store steps under 'steps' key like original flow
+            'customer_name': customer_name
+        }
         
         # Run 5 ASC 606 steps with progress reporting
         step_failures = []
@@ -160,7 +163,8 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     additional_context=additional_context
                 )
                 
-                analysis_results[f'step_{step_num}'] = step_result
+                # Store under 'steps' key to match original flow structure
+                analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
                 
             except Exception as e:
@@ -180,15 +184,9 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             }
             job.save_meta()
         
-        # Generate executive summary, background, and conclusion
+        # Generate executive summary, background, and conclusion using analyzer's method
         logger.info("→ Generating executive summary, background, and conclusion...")
-        conclusions_text = "\n\n".join([
-            analysis_results['steps']['step_1']['conclusion'],
-            analysis_results['steps']['step_2']['conclusion'],
-            analysis_results['steps']['step_3']['conclusion'],
-            analysis_results['steps']['step_4']['conclusion'],
-            analysis_results['steps']['step_5']['conclusion']
-        ])
+        conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results['steps'])
         
         analysis_results['executive_summary'] = analyzer.generate_executive_summary(conclusions_text, customer_name)
         analysis_results['background'] = analyzer.generate_background_section(conclusions_text, customer_name)
@@ -197,9 +195,8 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         memo_generator = CleanMemoGenerator()
         filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
         
-        # Prepare analysis results with metadata
+        # Prepare analysis results with metadata (customer_name already set during init)
         analysis_results['filename'] = filename
-        analysis_results['customer_name'] = customer_name
         
         memo_content = memo_generator.combine_clean_steps(
             analysis_results,
