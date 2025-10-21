@@ -52,11 +52,11 @@ def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
             return False, "Authentication required", None
         
         # Fetch analysis from backend
-        backend_url = os.getenv('BACKEND_URL', 'http://localhost:3000')
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         headers = {'Authorization': f'Bearer {token}'}
         
         response = requests.get(
-            f'{backend_url}/api/analysis/status/{analysis_id}',
+            f'{website_url}/api/analysis/status/{analysis_id}',
             headers=headers,
             timeout=10
         )
@@ -137,11 +137,11 @@ def check_for_analysis_to_load():
         if not token:
             return False, None, None
         
-        backend_url = os.getenv('BACKEND_URL', 'http://localhost:3000')
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         headers = {'Authorization': f'Bearer {token}'}
         
         response = requests.get(
-            f'{backend_url}/api/analysis/recent/asc606',
+            f'{website_url}/api/analysis/recent/asc606',
             headers=headers,
             timeout=10
         )

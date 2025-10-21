@@ -1,0 +1,17 @@
+2025-10-21 13:12:06,939 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 13:12:06,947 - asc606.step_analyzer - INFO - ✓ Final conclusion generated (529 chars)
+2025-10-21 13:12:06,947 - asc606.clean_memo_generator - INFO - Added clean step 1 content (2858 chars)
+2025-10-21 13:12:06,947 - asc606.clean_memo_generator - INFO - Added clean step 2 content (3484 chars)
+2025-10-21 13:12:06,947 - asc606.clean_memo_generator - INFO - Added clean step 3 content (3129 chars)
+2025-10-21 13:12:06,947 - asc606.clean_memo_generator - INFO - Added clean step 4 content (2824 chars)
+2025-10-21 13:12:06,947 - asc606.clean_memo_generator - INFO - Added clean step 5 content (3035 chars)
+2025-10-21 13:12:06,948 - asc606.clean_memo_generator - INFO - Clean memo generated: 26127 chars, 5/5 steps
+2025-10-21 13:12:06.948 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 13:12:06.948 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 13:12:06,948 - workers.analysis_worker - INFO - 💾 Saving analysis to database...
+2025-10-21 13:12:06,948 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-10-21 13:12:07,037 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-10-21 13:12:07,041 - workers.analysis_worker - INFO - ✓ Analysis saved successfully: 672cc54e
+2025-10-21 13:12:07,052 - rq.worker - INFO - Successfully completed workers.analysis_worker.run_asc606_analysis({'analysis_id': 49, 'user_id': 7, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5cC...) job in 0:01:11.105850s on worker 9bcb5f21afcf4dbd893b81452d0d3f00
+2025-10-21 13:12:07,052 - rq.worker - INFO - analysis: Job OK (49)
+2025-10-21 13:12:07,052 - rq.worker - INFO - Result is kept for 86400 seconds

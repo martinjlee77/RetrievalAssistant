@@ -14,14 +14,13 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 # Backend API configuration - Use environment variables for cross-deployment support
-BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 
 class WalletManager:
     """Manages user wallet operations and credit transactions"""
     
     def __init__(self):
-        self.backend_url = BACKEND_URL
+        self.backend_url = f"{WEBSITE_URL}/api"
     
     def get_user_balance(self, user_token: str) -> Dict[str, Any]:
         """

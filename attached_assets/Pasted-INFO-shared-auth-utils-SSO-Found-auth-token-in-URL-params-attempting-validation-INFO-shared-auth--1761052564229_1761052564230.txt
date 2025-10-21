@@ -1,0 +1,33 @@
+INFO:shared.auth_utils:SSO: Found auth_token in URL params, attempting validation
+INFO:shared.auth_utils:SSO: Validating token at https://www.veritaslogic.ai/api/auth/validate-token
+INFO:shared.auth_utils:SSO: Validation response status: 200
+INFO:shared.auth_utils:SSO: Token validation result: True
+INFO:shared.auth_utils:SSO: Auto-login successful for user support@veritaslogic.ai
+INFO:__main__:Created new user session: 28332d2c...
+ERROR:__main__:Error checking for recent analysis: HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/analysis/recent/asc606 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f06ad91db90>: Failed to establish a new connection: [Errno 111] Connection refused'))
+INFO:__main__:🔍 Page load - session_id: 28332d2c-9705-42fb-b3d8-f58a248ea3f9, session keys: ['show_whats_new', 'auth_token', 'user_data', 'file_uploader_key', 'user_session_id']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_28332d2c-9705-42fb-b3d8-f58a248ea3f9, has_analysis_key=False, has_memo_key=False
+ERROR:__main__:Error checking for recent analysis: HTTPConnectionPool(host='localhost', port=3000): Max retries exceeded with url: /api/analysis/recent/asc606 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f05f041fed0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+INFO:__main__:🔍 Page load - session_id: 28332d2c-9705-42fb-b3d8-f58a248ea3f9, session keys: ['show_whats_new', 'user_data', 'asc606_analyze_disabled', 'user_session_id', 'asc606_uploader_0', 'auth_token', 'file_uploader_key']
+INFO:__main__:🔍 Checking for memo: analysis_key=asc606_analysis_complete_28332d2c-9705-42fb-b3d8-f58a248ea3f9, has_analysis_key=False, has_memo_key=False
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: gemini_sow.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 519 words (~2 pages) via python-docx
+INFO:asc606.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc606.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 952, Output tokens: 24, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc606.step_analyzer:Raw LLM response for party extraction: ```json
+```
+INFO:asc606.step_analyzer:✓ Parties extracted - Vendor: InnovateTech Solutions Inc., Customer: Global Dynamics Corp.
+INFO:asc606.step_analyzer:  → Also replaced vendor alias 'InnovateTech' (5 occurrences)
+INFO:asc606.step_analyzer:  → Also replaced customer alias 'Customer' (10 occurrences)
+INFO:asc606.step_analyzer:✓ De-identification complete: vendor 'InnovateTech Solutions Inc.' → 'the Company' (1 occurrences), customer 'Global Dynamics Corp.' → 'the Customer' (1 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 473 words, 3K (≤10 pages) tier, $195.0
+ERROR:shared.wallet_manager:Error getting wallet balance: HTTPConnectionPool(host='127.0.0.1', port=3000): Max retries exceeded with url: /api/user/wallet-balance (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f06adaf2f90>: Failed to establish a new connection: [Errno 111] Connection refused'))

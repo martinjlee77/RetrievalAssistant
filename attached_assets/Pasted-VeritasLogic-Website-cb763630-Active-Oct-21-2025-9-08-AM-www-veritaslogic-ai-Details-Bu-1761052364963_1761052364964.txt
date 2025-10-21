@@ -1,0 +1,52 @@
+VeritasLogic Website
+/
+cb763630
+Active
+
+Oct 21, 2025, 9:08 AM
+www.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 9:08 AM
+Starting Container
+[2025-10-21 13:09:21 +0000] [5] [INFO] Booting worker with pid: 5
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 13:09:21 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 13:09:21 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 13:09:21 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 13:09:21 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 13:09:21 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 13:09:21 +0000] [4] [INFO] Booting worker with pid: 4
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+100.64.0.2 - - [21/Oct/2025:13:10:29 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.2 - - [21/Oct/2025:13:10:29 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:13:10:31 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:13:10:29 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:13:10:29 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:13:10:30 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:13:10:30 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.2 - - [21/Oct/2025:13:10:32 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+100.64.0.3 - - [21/Oct/2025:13:10:39 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:13:10:44 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:13:10:48 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.5 - - [21/Oct/2025:13:10:53 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:13:10:55 +0000] "POST /api/analysis/create HTTP/1.1" 200 381 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:13:10:55 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.7 - - [21/Oct/2025:13:10:55 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 49, status: completed
+INFO:backend_api:Credits charged: 195.00, new balance: 5735.00
+100.64.0.4 - - [21/Oct/2025:13:12:07 +0000] "POST /api/analysis/save HTTP/1.1" 200 109 "-" "python-requests/2.31.0"
