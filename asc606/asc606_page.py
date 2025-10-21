@@ -111,6 +111,11 @@ def check_for_analysis_to_load():
     """
     import requests
     
+    # Skip if user explicitly wants to start fresh (clicked "Analyze Another Contract")
+    if st.session_state.get('skip_auto_load', False):
+        st.session_state.skip_auto_load = False  # Clear flag after checking
+        return False, None, None
+    
     # Skip if already have memo in session
     session_id = st.session_state.get('user_session_id', '')
     memo_key = f'asc606_memo_data_{session_id}'
@@ -255,8 +260,10 @@ def render_asc606_page():
                 st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
             with col2:
                 if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_existing"):
+                    # Set flag to skip auto-load on next rerun
+                    st.session_state.skip_auto_load = True
                     # Clear session state for new analysis
-                    keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                    keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower() and k != 'skip_auto_load']
                     for key in keys_to_clear:
                         del st.session_state[key]
                     st.rerun()
@@ -278,8 +285,10 @@ def render_asc606_page():
             st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
             
             if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_existing"):
+                # Set flag to skip auto-load on next rerun
+                st.session_state.skip_auto_load = True
                 # Clear session state for new analysis
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower()]
+                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc606' in k.lower() and k != 'skip_auto_load']
                 for key in keys_to_clear:
                     del st.session_state[key]
                 st.rerun()
