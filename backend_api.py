@@ -132,33 +132,37 @@ def serve_streamlit_app():
     if not token:
         token = request.cookies.get('vl_auth_token')
     
+    # Preserve any query parameters from the incoming request (e.g., analysis_id=123)
+    query_string = request.query_string.decode('utf-8')
+    extra_params = f"&{query_string}" if query_string else ""
+    
     # Build redirect URL with automatic token refresh
     if token:
         # Validate token before redirecting
         payload = verify_token(token)
         if 'error' not in payload:
             # Token is valid, use it
-            redirect_url = f"{STREAMLIT_URL}?auth_token={token}"
+            redirect_url = f"{STREAMLIT_URL}?auth_token={token}{extra_params}"
         else:
             # Token is expired/invalid, try to refresh it
             logger.info(f"Token validation failed: {payload.get('error', 'Unknown error')}, attempting refresh")
             refreshed_token = attempt_token_refresh(request)
             if refreshed_token:
                 logger.info("Token refresh successful, redirecting with new token")
-                redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}"
+                redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}{extra_params}"
             else:
                 logger.info("Token refresh failed, redirecting without token")
-                redirect_url = STREAMLIT_URL
+                redirect_url = f"{STREAMLIT_URL}?{query_string}" if query_string else STREAMLIT_URL
     else:
         # No token found, try refresh anyway (user might be logged in via dashboard session)
         logger.info("No token found, attempting refresh from dashboard session")
         refreshed_token = attempt_token_refresh(request)
         if refreshed_token:
             logger.info("Dashboard session refresh successful, redirecting with new token")
-            redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}"
+            redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}{extra_params}"
         else:
             logger.info("No valid session found, redirecting without token")
-            redirect_url = STREAMLIT_URL
+            redirect_url = f"{STREAMLIT_URL}?{query_string}" if query_string else STREAMLIT_URL
     
     # Build enhanced HTML response with error handling and status checking
     html_content = f"""
@@ -352,7 +356,7 @@ def serve_streamlit_app():
             let currentStep = 0;
             let connectionAttempts = 0;
             const maxAttempts = 3;
-            const redirectUrl = '{redirect_url}';
+            const redirectUrl = {json.dumps(redirect_url)};
             
             function updateProgress(percentage) {{
                 document.getElementById('progressFill').style.width = percentage + '%';

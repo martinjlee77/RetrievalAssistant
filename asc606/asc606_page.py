@@ -150,6 +150,11 @@ def check_for_analysis_to_load():
             data = response.json()
             analysis_id = data.get('analysis_id')
             
+            # Guard: Only load if analysis_id is present
+            if not analysis_id:
+                logger.warning("Recent analysis response missing analysis_id")
+                return False, None, None
+            
             # Load this analysis into session state
             success, message, timestamp = fetch_and_load_analysis(analysis_id, source='recent')
             if success:
