@@ -122,12 +122,12 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         knowledge_search = ASC606KnowledgeSearch()
         
         # Extract customer name for memo generation
-        customer_name = None
+        customer_name = "the Customer"  # Default value
         try:
             if "the Customer" in combined_text:
                 customer_name = "the Customer"
         except:
-            pass
+            customer_name = "the Customer"  # Fallback on error
         
         # Initialize results storage
         analysis_results = {}
