@@ -122,7 +122,7 @@ def check_for_analysis_to_load():
         headers = {'Authorization': f'Bearer {token}'}
         
         response = requests.get(
-            f'{website_url}/api/analysis/recent/asc340',
+            f'{website_url}/api/analysis/recent/asc340-40',
             headers=headers,
             timeout=10
         )
@@ -189,7 +189,7 @@ def render_asc340_page():
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
-            st.markdown("""📄 **Your ASC 340-40 memo is ready below. To save the results, you can either:
+            st.markdown("""📄 **Your ASC 340-40 memo is ready below.** To save the results, you can either:
 
 - **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
 - **Download:** Download the memo as a Word (.docx), Markdown, or PDF file for later use.
