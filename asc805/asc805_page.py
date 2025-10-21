@@ -556,6 +556,10 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
             uploaded_filenames=uploaded_filenames,
             session_id=session_id
         )
+        
+    except Exception as e:
+        logger.error(f"ASC 805 analysis error for session {session_id[:8]}: {str(e)}")
+        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
 
 def _upload_and_process_asc805():

@@ -1,0 +1,126 @@
+VeritasLogic Analysis
+/
+94eddf62
+Active
+
+Oct 21, 2025, 5:06 PM
+tas.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 5:06 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 810 words (~3 pages) via python-docx
+INFO:__main__:Created new user session: e3156d44...
+INFO:asc718.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc718.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:utils.document_extractor:📄 Processing document: asc 718.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:utils.document_extractor:✓ Text extracted: 810 words (~3 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: asc 718.docx (0.02 MB)
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 1177, Output tokens: 23, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc718.step_analyzer:Raw LLM response for party extraction: ```json
+```
+INFO:asc718.step_analyzer:✓ Parties extracted - Granting Company: InnovateSphere Inc., Recipient: Jane Doe
+INFO:asc718.step_analyzer:✓ De-identification complete: granting company 'InnovateSphere Inc.' → 'the Company' (3 occurrences), recipient 'Jane Doe' → 'the Employee' (2 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 800 words, 3K (≤10 pages) tier, $195.0
+INFO:utils.document_extractor:📄 Processing document: asc 718.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 810 words (~3 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 800 words, 3K (≤10 pages) tier, $195.0
+INFO:asc718.job_analysis_runner:✓ Analysis record created with database ID: 61
+INFO:shared.job_manager:✓ Job submitted for ASC 718: 61 (analysis 61)
+INFO:asc718.job_analysis_runner:Job submitted: 61
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.QUEUED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.STARTED
+INFO:asc718.job_analysis_runner:Job 61 status: JobStatus.FINISHED
+INFO:asc718.job_analysis_runner:✓ Status API response: status=completed, has_memo=True
+INFO:asc718.job_analysis_runner:✓ Storing memo in session state: session_id=e3156d44-8afa-4fcb-8286-7c4c63c07e75, analysis_key=asc718_analysis_complete_e3156d44-8afa-4fcb-8286-7c4c63c07e75
+INFO:asc718.job_analysis_runner:✓ Session state stored. Keys in session: ['asc718_cached_text_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'file_uploader_key', 'asc718_cached_deidentify_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'asc718_cached_word_count_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'user_data', 'asc718_failed_files_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'deidentified_preview', 'user_session_id', 'asc718_analyze', 'show_whats_new', 'asc718_analysis_complete_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'api_cost_tracker', 'asc718_memo_data_e3156d44-8afa-4fcb-8286-7c4c63c07e75', 'asc718_uploader_0', 'auth_token']
+INFO:asc718.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 20335 bytes
+INFO:asc718.clean_memo_generator:PDF generation successful: 20335 bytes
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py:  
+  128 in exec_func_with_error_handling                                                  
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner  
+  .py:669 in code_to_exec                                                               
+                                                                                        
+INFO:asc718.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 20335 bytes
+INFO:asc718.clean_memo_generator:PDF generation successful: 20335 bytes
+INFO:asc718.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 20335 bytes
+INFO:asc718.clean_memo_generator:PDF generation successful: 20335 bytes
+  /app/home.py:54 in <module>                                                           
+                                                                                        
+    51 try_cross_domain_auth()                                                          
+    52                                                                                  
+    53 # 7. Run the app.                                                                
+  ❱ 54 pg.run()                                                                         
+    55                                                                                  
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/navigation/page.py:296 in run       
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/pages_manager.py:160 in     
+  get_page_script_byte_code                                                             
+                                                                                        
+                                                                                        
+  /usr/local/lib/python3.11/ast.py:50 in parse                                          
+                                                                                        
+      47 │   elif feature_version is None:                                              
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_cache.  
+  py:72 in get_bytecode                                                                 
+      48 │   │   feature_version = -1                                                   
+                                                                                        
+      49 │   # Else it should be an int giving the minor version for 3.x.               
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/magic.py:45    
+  ❱   50 │   return compile(source, filename, mode, flags,                              
+  in add_magic                                                                          
+      51 │   │   │   │      _feature_version=feature_version)                           
+  ▲                                                                                     
+────────────────────────────────────────────────────────────────────────────────────────
+      52                                                                                
+      53                                                                                
+SyntaxError: expected 'except' or 'finally' block
+────────────────────────────────────────────────────────────────────────────────────────
+────────────────────────────────────────────────────────────────────────────────────────
+   /app/asc805/asc805_page.py:561                                                       
+  def _upload_and_process_asc805():                                                     
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py:  
+  128 in exec_func_with_error_handling                                                  
+                                                                                        
+  /usr/local/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner  
+  .py:669 in code_to_exec                                                               
+                                                                                        
+  /app/home.py:54 in <module>                                                           
