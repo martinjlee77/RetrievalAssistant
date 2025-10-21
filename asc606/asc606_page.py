@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 from shared.ui_components import SharedUIComponents
-from shared.auth_utils import require_authentication, show_credits_warning, auth_manager, try_cross_domain_auth
+from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
 from shared.billing_manager import billing_manager
 from shared.preflight_pricing import preflight_pricing
 from shared.wallet_manager import wallet_manager
@@ -23,9 +23,6 @@ from asc606.knowledge_search import ASC606KnowledgeSearch
 from utils.document_extractor import DocumentExtractor
 
 logger = logging.getLogger(__name__)
-
-# Process SSO authentication from URL (for direct page links from dashboard)
-try_cross_domain_auth()
 
 def create_file_hash(uploaded_files):
     """Create a hash of uploaded files to detect changes."""
