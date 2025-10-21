@@ -636,6 +636,31 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return {'error': 'Invalid token'}
 
+def generate_service_token(user_id, email):
+    """
+    Generate a long-lived service token for background workers
+    
+    Service tokens are used by background workers to make authenticated API calls
+    without relying on the user's short-lived access token.
+    
+    Args:
+        user_id: User ID
+        email: User email
+        
+    Returns:
+        str: JWT service token valid for 24 hours
+    """
+    service_token = jwt.encode({
+        'user_id': user_id,
+        'email': email,
+        'exp': datetime.utcnow() + timedelta(hours=24),
+        'purpose': 'service',
+        'domain': 'veritaslogic.ai',
+        'issued_at': datetime.utcnow().isoformat()
+    }, app.config['SECRET_KEY'], algorithm='HS256')
+    
+    return service_token
+
 # Password management functions
 def hash_password(password):
     """Hash a password using bcrypt"""
@@ -1682,10 +1707,15 @@ def create_pending_analysis():
             
             conn.commit()
             
+            # Generate long-lived service token for background worker
+            # This prevents token expiration issues during long-running analyses
+            service_token = generate_service_token(user_id, payload['email'])
+            
             return jsonify({
                 'message': 'Analysis record created',
                 'analysis_id': db_analysis_id,
-                'memo_uuid': memo_uuid
+                'memo_uuid': memo_uuid,
+                'service_token': service_token
             }), 200
             
         except Exception as e:
