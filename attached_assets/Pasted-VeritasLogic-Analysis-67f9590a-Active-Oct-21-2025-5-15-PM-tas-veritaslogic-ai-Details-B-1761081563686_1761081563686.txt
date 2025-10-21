@@ -1,0 +1,77 @@
+VeritasLogic Analysis
+/
+67f9590a
+Active
+
+Oct 21, 2025, 5:15 PM
+tas.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 5:15 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:shared.auth_utils:SSO: Found auth_token in URL params, attempting validation
+INFO:asc718.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.auth_utils:SSO: Validating token at https://www.veritaslogic.ai/api/auth/validate-token
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.auth_utils:SSO: Validation response status: 200
+INFO:shared.pdf_generator:PDF generation successful: 20335 bytes
+INFO:shared.auth_utils:SSO: Token validation result: True
+INFO:asc718.clean_memo_generator:PDF generation successful: 20335 bytes
+INFO:shared.auth_utils:SSO: Auto-login successful for user support@veritaslogic.ai
+INFO:__main__:Created new user session: 9ed62197...
+INFO:__main__:📥 Auto-loaded analysis from recent: timestamp=2025-10-21T21:12:25.706873
+INFO:utils.document_extractor:📄 Processing document: asc 805.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 996 words (~3 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: asc 805.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 996 words (~3 pages) via python-docx
+INFO:asc805.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc805.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:asc805.step_analyzer:  → Also replaced target base name 'SYNERGY SOLUTIONS' (1 occurrences)
+INFO:asc805.step_analyzer:✓ De-identification complete: acquirer 'INNOVATE CORP.' → 'the Company' (3 occurrences), target 'SYNERGY SOLUTIONS INC.' → 'the Target' (3 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 931 words, 3K (≤10 pages) tier, $195.0
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 1154, Output tokens: 28, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc805.step_analyzer:Raw LLM response for party extraction: ```json
+```
+INFO:asc805.step_analyzer:✓ Parties extracted - Acquirer: INNOVATE CORP., Target: SYNERGY SOLUTIONS INC.
+INFO:utils.document_extractor:📄 Processing document: asc 805.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 996 words (~3 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 931 words, 3K (≤10 pages) tier, $195.0
+INFO:asc805.job_analysis_runner:✓ Analysis record created with database ID: 62
+INFO:shared.job_manager:✓ Job submitted for ASC 805: 62 (analysis 62)
+INFO:asc805.job_analysis_runner:Job submitted: 62
+INFO:asc805.job_analysis_runner:Job 62 status: JobStatus.QUEUED
+INFO:asc805.job_analysis_runner:Job 62 status: JobStatus.FAILED
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1659, in perform_job
+ERROR:asc805.job_analysis_runner:Job 62 failed: Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 700, in run_asc805_analysis
+    return_value = job.perform()
+    step_result = analyzer._analyze_step_with_retry(
+                   ^^^^^^^^^^^^^
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+    self._result = self._execute()
+During handling of the above exception, another exception occurred:
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+Traceback (most recent call last):
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/workers/analysis_worker.py", line 714, in run_asc805_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'

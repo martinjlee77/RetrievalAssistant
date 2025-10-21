@@ -1,0 +1,77 @@
+Worker
+/
+bbbaf107
+Active
+
+Oct 21, 2025, 5:15 PM
+Details
+Build Logs
+Deploy Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 5:15 PM
+Starting Container
+2025-10-21 21:16:46,308 - rq.worker - INFO - Worker 2ccce42066594cfc82d3d4776af9801d: subscribing to channel rq:pubsub:2ccce42066594cfc82d3d4776af9801d
+2025-10-21 21:16:46,313 - rq.worker - INFO - *** Listening on analysis...
+2025-10-21 21:16:46,316 - rq.worker - INFO - Worker 2ccce42066594cfc82d3d4776af9801d: cleaning registries for queue: analysis
+2025-10-21 21:16:46,238 - shared.redis_connection - INFO - Attempting to connect to Redis: redis://default:caASCJiqLuOysPZqbElpmjCYEfHmSylU@redis.railway.internal:6379
+2025-10-21 21:16:46,304 - shared.redis_connection - INFO - ✓ Connected to production Redis
+2025-10-21 21:16:46,306 - __main__ - INFO - 🚀 RQ Worker started. Waiting for jobs...
+2025-10-21 21:16:46,308 - rq.worker - INFO - Worker 2ccce42066594cfc82d3d4776af9801d: started with PID 1, version 2.6.0
+2025-10-21 21:18:14,396 - rq.worker - INFO - analysis: workers.analysis_worker.run_asc805_analysis({'analysis_id': 62, 'user_id': 7, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5cC...) (62)
+2025-10-21 21:18:17,435 - workers.analysis_worker - INFO - 🚀 Worker starting ASC 805 analysis: 62
+2025-10-21 21:18:17.435 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:17.435 WARNING streamlit.runtime.state.session_state_proxy: Session state does not function when running a script without `streamlit run`
+2025-10-21 21:18:17.435 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:17.436 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:17.436 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:17,436 - shared.api_cost_tracker - INFO - API cost tracker reset
+2025-10-21 21:18:17,480 - asc805.step_analyzer - INFO - 🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+2025-10-21 21:18:17,505 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-10-21 21:18:17,636 - shared.knowledge_base - INFO - ChromaDB client initialized for asc805_knowledge_base
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+2025-10-21 21:18:18,251 - asc805.knowledge_search - INFO - Retrieved guidance for Step 1
+2025-10-21 21:18:18,251 - workers.analysis_worker - ERROR - Error in Step 1: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+2025-10-21 21:18:18,251 - workers.analysis_worker - ERROR - ❌ Analysis failed: Step 1 failed: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+2025-10-21 21:18:17,647 - shared.knowledge_base - INFO - Embedding function initialized successfully
+Traceback (most recent call last):
+2025-10-21 21:18:17,648 - shared.knowledge_base - INFO - Collection 'asc805_guidance' loaded successfully
+2025-10-21 21:18:17,649 - asc805.knowledge_search - INFO - ASC 805 knowledge search initialized successfully
+  File "/app/workers/analysis_worker.py", line 700, in run_asc805_analysis
+2025-10-21 21:18:17,651 - workers.analysis_worker - INFO - 📊 Processing Step 1/5
+2025-10-21 21:18:17,651 - shared.knowledge_base - INFO - 🔍 Querying asc805_guidance knowledge base...
+    step_result = analyzer._analyze_step_with_retry(
+2025-10-21 21:18:18,151 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 21:18:18,251 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.60s)
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 714, in run_asc805_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+2025-10-21 21:18:18.252 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:18.252 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 21:18:18,252 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-10-21 21:18:18,348 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-10-21 21:18:18,351 - workers.analysis_worker - INFO - ✓ Failure status saved to database
+2025-10-21 21:18:18,360 - rq.worker - ERROR - Worker 2ccce42066594cfc82d3d4776af9801d: job 62: exception raised while executing (workers.analysis_worker.run_asc805_analysis)
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 700, in run_asc805_analysis
+    step_result = analyzer._analyze_step_with_retry(
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    self._result = self._execute()
+  File "/app/workers/analysis_worker.py", line 714, in run_asc805_analysis
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1659, in perform_job
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC805StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'target_company'

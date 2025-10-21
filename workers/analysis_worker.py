@@ -701,7 +701,7 @@ def run_asc805_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     step_num=step_num,
                     contract_text=combined_text,
                     authoritative_context=authoritative_context,
-                    target_company=target_company,
+                    customer_name=target_company,
                     additional_context=additional_context
                 )
                 
