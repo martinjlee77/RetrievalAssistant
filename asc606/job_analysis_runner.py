@@ -39,8 +39,9 @@ def submit_and_monitor_asc606_job(
         import uuid
         analysis_id = f"asc606_{int(time.time())}_{uuid.uuid4().hex[:8]}"
         
-        # Get user ID from analysis manager
-        user_id = st.session_state.get('user_id')
+        # Get user ID from session state (set during login)
+        user_data = st.session_state.get('user_data', {})
+        user_id = user_data.get('id')
         if not user_id:
             st.error("❌ User authentication failed. Please refresh and log in again.")
             return
