@@ -64,19 +64,25 @@ def submit_and_monitor_asc606_job(
             st.error(f"❌ Failed to create analysis record: {create_response.text}")
             return
         
-        # Extract database analysis_id (INTEGER) from response
+        # Extract database analysis_id (INTEGER) and service token from response
         create_data = create_response.json()
         db_analysis_id = create_data.get('analysis_id')  # This is the database INTEGER
+        service_token = create_data.get('service_token')  # Long-lived token for worker
+        
+        if not service_token:
+            st.error("❌ Failed to generate service token for background worker")
+            return
         
         logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
-        # Submit job to Redis queue        
+        # Submit job to Redis queue with service token (not user token)
+        # Service token is long-lived (24h) to prevent expiration during analysis
         try:
             job_id = job_manager.submit_analysis_job(
                 asc_standard='ASC 606',
                 analysis_id=db_analysis_id,  # Pass database INTEGER id to worker
                 user_id=user_id,
-                user_token=user_token,
+                user_token=service_token,  # Use service token instead of user token
                 pricing_result=pricing_result,
                 additional_context=additional_context,
                 combined_text=cached_combined_text,
