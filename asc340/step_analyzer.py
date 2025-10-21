@@ -1151,9 +1151,10 @@ Contract Summary: {conclusions_text}
 Instructions:
 1. Describe what type of arrangement was reviewed (high-level)
 2. Mention key cost elements if evident
-3. State the purpose of the ASC 340-40 analysi
+3. State the purpose of the ASC 340-40 analysis
 4. Professional accounting language
-5. Keep it high-level, no specific amounts or detailed terms"""
+5. Keep it high-level, no specific amounts or detailed terms
+6. DO NOT include any heading (like "Background" or "## Background") - just provide the paragraph text only"""
 
         try:
             params = {
