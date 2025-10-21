@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 # Backend API configuration - Use environment variables for cross-deployment support
 import os
-# For production, BACKEND_URL should point to the Flask backend service
-# e.g., 'https://www.veritaslogic.ai/api' or Railway internal service URL
-BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+# For production, BACKEND_URL should point to the Flask backend service (without /api suffix)
+# e.g., 'https://www.veritaslogic.ai' or Railway internal service URL
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000')
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
 
@@ -68,7 +68,7 @@ class AuthManager:
         
         try:
             # Use BACKEND_URL for API calls
-            credits_url = f"{BACKEND_URL}/user/check-credits"
+            credits_url = f"{BACKEND_URL}/api/user/check-credits"
             
             response = requests.post(
                 credits_url,
@@ -94,7 +94,7 @@ class AuthManager:
         
         try:
             # Use BACKEND_URL for API calls
-            profile_url = f"{BACKEND_URL}/user/profile"
+            profile_url = f"{BACKEND_URL}/api/user/profile"
             
             response = requests.get(
                 profile_url,
@@ -180,7 +180,7 @@ def attempt_login(email: str, password: str) -> Dict[str, Any]:
     """Attempt to login user with email and password via main website"""
     try:
         # Use BACKEND_URL for API calls
-        login_url = f"{BACKEND_URL}/login"
+        login_url = f"{BACKEND_URL}/api/login"
         logger.info(f"SSO: Attempting login at {login_url}")
         
         response = requests.post(
@@ -207,7 +207,7 @@ def validate_existing_token(token: str) -> Dict[str, Any]:
     """Validate an existing token using the cross-subdomain validation endpoint"""
     try:
         # Use BACKEND_URL for API calls (ensure it's set correctly for production)
-        validation_url = f"{BACKEND_URL}/auth/validate-token"
+        validation_url = f"{BACKEND_URL}/api/auth/validate-token"
         logger.info(f"SSO: Validating token at {validation_url}")
         
         response = requests.post(

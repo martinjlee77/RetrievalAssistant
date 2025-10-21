@@ -134,7 +134,40 @@ def serve_streamlit_app():
     
     # Preserve any query parameters from the incoming request (e.g., analysis_id=123)
     query_string = request.query_string.decode('utf-8')
-    extra_params = f"&{query_string}" if query_string else ""
+    
+    # Determine the Streamlit page to open based on analysis_id
+    page_param = ""
+    analysis_id = request.args.get('analysis_id')
+    if analysis_id:
+        try:
+            # Query database to get asc_standard for this analysis
+            conn = get_db_connection()
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor.execute(
+                "SELECT asc_standard FROM analyses WHERE id = %s",
+                (int(analysis_id),)
+            )
+            result = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            
+            if result:
+                asc_standard = result['asc_standard']
+                # Map ASC standards to Streamlit page titles (URL-encoded)
+                page_mapping = {
+                    'ASC 606': 'ASC%20606%3A%20Revenue%20Recognition',
+                    'ASC 340-40': 'ASC%20340-40%3A%20Cost%20to%20Obtain',
+                    'ASC 842': 'ASC%20842%3A%20Leases%20(Lessee)',
+                    'ASC 718': 'ASC%20718%3A%20Stock%20Compensation',
+                    'ASC 805': 'ASC%20805%3A%20Business%20Combinations',
+                }
+                page_title = page_mapping.get(asc_standard)
+                if page_title:
+                    page_param = f"&page={page_title}"
+        except Exception as e:
+            logger.error(f"Error determining page for analysis_id {analysis_id}: {e}")
+    
+    extra_params = f"&{query_string}{page_param}" if query_string else page_param
     
     # Build redirect URL with automatic token refresh
     if token:
@@ -152,7 +185,7 @@ def serve_streamlit_app():
                 redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}{extra_params}"
             else:
                 logger.info("Token refresh failed, redirecting without token")
-                redirect_url = f"{STREAMLIT_URL}?{query_string}" if query_string else STREAMLIT_URL
+                redirect_url = f"{STREAMLIT_URL}{extra_params}" if extra_params else STREAMLIT_URL
     else:
         # No token found, try refresh anyway (user might be logged in via dashboard session)
         logger.info("No token found, attempting refresh from dashboard session")
@@ -162,7 +195,7 @@ def serve_streamlit_app():
             redirect_url = f"{STREAMLIT_URL}?auth_token={refreshed_token}{extra_params}"
         else:
             logger.info("No valid session found, redirecting without token")
-            redirect_url = f"{STREAMLIT_URL}?{query_string}" if query_string else STREAMLIT_URL
+            redirect_url = f"{STREAMLIT_URL}{extra_params}" if extra_params else STREAMLIT_URL
     
     # Build enhanced HTML response with error handling and status checking
     html_content = f"""

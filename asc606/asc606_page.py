@@ -174,6 +174,11 @@ def render_asc606_page():
     if not require_authentication():
         return  # User will see login page
     
+    # Initialize user session ID for memo persistence
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0

@@ -252,11 +252,11 @@ class AnalysisManager:
             
             # Save to database via new unified API endpoint - use environment variable
             import os
-            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000')
             website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
             
             # For production cross-service communication, use website URL
-            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url.replace('/api', '')
+            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url
             
             response = requests.post(
                 f'{api_base_url}/api/analysis/complete',
@@ -304,9 +304,9 @@ class AnalysisManager:
                 return None
             
             # Check if token is still valid by making a quick test call
-            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000/api')
+            backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:3000')
             website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
-            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url.replace('/api', '')
+            api_base_url = website_url if not backend_url.startswith('http://127.0.0.1') and not backend_url.startswith('http://localhost') else backend_url
             
             # Test current token (use GET method)
             test_response = requests.get(
