@@ -1,0 +1,89 @@
+You reached the start of the range
+Oct 21, 2025, 1:01 AM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 05:05:05 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 05:05:05 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 05:05:05 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 05:05:05 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 05:05:05 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 05:05:05 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 05:05:05 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.2 - - [21/Oct/2025:05:05:52 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.3 - - [21/Oct/2025:05:07:54 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:07:54 +0000] "GET /api/user/profile HTTP/1.1" 200 2810 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:05:07:54 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:07:55 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:07:55 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:07:55 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:07:55 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:No token found, attempting refresh from dashboard session
+100.64.0.2 - - [21/Oct/2025:05:07:56 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:05:10:10 +0000] "GET / HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:05:10:10 +0000] "GET /styles.css HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:05:10:10 +0000] "GET /images/demo-poster.jpg HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:05:10:10 +0000] "GET /script.js HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:05:10:10 +0000] "GET /images/howitworks.jpeg HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:05:10:10 +0000] "GET /api/user/profile HTTP/1.1" 200 2810 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:05:10:11 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:05:10:16 +0000] "GET /images/favicon/apple-touch-icon.png HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.2 - - [21/Oct/2025:09:00:24 +0000] "GET / HTTP/1.1" 200 0 "-" "Mozilla/5.0 (compatible; HubSpot Crawler; HubSpot Domain check; +https://www.hubspot.com)"
+100.64.0.7 - - [21/Oct/2025:10:08:59 +0000] "GET / HTTP/1.1" 200 0 "-" "Hello from Palo Alto Networks, find out more about our scans in https://docs-cortex.paloaltonetworks.com/r/1/Cortex-Xpanse/Scanning-activity"
+100.64.0.8 - - [21/Oct/2025:10:15:41 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:10:15:41 +0000] "GET /images/demo-poster.jpg HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.9 - - [21/Oct/2025:10:15:41 +0000] "GET /styles.css HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:10:15:41 +0000] "GET /images/howitworks.jpeg HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:10:15:41 +0000] "GET /script.js HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:10:15:41 +0000] "GET /api/user/profile HTTP/1.1" 401 30 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:42 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:44 +0000] "GET /login.html HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:44 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:49 +0000] "POST /api/login HTTP/1.1" 200 713 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:49 +0000] "GET /dashboard.html HTTP/1.1" 304 0 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:10:15:49 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /dashboard.js HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /api/user/profile HTTP/1.1" 200 2810 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:50 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:52 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:53 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:15:56 +0000] "GET /analysis?analysis_id=47 HTTP/1.1" 200 12194 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:10:16:07 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:10:16:12 +0000] "GET /analysis?analysis_id=47 HTTP/1.1" 200 12194 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:10:16:19 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.7 - - [21/Oct/2025:10:16:38 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.2 - - [21/Oct/2025:10:16:42 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.9 - - [21/Oct/2025:10:16:46 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:10:16:51 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:10:16:51 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:10:16:51 +0000] "POST /api/analysis/create HTTP/1.1" 200 78 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 48, status: completed
+INFO:backend_api:Credits charged: 195.00, new balance: 5930.00
+100.64.0.4 - - [21/Oct/2025:10:18:14 +0000] "POST /api/analysis/save HTTP/1.1" 200 109 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:10:18:21 +0000] "GET /api/analysis/status/48 HTTP/1.1" 200 27179 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:10:18:41 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:10:18:48 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.5 - - [21/Oct/2025:10:18:50 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.5 - - [21/Oct/2025:10:18:54 +0000] "GET /api/api/analysis/recent/asc606 HTTP/1.1" 404 14 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:10:18:58 +0000] "GET /dashboard.html HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:18:59 +0000] "GET /api/user/profile HTTP/1.1" 200 2807 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:10:18:59 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:10:18:59 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:18:59 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:18:59 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:18:59 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4482 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:18:59 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:19:01 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:10:19:01 +0000] "GET /analysis?analysis_id=48 HTTP/1.1" 200 12194 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.8 - - [21/Oct/2025:10:19:08 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
