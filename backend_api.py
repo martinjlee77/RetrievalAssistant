@@ -2802,6 +2802,7 @@ def get_analysis_history():
         
         # Get recent analyses with details
         # Use memo_uuid as primary identifier since it's guaranteed to exist
+        # Only show completed analyses (not failed/processing ones)
         cursor.execute("""
             SELECT 
                 COALESCE(a.memo_uuid, 'unknown') as id,
@@ -2815,6 +2816,8 @@ def get_analysis_history():
                 CONCAT(a.asc_standard, ' Analysis') as document_name
             FROM analyses a
             WHERE a.user_id = %s 
+                AND a.status = 'completed'
+                AND a.completed_at IS NOT NULL
             ORDER BY a.completed_at DESC
             LIMIT 20
         """, (user_id,))
