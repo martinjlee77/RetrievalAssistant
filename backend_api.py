@@ -1679,15 +1679,15 @@ def save_worker_analysis():
         user_id = payload['user_id']
         data = request.get_json()
         
-        # Extract minimal data from worker (memo_uuid for lookup, memo_content, success, error)
-        memo_uuid = sanitize_string(data.get('memo_uuid', ''), 50)  # Use memo_uuid for lookup
+        # Extract minimal data from worker (analysis_id is database INTEGER)
+        analysis_id = int(data.get('analysis_id', 0))  # Database INTEGER id
         memo_content = data.get('memo_content', '')  # Full memo text
         api_cost = Decimal(str(data.get('api_cost', 0)))  # For logging only
         success = data.get('success', False)
         error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
         
-        if not memo_uuid:
-            return jsonify({'error': 'memo_uuid required'}), 400
+        if not analysis_id:
+            return jsonify({'error': 'analysis_id required'}), 400
         
         conn = get_db_connection()
         if not conn:
@@ -1698,14 +1698,14 @@ def save_worker_analysis():
         try:
             # CRITICAL: Retrieve AUTHORITATIVE pricing from existing analysis record
             # This record was created with server-validated pricing BEFORE job submission
-            # Look up by memo_uuid which is unique to each analysis
+            # Look up by analysis_id (database INTEGER) with user scoping for security
             cursor.execute("""
                 SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
                        file_count, final_charged_credits, billed_credits, status
                 FROM analyses 
-                WHERE memo_uuid = %s
+                WHERE analysis_id = %s
                 AND user_id = %s
-            """, (memo_uuid, user_id))
+            """, (analysis_id, user_id))
             
             existing_record = cursor.fetchone()
             
@@ -1834,9 +1834,9 @@ def save_worker_analysis():
         logger.error(f"Save analysis error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Failed to save analysis'}), 500
 
-@app.route('/api/analysis/status/<memo_uuid>', methods=['GET'])
-def get_analysis_status(memo_uuid):
-    """Get analysis status and memo content for polling by memo_uuid"""
+@app.route('/api/analysis/status/<int:analysis_id>', methods=['GET'])
+def get_analysis_status(analysis_id):
+    """Get analysis status and memo content for polling by analysis_id (database INTEGER)"""
     try:
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         if not token:
@@ -1856,15 +1856,15 @@ def get_analysis_status(memo_uuid):
         cursor = conn.cursor()
         
         try:
-            # Query analysis by memo_uuid (unique to each analysis)
+            # Query analysis by analysis_id (database INTEGER) with user scoping for security
             cursor.execute("""
                 SELECT analysis_id, memo_uuid, status, memo_content, error_message, 
                        completed_at, asc_standard, words_count, tier_name, file_count,
                        final_charged_credits
                 FROM analyses 
-                WHERE memo_uuid = %s
+                WHERE analysis_id = %s
                 AND user_id = %s
-            """, (memo_uuid, user_id))
+            """, (analysis_id, user_id))
             
             analysis = cursor.fetchone()
             

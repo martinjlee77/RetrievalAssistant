@@ -69,11 +69,11 @@ def submit_and_monitor_asc606_job(
             st.error(f"❌ Failed to create analysis record: {create_response.text}")
             return
         
-        # Extract memo_uuid from response for worker to use
+        # Extract database analysis_id (INTEGER) from response
         create_data = create_response.json()
-        memo_uuid = create_data.get('memo_uuid')
+        db_analysis_id = create_data.get('analysis_id')  # This is the database INTEGER
         
-        logger.info(f"✓ Analysis record created: {analysis_id}, memo_uuid: {memo_uuid}")
+        logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
         # Submit job to Redis queue
         st.info("📤 Submitting analysis to background queue...")
@@ -81,8 +81,7 @@ def submit_and_monitor_asc606_job(
         try:
             job_id = job_manager.submit_analysis_job(
                 asc_standard='ASC 606',
-                analysis_id=analysis_id,
-                memo_uuid=memo_uuid,  # Pass memo_uuid to worker
+                analysis_id=db_analysis_id,  # Pass database INTEGER id to worker
                 user_id=user_id,
                 user_token=user_token,
                 pricing_result=pricing_result,
@@ -143,7 +142,7 @@ def submit_and_monitor_asc606_job(
                     import requests
                     
                     status_response = requests.get(
-                        f'{backend_url}/api/analysis/status/{memo_uuid}',  # Use memo_uuid for lookup
+                        f'{backend_url}/api/analysis/status/{db_analysis_id}',  # Use database INTEGER id
                         headers={'Authorization': f'Bearer {user_token}'},
                         timeout=10
                     )
@@ -161,7 +160,7 @@ def submit_and_monitor_asc606_job(
                             st.session_state[analysis_key] = True
                             st.session_state[memo_key] = {
                                 'memo_content': analysis_data['memo_content'],
-                                'analysis_id': analysis_id,
+                                'analysis_id': db_analysis_id,
                                 'memo_uuid': analysis_data.get('memo_uuid'),
                                 'completion_timestamp': analysis_data.get('completed_at')
                             }
