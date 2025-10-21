@@ -46,8 +46,9 @@ def submit_and_monitor_asc606_job(
         # This stores authoritative pricing info that backend will use for billing
         # Backend will generate the database INTEGER analysis_id
         import requests
+        from shared.auth_utils import get_backend_url
         
-        backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        backend_url = get_backend_url()
         create_response = requests.post(
             f'{backend_url}/api/analysis/create',
             headers={'Authorization': f'Bearer {user_token}'},
@@ -127,7 +128,8 @@ def submit_and_monitor_asc606_job(
                 st.info("📥 Retrieving completed analysis...")
                 
                 try:
-                    backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+                    from shared.auth_utils import get_backend_url
+                    backend_url = get_backend_url()
                     import requests
                     
                     status_response = requests.get(
