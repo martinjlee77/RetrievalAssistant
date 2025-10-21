@@ -503,6 +503,9 @@ def render_asc606_page():
                        type="primary",
                        use_container_width=True,
                        key="asc606_analyze"):
+                # Set flag to skip auto-load during new analysis submission
+                st.session_state.skip_auto_load = True
+                
                 # Clear all UI elements that should disappear during analysis
                 warning_placeholder.empty()
                 processing_container.empty()
