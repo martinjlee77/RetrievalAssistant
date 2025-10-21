@@ -135,6 +135,8 @@ def serve_streamlit_app():
     # Determine the Streamlit page to open based on analysis_id
     page_path = ""
     analysis_id = request.args.get('analysis_id')
+    logger.info(f"Processing /analysis request with analysis_id={analysis_id}")
+    
     if analysis_id:
         try:
             # Query database to get asc_standard for this analysis
@@ -148,8 +150,12 @@ def serve_streamlit_app():
             cursor.close()
             conn.close()
             
+            logger.info(f"Database query result for analysis_id {analysis_id}: {result}")
+            
             if result:
                 asc_standard = result['asc_standard']
+                logger.info(f"Found asc_standard: {asc_standard}")
+                
                 # Map ASC standards to Streamlit page titles (URL-encoded for path)
                 page_mapping = {
                     'ASC 606': 'ASC%20606%3A%20Revenue%20Recognition',
@@ -159,8 +165,13 @@ def serve_streamlit_app():
                     'ASC 805': 'ASC%20805%3A%20Business%20Combinations',
                 }
                 page_title = page_mapping.get(asc_standard)
+                logger.info(f"Mapped to page_title: {page_title}")
+                
                 if page_title:
                     page_path = f"/{page_title}"
+                    logger.info(f"Set page_path: {page_path}")
+            else:
+                logger.warning(f"No analysis found for analysis_id {analysis_id}")
         except Exception as e:
             logger.error(f"Error determining page for analysis_id {analysis_id}: {e}")
     
@@ -206,6 +217,8 @@ def serve_streamlit_app():
                 redirect_url = f"{STREAMLIT_URL}{page_path}?analysis_id={analysis_id}"
             else:
                 redirect_url = STREAMLIT_URL
+    
+    logger.info(f"Final redirect URL: {redirect_url}")
     
     # Build enhanced HTML response with error handling and status checking
     html_content = f"""
