@@ -115,10 +115,12 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         memo_generator = CleanMemoGenerator()
         filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
         
-        memo_content = memo_generator.generate_clean_memo(
+        # Prepare analysis results with metadata
+        analysis_results['filename'] = filename
+        analysis_results['customer_name'] = customer_name
+        
+        memo_content = memo_generator.combine_clean_steps(
             analysis_results,
-            filename=filename,
-            customer_name=customer_name,
             analysis_id=analysis_id
         )
         
