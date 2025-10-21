@@ -1,0 +1,48 @@
+VeritasLogic Analysis
+/
+86ffaf1a
+Active
+
+Oct 21, 2025, 4:33 PM
+tas.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 4:33 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:__main__:Created new user session: 3a24a0cd...
+INFO:__main__:📥 Auto-loaded analysis from recent: timestamp=2025-10-21T20:24:47.585783
+INFO:asc340.clean_memo_generator:Displaying clean memo (length: 15926 chars)
+INFO:asc340.clean_memo_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:Generating PDF using ReportLab
+INFO:shared.pdf_generator:PDF generation successful: 14319 bytes
+INFO:asc340.clean_memo_generator:PDF generation successful: 14319 bytes
+INFO:asc842.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc842.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:utils.document_extractor:📄 Processing document: OFFICE LEASE AGREEMENT.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 586 words (~2 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: OFFICE LEASE AGREEMENT.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 586 words (~2 pages) via python-docx
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 1078, Output tokens: 25, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc842.step_analyzer:Raw LLM response for party extraction: {"lessor": "Acme Properties, LLC", "lessee": "InnovateTech Solutions, Inc."}
+INFO:asc842.step_analyzer:✓ Parties extracted - Lessor: Acme Properties, LLC, Lessee: InnovateTech Solutions, Inc.
+INFO:asc842.step_analyzer:✓ De-identification complete: lessee 'InnovateTech Solutions, Inc.' → 'the Company' (2 occurrences), lessor 'Acme Properties, LLC' → 'the Lessor' (2 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 571 words, 3K (≤10 pages) tier, $195.0
+INFO:utils.document_extractor:📄 Processing document: OFFICE LEASE AGREEMENT.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 586 words (~2 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 571 words, 3K (≤10 pages) tier, $195.0
+ERROR:__main__:ASC 842 analysis error for session 3a24a0cd: name 'pricing_result' is not defined

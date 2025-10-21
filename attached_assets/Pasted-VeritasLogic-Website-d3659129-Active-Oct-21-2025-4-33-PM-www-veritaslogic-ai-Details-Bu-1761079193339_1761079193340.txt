@@ -1,0 +1,58 @@
+VeritasLogic Website
+/
+d3659129
+Active
+
+Oct 21, 2025, 4:33 PM
+www.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 4:33 PM
+Starting Container
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 20:35:33 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 20:35:33 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-10-21 20:35:33 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 20:35:33 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 20:35:33 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 20:35:33 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 20:35:33 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+100.64.0.2 - - [21/Oct/2025:20:37:54 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:20:37:54 +0000] "GET /styles.css?v=2025090702 HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:54 +0000] "GET /dashboard.js HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:55 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4489 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:55 +0000] "GET /api/credit-packages HTTP/1.1" 200 156 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:55 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 4489 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:54 +0000] "GET /api/user/profile HTTP/1.1" 200 2813 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.4 - - [21/Oct/2025:20:37:55 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 94 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:20:37:55 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.5 - - [21/Oct/2025:20:37:54 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJlbWFpbCI6InN1cHBvcnRAdmVyaXRhc2xvZ2ljLmFpIiwiZXhwIjoxNzYxMDkzNDc2LCJwdXJwb3NlIjoiYWNjZXNzIiwiZG9tYWluIjoidmVyaXRhc2xvZ2ljLmFpIiwiaXNzdWVkX2F0IjoiMjAyNS0xMC0yMVQyMDozNzo1Ni4zNDIyMTMifQ.U0l0Glg9Ta6DDy9waCMPmO_nMzeuwqc80qTyd2alxwk
+100.64.0.4 - - [21/Oct/2025:20:37:56 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJlbWFpbCI6InN1cHBvcnRAdmVyaXRhc2xvZ2ljLmFpIiwiZXhwIjoxNzYxMDkzNDc3LCJwdXJwb3NlIjoiYWNjZXNzIiwiZG9tYWluIjoidmVyaXRhc2xvZ2ljLmFpIiwiaXNzdWVkX2F0IjoiMjAyNS0xMC0yMVQyMDozNzo1Ny42ODY0NjUifQ.0E1ejaxvJ9N1NBuYvp3aFkqeXmoc87WQHOYVxjWTMb8
+100.64.0.4 - - [21/Oct/2025:20:37:57 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.6 - - [21/Oct/2025:20:38:04 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:20:38:07 +0000] "GET /api/analysis/recent/asc340-40 HTTP/1.1" 200 16331 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:20:38:07 +0000] "GET /api/analysis/status/58 HTTP/1.1" 200 16314 "-" "python-requests/2.31.0"
+100.64.0.7 - - [21/Oct/2025:20:38:15 +0000] "GET /api/analysis/recent/asc842 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.8 - - [21/Oct/2025:20:38:23 +0000] "GET /api/analysis/recent/asc842 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.6 - - [21/Oct/2025:20:38:26 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.8 - - [21/Oct/2025:20:38:49 +0000] "GET /api/analysis/recent/asc842 HTTP/1.1" 404 39 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:20:38:50 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"

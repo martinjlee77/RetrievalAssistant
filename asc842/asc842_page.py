@@ -675,8 +675,12 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
             st.error("❌ No readable content found in uploaded files. Please check your documents and try again.")
             return
         
-        # Proceed with original analysis logic using the extracted text
-        perform_asc842_analysis(combined_text, additional_context, filename_string, analysis_details)
+        # Create uploaded filenames list if not provided
+        if not uploaded_filenames:
+            uploaded_filenames = filename_list if 'filename_list' in locals() else []
+        
+        # Proceed with background job submission
+        perform_asc842_analysis(combined_text, additional_context, pricing_result, uploaded_filenames)
         
         # Clear the progress message after analysis
         progress_message_placeholder.empty()
@@ -687,8 +691,8 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         progress_message_placeholder.empty()
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
-def perform_asc842_analysis(contract_text: str, additional_context: str = "", filename: str = "lease_contract.txt", analysis_details: dict = None):
-    """Perform the complete ASC 842 analysis and display results with session isolation."""
+def perform_asc842_analysis(contract_text: str, additional_context: str, pricing_result: Dict[str, Any], uploaded_filenames: List[str]):
+    """Perform ASC 842 analysis with background job processing."""
     
     # Session isolation - create unique session ID for this user
     if 'user_session_id' not in st.session_state:
@@ -696,8 +700,6 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
         logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
     
     session_id = st.session_state.user_session_id
-    
-    # NOTE: Progress message now managed by calling function to avoid duplication
     
     # Initialize analysis complete status with session isolation
     analysis_key = f'asc842_analysis_complete_{session_id}'
