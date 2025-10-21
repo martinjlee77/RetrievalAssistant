@@ -20,8 +20,131 @@ import os
 from asc805.step_analyzer import ASC805StepAnalyzer
 from asc805.knowledge_search import ASC805KnowledgeSearch
 from utils.document_extractor import DocumentExtractor
+from asc805.job_analysis_runner import submit_and_monitor_asc805_job
 
 logger = logging.getLogger(__name__)
+
+def create_file_hash(uploaded_files):
+    """Create a hash of uploaded files to detect changes."""
+    if not uploaded_files:
+        return None
+    file_info = [(f.name, f.size) for f in uploaded_files]
+    return hash(tuple(file_info))
+
+def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
+    """Fetch analysis from backend and load into session state."""
+    import requests
+    
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, "Authentication required", None
+        
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/status/{analysis_id}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            return False, "Analysis not found", None
+        elif response.status_code != 200:
+            return False, f"Failed to fetch analysis: {response.status_code}", None
+        
+        data = response.json()
+        
+        if data.get('status') != 'completed':
+            return False, f"Analysis is {data.get('status')}", None
+        
+        memo_content = data.get('memo_content')
+        if not memo_content:
+            return False, "No memo content found", None
+        
+        session_id = st.session_state.get('user_session_id', '')
+        analysis_key = f'asc805_analysis_complete_{session_id}'
+        memo_key = f'asc805_memo_data_{session_id}'
+        
+        st.session_state[analysis_key] = True
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'analysis_id': analysis_id,
+            'loaded_from': source,
+            'completed_at': data.get('completed_at')
+        }
+        
+        if 'skip_auto_load' in st.session_state:
+            del st.session_state['skip_auto_load']
+        
+        if source == 'url' and 'analysis_id' in st.query_params:
+            st.query_params.clear()
+        
+        timestamp = data.get('completed_at')
+        return True, "Analysis loaded successfully", timestamp
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch analysis {analysis_id}: {str(e)}")
+        return False, f"Error loading analysis: {str(e)}", None
+
+def check_for_analysis_to_load():
+    """Check for analysis to auto-load on page load."""
+    import requests
+    
+    if st.session_state.get('skip_auto_load', False):
+        return False, None, None
+    
+    session_id = st.session_state.get('user_session_id', '')
+    memo_key = f'asc805_memo_data_{session_id}'
+    if st.session_state.get(memo_key):
+        return False, None, None
+    
+    query_params = st.query_params
+    if 'analysis_id' in query_params:
+        try:
+            analysis_id = int(query_params['analysis_id'])
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='url')
+            if success:
+                return True, 'url', timestamp
+            else:
+                st.warning(f"Could not load analysis from URL: {message}")
+        except ValueError:
+            st.warning("Invalid analysis_id in URL")
+        return False, None, None
+    
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, None, None
+        
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/recent/asc805',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_id = data.get('analysis_id')
+            
+            if not analysis_id:
+                logger.warning("Recent analysis response missing analysis_id")
+                return False, None, None
+            
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='recent')
+            if success:
+                return True, 'recent', timestamp
+        elif response.status_code != 404:
+            logger.warning(f"Failed to check for recent analysis: {response.status_code}")
+        
+    except Exception as e:
+        logger.error(f"Error checking for recent analysis: {str(e)}")
+    
+    return False, None, None
 
 def render_asc805_page():
     """Render the ASC 805 analysis page."""
@@ -30,9 +153,19 @@ def render_asc805_page():
     if not require_authentication():
         return  # User will see login page
     
+    # Initialize user session ID for memo persistence
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
+    
+    # Check for analysis to auto-load (URL parameter or recent analysis)
+    loaded, source, timestamp = check_for_analysis_to_load()
+    if loaded:
+        logger.info(f"📥 Auto-loaded analysis from {source}: timestamp={timestamp}")
 
     # Page header
     st.title(":primary[ASC 805: Business Combinations]")
@@ -67,6 +200,7 @@ def render_asc805_page():
                     keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
                     for key in keys_to_clear:
                         del st.session_state[key]
+                    st.session_state['skip_auto_load'] = True
                     st.rerun()
             
             st.markdown("---")
@@ -92,6 +226,7 @@ def render_asc805_page():
                 keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
                 for key in keys_to_clear:
                     del st.session_state[key]
+                st.session_state['skip_auto_load'] = True
                 st.rerun()
             
             return  # Exit early, don't show file upload interface
@@ -408,193 +543,19 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
             'cost_charged': pricing_result['tier_info']['price']
         }
         
-        analysis_id = analysis_manager.start_analysis(analysis_details)
-        
-        # Step 2: Payment will be processed when analysis completes (no upfront charging)
-            
-        # Progress message that will be cleared later
-        progress_message_placeholder = st.empty()
-        progress_message_placeholder.error(
-            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
-            "Your analysis is running and will take up to 3-20 minutes. "
-            "Closing this browser will stop the analysis and forfeit your progress."
-        )
-        
         # Get contract text from cached text or pricing result
         contract_text = cached_combined_text if cached_combined_text else pricing_result.get('combined_text', '')
         
-        # Get filename from uploaded_filenames or pricing result
-        if uploaded_filenames:
-            filename = ', '.join(uploaded_filenames) if len(uploaded_filenames) > 1 else uploaded_filenames[0]
-        else:
-            filename = pricing_result.get('filename', 'Business Combination Documents')
-        
-        customer_name = pricing_result.get('customer_name', 'Entity')
-        analysis_title = f"Business Combination Analysis for {customer_name}"
-
-        # Initialize components
-        with st.spinner("Initializing analysis components..."):
-            try:
-                analyzer = ASC805StepAnalyzer()
-                knowledge_search = ASC805KnowledgeSearch()
-                from asc805.clean_memo_generator import CleanMemoGenerator
-                memo_generator = CleanMemoGenerator()
-                from shared.ui_components import SharedUIComponents
-                ui = SharedUIComponents()
-            except RuntimeError as e:
-                st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 805 knowledge base is not available. Try again and contact support if this persists.")
-                st.stop()
-                return
-
-        # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🔁 Starting..."):
-            try:
-                customer_name = analyzer.extract_entity_name_llm(contract_text)
-                logger.info(f"LLM extracted customer : {customer_name}")
-            except Exception as e:
-                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
-                customer_name = _extract_customer_name(contract_text)
-                logger.info(f"Regex fallback customer name: {customer_name}")
-
-        # Display progress
-        steps = [
-            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
-            "Step 5", "Memo Generation"
-        ]
-        progress_placeholder = st.empty()
-
-        # Step-by-step analysis with progress indicators
-        analysis_results = {}
-        
-        # Create a separate placeholder for progress indicators that can be cleared
-        progress_indicator_placeholder = st.empty()
-        
-        # Run 5 ASC 805 steps with progress
-        for step_num in range(1, 6):
-            # Show progress indicators in clearable placeholder
-            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
-
-            with st.spinner(f"Analyzing Step {step_num}..."):
-                # Get relevant guidance from knowledge base
-                authoritative_context = knowledge_search.search_for_step(
-                    step_num, contract_text)
-
-                # Analyze the step with additional context (using retry wrapper)
-                step_result = analyzer._analyze_step_with_retry(
-                    step_num=step_num,
-                    contract_text=contract_text,
-                    authoritative_context=authoritative_context,
-                    customer_name=customer_name,
-                    additional_context=additional_context)
-
-                analysis_results[f'step_{step_num}'] = step_result
-                logger.info(f"DEBUG: Completed step {step_num}")
-
-        # Generate additional sections (Executive Summary, Background, Conclusion)
-        # Show final progress indicators in clearable placeholder
-        ui.analysis_progress(steps, 6, progress_indicator_placeholder)
-
-        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Extract conclusions once from the 5 steps
-            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
-            
-            # Generate the three additional sections
-            executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
-            background = analyzer.generate_background_section(conclusions_text, customer_name)
-            conclusion = analyzer.generate_final_conclusion(conclusions_text)
-            
-            # Combine into the expected structure for memo generator
-            final_results = {
-                'customer_name': customer_name,
-                'analysis_title': analysis_title,
-                'analysis_date': datetime.now().strftime("%B %d, %Y"),
-                'filename': filename,
-                'steps': analysis_results,
-                'executive_summary': executive_summary,
-                'background': background,
-                'conclusion': conclusion
-            }
-            
-            
-            # Generate memo directly from complete analysis results
-            memo_content = memo_generator.combine_clean_steps(final_results)
-
-        # Store memo data in session state and clear progress messages
-        progress_message_placeholder.empty()  # Clears the in-progress message
-        progress_placeholder.empty()  # Clears the step headers
-        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
-        
-        # Create clearable completion message
-        completion_message_placeholder = st.empty()
-        completion_message_placeholder.success(
-            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 805 memo is ready. Scroll down to view the results."
+        # Submit background job for analysis
+        user_token = st.session_state.get('auth_token', '')
+        submit_and_monitor_asc805_job(
+            pricing_result=pricing_result,
+            additional_context=additional_context,
+            user_token=user_token,
+            cached_combined_text=contract_text,
+            uploaded_filenames=uploaded_filenames,
+            session_id=session_id
         )
-        
-        # Signal completion with session isolation
-        st.session_state[analysis_key] = True
-        
-        # CRITICAL FIX: Mark analysis as successful and charge customer
-        analysis_manager.complete_analysis(analysis_id, success=True)
-        
-        # Store memo data with session isolation
-        memo_key = f'asc805_memo_data_{session_id}'
-        st.session_state[memo_key] = {
-            'memo_content': memo_content,
-            'customer_name': customer_name,
-            'analysis_title': analysis_title,
-            'analysis_date': datetime.now().strftime("%B %d, %Y")
-        }
-        
-        st.success("✅ **Analysis Complete! This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.**")
-        st.markdown("""📄 **Your ASC 805 memo is ready below.** To save the results, you can either:
-
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
-        """)
-        
-        # Quick action buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
-        with col2:
-            if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_fresh"):
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
-                for key in keys_to_clear:
-                    del st.session_state[key]
-                st.rerun()
-        
-        st.markdown("---")
-        
-        # Display the memo using CleanMemoGenerator
-        memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content)
-        
-        # Re-run policy note and "Analyze Another" button
-        st.markdown("---")
-        st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
-        
-        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
-            # Clear session state for new analysis
-            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc805' in k.lower()]
-            for key in keys_to_clear:
-                del st.session_state[key]
-            st.rerun()
-        
-        # Clear completion message immediately after memo displays
-        completion_message_placeholder.empty()
-
-    except Exception as e:
-        # Clear the progress message even on error (if it exists)
-        if 'progress_message_placeholder' in locals():
-            progress_message_placeholder.empty()
-        
-        # CRITICAL FIX: Mark analysis as failed - NO CHARGE
-        if 'analysis_id' in locals() and analysis_id:
-            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
-        
-        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 805 analysis error for session {session_id[:8]}...: {str(e)}")
 
 
 def _upload_and_process_asc805():

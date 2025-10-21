@@ -230,6 +230,7 @@ def render_asc842_page():
                     keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc842' in k.lower()]
                     for key in keys_to_clear:
                         del st.session_state[key]
+                    st.session_state['skip_auto_load'] = True
                     st.rerun()
             
             st.markdown("---")
@@ -258,6 +259,7 @@ def render_asc842_page():
                     keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc842' in k.lower()]
                     for key in keys_to_clear:
                         del st.session_state[key]
+                    st.session_state['skip_auto_load'] = True
                     st.rerun()
                 
                 return
@@ -702,190 +704,16 @@ def perform_asc842_analysis(contract_text: str, additional_context: str = "", fi
     if analysis_key not in st.session_state:
         st.session_state[analysis_key] = False
     
-    # Start analysis tracking for database capture
-    if analysis_details is None:
-        # Fallback for legacy calls
-        pricing_result = st.session_state.get('pricing_result', {})
-        analysis_details = {
-            'asc_standard': 'ASC 842',
-            'total_words': len(contract_text.split()),
-            'file_count': 1,
-            'tier_info': pricing_result.get('tier_info', {}),
-            'cost_charged': pricing_result.get('tier_info', {}).get('price', 0.0)
-        }
-    analysis_id = analysis_manager.start_analysis(analysis_details)
-    
-    # Generate analysis title
-    analysis_title = _generate_analysis_title()
-
-    try:
-        # Initialize components
-        with st.spinner("Initializing analysis components..."):
-            try:
-                analyzer = ASC842StepAnalyzer()
-                knowledge_search = ASC842KnowledgeSearch()
-                from asc842.clean_memo_generator import CleanMemoGenerator
-                memo_generator = CleanMemoGenerator(
-                    template_path="asc842/templates/memo_template.md")
-                from shared.ui_components import SharedUIComponents
-                ui = SharedUIComponents()
-            except RuntimeError as e:
-                st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 842 knowledge base is not available. Try again and contact support if this persists.")
-                st.stop()
-                return
-
-        # Extract entity name using LLM (with regex fallback)
-        with st.spinner("🔁 Starting..."):
-            try:
-                entity_name = analyzer.extract_entity_name_llm(contract_text)
-                logger.info(f"LLM extracted entity name: {entity_name}")
-            except Exception as e:
-                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
-                entity_name = _extract_entity_name(contract_text)
-                logger.info(f"Regex fallback entity name: {entity_name}")
-
-        # Display progress
-        steps = [
-            "Processing", "Step 1", "Step 2", "Step 3", "Step 4",
-            "Step 5", "Memo Generation"
-        ]
-        progress_placeholder = st.empty()
-
-        # Step-by-step analysis with progress indicators
-        analysis_results = {}
-        
-        # Create a separate placeholder for progress indicators that can be cleared
-        progress_indicator_placeholder = st.empty()
-        
-        # Run 5 ASC 842 steps with progress
-        for step_num in range(1, 6):
-            # Show progress indicators in clearable placeholder
-            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
-
-            with st.spinner(f"Analyzing Step {step_num}..."):
-                # Get relevant guidance from knowledge base
-                authoritative_context = knowledge_search.search_for_step(
-                    step_num, contract_text)
-
-                # Analyze the step with additional context (using retry wrapper)
-                step_result = analyzer._analyze_step_with_retry(
-                    step_num=step_num,
-                    contract_text=contract_text,
-                    authoritative_context=authoritative_context,
-                    entity_name=entity_name,
-                    additional_context=additional_context)
-
-                analysis_results[f'step_{step_num}'] = step_result
-                logger.info(f"DEBUG: Completed step {step_num}")
-
-        # Generate additional sections (Executive Summary, Background, Conclusion)
-        # Show final progress indicators in clearable placeholder
-        ui.analysis_progress(steps, 6, progress_indicator_placeholder)
-
-        with st.spinner("Generating Executive Summary, Background, and Conclusion..."):
-            # Extract conclusions once from the 5 steps
-            conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
-            
-            # Generate the three additional sections
-            executive_summary = analyzer.generate_executive_summary(conclusions_text, entity_name)
-            background = analyzer.generate_background_section(conclusions_text, entity_name)
-            conclusion = analyzer.generate_final_conclusion(conclusions_text)
-            
-            # Combine into the expected structure for memo generator
-            final_results = {
-                'entity_name': entity_name,
-                'analysis_title': analysis_title,
-                'analysis_date': datetime.now().strftime("%B %d, %Y"),
-                'filename': filename,
-                'steps': analysis_results,
-                'executive_summary': executive_summary,
-                'background': background,
-                'conclusion': conclusion
-            }
-            
-            
-            # Generate memo directly from complete analysis results
-            memo_content = memo_generator.combine_clean_steps(final_results)
-
-        # Store memo data in session state and clear progress messages
-        # NOTE: Progress message clearing handled by calling function
-        progress_placeholder.empty()  # Clears the step headers
-        progress_indicator_placeholder.empty()  # Clears the persistent success boxes
-        
-        # Create clearable completion message
-        completion_message_placeholder = st.empty()
-        completion_message_placeholder.success(
-            f"✅ **ANALYSIS COMPLETE!** Your professional ASC 842 memo is ready. Scroll down to view the results."
-        )
-        
-        # Signal completion with session isolation
-        st.session_state[analysis_key] = True
-        
-        # Complete analysis for database capture  
-        memo_uuid = None
-        if analysis_id:
-            completion_result = analysis_manager.complete_analysis(analysis_id, success=True)
-            # Extract memo_uuid from the database save response
-            memo_uuid = st.session_state.get('analysis_manager_memo_uuid', analysis_id)
-        
-        # Store memo data with session isolation
-        memo_key = f'asc842_memo_data_{session_id}'
-        st.session_state[memo_key] = {
-            'memo_content': memo_content,
-            'entity_name': entity_name,
-            'analysis_title': analysis_title,
-            'analysis_date': datetime.now().strftime("%B %d, %Y"),
-            'analysis_id': memo_uuid or analysis_id  # Use database memo_uuid if available
-        }
-        
-        st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
-        st.markdown("""📄 **Your ASC 842 memo is ready below.** To save the results, you can either:
-
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-- **Download:** Download the memo as a Markdown, PDF, or Word (.docx) file for later use.
-
-        """)
-        
-        # Quick action buttons
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
-        with col2:
-            if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_fresh"):
-                keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc842' in k.lower()]
-                for key in keys_to_clear:
-                    del st.session_state[key]
-                st.rerun()
-        
-        st.markdown("---")
-        
-        # Display the memo using CleanMemoGenerator (like ASC 606)
-        memo_generator_display = CleanMemoGenerator()
-        memo_generator_display.display_clean_memo(memo_content, analysis_id, filename, entity_name)
-        
-        # Re-run policy note and "Analyze Another" button
-        st.markdown("---")
-        st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
-        
-        if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
-            # Clear session state for new analysis
-            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc842' in k.lower()]
-            for key in keys_to_clear:
-                del st.session_state[key]
-            st.rerun()
-        
-        # Clear completion message after memo displays (but keep the important info above)
-        completion_message_placeholder.empty()
-
-    except Exception as e:
-        st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
-        logger.error(f"ASC 842 analysis error for session {session_id[:8]}...: {str(e)}")
-        st.session_state[analysis_key] = True  # Signal completion (even on error)
-        
-        # Complete analysis for database capture (failure)
-        if 'analysis_id' in locals():
-            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
+    # Submit background job for analysis
+    user_token = st.session_state.get('auth_token', '')
+    submit_and_monitor_asc842_job(
+        pricing_result=pricing_result,
+        additional_context=additional_context,
+        user_token=user_token,
+        cached_combined_text=contract_text,
+        uploaded_filenames=uploaded_filenames,
+        session_id=session_id
+    )
 
 
 # Configure logging

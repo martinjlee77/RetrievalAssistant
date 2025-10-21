@@ -20,6 +20,7 @@ import os
 from utils.document_extractor import DocumentExtractor
 from asc340.step_analyzer import ASC340StepAnalyzer
 from asc340.knowledge_search import ASC340KnowledgeSearch
+from asc340.job_analysis_runner import submit_and_monitor_asc340_job
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,121 @@ def create_file_hash(uploaded_files):
     file_info = [(f.name, f.size) for f in uploaded_files]
     return hash(tuple(file_info))
 
+def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
+    """Fetch analysis from backend and load into session state."""
+    import requests
+    
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, "Authentication required", None
+        
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/status/{analysis_id}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            return False, "Analysis not found", None
+        elif response.status_code != 200:
+            return False, f"Failed to fetch analysis: {response.status_code}", None
+        
+        data = response.json()
+        
+        if data.get('status') != 'completed':
+            return False, f"Analysis is {data.get('status')}", None
+        
+        memo_content = data.get('memo_content')
+        if not memo_content:
+            return False, "No memo content found", None
+        
+        session_id = st.session_state.get('user_session_id', '')
+        analysis_key = f'asc340_analysis_complete_{session_id}'
+        memo_key = f'asc340_memo_data_{session_id}'
+        
+        st.session_state[analysis_key] = True
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'analysis_id': analysis_id,
+            'loaded_from': source,
+            'completed_at': data.get('completed_at')
+        }
+        
+        if 'skip_auto_load' in st.session_state:
+            del st.session_state['skip_auto_load']
+        
+        if source == 'url' and 'analysis_id' in st.query_params:
+            st.query_params.clear()
+        
+        timestamp = data.get('completed_at')
+        return True, "Analysis loaded successfully", timestamp
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch analysis {analysis_id}: {str(e)}")
+        return False, f"Error loading analysis: {str(e)}", None
+
+def check_for_analysis_to_load():
+    """Check for analysis to auto-load on page load."""
+    import requests
+    
+    if st.session_state.get('skip_auto_load', False):
+        return False, None, None
+    
+    session_id = st.session_state.get('user_session_id', '')
+    memo_key = f'asc340_memo_data_{session_id}'
+    if st.session_state.get(memo_key):
+        return False, None, None
+    
+    query_params = st.query_params
+    if 'analysis_id' in query_params:
+        try:
+            analysis_id = int(query_params['analysis_id'])
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='url')
+            if success:
+                return True, 'url', timestamp
+            else:
+                st.warning(f"Could not load analysis from URL: {message}")
+        except ValueError:
+            st.warning("Invalid analysis_id in URL")
+        return False, None, None
+    
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, None, None
+        
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/recent/asc340',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_id = data.get('analysis_id')
+            
+            if not analysis_id:
+                logger.warning("Recent analysis response missing analysis_id")
+                return False, None, None
+            
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='recent')
+            if success:
+                return True, 'recent', timestamp
+        elif response.status_code != 404:
+            logger.warning(f"Failed to check for recent analysis: {response.status_code}")
+        
+    except Exception as e:
+        logger.error(f"Error checking for recent analysis: {str(e)}")
+    
+    return False, None, None
+
 def render_asc340_page():
     """Render the ASC 340-40 analysis page."""
     
@@ -37,9 +153,19 @@ def render_asc340_page():
     if not require_authentication():
         return  # User will see login page
     
+    # Initialize user session ID for memo persistence
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
+    
+    # Check for analysis to auto-load (URL parameter or recent analysis)
+    loaded, source, timestamp = check_for_analysis_to_load()
+    if loaded:
+        logger.info(f"📥 Auto-loaded analysis from {source}: timestamp={timestamp}")
 
     # Page header
     st.title(":primary[ASC 340-40: Cost to Obtain]")
@@ -78,6 +204,7 @@ def render_asc340_page():
                     keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
                     for key in keys_to_clear:
                         del st.session_state[key]
+                    st.session_state['skip_auto_load'] = True
                     st.rerun()
             
             st.markdown("---")
@@ -103,6 +230,7 @@ def render_asc340_page():
                 keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
                 for key in keys_to_clear:
                     del st.session_state[key]
+                st.session_state['skip_auto_load'] = True
                 st.rerun()
             
             return  # Exit early, don't show file upload interface
@@ -538,178 +666,17 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
             st.info("ℹ️ **No Charge Applied**: Since the analysis could not be completed, you were not charged.")
             return
         
-        # Step 4: Show analysis warning and proceed with full workflow
-        progress_message_placeholder = st.empty()
-        progress_message_placeholder.error(
-            "🚨 **ANALYSIS IN PROGRESS - DO NOT CLOSE THIS TAB!**\n\n"
-            "Your analysis is running and will take up to 3-20 minutes. "
-            "Closing this browser will stop the analysis and forfeit your progress."
+        
+        # Submit background job for analysis
+        user_token = st.session_state.get('auth_token', '')
+        submit_and_monitor_asc340_job(
+            pricing_result=pricing_result,
+            additional_context=additional_context,
+            user_token=user_token,
+            cached_combined_text=combined_text,
+            uploaded_filenames=uploaded_filenames,
+            session_id=st.session_state.user_session_id
         )
-        
-        # Step 5: Initialize components
-        with st.spinner("Initializing analysis components..."):
-            try:
-                analyzer = ASC340StepAnalyzer()
-                knowledge_search = ASC340KnowledgeSearch()
-                from asc340.clean_memo_generator import CleanMemoGenerator
-                memo_generator = CleanMemoGenerator(template_path="asc340/templates/memo_template.md")
-                from shared.ui_components import SharedUIComponents
-                ui = SharedUIComponents()
-            except RuntimeError as e:
-                analysis_manager.complete_analysis(analysis_id, success=False, error_message=f"Component initialization failed: {str(e)}")
-                st.error(f"❌ Critical Error: {str(e)}")
-                st.error("ASC 340-40 knowledge base is not available. Try again and contact support if this persists.")
-                return
-
-        # Extract customer name
-        with st.spinner("🔁 Starting..."):
-            try:
-                customer_name = analyzer.extract_entity_name_llm(combined_text)
-                logger.info(f"LLM extracted customer: {customer_name}")
-            except Exception as e:
-                logger.warning(f"LLM entity extraction failed: {str(e)}, falling back to regex")
-                customer_name = "Unknown Customer"  # Simple fallback
-                    
-        # Setup progress tracking
-        steps = [
-            "Processing", "Step 1", "Step 2", "Memo Generation"
-        ]
-        progress_placeholder = st.empty()
-        progress_indicator_placeholder = st.empty()
-        
-        # Run 2 ASC 340-40 steps with progress indicators
-        analysis_results = {}
-        
-        for step_num in range(1, 3):
-            # Show progress
-            ui.analysis_progress(steps, step_num, progress_indicator_placeholder)
-            
-            with st.spinner(f"🔄 Running Step {step_num}..."):
-                try:
-                    # Get relevant knowledge for this step
-                    authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
-                    
-                    # Analyze the step with knowledge base context
-                    step_result = analyzer._analyze_step(
-                        step_num=step_num,
-                        contract_text=combined_text,
-                        authoritative_context=authoritative_context,
-                        customer_name=customer_name,
-                        additional_context=additional_context
-                    )
-                    
-                    analysis_results[f'step_{step_num}'] = step_result
-                    logger.info(f"Completed ASC 340-40 Step {step_num}")
-                except Exception as e:
-                    logger.error(f"Error in Step {step_num}: {str(e)}")
-                    # Continue with other steps
-                    analysis_results[f'step_{step_num}'] = {
-                        'markdown_content': f"Error in Step {step_num}: {str(e)}",
-                        'title': f"Step {step_num}: Error",
-                        'step_num': str(step_num)
-                    }
-        
-        # Show memo generation progress
-        ui.analysis_progress(steps, 3, progress_indicator_placeholder)
-        
-        # Generate memo
-        with st.spinner("📄 Generating professional memo..."):
-            try:
-                # Extract conclusions once and generate additional sections
-                conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results)
-                executive_summary = analyzer.generate_executive_summary(conclusions_text, customer_name)
-                background = analyzer.generate_background_section(conclusions_text, customer_name) 
-                final_conclusion = analyzer.generate_final_conclusion(conclusions_text)
-                
-                # Prepare analysis_results dict with all components for CleanMemoGenerator
-                memo_analysis_results = {
-                    **analysis_results,  # Include all step results
-                    'customer_name': customer_name,
-                    'filename': filename,
-                    'executive_summary': executive_summary,
-                    'background': background,
-                    'conclusion': final_conclusion,
-                    'additional_context': additional_context
-                }
-                
-                # Generate clean memo using the memo generator
-                memo_result = memo_generator.combine_clean_steps(memo_analysis_results)
-                
-                # Mark analysis as successful
-                analysis_manager.complete_analysis(analysis_id, success=True)
-                
-                # Clear progress and warning message, show results
-                progress_indicator_placeholder.empty()
-                progress_message_placeholder.empty()  # Remove the warning
-                
-                # memo_result is a string (markdown content), not a dict
-                if memo_result:
-                    
-                    # Store memo in session state for persistence
-                    if 'user_session_id' not in st.session_state:
-                        st.session_state.user_session_id = str(uuid.uuid4())
-                    
-                    session_id = st.session_state.user_session_id
-                    memo_key = f'asc340_memo_data_{session_id}'
-                    analysis_key = f'asc340_analysis_complete_{session_id}'
-                    
-                    # Store memo data and completion state
-                    st.session_state[memo_key] = memo_result
-                    st.session_state[analysis_key] = True
-                    
-                    st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
-                    st.markdown("""📄 **Your ASC 340-40 memo is ready below.** To save the results, you can either:
-
-- **Copy and Paste:** Select all the text below and copy & paste it into your document editor (Word, Google Docs, etc.).  
-- **Download:** Download the memo as a Word (.docx), Markdown, or PDF file for later use.         
-                    """)
-                    
-                    # Quick action buttons
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown('<a href="#save-your-memo" style="text-decoration: none;"><button style="width: 100%; padding: 0.5rem; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">⬇️ Jump to Downloads</button></a>', unsafe_allow_html=True)
-                    with col2:
-                        if st.button("🔄 Start New Analysis", type="secondary", use_container_width=True, key="top_new_analysis_fresh"):
-                            keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
-                            for key in keys_to_clear:
-                                del st.session_state[key]
-                            st.rerun()
-                    
-                    st.markdown("---")
-                    
-                    # Use the CleanMemoGenerator's display method
-                    memo_generator.display_clean_memo(memo_result)
-                    
-                    # Re-run policy note and "Analyze Another" button
-                    st.markdown("---")
-                    st.info("📋 Each analysis comes with one complimentary re-run within 14 days for input modifications or extractable text adjustments. If you'd like to request one, please contact support at support@veritaslogic.ai.")
-                    
-                    if st.button("🔄 **Analyze Another Contract**", type="secondary", use_container_width=True, key="bottom_new_analysis_fresh"):
-                        # Clear session state for new analysis
-                        keys_to_clear = [k for k in st.session_state.keys() if isinstance(k, str) and 'asc340' in k.lower()]
-                        for key in keys_to_clear:
-                            del st.session_state[key]
-                        st.rerun()
-                    
-                else:
-                    st.error("❌ Memo generation produced empty content")
-                
-            except Exception as e:
-                logger.error(f"Memo generation failed: {str(e)}")
-                analysis_manager.complete_analysis(analysis_id, success=False, error_message=f"Memo generation failed: {str(e)}")
-                st.error(f"❌ **Memo Generation Failed**: {str(e)}")
-                return
-                
-    except Exception as e:
-        logger.error(f"Critical error in new ASC 340-40 analysis: {str(e)}")
-        
-        # Auto-credit user for failed analysis
-        if analysis_id:
-            billing_manager.auto_credit_on_failure(user_token, pricing_result['tier_info']['price'], analysis_id)
-            analysis_manager.complete_analysis(analysis_id, success=False, error_message=str(e))
-        
-        st.error(f"❌ **Analysis Failed**: {str(e)}")
-        st.info("💰 **Refund Processed**: The full amount has been credited back to your wallet.")
 
 
 # Configure logging
