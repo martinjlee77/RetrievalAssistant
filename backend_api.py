@@ -144,7 +144,7 @@ def serve_streamlit_app():
             conn = get_db_connection()
             cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             cursor.execute(
-                "SELECT asc_standard FROM analyses WHERE id = %s",
+                "SELECT asc_standard FROM analyses WHERE analysis_id = %s",
                 (int(analysis_id),)
             )
             result = cursor.fetchone()
