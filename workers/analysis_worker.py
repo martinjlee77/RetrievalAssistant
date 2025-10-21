@@ -6,6 +6,7 @@ This worker runs in a separate process and handles long-running analyses
 import logging
 import sys
 import os
+import time
 from typing import Dict, Any
 from datetime import datetime
 
@@ -21,6 +22,73 @@ import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def _save_analysis_with_retry(backend_url: str, user_token: str, save_data: Dict[str, Any], max_retries: int = 5) -> Dict[str, Any]:
+    """
+    Save analysis to database with exponential backoff retry logic
+    
+    Retries up to max_retries times with exponential backoff (1s, 2s, 4s, 8s, 16s)
+    Handles 401 (auth) specially as non-retryable
+    
+    Returns:
+        Response JSON from successful save
+        
+    Raises:
+        Exception with descriptive error message on failure
+    """
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Saving analysis (attempt {attempt + 1}/{max_retries})...")
+            
+            response = requests.post(
+                f'{backend_url}/api/analysis/save',
+                headers={'Authorization': f'Bearer {user_token}'},
+                json=save_data,
+                timeout=30
+            )
+            
+            if response.ok:
+                logger.info(f"✓ Analysis saved successfully on attempt {attempt + 1}")
+                return response.json()
+            elif response.status_code == 401:
+                # Auth failure - don't retry
+                logger.error(f"Authentication failed (401) - token expired")
+                raise Exception("Session expired - please log in again and retry your analysis")
+            elif response.status_code == 403:
+                # Forbidden (e.g., email not verified) - don't retry
+                logger.error(f"Access forbidden (403): {response.text}")
+                raise Exception(f"Access denied: {response.text}")
+            else:
+                # Retryable error
+                logger.warning(f"Save failed with status {response.status_code}: {response.text}")
+                
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s, 8s, 16s
+                    logger.info(f"Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                else:
+                    raise Exception(f"Database save failed after {max_retries} attempts: {response.status_code} - {response.text}")
+                    
+        except requests.exceptions.Timeout:
+            logger.warning(f"Save request timed out (attempt {attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt
+                logger.info(f"Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise Exception(f"Database save timed out after {max_retries} attempts")
+                
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Network error on save (attempt {attempt + 1}/{max_retries}): {str(e)}")
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt
+                logger.info(f"Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                raise Exception(f"Network error after {max_retries} attempts: {str(e)}")
+    
+    # Should never reach here, but just in case
+    raise Exception(f"Save failed after {max_retries} attempts")
 
 def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -127,32 +195,25 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         # Get actual API costs
         api_cost = get_total_estimated_cost()
         
-        # Save analysis to database
+        # Save analysis to database WITH RETRY LOGIC
         logger.info("💾 Saving analysis to database...")
         backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         
-        # NOTE: Server will recalculate cost_charged from words_count for security
-        save_response = requests.post(
-            f'{backend_url}/api/analysis/save',
-            headers={'Authorization': f'Bearer {user_token}'},
-            json={
+        # NOTE: Server will recalculate cost_charged from analysis_id for security
+        # Worker only sends memo_content, api_cost, and success flag
+        save_result = _save_analysis_with_retry(
+            backend_url=backend_url,
+            user_token=user_token,
+            save_data={
                 'analysis_id': analysis_id,
                 'memo_content': memo_content,
                 'api_cost': api_cost,
-                'success': True,
-                'asc_standard': 'ASC 606',
-                'words_count': pricing_result['total_words'],
-                'tier_name': pricing_result['tier_info']['name'],
-                'file_count': pricing_result['file_count']
+                'success': True
             },
-            timeout=30
+            max_retries=5
         )
         
-        if not save_response.ok:
-            logger.error(f"Failed to save analysis to database: {save_response.text}")
-            raise Exception(f"Database save failed: {save_response.status_code}")
-        
-        memo_uuid = save_response.json().get('memo_uuid')
+        memo_uuid = save_result.get('memo_uuid')
         logger.info(f"✓ Analysis saved successfully: {memo_uuid}")
         
         # Return results
@@ -168,25 +229,35 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"❌ Analysis failed: {str(e)}", exc_info=True)
         
-        # Save failed analysis to database
+        # CRITICAL: Always save failure to database with retry logic
+        # This prevents analyses from getting stuck in 'processing' status
         try:
+            # Get API cost even on failure for tracking
+            api_cost = get_total_estimated_cost()
+            
             backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
-            requests.post(
-                f'{backend_url}/api/analysis/save',
-                headers={'Authorization': f'Bearer {user_token}'},
-                json={
+            
+            # Use retry helper to ensure failure is persisted
+            # NOTE: Server will look up pricing from analysis_id, not from worker data
+            _save_analysis_with_retry(
+                backend_url=backend_url,
+                user_token=user_token,
+                save_data={
                     'analysis_id': analysis_id,
                     'success': False,
-                    'error_message': str(e),
-                    'asc_standard': 'ASC 606',
-                    'words_count': pricing_result['total_words'],
-                    'tier_name': pricing_result['tier_info']['name'],
-                    'file_count': pricing_result['file_count']
+                    'error_message': str(e)[:500],  # Truncate to 500 chars
+                    'api_cost': api_cost
                 },
-                timeout=30
+                max_retries=5
             )
-        except:
-            logger.error("Failed to save error to database")
+            
+            logger.info(f"✓ Failure status saved to database")
+            
+        except Exception as save_error:
+            # If we can't save failure, log it prominently
+            logger.critical(f"🔥 CRITICAL: Failed to save failure status to database: {str(save_error)}")
+            logger.critical(f"🔥 Original error: {str(e)}")
+            logger.critical(f"🔥 Analysis {analysis_id} may be stuck in 'processing' status!")
         
         # Re-raise exception so RQ marks job as failed
         raise
