@@ -132,7 +132,9 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         # Initialize results storage with proper structure matching analyze_contract
         analysis_results = {
             'steps': {},  # Store steps under 'steps' key like original flow
-            'customer_name': customer_name
+            'customer_name': customer_name,
+            'analysis_title': 'Contract Analysis',
+            'analysis_date': datetime.now().strftime("%B %d, %Y")
         }
         
         # Run 5 ASC 606 steps with progress reporting
@@ -154,8 +156,8 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 # Get relevant knowledge for this step
                 authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
                 
-                # Analyze the step
-                step_result = analyzer._analyze_step(
+                # Analyze the step with retry logic (matches original flow)
+                step_result = analyzer._analyze_step_with_retry(
                     step_num=step_num,
                     contract_text=combined_text,
                     authoritative_context=authoritative_context,
