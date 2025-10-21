@@ -40,7 +40,7 @@ class JobManager:
         Submit an analysis job to the background queue
         
         Args:
-            asc_standard: ASC standard (e.g., "ASC 606")
+            asc_standard: ASC standard (e.g., "ASC 606", "ASC 842", etc.)
             analysis_id: Database INTEGER analysis ID
             user_id: User ID for authentication
             user_token: JWT token for API calls
@@ -53,7 +53,27 @@ class JobManager:
             Job ID for tracking (string representation of analysis_id)
         """
         try:
-            from workers.analysis_worker import run_asc606_analysis
+            # Route to correct worker function based on ASC standard
+            from workers.analysis_worker import (
+                run_asc606_analysis,
+                run_asc842_analysis,
+                run_asc718_analysis,
+                run_asc805_analysis,
+                run_asc340_analysis
+            )
+            
+            # Map ASC standard to worker function
+            worker_map = {
+                'ASC 606': run_asc606_analysis,
+                'ASC 842': run_asc842_analysis,
+                'ASC 718': run_asc718_analysis,
+                'ASC 805': run_asc805_analysis,
+                'ASC 340-40': run_asc340_analysis
+            }
+            
+            worker_function = worker_map.get(asc_standard)
+            if not worker_function:
+                raise ValueError(f"Unknown ASC standard: {asc_standard}")
             
             job_data = {
                 'analysis_id': analysis_id,
@@ -66,7 +86,7 @@ class JobManager:
             }
             
             job = self.queue.enqueue(
-                run_asc606_analysis,
+                worker_function,
                 job_data,
                 job_timeout='30m',
                 result_ttl=86400,
@@ -74,11 +94,11 @@ class JobManager:
                 job_id=str(analysis_id)
             )
             
-            logger.info(f"✓ Job submitted: {job.id} for analysis {analysis_id}")
+            logger.info(f"✓ Job submitted for {asc_standard}: {job.id} (analysis {analysis_id})")
             return job.id
             
         except Exception as e:
-            logger.error(f"Failed to submit job: {e}")
+            logger.error(f"Failed to submit job for {asc_standard}: {e}")
             raise
     
     def get_job_status(self, job_id: str) -> Dict[str, Any]:

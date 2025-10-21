@@ -1,0 +1,16 @@
+2025-10-21 19:39:24,757 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-10-21 19:39:24.768 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 19:39:24.768 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 19:39:24,768 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 19:39:25,756 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-5, using default: 'Could not automatically map gpt-5 to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-10-21 19:39:25,759 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-5, Input tokens: 2961, Output tokens: 1566, Cost: $0.0766
+2025-10-21 19:39:25,759 - shared.api_cost_tracker - INFO - Tracked step_1_analysis request: $0.0766 (Total: $0.0766)
+2025-10-21 19:39:25,759 - asc606.step_analyzer - INFO - ✓ Step 1: Completed in 98.2s
+2025-10-21 19:39:25,759 - workers.analysis_worker - INFO - ✓ Completed Step 1
+2025-10-21 19:39:25,761 - workers.analysis_worker - INFO - 📊 Processing Step 2/5
+2025-10-21 19:39:25,761 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-10-21 19:39:26,548 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 19:39:26,553 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.79s)
+2025-10-21 19:39:26,554 - asc606.knowledge_search - INFO - Retrieved guidance for Step 2
+2025-10-21 19:39:26,554 - asc606.step_analyzer - INFO - → Step 2: Starting analysis using gpt-5...
+2025-10-21 19:39:26,554 - asc606.step_analyzer - INFO - 💰 Extracting transaction price components and variable consideration...
