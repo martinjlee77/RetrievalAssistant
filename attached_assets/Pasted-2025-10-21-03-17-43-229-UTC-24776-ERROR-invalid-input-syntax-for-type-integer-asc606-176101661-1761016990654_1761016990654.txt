@@ -1,0 +1,82 @@
+2025-10-21 03:17:43.229 UTC [24776] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:43.229 UTC [24776] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:17:44.366 UTC [24777] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:44.366 UTC [24777] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+2025-10-21 03:17:46.498 UTC [24778] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+	                AND user_id = 7
+2025-10-21 03:17:46.498 UTC [24778] STATEMENT:  
+	            
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:17:50.580 UTC [24779] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:50.580 UTC [24779] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:17:58.667 UTC [24781] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:58.667 UTC [24781] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:17:58.754 UTC [24782] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:58.754 UTC [24782] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:17:59.823 UTC [24783] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:17:59.823 UTC [24783] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:18:01.908 UTC [24784] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:18:01.908 UTC [24784] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:18:05.976 UTC [24785] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+	                AND user_id = 7
+2025-10-21 03:18:05.976 UTC [24785] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	            
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+2025-10-21 03:18:14.059 UTC [24787] ERROR:  invalid input syntax for type integer: "asc606_1761016614_d38b32af" at character 245
+2025-10-21 03:18:14.059 UTC [24787] STATEMENT:  
+	                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+	                       file_count, final_charged_credits, billed_credits, status
+	                FROM analyses 
+	                WHERE analysis_id = 'asc606_1761016614_d38b32af'
+	                AND user_id = 7
+	            
+2025-10-21 03:18:49.938 UTC [76] LOG:  checkpoint starting: time
+2025-10-21 03:18:50.667 UTC [76] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.706 s, sync=0.007 s, total=0.730 s; sync files=8, longest=0.005 s, average=0.001 s; distance=11 kB, estimate=35 kB; lsn=0/1AF29A8, redo lsn=0/1AF2950

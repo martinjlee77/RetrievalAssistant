@@ -1695,13 +1695,19 @@ def save_worker_analysis():
         try:
             # CRITICAL: Retrieve AUTHORITATIVE pricing from existing analysis record
             # This record was created with server-validated pricing BEFORE job submission
+            # NOTE: analysis_id from worker is the job_id string, use memo_uuid to look up
             cursor.execute("""
                 SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
                        file_count, final_charged_credits, billed_credits, status
                 FROM analyses 
-                WHERE analysis_id = %s
-                AND user_id = %s
-            """, (analysis_id, user_id))
+                WHERE user_id = %s
+                AND memo_uuid = (
+                    SELECT memo_uuid FROM analyses 
+                    WHERE user_id = %s 
+                    ORDER BY started_at DESC 
+                    LIMIT 1
+                )
+            """, (user_id, user_id))
             
             existing_record = cursor.fetchone()
             
@@ -1852,17 +1858,23 @@ def get_analysis_status(analysis_id):
         cursor = conn.cursor()
         
         try:
-            # Query analysis by analysis_id directly
+            # Query analysis - use memo_uuid lookup since analysis_id from job is a string
+            # but database analysis_id is an integer
             cursor.execute("""
                 SELECT analysis_id, memo_uuid, status, memo_content, error_message, 
                        completed_at, asc_standard, words_count, tier_name, file_count,
                        final_charged_credits
                 FROM analyses 
-                WHERE analysis_id = %s
-                AND user_id = %s
+                WHERE user_id = %s
+                AND memo_uuid = (
+                    SELECT memo_uuid FROM analyses 
+                    WHERE user_id = %s 
+                    ORDER BY started_at DESC 
+                    LIMIT 1
+                )
                 ORDER BY started_at DESC
                 LIMIT 1
-            """, (analysis_id, user_id))
+            """, (user_id, user_id))
             
             analysis = cursor.fetchone()
             

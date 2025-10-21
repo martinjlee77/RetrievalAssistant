@@ -1,0 +1,28 @@
+railway-# \d analyses
+                                                  Table "public.analyses"
+        Column         |            Type             | Collation | Nullable |                    Default                
+-----------------------+-----------------------------+-----------+----------+-----------------------------------------------
+ analysis_id           | integer                     |           | not null | nextval('analyses_analysis_id_seq'::regclass)
+ user_id               | integer                     |           | not null |
+ asc_standard          | character varying(50)       |           | not null |
+ words_count           | integer                     |           |          |
+ est_api_cost          | numeric(10,4)               |           |          |
+ final_charged_credits | numeric(10,2)               |           |          |
+ billed_credits        | numeric(10,2)               |           |          |
+ tier_name             | character varying(50)       |           |          |
+ status                | character varying(50)       |           |          |
+ memo_uuid             | character varying(255)      |           |          |
+ started_at            | timestamp without time zone |           |          |
+ completed_at          | timestamp without time zone |           |          |
+ duration_seconds      | integer                     |           |          |
+ file_count            | integer                     |           |          |
+ created_at            | timestamp without time zone |           |          | now()
+ memo_content          | text                        |           |          |
+ error_message         | text                        |           |          |
+Indexes:
+    "analyses_pkey" PRIMARY KEY, btree (analysis_id)
+    "idx_analyses_memo_uuid" btree (memo_uuid)
+    "idx_analyses_user_id" btree (user_id)
+Foreign-key constraints:
+    "analyses_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+-- More  --
