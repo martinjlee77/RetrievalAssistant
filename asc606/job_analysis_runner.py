@@ -46,11 +46,10 @@ def submit_and_monitor_asc606_job(
         # This stores authoritative pricing info that backend will use for billing
         # Backend will generate the database INTEGER analysis_id
         import requests
-        from shared.auth_utils import get_backend_url
+        from shared.auth_utils import BACKEND_URL
         
-        backend_url = get_backend_url()
         create_response = requests.post(
-            f'{backend_url}/api/analysis/create',
+            f'{BACKEND_URL}/api/analysis/create',
             headers={'Authorization': f'Bearer {user_token}'},
             json={
                 'asc_standard': 'ASC 606',
@@ -128,12 +127,11 @@ def submit_and_monitor_asc606_job(
                 st.info("📥 Retrieving completed analysis...")
                 
                 try:
-                    from shared.auth_utils import get_backend_url
-                    backend_url = get_backend_url()
+                    from shared.auth_utils import BACKEND_URL
                     import requests
                     
                     status_response = requests.get(
-                        f'{backend_url}/api/analysis/status/{db_analysis_id}',  # Use database INTEGER id
+                        f'{BACKEND_URL}/api/analysis/status/{db_analysis_id}',  # Use database INTEGER id
                         headers={'Authorization': f'Bearer {user_token}'},
                         timeout=10
                     )
