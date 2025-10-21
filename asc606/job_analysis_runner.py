@@ -203,7 +203,7 @@ def submit_and_monitor_asc606_job(
             elif job_status == 'queued':
                 # Job is queued, waiting to start
                 status_text.info("⏳ Job queued - waiting for processing to begin...")
-                step_details.markdown("Your analysis is in the queue and will start shortly.")
+                # step_details.markdown("Your analysis is in the queue and will start shortly.")
                 
             else:
                 # Unknown status
