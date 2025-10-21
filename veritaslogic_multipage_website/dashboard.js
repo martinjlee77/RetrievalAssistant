@@ -586,6 +586,18 @@ function loadRecentAnalyses(analyses) {
     
     const tbody = document.getElementById('analysisTableBody');
     analyses.forEach(analysis => {
+        // Map ASC standard to Streamlit page title (URL will be generated from title)
+        const standardToPageTitle = {
+            'ASC 606': 'ASC 606: Revenue Recognition',
+            'ASC 842': 'ASC 842: Leases (Lessee)',
+            'ASC 718': 'ASC 718: Stock Compensation',
+            'ASC 805': 'ASC 805: Business Combinations',
+            'ASC 340-40': 'ASC 340-40: Cost to Obtain'
+        };
+        
+        const pageTitle = standardToPageTitle[analysis.asc_standard] || 'ASC 606: Revenue Recognition';
+        const viewUrl = `/analysis/${encodeURIComponent(pageTitle)}?analysis_id=${analysis.analysis_id}`;
+        
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${new Date(analysis.created_at).toLocaleDateString()}</td>
@@ -594,7 +606,7 @@ function loadRecentAnalyses(analyses) {
             <td>${analysis.file_count || 0}</td>
             <td>${analysis.tier_name || 'N/A'}</td>
             <td>${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(analysis.cost)}</td>
-            <td><a href="/analysis?analysis_id=${analysis.analysis_id}" target="_blank" class="btn btn-primary btn-sm">View</a></td>
+            <td><a href="${viewUrl}" target="_blank" class="btn btn-primary btn-sm">View</a></td>
         `;
         tbody.appendChild(row);
     });
