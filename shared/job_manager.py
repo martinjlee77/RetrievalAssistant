@@ -1,6 +1,7 @@
 """
 Job Manager for Background Analysis Processing
 Handles job submission, status checking, and result retrieval using Redis Queue (RQ)
+Auto-detects environment: uses fakeredis locally, real Redis in production
 """
 
 import os
@@ -13,21 +14,41 @@ from rq.job import Job
 
 logger = logging.getLogger(__name__)
 
+def get_redis_connection():
+    """
+    Get Redis connection - automatically uses fakeredis for local dev
+    Returns real Redis in production (Railway) or fakeredis locally (Replit)
+    """
+    redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+    
+    try:
+        logger.info(f"Attempting to connect to Redis: {redis_url}")
+        redis_conn = Redis.from_url(redis_url, socket_connect_timeout=2, decode_responses=False)
+        redis_conn.ping()
+        logger.info("✓ Connected to production Redis")
+        return redis_conn
+    except Exception as e:
+        logger.warning(f"Production Redis unavailable ({e}), using fakeredis for local development")
+        try:
+            from fakeredis import FakeRedis
+            fake_conn = FakeRedis(decode_responses=False)
+            logger.info("✓ Using fakeredis (local development mode)")
+            return fake_conn
+        except ImportError:
+            logger.error("fakeredis not installed. Run: pip install fakeredis")
+            raise
+
 class JobManager:
     """Manages background job processing for ASC analyses"""
     
     def __init__(self):
         """Initialize Redis connection and job queue"""
-        # Get Redis connection details from environment
-        redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
-        
         try:
-            # Don't decode_responses for RQ - it uses pickle (binary data)
-            self.redis_conn = Redis.from_url(redis_url, decode_responses=False)
+            self.redis_conn = get_redis_connection()
             self.queue = Queue('analysis', connection=self.redis_conn)
-            logger.info(f"Job manager initialized with Redis: {redis_url}")
+            logger.info("Job manager initialized successfully")
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {e}")
+            logger.error(f"Failed to initialize job manager: {e}")
             raise
     
     def submit_analysis_job(self, 
@@ -56,10 +77,8 @@ class JobManager:
             Job ID for tracking (string representation of analysis_id)
         """
         try:
-            # Import the worker function
             from workers.analysis_worker import run_asc606_analysis
             
-            # Prepare job data
             job_data = {
                 'analysis_id': analysis_id,
                 'user_id': user_id,
@@ -70,15 +89,13 @@ class JobManager:
                 'uploaded_filenames': uploaded_filenames
             }
             
-            # Submit job to queue with timeout (30 minutes max)
-            # Note: job_id must be string, so convert analysis_id (int) to string
             job = self.queue.enqueue(
                 run_asc606_analysis,
                 job_data,
                 job_timeout='30m',
-                result_ttl=86400,  # Keep results for 24 hours
-                failure_ttl=86400,  # Keep failure info for 24 hours
-                job_id=str(analysis_id)  # Use analysis_id as job_id (convert int to string)
+                result_ttl=86400,
+                failure_ttl=86400,
+                job_id=str(analysis_id)
             )
             
             logger.info(f"✓ Job submitted: {job.id} for analysis {analysis_id}")
@@ -98,22 +115,19 @@ class JobManager:
         try:
             job = Job.fetch(job_id, connection=self.redis_conn)
             
-            # Get job meta for progress tracking
             meta = job.meta or {}
             
             status_info = {
                 'job_id': job_id,
-                'status': job.get_status(),  # 'queued', 'started', 'finished', 'failed'
+                'status': job.get_status(),
                 'progress': meta.get('progress', {}),
                 'error': None,
                 'result': None
             }
             
-            # If finished, include result
             if job.is_finished:
                 status_info['result'] = job.result
                 
-            # If failed, include error
             if job.is_failed:
                 status_info['error'] = str(job.exc_info) if job.exc_info else "Unknown error"
                 
@@ -159,5 +173,4 @@ class JobManager:
             logger.error(f"Failed to update progress for job {job_id}: {e}")
 
 
-# Global instance
 job_manager = JobManager()
