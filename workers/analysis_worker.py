@@ -875,7 +875,7 @@ def run_asc340_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     step_num=step_num,
                     contract_text=combined_text,
                     authoritative_context=authoritative_context,
-                    company_name=company_name,
+                    customer_name=company_name,
                     additional_context=additional_context
                 )
                 

@@ -1,0 +1,66 @@
+VeritasLogic Analysis
+/
+7a90e230
+Active
+
+Oct 21, 2025, 3:46 PM
+tas.veritaslogic.ai
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 3:46 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+INFO:__main__:Created new user session: 20a01f65...
+INFO:utils.document_extractor:📄 Processing document: Plan A - cap.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 719 words (~2 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: Plan A - cap.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 719 words (~2 pages) via python-docx
+INFO:asc340.step_analyzer:🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+INFO:asc340.step_analyzer:🔒 Extracting party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-4o-mini, Input tokens: 1124, Output tokens: 35, Cost: $0.0002
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0002 (Total: $0.0002)
+INFO:asc340.step_analyzer:Raw LLM response for party extraction: {"company": "New Start Inc.", "counterparty": "Account Executives (AEs), Account Managers (AMs)", "counterparty_type": "employee"}
+INFO:asc340.step_analyzer:✓ Parties extracted - Company: New Start Inc., Counterparty: Account Executives (AEs), Account Managers (AMs) (employee)
+WARNING:asc340.step_analyzer:⚠️ Counterparty name 'Account Executives (AEs), Account Managers (AMs)' (normalized: 'Account Executives (AEs), Account Managers (AMs)') not found in contract text
+INFO:asc340.step_analyzer:✓ De-identification complete: company 'New Start Inc.' → 'the Company' (1 occurrences)
+INFO:shared.preflight_pricing:Pricing calculated: 682 words, 3K (≤10 pages) tier, $195.0
+INFO:utils.document_extractor:📄 Processing document: Plan A - cap.docx (0.02 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 719 words (~2 pages) via python-docx
+INFO:shared.preflight_pricing:Pricing calculated: 682 words, 3K (≤10 pages) tier, $195.0
+INFO:asc340.job_analysis_runner:✓ Analysis record created with database ID: 56
+INFO:shared.job_manager:✓ Job submitted for ASC 340-40: 56 (analysis 56)
+INFO:asc340.job_analysis_runner:Job submitted: 56
+INFO:asc340.job_analysis_runner:Job 56 status: JobStatus.QUEUED
+INFO:asc340.job_analysis_runner:Job 56 status: JobStatus.FAILED
+ERROR:asc340.job_analysis_runner:Job 56 failed: Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 874, in run_asc340_analysis
+    step_result = analyzer._analyze_step_with_retry(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1659, in perform_job
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+    self._result = self._execute()
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/workers/analysis_worker.py", line 888, in run_asc340_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'

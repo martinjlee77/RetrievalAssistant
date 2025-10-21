@@ -1,0 +1,79 @@
+Worker
+/
+e1aa7e62
+Active
+
+Oct 21, 2025, 3:46 PM
+Details
+Build Logs
+Deploy Logs
+Filter and search logs
+
+You reached the start of the range
+Oct 21, 2025, 3:46 PM
+Starting Container
+2025-10-21 19:48:15,292 - shared.redis_connection - INFO - Attempting to connect to Redis: redis://default:caASCJiqLuOysPZqbElpmjCYEfHmSylU@redis.railway.internal:6379
+2025-10-21 19:48:15,387 - shared.redis_connection - INFO - ✓ Connected to production Redis
+2025-10-21 19:48:15,390 - __main__ - INFO - 🚀 RQ Worker started. Waiting for jobs...
+2025-10-21 19:48:15,394 - rq.worker - INFO - Worker cc123994597f45e693d198880499661c: started with PID 1, version 2.6.0
+2025-10-21 19:48:15,394 - rq.worker - INFO - Worker cc123994597f45e693d198880499661c: subscribing to channel rq:pubsub:cc123994597f45e693d198880499661c
+2025-10-21 19:48:15,404 - rq.worker - INFO - *** Listening on analysis...
+2025-10-21 19:48:15,409 - rq.worker - INFO - Worker cc123994597f45e693d198880499661c: cleaning registries for queue: analysis
+2025-10-21 20:01:45,504 - rq.worker - INFO - Worker cc123994597f45e693d198880499661c: cleaning registries for queue: analysis
+2025-10-21 20:12:12,773 - rq.worker - INFO - analysis: workers.analysis_worker.run_asc340_analysis({'analysis_id': 56, 'user_id': 7, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5cC...) (56)
+2025-10-21 20:12:18,310 - workers.analysis_worker - INFO - 🚀 Worker starting ASC 340-40 analysis: 56
+2025-10-21 20:12:18.310 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:18.311 WARNING streamlit.runtime.state.session_state_proxy: Session state does not function when running a script without `streamlit run`
+2025-10-21 20:12:18.311 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:18.311 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:18.311 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:18,311 - shared.api_cost_tracker - INFO - API cost tracker reset
+2025-10-21 20:12:18,388 - asc340.step_analyzer - INFO - 🤖 Using GPT-4o for main analysis, GPT-4o-mini for light tasks
+2025-10-21 20:12:18,437 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-10-21 20:12:18,649 - shared.knowledge_base - INFO - ChromaDB client initialized for asc340_knowledge_base
+2025-10-21 20:12:18,663 - shared.knowledge_base - INFO - Embedding function initialized successfully
+2025-10-21 20:12:18,674 - shared.knowledge_base - INFO - Collection 'asc340_contract_costs' loaded successfully
+2025-10-21 20:12:18,674 - asc340.knowledge_search - INFO - ASC 340-40 knowledge search initialized successfully
+2025-10-21 20:12:18,676 - workers.analysis_worker - INFO - 📊 Processing Step 1/2
+2025-10-21 20:12:18,676 - shared.knowledge_base - INFO - 🔍 Querying asc340_contract_costs knowledge base...
+2025-10-21 20:12:20,037 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-10-21 20:12:20,121 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (1.44s)
+2025-10-21 20:12:20,121 - asc340.knowledge_search - INFO - Retrieved guidance for Step 1
+2025-10-21 20:12:20,121 - workers.analysis_worker - ERROR - Error in Step 1: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+2025-10-21 20:12:20,121 - workers.analysis_worker - ERROR - ❌ Analysis failed: Step 1 failed: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 874, in run_asc340_analysis
+    step_result = analyzer._analyze_step_with_retry(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 888, in run_asc340_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+2025-10-21 20:12:20.123 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:20.123 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-10-21 20:12:20,123 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-10-21 20:12:20,238 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-10-21 20:12:20,241 - workers.analysis_worker - INFO - ✓ Failure status saved to database
+2025-10-21 20:12:20,250 - rq.worker - ERROR - Worker cc123994597f45e693d198880499661c: job 56: exception raised while executing (workers.analysis_worker.run_asc340_analysis)
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 874, in run_asc340_analysis
+    step_result = analyzer._analyze_step_with_retry(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1659, in perform_job
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+    self._result = self._execute()
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/workers/analysis_worker.py", line 888, in run_asc340_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: ASC340StepAnalyzer._analyze_step_with_retry() got an unexpected keyword argument 'company_name'
+2025-10-21 20:12:20,291 - rq.worker - INFO - Worker cc123994597f45e693d198880499661c: cleaning registries for queue: analysis
