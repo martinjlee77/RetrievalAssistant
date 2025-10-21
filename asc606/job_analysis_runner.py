@@ -157,6 +157,10 @@ def submit_and_monitor_asc606_job(
                                 'completion_timestamp': analysis_data.get('completed_at')
                             }
                             
+                            # Clear skip_auto_load flag now that new analysis is complete
+                            if 'skip_auto_load' in st.session_state:
+                                del st.session_state['skip_auto_load']
+                            
                             logger.info(f"✓ Session state stored. Keys in session: {list(st.session_state.keys())}")
                             
                             st.info("📄 **Memo ready!** Refreshing page to display results...")

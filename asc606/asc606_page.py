@@ -90,6 +90,10 @@ def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
             'completed_at': data.get('completed_at')
         }
         
+        # Clear skip_auto_load flag since we successfully loaded a memo
+        if 'skip_auto_load' in st.session_state:
+            del st.session_state['skip_auto_load']
+        
         # Clear URL parameter after loading
         if source == 'url' and 'analysis_id' in st.query_params:
             st.query_params.clear()
@@ -112,8 +116,8 @@ def check_for_analysis_to_load():
     import requests
     
     # Skip if user explicitly wants to start fresh (clicked "Analyze Another Contract")
+    # Note: Don't clear the flag here - it needs to persist through file upload reruns
     if st.session_state.get('skip_auto_load', False):
-        st.session_state.skip_auto_load = False  # Clear flag after checking
         return False, None, None
     
     # Skip if already have memo in session
