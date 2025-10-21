@@ -130,28 +130,50 @@ def submit_and_monitor_asc606_job(
                 progress_bar.progress(100)
                 status_text.success("✅ Analysis complete!")
                 
-                # Get result
-                result = status_info['result']
+                # Fetch memo from database via backend API
+                st.info("📥 Retrieving completed analysis...")
                 
-                if result and result.get('success'):
-                    st.success("🎉 **Analysis completed successfully!**")
+                try:
+                    backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+                    import requests
                     
-                    # Store memo in session state
-                    analysis_key = f'asc606_analysis_complete_{session_id}'
-                    memo_key = f'asc606_memo_data_{session_id}'
+                    status_response = requests.get(
+                        f'{backend_url}/api/analysis/status/{analysis_id}',
+                        headers={'Authorization': f'Bearer {user_token}'},
+                        timeout=10
+                    )
                     
-                    st.session_state[analysis_key] = True
-                    st.session_state[memo_key] = {
-                        'memo_content': result['memo_content'],
-                        'analysis_id': result['analysis_id']
-                    }
-                    
-                    st.info("📄 **Memo saved!** Refreshing page to display results...")
-                    time.sleep(2)
-                    st.rerun()
-                else:
-                    st.error("❌ Analysis completed but failed to generate memo.")
-                    logger.error(f"Job completed but result missing: {result}")
+                    if status_response.ok:
+                        analysis_data = status_response.json()
+                        
+                        if analysis_data['status'] == 'completed' and analysis_data.get('memo_content'):
+                            st.success("🎉 **Analysis completed successfully!**")
+                            
+                            # Store memo in session state for display
+                            analysis_key = f'asc606_analysis_complete_{session_id}'
+                            memo_key = f'asc606_memo_data_{session_id}'
+                            
+                            st.session_state[analysis_key] = True
+                            st.session_state[memo_key] = {
+                                'memo_content': analysis_data['memo_content'],
+                                'analysis_id': analysis_id,
+                                'memo_uuid': analysis_data.get('memo_uuid'),
+                                'completion_timestamp': analysis_data.get('completed_at')
+                            }
+                            
+                            st.info("📄 **Memo ready!** Refreshing page to display results...")
+                            time.sleep(2)
+                            st.rerun()
+                        else:
+                            st.error("❌ Analysis completed but memo not available.")
+                            logger.error(f"Analysis status: {analysis_data}")
+                    else:
+                        st.error(f"❌ Failed to retrieve analysis: {status_response.text}")
+                        logger.error(f"Status fetch failed: {status_response.status_code}")
+                        
+                except Exception as e:
+                    st.error(f"❌ Error retrieving analysis: {str(e)}")
+                    logger.error(f"Failed to fetch analysis status: {str(e)}")
                 
                 return
                 
