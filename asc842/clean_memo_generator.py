@@ -61,6 +61,7 @@ class CleanMemoGenerator:
         # Add Executive Summary
         if 'executive_summary' in analysis_results:
             memo_lines.extend([
+                "## EXECUTIVE SUMMARY",
                 "",
                 analysis_results['executive_summary'],
                 "",

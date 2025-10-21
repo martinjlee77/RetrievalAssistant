@@ -1095,7 +1095,7 @@ Write a concise executive summary (2-3 paragraphs) that:
 3. Notes any significant judgments or policy elections
 4. Is suitable for senior management review
 
-Format as clean markdown."""
+IMPORTANT: Do NOT include any heading (like "Executive Summary" or "## Executive Summary"). Just provide the paragraph text only."""
                     }
                 ],
                 **self._get_max_tokens_param("executive_summary", self.light_model),
@@ -1156,7 +1156,7 @@ Write a brief background section (1 paragraph) that:
 3. References the ASC 842 methodology being applied
 4. Notes that this is a preliminary analysis with reasonable assumptions
 
-Format as clean markdown."""
+IMPORTANT: Do NOT include any heading (like "Background" or "## Background"). Just provide the paragraph text only."""
                     }
                 ],
                 **self._get_max_tokens_param("background", self.light_model),
