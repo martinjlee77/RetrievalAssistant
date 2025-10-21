@@ -1818,6 +1818,78 @@ def save_worker_analysis():
         logger.error(f"Save analysis error: {sanitize_for_log(e)}")
         return jsonify({'error': 'Failed to save analysis'}), 500
 
+@app.route('/api/analysis/status/<analysis_id>', methods=['GET'])
+def get_analysis_status(analysis_id):
+    """Get analysis status and memo content for polling"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token and get user
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        try:
+            # Query analysis by analysis_id (the job ID)
+            # Use memo_uuid from the latest analysis to find it
+            cursor.execute("""
+                SELECT analysis_id, memo_uuid, status, memo_content, error_message, 
+                       completed_at, asc_standard, words_count, tier_name, file_count,
+                       final_charged_credits
+                FROM analyses 
+                WHERE user_id = %s
+                AND memo_uuid = (
+                    SELECT memo_uuid FROM analyses 
+                    WHERE user_id = %s 
+                    ORDER BY started_at DESC 
+                    LIMIT 1
+                )
+                ORDER BY started_at DESC
+                LIMIT 1
+            """, (user_id, user_id))
+            
+            analysis = cursor.fetchone()
+            
+            if not analysis:
+                return jsonify({'error': 'Analysis not found'}), 404
+            
+            # Return status and memo if completed
+            response = {
+                'status': analysis['status'],
+                'memo_uuid': analysis['memo_uuid'],
+                'asc_standard': analysis['asc_standard'],
+                'words_count': analysis['words_count'],
+                'tier_name': analysis['tier_name'],
+                'file_count': analysis['file_count']
+            }
+            
+            if analysis['status'] == 'completed' and analysis['memo_content']:
+                response['memo_content'] = analysis['memo_content']
+                response['completed_at'] = analysis['completed_at'].isoformat() if analysis['completed_at'] else None
+                response['credits_charged'] = float(analysis['final_charged_credits']) if analysis['final_charged_credits'] else 0
+            elif analysis['status'] == 'failed' and analysis['error_message']:
+                response['error_message'] = analysis['error_message']
+                response['completed_at'] = analysis['completed_at'].isoformat() if analysis['completed_at'] else None
+            
+            return jsonify(response), 200
+            
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Get analysis status error: {sanitize_for_log(e)}")
+        return jsonify({'error': 'Failed to retrieve analysis status'}), 500
+
 @app.route('/api/analysis/complete', methods=['POST'])
 def complete_analysis():
     """Unified endpoint for analysis completion - handles both recording and billing atomically"""
