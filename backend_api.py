@@ -1583,6 +1583,90 @@ def check_user_credits():
         logger.error(f"Check credits error: {e}")
         return jsonify({'error': 'Failed to check credits'}), 500
 
+@app.route('/api/analysis/create', methods=['POST'])
+def create_pending_analysis():
+    """Create a pending analysis record before job submission (stores authoritative pricing)"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        # Verify token
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        
+        # Extract and validate data
+        analysis_id = sanitize_string(data.get('analysis_id', ''), 50)
+        asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
+        words_count = max(0, int(data.get('words_count', 0)))
+        tier_name = sanitize_string(data.get('tier_name', ''), 100)
+        file_count = max(0, int(data.get('file_count', 0)))
+        
+        # SERVER-SIDE PRICING VALIDATION
+        from shared.pricing_config import get_price_tier
+        tier_info = get_price_tier(words_count)
+        cost_to_charge = Decimal(str(tier_info['price']))
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor()
+        
+        try:
+            # Verify email
+            cursor.execute("SELECT email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
+            user_check = cursor.fetchone()
+            if not user_check or not user_check['email_verified']:
+                return jsonify({'error': 'Email verification required'}), 403
+            
+            # Check sufficient credits
+            if user_check['credits_balance'] < cost_to_charge:
+                return jsonify({'error': 'Insufficient credits'}), 402
+            
+            # Insert pending analysis with authoritative pricing
+            import uuid
+            memo_uuid = str(uuid.uuid4())[:8]
+            
+            cursor.execute("""
+                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost,
+                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
+                                    started_at, file_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+                ON CONFLICT (memo_uuid) DO NOTHING
+                RETURNING analysis_id
+            """, (user_id, asc_standard, words_count, 0,
+                  cost_to_charge, cost_to_charge, tier_name, 'processing', memo_uuid, file_count))
+            
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({'error': 'Duplicate analysis'}), 409
+            
+            db_analysis_id = result['analysis_id']
+            
+            conn.commit()
+            
+            return jsonify({
+                'message': 'Analysis record created',
+                'analysis_id': db_analysis_id,
+                'memo_uuid': memo_uuid
+            }), 200
+            
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Failed to create pending analysis: {sanitize_for_log(e)}")
+            raise
+        finally:
+            conn.close()
+            
+    except Exception as e:
+        logger.error(f"Create pending analysis error: {sanitize_for_log(e)}")
+        return jsonify({'error': 'Failed to create analysis record'}), 500
+
 @app.route('/api/analysis/save', methods=['POST'])
 def save_worker_analysis():
     """Save completed analysis from background worker with memo content"""
@@ -1599,27 +1683,12 @@ def save_worker_analysis():
         user_id = payload['user_id']
         data = request.get_json()
         
-        # Extract data
+        # Extract minimal data from worker (only memo_content, success, error)
         analysis_id = sanitize_string(data.get('analysis_id', ''), 50)
         memo_content = data.get('memo_content', '')  # Full memo text
-        api_cost = Decimal(str(data.get('api_cost', 0)))
+        api_cost = Decimal(str(data.get('api_cost', 0)))  # For logging only
         success = data.get('success', False)
         error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
-        
-        # For successful analysis, we need full details
-        asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
-        words_count = max(0, int(data.get('words_count', 0)))
-        tier_name = sanitize_string(data.get('tier_name', ''), 100)
-        file_count = max(0, int(data.get('file_count', 0)))
-        
-        # CRITICAL: SERVER-SIDE PRICING - Never trust client/worker provided costs
-        from shared.pricing_config import get_price_tier
-        tier_info = get_price_tier(words_count)
-        cost_charged = Decimal(str(tier_info['price']))  # Recalculate server-side
-        
-        # Generate customer-facing memo UUID
-        import uuid
-        memo_uuid = str(uuid.uuid4())[:8]
         
         conn = get_db_connection()
         if not conn:
@@ -1628,51 +1697,86 @@ def save_worker_analysis():
         cursor = conn.cursor()
         
         try:
-            # Verify email
-            cursor.execute("SELECT email, email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
+            # CRITICAL: Retrieve AUTHORITATIVE pricing from existing analysis record
+            # This record was created with server-validated pricing BEFORE job submission
+            cursor.execute("""
+                SELECT analysis_id, user_id, memo_uuid, asc_standard, words_count, tier_name, 
+                       file_count, final_charged_credits, billed_credits, status
+                FROM analyses 
+                WHERE memo_uuid = (
+                    SELECT memo_uuid FROM analyses 
+                    WHERE user_id = %s 
+                    ORDER BY started_at DESC 
+                    LIMIT 1
+                )
+                AND user_id = %s
+            """, (user_id, user_id))
+            
+            existing_record = cursor.fetchone()
+            
+            if not existing_record:
+                logger.error(f"No pending analysis found for user {user_id}")
+                return jsonify({'error': 'Analysis record not found'}), 404
+            
+            # Verify user owns this analysis
+            if existing_record['user_id'] != user_id:
+                logger.error(f"User {user_id} attempted to save analysis for user {existing_record['user_id']}")
+                return jsonify({'error': 'Unauthorized'}), 403
+            
+            # Check if already completed (idempotency)
+            if existing_record['status'] in ['completed', 'failed']:
+                logger.warning(f"Duplicate save attempt for analysis {existing_record['analysis_id']}")
+                
+                # Get current balance
+                cursor.execute("SELECT credits_balance FROM users WHERE id = %s", (user_id,))
+                current_balance = cursor.fetchone()['credits_balance']
+                
+                return jsonify({
+                    'message': 'Analysis already saved (idempotent)',
+                    'analysis_id': existing_record['analysis_id'],
+                    'memo_uuid': existing_record['memo_uuid'],
+                    'balance_remaining': float(current_balance)
+                }), 200
+            
+            # Use AUTHORITATIVE pricing from database (created at job submission time)
+            db_analysis_id = existing_record['analysis_id']
+            memo_uuid = existing_record['memo_uuid']
+            cost_charged = existing_record['final_charged_credits']  # Server-validated price
+            asc_standard = existing_record['asc_standard']
+            words_count = existing_record['words_count']
+            tier_name = existing_record['tier_name']
+            file_count = existing_record['file_count']
+            
+            analysis_status = 'completed' if success else 'failed'
+            
+            # Get current balance
+            cursor.execute("SELECT email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
             user_check = cursor.fetchone()
             if not user_check or not user_check['email_verified']:
                 logger.warning(f"Unverified user {user_id} attempted to save analysis")
                 return jsonify({'error': 'Email verification required'}), 403
             
             current_balance = user_check['credits_balance']
-            analysis_status = 'completed' if success else 'failed'
             
-            # IDEMPOTENCY CHECK - Prevent duplicate charges
+            # Update analysis record with completion data
             cursor.execute("""
-                SELECT analysis_id, memo_uuid, final_charged_credits 
-                FROM analyses 
-                WHERE user_id = %s AND memo_uuid LIKE %s
-                ORDER BY created_at DESC
-                LIMIT 1
-            """, (user_id, f"{analysis_id[:10]}%"))
-            
-            existing_analysis = cursor.fetchone()
-            if existing_analysis:
-                logger.warning(f"Duplicate save attempt for analysis {analysis_id}")
-                return jsonify({
-                    'message': 'Analysis already saved (idempotent)',
-                    'analysis_id': existing_analysis['analysis_id'],
-                    'memo_uuid': existing_analysis['memo_uuid'],
-                    'balance_remaining': float(current_balance)
-                }), 200
-            
-            # Insert analysis record with memo content
-            cursor.execute("""
-                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
-                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
-                                    started_at, completed_at, duration_seconds, file_count, memo_content, error_message)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), 0, %s, %s, %s)
-                RETURNING analysis_id
-            """, (user_id, asc_standard, words_count, api_cost, 
-                  cost_charged if success else 0,
-                  cost_charged if success else 0,
-                  tier_name, analysis_status, memo_uuid, file_count, 
+                UPDATE analyses 
+                SET status = %s,
+                    completed_at = NOW(),
+                    est_api_cost = %s,
+                    memo_content = %s,
+                    error_message = %s,
+                    final_charged_credits = %s,
+                    billed_credits = %s
+                WHERE analysis_id = %s AND user_id = %s
+            """, (analysis_status, api_cost, 
                   memo_content if success else None,
-                  error_message))
+                  error_message,
+                  cost_charged if success else 0,
+                  cost_charged if success else 0,
+                  db_analysis_id, user_id))
             
-            db_analysis_id = cursor.fetchone()['analysis_id']
-            logger.info(f"Analysis saved: {db_analysis_id}, status: {analysis_status}")
+            logger.info(f"Analysis updated: {db_analysis_id}, status: {analysis_status}")
             
             # Only charge credits if successful
             if success and cost_charged > 0:

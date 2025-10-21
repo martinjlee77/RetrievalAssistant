@@ -56,29 +56,36 @@ Ensure these are set:
 - `WEBSITE_URL`: Your production URL (e.g., https://www.veritaslogic.ai)
 - All existing secrets (OpenAI, Stripe, etc.)
 
-## How It Works
+## How It Works (BILLING-SAFE ARCHITECTURE)
 
 ### User Flow (New)
 1. User uploads contract and clicks "Confirm & Analyze"
-2. **Job submitted to Redis queue** (returns immediately)
-3. User sees progress updates every 10 seconds
-4. User can close tab, lock screen, switch tabs - **analysis continues**
-5. When complete, memo is saved to database
-6. User sees completion message and results
+2. **Backend creates analysis record** with server-validated pricing (status='processing')
+3. **Job submitted to Redis queue** (returns immediately)
+4. User sees progress updates every 10 seconds
+5. User can close tab, lock screen, switch tabs - **analysis continues**
+6. When complete, worker updates existing record with memo
+7. User sees completion message and results
 
-### Worker Flow
+### Worker Flow (Billing-Safe)
 1. Worker picks up job from Redis queue
-2. Runs all 5 ASC 606 analysis steps
+2. Runs all 5 ASC 606 analysis steps (raises exception on ANY step failure)
 3. Updates job progress after each step
 4. Generates final memo
-5. **Calls `/api/analysis/save` to save results and charge user**
-6. Marks job as complete with result
+5. **Calls `/api/analysis/save` with minimal data** (memo_content, success, error only)
+6. **Backend retrieves authoritative pricing from database** (created in step 2 above)
+7. Backend updates analysis record and charges user atomically
+8. Worker marks job as complete with result
 
-### Billing Safety
-- User is **only charged when worker successfully completes**
-- Failed analyses: No charge, error saved to database
-- Worker saves both memo content and billing info atomically
-- Credit transaction only created on success
+### Billing Safety (HARDENED)
+- **Two-phase commit**: Analysis record created FIRST with authoritative pricing, then job submitted
+- **Server-side pricing**: Backend recalculates ALL costs from database record (never trusts worker)
+- **Idempotency**: Database status check prevents duplicate charges even on worker retry
+- **Atomic save+charge**: Single transaction updates memo and deducts credits
+- **Failure protection**: Worker raises exception on any step failure (prevents billing for degraded output)
+- **Authorization**: Backend verifies user owns analysis before allowing save
+- User is **only charged when worker successfully completes ALL steps**
+- Failed analyses: $0 charge, error saved to database
 
 ## Testing Checklist (On Railway)
 
@@ -115,6 +122,26 @@ railway run redis-cli HGETALL rq:job:<job_id>
 ```
 
 ## Key Features
+
+### Billing Safety Architecture
+**Two-Phase Commit Pattern:**
+1. **Phase 1 (Frontend)**: Create analysis record with server-validated pricing
+   - `/api/analysis/create` endpoint validates pricing server-side
+   - Stores authoritative cost in database with status='processing'
+   - Prevents worker tampering by establishing pricing BEFORE job runs
+   
+2. **Phase 2 (Worker)**: Update record with results
+   - Worker sends minimal payload (memo_content, success flag only)
+   - Backend retrieves pricing from database (Phase 1 record)
+   - Update and charge happen in single atomic transaction
+   - Idempotency check prevents duplicate charges on retry
+
+**Why This is Safe:**
+- ✅ Worker cannot manipulate pricing (backend ignores worker cost fields)
+- ✅ No double-charging (idempotency via database status check)
+- ✅ No charging for failures (worker raises on step failure, backend checks success flag)
+- ✅ User authorization (backend verifies user_id owns analysis_id)
+- ✅ Atomic operations (update + charge in single transaction)
 
 ### Progress Tracking
 Worker updates job metadata after each step:

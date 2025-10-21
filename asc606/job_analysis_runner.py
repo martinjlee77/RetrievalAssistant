@@ -44,6 +44,31 @@ def submit_and_monitor_asc606_job(
             st.error("❌ User authentication failed. Please refresh and log in again.")
             return
         
+        # CRITICAL: Create analysis record FIRST with status='processing'
+        # This stores authoritative pricing info that backend will use for billing
+        st.info("📝 Creating analysis record...")
+        import requests
+        
+        backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        create_response = requests.post(
+            f'{backend_url}/api/analysis/create',
+            headers={'Authorization': f'Bearer {user_token}'},
+            json={
+                'analysis_id': analysis_id,
+                'asc_standard': 'ASC 606',
+                'words_count': pricing_result['total_words'],
+                'tier_name': pricing_result['tier_info']['name'],
+                'file_count': pricing_result['file_count']
+            },
+            timeout=10
+        )
+        
+        if not create_response.ok:
+            st.error(f"❌ Failed to create analysis record: {create_response.text}")
+            return
+        
+        logger.info(f"✓ Analysis record created: {analysis_id}")
+        
         # Submit job to Redis queue
         st.info("📤 Submitting analysis to background queue...")
         
