@@ -7,6 +7,7 @@ import requests
 import logging
 from typing import Dict, Any, Optional
 import streamlit as st
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,8 @@ class BillingManager:
     """Manages billing operations for completed analyses"""
     
     def __init__(self):
-        self.backend_url = "http://127.0.0.1:3000/api"
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        self.backend_url = f"{website_url}/api"
     
     def record_analysis_billing(
         self,
