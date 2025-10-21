@@ -55,14 +55,14 @@ def render_asc606_page():
     session_id = st.session_state.get('user_session_id', '')
     logger.info(f"🔍 Page load - session_id: {session_id}, session keys: {list(st.session_state.keys())}")
     
-    if session_id:
-        analysis_key = f'asc606_analysis_complete_{session_id}'
-        memo_key = f'asc606_memo_data_{session_id}'
-        
-        logger.info(f"🔍 Checking for memo: analysis_key={analysis_key}, has_analysis_key={st.session_state.get(analysis_key, False)}, has_memo_key={bool(st.session_state.get(memo_key))}")
-        
-        # If analysis is complete and memo exists, show results instead of file upload
-        if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+    # Always construct the keys (works with empty session_id too)
+    analysis_key = f'asc606_analysis_complete_{session_id}'
+    memo_key = f'asc606_memo_data_{session_id}'
+    
+    logger.info(f"🔍 Checking for memo: analysis_key={analysis_key}, has_analysis_key={st.session_state.get(analysis_key, False)}, has_memo_key={bool(st.session_state.get(memo_key))}")
+    
+    # If analysis is complete and memo exists, show results instead of file upload
+    if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
 
