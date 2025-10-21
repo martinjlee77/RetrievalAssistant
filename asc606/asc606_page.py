@@ -63,6 +63,16 @@ def render_asc606_page():
     
     # If analysis is complete and memo exists, show results instead of file upload
     if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            # Force scroll to top when memo is displayed
+            st.markdown(
+                """
+                <script>
+                    window.parent.document.querySelector('section.main').scrollTo(0, 0);
+                </script>
+                """,
+                unsafe_allow_html=True
+            )
+            
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             st.markdown("""📄 **Your ASC 606 memo is ready below.** To save the results, you can either:
 
