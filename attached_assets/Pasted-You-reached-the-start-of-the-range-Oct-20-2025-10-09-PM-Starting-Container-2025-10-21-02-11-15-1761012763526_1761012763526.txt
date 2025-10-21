@@ -1,0 +1,26 @@
+You reached the start of the range
+Oct 20, 2025, 10:09 PM
+Starting Container
+[2025-10-21 02:11:15 +0000] [1] [INFO] Using worker: sync
+[2025-10-21 02:11:15 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-10-21 02:11:15 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-10-21 02:11:15 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-10-21 02:11:15 +0000] [5] [INFO] Booting worker with pid: 5
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-10-21 02:11:15 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-10-21 02:11:15 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user support@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+100.64.0.2 - - [21/Oct/2025:02:11:29 +0000] "GET /analysis HTTP/1.1" 200 12179 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+100.64.0.3 - - [21/Oct/2025:02:11:37 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 262 "-" "python-requests/2.31.0"
+INFO:backend_api:No credits charged (success=False)
+100.64.0.3 - - [21/Oct/2025:02:11:52 +0000] "POST /api/analysis/save HTTP/1.1" 200 109 "-" "python-requests/2.31.0"
+100.64.0.3 - - [21/Oct/2025:02:11:48 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:02:11:50 +0000] "GET /api/user/wallet-balance HTTP/1.1" 200 19 "-" "python-requests/2.31.0"
+100.64.0.4 - - [21/Oct/2025:02:11:50 +0000] "POST /api/analysis/create HTTP/1.1" 200 78 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 38, status: failed
