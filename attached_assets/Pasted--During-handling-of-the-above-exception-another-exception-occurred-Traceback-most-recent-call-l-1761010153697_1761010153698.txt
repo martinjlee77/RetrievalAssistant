@@ -1,0 +1,117 @@
+
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/worker.py", line 36, in <module>
+    main()
+  File "/app/worker.py", line 31, in main
+    worker = Worker(['analysis'], connection=redis_conn)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 243, in __init__
+    connection.client_setname(self.name)
+  File "/usr/local/lib/python3.11/site-packages/redis/commands/core.py", line 709, in client_setname
+    return self.execute_command("CLIENT SETNAME", name, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 397, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/worker.py", line 36, in <module>
+    main()
+  File "/app/worker.py", line 31, in main
+2025-10-21 01:28:14,942 - __main__ - INFO - Connecting to Redis: redis://localhost:6379
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 389, in connect_check_health
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/retry.py", line 105, in call_with_retry
+    return do()
+           ^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 390, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 803, in _connect
+    raise err
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 787, in _connect
+    worker = Worker(['analysis'], connection=redis_conn)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 243, in __init__
+    connection.client_setname(self.name)
+  File "/usr/local/lib/python3.11/site-packages/redis/commands/core.py", line 709, in client_setname
+    return self.execute_command("CLIENT SETNAME", name, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 380, in connect
+    self.connect_check_health(check_health=True)
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 397, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+    worker = Worker(['analysis'], connection=redis_conn)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 243, in __init__
+    connection.client_setname(self.name)
+  File "/usr/local/lib/python3.11/site-packages/redis/commands/core.py", line 709, in client_setname
+    return self.execute_command("CLIENT SETNAME", name, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 621, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/client.py", line 627, in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/utils.py", line 195, in wrapper
+    return func(*args, **kwargs)
+2025-10-21 01:28:16,693 - __main__ - INFO - Connecting to Redis: redis://localhost:6379
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 389, in connect_check_health
+    sock = self.retry.call_with_retry(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/retry.py", line 105, in call_with_retry
+    return do()
+           ^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 390, in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 803, in _connect
+    raise err
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 787, in _connect
+    sock.connect(socket_address)
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 1533, in get_connection
+    connection.connect()
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 380, in connect
+ConnectionRefusedError: [Errno 111] Connection refused
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/worker.py", line 36, in <module>
+    main()
+  File "/app/worker.py", line 31, in main
+    self.connect_check_health(check_health=True)
+  File "/usr/local/lib/python3.11/site-packages/redis/connection.py", line 397, in connect_check_health
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
