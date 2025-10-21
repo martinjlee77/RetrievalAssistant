@@ -1740,12 +1740,29 @@ def save_worker_analysis():
             
             analysis_status = 'completed' if success else 'failed'
             
-            # Get current balance
+            # Get current balance and verification status
             cursor.execute("SELECT email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
             user_check = cursor.fetchone()
+            
+            # CRITICAL: If unverified, still persist failure status but don't charge
             if not user_check or not user_check['email_verified']:
-                logger.warning(f"Unverified user {user_id} attempted to save analysis")
-                return jsonify({'error': 'Email verification required'}), 403
+                logger.warning(f"Unverified user {user_id} attempted to complete analysis")
+                
+                # Mark analysis as failed with clear error message
+                cursor.execute("""
+                    UPDATE analyses 
+                    SET status = 'failed',
+                        completed_at = NOW(),
+                        error_message = 'Email verification required. Please verify your email and try again.'
+                    WHERE analysis_id = %s AND user_id = %s
+                """, (db_analysis_id, user_id))
+                
+                conn.commit()
+                
+                return jsonify({
+                    'error': 'Email verification required',
+                    'message': 'Analysis marked as failed. No credits charged.'
+                }), 403
             
             current_balance = user_check['credits_balance']
             
