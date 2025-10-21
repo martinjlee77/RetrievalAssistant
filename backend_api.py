@@ -1599,8 +1599,7 @@ def create_pending_analysis():
         user_id = payload['user_id']
         data = request.get_json()
         
-        # Extract and validate data
-        analysis_id = sanitize_string(data.get('analysis_id', ''), 50)
+        # Extract and validate data (no client-side analysis_id)
         asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
         words_count = max(0, int(data.get('words_count', 0)))
         tier_name = sanitize_string(data.get('tier_name', ''), 100)
@@ -1680,14 +1679,18 @@ def save_worker_analysis():
         data = request.get_json()
         
         # Extract minimal data from worker (analysis_id is database INTEGER)
-        analysis_id = int(data.get('analysis_id', 0))  # Database INTEGER id
+        try:
+            analysis_id = int(data.get('analysis_id', 0))  # Database INTEGER id
+        except (ValueError, TypeError):
+            return jsonify({'error': 'analysis_id must be a valid integer'}), 400
+            
         memo_content = data.get('memo_content', '')  # Full memo text
         api_cost = Decimal(str(data.get('api_cost', 0)))  # For logging only
         success = data.get('success', False)
         error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
         
-        if not analysis_id:
-            return jsonify({'error': 'analysis_id required'}), 400
+        if not analysis_id or analysis_id <= 0:
+            return jsonify({'error': 'Valid analysis_id required'}), 400
         
         conn = get_db_connection()
         if not conn:

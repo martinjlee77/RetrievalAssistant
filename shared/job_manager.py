@@ -32,7 +32,7 @@ class JobManager:
     
     def submit_analysis_job(self, 
                            asc_standard: str,
-                           analysis_id: str,
+                           analysis_id: int,
                            user_id: int,
                            user_token: str,
                            pricing_result: Dict[str, Any],
@@ -44,7 +44,7 @@ class JobManager:
         
         Args:
             asc_standard: ASC standard (e.g., "ASC 606")
-            analysis_id: Unique analysis ID
+            analysis_id: Database INTEGER analysis ID
             user_id: User ID for authentication
             user_token: JWT token for API calls
             pricing_result: Pricing calculation result
@@ -53,7 +53,7 @@ class JobManager:
             uploaded_filenames: List of uploaded file names
             
         Returns:
-            Job ID for tracking
+            Job ID for tracking (string representation of analysis_id)
         """
         try:
             # Import the worker function
@@ -71,13 +71,14 @@ class JobManager:
             }
             
             # Submit job to queue with timeout (30 minutes max)
+            # Note: job_id must be string, so convert analysis_id (int) to string
             job = self.queue.enqueue(
                 run_asc606_analysis,
                 job_data,
                 job_timeout='30m',
                 result_ttl=86400,  # Keep results for 24 hours
                 failure_ttl=86400,  # Keep failure info for 24 hours
-                job_id=analysis_id  # Use analysis_id as job_id for easy tracking
+                job_id=str(analysis_id)  # Use analysis_id as job_id (convert int to string)
             )
             
             logger.info(f"✓ Job submitted: {job.id} for analysis {analysis_id}")

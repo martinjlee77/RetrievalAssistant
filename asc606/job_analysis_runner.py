@@ -35,10 +35,6 @@ def submit_and_monitor_asc606_job(
         session_id: Session ID for caching results
     """
     try:
-        # Generate unique analysis ID
-        import uuid
-        analysis_id = f"asc606_{int(time.time())}_{uuid.uuid4().hex[:8]}"
-        
         # Get user ID from session state (set during login)
         user_data = st.session_state.get('user_data', {})
         user_id = user_data.get('id')
@@ -48,6 +44,7 @@ def submit_and_monitor_asc606_job(
         
         # CRITICAL: Create analysis record FIRST with status='processing'
         # This stores authoritative pricing info that backend will use for billing
+        # Backend will generate the database INTEGER analysis_id
         st.info("📝 Creating analysis record...")
         import requests
         
@@ -56,7 +53,6 @@ def submit_and_monitor_asc606_job(
             f'{backend_url}/api/analysis/create',
             headers={'Authorization': f'Bearer {user_token}'},
             json={
-                'analysis_id': analysis_id,
                 'asc_standard': 'ASC 606',
                 'words_count': pricing_result['total_words'],
                 'tier_name': pricing_result['tier_info']['name'],
