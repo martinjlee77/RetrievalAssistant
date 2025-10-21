@@ -145,6 +145,7 @@ def submit_and_monitor_asc606_job(
                     
                     if status_response.ok:
                         analysis_data = status_response.json()
+                        logger.info(f"✓ Status API response: status={analysis_data.get('status')}, has_memo={bool(analysis_data.get('memo_content'))}")
                         
                         if analysis_data['status'] == 'completed' and analysis_data.get('memo_content'):
                             st.success("🎉 **Analysis completed successfully!**")
@@ -152,6 +153,8 @@ def submit_and_monitor_asc606_job(
                             # Store memo in session state for display
                             analysis_key = f'asc606_analysis_complete_{session_id}'
                             memo_key = f'asc606_memo_data_{session_id}'
+                            
+                            logger.info(f"✓ Storing memo in session state: session_id={session_id}, analysis_key={analysis_key}")
                             
                             st.session_state[analysis_key] = True
                             st.session_state[memo_key] = {
@@ -161,12 +164,14 @@ def submit_and_monitor_asc606_job(
                                 'completion_timestamp': analysis_data.get('completed_at')
                             }
                             
+                            logger.info(f"✓ Session state stored. Keys in session: {list(st.session_state.keys())}")
+                            
                             st.info("📄 **Memo ready!** Refreshing page to display results...")
                             time.sleep(2)
                             st.rerun()
                         else:
                             st.error("❌ Analysis completed but memo not available.")
-                            logger.error(f"Analysis status: {analysis_data}")
+                            logger.error(f"Analysis status: {analysis_data.get('status')}, memo length: {len(analysis_data.get('memo_content', ''))}")
                     else:
                         st.error(f"❌ Failed to retrieve analysis: {status_response.text}")
                         logger.error(f"Status fetch failed: {status_response.status_code}")
