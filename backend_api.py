@@ -2951,10 +2951,11 @@ def get_analysis_history():
         cursor = conn.cursor()
         
         # Get recent analyses with details
-        # Use memo_uuid as primary identifier since it's guaranteed to exist
+        # Include both analysis_id and memo_uuid for different use cases
         # Only show completed analyses (not failed/processing ones)
         cursor.execute("""
             SELECT 
+                a.analysis_id,
                 COALESCE(a.memo_uuid, 'unknown') as id,
                 a.asc_standard,
                 a.completed_at,
@@ -2976,6 +2977,7 @@ def get_analysis_history():
         for row in cursor.fetchall():
             analyses.append({
                 'id': row['id'],
+                'analysis_id': row['analysis_id'],
                 'title': row['document_name'] or f"{row['asc_standard']} Analysis",
                 'asc_standard': row['asc_standard'] or 'Unknown',
                 'created_at': row['completed_at'].isoformat() if row['completed_at'] else '',

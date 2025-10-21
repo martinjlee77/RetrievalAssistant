@@ -576,6 +576,7 @@ function loadRecentAnalyses(analyses) {
                     <th>Files</th>
                     <th>Tier</th>
                     <th>Cost</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="analysisTableBody">
@@ -593,6 +594,7 @@ function loadRecentAnalyses(analyses) {
             <td>${analysis.file_count || 0}</td>
             <td>${analysis.tier_name || 'N/A'}</td>
             <td>${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(analysis.cost)}</td>
+            <td><a href="/analysis?analysis_id=${analysis.analysis_id}" target="_blank" class="btn btn-primary btn-sm">View</a></td>
         `;
         tbody.appendChild(row);
     });
