@@ -20,6 +20,7 @@ import os
 from utils.document_extractor import DocumentExtractor
 from asc842.step_analyzer import ASC842StepAnalyzer
 from asc842.knowledge_search import ASC842KnowledgeSearch
+from asc842.job_analysis_runner import submit_and_monitor_asc842_job
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,151 @@ def create_file_hash(uploaded_files):
     file_info = [(f.name, f.size) for f in uploaded_files]
     return hash(tuple(file_info))
 
+def fetch_and_load_analysis(analysis_id: int, source: str = 'url'):
+    """
+    Fetch analysis from backend and load into session state.
+    
+    Args:
+        analysis_id: Database analysis_id to fetch
+        source: 'url' for URL parameter, 'recent' for auto-load
+    
+    Returns:
+        Tuple of (success: bool, message: str, timestamp: str or None)
+    """
+    import requests
+    from datetime import datetime
+    
+    try:
+        # Get auth token
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, "Authentication required", None
+        
+        # Fetch analysis from backend
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/status/{analysis_id}',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            return False, "Analysis not found", None
+        elif response.status_code != 200:
+            return False, f"Failed to fetch analysis: {response.status_code}", None
+        
+        data = response.json()
+        
+        # Verify it's completed
+        if data.get('status') != 'completed':
+            return False, f"Analysis is {data.get('status')}", None
+        
+        memo_content = data.get('memo_content')
+        if not memo_content:
+            return False, "No memo content found", None
+        
+        # Load into session state
+        session_id = st.session_state.get('user_session_id', '')
+        analysis_key = f'asc842_analysis_complete_{session_id}'
+        memo_key = f'asc842_memo_data_{session_id}'
+        
+        # Store memo data with metadata
+        st.session_state[analysis_key] = True
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'analysis_id': analysis_id,
+            'loaded_from': source,
+            'completed_at': data.get('completed_at')
+        }
+        
+        # Clear skip_auto_load flag since we successfully loaded a memo
+        if 'skip_auto_load' in st.session_state:
+            del st.session_state['skip_auto_load']
+        
+        # Clear URL parameter after loading
+        if source == 'url' and 'analysis_id' in st.query_params:
+            st.query_params.clear()
+        
+        timestamp = data.get('completed_at')
+        return True, "Analysis loaded successfully", timestamp
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch analysis {analysis_id}: {str(e)}")
+        return False, f"Error loading analysis: {str(e)}", None
+
+def check_for_analysis_to_load():
+    """
+    Check for analysis to auto-load on page load.
+    Priority: 1) URL parameter, 2) Recent analysis (within 24 hours)
+    
+    Returns:
+        Tuple of (loaded: bool, source: str, timestamp: str or None)
+    """
+    import requests
+    
+    # Skip if user explicitly wants to start fresh (clicked "Analyze Another Contract")
+    # Note: Don't clear the flag here - it needs to persist through file upload reruns
+    if st.session_state.get('skip_auto_load', False):
+        return False, None, None
+    
+    # Skip if already have memo in session
+    session_id = st.session_state.get('user_session_id', '')
+    memo_key = f'asc842_memo_data_{session_id}'
+    if st.session_state.get(memo_key):
+        return False, None, None
+    
+    # Priority 1: Check URL parameter ?analysis_id=X
+    query_params = st.query_params
+    if 'analysis_id' in query_params:
+        try:
+            analysis_id = int(query_params['analysis_id'])
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='url')
+            if success:
+                return True, 'url', timestamp
+            else:
+                st.warning(f"Could not load analysis from URL: {message}")
+        except ValueError:
+            st.warning("Invalid analysis_id in URL")
+        return False, None, None
+    
+    # Priority 2: Check for recent completed analysis (within 24 hours)
+    try:
+        token = st.session_state.get('auth_token')
+        if not token:
+            return False, None, None
+        
+        website_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        headers = {'Authorization': f'Bearer {token}'}
+        
+        response = requests.get(
+            f'{website_url}/api/analysis/recent/asc842',
+            headers=headers,
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_id = data.get('analysis_id')
+            
+            # Guard: Only load if analysis_id is present
+            if not analysis_id:
+                logger.warning("Recent analysis response missing analysis_id")
+                return False, None, None
+            
+            # Load this analysis into session state
+            success, message, timestamp = fetch_and_load_analysis(analysis_id, source='recent')
+            if success:
+                return True, 'recent', timestamp
+        elif response.status_code != 404:
+            logger.warning(f"Failed to check for recent analysis: {response.status_code}")
+        
+    except Exception as e:
+        logger.error(f"Error checking for recent analysis: {str(e)}")
+    
+    return False, None, None
+
 def render_asc842_page():
     """Render the ASC 842 analysis page."""
     
@@ -37,9 +183,19 @@ def render_asc842_page():
     if not require_authentication():
         return  # User will see login page
     
+    # Initialize user session ID for memo persistence
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
+    
+    # Check for analysis to auto-load (URL parameter or recent analysis)
+    loaded, source, timestamp = check_for_analysis_to_load()
+    if loaded:
+        logger.info(f"📥 Auto-loaded analysis from {source}: timestamp={timestamp}")
 
     # Page header
     st.title(":primary[ASC 842: Leases (Lessee)]")
