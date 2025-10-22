@@ -1622,6 +1622,14 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.6;
     text-align: center;
 }
+.first-time-banner a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+    font-weight: 600;
+}
+.first-time-banner a:hover {
+    color: #ffffff;
+}
 
 /* New Compact Pricing Table Styles */
 .pricing-compact-table {

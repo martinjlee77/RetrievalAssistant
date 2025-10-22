@@ -202,7 +202,7 @@ def submit_and_monitor_asc340_job(
                 
                 # Update progress bar (0-100%)
                 # With 2 steps: Step 1 = 50%, Step 2 = 100%
-                progress_pct = int((current_step / total_steps) * 100)
+                progress_pct = int(((current_step - 0.5)/ total_steps) * 100)
                 progress_bar.progress(progress_pct)
                 
                 # Show animated spinner with current step (replaces static status_text)

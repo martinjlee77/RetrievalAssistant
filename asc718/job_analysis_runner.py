@@ -197,7 +197,7 @@ def submit_and_monitor_asc718_job(
                 step_name = progress.get('step_name', f'Step {current_step}')
                 
                 # Update progress bar (0-100%)
-                progress_pct = int((current_step / total_steps) * 100)
+                progress_pct = int(((current_step - 0.5) / total_steps) * 100)
                 progress_bar.progress(progress_pct)
                 
                 # Show animated spinner with current step (replaces static status_text)
