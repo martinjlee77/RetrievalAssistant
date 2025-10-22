@@ -184,6 +184,32 @@ def render_asc805_page():
         
         # If analysis is complete and memo exists, show results instead of file upload
         if st.session_state.get(analysis_key, False) and st.session_state.get(memo_key):
+            # Show auto-load banner if this was loaded from recent analysis
+            memo_data = st.session_state.get(memo_key, {})
+            if memo_data.get('loaded_from') == 'recent':
+                from datetime import datetime
+                timestamp = memo_data.get('completed_at')
+                try:
+                    completed_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00')) if timestamp else None
+                    if completed_time:
+                        time_diff = datetime.now(completed_time.tzinfo) - completed_time
+                        hours = int(time_diff.total_seconds() // 3600)
+                        minutes = int((time_diff.total_seconds() % 3600) // 60)
+                        
+                        if hours == 0:
+                            time_str = f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+                        elif hours < 24:
+                            time_str = f"{hours} hour{'s' if hours != 1 else ''} ago"
+                        else:
+                            time_str = "earlier today"
+                        
+                        st.info(f"📋 Your analysis from {time_str} is ready below. To view older analyses, visit your **History** tab.")
+                    else:
+                        st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
+                except Exception as e:
+                    logger.warning(f"Failed to parse timestamp: {e}")
+                    st.info("📋 Your recent analysis is ready below. To view older analyses, visit your **History** tab.")
+            
             st.success("✅ **Analysis Complete!** This AI-generated analysis requires review by qualified accounting professionals and should be approved by management before use.")
             st.markdown("""📄 **Your ASC 805 memo is ready below.**  To save the results, you can either:
 
