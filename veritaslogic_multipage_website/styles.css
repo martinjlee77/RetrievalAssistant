@@ -5004,55 +5004,12 @@ a:focus {
 .demo-details-list li {
     color: var(--color-text-muted);
     font-size: 1rem;
-    line-height: 1.8;
+    line-height: 1.5;
     padding: 0.5rem 0;
 }
 
 .demo-details-list li strong {
     color: var(--color-accent);
-}
-
-.demo-what-section {
-    background: var(--gradient-secondary);
-    padding: 60px 0;
-    border-bottom: var(--border-subtle);
-}
-
-.demo-what-section h2 {
-    text-align: center;
-    font-size: 2rem;
-    color: var(--color-accent);
-    margin-bottom: 1.5rem;
-}
-
-.demo-what-text {
-    max-width: 800px;
-    margin: 0 auto;
-    font-size: 1.05rem;
-    color: var(--color-text-muted);
-    line-height: 1.7;
-    text-align: center;
-}
-
-.demo-about-section {
-    background: var(--gradient-tertiary);
-    padding: 60px 0;
-    text-align: center;
-    border-bottom: var(--border-subtle);
-}
-
-.demo-about-section h2 {
-    font-size: 2rem;
-    color: var(--color-accent);
-    margin-bottom: 1.5rem;
-}
-
-.demo-about-text {
-    font-size: 1.05rem;
-    color: var(--color-text-muted);
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.7;
 }
 
 .demo-registration-section {
