@@ -74,6 +74,10 @@ def serve_index():
 def serve_dashboard():
     return send_from_directory('veritaslogic_multipage_website', 'dashboard.html')
 
+@app.route('/demo.html')
+def serve_demo():
+    return send_from_directory('veritaslogic_multipage_website', 'demo.html')
+
 def attempt_token_refresh(request_obj):
     """
     Attempt to refresh an expired token using refresh token from cookies
@@ -2955,6 +2959,47 @@ Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
         return jsonify({
             'error': 'Failed to send message. Please try again or email us directly at hello@veritaslogic.ai'
         }), 500
+
+@app.route('/api/demo/register', methods=['POST'])
+def demo_registration():
+    """Handle demo registration form submissions via Postmark"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['name', 'email', 'company', 'role']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'error': f'{field} is required'}), 400
+        
+        # Extract form data
+        name = sanitize_string(data.get('name'), 100)
+        email = sanitize_string(data.get('email'), 100)
+        company = sanitize_string(data.get('company'), 100)
+        role = sanitize_string(data.get('role'), 100)
+        
+        # Send email using PostmarkClient
+        postmark = PostmarkClient()
+        success = postmark.send_demo_registration(
+            name=name,
+            email=email,
+            company=company,
+            role=role
+        )
+        
+        if not success:
+            raise Exception("Failed to send demo registration email")
+        
+        logger.info(f"Demo registration: {name} from {company} ({email})")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Registration successful! Check your email for the invite.'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Demo registration error: {sanitize_for_log(e)}")
+        return jsonify({'error': 'Failed to register. Please try again or email support@veritaslogic.ai'}), 500
 
 @app.route('/api/health', methods=['GET'])
 def health_check():

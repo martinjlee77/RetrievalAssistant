@@ -722,3 +722,66 @@ Action Required:
         except Exception as e:
             logger.error(f"Error sending database error alert: {e}")
             return False
+    
+    def send_demo_registration(self, name: str, email: str, company: str, role: str) -> bool:
+        """
+        Send demo registration notification to support
+        
+        Args:
+            name: Registrant's full name
+            email: Registrant's email
+            company: Registrant's company
+            role: Registrant's role
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'Demo Registration - {name} from {company}',
+                'HtmlBody': f"""
+                <h2>🎯 New Demo Registration - October 29, 2025</h2>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Email:</strong> {email}</p>
+                <p><strong>Company:</strong> {company}</p>
+                <p><strong>Role:</strong> {role}</p>
+                <hr>
+                <p><em>Send calendar invite and Microsoft Teams link to {email}</em></p>
+                """,
+                'TextBody': f"""
+New Demo Registration - October 29, 2025
+
+Name: {name}
+Email: {email}
+Company: {company}
+Role: {role}
+
+Send calendar invite and Microsoft Teams link to {email}
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Demo registration notification sent for {email}")
+                return True
+            else:
+                logger.error(f"Failed to send demo registration: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending demo registration: {e}")
+            return False

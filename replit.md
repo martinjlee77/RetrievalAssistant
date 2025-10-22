@@ -68,3 +68,4 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **OpenAI API**: Large language model interactions (`gpt-4o`, `gpt-4o-mini`, `gpt-5`).
 - **FPDF**, **WeasyPrint**, **python-docx**: Document generation (PDF, HTML-to-PDF, Word).
 - **Camelot & Tabula-py**: Table extraction from PDFs.
+- **Postmark**: Email delivery service for transactional emails (verification, password resets, notifications).

@@ -1,0 +1,35 @@
+•	Page title: VeritasLogic Live Demo — Reserve Your Spot (10 seats)
+•	Hero headline: Technical accounting memos in minutes
+•	Subheadline: 30 minute live demo with Lead Accountant & Founder of VLogic
+•	Date/time: Tuesday, October 28, 2025 — 1:00 PM ET / 10:00 AM PT — Microsoft Teams
+•	Intro: See how VeritasLogic drafts technical accounting memos in minutes. In 30 minutes, we’ll walk through the core workflows and run an ASC 606 contract live through the platform—plus live Q&A.
+•	What you’ll see:
+o	5 minute overview of the platform and who it’s for
+o	Live walkthrough of core features and common use cases
+o	Q&A and next steps
+•	Who should attend: Technical accounting directors, controllers, and CAOs who spend days analyzing and writing memos for ASC 606, ASC 842, ASC 805, ASC 718 and related topics.
+•	Presenter: Martin J. Lee, CPA — Lead Accountant & Founder. Former Audit Partner at EY and National SME in Professional Practice. Advisor to Fortune 500s and startups on ASC 606/842/718, M&A, IPOs, and SEC reporting. Early pioneer in applying AI to complex accounting at enterprise scale.
+•	CTA block: Reserve your seat (first 10 guaranteed) Form fields:
+o	Full name (required)
+o	Email (required)
+o	Company (optional)
+o	Role (optional) Button: Request invite Microcopy: We’ll email your calendar invite and Teams link. No spam—just event info.
+•	Capacity note (kept open): Seats are guaranteed for the first 10 registrants. Additional signups are welcome; we’ll notify you about the next session or recording.
+•	Footer: Questions? support@veritaslogic.ai 
+•	Privacy: veritaslogic.ai/privacy.html By registering, you agree to receive event emails related to this demo.
+On site confirmation message
+•	You’re in. Check your email for your calendar invite and Teams link. If you don’t see it in a few minutes, check spam or contact support@veritaslogic.ai.
+Email copy
+1.	Confirmation (send immediately) Subject: You’re confirmed — Veritas Logic demo on Oct 28 at 1:00 PM ET Body: Hi [First Name], You’re confirmed for our 30 minute live demo.
+Date/time: Tuesday, October 28, 2025 — 1:00 PM ET / 10:00 AM PT Duration: 30 minutes Presenter: Martin J. Lee, CPA — Lead Accountant & Founder Join: [Microsoft Teams link] Add to calendar: [ICS link]
+We’ll send reminders before we start. Questions? Reply to this email. —Veritas Logic
+2.	Reminder (24 hours before) Subject: Reminder: Veritas Logic demo is tomorrow Body: Hi [First Name], quick reminder your demo is tomorrow at 1:00 PM ET / 10:00 AM PT. Join: [Microsoft Teams link] Need to reschedule? Reply to this email.
+3.	Reminder (1 hour before) Subject: Starting soon: Veritas Logic demo (in 1 hour) Body: We start in 1 hour: 1:00 PM ET / 10:00 AM PT. Join: [Microsoft Teams link] See you there.
+4.	Overflow/waitlist (if >10 register) Subject: You’re on the list for the next Veritas Logic demo Body: Thanks for registering. This session’s 10 guaranteed seats are filled, but you’re confirmed for the next available slot or the session recording. We’ll email details shortly. Questions? Reply to this email.
+Optional meta
+•	Meta title: Veritas Logic Live Demo — 30 Minute Walkthrough (Oct 28, 1:00 PM ET)
+•	Meta description: See how Veritas Logic creates technical accounting memos in minutes. Live demo + Q&A. First 10 guaranteed seats. Register now.
+Privacy policy guidance You don’t need a separate policy, but ensure your current Privacy Policy clearly covers event registrations. Consider adding a short clause like:
+“Event registration: When you register for a VeritasLogic event or demo, we collect your name, email, company, and role to process your registration and send confirmations, reminders, related materials, and follow ups. We rely on legitimate interests or consent, as applicable. We use service providers (e.g., Microsoft Teams and email delivery platforms) to process this information. You can opt out of non transactional communications at any time. We retain event registration data for up to 12 months unless you request deletion.”
+Optional form note: Add a single checkbox for marketing opt in if you plan to email product updates beyond event logistics. Label: “I’d like to receive product updates from Veritas Logic (optional).”
+Anything else you want changed in tone or content? If you’d like, I can also provide a lightweight HTML snippet you can drop onto veritaslogic.ai with these fields wired for your backend.
