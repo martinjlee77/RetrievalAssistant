@@ -1,0 +1,121 @@
+                      USER INTERACTION LAYER                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                              ┌───────▼───────┐
+                              │  1️⃣ SELECT           │
+                              │   STANDARD       │
+                              │ ASC 606/842/     │
+                              │  718/805/           │
+                              │    340-40            │
+                              └───────┬───────┘
+                                      │
+                              ┌───────▼───────┐
+                              │  2️⃣ UPLOAD    │
+                              │  DOCUMENTS    │
+                              │ PDF/DOCX/TXT  │
+                              │ Multi-file OK │
+                              └───────┬───────┘
+                                      │
+┌─────────────────────────────────────▼─────────────────────────────────────────┐
+│                        DOCUMENT PROCESSING LAYER                             │
+├───────────────────────────────────────────────────────────────────────────────┤
+│  📄 EXTRACTION ENGINE                                                        │
+│  ├─ PDF: PyMuPDF, PDFPlumber, Camelot                                       │
+│  ├─ Tables: Tabula-py extraction                                             │
+│  ├─ Text: Coordinate-based layout analysis                                   │
+│  └─ Output: Structured contract data                                         │
+└───────────────────────────┬───────────────────────────────────────────────────┘
+                            │
+            ┌───────────────▼───────────────┐
+            │   3️⃣ CONTRACT ANALYSIS       │
+            │                               │
+            │ ┌─────────────────────────────┐ │
+            │ │   TERM EXTRACTION MATRIX    │ │
+            │ │ ├─ Key contract terms       │ │
+            │ │ ├─ Financial amounts        │ │
+            │ │ ├─ Dates & milestones       │ │
+            │ │ └─ Standard-specific data   │ │
+            │ └─────────────────────────────┘ │
+            └───────────────┬───────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────────────────────┐
+│                          HYBRID RAG SYSTEM                                   │
+├───────────────────────────────────────────────────────────────────────────────┤
+│  🔍 KNOWLEDGE RETRIEVAL                                                      │
+│                                                                               │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
+│  │   CONTRACT TEXT │    │   CHROMADB      │    │ STANDARD-SPECIFIC│          │
+│  │                               │    │   VECTORSTORE   │    │ SEARCH QUERIES   │          │
+│  │ ├─ Your docs          │◄──►│                  │◄──►│                  │          │
+│  │ ├─ Extracted           │    │ ├─ ASC 606 KB   │    │ ├─ Revenue terms │          │
+│  │   terms                   │    │ ├─ ASC 842 KB   │    │ ├─ Lease terms   │          │
+│  │ └─ Key amounts     │    │ ├─ ASC 718 KB   │    │ ├─ Stock comp    │          │
+│  └─────────────────┘    │ ├─ ASC 805 KB   │    │ ├─ M&A terms     │          │
+│                                         │ └─ ASC 340-40   │    │ └─ Cost terms    │          │
+│                                         └─────────────────┘    └─────────────────┘          │
+│                                                                               │
+│  📊 RETRIEVAL RESULTS                                                        │
+│  ├─ Semantic similarity matching                                             │
+│  ├─ Metadata filtering by standard                                           │
+│  ├─ Paragraph-level FASB citations                                           │
+│  └─ Contextual guidance retrieval                                            │
+└───────────────────────────┬───────────────────────────────────────────────────┘
+                            │
+            ┌───────────────▼───────────────┐
+            │     4️⃣ AI ANALYSIS           │
+            │                               │
+            │ ┌─────────────────────────────┐ │
+            │ │      LLM ORCHESTRATION      │ │
+            │ │                             │ │
+            │ │ ┌─────────┐ ┌─────────────┐ │ │
+            │ │ │ GPT-4o   │ │ STRUCTURED │ │ │
+            │ │ │ PRIMARY │ │ PROMPTS      │ │ │
+            │ │ └─────────┘ │                       │ │ │
+            │ │                       │ ├─ System   │ │ │
+            │ │ ┌─────────┐ │ ├─ Context  │ │ │
+            │ │ │ GPT-5      │ │ ├─ Steps    │ │ │
+            │ │ │FALLBACK │ │ └─ Citations│ │ │
+            │ │ └─────────┘ └─────────────┘ │ │
+            │ └─────────────────────────────┘ │
+            └───────────────┬───────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────────────────────┐
+│                      PROFESSIONAL MEMO GENERATION                            │
+├───────────────────────────────────────────────────────────────────────────────┤
+│  📝 STRUCTURED OUTPUT                                                        │
+│                                                                               │
+│  ┌─────────────────────────────────────────────────────────────────────────┐ │
+│  │                      ACCOUNTING MEMO                                    │ │
+│  │                                                                         │ │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐        │ │
+│  │  │ EXECUTIVE            │  │ STANDARD-           │  │ FINANCIAL       │        │ │
+│  │  │ SUMMARY             │  │ SPECIFIC                │  │ CALCULATIONS    │        │ │
+│  │  │                                │  │ ANALYSIS               │  │                 │        │ │
+│  │  │ ├─ Conclusion        │  │                                │  │ ├─ Extract-Then-│        │ │
+│  │  │ ├─ Key findings      │  │ ├─ Step 1                │  │   Calculate     │        │ │
+│  │  │ └─ Impact               │  │ ├─ Step 2                │  │ ├─ Journal      │        │ │
+│  │  └─────────────────┘  │ ├─ Step 3                 │  │   entries       │        │ │
+│  │                                      │ ├─ Citations              │  │ └─ Amounts      │        │ │
+│  │  ┌─────────────────┐  │ └─ Judgments          │  └─────────────────┘        │ │
+│  │  │ CONCLUSION &    │  └─────────────────┘                             │ │
+│  │  │ RECOMMENDATIONS │                                                   │ │
+│  │  │                                │  ┌─────────────────┐                             │ │
+│  │  │ ├─ Final result         │  │ FORMAT OPTIONS  │                             │ │
+│  │  │ ├─ Next steps          │  │                 │                             │ │
+│  │  │ └─ Follow-up           │  │ ├─ DOCX export  │                             │ │
+│  │  └─────────────────┘  │ ├─ HTML view    │                             │ │
+│  │                                       │ └─ PDF download │                             │ │
+│  │                                       └─────────────────┘                             │ │
+│  └─────────────────────────────────────────────────────────────────────────┘ │
+└───────────────────────────┬───────────────────────────────────────────────────┘
+                            │
+                    ┌───────▼───────┐
+                    │  5️⃣ DELIVERY  │
+                    │               │
+                    │ ├─ Big 4      │
+                    │   Quality     │
+                    │ ├─ Audit-     │
+                    │   Ready       │
+                    │ └─ Citation   │
+                    │   Level       │
+                    └───────────────┘
