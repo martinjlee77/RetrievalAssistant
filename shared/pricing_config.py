@@ -78,7 +78,7 @@ APPROVED_BUSINESS_DOMAINS = [
 
 # Credit Settings
 CREDIT_EXPIRATION_MONTHS = 12
-NEW_USER_WELCOME_CREDITS = 200  # $200 First Memo Credit
+NEW_USER_WELCOME_CREDITS = 295  # $295 First Memo Credit - covers 9K tier
 
 def get_price_tier(word_count):
     """
