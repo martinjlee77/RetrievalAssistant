@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime
+from shared.subscription_widgets import display_subscription_dashboard
 
 # Styling added for card backgrounds
 st.html("""
@@ -54,6 +55,11 @@ st.title(":primary[Technical Accounting Solutions (TAS) Platform]")
 st.subheader(
     "Generate **strong first-draft memos** using AI, based on authoritative guidance."
 )
+
+# ---------------------------
+# Subscription Dashboard
+# ---------------------------
+display_subscription_dashboard()
 
 # ---------------------------
 # What's new expander

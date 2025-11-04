@@ -3564,6 +3564,288 @@ def log_platform_activity():
         return jsonify({'error': 'Failed to log activity'}), 500
 
 # ==========================================
+# STRIPE WEBHOOK HANDLERS
+# ==========================================
+
+@app.route('/api/webhooks/stripe', methods=['POST'])
+def stripe_subscription_webhook():
+    """
+    Handle Stripe webhook events for subscription management.
+    Supports: subscription.created/updated/deleted, invoice.payment_succeeded/failed,
+    checkout.session.completed with idempotency protection.
+    """
+    import stripe
+    
+    payload = request.get_data()
+    sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+    
+    if not webhook_secret:
+        logger.error("STRIPE_WEBHOOK_SECRET not configured")
+        return jsonify({'error': 'Webhook not configured'}), 500
+    
+    try:
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError as e:
+        logger.error(f"Invalid webhook payload: {e}")
+        return jsonify({'error': 'Invalid payload'}), 400
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Invalid webhook signature: {e}")
+        return jsonify({'error': 'Invalid signature'}), 400
+    
+    event_type = event['type']
+    event_id = event['id']
+    
+    logger.info(f"Received Stripe webhook: {event_type} ({event_id})")
+    
+    conn = get_db_connection()
+    if not conn:
+        logger.error("Database connection failed for webhook processing")
+        return jsonify({'error': 'Database unavailable'}), 500
+    
+    try:
+        cursor = conn.cursor()
+        
+        # Check for idempotency - have we already processed this event?
+        cursor.execute("""
+            SELECT id FROM stripe_webhook_events
+            WHERE event_id = %s
+        """, (event_id,))
+        
+        if cursor.fetchone():
+            logger.info(f"Event {event_id} already processed (idempotent)")
+            return jsonify({'received': True, 'status': 'already_processed'}), 200
+        
+        # Record event for idempotency
+        cursor.execute("""
+            INSERT INTO stripe_webhook_events (event_id, event_type, processed_at)
+            VALUES (%s, %s, NOW())
+        """, (event_id, event_type))
+        
+        # Route to appropriate handler
+        if event_type == 'checkout.session.completed':
+            handle_checkout_completed(event, conn)
+        
+        elif event_type == 'customer.subscription.created':
+            handle_subscription_created(event, conn)
+        
+        elif event_type == 'customer.subscription.updated':
+            handle_subscription_updated(event, conn)
+        
+        elif event_type == 'customer.subscription.deleted':
+            handle_subscription_deleted(event, conn)
+        
+        elif event_type == 'invoice.payment_succeeded':
+            handle_payment_succeeded(event, conn)
+        
+        elif event_type == 'invoice.payment_failed':
+            handle_payment_failed(event, conn)
+        
+        else:
+            logger.info(f"Unhandled webhook event type: {event_type}")
+        
+        conn.commit()
+        
+        return jsonify({'received': True, 'status': 'processed'}), 200
+        
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Webhook processing error: {e}")
+        return jsonify({'error': 'Processing failed'}), 500
+    finally:
+        conn.close()
+
+
+def handle_checkout_completed(event, conn):
+    """Handle successful checkout session completion"""
+    session = event['data']['object']
+    
+    org_id = session['metadata'].get('org_id')
+    plan_key = session['metadata'].get('plan_key')
+    stripe_subscription_id = session.get('subscription')
+    customer_id = session.get('customer')
+    
+    if not org_id or not plan_key:
+        logger.error(f"Missing metadata in checkout session: {session['id']}")
+        return
+    
+    logger.info(f"Checkout completed for org {org_id}, plan {plan_key}")
+    
+    cursor = conn.cursor()
+    
+    # Update organization with customer ID
+    cursor.execute("""
+        UPDATE organizations
+        SET stripe_customer_id = %s, updated_at = NOW()
+        WHERE id = %s
+    """, (customer_id, org_id))
+    
+    # The actual subscription will be created via subscription.created event
+    logger.info(f"Updated org {org_id} with Stripe customer {customer_id}")
+
+
+def handle_subscription_created(event, conn):
+    """Handle new subscription creation"""
+    subscription = event['data']['object']
+    
+    stripe_sub_id = subscription['id']
+    customer_id = subscription['customer']
+    status = subscription['status']
+    plan_key = subscription['metadata'].get('plan_key', 'professional')
+    
+    current_period_start = datetime.fromtimestamp(subscription['current_period_start'], tz=timezone.utc)
+    current_period_end = datetime.fromtimestamp(subscription['current_period_end'], tz=timezone.utc)
+    
+    cursor = conn.cursor()
+    
+    # Find organization by customer ID
+    cursor.execute("""
+        SELECT id FROM organizations
+        WHERE stripe_customer_id = %s
+    """, (customer_id,))
+    
+    org = cursor.fetchone()
+    
+    if not org:
+        logger.error(f"No organization found for Stripe customer {customer_id}")
+        return
+    
+    org_id = org['id']
+    
+    logger.info(f"Creating subscription for org {org_id}: {plan_key}, status: {status}")
+    
+    # Cancel any existing trial subscriptions for this org
+    cursor.execute("""
+        UPDATE subscription_instances
+        SET status = 'cancelled', updated_at = NOW()
+        WHERE org_id = %s AND status = 'trialing'
+    """, (org_id,))
+    
+    # Create new subscription instance
+    cursor.execute("""
+        INSERT INTO subscription_instances (
+            org_id, plan_key, stripe_subscription_id, status,
+            current_period_start, current_period_end
+        )
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (org_id, stripe_subscription_id) 
+        DO UPDATE SET
+            status = EXCLUDED.status,
+            current_period_start = EXCLUDED.current_period_start,
+            current_period_end = EXCLUDED.current_period_end,
+            updated_at = NOW()
+    """, (org_id, plan_key, stripe_sub_id, status, current_period_start, current_period_end))
+    
+    logger.info(f"Subscription created for org {org_id}")
+
+
+def handle_subscription_updated(event, conn):
+    """Handle subscription updates (plan changes, renewals, cancellations)"""
+    subscription = event['data']['object']
+    
+    stripe_sub_id = subscription['id']
+    status = subscription['status']
+    plan_key = subscription['metadata'].get('plan_key')
+    
+    current_period_start = datetime.fromtimestamp(subscription['current_period_start'], tz=timezone.utc)
+    current_period_end = datetime.fromtimestamp(subscription['current_period_end'], tz=timezone.utc)
+    
+    cursor = conn.cursor()
+    
+    logger.info(f"Updating subscription {stripe_sub_id}: status={status}")
+    
+    # Update subscription instance
+    cursor.execute("""
+        UPDATE subscription_instances
+        SET status = %s,
+            current_period_start = %s,
+            current_period_end = %s,
+            plan_key = COALESCE(%s, plan_key),
+            updated_at = NOW()
+        WHERE stripe_subscription_id = %s
+    """, (status, current_period_start, current_period_end, plan_key, stripe_sub_id))
+    
+    if cursor.rowcount == 0:
+        logger.warning(f"No subscription found for Stripe subscription {stripe_sub_id}")
+        # Fallback: create it using subscription.created logic
+        handle_subscription_created(event, conn)
+    else:
+        logger.info(f"Subscription {stripe_sub_id} updated")
+
+
+def handle_subscription_deleted(event, conn):
+    """Handle subscription cancellation"""
+    subscription = event['data']['object']
+    
+    stripe_sub_id = subscription['id']
+    
+    cursor = conn.cursor()
+    
+    logger.info(f"Cancelling subscription {stripe_sub_id}")
+    
+    cursor.execute("""
+        UPDATE subscription_instances
+        SET status = 'cancelled', updated_at = NOW()
+        WHERE stripe_subscription_id = %s
+    """, (stripe_sub_id,))
+    
+    logger.info(f"Subscription {stripe_sub_id} cancelled")
+
+
+def handle_payment_succeeded(event, conn):
+    """Handle successful invoice payment"""
+    invoice = event['data']['object']
+    
+    stripe_sub_id = invoice.get('subscription')
+    amount_paid = invoice.get('amount_paid', 0) / 100  # Convert cents to dollars
+    
+    if not stripe_sub_id:
+        logger.info("Invoice payment succeeded but no subscription ID found")
+        return
+    
+    cursor = conn.cursor()
+    
+    logger.info(f"Payment succeeded for subscription {stripe_sub_id}: ${amount_paid:.2f}")
+    
+    # Update subscription status to active if it was past_due
+    cursor.execute("""
+        UPDATE subscription_instances
+        SET status = 'active', updated_at = NOW()
+        WHERE stripe_subscription_id = %s AND status = 'past_due'
+    """, (stripe_sub_id,))
+    
+    if cursor.rowcount > 0:
+        logger.info(f"Subscription {stripe_sub_id} reactivated after payment")
+
+
+def handle_payment_failed(event, conn):
+    """Handle failed invoice payment"""
+    invoice = event['data']['object']
+    
+    stripe_sub_id = invoice.get('subscription')
+    
+    if not stripe_sub_id:
+        logger.info("Invoice payment failed but no subscription ID found")
+        return
+    
+    cursor = conn.cursor()
+    
+    logger.warning(f"Payment failed for subscription {stripe_sub_id}")
+    
+    # Update subscription status to past_due
+    cursor.execute("""
+        UPDATE subscription_instances
+        SET status = 'past_due', updated_at = NOW()
+        WHERE stripe_subscription_id = %s
+    """, (stripe_sub_id,))
+    
+    logger.info(f"Subscription {stripe_sub_id} marked as past_due")
+
+
+# ==========================================
 # SUBSCRIPTION API ENDPOINTS
 # ==========================================
 
