@@ -1615,7 +1615,10 @@ def get_user_profile():
 
 @app.route('/api/user/check-credits', methods=['POST'])
 def check_user_credits():
-    """Check if user has sufficient credits for analysis"""
+    """
+    Check if user has sufficient word allowance for analysis
+    MIGRATED: Now uses subscription-based word allowances instead of credits
+    """
     try:
         # Get token from Authorization header
         auth_header = request.headers.get('Authorization')
@@ -1630,47 +1633,71 @@ def check_user_credits():
         
         user_id = payload['user_id']
         data = request.get_json()
-        required_credits = data.get('required_credits', 0)
+        
+        # Accept both 'words_needed' (new) and 'required_credits' (legacy) for backwards compatibility
+        words_needed = data.get('words_needed') or data.get('required_credits', 0)
         
         conn = get_db_connection()
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
         
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT credits_balance, email_verified
-            FROM users 
-            WHERE id = %s
-        """, (user_id,))
-        
-        user = cursor.fetchone()
-        conn.close()
-        
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        
-        # Check email verification first
-        if not user['email_verified']:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT u.email_verified, u.org_id, o.id as org_id_check
+                FROM users u
+                LEFT JOIN organizations o ON u.org_id = o.id
+                WHERE u.id = %s
+            """, (user_id,))
+            
+            user = cursor.fetchone()
+            
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+            
+            # Check email verification first
+            if not user['email_verified']:
+                return jsonify({
+                    'can_proceed': False,
+                    'error': 'Email verification required',
+                    'message': 'Please verify your email address before running analyses.',
+                    'email_verified': False
+                }), 403
+            
+            # Get subscription allowance using SubscriptionManager
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            
+            allowance_check = sub_mgr.check_word_allowance(user['org_id'], words_needed)
+            
+            # Get current usage for additional context
+            usage = sub_mgr.get_current_usage(user['org_id'])
+            
             return jsonify({
-                'can_proceed': False,
-                'error': 'Email verification required',
-                'message': 'Please verify your email address before running analyses.',
-                'credits_balance': float(user['credits_balance'] or 0),
-                'email_verified': False
-            }), 403
-        
-        can_proceed = (user['credits_balance'] >= required_credits)
-        
-        return jsonify({
-            'can_proceed': can_proceed,
-            'credits_balance': float(user['credits_balance'] or 0),
-            'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
-            'is_free_analysis': False  # No free analyses in enterprise model
-        }), 200
+                'can_proceed': allowance_check['allowed'],
+                'words_available': allowance_check.get('words_available', 0),
+                'words_needed': words_needed,
+                'subscription': {
+                    'has_subscription': usage['has_subscription'],
+                    'status': usage.get('subscription_status'),
+                    'plan_name': usage.get('plan_name'),
+                    'word_allowance': usage.get('word_allowance', 0),
+                    'rollover_words': usage.get('rollover_words', 0),
+                    'words_used': usage.get('words_used', 0),
+                    'is_trial': usage.get('is_trial', False),
+                    'trial_end_date': usage.get('trial_end_date').isoformat() if usage.get('trial_end_date') else None
+                },
+                'upgrade_needed': allowance_check.get('upgrade_needed', False),
+                'suggested_action': allowance_check.get('suggested_action'),
+                'message': allowance_check.get('reason')
+            }), 200
+            
+        finally:
+            conn.close()
         
     except Exception as e:
-        logger.error(f"Check credits error: {e}")
-        return jsonify({'error': 'Failed to check credits'}), 500
+        logger.error(f"Check allowance error: {e}")
+        return jsonify({'error': 'Failed to check word allowance'}), 500
 
 @app.route('/api/analysis/create', methods=['POST'])
 def create_pending_analysis():
@@ -1694,11 +1721,6 @@ def create_pending_analysis():
         tier_name = sanitize_string(data.get('tier_name', ''), 100)
         file_count = max(0, int(data.get('file_count', 0)))
         
-        # SERVER-SIDE PRICING VALIDATION
-        from shared.pricing_config import get_price_tier
-        tier_info = get_price_tier(words_count)
-        cost_to_charge = Decimal(str(tier_info['price']))
-        
         conn = get_db_connection()
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
@@ -1706,28 +1728,36 @@ def create_pending_analysis():
         cursor = conn.cursor()
         
         try:
-            # Verify email
-            cursor.execute("SELECT email_verified, credits_balance FROM users WHERE id = %s", (user_id,))
+            # Verify email and get org
+            cursor.execute("SELECT email_verified, org_id FROM users WHERE id = %s", (user_id,))
             user_check = cursor.fetchone()
             if not user_check or not user_check['email_verified']:
                 return jsonify({'error': 'Email verification required'}), 403
             
-            # Check sufficient credits
-            if user_check['credits_balance'] < cost_to_charge:
-                return jsonify({'error': 'Insufficient credits'}), 402
+            # Check subscription allowance
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            allowance_check = sub_mgr.check_word_allowance(user_check['org_id'], words_count)
             
-            # Insert pending analysis with authoritative pricing
+            if not allowance_check['allowed']:
+                return jsonify({
+                    'error': 'Insufficient word allowance',
+                    'message': allowance_check['reason'],
+                    'upgrade_needed': allowance_check.get('upgrade_needed', False),
+                    'suggested_action': allowance_check.get('suggested_action')
+                }), 402
+            
+            # Insert pending analysis record (subscription-based, no upfront charging)
             import uuid
             memo_uuid = str(uuid.uuid4())[:8]
             
             cursor.execute("""
-                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost,
-                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
-                                    started_at, file_count)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+                INSERT INTO analyses (user_id, org_id, asc_standard, words_count, tier_name, 
+                                    status, memo_uuid, started_at, file_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)
                 RETURNING analysis_id
-            """, (user_id, asc_standard, words_count, 0,
-                  cost_to_charge, cost_to_charge, tier_name, 'processing', memo_uuid, file_count))
+            """, (user_id, user_check['org_id'], asc_standard, words_count,
+                  tier_name, 'processing', memo_uuid, file_count))
             
             result = cursor.fetchone()
             db_analysis_id = result['analysis_id']
@@ -2602,8 +2632,18 @@ def get_credit_packages():
         logger.error(f"Error getting credit packages: {e}")
         return jsonify({'error': 'Failed to get credit packages'}), 500
 
-@app.route('/api/purchase-credits', methods=['POST'])
+@app.route('/api/purchase-credits', methods=['POST', 'GET'])
 def purchase_credits():
+    """DEPRECATED: Credit purchases removed. Platform now uses subscription model."""
+    return jsonify({
+        'error': 'Credit purchases are no longer available',
+        'message': 'VeritasLogic now uses a subscription-based model. Start your 14-day free trial to continue.',
+        'action_required': 'start_subscription_trial',
+        'learn_more': '/pricing'
+    }), 410
+
+@app.route('/api/purchase-credits-legacy', methods=['POST'])
+def purchase_credits_legacy():
     """Legacy endpoint - redirects to Stripe payment flow"""
     return jsonify({
         'error': 'This endpoint is deprecated. Use /api/stripe/create-payment-intent for payments.',
@@ -2653,7 +2693,18 @@ def get_wallet_balance():
 
 @app.route('/api/user/purchase-credits', methods=['POST'])
 def user_purchase_credits():
-    """User credit purchase endpoint (matches wallet manager calls)"""
+    """DEPRECATED: Platform now uses subscription model"""
+    logger.warning(f"Deprecated endpoint /api/user/purchase-credits called")
+    return jsonify({
+        'success': False,
+        'error': 'Credit purchases are no longer available',
+        'message': 'VeritasLogic now uses subscriptions. Start your 14-day free trial.',
+        'action_required': 'start_subscription_trial'
+    }), 410
+
+@app.route('/api/user/purchase-credits-legacy', methods=['POST'])
+def user_purchase_credits_legacy():
+    """DEPRECATED: User credit purchase endpoint (matches wallet manager calls)"""
     try:
         data = request.get_json()
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
@@ -2790,7 +2841,18 @@ def charge_wallet():
 
 @app.route('/api/user/auto-credit', methods=['POST'])
 def auto_credit_wallet():
-    """Auto-credit user's wallet for failed analysis"""
+    """DEPRECATED: Auto-credit removed (subscription model doesn't charge for failed analyses)"""
+    logger.warning(f"Deprecated endpoint /api/user/auto-credit called")
+    return jsonify({
+        'success': False,
+        'error': 'Auto-credit is no longer needed',
+        'message': 'Subscriptions only deduct words from successful analyses. Failed analyses are free.',
+        'note': 'No action required - your word allowance was not affected.'
+    }), 410
+
+@app.route('/api/user/auto-credit-legacy', methods=['POST'])
+def auto_credit_wallet_legacy():
+    """DEPRECATED LEGACY: Auto-credit user's wallet for failed analysis"""
     try:
         data = request.get_json()
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
