@@ -22,6 +22,23 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="VeritasLogic" />
     <link rel="manifest" href="/images/favicon/site.webmanifest" />
+    <script>
+        // reCAPTCHA Site Key - dynamically loaded from backend
+        window.RECAPTCHA_SITE_KEY = null;
+        // Fetch site key from backend
+        fetch('/api/recaptcha-config')
+            .then(r => r.json())
+            .then(data => {
+                if (data.site_key) {
+                    window.RECAPTCHA_SITE_KEY = data.site_key;
+                    // Load reCAPTCHA script
+                    const script = document.createElement('script');
+                    script.src = `https://www.google.com/recaptcha/api.js?render=${data.site_key}`;
+                    document.head.appendChild(script);
+                }
+            })
+            .catch(err => console.warn('reCAPTCHA not configured:', err));
+    </script>
 </head>
 <body>
     <!-- Navigation -->
@@ -313,6 +330,17 @@
             form.classList.add('loading');
             
             try {
+                // Generate reCAPTCHA token if configured
+                let recaptchaToken = null;
+                if (window.grecaptcha && window.RECAPTCHA_SITE_KEY) {
+                    try {
+                        recaptchaToken = await window.grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
+                        formData.recaptcha_token = recaptchaToken;
+                    } catch (err) {
+                        console.warn('reCAPTCHA token generation failed:', err);
+                    }
+                }
+                
                 // Construct API URL for Replit environment
                 const apiUrl = '/api/signup';
                 const response = await fetch(apiUrl, {

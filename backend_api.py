@@ -22,6 +22,13 @@ import requests
 from shared.pricing_config import is_business_email
 from shared.postmark_client import PostmarkClient
 from shared.log_sanitizer import sanitize_for_log, sanitize_exception_for_db
+from shared.trial_protection import (
+    verify_recaptcha,
+    check_rate_limit,
+    record_signup_attempt,
+    check_domain_trial_eligibility,
+    cleanup_old_signup_attempts
+)
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -788,6 +795,59 @@ def signup():
                 'error': 'Only business email addresses are accepted. Please use your company email address to register.'
             }), 400
         
+        # Extract domain from email for organization
+        email_domain = email.split('@')[1].lower()
+        
+        # Get user's IP address for rate limiting
+        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        if ',' in user_ip:
+            user_ip = user_ip.split(',')[0].strip()
+        
+        # TRIAL ABUSE PREVENTION STEP 1: Verify reCAPTCHA token
+        recaptcha_secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
+        
+        if recaptcha_secret_key:
+            # reCAPTCHA is configured - token is REQUIRED
+            recaptcha_token = data.get('recaptcha_token')
+            if not recaptcha_token:
+                record_signup_attempt(conn, user_ip, email, email_domain, False, "Missing reCAPTCHA token")
+                conn.close()
+                logger.warning(f"Signup blocked - no reCAPTCHA token provided: {email}")
+                return jsonify({
+                    'error': 'Security verification required. Please refresh the page and try again.'
+                }), 400
+            
+            recaptcha_success, recaptcha_score, recaptcha_error = verify_recaptcha(recaptcha_token, user_ip)
+            if not recaptcha_success:
+                record_signup_attempt(conn, user_ip, email, email_domain, False, f"reCAPTCHA failed: {recaptcha_error}")
+                conn.close()
+                return jsonify({
+                    'error': 'Security verification failed. Please refresh the page and try again.'
+                }), 400
+            logger.info(f"reCAPTCHA verified for {email}: score={recaptcha_score:.2f}")
+        else:
+            # Development mode - reCAPTCHA not configured, allow signup
+            logger.info(f"reCAPTCHA not configured - allowing signup in development mode: {email}")
+        
+        # TRIAL ABUSE PREVENTION STEP 2: Check rate limits
+        rate_allowed, rate_error, wait_minutes = check_rate_limit(conn, user_ip, email_domain)
+        if not rate_allowed:
+            record_signup_attempt(conn, user_ip, email, email_domain, False, rate_error)
+            conn.close()
+            return jsonify({'error': rate_error}), 429
+        
+        # TRIAL ABUSE PREVENTION STEP 3: Check domain trial eligibility
+        # Only check for new organizations (not existing users joining their org)
+        cursor.execute("SELECT id FROM organizations WHERE domain = %s", (email_domain,))
+        org_exists = cursor.fetchone()
+        
+        if not org_exists:
+            trial_eligible, trial_error = check_domain_trial_eligibility(conn, email_domain)
+            if not trial_eligible:
+                record_signup_attempt(conn, user_ip, email, email_domain, False, trial_error)
+                conn.close()
+                return jsonify({'error': trial_error}), 403
+        
         # Hash password before storing
         password_hash = hash_password(password)
         
@@ -804,9 +864,6 @@ def signup():
             utm_tracking['utm_campaign'] = sanitize_string(data.get('utm_campaign', ''), 100)
         if data.get('plan'):
             utm_tracking['selected_plan'] = sanitize_string(data.get('plan', ''), 50)
-        
-        # Extract domain from email for organization
-        email_domain = email.split('@')[1].lower()
         
         # Check if organization already exists for this domain
         cursor.execute("""
@@ -917,6 +974,13 @@ def signup():
                     raise
         
         conn.commit()
+        
+        # Record successful signup attempt for rate limiting tracking
+        record_signup_attempt(conn, user_ip, email, email_domain, True)
+        
+        # Cleanup old signup attempts (housekeeping)
+        cleanup_old_signup_attempts(conn)
+        
         conn.close()
         
         # Send verification email
@@ -978,6 +1042,16 @@ def signup():
             logger.error(f"Failed to send database error alert: {alert_error}")
         
         return jsonify({'error': 'Registration failed'}), 500
+
+
+@app.route('/api/recaptcha-config', methods=['GET'])
+def get_recaptcha_config():
+    """Provide reCAPTCHA site key for frontend"""
+    recaptcha_site_key = os.getenv('RECAPTCHA_SITE_KEY')
+    if recaptcha_site_key:
+        return jsonify({'site_key': recaptcha_site_key}), 200
+    else:
+        return jsonify({'site_key': None}), 200
 
 
 @app.route('/api/login', methods=['POST'])
