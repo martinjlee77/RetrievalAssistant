@@ -255,6 +255,15 @@
             const submitButton = document.getElementById('submitButton');
             const messageContainer = document.getElementById('messageContainer');
             
+            // Extract UTM parameters from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmParams = {
+                utm_source: urlParams.get('utm_source') || null,
+                utm_medium: urlParams.get('utm_medium') || null,
+                utm_campaign: urlParams.get('utm_campaign') || null,
+                plan: urlParams.get('plan') || null
+            };
+            
             // Get form data
             const formData = {
                 email: document.getElementById('email').value.trim(),
@@ -264,7 +273,8 @@
                 job_title: document.getElementById('jobTitle').value,
                 password: document.getElementById('password').value,
                 terms_accepted: document.getElementById('terms').checked,
-                marketing_opt_in: document.getElementById('marketingOptIn').checked
+                marketing_opt_in: document.getElementById('marketingOptIn').checked,
+                ...utmParams
             };
             
             // Basic validation

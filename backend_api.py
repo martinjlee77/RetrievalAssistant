@@ -79,6 +79,10 @@ def serve_dashboard():
 def serve_demo():
     return send_from_directory('veritaslogic_multipage_website', 'demo.html')
 
+@app.route('/appsource')
+def serve_appsource():
+    return send_from_directory('veritaslogic_multipage_website', 'appsource.html')
+
 def attempt_token_refresh(request_obj):
     """
     Attempt to refresh an expired token using refresh token from cookies
@@ -790,6 +794,17 @@ def signup():
         # Get marketing opt-in preference (defaults to False if not provided)
         marketing_opt_in = data.get('marketing_opt_in', False)
         
+        # Extract UTM parameters for attribution tracking
+        utm_tracking = {}
+        if data.get('utm_source'):
+            utm_tracking['utm_source'] = sanitize_string(data.get('utm_source', ''), 100)
+        if data.get('utm_medium'):
+            utm_tracking['utm_medium'] = sanitize_string(data.get('utm_medium', ''), 100)
+        if data.get('utm_campaign'):
+            utm_tracking['utm_campaign'] = sanitize_string(data.get('utm_campaign', ''), 100)
+        if data.get('plan'):
+            utm_tracking['selected_plan'] = sanitize_string(data.get('plan', ''), 50)
+        
         # Extract domain from email for organization
         email_domain = email.split('@')[1].lower()
         
@@ -801,16 +816,51 @@ def signup():
         org_result = cursor.fetchone()
         
         if org_result:
-            # Organization exists - add user to existing org
+            # Organization exists - add user to existing org and update attribution if provided
             org_id = org_result['id']
             logger.info(f"Adding user {email} to existing organization (domain: {email_domain})")
+            
+            # If UTM parameters provided, append to existing org settings
+            if utm_tracking:
+                cursor.execute("""
+                    SELECT settings FROM organizations WHERE id = %s
+                """, (org_id,))
+                current_settings = cursor.fetchone()['settings'] or {}
+                
+                # Append attribution to signups array
+                if 'signups' not in current_settings:
+                    current_settings['signups'] = []
+                
+                current_settings['signups'].append({
+                    'email': email,
+                    'timestamp': datetime.utcnow().isoformat(),
+                    **utm_tracking
+                })
+                
+                cursor.execute("""
+                    UPDATE organizations 
+                    SET settings = %s, updated_at = NOW()
+                    WHERE id = %s
+                """, (json.dumps(current_settings), org_id))
+                
+                logger.info(f"Appended signup attribution for {email}: {utm_tracking}")
         else:
-            # Create new organization
+            # Create new organization with UTM tracking in settings
+            org_settings = {}
+            if utm_tracking:
+                org_settings['attribution'] = utm_tracking
+                org_settings['signups'] = [{
+                    'email': email,
+                    'timestamp': datetime.utcnow().isoformat(),
+                    **utm_tracking
+                }]
+                logger.info(f"Tracking signup attribution: {utm_tracking}")
+            
             cursor.execute("""
                 INSERT INTO organizations (name, domain, settings)
                 VALUES (%s, %s, %s)
                 RETURNING id
-            """, (company_name, email_domain, json.dumps({})))
+            """, (company_name, email_domain, json.dumps(org_settings)))
             
             org_id = cursor.fetchone()['id']
             logger.info(f"Created new organization for {company_name} (domain: {email_domain})")
@@ -4101,7 +4151,7 @@ def create_upgrade_checkout():
 
 @app.route('/api/leads/appsource', methods=['POST'])
 def track_appsource_lead():
-    """Track lead from Microsoft AppSource"""
+    """Track lead from Microsoft AppSource (handles both anonymous visits and identified leads)"""
     try:
         data = request.get_json()
         
@@ -4116,52 +4166,45 @@ def track_appsource_lead():
         utm_content = sanitize_string(data.get('utm_content', ''), 100)
         utm_term = sanitize_string(data.get('utm_term', ''), 100)
         referrer = sanitize_string(data.get('referrer', ''), 500)
-        landing_page = sanitize_string(data.get('landing_page', ''), 500)
+        landing_page = sanitize_string(data.get('page_url', ''), 500)
         
-        if not email:
-            return jsonify({'error': 'Email is required'}), 400
+        # Email is optional for anonymous page visit tracking
         
         conn = get_db_connection()
         if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
+            # Fallback to logging if DB unavailable
+            logger.warning("Database unavailable for lead tracking - logging only")
+            logger.info(f"AppSource page visit: utm_source={utm_source}, utm_medium={utm_medium}, utm_campaign={utm_campaign}, email={email or 'anonymous'}")
+            return jsonify({'success': True, 'message': 'Visit logged'}), 200
         
         try:
             cursor = conn.cursor()
             
-            # Check if user exists
-            cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
-            user = cursor.fetchone()
+            # Check if user exists (if email provided)
+            user_id = None
+            if email:
+                cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+                user_row = cursor.fetchone()
+                if user_row:
+                    user_id = user_row['id']
             
-            if not user:
-                # Store lead for future attribution when user signs up
-                cursor.execute("""
-                    INSERT INTO lead_sources (
-                        user_id, source, campaign, medium, utm_source, utm_campaign,
-                        utm_medium, utm_content, utm_term, referrer, landing_page
-                    )
-                    VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (source, campaign, medium, utm_source, utm_campaign, utm_medium,
-                      utm_content, utm_term, referrer, landing_page))
-                
-                logger.info(f"AppSource lead tracked (pre-signup): {email}")
-            else:
-                # User exists - update lead source
-                cursor.execute("""
-                    INSERT INTO lead_sources (
-                        user_id, source, campaign, medium, utm_source, utm_campaign,
-                        utm_medium, utm_content, utm_term, referrer, landing_page
-                    )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (user['id'], source, campaign, medium, utm_source, utm_campaign,
-                      utm_medium, utm_content, utm_term, referrer, landing_page))
-                
-                logger.info(f"AppSource lead tracked for user {user['id']}")
+            # Insert lead record (works for both anonymous and identified visits)
+            cursor.execute("""
+                INSERT INTO lead_sources (
+                    user_id, source, campaign, medium, utm_source, utm_campaign,
+                    utm_medium, utm_content, utm_term, referrer, landing_page, created_at
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (user_id, source, campaign, medium, utm_source, utm_campaign,
+                  utm_medium, utm_content, utm_term, referrer, landing_page))
             
             conn.commit()
             
+            logger.info(f"AppSource lead tracked: utm_source={utm_source}, utm_medium={utm_medium}, utm_campaign={utm_campaign}, email={email or 'anonymous'}, user_id={user_id}")
+            
             return jsonify({
                 'success': True,
-                'message': 'Lead tracked successfully'
+                'message': 'Visit tracked successfully'
             }), 200
             
         finally:
