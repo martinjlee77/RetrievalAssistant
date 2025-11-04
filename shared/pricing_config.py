@@ -3,63 +3,163 @@ Centralized Pricing Configuration for VeritasLogic Analysis Platform
 Easy to update pricing without touching code
 """
 
-# Tiered Pricing Structure - Update prices here only
-PRICING_TIERS = {
-    1: {
-        "name": "3K (≤10 pages)",
-        "price": 129.00,
-        "max_words": 3000,
-        "description": "Same features in every tier. For very short packages.",
-        "docs_per_run": 10,
-        "reruns_included": 1,
-        "rerun_window_days": 14
+# ==========================================
+# SUBSCRIPTION PLANS
+# ==========================================
+SUBSCRIPTION_PLANS = {
+    'professional': {
+        'plan_key': 'professional',
+        'name': 'Professional',
+        'price_monthly': 295.00,
+        'word_allowance': 30000,
+        'seats': 1,
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Priority email support',
+            'Professional-grade analysis quality'
+        ],
+        'ideal_for': 'Individual controllers and technical accounting professionals',
+        'stripe_price_id': None,  # Set when Stripe products created
     },
-    2: {
-        "name": "9K (≤30 pages)",
-        "price": 195.00,
-        "max_words": 9000,
-        "description": "Same features in every tier. For short packages.",
-        "docs_per_run": 10,
-        "reruns_included": 1,
-        "rerun_window_days": 14
+    'team': {
+        'plan_key': 'team',
+        'name': 'Team',
+        'price_monthly': 595.00,
+        'word_allowance': 75000,
+        'seats': 3,
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Priority email support',
+            'Multi-user organization with pooled usage',
+            'Audit logs and user management',
+            'Shared analysis history across team'
+        ],
+        'ideal_for': 'Accounting teams and small firms',
+        'stripe_price_id': None,
     },
-    3: {
-        "name": "15K (≤50 pages)",
-        "price": 325.00,
-        "max_words": 15000,
-        "description": "Same features in every tier. For shorter packages.",
-        "docs_per_run": 10,
-        "reruns_included": 1,
-        "rerun_window_days": 14
-    },
-    4: {
-        "name": "30K (≤100 pages)",
-        "price": 525.00,
-        "max_words": 30000,
-        "description": "Same features in every tier. For standard-length packages.",
-        "docs_per_run": 10,
-        "reruns_included": 1,
-        "rerun_window_days": 14
-    },
-    5: {
-        "name": "60K (≤200 pages)",
-        "price": 850.00,
-        "max_words": 60000,
-        "description": "Same features in every tier. For long or complex packages.",
-        "docs_per_run": 10,
-        "reruns_included": 1,
-        "rerun_window_days": 14
+    'enterprise': {
+        'plan_key': 'enterprise',
+        'name': 'Enterprise',
+        'price_monthly': 1195.00,
+        'word_allowance': 180000,
+        'seats': 999,  # Effectively unlimited
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Dedicated customer success manager',
+            'Custom SLA with guaranteed response times',
+            'Azure OpenAI deployment option (data residency)',
+            'Unlimited internal viewers',
+            'Advanced security and compliance features',
+            'SSO integration (coming soon)'
+        ],
+        'ideal_for': 'Large enterprises and Big 4 accounting firms',
+        'stripe_price_id': None,
     }
 }
 
-# Credit Purchase Options
+# Trial Configuration
+TRIAL_CONFIG = {
+    'duration_days': 14,
+    'word_allowance': 9000,  # Enough for 1-2 typical analyses
+    'requires_payment_method': True,
+    'cancellation_policy': 'Cancel anytime during trial - no charge if canceled before trial ends'
+}
+
+# Rollover Policy
+ROLLOVER_CONFIG = {
+    'enabled': True,
+    'expiration_months': 12,  # Unused words expire after 12 months
+    'description': 'Unused monthly word allowance carries forward for 12 months'
+}
+
+# ==========================================
+# LEGACY COMPATIBILITY (DEPRECATED)
+# ==========================================
+# Keep these exports for backward compatibility during migration
+# TODO: Remove after backend_api.py migrated to subscription model
+
+PRICING_TIERS = {
+    # Deprecated: Kept for backward compatibility only
+    # New code should use SUBSCRIPTION_PLANS instead
+}
+
 CREDIT_PACKAGES = [
-    {"amount": 1000, "display": "Add $1,000 Credits"},
-    {"amount": 2000, "display": "Add $2,000 Credits"}, 
-    {"amount": 3000, "display": "Add $3,000 Credits"}
+    # Deprecated: Kept for backward compatibility only
+    # Subscriptions don't use credit packages
 ]
 
-# Business Email Configuration
+CREDIT_EXPIRATION_MONTHS = 12  # Still used for rollover
+NEW_USER_WELCOME_CREDITS = 0  # Deprecated: Trial uses word allowance instead
+
+def get_price_tier(word_count):
+    """
+    DEPRECATED: Use subscription model instead
+    This function is kept for backward compatibility only
+    """
+    raise NotImplementedError(
+        "get_price_tier() is deprecated. "
+        "Platform now uses subscription-based pricing. "
+        "Use subscription_manager.check_word_allowance() instead."
+    )
+
+def get_credit_packages():
+    """
+    DEPRECATED: Use subscription plans instead
+    """
+    return []  # Return empty list for now
+
+# ==========================================
+# HELPER FUNCTIONS - SUBSCRIPTION PLANS
+# ==========================================
+
+def get_all_plans():
+    """
+    Get all subscription plans
+    
+    Returns:
+        dict: All subscription plans keyed by plan_key
+    """
+    return SUBSCRIPTION_PLANS.copy()
+
+def get_plan_by_key(plan_key):
+    """
+    Get subscription plan details by plan_key
+    
+    Args:
+        plan_key (str): Plan key (professional, team, enterprise)
+        
+    Returns:
+        dict: Plan details or None if not found
+    """
+    return SUBSCRIPTION_PLANS.get(plan_key)
+
+def get_plan_comparison():
+    """
+    Get plans formatted for comparison table
+    
+    Returns:
+        list: Plans sorted by price with formatted comparison data
+    """
+    plans = []
+    for key in ['professional', 'team', 'enterprise']:
+        plan = SUBSCRIPTION_PLANS[key].copy()
+        plan['price_display'] = f"${plan['price_monthly']:.0f}/mo"
+        plan['word_allowance_display'] = f"{plan['word_allowance']:,} words/mo"
+        plan['seats_display'] = f"{plan['seats']} user{'s' if plan['seats'] > 1 else ''}"
+        plans.append(plan)
+    return plans
+
+# ==========================================
+# BUSINESS EMAIL VALIDATION
+# ==========================================
+
+# Personal email providers to reject for trial signup
 PERSONAL_EMAIL_PROVIDERS = [
     'gmail.com',
     'outlook.com', 
@@ -75,48 +175,6 @@ PERSONAL_EMAIL_PROVIDERS = [
 APPROVED_BUSINESS_DOMAINS = [
     'veritaslogic.ai'
 ]
-
-# Credit Settings
-CREDIT_EXPIRATION_MONTHS = 12
-NEW_USER_WELCOME_CREDITS = 195  # $195 First Memo Credit - covers 9K tier
-
-def get_price_tier(word_count):
-    """
-    Determine pricing tier based on document word count
-    
-    Args:
-        word_count (int): Number of words in document
-        
-    Returns:
-        dict: Tier information with tier number, name, price, description, per_1k_rate
-    """
-    for tier_num, tier_info in PRICING_TIERS.items():
-        if word_count <= tier_info['max_words']:
-            return {
-                'tier': tier_num,
-                'name': tier_info['name'],
-                'price': tier_info['price'],
-                'description': tier_info['description'],
-                'max_words': tier_info['max_words'],
-                'docs_per_run': tier_info['docs_per_run'],
-                'reruns_included': tier_info['reruns_included'],
-                'rerun_window_days': tier_info['rerun_window_days'],
-                'word_count': word_count
-            }
-    
-    # Document exceeds maximum tier - contact support required
-    return {
-        'tier': None,
-        'name': 'Contact Support Required',
-        'price': None,
-        'description': f'Document exceeds 60,000 words ({word_count:,} words). Please contact support for custom pricing.',
-        'max_words': None,
-        'docs_per_run': None,
-        'reruns_included': None,
-        'rerun_window_days': None,
-        'contact_support': True,
-        'word_count': word_count
-    }
 
 def is_business_email(email):
     """
@@ -171,23 +229,3 @@ def is_business_email(email):
         logger.warning(f"Email {email} rejected: MX lookup failed for {domain}: {e}")
         return False
 
-def format_tier_display(tier_info):
-    """
-    Format tier information for display
-    
-    Args:
-        tier_info (dict): Tier information from get_price_tier()
-        
-    Returns:
-        str: Formatted display string
-    """
-    return f"Tier {tier_info['tier']}: {tier_info['name']} - ${tier_info['price']:.2f}"
-
-def get_credit_packages():
-    """
-    Get available credit purchase packages
-    
-    Returns:
-        list: Credit package options
-    """
-    return CREDIT_PACKAGES.copy()
