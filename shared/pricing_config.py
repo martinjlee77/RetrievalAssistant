@@ -22,7 +22,8 @@ SUBSCRIPTION_PLANS = {
             'Professional-grade analysis quality'
         ],
         'ideal_for': 'Individual controllers and technical accounting professionals',
-        'stripe_price_id': None,  # Set when Stripe products created
+        'stripe_product_id': 'prod_TMZYA0436dZmL1',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PqqOL6uAu',
     },
     'team': {
         'plan_key': 'team',
@@ -41,7 +42,8 @@ SUBSCRIPTION_PLANS = {
             'Shared analysis history across team'
         ],
         'ideal_for': 'Accounting teams and small firms',
-        'stripe_price_id': None,
+        'stripe_product_id': 'prod_TMZYrJj8yswA2r',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PDTLc5DTU',
     },
     'enterprise': {
         'plan_key': 'enterprise',
@@ -62,7 +64,8 @@ SUBSCRIPTION_PLANS = {
             'SSO integration (coming soon)'
         ],
         'ideal_for': 'Large enterprises and Big 4 accounting firms',
-        'stripe_price_id': None,
+        'stripe_product_id': 'prod_TMZY36SH65ts7H',
+        'stripe_price_id': 'price_1SPqP92M206TZw8P1uY9VdzR',
     }
 }
 

@@ -1,0 +1,89 @@
+~/workspace$ python setup_stripe_products.py --setup
+
+VeritasLogic Stripe Product Setup
+
+================================================================================
+Existing Stripe Products
+================================================================================
+
+Product: $500 credit purchase
+  ID: prod_T4eAiEeVNQVATx
+  Price: price_1S8UsD2M206TZw8PTh4Xl6S9 - $500.00/one-time
+
+Create new products and prices? This will create charges in Stripe. [y/N]: y
+================================================================================
+Creating Stripe Products and Prices for VeritasLogic Subscriptions
+================================================================================
+
+Creating product: Professional
+  Price: $295.0/month
+  Words: 30,000
+  ✅ Product created: prod_TMZYA0436dZmL1
+  ✅ Price created: price_1SPqP82M206TZw8PqqOL6uAu
+
+Creating product: Team
+  Price: $595.0/month
+  Words: 75,000
+  ✅ Product created: prod_TMZYrJj8yswA2r
+  ✅ Price created: price_1SPqP82M206TZw8PDTLc5DTU
+
+Creating product: Enterprise
+  Price: $1195.0/month
+  Words: 180,000
+  ✅ Product created: prod_TMZY36SH65ts7H
+  ✅ Price created: price_1SPqP92M206TZw8P1uY9VdzR
+
+================================================================================
+RESULTS - Copy these price IDs to pricing_config.py
+================================================================================
+
+PROFESSIONAL:
+  Product ID:  prod_TMZYA0436dZmL1
+  Price ID:    price_1SPqP82M206TZw8PqqOL6uAu
+  Name:        Professional
+  Price:       $295.0/month
+  Words:       30,000
+
+TEAM:
+  Product ID:  prod_TMZYrJj8yswA2r
+  Price ID:    price_1SPqP82M206TZw8PDTLc5DTU
+  Name:        Team
+  Price:       $595.0/month
+  Words:       75,000
+
+ENTERPRISE:
+  Product ID:  prod_TMZY36SH65ts7H
+  Price ID:    price_1SPqP92M206TZw8P1uY9VdzR
+  Name:        Enterprise
+  Price:       $1195.0/month
+  Words:       180,000
+
+================================================================================
+UPDATE pricing_config.py WITH THESE VALUES:
+================================================================================
+
+SUBSCRIPTION_PLANS = {
+    'professional': {
+        ...,  # Keep existing config
+        'stripe_product_id': 'prod_TMZYA0436dZmL1',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PqqOL6uAu',
+    },
+    'team': {
+        ...,  # Keep existing config
+        'stripe_product_id': 'prod_TMZYrJj8yswA2r',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PDTLc5DTU',
+    },
+    'enterprise': {
+        ...,  # Keep existing config
+        'stripe_product_id': 'prod_TMZY36SH65ts7H',
+        'stripe_price_id': 'price_1SPqP92M206TZw8P1uY9VdzR',
+    },
+}
+
+
+✅ Setup complete!
+
+Next steps:
+1. Copy the price IDs above to pricing_config.py
+2. Restart the backend API workflow
+3. Test the /api/subscription/upgrade endpoint
