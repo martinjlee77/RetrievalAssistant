@@ -10,6 +10,7 @@ SUBSCRIPTION_PLANS = {
     'professional': {
         'plan_key': 'professional',
         'name': 'Professional',
+        'description': 'For individual controllers and technical accounting professionals',
         'price_monthly': 295.00,
         'word_allowance': 30000,
         'seats': 1,
@@ -26,6 +27,7 @@ SUBSCRIPTION_PLANS = {
     'team': {
         'plan_key': 'team',
         'name': 'Team',
+        'description': 'For accounting teams and small firms with shared usage',
         'price_monthly': 595.00,
         'word_allowance': 75000,
         'seats': 3,
@@ -44,6 +46,7 @@ SUBSCRIPTION_PLANS = {
     'enterprise': {
         'plan_key': 'enterprise',
         'name': 'Enterprise',
+        'description': 'For large enterprises and Big 4 firms with custom SLA and dedicated support',
         'price_monthly': 1195.00,
         'word_allowance': 180000,
         'seats': 999,  # Effectively unlimited
