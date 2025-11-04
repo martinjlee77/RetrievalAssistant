@@ -39,7 +39,8 @@ STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 # Environment configuration
 WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
-INITIAL_SIGNUP_CREDITS = Decimal(os.getenv('INITIAL_SIGNUP_CREDITS', '295.00'))
+# DEPRECATED: Credit system replaced with subscription model
+# INITIAL_SIGNUP_CREDITS = Decimal(os.getenv('INITIAL_SIGNUP_CREDITS', '295.00'))
 DEVELOPMENT_URLS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000", 
@@ -789,13 +790,45 @@ def signup():
         # Get marketing opt-in preference (defaults to False if not provided)
         marketing_opt_in = data.get('marketing_opt_in', False)
         
-        # Create unverified account that requires email verification
+        # Extract domain from email for organization
+        email_domain = email.split('@')[1].lower()
+        
+        # Check if organization already exists for this domain
         cursor.execute("""
-            INSERT INTO users (email, first_name, last_name, company_name, job_title, 
+            SELECT id FROM organizations WHERE domain = %s
+        """, (email_domain,))
+        
+        org_result = cursor.fetchone()
+        
+        if org_result:
+            # Organization exists - add user to existing org
+            org_id = org_result['id']
+            logger.info(f"Adding user {email} to existing organization (domain: {email_domain})")
+        else:
+            # Create new organization
+            cursor.execute("""
+                INSERT INTO organizations (name, domain, settings)
+                VALUES (%s, %s, %s)
+                RETURNING id
+            """, (company_name, email_domain, json.dumps({})))
+            
+            org_id = cursor.fetchone()['id']
+            logger.info(f"Created new organization for {company_name} (domain: {email_domain})")
+        
+        # Create user with org_id (first user in org becomes owner)
+        cursor.execute("""
+            SELECT COUNT(*) as user_count FROM users WHERE org_id = %s
+        """, (org_id,))
+        
+        user_count = cursor.fetchone()['user_count']
+        user_role = 'owner' if user_count == 0 else 'member'
+        
+        cursor.execute("""
+            INSERT INTO users (email, first_name, last_name, job_title, org_id, role,
                              password_hash, terms_accepted_at, email_verified, marketing_opt_in)
-            VALUES (%s, %s, %s, %s, %s, %s, NOW(), FALSE, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), FALSE, %s)
             RETURNING id
-        """, (email, first_name, last_name, company_name, job_title, password_hash, marketing_opt_in))
+        """, (email, first_name, last_name, job_title, org_id, user_role, password_hash, marketing_opt_in))
         
         user_id = cursor.fetchone()['id']
         
@@ -809,34 +842,29 @@ def signup():
             VALUES (%s, %s, %s)
         """, (user_id, verification_token, expires_at))
         
-        # Award initial signup credits if configured and not already awarded
-        if INITIAL_SIGNUP_CREDITS > 0:
-            # Check if signup bonus already awarded (idempotency check)
+        # Create trial subscription for organization (only if first user / owner)
+        trial_info = None
+        if user_role == 'owner':
+            # Check if org already has a subscription
             cursor.execute("""
-                SELECT id FROM credit_transactions 
-                WHERE user_id = %s AND reason = 'signup_bonus_v1'
-            """, (user_id,))
+                SELECT id FROM subscription_instances 
+                WHERE org_id = %s AND status IN ('active', 'trial', 'past_due')
+            """, (org_id,))
             
             if not cursor.fetchone():
-                # Award signup credits
-                cursor.execute("""
-                    UPDATE users 
-                    SET credits_balance = credits_balance + %s
-                    WHERE id = %s
-                    RETURNING credits_balance
-                """, (INITIAL_SIGNUP_CREDITS, user_id))
+                # Create trial subscription
+                from shared.subscription_manager import SubscriptionManager
+                sub_mgr = SubscriptionManager(conn)
                 
-                new_balance = cursor.fetchone()['credits_balance']
-                
-                # Record the transaction for audit trail
-                cursor.execute("""
-                    INSERT INTO credit_transactions 
-                    (user_id, amount, reason, balance_after, metadata)
-                    VALUES (%s, %s, 'signup_bonus_v1', %s, %s)
-                """, (user_id, INITIAL_SIGNUP_CREDITS, new_balance, 
-                      json.dumps({'awarded_at': datetime.utcnow().isoformat()})))
-                
-                logger.info(f"Awarded ${INITIAL_SIGNUP_CREDITS} signup bonus to user {email}")
+                try:
+                    trial_result = sub_mgr.create_trial_subscription(org_id, plan_key='professional')
+                    trial_info = trial_result
+                    logger.info(f"Created 14-day trial subscription for org {org_id}: {trial_result['word_allowance']} words")
+                except Exception as trial_error:
+                    logger.error(f"Failed to create trial subscription: {trial_error}")
+                    # Don't block signup if trial creation fails
+                    conn.rollback()
+                    raise
         
         conn.commit()
         conn.close()
@@ -855,19 +883,21 @@ def signup():
             logger.error(f"Failed to send email verification to {email}")
         
         # Send admin notification for new signup (don't block on failure)
-        if INITIAL_SIGNUP_CREDITS > 0:
+        try:
             admin_notified = postmark_client.send_new_signup_notification(
                 user_email=email,
                 first_name=first_name,
                 last_name=last_name,
                 company_name=company_name,
                 job_title=job_title,
-                awarded_credits=float(INITIAL_SIGNUP_CREDITS)
+                awarded_credits=0  # Deprecated field - now using trial subscriptions
             )
             if admin_notified:
-                logger.info(f"Admin notified of new signup: {email}")
+                logger.info(f"Admin notified of new signup: {email} (trial subscription created)")
             else:
                 logger.warning(f"Failed to send admin notification for new signup: {email}")
+        except Exception as notify_error:
+            logger.warning(f"Admin notification skipped: {notify_error}")
         
         logger.info(f"User {email} registered successfully - pending email verification")
         
@@ -2100,7 +2130,10 @@ def get_recent_analysis(asc_standard):
 
 @app.route('/api/analysis/complete', methods=['POST'])
 def complete_analysis():
-    """Unified endpoint for analysis completion - handles both recording and billing atomically"""
+    """
+    Unified endpoint for analysis completion - handles recording and word deduction atomically
+    MIGRATED: Now uses subscription-based word allowances instead of credits
+    """
     try:
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         if not token:
@@ -2117,20 +2150,13 @@ def complete_analysis():
         # Extract and validate input data
         asc_standard = sanitize_string(data.get('asc_standard', ''), 50)
         words_count = max(0, int(data.get('words_count', 0)))
-        api_cost = Decimal(str(data.get('api_cost', 0)))  # What OpenAI actually charged
         file_count = max(0, int(data.get('file_count', 0)))
         tier_name = sanitize_string(data.get('tier_name', ''), 100)
-        is_free_analysis = data.get('is_free_analysis', False)
         idempotency_key = sanitize_string(data.get('idempotency_key', ''), 100)
         started_at = data.get('started_at')
         duration_seconds = max(0, int(data.get('duration_seconds', 0)))
-        success = data.get('success', False)  # CRITICAL: Only charge if True
+        success = data.get('success', False)  # CRITICAL: Only deduct words if True
         error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
-        
-        # Server-side cost calculation (no more client-provided billing amounts)
-        from shared.pricing_config import get_price_tier
-        tier_info = get_price_tier(words_count)
-        final_charged_credits = Decimal(str(tier_info['price']))
         
         # Generate customer-facing memo UUID
         import uuid
@@ -2143,31 +2169,29 @@ def complete_analysis():
         cursor = conn.cursor()
         
         try:
-            # DEPLOYMENT FIX: Use enhanced logger for production visibility
             veritaslogic_logger.info(f"BACKEND: Starting analysis completion for user {user_id}")
             logger.info(f"Starting analysis completion for user {user_id}")
             
-            # CRITICAL: Verify email before allowing credit spending
-            cursor.execute("SELECT email, email_verified FROM users WHERE id = %s", (user_id,))
+            # Verify email and get org_id
+            cursor.execute("SELECT email, email_verified, org_id FROM users WHERE id = %s", (user_id,))
             user_check = cursor.fetchone()
             if not user_check or not user_check['email_verified']:
-                logger.warning(f"Unverified user {user_id} attempted to run analysis")
+                logger.warning(f"Unverified user {user_id} attempted to complete analysis")
                 return jsonify({
                     'error': 'Email verification required',
-                    'message': 'Please verify your email address before running analyses. Check your inbox for the verification link.'
+                    'message': 'Please verify your email address before running analyses.'
                 }), 403
             
-            # Store user email for potential error notifications
             user_email = user_check['email']
+            org_id = user_check['org_id']
             
-            # Check idempotency - prevent duplicate charges
+            # Check idempotency - prevent duplicate word deductions
             if idempotency_key:
                 veritaslogic_logger.info(f"BACKEND: Checking idempotency for key: {idempotency_key}")
                 logger.info(f"Checking idempotency for key: {idempotency_key}")
                 cursor.execute("""
-                    SELECT analysis_id, memo_uuid FROM credit_transactions 
-                    WHERE user_id = %s AND reason = 'analysis_charge' 
-                    AND metadata->>'idempotency_key' = %s
+                    SELECT analysis_id, memo_uuid, words_charged FROM analyses 
+                    WHERE user_id = %s AND memo_uuid = %s
                 """, (user_id, idempotency_key))
                 existing = cursor.fetchone()
                 if existing:
@@ -2176,97 +2200,88 @@ def complete_analysis():
                         'message': 'Analysis already recorded (idempotent)',
                         'analysis_id': existing['analysis_id'],
                         'memo_uuid': existing['memo_uuid'],
-                        'final_charged_credits': float(final_charged_credits),
+                        'words_charged': existing['words_charged'] or 0,
                         'is_duplicate': True
                     }), 200
             
-            # Insert analysis record with all required fields (including billed_credits for backward compatibility)
-            # CRITICAL FIX: Set status based on success flag
+            # Set status based on success flag
             analysis_status = 'completed' if success else 'failed'
             logger.info(f"Inserting analysis record for user {user_id} with status: {analysis_status}")
             
-            # Store error_message in metadata for now (until production DB has error_message column)
-            # TODO: Add error_message column to production DB, then include it in INSERT
+            # Insert analysis record with new subscription schema
             cursor.execute("""
-                INSERT INTO analyses (user_id, asc_standard, words_count, est_api_cost, 
-                                    final_charged_credits, billed_credits, tier_name, status, memo_uuid,
-                                    started_at, completed_at, duration_seconds, file_count)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s)
+                INSERT INTO analyses (user_id, org_id, asc_standard, words_count, tier_name, 
+                                    status, memo_uuid, started_at, completed_at, 
+                                    duration_seconds, file_count, error_message, words_charged)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)
                 RETURNING analysis_id
-            """, (user_id, asc_standard, words_count, api_cost, 
-                  final_charged_credits if success else 0,  # Only set charged amount if successful
-                  final_charged_credits if success else 0,  # Only set billed amount if successful
-                  tier_name, analysis_status, memo_uuid, started_at, duration_seconds, file_count))
+            """, (user_id, org_id, asc_standard, words_count, tier_name, 
+                  analysis_status, memo_uuid, started_at, duration_seconds, 
+                  file_count, error_message, 0))
             
             analysis_id = cursor.fetchone()['analysis_id']
             logger.info(f"Analysis record created with ID: {analysis_id}, status: {analysis_status}")
             
-            # Get current balance for balance_after calculation
-            logger.info(f"Getting current balance for user {user_id}")
-            cursor.execute("SELECT credits_balance FROM users WHERE id = %s", (user_id,))
-            current_balance = cursor.fetchone()['credits_balance']
-            logger.info(f"Current balance: {current_balance}")
+            words_charged = 0
+            deduction_details = None
             
-            # CRITICAL FIX: Only charge credits if analysis succeeded
-            if not success:
-                # Failed analysis - record but DON'T charge
-                balance_after = current_balance  # Balance unchanged
-                logger.info(f"Analysis failed - no credits charged. Balance remains: {current_balance}")
+            # CRITICAL: Only deduct words if analysis succeeded
+            if success:
+                # Deduct words from subscription allowance
+                from shared.subscription_manager import SubscriptionManager
+                sub_mgr = SubscriptionManager(conn)
                 
-                # No credit transaction needed - analysis record already tracks failure with status='failed'
-                # Error details stored in analysis metadata
-                
-            elif is_free_analysis:
-                # No free analyses in enterprise model - this is for backward compatibility only
-                pass  # No database update needed since free_analyses_remaining field was removed
-                
-                balance_after = current_balance  # No credit charge for free analysis
-                
-                # Record credit transaction for tracking (zero amount)
-                cursor.execute("""
-                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason, 
-                                                   balance_after, memo_uuid, metadata, created_at)
-                    VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
-                """, (user_id, analysis_id, 0, balance_after, memo_uuid, 
-                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
-                
+                try:
+                    deduction_result = sub_mgr.deduct_words(org_id, words_count, analysis_id)
+                    words_charged = deduction_result['words_deducted']
+                    deduction_details = deduction_result
+                    
+                    # Update analysis record with actual words charged
+                    cursor.execute("""
+                        UPDATE analyses 
+                        SET words_charged = %s
+                        WHERE analysis_id = %s
+                    """, (words_charged, analysis_id))
+                    
+                    logger.info(f"Successfully deducted {words_charged} words from org {org_id}: {deduction_result['from_allowance']} from allowance, {deduction_result['from_rollover']} from rollover")
+                    
+                except ValueError as ve:
+                    # Insufficient words - this shouldn't happen if pre-flight check passed
+                    logger.error(f"Word deduction failed for analysis {analysis_id}: {ve}")
+                    conn.rollback()
+                    return jsonify({
+                        'error': 'Insufficient word allowance',
+                        'message': str(ve),
+                        'suggestion': 'Please upgrade your subscription to continue.'
+                    }), 402
             else:
-                # Successful analysis - charge credits
-                # Calculate new balance after charge
-                balance_after = max(current_balance - final_charged_credits, 0)
-                
-                # Deduct from credits balance
-                logger.info(f"Successful analysis - updating balance from {current_balance} to {balance_after}")
-                cursor.execute("""
-                    UPDATE users 
-                    SET credits_balance = %s
-                    WHERE id = %s
-                """, (balance_after, user_id))
-                logger.info(f"Balance updated successfully")
-                
-                # Record credit transaction with full audit trail
-                logger.info(f"Recording credit transaction for analysis {analysis_id}")
-                cursor.execute("""
-                    INSERT INTO credit_transactions (user_id, analysis_id, amount, reason,
-                                                   balance_after, memo_uuid, metadata, created_at)
-                    VALUES (%s, %s, %s, 'analysis_charge', %s, %s, %s, NOW())
-                """, (user_id, analysis_id, -final_charged_credits, balance_after, memo_uuid,
-                      json.dumps({'idempotency_key': idempotency_key, 'est_api_cost': float(api_cost)}) if idempotency_key else json.dumps({'est_api_cost': float(api_cost)})))
-                logger.info(f"Credit transaction recorded successfully")
+                # Failed analysis - no word deduction
+                logger.info(f"Analysis failed - no words charged. Error: {error_message}")
             
+            # Commit transaction
             logger.info(f"Committing transaction for analysis {analysis_id}")
             conn.commit()
             logger.info(f"Transaction committed successfully")
             
-            logger.info(f"Analysis completed for user {user_id}: {asc_standard}, memo: {memo_uuid}, cost: {final_charged_credits}")
+            # Get updated subscription usage for response
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            usage = sub_mgr.get_current_usage(org_id)
+            
+            logger.info(f"Analysis completed for user {user_id}: {asc_standard}, memo: {memo_uuid}, words charged: {words_charged}")
             
             return jsonify({
                 'message': 'Analysis completed successfully',
-                'analysis_id': analysis_id,  # Database primary key
-                'memo_uuid': memo_uuid,      # Customer-facing ID
-                'final_charged_credits': float(final_charged_credits),
-                'balance_remaining': float(balance_after),
-                'is_free_analysis': is_free_analysis
+                'analysis_id': analysis_id,
+                'memo_uuid': memo_uuid,
+                'words_charged': words_charged,
+                'subscription_usage': {
+                    'words_available': usage.get('words_available', 0),
+                    'words_used': usage.get('words_used', 0),
+                    'word_allowance': usage.get('word_allowance', 0),
+                    'rollover_words': usage.get('rollover_words', 0)
+                },
+                'deduction_breakdown': deduction_details if deduction_details else None
             }), 200
             
         except Exception as e:
@@ -2281,32 +2296,31 @@ def complete_analysis():
         error_msg = sanitize_for_log(e, max_length=300)
         
         # Enhanced error logging with full context
-        logger.exception(f"BILLING ERROR - Analysis completion failed for user {user_id}")
+        logger.exception(f"ANALYSIS COMPLETION ERROR - Failed for user {user_id if 'user_id' in locals() else 'unknown'}")
         logger.error(f"Error Type: {error_type}")
         logger.error(f"Error Details: {error_msg}")
-        logger.error(f"ASC Standard: {asc_standard}, Words: {words_count}, Credits to charge: {final_charged_credits}")
+        if 'asc_standard' in locals():
+            logger.error(f"ASC Standard: {asc_standard}, Words: {words_count}")
         
-        # Send critical billing error alert to support team
+        # Send critical error alert to support team
         try:
             postmark = PostmarkClient()
-            # Get user email safely (might not be set if error occurred early)
-            email_for_alert = user_email if 'user_email' in locals() else f"User ID {user_id}"
+            email_for_alert = user_email if 'user_email' in locals() else f"User ID {user_id if 'user_id' in locals() else 'unknown'}"
             postmark.send_billing_error_alert(
-                user_id=user_id,
+                user_id=user_id if 'user_id' in locals() else 0,
                 user_email=email_for_alert,
-                asc_standard=asc_standard,
+                asc_standard=asc_standard if 'asc_standard' in locals() else 'unknown',
                 error_type=error_type,
                 error_details=error_msg,
-                words_count=words_count,
-                credits_to_charge=float(final_charged_credits)
+                words_count=words_count if 'words_count' in locals() else 0,
+                credits_to_charge=0
             )
-            logger.info("Billing error alert sent to support team")
+            logger.info("Analysis error alert sent to support team")
         except Exception as alert_error:
-            logger.error(f"Failed to send billing error alert: {sanitize_for_log(alert_error)}")
+            logger.error(f"Failed to send error alert: {sanitize_for_log(alert_error)}")
         
-        # Return detailed error for debugging (safe for production since it doesn't expose sensitive data)
         return jsonify({
-            'error': 'Analysis billing failed',
+            'error': 'Analysis completion failed',
             'details': f'{error_type}: {error_msg}',
             'message': 'The analysis could not be saved. Please contact support if this persists.'
         }), 500
@@ -3548,6 +3562,333 @@ def log_platform_activity():
     except Exception as e:
         logger.error(f"Platform activity error: {e}")
         return jsonify({'error': 'Failed to log activity'}), 500
+
+# ==========================================
+# SUBSCRIPTION API ENDPOINTS
+# ==========================================
+
+@app.route('/api/subscription/plans', methods=['GET'])
+def get_subscription_plans():
+    """Get all available subscription plans"""
+    try:
+        from shared.pricing_config import get_plan_comparison
+        
+        plans = get_plan_comparison()
+        
+        return jsonify({
+            'plans': plans,
+            'trial_config': {
+                'duration_days': 14,
+                'word_allowance': 9000,
+                'requires_payment_method': True
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Get subscription plans error: {e}")
+        return jsonify({'error': 'Failed to get subscription plans'}), 500
+
+
+@app.route('/api/subscription/usage', methods=['GET'])
+def get_subscription_usage():
+    """Get current subscription usage for user's organization"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT org_id FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            
+            usage = sub_mgr.get_current_usage(user['org_id'])
+            
+            return jsonify(usage), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Get subscription usage error: {e}")
+        return jsonify({'error': 'Failed to get subscription usage'}), 500
+
+
+@app.route('/api/subscription/activate-trial', methods=['POST'])
+def activate_trial():
+    """
+    Activate trial subscription for organization
+    NOTE: Trials are automatically created during signup
+    This endpoint is for manual activation if needed
+    """
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT org_id, role FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            if user['role'] != 'owner':
+                return jsonify({'error': 'Only organization owners can activate trials'}), 403
+            
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            
+            trial_result = sub_mgr.create_trial_subscription(user['org_id'], plan_key='professional')
+            
+            return jsonify({
+                'message': 'Trial activated successfully',
+                'trial': trial_result
+            }), 200
+            
+        except ValueError as ve:
+            return jsonify({'error': str(ve)}), 400
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Activate trial error: {e}")
+        return jsonify({'error': 'Failed to activate trial'}), 500
+
+
+@app.route('/api/subscription/upgrade', methods=['POST'])
+def create_upgrade_checkout():
+    """Create Stripe checkout session for subscription upgrade"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        
+        plan_key = sanitize_string(data.get('plan_key', ''), 50)
+        
+        if not plan_key or plan_key not in ['professional', 'team', 'enterprise']:
+            return jsonify({'error': 'Valid plan_key required (professional, team, or enterprise)'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT u.org_id, u.email, u.role, o.stripe_customer_id, o.name as org_name
+                FROM users u
+                JOIN organizations o ON u.org_id = o.id
+                WHERE u.id = %s
+            """, (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            if user['role'] != 'owner':
+                return jsonify({'error': 'Only organization owners can upgrade subscriptions'}), 403
+            
+            # Get plan details
+            from shared.pricing_config import get_plan_by_key
+            plan = get_plan_by_key(plan_key)
+            
+            if not plan:
+                return jsonify({'error': f'Plan {plan_key} not found'}), 404
+            
+            # Get or create Stripe customer
+            import stripe
+            stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+            
+            if user['stripe_customer_id']:
+                customer_id = user['stripe_customer_id']
+            else:
+                # Create Stripe customer
+                customer = stripe.Customer.create(
+                    email=user['email'],
+                    name=user['org_name'],
+                    metadata={
+                        'org_id': user['org_id'],
+                        'user_id': user_id
+                    }
+                )
+                customer_id = customer.id
+                
+                # Save customer ID
+                cursor.execute("""
+                    UPDATE organizations
+                    SET stripe_customer_id = %s
+                    WHERE id = %s
+                """, (customer_id, user['org_id']))
+                conn.commit()
+            
+            # Create Stripe checkout session
+            # NOTE: Stripe price IDs will be set up in Task 6
+            stripe_price_id = plan.get('stripe_price_id')
+            
+            if not stripe_price_id:
+                return jsonify({
+                    'error': 'Stripe integration not configured',
+                    'message': f'Please contact support to set up {plan["name"]} subscription'
+                }), 503
+            
+            checkout_session = stripe.checkout.Session.create(
+                customer=customer_id,
+                payment_method_types=['card'],
+                mode='subscription',
+                line_items=[{
+                    'price': stripe_price_id,
+                    'quantity': 1
+                }],
+                success_url=f"{WEBSITE_URL}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{WEBSITE_URL}/subscription/cancel",
+                metadata={
+                    'org_id': user['org_id'],
+                    'user_id': user_id,
+                    'plan_key': plan_key
+                },
+                subscription_data={
+                    'trial_period_days': 14 if not user.get('has_trialed') else 0,
+                    'metadata': {
+                        'org_id': user['org_id'],
+                        'plan_key': plan_key
+                    }
+                }
+            )
+            
+            logger.info(f"Created Stripe checkout session for org {user['org_id']}: {checkout_session.id}")
+            
+            return jsonify({
+                'checkout_url': checkout_session.url,
+                'session_id': checkout_session.id,
+                'plan': {
+                    'key': plan_key,
+                    'name': plan['name'],
+                    'price_monthly': plan['price_monthly'],
+                    'word_allowance': plan['word_allowance']
+                }
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error creating checkout session: {se}")
+        return jsonify({
+            'error': 'Payment processing error',
+            'message': 'Unable to create checkout session. Please try again.'
+        }), 500
+    except Exception as e:
+        logger.error(f"Create upgrade checkout error: {e}")
+        return jsonify({'error': 'Failed to create checkout session'}), 500
+
+
+@app.route('/api/leads/appsource', methods=['POST'])
+def track_appsource_lead():
+    """Track lead from Microsoft AppSource"""
+    try:
+        data = request.get_json()
+        
+        # Extract UTM parameters and lead info
+        email = sanitize_email(data.get('email', ''))
+        source = sanitize_string(data.get('source', 'appsource'), 50)
+        campaign = sanitize_string(data.get('campaign', ''), 100)
+        medium = sanitize_string(data.get('medium', ''), 50)
+        utm_source = sanitize_string(data.get('utm_source', ''), 100)
+        utm_campaign = sanitize_string(data.get('utm_campaign', ''), 100)
+        utm_medium = sanitize_string(data.get('utm_medium', ''), 100)
+        utm_content = sanitize_string(data.get('utm_content', ''), 100)
+        utm_term = sanitize_string(data.get('utm_term', ''), 100)
+        referrer = sanitize_string(data.get('referrer', ''), 500)
+        landing_page = sanitize_string(data.get('landing_page', ''), 500)
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Check if user exists
+            cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
+            
+            if not user:
+                # Store lead for future attribution when user signs up
+                cursor.execute("""
+                    INSERT INTO lead_sources (
+                        user_id, source, campaign, medium, utm_source, utm_campaign,
+                        utm_medium, utm_content, utm_term, referrer, landing_page
+                    )
+                    VALUES (NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (source, campaign, medium, utm_source, utm_campaign, utm_medium,
+                      utm_content, utm_term, referrer, landing_page))
+                
+                logger.info(f"AppSource lead tracked (pre-signup): {email}")
+            else:
+                # User exists - update lead source
+                cursor.execute("""
+                    INSERT INTO lead_sources (
+                        user_id, source, campaign, medium, utm_source, utm_campaign,
+                        utm_medium, utm_content, utm_term, referrer, landing_page
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (user['id'], source, campaign, medium, utm_source, utm_campaign,
+                      utm_medium, utm_content, utm_term, referrer, landing_page))
+                
+                logger.info(f"AppSource lead tracked for user {user['id']}")
+            
+            conn.commit()
+            
+            return jsonify({
+                'success': True,
+                'message': 'Lead tracked successfully'
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Track AppSource lead error: {e}")
+        return jsonify({'error': 'Failed to track lead'}), 500
+
 
 if __name__ == '__main__':
     import argparse
