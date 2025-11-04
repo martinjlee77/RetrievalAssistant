@@ -1,0 +1,144 @@
+Great plan and good questions. Overall, your Phase 1 architecture is sound. Below are my recommendations, concrete decisions, and a few tweaks so you can build without rework and make the AppSource offer attractive but sustainable.
+
+Summary decisions (recommended)
+
+Subscription model: Monthly dollar credit bank with rollover (Option B), not fixed-size analyses. Add a small bonus to make subs attractive, keep a clear cap to limit liability.
+Rollover: Yes, with a cap. Rollover up to 2x the plan’s monthly credit amount; credits expire after 12 months.
+Overflow: Allow self-serve top-up credits for Individual/Professional; for Team, notify admin and allow admin-only top-ups or upgrade. Soft block for team users when out.
+Auth: Keep email/password for solos. Require Azure AD SSO for Team/Enterprise. Support account linking so an email user can join an Azure AD org later.
+API: One API server (expand backend_api.py with new routes). Simpler deploy, fewer moving parts.
+Hosting: Stay on Railway for Phase 1. Prepare a light “Phase 3” migration plan to Azure if/when enterprise asks.
+AppSource pricing: Use subscription prices that offer a clear (but not excessive) discount vs a la carte, plus modest monthly credit “bonus.” See numbers below.
+Review of your dev’s plan
+
+Directory layout and FastAPI shim: Good. I’d unify API functions into one server rather than running a second on port 8000 to avoid CORS and ops complexity.
+Refactor to shared/memo_generator.py: Critical first task. Make the generate_memo() signature stable now; everything else can wrap it.
+Multitenancy: Add orgs, plans, entitlements, usage, audit_log. Also add a topup_ledger table to keep a clean audit trail of purchased credits.
+Idempotency and rate limits: Add an idempotency_key on submissions and a simple per-org rate limit to avoid accidental double charges.
+Concrete choices for the eight decisions
+
+DECISION 1: Subscription tier strategy
+
+Choose Option B (credit bank). Keep it in dollars to minimize user confusion: “You get $X of analysis each month, at our published per-analysis rates.”
+Add a small bonus to make subscriptions attractive but sustainable:
+Monthly plans: +10% bonus credits
+Annual prepaid plans: +25% bonus credits
+Example mapping:
+Starter 
+149
+/
+m
+o
+→
+149/mo→165 credits/mo
+Professional 
+349
+/
+m
+o
+→
+349/mo→385 credits/mo
+Team 
+999
+/
+m
+o
+→
+999/mo→1,150 credits/mo
+Why: Users can mix sizes without support tickets. You avoid hard edge cases like “why can’t I run a 9K on Starter.”
+DECISION 2: Rollover policy
+
+Choose Option B with a cap:
+Credits roll over and expire after 12 months (consistent with today).
+Cap accumulated balance at 2x the plan’s monthly credit amount (prevents large liability build-up).
+Show a simple credit balance widget and upcoming expirations.
+DECISION 3: Mixed-auth UX
+
+Approve your dev’s flow. Add explicit account linking:
+If an email-only user is invited to a Team org (Azure AD), prompt one-time link of email account to Azure identity. After linking, default to Azure SSO.
+Allow unlink only by org admin.
+DECISION 4: Subscription overflow
+
+Professional: Option B (self-serve top-ups). Message: “You’ve used your monthly credits. Reset in X days. Need more now? Buy a one-time pack.”
+Team: Option C (soft block + admin notification). Team users see “out of credits”; only org admins can top-up or upgrade. Send email to admin with quick links to top-up or upgrade.
+DECISION 5: Azure AD integration approach
+
+Choose Option A (direct Azure AD multi-tenant) for Phase 1. You’re AppSource-first and targeting Microsoft tenants; keep dependencies low.
+Keep a future flag to add Azure OpenAI routing if requested by a tenant.
+DECISION 6: Database schema (approve with two additions)
+
+Approve proposed tables and add:
+topup_ledger: id, org_id, amount, source(stripe/microsoft), created_at
+invoices: id, org_id, plan_id, period_start, period_end, amount, provider(stripe/msft), status
+usage table: include idempotency_key, request_hash to dedupe.
+analyses table: include input_word_count, tier_at_run (3k/9k/15k/30k/60k), llm_model_used.
+DECISION 7: API architecture
+
+Choose Option A: single API server. Add routes:
+POST /api/memo/{standard}
+GET /api/memo/status/{analysis_id}
+POST /api/memo/cancel/{analysis_id} (optional)
+Enforce entitlements in POST before enqueueing. Decrement credits on completion, not on submission.
+DECISION 8: AppSource pricing
+
+Recommend subscription pricing that’s clearly better than a la carte, but not loss-making:
+Starter 
+149
+/
+m
+o
+→
+149/mo→165 credits (about one 9K analysis with small overage or one 9K every two months with rollover)
+Professional 
+349
+/
+m
+o
+→
+349/mo→385 credits (close to two 9K per month at a slight discount)
+Team 
+999
+/
+m
+o
+→
+999/mo→1,150 credits (roughly five to six 9K-equivalents over two months; team mixing)
+Enterprise: private offer (SSO, region pinning, DPAs, SLAs)
+Keep current a la carte pricing visible on your site for clarity.
+Implementation details to avoid gotchas
+
+Entitlement math
+On subscribe/renew: entitlements[org].monthly_credit += plan_credit + bonus_credit; enforce cap on rollover balance (2x monthly plan credit).
+On completion: deduct the a la carte price for the tier actually used (based on input processed words).
+If insufficient balance: for Professional/Starter show buy-top-up; for Team notify admin.
+Idempotency
+Require an Idempotency-Key header from the client; store it on submission with a hash of inputs. If a duplicate arrives within 24h, return the existing analysis_id.
+Pricing fairness
+Display estimated “credit cost” before enqueuing based on detected word count/tier. If the doc exceeds the chosen tier after processing, either:
+Fail gracefully and allow resubmit at a higher tier, or
+Auto-upcharge credits with a confirmation step when initiating (cleaner UX).
+Status page and metrics
+Track queue wait, run time, fail rate by standard and tier. Show “systems normal/degraded” externally.
+Partner Center/AppSource specifics (Phase 1)
+
+Offer type: SaaS, non-transactable (Get it now – Free trial).
+Free trial: “30-day free trial with $195 in analysis credits (one 9K analysis).”
+Public copy: Replace “GPT-5” with “state-of-the-art large language models (e.g., GPT-4-class) with retrieval and guardrails. Azure OpenAI available on request.”
+Required links: Privacy Policy, Terms, Subprocessors, Security Overview (2–3 pages), Support email, Status page.
+Assets: 5 screenshots and a 2-minute video (upload → de-identify → analyze → memo with citations → DOCX/PDF export → history). Include the Azure AD sign-in moment.
+Staying on Railway vs migrating to Azure
+
+Not required to move for Phase 1. Keep Railway now for speed.
+Prepare a simple migration plan (when asked):
+Azure App Service (web/API), Azure Database for PostgreSQL, Azure Cache for Redis, Azure Storage (Blob for exports), Key Vault, optional Azure OpenAI endpoint.
+Timeline: 1–2 weeks lift-and-shift once code is containerized.
+Security/documentation checklist
+
+Security whitepaper (2–3 pages): data flow, encryption in transit/at rest, retention/deletion defaults, subprocessors, access controls, logging/audit, incident response, model provider retention policy, option for Azure OpenAI.
+Subprocessors page: OpenAI/Azure OpenAI, Railway, Stripe, email provider, file storage provider.
+Remove any FASB codification verbatim text from samples; cite and summarize only.
+Optional enhancements that help win IT quickly
+
+Admin console for orgs: users, credit balance, top-up button, export usage CSV.
+Simple audit log per org: user, event, timestamp (submitted, completed, downloaded).
+Region preference setting (US-only default).

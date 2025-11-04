@@ -1,0 +1,110 @@
+Love this. Your dev’s assessment is spot on: AppSource is doable, and the Word add‑in is the unlock. Here’s a crisp plan, gaps to close, and answers to your questions so you can move fast with confidence.
+
+Executive take
+
+Phase 1: Non‑transactable SaaS listing on Microsoft Commercial Marketplace (surfaces in AppSource). Keep your Streamlit app. Add Azure AD SSO and a simple subscriptions layer. This is the fastest way to get discoverability and “click to try” without heavy refactor.
+Phase 2: Word task‑pane add‑in that calls a thin API wrapper. This is the adoption multiplier and your differentiator.
+Avoid “GPT‑5” in any listing. Use “state‑of‑the‑art LLMs (e.g., GPT‑4‑class)” or “Azure OpenAI compatible.”
+Answers to your three questions
+
+Azure AD requirement: Offer both. Keep email/password for self‑serve trials; enable Azure AD SSO for teams and make it required for Team/Enterprise plans. That satisfies IT without blocking small buyers.
+Subscriptions vs credits: For Marketplace, subscriptions with included monthly analysis credits are simplest. Keep Stripe credit top‑ups on your site for overage until you add metered billing in Marketplace.
+Do it yourself vs contractor: Given your current stack and goals, hire a contractor for 4–6 weeks to handle Azure AD SSO, the Marketplace SaaS listing, subscriptions, and the Word add‑in shell. You focus on templates, QA, and security docs.
+Phase 1: AppSource (SaaS) checklist and plan What you need to ship (no Office add‑in yet)
+
+Azure AD SSO (multi‑tenant OIDC). You can broker with Auth0 or WorkOS if that’s faster.
+Subscription plans and entitlements:
+Starter: 1 analysis/month
+Professional: 3/month
+Team: 10/month
+Enterprise: custom/private offers Credits roll over 12 months; allow on‑site top‑ups via Stripe.
+Minimal “SaaS landing page” in your app for Marketplace flows: handle free trial activation and plan selection.
+Security and privacy docs: 2–3 pages covering data flow, encryption, retention/deletion, LLM provider settings, tenant isolation, incident response.
+Publisher setup in Partner Center: verified domain, tax/payout, support contacts.
+Steps and effort (2–4 weeks)
+
+Week 1:
+Implement Azure AD SSO; keep email/password alongside it.
+Add plan table in DB; entitlement check on job submission.
+Prepare privacy policy, terms, security whitepaper.
+Week 2:
+Create Commercial Marketplace SaaS offer in Partner Center (non‑transactable “Get it now” with free trial).
+Listing assets: title, short/long descriptions, 5 screenshots, 2‑minute demo video, categories (Accounting, Compliance), industries.
+Validate flows (sign‑up, SSO, submit job, see credits).
+Week 3–4:
+Microsoft validation fixes (if any).
+Optional: move hosting to Azure App Service/Azure Postgres/Azure Blob for extra trust; not required but helps with IT questionnaires.
+Non‑transactable vs transactable
+
+Non‑transactable (start here): Fastest. Buyers click to your site to start a free trial and pay via Stripe.
+Transactable (next): Implement Microsoft’s SaaS Fulfillment APIs (Resolve/Activate) and optional Metering. Buyers are billed via Microsoft; procurement is easier for many enterprises. Add this after you see inbound.
+Phase 2: Word add‑in plan (4–6 weeks) Scope for v1
+
+Word task pane for Windows/Mac/Web. Users sign in with Azure AD.
+Inputs: paste facts or attach files; choose standard (606/842/etc).
+Call your API; return a structured memo; insert as formatted DOCX sections; keep a “copy to clipboard” and “download DOCX/PDF.”
+Show citations and a “disclaimer” box. Respect entitlements.
+API shim (so you don’t rewrite your app)
+
+POST /api/memo/{standard}
+Input: text blocks, optional file URLs/IDs, options (sections on/off), tenant/user IDs.
+Output: JSON { sections[], citations[], docx_url, pdf_url, analysis_id, confidence_score }.
+POST /api/status/{analysis_id} to poll job status.
+Auth: bearer tokens from Azure AD or your broker (Auth0/WorkOS).
+The API simply wraps your existing generate_memo() flow and uses your Redis/RQ background worker.
+Test matrix
+
+Word on Windows (current channel), Mac, and Word Online.
+Documents with and without existing styles; large memos; footnotes/bullets.
+SSO flows across tenants; expired tokens; entitlement edge cases.
+Accessibility: keyboard nav and basic screen‑reader labels.
+Security and compliance tweaks before listing
+
+Model provider language: say “OpenAI/Azure OpenAI with data not used for training; 0–30 day retention option.” Avoid “GPT‑5.”
+FASB content: continue citing ASC paragraphs; do not reproduce codification text verbatim.
+Data handling:
+Keep “no storage of originals” default, but add an enterprise toggle for X‑day retention with secure deletion and region selection (US‑only).
+Encrypt at rest/in transit; log access to memos; provide a basic audit trail.
+Uptime/SLA:
+Publish a status page (Statuspage/Better Uptime).
+Health checks and autoscaling for the RQ worker and web app.
+99.9% target is fine; Railway can be OK for MVP, but Azure App Service or Render with autoscaling is safer for an SLA.
+Pricing recommendations for Marketplace
+
+Starter $129/month (1 analysis)
+Professional $395/month (3 analyses)
+Team $995/month (10 analyses, Azure AD SSO, basic audit log)
+Enterprise: private offer; SSO, region pinning, DPA, support SLAs Keep one‑off Stripe “top‑up credits” on your site until you add metered billing in Marketplace.
+What Microsoft will actually check
+
+Sign‑in works (Azure AD), free trial starts, core flow runs end‑to‑end.
+Privacy policy, terms, and support links resolve; security summary is present.
+Clear description, non‑misleading claims; no prohibited IP use.
+Add‑in (Phase 2): functional test on Word Web/Windows/Mac; no crashes; basic accessibility.
+Where your plan could stumble and how to avoid it
+
+“GPT‑5” claims: remove in all public collateral. Use “leading LLMs/GPT‑4‑class” or “Azure OpenAI compatible.”
+Tight Streamlit coupling: your dev’s 2–3 day refactor to a generate_memo() function is the critical step. Lock that in as Sprint 1.
+Enterprise asks for Azure OpenAI: have a “switch” ready to route through Azure OpenAI if the customer demands it (same prompts, different endpoint).
+Marketplace timing: Microsoft validations can bounce you once; budget 1–2 weeks for fixes.
+Contractor scope (so you can delegate cleanly)
+
+Deliverables:
+Azure AD SSO integration
+Subscription plans + entitlements + admin UI
+Minimal API shim (FastAPI) for /api/memo endpoints
+Non‑transactable Marketplace listing (assets + submission)
+Word add‑in (task pane) MVP and AppSource submission
+Skills: Python (FastAPI), Office.js/React, Azure AD OIDC, Stripe subscriptions, basic DevOps (Azure App Service/S3/Blob, Postgres).
+Duration: 6–8 weeks part‑time or 4–6 weeks full‑time.
+Your 30‑60 day execution timeline
+
+Weeks 1–2: Refactor generate_memo(); add Azure AD SSO; add subscriptions/entitlements; produce security whitepaper (2–3 pages).
+Weeks 3–4: Submit non‑transactable SaaS listing; stand up status page; optional deploy to Azure App Service/Azure Postgres/Blob.
+Weeks 5–8: Build and submit Word add‑in; add API shim; record a 2‑minute demo; prepare a one‑pager for IT (SSO, retention, encryption, LLM data policy).
+Weeks 7–10: If demand warrants, start transactable SaaS setup (Fulfillment APIs) and/or AWS Marketplace.
+If you want, I can:
+
+Draft the exact request/response JSON for /api/memo/asc606 and /api/memo/asc842.
+Provide an AppSource SaaS offer checklist tailored to your listing (fields, screenshots, video script, security Q&A).
+Share a lightweight security whitepaper outline you can fill in to pass IT review.

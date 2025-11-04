@@ -1,0 +1,79 @@
+You have two realistic marketplace paths. Start with the easy one, then add the Word add‑in later.
+
+Phase 1 (easiest): List VeritasLogic as a SaaS offer on Microsoft Commercial Marketplace (AppSource)
+
+Why: Zero code inside Office required. You keep your current web app UI, add Azure AD SSO, and let companies buy/sub through Microsoft procurement. This gets you the AppSource visibility and “click to purchase” without rebuilding everything as an API first.
+What’s required:
+Single sign‑on: Azure AD multi‑tenant (OIDC). You can use Auth0/WorkOS to simplify if needed.
+Subscription plans and entitlements (seat or usage limits) instead of pure pay‑per‑analysis. You can still meter analyses as “credits per month.”
+Security/Privacy docs, support email, terms. No Office add‑in yet.
+Timeline: 2–4 weeks once the basics are in place.
+Phase 2 (adds adoption): Ship a Word add‑in that calls your backend
+
+Why: Your buyer lives in Word. A task‑pane add‑in removes friction and boosts conversion.
+What’s required:
+Keep your web app. Add a small API endpoint that the add‑in can call (no need to rewrite the whole app).
+Office.js add‑in UI for Word (side panel). Auth via Azure AD to the same account.
+Same billing and entitlements as your SaaS listing.
+Timeline: 3–6 additional weeks once Phase 1 is live.
+What I need from you to assess feasibility (and give you a concrete plan)
+
+Code/app basics
+Rough code layout: is memo generation a function you can call (e.g., generate_memo(facts, attachments, standard)) or tightly coupled to Streamlit UI?
+Languages/libs: Python version, key packages (OpenAI SDK, LangChain/LlamaIndex, pdf parsers).
+Typical input sizes: pages/word counts, file types (PDF/DOCX), and max file size.
+Long‑running steps: how long a heavy analysis takes; do you already run background tasks.
+Hosting and data
+Where it runs today (Replit always‑on? any DB?). Do you save outputs anywhere?
+Any storage (S3/Azure Blob) and database (Postgres/SQLite/Supabase)?
+Current auth (email/password? none?) and billing (Stripe?).
+LLM/provider settings
+Which models you call and where (OpenAI, Azure OpenAI). Any need for customer‑specific keys?
+Security posture
+Current retention, deletion, and logging. Region constraints you want (US‑only?).
+Business choices
+Preferred subscription tiers (seats vs usage). Will you include a free trial (e.g., 1 memo)?
+If you can answer those bullets in plain English, I’ll turn it into a step‑by‑step build plan with effort estimates.
+
+Lowest‑effort technical blueprint (so you know what we’d do)
+
+Keep Streamlit for now.
+Add a tiny API service next to it (FastAPI) exposing just 2 endpoints to start:
+POST /api/memo/asc606 and /api/memo/asc842
+Input: facts text, optional file URLs, output format, desired sections.
+Output: JSON with sections, citations, and a DOCX URL.
+Refactor the memo logic into a callable function your API can invoke. The Streamlit app keeps calling the same function.
+Add Azure AD SSO for your web app (Auth0/WorkOS can broker it in days).
+Add Stripe subscriptions with metered usage for “analyses/month” and soft overage.
+Deploy on a simple host (Render/Railway/Azure Web Apps). Store files in S3 or Azure Blob; use Postgres (Supabase is fine) for users/entitlements/logs.
+Submit a non‑transactable SaaS listing to AppSource first (buyers click through to your site and pay via Stripe). Later, add a transactable Microsoft offer if you want Microsoft to handle billing.
+Suggested subscription model (maps cleanly to marketplaces)
+
+Starter: $99/month, 3 users, 5 analyses/month, standard models, email support.
+Team: $399/month, 10 users, 25 analyses/month, priority queue, Teams SSO.
+Pro: $999/month, 25 users, 75 analyses/month, higher limits, data retention controls.
+Enterprise: custom via marketplace private offer (SSO/SOC2, regional storage, support SLA). You can still offer one‑off “packs” of analysis credits via Stripe if needed.
+Rough effort and costs (if you use a contract engineer)
+
+Phase 1 (SaaS listing without add‑in): 2–4 weeks
+API shim + refactor core function: 3–5 days
+Auth (Azure AD via Auth0/WorkOS): 2–4 days
+Stripe subscriptions + entitlements checks: 1–2 days
+Deploy + storage + Postgres: 1–2 days
+AppSource SaaS listing assets + security/privacy docs: 2–3 days
+Phase 2 (Word add‑in): 3–6 weeks
+Office.js add‑in, auth, call your API, insert memo: 8–15 days
+Packaging, validation, demo video, listing: 3–5 days Infra: a few hundred dollars/month at your current scale.
+Key risks/blockers to flag early
+
+If memo generation is tightly welded to Streamlit UI code, we’ll need to separate it—still doable, just more refactor.
+Replace “GPT‑5” claims in your marketing. Say “leading large language models (e.g., GPT‑4‑class)” to pass marketplace reviews.
+Ensure you don’t reproduce FASB codification text verbatim in outputs; cite and summarize instead.
+Concrete next steps
+
+Send answers to the feasibility bullets above.
+I’ll give you:
+A minimal API spec for /memo endpoints (request/response fields),
+An AppSource SaaS submission checklist tailored to you,
+A week‑by‑week plan with tasks you can hand to a contractor, plus a short JD for the contractor.
+If you prefer, we can also consider listing first on AWS Marketplace (SaaS) instead of AppSource, but given your audience writes memos in Word, AppSource as a SaaS web app is the fastest, lowest‑change step that unlocks enterprise procurement and discoverability.

@@ -1,0 +1,28 @@
+High‑level recommendations
+
+Keep Railway for Phase 1. Don’t migrate to Azure yet unless a buyer explicitly requires it. You don’t need Azure hosting to appear in AppSource.
+Non‑transactable SaaS listing first. “Get it now (Free trial)” that redirects to your landing page. Keep Stripe for billing initially; consider Microsoft transactable later.
+Add Azure AD SSO and monthly subscriptions with included analyses. Keep one‑off Stripe top‑ups as overflow.
+Refactor a single generate_memo() function and expose a minimal FastAPI shim. Don’t overbuild the API yet; it’s mainly future‑proofing and will be reused for the Word add‑in.
+Architecture review and tweaks Your layout is good. I’d add a few elements to make Phase 1 robust and enterprise‑friendly:
+
+Multitenancy model
+database.orgs: id, name, ms_tenant_id (GUID), plan_id, region_pref, created_at
+database.users: id, org_id, email, auth_provider (local/azure), azure_oid, role
+database.plans: id, name, analyses_per_month, price, features_json
+database.entitlements: org_id, month_start, included_analyses, rollover_credits
+database.usage: org_id, analysis_id, timestamp, words_tier, status
+database.analyses: id, org_id, user_id, standard, status, docx_url, pdf_url, cost_tier, runtime_ms
+database.audit_log: org_id, user_id, event, details_json, timestamp
+API/worker hygiene
+Idempotency keys on job submission (to avoid double‑charging on retries).
+Signed URLs with short expiry for docx/pdf downloads (S3/Blob or Railway equivalent).
+Rate limiting per org/user (basic token bucket).
+Job cancellation endpoint for queued/running analyses.
+Security and data handling
+Keep “no storage of originals” default. Add a tenant setting for X‑day retention if an enterprise requests it later.
+Keep de‑identification, but ensure the de‑identified output includes a simple mapping placeholder table the user can manually reverse if they want.
+Publish a subprocessors page (OpenAI, Railway, Stripe, email provider).
+Telemetry and status
+Add basic runtime metrics (avg time per standard, error rate, queue time, completions).
+Public status page via Better Uptime/Statuspage. Don’t promise a contractual 99.9% SLA publicly—make that an Enterprise SLA only.

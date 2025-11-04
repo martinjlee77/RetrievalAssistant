@@ -1,0 +1,44 @@
+Short answer: Your developer’s “Contact Me first” plan is a smart, low-risk way to test AppSource. I’d do a slightly stronger variant: publish a non-transactable SaaS “Get it now (Free trial)” that redirects to a simple trial page on your site (no Azure AD, no subscriptions yet) with the $195 credit. It’s still minimal dev, but converts better than “Contact Me.”
+
+Recommendation
+
+Phase 0 (3–5 days): AppSource listing with:
+Option A: Contact Me (fastest, pure lead-gen), or
+Option B: Non-transactable SaaS “Get it now (Free trial)” that lands on your site and creates an email/password account with 1 free 9K analysis. No Azure AD needed. This gives you real usage data, not just leads.
+Run this for 60–90 days with a clear KPI scorecard. If you hit targets, greenlight Phase 1.5 (subscriptions/SSO) or Phase 2 (Word add-in).
+Why this path
+
+Minimal engineering risk and cost.
+Validates discovery and demand on AppSource before investing in Azure AD, subscriptions, and multi-tenant logic.
+Lets you iterate pricing/tiers easily via a config file while measuring real conversion.
+KPI scorecard (90 days)
+
+Listing views: 150+/month by month 2
+Trial starts (from AppSource): 8–15/month by month 2
+First memo completed: ≥50% of trials
+Paid conversions: 2–4 subs/month by month 3 (Starter/Pro/Team mix) If you’re below ~50% of these, accelerate Word add-in and/or mirror on AWS Marketplace.
+What you need for the listing
+
+Copy: practical title/keywords (ASC 606, 842, 718, 805; “technical accounting memo generator”).
+5 screenshots: upload → de-identify → progress → memo with citations → DOCX export → history.
+2-minute video: Azure-style polish; show end-to-end analysis and DOCX export.
+Links: Privacy, Terms, Subprocessors, 2–3 page Security FAQ; status page.
+Landing page: unique URL with UTM, “Start free trial,” $195 credit explained, simple form (name/email/company), and immediate path to run the first memo.
+Pricing flexibility
+
+Keep all plan/price/credit values in a single pricing_config.py (or ENV) with:
+Per-tier monthly credit amounts and bonus %
+Rollover cap (2x)
+A la carte tier pricing table (3k/9k/15k/30k/60k)
+Add an admin toggle to switch between:
+a) pure a la carte, b) contact-me only, c) “Get it now” with free trial/credits
+This lets you adjust without code changes.
+Notes on “Contact Me” vs “Get it now”
+
+Contact Me: Easiest to ship; expect fewer but higher-intent leads. Good for 60-day smoke test.
+Get it now (Free trial): Slightly more setup (trial landing + auto-credit), better conversion and engagement data. Still no Azure AD/subscriptions required.
+Cautions
+
+Start Partner Center verification now; it can take a bit.
+Remove “GPT-5” everywhere. Say “state-of-the-art LLMs (e.g., GPT‑4‑class)” and “Azure OpenAI available on request.”
+Don’t include verbatim codification text; cite and summarize.

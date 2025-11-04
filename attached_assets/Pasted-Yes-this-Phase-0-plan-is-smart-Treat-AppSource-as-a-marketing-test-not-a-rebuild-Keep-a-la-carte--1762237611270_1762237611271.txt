@@ -1,0 +1,50 @@
+Yes—this Phase 0 plan is smart. Treat AppSource as a marketing test, not a rebuild. Keep a la carte, Stripe, and email/password; add only a tracked landing page and listing assets. A few tweaks to maximize signal and prevent abuse:
+
+What to build now (3–5 days)
+
+Partner Center setup
+
+Start publisher verification now (can take days).
+Create a non-transactable SaaS offer with “Get it now (Free trial)” pointing to your landing URL.
+AppSource landing page (unique URL, e.g., /appsource)
+
+Auto-apply $195 credit on signup when source=appsource (store source in user table).
+Show remaining credit and a 3-step “Run your first analysis” guide.
+Add reCAPTCHA and block free-email domains (or manual review) to reduce abuse.
+Tracking and attribution
+
+Add UTM params to the listing link. Store source + campaign on the user record.
+GA4 events: appsource_view, appsource_signup, first_analysis_started, first_analysis_completed, credit_purchase.
+Simple funnel dashboard: views → signups → first memo → paid.
+Assets and compliance
+
+5 screenshots + 2-minute video (upload → de-ID → analyze → memo with citations → DOCX export).
+Replace “GPT-5” with “state-of-the-art LLMs (e.g., GPT‑4‑class); Azure OpenAI available on request.”
+Publish Privacy, Terms, Subprocessors, 2–3 page Security FAQ, and a status page link.
+Abuse and eligibility guardrails
+
+One free trial credit per organization: detect by email domain; allow exceptions for major shared domains (.edu/.gov) via manual approval.
+Rate-limit signups from the same IP; require email verification before credit.
+Add a “request business email” fallback if someone uses Gmail/Outlook.
+Success criteria (90-day scorecard)
+
+Listing views: ≥150/month by month 2
+Trial signups (AppSource source): 8–15/month
+First memo completion rate: ≥50% of signups
+Paid conversions: 2–4/month by month 3 If under half these, pull forward the Word add-in and/or mirror on AWS Marketplace.
+Copy tips for the listing
+
+Title: VeritasLogic: AI Technical Accounting Memo Generator (ASC 606/842/718/805)
+Short description: Generate review-ready technical accounting memos with ASC citations in minutes. Free 9K analysis for AppSource users.
+Keywords: ASC 606, ASC 842, stock compensation, business combinations, technical accounting, SEC disclosure, audit memo.
+Minimal dev changes
+
+Add source tracking and auto-credit on signup when source=appsource.
+Add a “first-run” guide and credit balance display.
+No Azure AD, no subscriptions, no multi-tenant changes yet.
+Contingency
+
+If you want even lighter: switch “Get it now” to “Contact me” (pure lead form). Lower conversion to usage but zero code.
+Bottom line
+
+Proceed with Phase 0 exactly as outlined, with the guardrails and tracking above. You’ll know in 60–90 days if AppSource is worth deeper investment (SSO, subscriptions, Word add-in).
