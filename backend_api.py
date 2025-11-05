@@ -3084,14 +3084,15 @@ def get_usage_stats():
         result = cursor.fetchone()
         month_analyses = result['month_analyses'] if result else 0
         
-        # Get total spent
+        # Get total words used (subscription model)
+        # For subscription model, "total spent" is replaced with word usage
         cursor.execute("""
-            SELECT COALESCE(SUM(amount), 0) as total_spent
-            FROM credit_transactions 
-            WHERE user_id = %s AND reason = 'analysis_charge'
+            SELECT COALESCE(SUM(words_count), 0) as total_words_used
+            FROM analyses 
+            WHERE user_id = %s AND status = 'completed'
         """, (user_id,))
         result = cursor.fetchone()
-        total_spent = result['total_spent'] if result else 0
+        total_words_used = result['total_words_used'] if result else 0
         
         conn.close()
         
@@ -3100,7 +3101,7 @@ def get_usage_stats():
             'stats': {
                 'total_analyses': int(total_analyses),
                 'analyses_this_month': int(month_analyses),
-                'total_spent': float(total_spent)
+                'total_spent': 0  # Deprecated for subscription model
             }
         }), 200
         
@@ -3139,7 +3140,7 @@ def get_analysis_history():
                 a.asc_standard,
                 a.completed_at,
                 a.status,
-                a.final_charged_credits as cost,
+                0 as cost,
                 a.words_count,
                 a.file_count,
                 a.tier_name,
@@ -3909,6 +3910,103 @@ def get_subscription_usage():
     except Exception as e:
         logger.error(f"Get subscription usage error: {e}")
         return jsonify({'error': 'Failed to get subscription usage'}), 500
+
+
+@app.route('/api/subscription/status', methods=['GET'])
+def get_subscription_status():
+    """Get current subscription status for user's organization"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT org_id FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            # Get active subscription
+            cursor.execute("""
+                SELECT 
+                    si.id,
+                    si.status,
+                    si.trial_start_date,
+                    si.trial_end_date,
+                    si.current_period_start,
+                    si.current_period_end,
+                    si.cancel_at_period_end,
+                    si.stripe_subscription_id,
+                    sp.name as plan_name,
+                    sp.plan_key,
+                    sp.price_monthly as plan_price,
+                    sp.word_allowance
+                FROM subscription_instances si
+                JOIN subscription_plans sp ON si.plan_id = sp.id
+                WHERE si.org_id = %s 
+                    AND si.status IN ('trial', 'active', 'past_due', 'canceled')
+                ORDER BY si.created_at DESC
+                LIMIT 1
+            """, (user['org_id'],))
+            
+            subscription = cursor.fetchone()
+            
+            if not subscription:
+                return jsonify({
+                    'success': False,
+                    'error': 'No subscription found'
+                }), 404
+            
+            # Get current usage
+            current_month = date.today().replace(day=1)
+            cursor.execute("""
+                SELECT words_used, word_allowance
+                FROM subscription_usage
+                WHERE org_id = %s AND month_start = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (user['org_id'], current_month))
+            
+            usage = cursor.fetchone()
+            words_used = usage['words_used'] if usage else 0
+            word_allowance = usage['word_allowance'] if usage else subscription['word_allowance']
+            
+            return jsonify({
+                'success': True,
+                'subscription': {
+                    'status': subscription['status'],
+                    'plan_name': subscription['plan_name'],
+                    'plan_key': subscription['plan_key'],
+                    'plan_price': float(subscription['plan_price']) if subscription['plan_price'] else 0,
+                    'word_allowance': word_allowance,
+                    'words_used': words_used,
+                    'trial_start_date': subscription['trial_start_date'].isoformat() if subscription['trial_start_date'] else None,
+                    'trial_end_date': subscription['trial_end_date'].isoformat() if subscription['trial_end_date'] else None,
+                    'current_period_start': subscription['current_period_start'].isoformat() if subscription['current_period_start'] else None,
+                    'current_period_end': subscription['current_period_end'].isoformat() if subscription['current_period_end'] else None,
+                    'cancel_at_period_end': subscription['cancel_at_period_end'],
+                    'has_payment_method': bool(subscription['stripe_subscription_id'])
+                }
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Get subscription status error: {e}")
+        return jsonify({'error': 'Failed to get subscription status'}), 500
 
 
 @app.route('/api/subscription/activate-trial', methods=['POST'])
