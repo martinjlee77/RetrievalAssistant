@@ -1832,6 +1832,249 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255, 255, 255, 0.8);
     padding: 0.75rem 0 0.75rem 2rem;
     position: relative;
+}
+
+/* ================================
+   SUBSCRIPTION PRICING GRID STYLES
+   ================================ */
+
+.pricing-section {
+    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+    padding: 4rem 0;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Base pricing card styles */
+.pricing-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    position: relative;
+}
+
+/* Trial card specific */
+.pricing-card.trial-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #4a90e2;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Team card specific (most popular) */
+.pricing-card.team-card {
+    border: 3px solid #4a90e2;
+    box-shadow: 0 8px 16px rgba(74,144,226,0.15);
+}
+
+/* Badge styling */
+.pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #27ae60;
+    color: white;
+    padding: 0.35rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.pricing-badge.popular {
+    background: #4a90e2;
+    top: -15px;
+    padding: 0.4rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* Card title */
+.pricing-card h3 {
+    font-size: 1.75rem;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* Card description */
+.pricing-card-description {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    min-height: 3rem;
+}
+
+/* Price display */
+.pricing-price {
+    margin: 1.5rem 0;
+}
+
+.pricing-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.pricing-amount.trial {
+    color: #27ae60;
+}
+
+.pricing-period {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* Word count box */
+.pricing-word-box {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: #f0f4f8;
+    border-radius: 8px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pricing-word-box.trial {
+    background: #e8f5e9;
+}
+
+.pricing-word-box.team {
+    background: #e3f2fd;
+}
+
+.pricing-word-count {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.pricing-word-details {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.75rem;
+}
+
+/* Features section */
+.pricing-features {
+    text-align: center;
+    padding: 1.5rem 0;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.pricing-features p {
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-features p:last-child {
+    margin-bottom: 0;
+}
+
+.pricing-features .detail {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 400;
+}
+
+/* CTA section */
+.pricing-cta {
+    margin-top: auto;
+}
+
+.pricing-cta .btn {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.05rem;
+    display: block;
+    text-align: center;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pricing-cta .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(74,144,226,0.3);
+}
+
+/* Auto-renew notice */
+.pricing-notice {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 1rem;
+    line-height: 1.5;
+    padding: 0.75rem;
+    background: #fff3cd;
+    border-radius: 6px;
+    border-left: 3px solid #ffc107;
+}
+
+/* Included features section */
+.pricing-included {
+    max-width: 1200px;
+    margin: 4rem auto 0;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.pricing-included h3 {
+    color: white;
+    text-align: center;
+    font-size: 1.75rem;
+    margin-bottom: 2.5rem;
+}
+
+.pricing-included-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.pricing-included-item {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+}
+
+.pricing-included-item .checkmark {
+    color: #27ae60;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.pricing-included-item p {
+    color: white;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
     font-size: 0.95rem;
     line-height: 1.5;
 }
