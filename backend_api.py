@@ -4098,6 +4098,90 @@ def create_upgrade_checkout():
         return jsonify({'error': 'Failed to create checkout session'}), 500
 
 
+@app.route('/api/subscription/cancel', methods=['POST'])
+def cancel_subscription():
+    """Cancel user's subscription (remains active until end of billing period)"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT u.org_id, u.email, u.role
+                FROM users u
+                WHERE u.id = %s
+            """, (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            if user['role'] != 'owner':
+                return jsonify({'error': 'Only organization owners can cancel subscriptions'}), 403
+            
+            # Get subscription
+            cursor.execute("""
+                SELECT si.id, si.stripe_subscription_id, si.status
+                FROM subscription_instances si
+                WHERE si.org_id = %s AND si.status IN ('active', 'trial')
+                ORDER BY si.created_at DESC
+                LIMIT 1
+            """, (user['org_id'],))
+            subscription = cursor.fetchone()
+            
+            if not subscription:
+                return jsonify({'error': 'No active subscription found'}), 404
+            
+            # Cancel in Stripe if it's a paid subscription
+            if subscription['stripe_subscription_id']:
+                import stripe
+                stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+                
+                try:
+                    stripe.Subscription.modify(
+                        subscription['stripe_subscription_id'],
+                        cancel_at_period_end=True
+                    )
+                    logger.info(f"Canceled Stripe subscription {subscription['stripe_subscription_id']}")
+                except stripe.error.StripeError as se:
+                    logger.error(f"Stripe cancellation error: {se}")
+                    return jsonify({'error': 'Failed to cancel subscription with payment provider'}), 500
+            
+            # Update database
+            cursor.execute("""
+                UPDATE subscription_instances
+                SET cancel_at_period_end = true, updated_at = NOW()
+                WHERE id = %s
+            """, (subscription['id'],))
+            conn.commit()
+            
+            logger.info(f"Canceled subscription for org {user['org_id']}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Subscription canceled. Access continues until end of billing period.'
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Cancel subscription error: {e}")
+        return jsonify({'error': 'Failed to cancel subscription'}), 500
+
+
 @app.route('/api/leads/appsource', methods=['POST'])
 def track_appsource_lead():
     """Track lead from Microsoft AppSource (handles both anonymous visits and identified leads)"""

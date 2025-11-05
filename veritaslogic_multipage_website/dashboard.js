@@ -94,7 +94,7 @@ function showDashboard(userData) {
     
     // Check for hash in URL to show specific section
     const hash = window.location.hash.replace('#', '');
-    if (hash && ['overview', 'credits', 'profile', 'history'].includes(hash)) {
+    if (hash && ['overview', 'subscription', 'profile', 'history'].includes(hash)) {
         showSection(hash);
     } else {
         showSection('overview');
@@ -392,26 +392,14 @@ async function populateDashboard(userData) {
     document.getElementById('editFirstName').value = userData.first_name || '';
     document.getElementById('editLastName').value = userData.last_name || '';
     
-    // Update credits display
-    const paidCredits = parseFloat(userData.credits_balance || 0);
-    document.getElementById('creditsBalance').textContent = `$${paidCredits.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+    // Load subscription data
+    await loadSubscriptionData();
     
     // Load usage statistics
     await loadUsageStatistics();
     
     // Load recent analyses
     await loadAnalysisHistory();
-    
-    // Load credit packages for Credits section
-    await loadCreditPackages();
-    
-    // Force fallback packages as backup
-    setTimeout(() => {
-        const container = document.getElementById('creditPackages');
-        if (container && container.innerHTML.trim() === '') {
-            showFallbackPackages();
-        }
-    }, 2000);
 }
 
 async function loadUsageStatistics() {
@@ -487,74 +475,241 @@ async function loadAnalysisHistory() {
     }
 }
 
-async function loadCreditPackages() {
+async function loadSubscriptionData() {
     try {
-        const response = await fetch('/api/credit-packages');
-        const { packages } = await response.json();
-        
-        const container = document.getElementById('creditPackages');
-        container.innerHTML = '';
-        
-        packages.forEach(pkg => {
-            const packageEl = document.createElement('div');
-            packageEl.className = 'credit-package';
-            packageEl.setAttribute('data-amount', pkg.amount);
-            
-            packageEl.innerHTML = `
-                <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
-                <div class="package-description">Add $${pkg.amount.toLocaleString()} Credits</div>
-            `;
-            container.appendChild(packageEl);
-        });
-        
-        // Use event delegation for better reliability
-        container.onclick = function(e) {
-            const packageEl = e.target.closest('.credit-package');
-            if (packageEl && packageEl.hasAttribute('data-amount')) {
-                const amount = parseInt(packageEl.getAttribute('data-amount'));
-                selectPackage(amount);
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/subscription/status', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
-        };
-        
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                updateSubscriptionUI(data);
+            }
+        } else {
+            console.error('Failed to load subscription data');
+            showNoSubscriptionState();
+        }
     } catch (error) {
-        console.error('Failed to load credit packages:', error);
-        // Show fallback packages
-        showFallbackPackages();
+        console.error('Error loading subscription data:', error);
+        showNoSubscriptionState();
     }
 }
 
-function showFallbackPackages() {
-    const container = document.getElementById('creditPackages');
-    if (!container) return;
+function updateSubscriptionUI(data) {
+    const sub = data.subscription;
     
-    container.innerHTML = '';
+    // Calculate word usage
+    const wordsUsed = sub.words_used || 0;
+    const wordsAllowed = sub.word_allowance || 0;
+    const wordsRemaining = Math.max(0, wordsAllowed - wordsUsed);
+    const usagePercent = wordsAllowed > 0 ? Math.min(100, (wordsUsed / wordsAllowed) * 100) : 0;
     
-    const packages = [
-        {amount: 1000, display: 'Professional Package'},
-        {amount: 2000, display: 'Enterprise Package'},
-        {amount: 3000, display: 'Premium Package'}
-    ];
-    
-    packages.forEach(pkg => {
-        const packageEl = document.createElement('div');
-        packageEl.className = 'credit-package';
-        packageEl.setAttribute('data-amount', pkg.amount);
+    // Update overview section subscription card
+    if (sub.status === 'trial') {
+        const daysLeft = Math.ceil((new Date(sub.trial_end_date) - new Date()) / (1000 * 60 * 60 * 24));
+        document.getElementById('planName').textContent = `${sub.plan_name} (Trial)`;
+        document.getElementById('planStatus').textContent = `${daysLeft} days remaining`;
+        document.getElementById('planStatus').className = 'plan-status trial';
         
-        packageEl.innerHTML = `
-            <div class="package-amount">$${pkg.amount.toLocaleString()}</div>
-            <div class="package-description">Add $${pkg.amount.toLocaleString()} Credits</div>
-        `;
-        container.appendChild(packageEl);
-    });
+        const trialEnd = new Date(sub.trial_end_date).toLocaleDateString();
+        document.getElementById('renewalInfo').textContent = `Trial ends ${trialEnd}`;
+    } else if (sub.status === 'active') {
+        document.getElementById('planName').textContent = sub.plan_name;
+        document.getElementById('planStatus').textContent = 'Active';
+        document.getElementById('planStatus').className = 'plan-status active';
+        
+        const nextBilling = new Date(sub.current_period_end).toLocaleDateString();
+        document.getElementById('renewalInfo').textContent = `Next billing: ${nextBilling}`;
+    } else if (sub.status === 'past_due') {
+        document.getElementById('planName').textContent = sub.plan_name;
+        document.getElementById('planStatus').textContent = 'Payment Failed';
+        document.getElementById('planStatus').className = 'plan-status past-due';
+        
+        document.getElementById('renewalInfo').textContent = 'Please update payment method';
+    } else if (sub.status === 'canceled') {
+        document.getElementById('planName').textContent = sub.plan_name;
+        const endsDate = new Date(sub.current_period_end).toLocaleDateString();
+        document.getElementById('planStatus').textContent = 'Canceled';
+        document.getElementById('planStatus').className = 'plan-status canceled';
+        document.getElementById('renewalInfo').textContent = `Access ends ${endsDate}`;
+    }
     
-    // Use event delegation for better reliability
-    container.onclick = function(e) {
-        const packageEl = e.target.closest('.credit-package');
-        if (packageEl && packageEl.hasAttribute('data-amount')) {
-            const amount = parseInt(packageEl.getAttribute('data-amount'));
-            selectPackage(amount);
+    // Update word allowance display in overview
+    const wordsRemainingEl = document.getElementById('wordsRemaining');
+    if (wordsRemainingEl) {
+        wordsRemainingEl.innerHTML = `<span class="number">${wordsRemaining.toLocaleString()}</span> words remaining`;
+    }
+    
+    const wordsTotalEl = document.getElementById('wordsTotal');
+    if (wordsTotalEl) {
+        wordsTotalEl.textContent = `of ${wordsAllowed.toLocaleString()} total`;
+    }
+    
+    // Update detailed subscription section
+    const currentPlanBadge = document.getElementById('currentPlanBadge');
+    if (currentPlanBadge) {
+        if (sub.status === 'trial') {
+            currentPlanBadge.textContent = `${sub.plan_name} - Free Trial`;
+        } else {
+            currentPlanBadge.textContent = sub.plan_name;
         }
+    }
+    
+    const currentPlanPrice = document.getElementById('currentPlanPrice');
+    if (currentPlanPrice && sub.plan_price) {
+        currentPlanPrice.textContent = `$${sub.plan_price}/month`;
+    }
+    
+    const wordsUsedStat = document.getElementById('wordsUsedStat');
+    if (wordsUsedStat) {
+        wordsUsedStat.textContent = `${wordsUsed.toLocaleString()} words used`;
+    }
+    
+    const wordsAvailableStat = document.getElementById('wordsAvailableStat');
+    if (wordsAvailableStat) {
+        wordsAvailableStat.textContent = `${wordsRemaining.toLocaleString()} words available`;
+    }
+    
+    // Update usage bar
+    const usageBar = document.getElementById('usageBar');
+    if (usageBar) {
+        usageBar.style.width = `${usagePercent}%`;
+        
+        // Color code the usage bar
+        if (usagePercent >= 90) {
+            usageBar.className = 'usage-bar critical';
+        } else if (usagePercent >= 75) {
+            usageBar.className = 'usage-bar warning';
+        } else {
+            usageBar.className = 'usage-bar normal';
+        }
+    }
+}
+
+function showNoSubscriptionState() {
+    // Show default empty state
+    document.getElementById('planName').textContent = 'No Active Plan';
+    document.getElementById('planStatus').textContent = 'Inactive';
+    document.getElementById('planStatus').className = 'plan-status inactive';
+    document.getElementById('renewalInfo').textContent = 'Subscribe to get started';
+    
+    const wordsRemainingEl = document.getElementById('wordsRemaining');
+    if (wordsRemainingEl) {
+        wordsRemainingEl.innerHTML = '<span class="number">0</span> words remaining';
+    }
+    
+    const wordsTotalEl = document.getElementById('wordsTotal');
+    if (wordsTotalEl) {
+        wordsTotalEl.textContent = 'of 0 total';
+    }
+    
+    const currentPlanBadge = document.getElementById('currentPlanBadge');
+    if (currentPlanBadge) {
+        currentPlanBadge.textContent = 'No Plan';
+    }
+    
+    const currentPlanPrice = document.getElementById('currentPlanPrice');
+    if (currentPlanPrice) {
+        currentPlanPrice.textContent = '$0/month';
+    }
+    
+    const wordsUsedStat = document.getElementById('wordsUsedStat');
+    if (wordsUsedStat) {
+        wordsUsedStat.textContent = '0 words used';
+    }
+    
+    const wordsAvailableStat = document.getElementById('wordsAvailableStat');
+    if (wordsAvailableStat) {
+        wordsAvailableStat.textContent = '0 words available';
+    }
+    
+    const usageBar = document.getElementById('usageBar');
+    if (usageBar) {
+        usageBar.style.width = '0%';
+    }
+}
+
+// Subscription Management Functions
+async function upgradeToPlan(planKey) {
+    const planNames = {
+        'professional': 'Professional',
+        'team': 'Team',
+        'enterprise': 'Enterprise'
     };
+    
+    const planName = planNames[planKey] || planKey;
+    
+    if (!confirm(`Upgrade to ${planName} plan? Your trial will end and billing will begin immediately.`)) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/subscription/upgrade', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ plan_key: planKey })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            alert(`Successfully upgraded to ${planName} plan!`);
+            // Reload subscription data
+            await loadSubscriptionData();
+        } else {
+            alert(`Failed to upgrade: ${data.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Upgrade error:', error);
+        alert('Network error. Please try again.');
+    }
+}
+
+async function updatePaymentMethod() {
+    alert('Payment method update coming soon. Please contact support@veritaslogic.ai for assistance.');
+}
+
+async function viewInvoiceHistory() {
+    alert('Invoice history coming soon. Please contact support@veritaslogic.ai for records.');
+}
+
+async function cancelSubscription() {
+    if (!confirm('Are you sure you want to cancel your subscription? You will lose access at the end of your current billing period.')) {
+        return;
+    }
+    
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/subscription/cancel', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            alert('Subscription canceled. You will retain access until the end of your current billing period.');
+            // Reload subscription data
+            await loadSubscriptionData();
+        } else {
+            alert(`Failed to cancel: ${data.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Cancel error:', error);
+        alert('Network error. Please try again.');
+    }
 }
 
 function loadRecentAnalyses(analyses) {
@@ -1192,6 +1347,10 @@ window.handleAuthButton = handleAuthButton;
 window.logout = logout;
 window.resendVerification = resendVerification;
 window.checkVerificationStatus = checkVerificationStatus;
+window.upgradeToPlan = upgradeToPlan;
+window.updatePaymentMethod = updatePaymentMethod;
+window.viewInvoiceHistory = viewInvoiceHistory;
+window.cancelSubscription = cancelSubscription;
 
 // Initialize payment form handler
 setTimeout(() => {
