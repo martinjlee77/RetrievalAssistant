@@ -1633,6 +1633,17 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.75rem 2rem;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    max-width: none !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.trial-card {
+    max-width: none !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 .pricing-card:hover {
