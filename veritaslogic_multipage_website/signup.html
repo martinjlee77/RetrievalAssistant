@@ -23,26 +23,40 @@
     <meta name="apple-mobile-web-app-title" content="VeritasLogic" />
     <link rel="manifest" href="/images/favicon/site.webmanifest" />
     <script>
-        // reCAPTCHA Site Key and loading state
+        // reCAPTCHA Enterprise configuration
         window.RECAPTCHA_SITE_KEY = null;
+        window.RECAPTCHA_WIDGET_ID = null;
         window.RECAPTCHA_READY = false;
         
-        // Fetch site key from backend and load reCAPTCHA
+        // Fetch site key from backend and load reCAPTCHA Enterprise
         fetch('/api/recaptcha-config')
             .then(r => r.json())
             .then(data => {
                 if (data.site_key) {
                     window.RECAPTCHA_SITE_KEY = data.site_key;
                     
-                    // Load reCAPTCHA Enterprise script and mark ready when loaded
+                    // Load reCAPTCHA Enterprise script with explicit rendering
                     const script = document.createElement('script');
-                    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${data.site_key}`;
+                    script.src = `https://www.google.com/recaptcha/enterprise.js?render=explicit`;
                     script.onload = () => {
-                        // Wait for grecaptcha.enterprise to be ready
+                        // Wait for grecaptcha.enterprise to be ready, then render widget
                         if (window.grecaptcha && window.grecaptcha.enterprise) {
                             window.grecaptcha.enterprise.ready(() => {
+                                // Create invisible reCAPTCHA widget container
+                                const container = document.createElement('div');
+                                container.id = 'recaptcha-container';
+                                container.style.display = 'none';
+                                document.body.appendChild(container);
+                                
+                                // Render invisible widget and store widget ID
+                                window.RECAPTCHA_WIDGET_ID = window.grecaptcha.enterprise.render('recaptcha-container', {
+                                    sitekey: data.site_key,
+                                    size: 'invisible',
+                                    badge: 'inline'
+                                });
+                                
                                 window.RECAPTCHA_READY = true;
-                                console.log('reCAPTCHA Enterprise loaded and ready');
+                                console.log('reCAPTCHA Enterprise widget rendered and ready');
                             });
                         }
                     };
@@ -348,16 +362,9 @@
                 // Generate reCAPTCHA token if configured
                 if (window.RECAPTCHA_SITE_KEY && window.RECAPTCHA_READY) {
                     try {
-                        // Use grecaptcha.enterprise.ready() to ensure it's initialized
-                        const recaptchaToken = await new Promise((resolve, reject) => {
-                            window.grecaptcha.enterprise.ready(async () => {
-                                try {
-                                    const token = await window.grecaptcha.enterprise.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
-                                    resolve(token);
-                                } catch (err) {
-                                    reject(err);
-                                }
-                            });
+                        // Execute reCAPTCHA Enterprise with rendered widget ID
+                        const recaptchaToken = await window.grecaptcha.enterprise.execute(window.RECAPTCHA_WIDGET_ID, {
+                            action: 'signup'
                         });
                         formData.recaptcha_token = recaptchaToken;
                         console.log('reCAPTCHA token generated successfully');
