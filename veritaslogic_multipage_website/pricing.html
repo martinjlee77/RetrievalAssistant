@@ -316,7 +316,12 @@
                 event.target.textContent = 'Loading...';
                 
                 // Call backend to create Stripe Checkout session
-                const response = await fetch('http://localhost:3000/api/create-checkout-session', {
+                // Use relative URL to work in both dev and production
+                const apiUrl = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:3000/api/create-checkout-session'
+                    : '/api/create-checkout-session';
+                
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

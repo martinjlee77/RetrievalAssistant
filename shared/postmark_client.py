@@ -798,3 +798,127 @@ Send calendar invite and Microsoft Teams link to {email}
         except Exception as e:
             logger.error(f"Error sending demo registration: {e}")
             return False
+    
+    def send_purchase_welcome_email(self, to_email: str, customer_name: str, 
+                                    plan_name: str, temp_password: str, login_url: str) -> bool:
+        """
+        Send welcome email to new customer after direct purchase
+        
+        Args:
+            to_email: Customer's email address
+            customer_name: Customer's name
+            plan_name: Name of purchased plan
+            temp_password: Temporary password for first login
+            login_url: URL to login page
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': to_email,
+                'Subject': f'Welcome to VeritasLogic.ai - {plan_name} Plan Activated',
+                'HtmlBody': f"""
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #2c3e50;">
+                    <div style="background: linear-gradient(135deg, #1a4d6d 0%, #2C5F7F 100%); padding: 2rem; text-align: center; border-radius: 8px 8px 0 0;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 2rem;">Welcome to VeritasLogic.ai</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0;">Your {plan_name} subscription is now active</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 2rem; border-radius: 0 0 8px 8px;">
+                        <h2 style="color: #2c3e50; margin-top: 0;">🎉 Your Account is Ready!</h2>
+                        
+                        <p>Hi {customer_name},</p>
+                        
+                        <p>Thank you for subscribing to VeritasLogic.ai. Your payment has been processed successfully, and your account is ready to use.</p>
+                        
+                        <div style="background: white; border-left: 4px solid #4a90e2; padding: 1.5rem; margin: 1.5rem 0; border-radius: 4px;">
+                            <h3 style="margin-top: 0; color: #2c3e50;">Your Login Credentials</h3>
+                            <p style="margin: 0.5rem 0;"><strong>Email:</strong> {to_email}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Temporary Password:</strong> <code style="background: #f0f0f0; padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace;">{temp_password}</code></p>
+                            <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">
+                                ⚠️ <strong>Important:</strong> Please change your password after your first login for security.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 2rem 0;">
+                            <a href="{login_url}" style="display: inline-block; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                                Log In to Your Account
+                            </a>
+                        </div>
+                        
+                        <h3 style="color: #2c3e50;">What's Next?</h3>
+                        <ol style="line-height: 1.8;">
+                            <li>Log in using the credentials above</li>
+                            <li>Change your password to something secure</li>
+                            <li>Upload your first contract for analysis</li>
+                            <li>Generate Big 4-quality accounting memos in minutes</li>
+                        </ol>
+                        
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 1rem; margin: 1.5rem 0;">
+                            <p style="margin: 0; color: #856404;">
+                                <strong>Need Help?</strong><br>
+                                Reply to this email or contact us at <a href="mailto:support@veritaslogic.ai" style="color: #4a90e2;">support@veritaslogic.ai</a>
+                            </p>
+                        </div>
+                        
+                        <p style="margin-top: 2rem; color: #666; font-size: 0.9rem;">
+                            Thanks for choosing VeritasLogic.ai!<br>
+                            <em>— The VeritasLogic Team</em>
+                        </p>
+                    </div>
+                </div>
+                """,
+                'TextBody': f"""
+Welcome to VeritasLogic.ai - {plan_name} Plan Activated
+
+Hi {customer_name},
+
+Thank you for subscribing to VeritasLogic.ai. Your payment has been processed successfully, and your account is ready to use.
+
+YOUR LOGIN CREDENTIALS
+Email: {to_email}
+Temporary Password: {temp_password}
+
+⚠️ IMPORTANT: Please change your password after your first login for security.
+
+Log in here: {login_url}
+
+WHAT'S NEXT?
+1. Log in using the credentials above
+2. Change your password to something secure
+3. Upload your first contract for analysis
+4. Generate Big 4-quality accounting memos in minutes
+
+NEED HELP?
+Reply to this email or contact us at support@veritaslogic.ai
+
+Thanks for choosing VeritasLogic.ai!
+— The VeritasLogic Team
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Purchase welcome email sent to {to_email}")
+                return True
+            else:
+                logger.error(f"Failed to send purchase welcome email: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending purchase welcome email: {e}")
+            return False

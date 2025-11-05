@@ -2590,6 +2590,152 @@ def create_checkout_session():
         logger.error(f"Create checkout session error: {e}")
         return jsonify({'error': 'Failed to create checkout session'}), 500
 
+@app.route('/api/process-checkout-success', methods=['POST'])
+def process_checkout_success():
+    """Process successful Stripe Checkout and create user account (idempotent)"""
+    conn = None
+    cursor = None
+    try:
+        from shared.pricing_config import SUBSCRIPTION_PLANS
+        from shared.subscription_manager import SubscriptionManager
+        import secrets as secret_gen
+        
+        data = request.get_json()
+        session_id = data.get('session_id')
+        
+        if not session_id:
+            return jsonify({'error': 'Session ID is required'}), 400
+        
+        # Retrieve the session from Stripe
+        session = stripe.checkout.Session.retrieve(session_id)
+        
+        if session.payment_status != 'paid':
+            return jsonify({'error': 'Payment not completed'}), 400
+        
+        # Get plan details from metadata
+        plan_key = session.metadata.get('plan_key')
+        if not plan_key or plan_key not in SUBSCRIPTION_PLANS:
+            return jsonify({'error': 'Invalid plan'}), 400
+        
+        plan = SUBSCRIPTION_PLANS[plan_key]
+        customer_email = session.customer_details.email
+        customer_name = session.customer_details.name or customer_email.split('@')[0]
+        
+        # Get database connection
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # IDEMPOTENCY: Check if this session was already processed
+        cursor.execute("""
+            SELECT u.id, u.email FROM users u
+            JOIN organizations o ON u.org_id = o.id
+            WHERE o.stripe_customer_id = %s AND u.email = %s
+        """, (session.customer, customer_email))
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            # Session already processed - return success (idempotent)
+            logger.info(f"Session {session_id} already processed for {customer_email}")
+            return jsonify({
+                'success': True,
+                'message': 'Account already created',
+                'email': customer_email,
+                'already_processed': True
+            }), 200
+        
+        # Check if email is already used (edge case: different checkout)
+        cursor.execute("SELECT id FROM users WHERE email = %s", (customer_email,))
+        email_conflict = cursor.fetchone()
+        
+        if email_conflict:
+            logger.warning(f"Email {customer_email} already exists with different checkout")
+            return jsonify({'error': 'An account with this email already exists. Please login.'}), 400
+        
+        # Generate random password for the user
+        temp_password = secret_gen.token_urlsafe(16)
+        password_hash = bcrypt.hashpw(temp_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # Extract company name from email domain
+        company_domain = customer_email.split('@')[1]
+        company_name = company_domain.split('.')[0].title()
+        
+        # Create organization with Stripe customer ID
+        cursor.execute("""
+            INSERT INTO organizations (name, stripe_customer_id, created_at)
+            VALUES (%s, %s, NOW())
+            RETURNING id
+        """, (company_name, session.customer))
+        org_id = cursor.fetchone()['id']
+        
+        # Create user
+        cursor.execute("""
+            INSERT INTO users (email, password_hash, name, company, email_verified, org_id, created_at)
+            VALUES (%s, %s, %s, %s, true, %s, NOW())
+            RETURNING id
+        """, (customer_email, password_hash, customer_name, company_name, org_id))
+        user_id = cursor.fetchone()['id']
+        
+        # Create subscription using SubscriptionManager
+        sub_manager = SubscriptionManager(conn)
+        subscription = sub_manager.create_subscription(
+            org_id=org_id,
+            plan_key=plan_key,
+            stripe_customer_id=session.customer,
+            stripe_subscription_id=session.subscription,
+            trial_days=0
+        )
+        
+        conn.commit()
+        
+        # Send welcome email with credentials
+        email_sent = False
+        try:
+            postmark = PostmarkClient()
+            email_sent = postmark.send_purchase_welcome_email(
+                to_email=customer_email,
+                customer_name=customer_name,
+                plan_name=plan['name'],
+                temp_password=temp_password,
+                login_url=f"{WEBSITE_URL}/login.html"
+            )
+            if email_sent:
+                logger.info(f"Sent welcome email to {customer_email}")
+        except Exception as email_error:
+            logger.error(f"Failed to send welcome email: {email_error}")
+        
+        # If email failed, store temp password for support retrieval
+        if not email_sent:
+            cursor.execute("""
+                UPDATE users
+                SET notes = %s
+                WHERE id = %s
+            """, (f"URGENT: Welcome email failed to send. Temp password: {temp_password}. Send manually or via password reset.", user_id))
+            conn.commit()
+            logger.error(f"CRITICAL: Welcome email failed for {customer_email}. Password stored in user notes for support.")
+        
+        logger.info(f"Successfully created account for {customer_email} with {plan_key} plan")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Account created successfully',
+            'email': customer_email,
+            'email_sent': email_sent
+        }), 200
+        
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error processing checkout: {se}")
+        return jsonify({'error': 'Failed to verify payment'}), 500
+    except Exception as e:
+        logger.error(f"Process checkout success error: {e}")
+        if conn:
+            conn.rollback()
+        return jsonify({'error': 'Failed to create account. Please contact support.'}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route('/api/stripe/create-payment-intent', methods=['POST'])
 def create_payment_intent():
     """Create a Stripe payment intent for credit purchase"""
@@ -3688,6 +3834,15 @@ def handle_checkout_completed(event, conn):
     """Handle successful checkout session completion"""
     session = event['data']['object']
     
+    signup_type = session['metadata'].get('signup_type')
+    
+    # For direct purchases, the account is created in the success endpoint
+    # The webhook will receive the subscription.created event separately
+    if signup_type == 'direct_purchase':
+        logger.info(f"Checkout completed for direct purchase (session {session['id']}). Account creation handled by success endpoint.")
+        return
+    
+    # For trial signups or upgrades with existing org
     org_id = session['metadata'].get('org_id')
     plan_key = session['metadata'].get('plan_key')
     stripe_subscription_id = session.get('subscription')
