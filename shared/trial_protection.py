@@ -127,11 +127,11 @@ def check_rate_limit(conn, ip_address, email_domain):
     
     # Check IP-based rate limit
     cursor.execute("""
-        SELECT COUNT(*) FROM signup_attempts
+        SELECT COUNT(*) AS attempt_count FROM signup_attempts
         WHERE ip_address = %s AND attempted_at > %s
     """, (ip_address, cutoff_time))
     
-    ip_attempts = cursor.fetchone()[0]
+    ip_attempts = cursor.fetchone()['attempt_count']
     
     if ip_attempts >= MAX_SIGNUP_ATTEMPTS_PER_IP:
         logger.warning(f"Rate limit exceeded for IP {ip_address}: {ip_attempts} attempts")
@@ -139,11 +139,11 @@ def check_rate_limit(conn, ip_address, email_domain):
     
     # Check domain-based rate limit
     cursor.execute("""
-        SELECT COUNT(*) FROM signup_attempts
+        SELECT COUNT(*) AS attempt_count FROM signup_attempts
         WHERE email_domain = %s AND attempted_at > %s
     """, (email_domain, cutoff_time))
     
-    domain_attempts = cursor.fetchone()[0]
+    domain_attempts = cursor.fetchone()['attempt_count']
     
     if domain_attempts >= MAX_SIGNUP_ATTEMPTS_PER_DOMAIN:
         logger.warning(f"Rate limit exceeded for domain {email_domain}: {domain_attempts} attempts")
