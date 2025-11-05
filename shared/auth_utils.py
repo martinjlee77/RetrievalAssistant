@@ -57,8 +57,8 @@ class AuthManager:
     
     def check_credits(self, required_credits: float) -> Dict[str, Any]:
         """
-        Check if user has sufficient credits for analysis
-        Returns dict with can_proceed, credits_balance, etc.
+        Check if user has sufficient word allowance for analysis
+        Returns dict with can_proceed, subscription info, etc.
         """
         if not self.is_authenticated():
             return {'can_proceed': False, 'error': 'Not authenticated'}
@@ -281,21 +281,26 @@ def show_user_sidebar(auth_manager: AuthManager):
                 auth_manager.logout()
 
 def show_credits_warning(required_credits: float, auth_manager: AuthManager):
-    """Show warning if user doesn't have sufficient credits"""
+    """Show warning if user doesn't have sufficient word allowance (DEPRECATED - use subscription checks)"""
     credits_info = auth_manager.check_credits(required_credits)
     
     if not credits_info.get('can_proceed', False):
+        # Get subscription info from the response
+        sub_info = credits_info.get('subscription', {})
+        words_available = credits_info.get('words_available', 0)
+        
         st.error(
             f"""
-            **Insufficient Credits for Analysis**
+            **Insufficient Word Allowance for Analysis**
             
-            This analysis requires **\\${required_credits:.2f}** in credits.
+            This analysis requires **{required_credits:,.0f}** words.
             
-            **Your current balance:**
-            - Credits: \\${credits_info.get('credits_balance', 0):.2f}
+            **Your current allowance:**
+            - Plan: {sub_info.get('plan_name', 'No active subscription')}
+            - Words available: {words_available:,.0f}
             
             **Next steps:**
-            1. [Add credits to your account]({WEBSITE_URL}/dashboard.html)
+            1. [Upgrade your subscription]({WEBSITE_URL}/dashboard.html)
             2. Contact support for assistance
             """
         )
