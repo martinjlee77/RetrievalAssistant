@@ -51,9 +51,17 @@ def verify_recaptcha(token, remote_ip=None):
         response = requests.post(RECAPTCHA_VERIFY_URL, data=payload, timeout=5)
         result = response.json()
         
+        # DEBUG: Log full Google response
+        logger.info(f"reCAPTCHA Google API Response: {result}")
+        
         success = result.get('success', False)
         score = result.get('score', 0.0)
         error_codes = result.get('error-codes', [])
+        hostname = result.get('hostname', 'N/A')
+        action = result.get('action', 'N/A')
+        challenge_ts = result.get('challenge_ts', 'N/A')
+        
+        logger.info(f"reCAPTCHA Details - success={success}, score={score}, hostname={hostname}, action={action}, challenge_ts={challenge_ts}, errors={error_codes}")
         
         if not success:
             error_msg = f"reCAPTCHA verification failed: {', '.join(error_codes)}"
