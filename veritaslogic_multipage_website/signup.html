@@ -23,21 +23,36 @@
     <meta name="apple-mobile-web-app-title" content="VeritasLogic" />
     <link rel="manifest" href="/images/favicon/site.webmanifest" />
     <script>
-        // reCAPTCHA Site Key - dynamically loaded from backend
+        // reCAPTCHA Site Key and loading state
         window.RECAPTCHA_SITE_KEY = null;
-        // Fetch site key from backend
+        window.RECAPTCHA_READY = false;
+        
+        // Fetch site key from backend and load reCAPTCHA
         fetch('/api/recaptcha-config')
             .then(r => r.json())
             .then(data => {
                 if (data.site_key) {
                     window.RECAPTCHA_SITE_KEY = data.site_key;
-                    // Load reCAPTCHA script
+                    
+                    // Load reCAPTCHA script and mark ready when loaded
                     const script = document.createElement('script');
                     script.src = `https://www.google.com/recaptcha/api.js?render=${data.site_key}`;
+                    script.onload = () => {
+                        // Wait for grecaptcha to be ready
+                        if (window.grecaptcha) {
+                            window.grecaptcha.ready(() => {
+                                window.RECAPTCHA_READY = true;
+                                console.log('reCAPTCHA loaded and ready');
+                            });
+                        }
+                    };
                     document.head.appendChild(script);
                 }
             })
-            .catch(err => console.warn('reCAPTCHA not configured:', err));
+            .catch(err => {
+                console.warn('reCAPTCHA not configured:', err);
+                window.RECAPTCHA_READY = false;
+            });
     </script>
 </head>
 <body>
@@ -331,13 +346,28 @@
             
             try {
                 // Generate reCAPTCHA token if configured
-                let recaptchaToken = null;
-                if (window.grecaptcha && window.RECAPTCHA_SITE_KEY) {
+                if (window.RECAPTCHA_SITE_KEY && window.RECAPTCHA_READY) {
                     try {
-                        recaptchaToken = await window.grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
+                        // Use grecaptcha.ready() to ensure it's initialized
+                        const recaptchaToken = await new Promise((resolve, reject) => {
+                            window.grecaptcha.ready(async () => {
+                                try {
+                                    const token = await window.grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
+                                    resolve(token);
+                                } catch (err) {
+                                    reject(err);
+                                }
+                            });
+                        });
                         formData.recaptcha_token = recaptchaToken;
+                        console.log('reCAPTCHA token generated successfully');
                     } catch (err) {
-                        console.warn('reCAPTCHA token generation failed:', err);
+                        console.error('reCAPTCHA token generation failed:', err);
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Create Account';
+                        form.classList.remove('loading');
+                        showMessage('Security verification failed. Please refresh the page and try again.', 'error');
+                        return;
                     }
                 }
                 
