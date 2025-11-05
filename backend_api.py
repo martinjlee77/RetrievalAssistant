@@ -1071,10 +1071,12 @@ def login():
         
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, email, first_name, last_name, company_name, job_title, 
-                   credits_balance, password_hash, created_at, email_verified, research_assistant_access
-            FROM users 
-            WHERE email = %s
+            SELECT u.id, u.email, u.first_name, u.last_name, u.job_title, u.org_id,
+                   u.password_hash, u.created_at, u.email_verified, u.research_assistant_access,
+                   o.name as company_name
+            FROM users u
+            LEFT JOIN organizations o ON u.org_id = o.id
+            WHERE u.email = %s
         """, (email,))
         
         user = cursor.fetchone()
@@ -1132,10 +1134,11 @@ def login():
                 'email': user['email'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'company_name': user['company_name'],
-                'job_title': user['job_title'],
-                'credits_balance': float(user['credits_balance'] or 0),
-                'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
+                'company_name': user['company_name'] or '',
+                'job_title': user['job_title'] or '',
+                'org_id': user['org_id'],
+                'credits_balance': 0,  # Legacy field - subscriptions now manage usage
+                'free_analyses_remaining': 0,  # Legacy field removed
                 'email_verified': bool(user['email_verified']),
                 'research_assistant_access': bool(user['research_assistant_access'])
             },
