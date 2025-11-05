@@ -782,7 +782,7 @@ def signup():
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
         
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
         if cursor.fetchone():
             conn.close()
