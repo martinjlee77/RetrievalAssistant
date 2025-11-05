@@ -3841,6 +3841,19 @@ def handle_subscription_created(event, conn):
     
     logger.info(f"Creating subscription for org {org_id}: {plan_key}, status: {status}")
     
+    # Look up plan ID from plan_key
+    cursor.execute("""
+        SELECT id FROM subscription_plans
+        WHERE plan_key = %s AND is_active = true
+    """, (plan_key,))
+    
+    plan = cursor.fetchone()
+    if not plan:
+        logger.error(f"Plan {plan_key} not found")
+        return
+    
+    plan_id = plan['id']
+    
     # Cancel any existing trial subscriptions for this org
     cursor.execute("""
         UPDATE subscription_instances
@@ -3851,7 +3864,7 @@ def handle_subscription_created(event, conn):
     # Create new subscription instance
     cursor.execute("""
         INSERT INTO subscription_instances (
-            org_id, plan_key, stripe_subscription_id, status,
+            org_id, plan_id, stripe_subscription_id, status,
             current_period_start, current_period_end
         )
         VALUES (%s, %s, %s, %s, %s, %s)
@@ -3861,7 +3874,7 @@ def handle_subscription_created(event, conn):
             current_period_start = EXCLUDED.current_period_start,
             current_period_end = EXCLUDED.current_period_end,
             updated_at = NOW()
-    """, (org_id, plan_key, stripe_sub_id, status, current_period_start, current_period_end))
+    """, (org_id, plan_id, stripe_sub_id, status, current_period_start, current_period_end))
     
     logger.info(f"Subscription created for org {org_id}")
 
@@ -3881,16 +3894,38 @@ def handle_subscription_updated(event, conn):
     
     logger.info(f"Updating subscription {stripe_sub_id}: status={status}")
     
+    # Look up plan ID if plan_key provided
+    plan_id = None
+    if plan_key:
+        cursor.execute("""
+            SELECT id FROM subscription_plans
+            WHERE plan_key = %s AND is_active = true
+        """, (plan_key,))
+        
+        plan = cursor.fetchone()
+        if plan:
+            plan_id = plan['id']
+    
     # Update subscription instance
-    cursor.execute("""
-        UPDATE subscription_instances
-        SET status = %s,
-            current_period_start = %s,
-            current_period_end = %s,
-            plan_key = COALESCE(%s, plan_key),
-            updated_at = NOW()
-        WHERE stripe_subscription_id = %s
-    """, (status, current_period_start, current_period_end, plan_key, stripe_sub_id))
+    if plan_id:
+        cursor.execute("""
+            UPDATE subscription_instances
+            SET status = %s,
+                current_period_start = %s,
+                current_period_end = %s,
+                plan_id = %s,
+                updated_at = NOW()
+            WHERE stripe_subscription_id = %s
+        """, (status, current_period_start, current_period_end, plan_id, stripe_sub_id))
+    else:
+        cursor.execute("""
+            UPDATE subscription_instances
+            SET status = %s,
+                current_period_start = %s,
+                current_period_end = %s,
+                updated_at = NOW()
+            WHERE stripe_subscription_id = %s
+        """, (status, current_period_start, current_period_end, stripe_sub_id))
     
     if cursor.rowcount == 0:
         logger.warning(f"No subscription found for Stripe subscription {stripe_sub_id}")
