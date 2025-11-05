@@ -1268,10 +1268,12 @@ def validate_cross_domain_token():
         
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, email, first_name, last_name, company_name, job_title, 
-                   credits_balance, email_verified, created_at
-            FROM users 
-            WHERE id = %s AND email_verified = true
+            SELECT u.id, u.email, u.first_name, u.last_name, u.job_title, u.org_id,
+                   u.email_verified, u.created_at,
+                   o.name as company_name
+            FROM users u
+            LEFT JOIN organizations o ON u.org_id = o.id
+            WHERE u.id = %s AND u.email_verified = true
         """, (user_id,))
         
         user = cursor.fetchone()
@@ -1288,9 +1290,9 @@ def validate_cross_domain_token():
                 'email': user['email'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'company_name': user['company_name'],
-                'job_title': user['job_title'],
-                'credits_balance': float(user['credits_balance'] or 0),
+                'company_name': user['company_name'] or '',
+                'job_title': user['job_title'] or '',
+                'org_id': user['org_id'],
                 'email_verified': bool(user['email_verified']),
                 'member_since': user['created_at'].isoformat()
             }
@@ -1697,12 +1699,14 @@ def get_user_profile():
         
         cursor = conn.cursor()
         
-        # Get user data
+        # Get user data with organization
         cursor.execute("""
-            SELECT id, email, first_name, last_name, company_name, job_title,
-                   credits_balance, created_at, email_verified, research_assistant_access
-            FROM users 
-            WHERE id = %s
+            SELECT u.id, u.email, u.first_name, u.last_name, u.job_title, u.org_id,
+                   u.created_at, u.email_verified, u.research_assistant_access,
+                   o.name as company_name
+            FROM users u
+            LEFT JOIN organizations o ON u.org_id = o.id
+            WHERE u.id = %s
         """, (user_id,))
         
         user = cursor.fetchone()
@@ -1710,9 +1714,9 @@ def get_user_profile():
             conn.close()
             return jsonify({'error': 'User not found'}), 404
         
-        # Get recent analyses
+        # Get recent analyses (billed_credits removed - subscription system now)
         cursor.execute("""
-            SELECT asc_standard, billed_credits, completed_at
+            SELECT asc_standard, completed_at
             FROM analyses 
             WHERE user_id = %s AND status = 'completed'
             ORDER BY completed_at DESC 
@@ -1720,17 +1724,6 @@ def get_user_profile():
         """, (user_id,))
         
         recent_analyses = cursor.fetchall()
-        
-        # Get credit transaction history
-        cursor.execute("""
-            SELECT amount, reason, created_at
-            FROM credit_transactions
-            WHERE user_id = %s
-            ORDER BY created_at DESC
-            LIMIT 20
-        """, (user_id,))
-        
-        transactions = cursor.fetchall()
         
         conn.close()
         
@@ -1740,10 +1733,9 @@ def get_user_profile():
                 'email': user['email'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'company_name': user['company_name'],
-                'job_title': user['job_title'],
-                'credits_balance': float(user['credits_balance'] or 0),
-                'free_analyses_remaining': 0,  # Legacy field removed, always 0 for enterprise
+                'company_name': user['company_name'] or '',
+                'job_title': user['job_title'] or '',
+                'org_id': user['org_id'],
                 'member_since': user['created_at'].isoformat(),
                 'email_verified': bool(user['email_verified']),
                 'research_assistant_access': bool(user['research_assistant_access'])
@@ -1751,18 +1743,9 @@ def get_user_profile():
             'recent_analyses': [
                 {
                     'asc_standard': analysis['asc_standard'],
-                    'cost': float(analysis['billed_credits'] or 0),
                     'completed_at': analysis['completed_at'].isoformat()
                 }
                 for analysis in recent_analyses
-            ],
-            'transactions': [
-                {
-                    'amount': float(transaction['amount'] or 0),
-                    'reason': transaction['reason'],
-                    'date': transaction['created_at'].isoformat()
-                }
-                for transaction in transactions
             ]
         }), 200
         
@@ -2793,44 +2776,14 @@ def purchase_credits_legacy():
 
 @app.route('/api/user/wallet-balance', methods=['GET'])
 def get_wallet_balance():
-    """Get user's current wallet balance"""
-    try:
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        
-        if not token:
-            return jsonify({'error': 'Authorization token required'}), 401
-        
-        # Verify token and get user
-        payload = verify_token(token)
-        if 'error' in payload:
-            return jsonify({'error': payload['error']}), 401
-        
-        user_id = payload['user_id']
-        
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-        
-        cursor = conn.cursor()
-        
-        # Get current wallet balance
-        cursor.execute("""
-            SELECT credits_balance FROM users WHERE id = %s
-        """, (user_id,))
-        
-        result = cursor.fetchone()
-        conn.close()
-        
-        if result:
-            return jsonify({
-                'balance': float(result['credits_balance'] or 0)
-            }), 200
-        else:
-            return jsonify({'error': 'User not found'}), 404
-            
-    except Exception as e:
-        logger.error(f"Wallet balance error: {e}")
-        return jsonify({'error': 'Failed to get wallet balance'}), 500
+    """DEPRECATED: Wallet balance endpoint - platform now uses subscription word allowances"""
+    logger.warning(f"Deprecated endpoint /api/user/wallet-balance called")
+    return jsonify({
+        'error': 'Wallet balance system has been replaced',
+        'message': 'VeritasLogic now uses subscription-based word allowances. Check your subscription status instead.',
+        'action_required': 'check_subscription_status',
+        'balance': 0  # Legacy compatibility
+    }), 410
 
 @app.route('/api/user/purchase-credits', methods=['POST'])
 def user_purchase_credits():
@@ -2846,139 +2799,24 @@ def user_purchase_credits():
 @app.route('/api/user/purchase-credits-legacy', methods=['POST'])
 def user_purchase_credits_legacy():
     """DEPRECATED: User credit purchase endpoint (matches wallet manager calls)"""
-    try:
-        data = request.get_json()
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        
-        if not token:
-            return jsonify({'error': 'Authorization token required'}), 401
-        
-        # Verify token and get user
-        payload = verify_token(token)
-        if 'error' in payload:
-            return jsonify({'error': payload['error']}), 401
-        
-        user_id = payload['user_id']
-        amount = data.get('credit_amount')
-        
-        if not amount or amount < 10:
-            return jsonify({'error': 'Invalid credit amount. Minimum $10'}), 400
-        
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-        
-        cursor = conn.cursor()
-        
-        # Add credits to user's balance
-        cursor.execute("""
-            UPDATE users 
-            SET credits_balance = credits_balance + %s
-            WHERE id = %s
-        """, (amount, user_id))
-        
-        # Record credit purchase transaction
-        cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
-            VALUES (%s, %s, 'wallet_topup', NOW())
-        """, (user_id, amount))
-        
-        # Get updated balance
-        cursor.execute("""
-            SELECT credits_balance FROM users WHERE id = %s
-        """, (user_id,))
-        
-        new_balance = cursor.fetchone()['credits_balance']
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"User {user_id} purchased ${amount} credits. New balance: ${new_balance}")
-        
-        return jsonify({
-            'success': True,
-            'message': f'Successfully added ${amount:.2f} to your wallet!',
-            'amount_purchased': amount,
-            'new_balance': float(new_balance)
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Purchase credits error: {e}")
-        return jsonify({'success': False, 'error': 'Failed to purchase credits'}), 500
+    logger.warning(f"Deprecated endpoint /api/user/purchase-credits-legacy called")
+    return jsonify({
+        'success': False,
+        'error': 'Credit purchases are no longer available',
+        'message': 'VeritasLogic now uses subscriptions. Upgrade your subscription plan for more word allowance.',
+        'action_required': 'upgrade_subscription'
+    }), 410
 
 @app.route('/api/user/charge-wallet', methods=['POST'])
 def charge_wallet():
-    """Charge user's wallet for analysis"""
-    try:
-        data = request.get_json()
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        
-        if not token:
-            return jsonify({'error': 'Authorization token required'}), 401
-        
-        # Verify token and get user
-        payload = verify_token(token)
-        if 'error' in payload:
-            return jsonify({'error': payload['error']}), 401
-        
-        user_id = payload['user_id']
-        charge_amount = data.get('charge_amount')
-        
-        if not charge_amount or charge_amount <= 0:
-            return jsonify({'error': 'Invalid charge amount'}), 400
-        
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-        
-        cursor = conn.cursor()
-        
-        # Check if user has sufficient balance
-        cursor.execute("""
-            SELECT credits_balance FROM users WHERE id = %s
-        """, (user_id,))
-        
-        result = cursor.fetchone()
-        if not result:
-            conn.close()
-            return jsonify({'error': 'User not found'}), 404
-        
-        current_balance = float(result['credits_balance'] or 0)
-        
-        if current_balance < charge_amount:
-            conn.close()
-            return jsonify({'error': f'Insufficient balance. You have ${current_balance:.2f}, need ${charge_amount:.2f}'}), 400
-        
-        # Deduct credits from user's balance
-        new_balance = current_balance - charge_amount
-        cursor.execute("""
-            UPDATE users 
-            SET credits_balance = %s
-            WHERE id = %s
-        """, (new_balance, user_id))
-        
-        # Record charge transaction
-        cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
-            VALUES (%s, %s, %s, NOW())
-        """, (user_id, -charge_amount, "analysis_charge"))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"User {user_id} charged ${charge_amount}. New balance: ${new_balance}")
-        
-        return jsonify({
-            'success': True,
-            'message': f'Successfully charged ${charge_amount:.2f}',
-            'charge_amount': charge_amount,
-            'remaining_balance': new_balance,
-            'transaction_id': f'charge_{user_id}_{int(datetime.now().timestamp())}'
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Charge wallet error: {e}")
-        return jsonify({'error': 'Failed to charge wallet'}), 500
+    """DEPRECATED: Wallet charging removed - subscription system now tracks word usage automatically"""
+    logger.warning(f"Deprecated endpoint /api/user/charge-wallet called")
+    return jsonify({
+        'success': False,
+        'error': 'Wallet charging is no longer used',
+        'message': 'Word usage is automatically tracked with your subscription. No manual charging needed.',
+        'action_required': 'none'
+    }), 410
 
 @app.route('/api/user/auto-credit', methods=['POST'])
 def auto_credit_wallet():
@@ -2994,66 +2832,13 @@ def auto_credit_wallet():
 @app.route('/api/user/auto-credit-legacy', methods=['POST'])
 def auto_credit_wallet_legacy():
     """DEPRECATED LEGACY: Auto-credit user's wallet for failed analysis"""
-    try:
-        data = request.get_json()
-        token = request.headers.get('Authorization', '').replace('Bearer ', '')
-        
-        if not token:
-            return jsonify({'error': 'Authorization token required'}), 401
-        
-        # Verify token and get user
-        payload = verify_token(token)
-        if 'error' in payload:
-            return jsonify({'error': payload['error']}), 401
-        
-        user_id = payload['user_id']
-        credit_amount = data.get('credit_amount')
-        
-        if not credit_amount or credit_amount <= 0:
-            return jsonify({'error': 'Invalid credit amount'}), 400
-        
-        conn = get_db_connection()
-        if not conn:
-            return jsonify({'error': 'Database connection failed'}), 500
-        
-        cursor = conn.cursor()
-        
-        # Add credits to user's balance
-        cursor.execute("""
-            UPDATE users 
-            SET credits_balance = credits_balance + %s
-            WHERE id = %s
-        """, (credit_amount, user_id))
-        
-        # Get updated balance
-        cursor.execute("""
-            SELECT credits_balance FROM users WHERE id = %s
-        """, (user_id,))
-        
-        result = cursor.fetchone()
-        new_balance = float(result['credits_balance'] or 0)
-        
-        # Record auto-credit transaction
-        cursor.execute("""
-            INSERT INTO credit_transactions (user_id, amount, reason, created_at)
-            VALUES (%s, %s, %s, NOW())
-        """, (user_id, credit_amount, "admin_topup"))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"Auto-credited ${credit_amount} to user {user_id}. New balance: ${new_balance}")
-        
-        return jsonify({
-            'success': True,
-            'message': f'Successfully credited ${credit_amount:.2f} for failed analysis',
-            'credit_amount': credit_amount,
-            'new_balance': new_balance
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Auto-credit error: {e}")
-        return jsonify({'error': 'Failed to auto-credit wallet'}), 500
+    logger.warning(f"Deprecated endpoint /api/user/auto-credit-legacy called")
+    return jsonify({
+        'success': False,
+        'error': 'Auto-credit is no longer needed',
+        'message': 'Subscriptions only deduct words from successful analyses. Failed analyses are free.',
+        'note': 'No action required - your word allowance was not affected.'
+    }), 410
 
 @app.route('/api/contact', methods=['POST'])
 def contact_form():
@@ -3597,10 +3382,12 @@ def sync_user_session():
         
         # Get current user data for cross-platform sync
         cursor.execute("""
-            SELECT id, email, first_name, last_name, company_name, 
-                   credits_balance, preferences, created_at
-            FROM users 
-            WHERE id = %s
+            SELECT u.id, u.email, u.first_name, u.last_name, u.org_id,
+                   u.preferences, u.created_at,
+                   o.name as company_name
+            FROM users u
+            LEFT JOIN organizations o ON u.org_id = o.id
+            WHERE u.id = %s
         """, (user_id,))
         
         user = cursor.fetchone()
@@ -3617,8 +3404,8 @@ def sync_user_session():
                 'email': user['email'],
                 'first_name': user['first_name'],
                 'last_name': user['last_name'],
-                'company_name': user['company_name'],
-                'credits_balance': float(user['credits_balance'] or 0),
+                'company_name': user['company_name'] or '',
+                'org_id': user['org_id'],
                 'member_since': user['created_at'].isoformat(),
                 'preferences': user['preferences'] or {}
             },

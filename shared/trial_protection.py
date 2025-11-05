@@ -209,7 +209,7 @@ def check_domain_trial_eligibility(conn, email_domain):
         # No organization exists for this domain - eligible
         return True, None
     
-    org_id, company_name, sub_status, plan_key, is_trial = result
+    org_id, company_name, sub_status, plan_id, is_trial = result
     
     if sub_status and is_trial:
         # Domain already has an active trial
