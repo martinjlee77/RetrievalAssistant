@@ -411,6 +411,15 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.5;       /* Adjust line height for better readability */
     margin-top: 1rem;         /* Reduced space from CTA buttons */ 
 }
+/* Mobile responsive - adjust values as needed */
+@media (max-width: 768px) {
+    .hero-microcopy {
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+        padding: 0 1rem;
+        text-align: center; /*Center text on smaller screens*/
+    }
+}
 /* ================================
    8. HOW IT WORKS SECTION
    ================================ */
@@ -460,6 +469,26 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 2rem;
     text-align: center;
 }
+.demo-preview-points {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+.demo-preview-points p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+.demo-preview-points ul {
+    color: rgba(255,255,255,0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+    list-style-type: disc;
+    margin-left: 2rem;
+}
+.demo-preview-points li {
+    margin-bottom: 0.5rem;
+}
 .demo-fallback {
     margin-top: 1.5rem;
     text-align: center;
@@ -486,6 +515,17 @@ h1, h2, h3, h4, h5, h6 {
     height: auto;
     display: block;
 }
+/* ================================
+   10. TRUST INDICATORS
+   ================================ */
+/* ================================
+   7. SECTION HEADERS - GLOBAL
+   ================================
+   Use these classes for consistent subheaders across ALL sections */
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
 .section-header h2 {
     font-size: 2.5rem;
     color: #ffffff;
@@ -503,6 +543,17 @@ h1, h2, h3, h4, h5, h6 {
    11. FEATURE CARDS & GRIDS
    ================================ */
 .features-summary,
+.features-summary::before,
+.value-props::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
+}
 .features-grid,
 /* Use .glass-panel.glass-panel--centered.glass-panel--interactive.glass-panel--highlight instead */
 .feature-card h3,
@@ -593,6 +644,14 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 2rem;
 }
 
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .feature-content.two-column {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
 /* ================================
    13. HUMAN REVIEW SECTION
    ================================ */
@@ -643,6 +702,98 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     position: absolute;
     left: 0;
+}
+/* Use .btn.btn--secondary instead */
+.review-process {
+    background: rgba(255,255,255,0.05);
+    padding: 1rem 0.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+    max-width: 600px;
+    margin: 0 auto;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+}
+.review-process h4 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #ffffff;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.review-process img {
+  max-height: 500px;
+  max-width: 100%;
+  width: auto; /* Maintain aspect ratio */
+  display: block; /* Prevents extra whitespace below the image */
+}
+.review-steps,
+.process-step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.process-step {
+    flex-direction: column;
+    text-align: center;
+    flex: 1;
+}
+.step-number {
+    background: rgba(255,255,255,0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 auto 1rem auto;
+}
+/*.process-arrow {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.5rem;
+}*/
+.process-separator {
+    height: 1px; /* Adjust as needed */
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.2); /* Adjust color as needed */
+    margin: 1rem 0; /* Adjust spacing as needed */
+}
+.process-step h5 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+.process-step p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .review-content {
+        /* Change from two columns to a single column */
+        grid-template-columns: 1fr; 
+
+        /* Reduce the gap for a better look on mobile */
+        gap: 3rem; 
+    }
+
+    .review-text {
+        /* On mobile, center-align the text to match the section header */
+        text-align: center;
+    }
+
+    .review-benefits {
+        /* If the text is centered, the list items should be left-aligned for readability */
+        text-align: left;
+
+        /* Add some margin so it doesn't stick to the button below */
+        margin-bottom: 3rem;
+    }
 }
 
 /* ================================
@@ -745,6 +896,14 @@ h1, h2, h3, h4, h5, h6 {
 .blog-content {
     padding: 80px 0;
     background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
+}
+.blog-layout {
+    display: block;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
 }
 .blog-main {
     max-width: 800px;
@@ -878,6 +1037,9 @@ h1, h2, h3, h4, h5, h6 {
     color: #212F3C;
     border-color: #ffffff;
     font-weight: 600;
+}
+.hidden {
+    display: none;
 }
 
 /* ================================
@@ -1073,6 +1235,24 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
     margin: 0 auto;
 }
+.team-member h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+.team-member p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+}
+.recognition-item h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+.recognition-item p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+}
 /* Features Page Specific Styles */
 .features-detailed {
     padding: var(--space-section-sm) 0;
@@ -1125,6 +1305,29 @@ h1, h2, h3, h4, h5, h6 {
 .btn--secondary:hover {
     background: rgba(255,255,255,0.15);
     border-color: rgba(255,255,255,0.4);
+}
+.btn--ghost:hover {
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
+}
+.btn--nav:hover {
+    transform: translateY(-2px);
+}
+/* Unified Glass Panel System */
+.glass-panel--interactive:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: var(--shadow-card);
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+}
+.glass-panel--highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 100%);
 }
 /* Grid Utilities */
 /* Background Utilities */
@@ -1224,6 +1427,20 @@ h1, h2, h3, h4, h5, h6 {
     border-color: rgba(255,255,255,0.25);
     transform: translateY(-2px);
 }
+.standard-number {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.standard-name {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}
 .standards-boxes .status {
     font-size: 0.8rem;
     padding: 0.25rem 0.75rem;
@@ -1244,6 +1461,46 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.9rem;
     margin: 0.5rem 0;
 }
+.knowledge-layer strong {
+    color: #ffffff;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.step-content h5 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+.step-content p {
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 1rem;
+}
+.demo-btn,
+.demo-btn:hover,
+.demo-trial-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+}
+.reviewer-credentials h4 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+.reviewer-credentials ul {
+    list-style: none;
+    color: rgba(255,255,255,0.8);
+}
+.reviewer-credentials li {
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 1.5rem;
+}
+.reviewer-credentials li::before {
+    content: '•';
+    color: rgba(255,255,255,0.6);
+    position: absolute;
+    left: 0;
+}
 .security-architecture,
 .security-layers {
     display: flex;
@@ -1262,6 +1519,15 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
     display: block;
     margin-bottom: 0.5rem;
+}
+.custom-item h5 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+.custom-item p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
 }
 .feature-comparison {
     padding: 50px 0;
@@ -1287,6 +1553,12 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.1);
 }
+.comparison-table th,
+.comparison-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 .comparison-table th {
     background: rgba(255,255,255,0.1);
     color: #ffffff;
@@ -1299,6 +1571,51 @@ h1, h2, h3, h4, h5, h6 {
 .comparison-table tr:last-child th,
 .comparison-table tr:last-child td {
     border-bottom: none;
+}
+/* Pricing Page Specific Styles */
+.philosophy-item h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+.philosophy-item p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+}
+/* Launch Pricing Banner */
+.pricing-banner {
+    background: linear-gradient(135deg, #1a4d6d 0%, #2C5F7F 50%, #1a4d6d 100%);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.pricing-banner .banner-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: #ffffff;
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+}
+
+.pricing-banner .banner-content p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.pricing-main {
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
+    text-align: center;
+}
+.pricing-main h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #ffffff;
+    font-weight: 700;
 }
 
 /* ================================
@@ -1464,6 +1781,11 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
 }
 
+/* CTA section */
+.pricing-cta {
+    margin-top: auto;
+}
+
 .pricing-cta .btn {
     width: 100%;
     padding: 1rem;
@@ -1559,6 +1881,15 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 2rem;
 }
 
+.faq-item {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
 .faq-item:last-child {
     margin-bottom: 0;
 }
@@ -1566,6 +1897,242 @@ h1, h2, h3, h4, h5, h6 {
 .faq-item h4 {
     color: white;
     margin-bottom: 1rem;
+}
+
+.faq-item p {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.7;
+}
+
+.faq-item a {
+    color: #4a90e2;
+}
+
+.examples-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+
+.examples-list li strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Responsive Pricing Styles */
+@media (max-width: 768px) {
+    .pricing-banner .banner-content h2 {
+        font-size: 2rem;
+    }
+
+    .pricing-banner .banner-content p {
+        font-size: 1rem;
+    }
+
+    .pricing-card {
+        padding: 1.5rem;
+    }
+
+    .pricing-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .tier-name {
+        font-size: 1.2rem;
+    }
+
+    .pricing-card-body {
+        text-align: left;
+        margin-top: 1rem;
+    }
+
+    .price-display {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .price-current {
+        font-size: 1.75rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .included-features-section {
+        padding: 2rem 1.5rem;
+    }
+}
+/* Two-Column Pricing Layout */
+.pricing-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+.pricing-table-section {
+    position: relative;
+}
+
+.first-time-banner {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    border-left: 4px solid rgba(255,255,255,0.4);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border-radius: var(--border-radius-sm);
+}
+.first-time-banner h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+.first-time-banner p {
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+    font-size: 1rem;
+    line-height: 1.6;
+    text-align: center;
+}
+.first-time-banner a {
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+    font-weight: 600;
+}
+.first-time-banner a:hover {
+    color: #ffffff;
+}
+
+/* New Compact Pricing Table Styles */
+.pricing-compact-table {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+.pricing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    align-items: center;
+    padding: 2.0rem 1.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+.pricing-row:last-child {
+    border-bottom: none;
+}
+.pricing-row:hover:not(.header) {
+    background: rgba(255,255,255,0.05);
+}
+.pricing-row.header {
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 100%);
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+/* Professional Color Accents for Each Tier */
+.pricing-row.tier-3k::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #B5C9D8, #9FB6C9 100%);
+}
+.pricing-row.tier-9k::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #BBD0DD, #A5C0D2 100%);
+}
+.pricing-row.tier-15k::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #C1D5E2, #ABC7D8 100%);
+}
+.pricing-row.tier-30k::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #C7DBE7, #B1CFDE 100%);
+}
+.pricing-row.tier-60k::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #D0E2EC, #B9D5E4 100%);
+}
+.pricing-row.tier-custom::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #9cb9c9, #90b0c1 100%);
+}
+
+.tier-info {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+.tier-info strong {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+}
+.tier-docs {
+    text-align: center;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    line-height: 1.4;
+}
+.tier-price {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ffffff;
+}
+.tier-price strong {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+}
+.pricing-note p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    margin: 0;
 }
 /* Features Section (Right Column) */
 .features-section {
@@ -1585,6 +2152,80 @@ h1, h2, h3, h4, h5, h6 {
     text-align: left;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.features-list li {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    line-height: 1.2 !important;
+    margin-bottom: 0.3rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+.features-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 40%;
+    transform: translateY(-40%);
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 50%;
+}
+.features-highlight p {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+}
+/* Pricing Notes Section */
+.pricing-notes {
+    margin-top: 3rem;
+    padding: 2rem;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: center;
+}
+.measurement-note,
+.estimator-note,
+.edge-case-note {
+    margin-bottom: 1.5rem;
+    color: rgba(255,255,255,0.8);
+}
+.tier-examples {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.tier-examples p {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+}
+.tier-examples ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.tier-examples li {
+    margin-bottom: 0.75rem;
+    color: rgba(255,255,255,0.8);
+    padding-left: 1rem;
+    position: relative;
+}
+.tier-examples li::before {
+    content: "•";
+    color: rgba(255,255,255,0.6);
+    position: absolute;
+    left: 0;
+}
 .pricing-card:hover {
     transform: translateY(-5px);
     border-color: rgba(255,255,255,0.25);
@@ -1593,6 +2234,23 @@ h1, h2, h3, h4, h5, h6 {
 .pricing-card.featured {
     border-color: rgba(255,255,255,0.3);
     transform: scale(1.05);
+}
+.card-header h3 {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+.features-list {
+    list-style: none;
+    text-align: left;
+    margin: 2rem 0;
+}
+.features-list li {
+    color: rgba(255,255,255,0.8);
+    padding: 0.75rem 0;
+    position: relative;
+    padding-left: 2rem;
+    line-height: 1.5;
 }
 .pricing-cta {
     display: inline-block;
@@ -1622,6 +2280,178 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(255,255,255,0.15);
     border-color: rgba(255,255,255,0.4);
 }
+.addon-services {
+    padding: var(--space-section) 0;
+    background: var(--gradient-tertiary);
+}
+.addon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+.addon-card {
+    background: rgba(255,255,255,0.05);
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+.addon-card h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.addon-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #22c55e;
+    margin-bottom: 1rem;
+    font-family: 'Poppins', 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+}
+.addon-card p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+.addon-card ul {
+    list-style: none;
+    text-align: left;
+    margin-top: 1.5rem;
+}
+.addon-card li {
+    color: rgba(255,255,255,0.8);
+    padding: 0.5rem 0;
+    position: relative;
+    padding-left: 2rem;
+}
+.addon-card li::before {
+    content: '•';
+    color: rgba(255,255,255,0.6);
+    position: absolute;
+    left: 0;
+}
+.cost-comparison {
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
+}
+.comparison-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 3rem;
+    margin-top: 3rem;
+}
+.comparison-card {
+    background: rgba(255,255,255,0.05);
+    padding: 3rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(15px);
+}
+.comparison-card.highlighted {
+    border-color: rgb(33, 66, 196, 0.3);
+    background: rgb(61, 138, 219, 0.05);
+    position: relative;
+}
+.comparison-card h3 {
+    color: #ffffff;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+.cost-breakdown {
+    margin-bottom: 2rem;
+}
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.cost-item:last-of-type {
+    border-bottom: none;
+}
+.cost-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-top: 1rem;
+    border-top: 2px solid rgba(255,255,255,0.2);
+    font-weight: 700;
+}
+.cost-label {
+    color: rgba(255,255,255,0.8);
+}
+.cost-amount {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.cost-total .cost-label,
+.cost-total .cost-amount {
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+.time-estimate {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+.savings-badge {
+    position: absolute;
+    top: -15px;
+    right: 20px;
+    background: linear-gradient(135deg, #447ef3, #161ba2);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+.volume-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.volume-table th,
+.volume-table td {
+    padding: 1.5rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.volume-table th {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    font-weight: 600;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+.volume-table td {
+    color: rgba(255,255,255,0.8);
+}
+.volume-table tr:last-child th,
+.volume-table tr:last-child td {
+    border-bottom: none;
+}
+.pricing-faq {
+    padding: var(--space-section) 0;
+    background: var(--gradient-primary);
+}
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
 .faq-item {
     background: rgba(255,255,255,0.05);
     padding: 2rem;
@@ -1647,6 +2477,36 @@ h1, h2, h3, h4, h5, h6 {
 .faq-item a:hover {
     text-decoration: none;
 }
+/* Contact Page Specific Styles */
+.trial-info h2 {
+    font-size: 2.2rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.trial-info p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+.trial-benefits li {
+    color: rgba(255,255,255,0.8);
+    padding: 0.75rem 0;
+    line-height: 1.6;
+}
+.trial-guarantee h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 600;
+}
+.trial-guarantee p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin: 0;
+}
 .unified-contact-section {
     padding: var(--space-section) 0;
     background: var(--gradient-primary);
@@ -1669,6 +2529,11 @@ h1, h2, h3, h4, h5, h6 {
 .contact-form .form-group label,
 .unified-contact-section .form-group label {
     color: #ffffff !important;
+}
+/* Form container for auth forms */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
 }
 /* Form header styling */
 .form-header {
@@ -1706,6 +2571,69 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.8);
     text-decoration: underline;
 }
+/* Analysis History Improved Styling */
+.analysis-meta span,
+.analysis-stats span {
+    white-space: nowrap;
+}
+.analysis-meta strong,
+.analysis-stats strong {
+    color: #333;
+}
+/* Improve analysis item spacing */
+.analysis-item h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+}
+
+/* --- Analysis History Table (Unified Dark Theme) --- */
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #ffffff; /* Default text color for the whole table */
+}
+
+.analysis-table th,
+.analysis-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Use a subtle transparent border */
+}
+
+.analysis-table th {
+    background-color: rgba(255, 255, 255, 0.1); /* Header background */
+    font-weight: 500;
+    color: #ffffff;
+}
+
+
+.analysis-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Credit Package Styling */
+.credit-package:hover {
+    background: #2d3748;
+    border-color: #2d3748;
+    transform: translateY(-2px);
+}
+.credit-package .package-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+.credit-package .package-description {
+    color: #ffffff;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+/* --- Dashboard Sidebar Footer Button --- */
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto; /* This pushes the footer to the bottom */
+}
 
 .sidebar-footer .btn {
     width: 100%; /* Make the button take the full width of the sidebar */
@@ -1723,6 +2651,19 @@ h1, h2, h3, h4, h5, h6 {
 .btn.btn-secondary[onclick*="cancelPayment"]:hover {
     background-color: #5a6268;
     border-color: #545b62;
+}
+.form-group {
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+}
+.form-row {
+    margin-bottom: 0;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-weight: 500;
 }
 .form-group input,
 .form-group select,
@@ -1750,6 +2691,17 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.5);
     opacity: 1;
 }
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 400;
+    cursor: pointer;
+}
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
 .form-submit {
     background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
     color: #212F3C;
@@ -1767,6 +2719,31 @@ h1, h2, h3, h4, h5, h6 {
 .form-submit:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(255,255,255,0.3);
+}
+.form-note {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 1rem;
+}
+.contact-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255,255,255,0.25);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+.contact-card h3 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.contact-card p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+.contact-link:hover {
+    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.1);
 }
 .demo-form-section,
 .enterprise-form-section,
@@ -1875,6 +2852,265 @@ h1, h2, h3, h4, h5, h6 {
         gap: 2rem;
     }
 }
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    .hero h1,
+    .page-header h1 {
+        font-size: 2.6rem;
+        line-height: 1.15;
+    }
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    .hero-cta,
+    .demo-link,
+    .secondary-cta {
+        margin: 0;
+        width: auto;
+    }
+    .features-grid,
+    .pricing-table-section {
+        order: 1;
+    }
+    .features-section {
+        order: 2;
+        position: static;
+        padding: 1.5rem;
+    }
+    .pricing-compact-table {
+        margin: 0 1rem;
+    }
+    .pricing-row {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+        text-align: center;
+    }
+    .pricing-row.header {
+        display: none; /* Hide header on mobile, use card style instead */
+    }
+    .pricing-row:not(.header) {
+        background: rgba(255,255,255,0.08);
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+    .tier-info,
+    .tier-docs,
+    .tier-price {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    .tier-info strong {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    .tier-price {
+        font-size: 1.6rem;
+        margin-bottom: 0.75rem;
+    }
+    .tier-docs {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+        text-align: center;
+    }
+    .features-section h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+    .features-list li {
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+    }
+    .comparison-cards {
+        grid-template-columns: 1fr;
+    }
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    .container {
+        padding: 0 1rem;
+    }
+    .nav-container {
+        padding: 0 1rem;
+    }
+
+    /* 1. Stack the main feature sections */
+    .feature-content {
+        grid-template-columns: 1fr; /* Change from two columns to one */
+        gap: 3rem; /* Adjust the vertical gap */
+    }
+
+    /* 2. Stack the nested standards boxes */
+    .standards-boxes {
+        grid-template-columns: 1fr; /* Show one box per row */
+    }
+
+    /* 3. Stack the security architecture layers */
+    .security-layers {
+        /* This rule assumes .security-layers is a grid or flex container. */
+        /* It will stack the items vertically. */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* 4. Improve table readability on mobile */
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem; /* Make padding slightly smaller */
+        font-size: 0.9rem; /* Reduce font size a bit */
+    }
+
+    /* --- 1. Main Two-Column Layout Stacking --- */
+    .pricing-layout {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .features-section {
+        position: static;
+        top: auto;
+        padding: 1.5rem;
+    }
+
+    .pricing-table-section {
+        width: 100%;
+    }
+
+    /* --- 2. Pricing Table Redesign (Critical Mobile Fix) --- */
+    .pricing-compact-table {
+        background: none;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .pricing-row.header {
+        display: none;
+    }
+
+    .pricing-row {
+        display: block;
+        grid-template-columns: none;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .pricing-row:last-child {
+        margin-bottom: 0;
+    }
+
+    /* FIX: Add "Tier" label and style the card header */
+    .tier-info {
+        display: flex;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: left;
+    }
+
+    .tier-info::before {
+        content: 'Tier';
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+        margin-right: 0.75rem;
+    }
+
+    /* FIX: Robust grid layout for data rows to ensure alignment */
+    .tier-price,
+    .tier-docs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        padding: 0.4rem 0;
+        text-align: right; /* Aligns the value (second column) to the right */
+    }
+
+    /* FIX: Add labels and fix font sizes/spacing */
+    .tier-price::before,
+    .tier-docs::before {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+        text-align: left;
+        font-size: 1rem; /* Consistent font size */
+    }
+
+    .tier-price::before {
+        content: 'Price per Analysis';
+    }
+
+    .tier-docs::before {
+        content: 'Document Size';
+    }
+
+    /* FIX: Consistent font size for values */
+    .tier-price, .tier-price strong,
+    .tier-docs {
+        font-size: 1rem;
+    }
+
+    .pricing-notes {
+        text-align: left;
+        padding: 0;
+        margin-top: 1.5rem;
+    }
+
+    .tier-examples ul {
+        margin: 0;
+    }
+
+    /* --- 3. Grid Layouts & Spacing --- */
+    .comparison-card, .addon-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .savings-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 1rem;
+        right: 10px;
+        top: -10px;
+    }
+
+    .cost-comparison p {
+        text-align: left;
+    }
+
+    .pricing-cta {
+        width: 100%;
+    }
+    .founder-section {
+        grid-template-columns: 1fr; /* Stack columns */
+        gap: 2rem;
+    }
+
+    .founder-image {
+        margin-bottom: 1rem;
+    }
+
+    /* Center the title block on mobile */
+    .founder-title {
+        text-align: center;
+    }
+}
 
 @media (max-width: 480px) {
     .hero h1,
@@ -1921,6 +3157,28 @@ h1, h2, h3, h4, h5, h6 {
 /* Smooth scrolling for the whole page */
 html {
     scroll-behavior: smooth;
+}
+/* Authentication Pages Styles */
+.auth-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
+    min-height: calc(100vh - 200px);
+}
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
+.auth-form {
+    background: rgba(255,255,255,0.95);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 .business-notice {
     background: #e3f2fd;
@@ -1999,6 +3257,9 @@ html {
     margin-top: 5px;
     display: block;
 }
+.required {
+    color: #e74c3c;
+}
 .terms-group {
     margin: 25px 0;
     padding: 20px;
@@ -2019,9 +3280,135 @@ html {
     width: auto;
     margin-top: 2px;
 }
+.auth-button {
+    width: 100%;
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+.auth-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+}
+.auth-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.auth-links {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #e1e8ed;
+}
+.auth-links a {
+    color: #2196f3;
+    text-decoration: none;
+    font-weight: 500;
+}
+.auth-links a:hover {
+    text-decoration: underline;
+}
 .auth-links p {
     color: #666;
     margin: 8px 0;
+}
+.loading {
+    opacity: 0.7;
+    poPoppins-events: none;
+}
+/* Pricing Details Table */
+.pricing-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+.pricing-table th,
+.pricing-table td {
+    padding: 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.pricing-table th {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+.pricing-table td {
+    color: rgba(255,255,255,0.9);
+}
+.pricing-table 
+.pricing-table strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+/* Credit Purchase Styles */
+.credit-packages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+.credit-package {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+.credit-package:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+.package-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+.package-description {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+.payment-form-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 20px;
+    border: 1px solid #e2e8f0;
+}
+.selected-package-info {
+    background: #e8f5e8;
+    border: 1px solid #c6f6d5;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.selected-package-info h4 {
+    margin: 0 0 5px 0;
+    color: #2d3748;
+}
+.selected-package-info p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 0.9rem;
 }
 #card-element {
     background: white;
@@ -2039,6 +3426,24 @@ html {
     color: #e53e3e;
     margin: 10px 0;
     font-size: 0.9rem;
+}
+.payment-btn {
+    width: 100%;
+    margin: 15px 0;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+#payment-messages {
+    margin-top: 15px;
+}
+/* Dashboard Styles */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    background: #f7fafc;
 }
 .dashboard-header {
     /* We removed background, padding, border-radius, and box-shadow */
@@ -2060,6 +3465,18 @@ html {
     margin: 0;
     font-size: 1.1rem;
 }
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
 .card h2 {
     color: #2c3e50;
     margin-bottom: 20px;
@@ -2074,10 +3491,26 @@ html {
     color: #2d5a41;
     margin-bottom: 5px;
 }
+.free-analyses .label {
+    color: #2d5a41;
+    font-weight: 600;
+}
+.credits-display {
+    background: #212F3C;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
 .credits-display .number {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 5px;
+}
+.credits-display .label {
+    opacity: 0.9;
+    font-weight: 500;
+    color: #9f9d9d;
 }
 .usage-stats {
     display: grid;
@@ -2171,8 +3604,47 @@ html {
 .empty-state .btn {
     margin-top: 15px;
 }
+.analysis-item:last-child {
+    border-bottom: none;
+}
+.analysis-details h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+.analysis-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+.profile-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+.profile-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #edf2f7;
+}
 .profile-field:last-child {
     border-bottom: none;
+}
+.field-label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+.field-value {
+    color: #666;
+}
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: #666;
 }
 
 /* --- Dashboard Inline Login Form (Unified Dark Theme) --- */
@@ -2258,6 +3730,26 @@ html {
     text-decoration: underline;
     text-underline-offset: 4px;
 }
+/* Network Error */
+.network-error {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    max-width: 500px;
+    width: 100%;
+}
+.network-error h2 {
+    color: #e53e3e;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+.network-error p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
 .network-error .btn {
     padding: 12px 24px;
     border-radius: 8px;
@@ -2274,6 +3766,38 @@ html {
 .network-error .btn:hover {
     background: #5a67d8;
 }
+/* Dashboard responsive styles */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .usage-stats {
+        grid-template-columns: 1fr;
+    }
+    .error-actions .btn {
+        width: 200px;
+    }
+}
+/* Quick Actions Button Consistency - All White Buttons with Dark Text */
+.action-buttons .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    text-align: center;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #ddd;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
 .action-buttons .btn:hover {
     background-color: #f8f9fa;
     color: #2c3e50;
@@ -2281,6 +3805,42 @@ html {
 }
 .action-buttons a.btn {
     color: #333333;
+}
+/* Login Page Styles - use specific class for login only */
+.login-page .auth-section {
+    min-height: calc(100vh - 140px); /* Account for header/footer */
+    padding: 100px 0 60px 0;
+    background: #f8fafc;
+}
+.login-page .auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.login-page .auth-form {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+    border: 1px solid #e1e8ed;
+}
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.auth-header h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+.auth-header p {
+    color: #666;
+    font-size: 1.1rem;
 }
 .auth-form .form-group {
     margin-bottom: 20px;
@@ -2304,6 +3864,45 @@ html {
     outline: none;
     border-color: #667eea;
 }
+/* Password Requirements */
+.password-requirements {
+    margin-top: 10px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+}
+.password-requirements small {
+    display: block;
+    margin-bottom: 8px;
+    color: #6c757d;
+    font-weight: 500;
+}
+.password-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.password-requirements li {
+    padding: 4px 0;
+    color: #dc3545;
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+}
+.password-requirements li:before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    color: #dc3545;
+}
+.password-requirements li.valid {
+    color: #28a745;
+}
+.password-requirements li.valid:before {
+    content: "✓";
+    color: #28a745;
+}
 /* Password Feedback */
 .password-feedback {
     margin-top: 8px;
@@ -2317,6 +3916,26 @@ html {
 .password-feedback.invalid {
     color: #dc3545;
     font-weight: 500;
+}
+.auth-button {
+    width: 100%;
+    background: #667eea;
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+}
+.auth-button:hover:not(:disabled) {
+    background: #5a67d8;
+}
+.auth-button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
 }
 .auth-links {
     text-align: center;
@@ -2336,6 +3955,28 @@ html {
 .loading {
     opacity: 0.7;
     poPoppins-events: none;
+}
+/* Email Verification Page */
+.verify-header h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+.verify-content p {
+    margin-bottom: 15px;
+}
+.email-steps h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+.email-steps ol {
+    margin: 0;
+    padding-left: 20px;
+}
+.email-steps li {
+    margin-bottom: 8px;
+    color: #4a5568;
 }
 .verify-card .btn {
     display: inline-block;
@@ -2364,11 +4005,44 @@ html {
     background: #667eea;
     color: white;
 }
+.help-text a {
+    color: #667eea;
+    text-decoration: none;
+}
+.help-text a:hover {
+    text-decoration: underline;
+}
+.success-state 
+.error-state 
+@media (max-width: 768px) {
+    .verify-card .btn {
+        display: block;
+        width: 100%;
+        margin: 0 0 10px 0;
+        text-align: center;
+    }
+}
 /* Navigation Auth Buttons */
 .nav-auth-buttons {
     display: flex;
     gap: 10px;
     align-items: center;
+}
+/* Use .btn.btn--nav.btn--nav-primary and .btn.btn--nav.btn--nav-secondary instead */
+/* Mobile responsive for auth buttons */
+@media (max-width: 768px) {
+    .nav-auth-buttons {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .nav-cta.primary,
+    .nav-cta.secondary {
+        padding: 8px 16px;
+        font-size: 13px;
+        text-align: center;
+        width: 120px;
+    }
 }
 /* Focus styles for accessibility */
 button:focus,
@@ -2531,15 +4205,112 @@ a:focus {
     font-weight: 700;
 }
 
+.credit-purchase-card h2 {
+    font-size: 2rem;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+}
+
 /* --- Dashboard Card Button Layout --- */
 .balance-card .btn {
     width: 100%;
     margin-top: 1.5rem;
 }
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.action-buttons .btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+}
+/* Custom Amount Section */
+.custom-amount-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.custom-amount-input label {
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+}
+.amount-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.currency-symbol {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0 0.5rem;
+}
+.amount-input-group input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1rem;
+    padding: 0.5rem;
+    outline: none;
+}
+.amount-input-group input::placeholder {
+    color: #a0a0a0;
+}
 .amount-input-group .btn {
     margin: 0;
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+}
+/* Credit Package Enhancements */
+.credit-packages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.credit-package:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+.credit-package.selected {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #ffffff;
+}
+
+/* --- Add Credits Page Redesign --- */
+
+/* 2. Style the new introductory paragraph */
+.credits-policy-intro {
+    text-align: center; /* Center the intro text */
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px; /* Keep the line length readable */
+    margin: 0 auto 3rem auto; /* Center the block and add space below it */
+    line-height: 1.7;
+}
+
+/* 3. Style the subheadings ("Credit Packages", "Custom Amount") consistently */
+.credit-purchase-card h3 {
+    font-size: 1.5rem;
+    color: #ffffff;
+    font-weight: 600;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Add a separator line */
 }
 /* Profile Fields */
 .profile-fields {
@@ -2617,6 +4388,79 @@ a:focus {
     margin: 0 auto 2.5rem auto; 
     text-align: center;
 }
+/* Payment Form Enhancements */
+.payment-form-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.selected-package {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #ffffff;
+    font-weight: 600;
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 80px;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        flex-direction: row;
+    }
+    .sidebar-header,
+    .sidebar-footer {
+        display: none; /* Hide on mobile for cleaner horizontal nav */
+    }
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-around;
+        padding: 0;
+    }
+    .nav-item {
+        flex: 1;
+        justify-content: center;
+        padding: 0.75rem 0.5rem;
+        border-left: none;
+        border-bottom: 4px solid transparent;
+    }
+    .nav-item.active {
+        border-bottom-color: #ffffff;
+        border-left-color: transparent;
+    }
+    .nav-text {
+        display: none; /* Show icons only on mobile */
+    }
+    .nav-icon {
+        font-size: 1.5rem;
+    }
+    .dashboard-main {
+        margin-left: 0;
+        padding-top: 80px; /* Account for fixed top nav */
+    }
+    .dashboard-container {
+        flex-direction: column;
+    }
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
 /* Enhanced Button Styling for Dashboard */
 .dashboard-section .btn {
     font-family: 'Poppins', sans-serif;
@@ -2635,6 +4479,17 @@ a:focus {
 .recent-analyses {
     max-height: 500px;
     overflow-y: auto;
+}
+.analysis-details h4 {
+    color: #ffffff;
+    margin: 0 0 0.5rem 0;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+.analysis-details p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
 }
 /* Empty State Styling */
 .empty-state {
@@ -2693,6 +4548,12 @@ a:focus {
 }
 .timeline-content h4 { margin: 0 0 0.25rem; color: #fff; font-size: 1.05rem; }
 .timeline-content p { margin: 0; color: var(--color-text-muted); font-size: 0.95rem; }
+@media (max-width: 768px) {
+  .timeline { padding-left: 1.25rem; }
+  .timeline::before { left: 0.7rem; }
+  .timeline-item { grid-template-columns: 2.25rem 1fr; }
+  .timeline-marker { width: 1.75rem; height: 1.75rem; font-size: 0.9rem; }
+}
 
 /* --- Password Helper Tooltip Styles --- */
 .password-wrapper {
@@ -2853,6 +4714,46 @@ a:focus {
     font-weight: 500;
     border: 1px solid transparent;
 }
+
+.success-message {
+    background-color: rgba(45, 212, 191, 0.1); /* Teal background */
+    color: #0d9488; /* Dark teal text */
+    border-color: rgba(45, 212, 191, 0.3);
+}
+.error-message {
+    background-color: rgba(248, 113, 113, 0.1); /* Red background */
+    color: #ef4444; /* Red text */
+    border-color: rgba(248, 113, 113, 0.3);
+}
+.info-message {
+    background-color: rgba(96, 165, 250, 0.1); /* Blue background */
+    color: #60a5fa; /* Blue text */
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+/* "No Token" instructions styling */
+.verification-instructions {
+    text-align: left;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+.verification-instructions h3 {
+    margin-top: 0;
+    color: #ffffff;
+}
+.verification-instructions ol {
+    padding-left: 20px;
+    margin-bottom: 2rem;
+}
+.verification-instructions li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+.verification-actions {
+    text-align: center;
+}
 /* ================================
    Dashboard Styles
    ================================ */
@@ -2982,6 +4883,14 @@ a:focus {
     font-weight: 500;
 }
 
+.info-message {
+    background-color: #3b82f6;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
 /* Platform Status Styles */
 .platform-status-card {
     background: rgba(255, 255, 255, 0.1);
@@ -3060,6 +4969,25 @@ a:focus {
 .platform-actions {
     margin-top: 1.5rem;
 }
+
+.platform-launch-btn {
+    width: 100%;
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.platform-launch-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.platform-launch-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
 /* --- Support Card Styles --- */
 
 .support-card {
@@ -3100,6 +5028,13 @@ a:focus {
 .support-content a:hover {
     /* Adds a subtle hover effect to the link */
     color: #a7c5ff;
+}
+
+/* Enhanced Quick Actions */
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
 }
 
 .action-buttons .btn {
@@ -3181,6 +5116,38 @@ a:focus {
     color: #fbbf24;
 }
 
+/* Cross-platform notification system */
+.platform-notification {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    max-width: 350px;
+}
+
+.platform-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.platform-notification .notification-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.platform-notification .notification-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
 /* Navigation enhancement for platform connectivity */
 .navbar .nav-links li:has(.platform-nav-link) {
     background: rgba(255, 255, 255, 0.05);
@@ -3200,8 +5167,59 @@ a:focus {
     display: none !important;
 }
 
+.btn-full {
+    width: 100%;
+}
+
+.mt-lg {
+    margin-top: 20px;
+}
+
 .mt-md {
     margin-top: 15px;
+}
+
+/* Responsive design for platform status */
+@media (max-width: 768px) {
+    .verification-card {
+        padding: 2rem;
+        margin: 1rem;
+    }
+
+    .verification-actions {
+        flex-direction: column;
+    }
+
+    .verification-actions .btn {
+        min-width: auto;
+    }
+    
+    .platform-status {
+        gap: 0.75rem;
+    }
+    
+    .status-item {
+        padding: 0.5rem;
+    }
+    
+    .platform-launch-btn {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .platform-nav-link {
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .nav-platform-status {
+        display: none;
+    }
+    
+    .platform-notification {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
 }
 
 /* ========================================
@@ -3360,6 +5378,19 @@ a:focus {
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(102, 126, 234, 0.5);
     transform: translateX(4px);
+}
+
+/* Responsive adjustments for mockup */
+@media (max-width: 768px) {
+    .assistant-mockup {
+        padding: 1rem;
+    }
+    
+    .mockup-selector,
+    .mockup-question {
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+    }
 }
 
 /* ================================
