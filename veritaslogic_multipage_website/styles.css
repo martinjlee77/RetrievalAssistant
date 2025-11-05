@@ -1312,11 +1312,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-    max-width: 1400px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
     margin: 0 auto;
-    align-items: stretch;
+    justify-content: center;
 }
 
 .pricing-card {
@@ -1325,8 +1325,9 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 12px;
     padding: 2rem;
     display: grid;
-    grid-template-rows: auto minmax(72px, auto) auto minmax(110px, auto) minmax(96px, auto) auto;
-    gap: 0;
+    grid-template-rows: auto minmax(80px, auto) auto minmax(120px, auto) minmax(110px, auto) auto;
+    gap: 1.5rem;
+    height: 100%;
     position: relative;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
@@ -1350,8 +1351,9 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.5rem;
     font-weight: 600;
     color: #1f2937;
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     grid-row: 1;
+    text-align: center;
 }
 
 .pricing-card-description {
@@ -1359,17 +1361,16 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.875rem;
     line-height: 1.5;
     margin: 0;
-    padding-bottom: 1.25rem;
     grid-row: 2;
-    display: flex;
-    align-items: flex-start;
+    text-align: center;
 }
 
 .pricing-price {
     margin: 0;
-    padding: 1.25rem 0;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid #f3f4f6;
     grid-row: 3;
+    text-align: center;
 }
 
 .pricing-amount {
@@ -1393,11 +1394,12 @@ h1, h2, h3, h4, h5, h6 {
     background: #f9fafb;
     border-radius: 8px;
     padding: 1.25rem;
-    margin: 1.25rem 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     grid-row: 4;
+    text-align: center;
 }
 
 .pricing-word-box.trial {
@@ -1425,11 +1427,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .pricing-features {
     margin: 0;
-    padding: 1.25rem 0;
+    padding: 0;
     grid-row: 5;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    text-align: center;
 }
 
 .pricing-features p {
@@ -1446,14 +1449,19 @@ h1, h2, h3, h4, h5, h6 {
 
 .pricing-cta {
     margin: 0;
-    padding-top: 1.25rem;
+    padding: 0;
     grid-row: 6;
     align-self: end;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .pricing-cta .btn {
-    width: 100%;
-    padding: 0.875rem 1.5rem;
+    width: auto;
+    max-width: none;
+    padding: 0.85rem 1.75rem;
     background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
     color: white;
     border: none;
@@ -1466,6 +1474,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    overflow: visible;
     transition: all 0.2s ease;
 }
 
