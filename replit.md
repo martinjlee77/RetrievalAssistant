@@ -9,6 +9,7 @@ VeritasLogic.ai is a premium enterprise AI platform for accounting firms and lar
 - **UI/UX Standards**: Professional, clean interfaces with Big 4 inspired design language and consistent dark gradient styling
 - **Contact Handling**: All inquiries route through unified professional contact system at support@veritaslogic.ai
 - **CSS/Styling Rule**: NEVER use inline styles in HTML files. Always use CSS classes defined in styles.css for maintainability.
+- **CSS Replacement Rule**: When updating CSS, REPLACE existing rules instead of adding new ones. Delete old/deprecated CSS blocks to prevent accumulation of legacy styles. Never let styles.css grow beyond ~4000 lines.
 
 Critical Development Rules - Prompt Protection:
 1. NEVER modify prompt text content without explicit user approval.
