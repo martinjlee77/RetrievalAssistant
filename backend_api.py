@@ -2530,6 +2530,66 @@ def create_signup_setup_intent():
         logger.error(f"Setup Intent creation error: {e}")
         return jsonify({'error': 'Failed to initialize payment method collection'}), 500
 
+@app.route('/api/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    """Create a Stripe Checkout session for direct plan purchase"""
+    try:
+        from shared.pricing_config import SUBSCRIPTION_PLANS
+        
+        data = request.get_json()
+        plan_key = data.get('plan')
+        
+        if not plan_key:
+            return jsonify({'error': 'Plan is required'}), 400
+        
+        # Validate plan exists
+        if plan_key not in SUBSCRIPTION_PLANS:
+            return jsonify({'error': 'Invalid plan selected'}), 400
+        
+        plan = SUBSCRIPTION_PLANS[plan_key]
+        
+        # Create Stripe Checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            mode='subscription',
+            line_items=[{
+                'price': plan['stripe_price_id'],
+                'quantity': 1,
+            }],
+            success_url=f"{WEBSITE_URL}/checkout-success.html?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{WEBSITE_URL}/pricing.html",
+            allow_promotion_codes=True,
+            billing_address_collection='required',
+            customer_email=data.get('email'),
+            metadata={
+                'plan_key': plan_key,
+                'signup_type': 'direct_purchase'
+            },
+            subscription_data={
+                'metadata': {
+                    'plan_key': plan_key,
+                    'signup_type': 'direct_purchase'
+                }
+            }
+        )
+        
+        logger.info(f"Created Stripe Checkout session for {plan_key} plan: {checkout_session.id}")
+        
+        return jsonify({
+            'checkout_url': checkout_session.url,
+            'session_id': checkout_session.id
+        }), 200
+        
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error creating checkout session: {se}")
+        return jsonify({
+            'error': 'Payment processing error',
+            'message': 'Unable to create checkout session. Please try again.'
+        }), 500
+    except Exception as e:
+        logger.error(f"Create checkout session error: {e}")
+        return jsonify({'error': 'Failed to create checkout session'}), 500
+
 @app.route('/api/stripe/create-payment-intent', methods=['POST'])
 def create_payment_intent():
     """Create a Stripe payment intent for credit purchase"""
