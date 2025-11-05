@@ -57,83 +57,91 @@
         <div class="container">
             <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1400px; margin: 0 auto;">
                 <!-- Free Trial Card -->
-                <div class="pricing-card trial-card" style="background: rgba(255, 255, 255, 0.95); border: 2px solid #4a90e2; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative;">
+                <div class="pricing-card trial-card" style="background: rgba(255, 255, 255, 0.95); border: 2px solid #4a90e2; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column;">
                     <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #27ae60; color: white; padding: 0.35rem 1.2rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">NO COMMITMENT - CANCEL ANYTIME</div>
-                    <h3 style="font-size: 1.75rem; color: #2c3e50; margin-bottom: 0.75rem; margin-top: 0.5rem;">Free Trial</h3>
-                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 2rem; min-height: 3rem;">Try all features risk-free before you commit</p>
-                    <div style="margin: 2rem 0;">
+                    <h3 style="font-size: 1.75rem; color: #2c3e50; margin-bottom: 0.75rem; margin-top: 0.5rem;">Trial</h3>
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 1rem; min-height: 3rem;">Try all features risk-free before you commit</p>
+                    <div style="margin: 1.5rem 0;">
                         <span style="font-size: 3rem; font-weight: 700; color: #27ae60;">$0</span>
                         <span style="color: #666; font-size: 1.1rem;">/14 days</span>
                     </div>
-                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #e8f5e9; border-radius: 8px;">
+                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #e8f5e9; border-radius: 8px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
                         <strong style="font-size: 1.5rem; color: #2c3e50;">9,000 words</strong>
-                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Full platform access for 14 days</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Full platform access</p>
                     </div>
-                    <div style="text-align: center; padding: 2rem 0; min-height: 80px;">
-                        <p style="color: #666; font-size: 0.9rem;">All platform features included</p>
+                    <div style="text-align: center; padding: 1.5rem 0; min-height: 100px; display: flex; flex-direction: column; justify-content: center; flex-grow: 1;">
+                        <p style="color: #2c3e50; font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;">All features included</p>
+                        <p style="color: #666; font-size: 0.9rem;">Credit card required</p>
                     </div>
-                    <a href="signup.html" class="btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Start Your Free Trial</a>
-                    <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.5; padding: 0.75rem; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107;">
-                        <strong>Auto-renews to Professional ($295/mo) on day 15 unless canceled.</strong><br>
-                        Credit card required. Cancel anytime before day 14 to avoid charges.
-                    </p>
+                    <div style="margin-top: auto;">
+                        <a href="signup.html" class="btn" style="width: 100%; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Start Your Free Trial</a>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.5; padding: 0.75rem; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107;">
+                            <strong>Auto-renews to Professional ($295/mo) on day 15 unless canceled.</strong>
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- Professional Plan -->
-                <div class="pricing-card" style="background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div class="pricing-card" style="background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
                     <h3 style="font-size: 1.75rem; color: #2c3e50; margin-bottom: 0.75rem;">Professional</h3>
-                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 2rem; min-height: 3rem;">For individual controllers and technical accounting professionals</p>
-                    <div style="margin: 2rem 0;">
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 1rem; min-height: 3rem;">For individual controllers and technical accounting professionals</p>
+                    <div style="margin: 1.5rem 0;">
                         <span style="font-size: 3rem; font-weight: 700; color: #2c3e50;">$295</span>
                         <span style="color: #666; font-size: 1.1rem;">/month</span>
                     </div>
-                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #f0f4f8; border-radius: 8px;">
+                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #f0f4f8; border-radius: 8px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
                         <strong style="font-size: 1.5rem; color: #2c3e50;">30,000 words/month</strong>
-                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Unused words roll over for 12 months</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Rolls over 12 months</p>
                     </div>
-                    <div style="text-align: center; padding: 2rem 0; min-height: 80px;">
+                    <div style="text-align: center; padding: 1.5rem 0; min-height: 100px; display: flex; flex-direction: column; justify-content: center; flex-grow: 1;">
                         <p style="color: #2c3e50; font-size: 1rem; font-weight: 500;">1 user seat</p>
                     </div>
-                    <a href="signup.html?plan=professional" class="btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Professional</a>
+                    <div style="margin-top: auto;">
+                        <a href="signup.html?plan=professional" class="btn" style="width: 100%; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Professional</a>
+                    </div>
                 </div>
 
                 <!-- Team Plan -->
-                <div class="pricing-card" style="background: white; border: 3px solid #4a90e2; border-radius: 12px; padding: 2.5rem; text-align: center; position: relative; box-shadow: 0 8px 16px rgba(74,144,226,0.15); transform: scale(1.05);">
+                <div class="pricing-card" style="background: white; border: 3px solid #4a90e2; border-radius: 12px; padding: 2.5rem; text-align: center; position: relative; box-shadow: 0 8px 16px rgba(74,144,226,0.15); transform: scale(1.05); display: flex; flex-direction: column;">
                     <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #4a90e2; color: white; padding: 0.4rem 1.5rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600;">MOST POPULAR</div>
                     <h3 style="font-size: 1.75rem; color: #2c3e50; margin-bottom: 0.75rem; margin-top: 0.5rem;">Team</h3>
-                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 2rem; min-height: 3rem;">For accounting teams and small firms with shared usage</p>
-                    <div style="margin: 2rem 0;">
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 1rem; min-height: 3rem;">For accounting teams and small firms with shared usage</p>
+                    <div style="margin: 1.5rem 0;">
                         <span style="font-size: 3rem; font-weight: 700; color: #2c3e50;">$595</span>
                         <span style="color: #666; font-size: 1.1rem;">/month</span>
                     </div>
-                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #e3f2fd; border-radius: 8px;">
+                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #e3f2fd; border-radius: 8px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
                         <strong style="font-size: 1.5rem; color: #2c3e50;">75,000 words/month</strong>
-                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Pooled across team, rolls over 12 months</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Pooled, rolls over 12 months</p>
                     </div>
-                    <div style="text-align: center; padding: 2rem 0; min-height: 80px;">
+                    <div style="text-align: center; padding: 1.5rem 0; min-height: 100px; display: flex; flex-direction: column; justify-content: center; flex-grow: 1;">
                         <p style="color: #2c3e50; font-size: 1rem; font-weight: 500;">3 user seats</p>
-                        <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Pooled usage across team</p>
+                        <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Pooled usage</p>
                     </div>
-                    <a href="signup.html?plan=team" class="btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Team Plan</a>
+                    <div style="margin-top: auto;">
+                        <a href="signup.html?plan=team" class="btn" style="width: 100%; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Team Plan</a>
+                    </div>
                 </div>
 
                 <!-- Enterprise Plan -->
-                <div class="pricing-card" style="background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div class="pricing-card" style="background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 2.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
                     <h3 style="font-size: 1.75rem; color: #2c3e50; margin-bottom: 0.75rem;">Enterprise</h3>
-                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 2rem; min-height: 3rem;">For large enterprises and Big 4 firms with custom SLA</p>
-                    <div style="margin: 2rem 0;">
+                    <p style="color: #666; font-size: 0.95rem; margin-bottom: 1rem; min-height: 3rem;">For large enterprises and Big 4 firms with custom SLA</p>
+                    <div style="margin: 1.5rem 0;">
                         <span style="font-size: 3rem; font-weight: 700; color: #2c3e50;">$1,195</span>
                         <span style="color: #666; font-size: 1.1rem;">/month</span>
                     </div>
-                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #f0f4f8; border-radius: 8px;">
+                    <div style="margin: 1.5rem 0; padding: 1.5rem; background: #f0f4f8; border-radius: 8px; min-height: 90px; display: flex; flex-direction: column; justify-content: center;">
                         <strong style="font-size: 1.5rem; color: #2c3e50;">180,000 words/month</strong>
-                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Enterprise-grade allowance</p>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.75rem;">Enterprise-grade</p>
                     </div>
-                    <div style="text-align: center; padding: 2rem 0; min-height: 80px;">
+                    <div style="text-align: center; padding: 1.5rem 0; min-height: 100px; display: flex; flex-direction: column; justify-content: center; flex-grow: 1;">
                         <p style="color: #2c3e50; font-size: 1rem; font-weight: 500;">Unlimited user seats</p>
                         <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">Custom SLA & dedicated support</p>
                     </div>
-                    <a href="signup.html?plan=enterprise" class="btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Enterprise</a>
+                    <div style="margin-top: auto;">
+                        <a href="signup.html?plan=enterprise" class="btn" style="width: 100%; padding: 1rem; font-size: 1.05rem; display: block; text-align: center; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">Select Enterprise</a>
+                    </div>
                 </div>
             </div>
             
