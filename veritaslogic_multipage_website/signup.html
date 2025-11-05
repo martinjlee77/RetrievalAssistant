@@ -34,15 +34,15 @@
                 if (data.site_key) {
                     window.RECAPTCHA_SITE_KEY = data.site_key;
                     
-                    // Load reCAPTCHA script and mark ready when loaded
+                    // Load reCAPTCHA Enterprise script and mark ready when loaded
                     const script = document.createElement('script');
-                    script.src = `https://www.google.com/recaptcha/api.js?render=${data.site_key}`;
+                    script.src = `https://www.google.com/recaptcha/enterprise.js?render=${data.site_key}`;
                     script.onload = () => {
-                        // Wait for grecaptcha to be ready
-                        if (window.grecaptcha) {
-                            window.grecaptcha.ready(() => {
+                        // Wait for grecaptcha.enterprise to be ready
+                        if (window.grecaptcha && window.grecaptcha.enterprise) {
+                            window.grecaptcha.enterprise.ready(() => {
                                 window.RECAPTCHA_READY = true;
-                                console.log('reCAPTCHA loaded and ready');
+                                console.log('reCAPTCHA Enterprise loaded and ready');
                             });
                         }
                     };
@@ -348,11 +348,11 @@
                 // Generate reCAPTCHA token if configured
                 if (window.RECAPTCHA_SITE_KEY && window.RECAPTCHA_READY) {
                     try {
-                        // Use grecaptcha.ready() to ensure it's initialized
+                        // Use grecaptcha.enterprise.ready() to ensure it's initialized
                         const recaptchaToken = await new Promise((resolve, reject) => {
-                            window.grecaptcha.ready(async () => {
+                            window.grecaptcha.enterprise.ready(async () => {
                                 try {
-                                    const token = await window.grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
+                                    const token = await window.grecaptcha.enterprise.execute(window.RECAPTCHA_SITE_KEY, {action: 'signup'});
                                     resolve(token);
                                 } catch (err) {
                                     reject(err);
