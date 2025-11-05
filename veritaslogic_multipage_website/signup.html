@@ -22,6 +22,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="VeritasLogic" />
     <link rel="manifest" href="/images/favicon/site.webmanifest" />
+    
+    <!-- Stripe.js for payment method collection -->
+    <script src="https://js.stripe.com/v3/"></script>
     <script>
         // reCAPTCHA Enterprise configuration
         window.RECAPTCHA_SITE_KEY = null;
@@ -97,10 +100,10 @@
 
             <!-- This is the new, structured list -->
             <ul class="signup-benefits">
-                <li>Receive one free, full-length technical analysis documented in a professional memo</li>
-                <li>Valid for documents up to 9,000 words or ~30 pages (a $295 value)</li>
-                <li>One complimentary re-run within 14 days for input modifications or extractable text adjustments</li>
-                <li>No credit card or commitment is required to start</li>
+                <li>Start your 14-day free trial with 9,000 words included (~30 pages of contract analysis)</li>
+                <li>Access all ASC standards: ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40</li>
+                <li>Professional Big 4-quality memos with authoritative citations</li>
+                <li>Credit card required to activate trial — cancel anytime with no charges during trial period</li>
             </ul>
         </div>
     </section>
@@ -179,6 +182,16 @@
                         <label for="confirmPassword">Confirm Password <span class="required"></span></label>
                         <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password" autocomplete="new-password">
                         <div id="password-match" class="password-feedback"></div>
+                    </div>
+                    
+                    <!-- Credit Card Section -->
+                    <div class="form-group card-section">
+                        <label>Credit Card Information <span class="required"></span></label>
+                        <p class="card-notice">Your card will not be charged during the 14-day trial. Cancel anytime before the trial ends to avoid charges.</p>
+                        <div id="card-element" class="stripe-card-element">
+                            <!-- Stripe Card Element will be inserted here -->
+                        </div>
+                        <div id="card-errors" role="alert" class="card-errors"></div>
                     </div>
                     
                     <!-- Marketing Opt-in Checkbox -->
@@ -294,6 +307,58 @@
         
     </script>
     <script>
+        // Initialize Stripe and Card Element
+        let stripe = null;
+        let cardElement = null;
+        
+        // Fetch Stripe public key and initialize
+        fetch('/api/stripe/public-key')
+            .then(r => r.json())
+            .then(data => {
+                if (data.public_key) {
+                    stripe = Stripe(data.public_key);
+                    const elements = stripe.elements();
+                    
+                    // Create and mount card element
+                    cardElement = elements.create('card', {
+                        style: {
+                            base: {
+                                fontSize: '16px',
+                                color: '#32325d',
+                                fontFamily: '"Poppins", sans-serif',
+                                '::placeholder': {
+                                    color: '#aab7c4'
+                                }
+                            },
+                            invalid: {
+                                color: '#fa755a',
+                                iconColor: '#fa755a'
+                            }
+                        }
+                    });
+                    
+                    cardElement.mount('#card-element');
+                    
+                    // Handle real-time validation errors
+                    cardElement.on('change', function(event) {
+                        const displayError = document.getElementById('card-errors');
+                        if (event.error) {
+                            displayError.textContent = event.error.message;
+                        } else {
+                            displayError.textContent = '';
+                        }
+                    });
+                } else {
+                    console.error('Failed to load Stripe');
+                    document.querySelector('.card-section').innerHTML = '<p class="error-message">Payment system unavailable. Please contact support.</p>';
+                }
+            })
+            .catch(err => {
+                console.error('Stripe initialization failed:', err);
+                document.querySelector('.card-section').innerHTML = '<p class="error-message">Payment system unavailable. Please contact support.</p>';
+            });
+    </script>
+    <script>
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -353,16 +418,21 @@
                 return;
             }
             
+            // Validate Stripe is ready
+            if (!stripe || !cardElement) {
+                showMessage('Payment system is not ready. Please refresh the page and try again.', 'error');
+                return;
+            }
+            
             // Show loading state
             submitButton.disabled = true;
-            submitButton.textContent = 'Creating Account...';
+            submitButton.textContent = 'Processing...';
             form.classList.add('loading');
             
             try {
-                // Generate reCAPTCHA token if configured
+                // Step 1: Generate reCAPTCHA token if configured
                 if (window.RECAPTCHA_SITE_KEY && window.RECAPTCHA_READY) {
                     try {
-                        // Execute reCAPTCHA Enterprise with rendered widget ID
                         const recaptchaToken = await window.grecaptcha.enterprise.execute(window.RECAPTCHA_WIDGET_ID, {
                             action: 'signup'
                         });
@@ -378,19 +448,53 @@
                     }
                 }
                 
-                // Construct API URL for Replit environment
-                const apiUrl = '/api/signup';
-                const response = await fetch(apiUrl, {
+                // Step 2: Create Setup Intent on backend
+                submitButton.textContent = 'Validating payment method...';
+                const setupIntentResponse = await fetch('/api/signup/create-setup-intent', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: formData.email })
+                });
+                
+                if (!setupIntentResponse.ok) {
+                    const errorData = await setupIntentResponse.json();
+                    throw new Error(errorData.error || 'Failed to initialize payment');
+                }
+                
+                const { client_secret } = await setupIntentResponse.json();
+                
+                // Step 3: Confirm Setup Intent with Stripe
+                const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(client_secret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: {
+                            name: `${formData.first_name} ${formData.last_name}`,
+                            email: formData.email
+                        }
+                    }
+                });
+                
+                if (stripeError) {
+                    throw new Error(stripeError.message);
+                }
+                
+                if (setupIntent.status !== 'succeeded') {
+                    throw new Error('Card verification failed. Please try a different card.');
+                }
+                
+                // Step 4: Complete signup with payment method ID
+                submitButton.textContent = 'Creating account...';
+                formData.payment_method_id = setupIntent.payment_method;
+                
+                const signupResponse = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 
-                const result = await response.json();
+                const result = await signupResponse.json();
                 
-                if (response.ok) {
+                if (signupResponse.ok) {
                     submitButton.disabled = true;
                     submitButton.textContent = 'Account Created';
                     showMessage('Account created successfully! Please check your email to verify your account.', 'success');
@@ -406,7 +510,7 @@
                 
             } catch (error) {
                 console.error('Signup error:', error);
-                showMessage('Network error. Please check your connection and try again.', 'error');
+                showMessage(error.message || 'An error occurred. Please try again.', 'error');
             } finally {
                 // Only reset loading state if signup was not successful
                 if (submitButton.textContent !== 'Account Created') {

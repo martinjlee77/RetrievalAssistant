@@ -959,14 +959,30 @@ def signup():
             """, (org_id,))
             
             if not cursor.fetchone():
-                # Create trial subscription
+                # Create trial subscription with payment method
                 from shared.subscription_manager import SubscriptionManager
                 sub_mgr = SubscriptionManager(conn)
                 
+                # Get payment_method_id from signup data (required for trials)
+                payment_method_id = data.get('payment_method_id')
+                
+                if not payment_method_id:
+                    conn.rollback()
+                    conn.close()
+                    logger.error(f"Signup blocked - payment method required for trial: {email}")
+                    return jsonify({
+                        'error': 'Payment method is required to activate your trial. Please refresh and try again.'
+                    }), 400
+                
                 try:
-                    trial_result = sub_mgr.create_trial_subscription(org_id, plan_key='professional')
+                    trial_result = sub_mgr.create_trial_subscription(
+                        org_id, 
+                        plan_key='professional',
+                        payment_method_id=payment_method_id,
+                        customer_email=email
+                    )
                     trial_info = trial_result
-                    logger.info(f"Created 14-day trial subscription for org {org_id}: {trial_result['word_allowance']} words")
+                    logger.info(f"Created 14-day trial subscription for org {org_id}: {trial_result['word_allowance']} words, payment method attached")
                 except Exception as trial_error:
                     logger.error(f"Failed to create trial subscription: {trial_error}")
                     # Don't block signup if trial creation fails
@@ -2479,6 +2495,40 @@ def record_analysis():
 def get_stripe_config():
     """Get Stripe publishable key for frontend"""
     return jsonify({'publishable_key': STRIPE_PUBLISHABLE_KEY}), 200
+
+@app.route('/api/stripe/public-key', methods=['GET'])
+def get_stripe_public_key():
+    """Get Stripe publishable key for signup flow"""
+    return jsonify({'public_key': STRIPE_PUBLISHABLE_KEY}), 200
+
+@app.route('/api/signup/create-setup-intent', methods=['POST'])
+def create_signup_setup_intent():
+    """Create a Setup Intent for collecting payment method during signup"""
+    try:
+        data = request.get_json()
+        email = data.get('email', '')
+        
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        # Create Setup Intent with Stripe
+        setup_intent = stripe.SetupIntent.create(
+            payment_method_types=['card'],
+            metadata={
+                'signup_email': email,
+                'purpose': 'trial_signup'
+            }
+        )
+        
+        logger.info(f"Created Setup Intent for signup: {email}")
+        
+        return jsonify({
+            'client_secret': setup_intent.client_secret
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Setup Intent creation error: {e}")
+        return jsonify({'error': 'Failed to initialize payment method collection'}), 500
 
 @app.route('/api/stripe/create-payment-intent', methods=['POST'])
 def create_payment_intent():

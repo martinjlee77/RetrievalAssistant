@@ -151,9 +151,9 @@
                     <span class="nav-icon">dashboard</span>
                     <span class="nav-text">Overview</span>
                 </a>
-                <a href="#credits" class="nav-item" onclick="showSection('credits')">
-                    <span class="nav-icon">credit_card</span>
-                    <span class="nav-text">Credits</span>
+                <a href="#subscription" class="nav-item" onclick="showSection('subscription')">
+                    <span class="nav-icon">workspace_premium</span>
+                    <span class="nav-text">Subscription</span>
                 </a>
                 <a href="#profile" class="nav-item" onclick="showSection('profile')">
                     <span class="nav-icon">person</span>
@@ -182,21 +182,29 @@
             <div id="overviewSection" class="dashboard-section active">
             
                 <div class="dashboard-grid">
-                    <!-- Account Balance Card -->
+                    <!-- Subscription Status Card -->
                     <div class="card balance-card">
-                        <h2><span class="nav-icon">account_balance_wallet</span>
-                            Account Balance
+                        <h2><span class="nav-icon">workspace_premium</span>
+                            Subscription Status
                         </h2>
                         
-                        <div class="credits-display" id="creditsDisplay">
-                            <div class="number" id="creditsBalance">$0</div>
-                            <div class="label">Credits Available</div>
-                            <!-- <small class="credits-expiry">Credits expire 12 months from purchase.</small> -->
+                        <div class="subscription-display" id="subscriptionDisplay">
+                            <div class="subscription-plan">
+                                <div class="plan-name" id="planName">Loading...</div>
+                                <div class="plan-status" id="planStatus"></div>
+                            </div>
+                            <div class="word-allowance">
+                                <div class="words-remaining" id="wordsRemaining">
+                                    <span class="number">0</span> words remaining
+                                </div>
+                                <div class="words-total" id="wordsTotal">of 0 total</div>
+                            </div>
+                            <div class="renewal-info" id="renewalInfo"></div>
                         </div>
                         
-                        <button onclick="showSection('credits')" class="btn btn--secondary">
-                            <span class="nav-icon">add_box</span>
-                            Add More Credits
+                        <button onclick="showSection('subscription')" class="btn btn--secondary">
+                            <span class="nav-icon">upgrade</span>
+                            Manage Subscription
                         </button>
                     </div>
                     
@@ -269,52 +277,118 @@
                 </div>
             </div>
 
-                <!-- Credits Section -->
-                <div id="creditsSection" class="dashboard-section">
-
-                    <div class="card credit-purchase-card">
-                        <h2>Add Credits to Your Account</h2>
-
-                        <p class="credits-policy-intro">Select a package or enter a custom amount. Credits expire 12 months from purchase and are processed securely by Stripe.</p>
-
-                        <h3>Credit Packages</h3>
-                        <div class="credit-packages" id="creditPackages">
-                            <div class="loading-packages">Loading packages...</div>
-                        </div>
+                <!-- Subscription Section -->
+                <div id="subscriptionSection" class="dashboard-section">
+                    <h2 class="subscription-main-title">Manage Your Subscription</h2>
                     
-                    <h3>Custom Amount</h3>
-                    <div class="custom-amount-section">
-                        <div class="custom-amount-input">
-                            <label for="customAmount">Enter amount ($195 - $3,000):</label>
-                            <div class="amount-input-group">
-                                <span class="currency-symbol">$</span>
-                                <input type="number" id="customAmount" min="195" max="3000" step="1" placeholder="1000">
-                                <button onclick="selectCustomAmount()" class="btn btn-secondary">Select</button>
+                    <!-- Current Plan Card -->
+                    <div class="card subscription-details-card">
+                        <h3>Current Plan</h3>
+                        <div class="current-plan-details">
+                            <div class="plan-header">
+                                <span class="plan-badge" id="currentPlanBadge">Free Trial</span>
+                                <span class="plan-price" id="currentPlanPrice">$0/month</span>
+                            </div>
+                            <div class="plan-features" id="currentPlanFeatures">
+                                <div class="feature-item">
+                                    <span class="feature-icon">✓</span>
+                                    <span>Loading plan details...</span>
+                                </div>
+                            </div>
+                            <div class="plan-usage" id="planUsage">
+                                <div class="usage-bar-container">
+                                    <div class="usage-bar" id="usageBar"></div>
+                                </div>
+                                <div class="usage-stats">
+                                    <span id="wordsUsedStat">0 words used</span>
+                                    <span id="wordsAvailableStat">0 words available</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="payment-form-container hidden" id="paymentFormContainer">
-                        <h3>Payment Details</h3>
-                        <div class="selected-package" id="selectedPackageDisplay"></div>
+
+                    <!-- Upgrade Options -->
+                    <div class="card upgrade-options-card">
+                        <h3>Upgrade Your Plan</h3>
+                        <p class="upgrade-intro">Get more word allowance and unlock advanced features.</p>
                         
-                        <form id="payment-form">
-                            <div id="card-element">
-                                <!-- Stripe card element will be inserted here -->
+                        <div class="subscription-plans" id="subscriptionPlans">
+                            <!-- Professional Plan -->
+                            <div class="plan-option" data-plan="professional">
+                                <div class="plan-option-header">
+                                    <h4>Professional</h4>
+                                    <div class="plan-option-price">$295<span>/month</span></div>
+                                </div>
+                                <ul class="plan-option-features">
+                                    <li>30,000 words/month</li>
+                                    <li>All ASC standards</li>
+                                    <li>Priority support</li>
+                                    <li>Rollover unused words</li>
+                                </ul>
+                                <button onclick="upgradeToPlan('professional')" class="btn btn-primary">
+                                    Upgrade to Professional
+                                </button>
                             </div>
-                            <div id="card-errors" role="alert"></div>
-                            
-                            <button type="submit" id="submit-payment" class="btn btn-primary payment-btn">
-                                <span id="button-text">Complete Payment</span>
+
+                            <!-- Team Plan -->
+                            <div class="plan-option popular" data-plan="team">
+                                <div class="popular-badge">Most Popular</div>
+                                <div class="plan-option-header">
+                                    <h4>Team</h4>
+                                    <div class="plan-option-price">$595<span>/month</span></div>
+                                </div>
+                                <ul class="plan-option-features">
+                                    <li>75,000 words/month</li>
+                                    <li>All ASC standards</li>
+                                    <li>Priority support</li>
+                                    <li>Rollover unused words</li>
+                                    <li>Team collaboration</li>
+                                </ul>
+                                <button onclick="upgradeToPlan('team')" class="btn btn-primary">
+                                    Upgrade to Team
+                                </button>
+                            </div>
+
+                            <!-- Enterprise Plan -->
+                            <div class="plan-option" data-plan="enterprise">
+                                <div class="plan-option-header">
+                                    <h4>Enterprise</h4>
+                                    <div class="plan-option-price">$1,195<span>/month</span></div>
+                                </div>
+                                <ul class="plan-option-features">
+                                    <li>180,000 words/month</li>
+                                    <li>All ASC standards</li>
+                                    <li>Dedicated support</li>
+                                    <li>Rollover unused words</li>
+                                    <li>Team collaboration</li>
+                                    <li>Custom integrations</li>
+                                </ul>
+                                <button onclick="upgradeToPlan('enterprise')" class="btn btn-primary">
+                                    Upgrade to Enterprise
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing & Cancel -->
+                    <div class="card billing-management-card">
+                        <h3>Billing Management</h3>
+                        <div class="billing-actions">
+                            <button onclick="updatePaymentMethod()" class="btn btn-secondary">
+                                <span class="nav-icon">credit_card</span>
+                                Update Payment Method
                             </button>
-                        </form>
-                        
-                        <button onclick="cancelPayment()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="viewInvoiceHistory()" class="btn btn-secondary">
+                                <span class="nav-icon">receipt</span>
+                                View Invoice History
+                            </button>
+                            <button onclick="cancelSubscription()" class="btn btn-tertiary">
+                                <span class="nav-icon">cancel</span>
+                                Cancel Subscription
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div id="payment-messages" aria-live="polite"></div>
                 </div>
-            </div>
 
             <!-- Profile Section -->
             <div id="profileSection" class="dashboard-section">

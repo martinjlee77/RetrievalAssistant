@@ -412,18 +412,24 @@ class SubscriptionManager:
                 'new_month_allowance': subscription['word_allowance']
             }
     
-    def create_trial_subscription(self, org_id, plan_key='professional', stripe_subscription_id=None):
+    def create_trial_subscription(self, org_id, plan_key='professional', stripe_subscription_id=None, payment_method_id=None, customer_email=None):
         """
         Create a new trial subscription for organization
         
         Args:
             org_id (int): Organization ID
             plan_key (str): Plan to trial (default: professional)
-            stripe_subscription_id (str): Stripe subscription ID if created
+            stripe_subscription_id (str): Stripe subscription ID if created externally
+            payment_method_id (str): Stripe payment method ID to attach
+            customer_email (str): Customer email for Stripe customer creation
             
         Returns:
             dict: Created subscription details
         """
+        import stripe
+        import os
+        stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+        
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
             # Get plan details
             cur.execute("""
@@ -444,6 +450,44 @@ class SubscriptionManager:
             
             if cur.fetchone():
                 raise ValueError("Organization already has an active subscription")
+            
+            # Create Stripe customer and subscription if payment method provided
+            stripe_customer_id = None
+            if payment_method_id and customer_email:
+                try:
+                    # Create Stripe customer
+                    customer = stripe.Customer.create(
+                        email=customer_email,
+                        payment_method=payment_method_id,
+                        invoice_settings={'default_payment_method': payment_method_id},
+                        metadata={'org_id': org_id}
+                    )
+                    stripe_customer_id = customer.id
+                    logger.info(f"Created Stripe customer {stripe_customer_id} for org {org_id}")
+                    
+                    # Create Stripe subscription with trial
+                    subscription = stripe.Subscription.create(
+                        customer=stripe_customer_id,
+                        items=[{'price': plan['stripe_price_id']}],
+                        trial_period_days=14,
+                        metadata={
+                            'org_id': org_id,
+                            'plan_key': plan_key
+                        }
+                    )
+                    stripe_subscription_id = subscription.id
+                    logger.info(f"Created Stripe subscription {stripe_subscription_id} with 14-day trial")
+                    
+                    # Store stripe_customer_id in organizations table
+                    cur.execute("""
+                        UPDATE organizations 
+                        SET stripe_customer_id = %s, updated_at = NOW()
+                        WHERE id = %s
+                    """, (stripe_customer_id, org_id))
+                    
+                except stripe.error.StripeError as e:
+                    logger.error(f"Stripe error creating customer/subscription: {e}")
+                    raise ValueError(f"Payment setup failed: {str(e)}")
             
             # Create trial subscription
             trial_start = datetime.now()
