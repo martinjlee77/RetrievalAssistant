@@ -11,10 +11,12 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
-# reCAPTCHA Configuration
+# reCAPTCHA Enterprise Configuration
 RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')
 RECAPTCHA_SITE_KEY = os.getenv('RECAPTCHA_SITE_KEY')
-RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+GOOGLE_CLOUD_API_KEY = os.getenv('GOOGLE_CLOUD_API_KEY')
+GOOGLE_CLOUD_PROJECT_ID = 'gen-lang-client-0926483167'
+RECAPTCHA_ENTERPRISE_API_URL = f'https://recaptchaenterprise.googleapis.com/v1/projects/{GOOGLE_CLOUD_PROJECT_ID}/assessments'
 
 # Rate Limiting Configuration
 RATE_LIMIT_WINDOW_MINUTES = 60
@@ -23,66 +25,87 @@ MAX_SIGNUP_ATTEMPTS_PER_DOMAIN = 2
 
 def verify_recaptcha(token, remote_ip=None):
     """
-    Verify reCAPTCHA v3 token with Google
+    Verify reCAPTCHA Enterprise token with Google Cloud API
     
     Args:
-        token (str): reCAPTCHA token from frontend
+        token (str): reCAPTCHA Enterprise token from frontend
         remote_ip (str, optional): User's IP address
         
     Returns:
         tuple: (success: bool, score: float, error_message: str)
     """
-    if not RECAPTCHA_SECRET_KEY:
-        logger.warning("RECAPTCHA_SECRET_KEY not configured - skipping verification")
+    if not GOOGLE_CLOUD_API_KEY:
+        logger.warning("GOOGLE_CLOUD_API_KEY not configured - skipping verification")
         return True, 1.0, None  # Allow in development
     
     if not token:
         return False, 0.0, "reCAPTCHA token missing"
     
     try:
+        # Build Enterprise API request
         payload = {
-            'secret': RECAPTCHA_SECRET_KEY,
-            'response': token
+            'event': {
+                'token': token,
+                'siteKey': RECAPTCHA_SITE_KEY,
+                'expectedAction': 'signup'
+            }
         }
         
         if remote_ip:
-            payload['remoteip'] = remote_ip
+            payload['event']['userIpAddress'] = remote_ip
         
-        response = requests.post(RECAPTCHA_VERIFY_URL, data=payload, timeout=5)
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        
+        # Call Enterprise API with API key
+        url = f'{RECAPTCHA_ENTERPRISE_API_URL}?key={GOOGLE_CLOUD_API_KEY}'
+        response = requests.post(url, json=payload, headers=headers, timeout=5)
         result = response.json()
         
         # DEBUG: Log full Google response
-        logger.info(f"reCAPTCHA Google API Response: {result}")
+        logger.info(f"reCAPTCHA Enterprise API Response: {result}")
         
-        success = result.get('success', False)
-        score = result.get('score', 0.0)
-        error_codes = result.get('error-codes', [])
-        hostname = result.get('hostname', 'N/A')
-        action = result.get('action', 'N/A')
-        challenge_ts = result.get('challenge_ts', 'N/A')
+        # Parse Enterprise API response
+        token_properties = result.get('tokenProperties', {})
+        risk_analysis = result.get('riskAnalysis', {})
         
-        logger.info(f"reCAPTCHA Details - success={success}, score={score}, hostname={hostname}, action={action}, challenge_ts={challenge_ts}, errors={error_codes}")
+        valid = token_properties.get('valid', False)
+        action = token_properties.get('action', 'N/A')
+        hostname = token_properties.get('hostname', 'N/A')
+        create_time = token_properties.get('createTime', 'N/A')
+        invalid_reason = token_properties.get('invalidReason', None)
         
-        if not success:
-            error_msg = f"reCAPTCHA verification failed: {', '.join(error_codes)}"
+        score = risk_analysis.get('score', 0.0)
+        reasons = risk_analysis.get('reasons', [])
+        
+        logger.info(f"reCAPTCHA Enterprise Details - valid={valid}, score={score}, hostname={hostname}, action={action}, create_time={create_time}, reasons={reasons}")
+        
+        if not valid:
+            error_msg = f"reCAPTCHA token invalid: {invalid_reason or 'unknown reason'}"
             logger.warning(f"reCAPTCHA failed for IP {remote_ip}: {error_msg}")
             return False, score, error_msg
         
-        # reCAPTCHA v3 scores range from 0.0 (bot) to 1.0 (human)
+        # Check action matches
+        if action != 'signup':
+            logger.warning(f"reCAPTCHA action mismatch: expected 'signup', got '{action}'")
+            return False, score, "Invalid reCAPTCHA action"
+        
+        # Enterprise scores range from 0.0 (bot) to 1.0 (human)
         # We require a minimum score of 0.5 for signup
         if score < 0.5:
             logger.warning(f"Low reCAPTCHA score {score} for IP {remote_ip}")
             return False, score, f"Suspicious activity detected (score: {score:.2f})"
         
-        logger.info(f"reCAPTCHA verified successfully: score={score:.2f}, IP={remote_ip}")
+        logger.info(f"reCAPTCHA Enterprise verified successfully: score={score:.2f}, IP={remote_ip}")
         return True, score, None
         
     except requests.Timeout:
-        logger.error("reCAPTCHA verification timeout")
+        logger.error("reCAPTCHA Enterprise verification timeout")
         # Allow signup on timeout to avoid blocking legitimate users
         return True, 1.0, None
     except Exception as e:
-        logger.error(f"reCAPTCHA verification error: {e}")
+        logger.error(f"reCAPTCHA Enterprise verification error: {e}")
         # Allow signup on error to avoid blocking legitimate users
         return True, 1.0, None
 
