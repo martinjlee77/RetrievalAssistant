@@ -195,7 +195,7 @@ def check_domain_trial_eligibility(conn, email_domain):
     
     # Check if domain already has an organization with a trial or paid subscription
     cursor.execute("""
-        SELECT o.id, o.name, si.status, si.plan_key, si.trial
+        SELECT o.id, o.name, si.status, si.plan_id, si.trial_start_date IS NOT NULL AS trial
         FROM organizations o
         LEFT JOIN subscription_instances si ON o.id = si.org_id
         WHERE o.domain = %s
@@ -224,21 +224,21 @@ def check_domain_trial_eligibility(conn, email_domain):
     # Domain exists but no active subscription - could be expired trial
     # Allow new trial if previous trial has ended
     cursor.execute("""
-        SELECT trial, status, trial_ends_at
+        SELECT trial_start_date IS NOT NULL AS trial, status, trial_end_date
         FROM subscription_instances
-        WHERE org_id = %s AND trial = true
+        WHERE org_id = %s AND trial_start_date IS NOT NULL
         ORDER BY created_at DESC
         LIMIT 1
     """, (org_id,))
     
     past_trial = cursor.fetchone()
     
-    if past_trial and past_trial[1] in ('active', 'trial'):
+    if past_trial and past_trial['status'] in ('active', 'trial'):
         # Active trial exists
         return False, f"Your organization already has an active trial. Please contact support if you need assistance."
     
-    if past_trial and past_trial[2]:
-        trial_end = past_trial[2]
+    if past_trial and past_trial['trial_end_date']:
+        trial_end = past_trial['trial_end_date']
         days_since_trial = (datetime.utcnow() - trial_end).days
         
         if days_since_trial < 90:
