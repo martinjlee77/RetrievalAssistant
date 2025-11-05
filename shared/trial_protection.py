@@ -195,7 +195,7 @@ def check_domain_trial_eligibility(conn, email_domain):
     
     # Check if domain already has an organization with a trial or paid subscription
     cursor.execute("""
-        SELECT o.id, o.company_name, si.status, si.plan_key, si.trial
+        SELECT o.id, o.name, si.status, si.plan_key, si.trial
         FROM organizations o
         LEFT JOIN subscription_instances si ON o.id = si.org_id
         WHERE o.domain = %s
