@@ -405,12 +405,12 @@ async function populateDashboard(userData) {
 async function loadUsageStatistics() {
     const totalAnalysesEl = document.getElementById('totalAnalyses');
     const thisMonthEl = document.getElementById('thisMonth');
-    const totalSpentEl = document.getElementById('totalSpent');
+    const currentPlanEl = document.getElementById('currentPlan');
     
     // Show loading state
     totalAnalysesEl.textContent = '...';
     thisMonthEl.textContent = '...';
-    totalSpentEl.textContent = '...';
+    currentPlanEl.textContent = '...';
     
     try {
         const token = localStorage.getItem('authToken');
@@ -427,19 +427,20 @@ async function loadUsageStatistics() {
                 // Update usage statistics
                 totalAnalysesEl.textContent = data.stats.total_analyses;
                 thisMonthEl.textContent = data.stats.analyses_this_month;
-                totalSpentEl.textContent = `$${Math.abs(data.stats.total_spent).toFixed(0)}`;
+                // Current plan will be updated by loadSubscriptionData()
+                currentPlanEl.textContent = 'Loading...';
             }
         } else {
             console.error('Failed to load usage statistics');
             totalAnalysesEl.textContent = '0';
             thisMonthEl.textContent = '0';
-            totalSpentEl.textContent = '$0';
+            currentPlanEl.textContent = 'None';
         }
     } catch (error) {
         console.error('Error loading usage statistics:', error);
         totalAnalysesEl.textContent = '0';
         thisMonthEl.textContent = '0';
-        totalSpentEl.textContent = '$0';
+        currentPlanEl.textContent = 'None';
     }
 }
 
@@ -508,6 +509,16 @@ function updateSubscriptionUI(data) {
     const wordsAllowed = sub.word_allowance || 0;
     const wordsRemaining = Math.max(0, wordsAllowed - wordsUsed);
     const usagePercent = wordsAllowed > 0 ? Math.min(100, (wordsUsed / wordsAllowed) * 100) : 0;
+    
+    // Update current plan stat in usage statistics card
+    const currentPlanEl = document.getElementById('currentPlan');
+    if (currentPlanEl) {
+        if (sub.status === 'trial') {
+            currentPlanEl.textContent = 'Trial';
+        } else {
+            currentPlanEl.textContent = sub.plan_name || 'Active';
+        }
+    }
     
     // Update overview section subscription card
     if (sub.status === 'trial') {
@@ -606,6 +617,11 @@ function showNoSubscriptionState() {
     const wordsTotalEl = document.getElementById('wordsTotal');
     if (wordsTotalEl) {
         wordsTotalEl.textContent = 'of 0 total';
+    }
+    
+    const currentPlanEl = document.getElementById('currentPlan');
+    if (currentPlanEl) {
+        currentPlanEl.textContent = 'None';
     }
     
     const currentPlanBadge = document.getElementById('currentPlanBadge');
