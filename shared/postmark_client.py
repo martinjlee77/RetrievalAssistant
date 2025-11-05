@@ -260,8 +260,21 @@ If you have any questions, reply to this email and we'll help.
                 'X-Postmark-Server-Token': self.api_key
             }
             
+            # Determine base URL based on environment
+            import os
+            if os.getenv('RAILWAY_ENVIRONMENT'):
+                # Production on Railway
+                base_url = "https://veritaslogic.ai"
+            elif os.getenv('REPL_SLUG'):
+                # Development on Replit
+                replit_domain = os.getenv('REPLIT_DEV_DOMAIN', 'localhost:3000')
+                base_url = f"https://{replit_domain}"
+            else:
+                # Local development
+                base_url = "http://localhost:3000"
+            
             # Create the verification link
-            verification_link = f"https://veritaslogic.ai/verify-email.html?token={verification_token}"
+            verification_link = f"{base_url}/verify-email.html?token={verification_token}"
             
             email_data = {
                 'From': self.from_email,
