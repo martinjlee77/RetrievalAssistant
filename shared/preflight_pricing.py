@@ -239,151 +239,104 @@ class PreflightPricing:
         """Create filename-aware scanned PDF message using DocumentExtractor's method"""
         return self.document_extractor._get_scanned_pdf_message(reasons=reasons, filename=filename)
     
-    def check_subscription_allowance(self, org_id: int, total_words: int, file_count: int) -> Dict[str, Any]:
+    def check_subscription_allowance(self, user_token: str, total_words: int) -> Dict[str, Any]:
         """
-        Check if organization has sufficient word allowance for analysis (subscription-based)
+        Check if user has sufficient word allowance for analysis (subscription-based)
         
         Args:
-            org_id: Organization ID
+            user_token: User authentication token
             total_words: Total word count across all files
-            file_count: Number of files
             
         Returns:
             Dict containing allowance check result, usage info, and UI messaging
         """
         if total_words == 0:
             return {
-                'success': False,
-                'allowed': False,
-                'error': 'No text available for analysis',
+                'can_proceed': False,
+                'error_message': 'No text available for analysis',
                 'total_words': 0
             }
         
-        # Get subscription allowance check
-        subscription_manager = SubscriptionManager()
-        allowance_check = subscription_manager.check_word_allowance(org_id, total_words)
-        usage_info = subscription_manager.get_current_usage(org_id)
+        # Get subscription allowance check via API
+        import requests
+        from shared.auth_utils import WEBSITE_URL
         
-        # Calculate estimated pages for user display
-        estimated_total_pages = max(1, round(total_words / 300))
+        try:
+            response = requests.post(
+                f'{WEBSITE_URL}/api/subscription/check-allowance',
+                headers={'Authorization': f'Bearer {user_token}'},
+                json={'words_needed': total_words},
+                timeout=10
+            )
+            
+            if not response.ok:
+                logger.error(f"Allowance check failed: {response.status_code} - {response.text}")
+                return {
+                    'can_proceed': False,
+                    'error_message': 'Failed to check word allowance. Please try again.',
+                    'total_words': total_words
+                }
+            
+            allowance_data = response.json()
+            
+        except Exception as e:
+            logger.error(f"Allowance check error: {str(e)}")
+            return {
+                'can_proceed': False,
+                'error_message': 'Network error checking word allowance. Please try again.',
+                'total_words': total_words
+            }
         
-        # Build result with allowance metadata
+        # Extract allowance data from API response
+        can_proceed = allowance_data.get('can_proceed', False)
+        segment = allowance_data.get('segment', 'unknown')  # trial, paid, past_due, none
+        status = allowance_data.get('status', 'unknown')
+        words_available = allowance_data.get('words_available', 0)
+        words_remaining_after = allowance_data.get('words_remaining_after', 0)
+        show_warning = allowance_data.get('show_warning', False)
+        renewal_date = allowance_data.get('renewal_date', 'Unknown')
+        org_id = allowance_data.get('org_id')
+        upgrade_link = allowance_data.get('upgrade_link', '/dashboard')
+        
+        # Build standard result structure
         result = {
-            'success': True,
-            'allowed': allowance_check['allowed'],
+            'can_proceed': can_proceed,
             'total_words': total_words,
-            'estimated_total_pages': estimated_total_pages,
-            'file_count': file_count,
-            'words_available': allowance_check['words_available'],
-            'usage_info': usage_info,
-            'allowance_check': allowance_check
+            'segment': segment,
+            'status': status,
+            'words_available': words_available,
+            'words_remaining_after': words_remaining_after,
+            'show_warning': show_warning,
+            'renewal_date': renewal_date,
+            'org_id': org_id,
+            'upgrade_link': upgrade_link
         }
         
-        # Add tailored UI messaging based on subscription status
-        if allowance_check['allowed']:
-            # Sufficient allowance - show confirmation
-            words_remaining = allowance_check.get('words_remaining_after', 0)
-            result['ui_message'] = {
-                'type': 'success',
-                'title': '✅ Sufficient Word Allowance',
-                'content': f"""
-**This analysis will use {total_words:,} words** ({estimated_total_pages} pages across {file_count} file{'s' if file_count != 1 else ''})
-
-- **Available:** {allowance_check['words_available']:,} words
-- **After analysis:** {words_remaining:,} words remaining
-- **Plan:** {usage_info.get('plan_name', 'N/A')}
-"""
-            }
-        else:
-            # Insufficient allowance - show upgrade message
-            suggested_action = allowance_check.get('suggested_action', 'upgrade_plan')
-            
-            if suggested_action == 'update_payment':
-                # Past due account
-                result['ui_message'] = {
-                    'type': 'error',
-                    'title': '⚠️ Payment Required',
-                    'content': f"""
-Your subscription payment is past due. Please update your payment method to continue using VeritasLogic.
-
-**Analysis requires:** {total_words:,} words ({estimated_total_pages} pages)
-
-[Update Payment Method in Dashboard](#)
-""",
-                    'action': 'update_payment',
-                    'action_url': '/dashboard#billing'
-                }
-            elif suggested_action == 'start_trial':
-                # No subscription
-                result['ui_message'] = {
-                    'type': 'info',
-                    'title': '🎉 Start Your Free Trial',
-                    'content': f"""
-**This analysis requires {total_words:,} words** ({estimated_total_pages} pages)
-
-Start your 14-day free trial with {usage_info.get('word_allowance', 9000):,} words to analyze this contract.
-
-[Start Free Trial](#)
-""",
-                    'action': 'start_trial',
-                    'action_url': '/signup.html'
-                }
+        # Add error message if blocked
+        if not can_proceed:
+            if segment == 'past_due':
+                # STRICT ENFORCEMENT: Completely block past-due users
+                result['error_message'] = (
+                    f"Your subscription payment failed. Please update your payment method to continue. "
+                    f"Visit your dashboard to resolve this issue."
+                )
+                logger.warning(f"BLOCKED past-due user (org {org_id}): Cannot proceed with {total_words} word analysis")
+            elif segment == 'none':
+                result['error_message'] = (
+                    f"No active subscription found. Start your 14-day free trial to analyze this contract."
+                )
             else:
-                # Insufficient words - need upgrade
-                is_trial = usage_info.get('is_trial', False)
-                current_plan = usage_info.get('plan_key', 'professional')
-                
-                if is_trial:
-                    # Trial user - celebratory tone
-                    result['ui_message'] = {
-                        'type': 'warning',
-                        'title': '🎉 Great Choice!',
-                        'content': f"""
-**This contract requires {total_words:,} words** ({estimated_total_pages} pages across {file_count} file{'s' if file_count != 1 else ''})
-
-You have **{allowance_check['words_available']:,} words** remaining in your trial.
-
-Continue with a paid plan to analyze this contract and get your full monthly allowance.
-
-- **Professional Plan:** 30,000 words/month - $295/month
-- **Team Plan:** 75,000 words/month - $595/month  
-- **Enterprise Plan:** 180,000 words/month - $1,195/month
-""",
-                        'action': 'upgrade_plan',
-                        'action_url': '/dashboard#billing',
-                        'cta_text': 'Continue with Professional Plan'
-                    }
-                else:
-                    # Paid user - firm but helpful
-                    result['ui_message'] = {
-                        'type': 'error',
-                        'title': '⚠️ Insufficient Word Allowance',
-                        'content': f"""
-**This contract requires {total_words:,} words** ({estimated_total_pages} pages across {file_count} file{'s' if file_count != 1 else ''})
-
-You have **{allowance_check['words_available']:,} words** remaining this month.
-
-**Current Plan:** {usage_info.get('plan_name', 'N/A')}
-
-**Options:**
-- Upgrade to a higher plan with more words per month
-- Contact our team at [support@veritaslogic.ai](mailto:support@veritaslogic.ai) for custom enterprise pricing
-""",
-                        'action': 'upgrade_plan',
-                        'action_url': '/dashboard#billing',
-                        'cta_text': 'Upgrade Plan'
-                    }
-        
-        # Log allowance decision for support visibility
-        if allowance_check['allowed']:
+                # Insufficient word allowance
+                result['error_message'] = (
+                    f"Insufficient word allowance. You have {words_available:,} words available, "
+                    f"but this analysis requires {total_words:,} words."
+                )
+                logger.warning(f"Insufficient allowance for org {org_id}: {total_words} needed, {words_available} available")
+        else:
+            # Log successful allowance check
             logger.info(
                 f"Allowance check PASSED for org {org_id}: {total_words} words needed, "
-                f"{allowance_check['words_available']} available, {allowance_check.get('words_remaining_after', 0)} remaining after"
-            )
-        else:
-            logger.warning(
-                f"Allowance check FAILED for org {org_id}: {total_words} words needed, "
-                f"{allowance_check['words_available']} available, reason: {allowance_check['reason']}"
+                f"{words_available:,} available, {words_remaining_after:,} remaining after, segment={segment}"
             )
         
         return result
