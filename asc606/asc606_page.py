@@ -541,6 +541,9 @@ def render_asc606_page():
                 user_data = st.session_state.get('user_data', {})
                 org_id = user_data.get('org_id')
                 
+                # Add file_count to allowance_result (needed by job submission)
+                allowance_result['file_count'] = len(uploaded_filenames)
+                
                 # Submit job and monitor progress
                 submit_and_monitor_asc606_job(
                     allowance_result=allowance_result,
