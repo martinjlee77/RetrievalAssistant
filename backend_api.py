@@ -4156,6 +4156,85 @@ def get_subscription_usage():
         return jsonify({'error': 'Failed to get subscription usage'}), 500
 
 
+@app.route('/api/subscription/check-allowance', methods=['POST'])
+def check_subscription_allowance():
+    """Check if user has sufficient word allowance for analysis (preflight check)"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        data = request.get_json()
+        words_needed = int(data.get('words_needed', 0))
+        
+        if words_needed <= 0:
+            return jsonify({'error': 'Invalid words_needed parameter'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT org_id FROM users WHERE id = %s", (user_id,))
+            user = cursor.fetchone()
+            
+            if not user or not user['org_id']:
+                return jsonify({'error': 'User organization not found'}), 404
+            
+            org_id = user['org_id']
+            
+            from shared.subscription_manager import SubscriptionManager
+            sub_mgr = SubscriptionManager(conn)
+            
+            allowance_check = sub_mgr.check_word_allowance(org_id, words_needed)
+            usage_info = sub_mgr.get_current_usage(org_id)
+            
+            can_proceed = allowance_check['allowed']
+            suggested_action = allowance_check.get('suggested_action', 'upgrade_plan')
+            
+            if usage_info.get('is_trial'):
+                segment = 'trial'
+            elif usage_info.get('subscription_status') == 'past_due':
+                segment = 'past_due'
+            elif usage_info.get('has_subscription'):
+                segment = 'paid'
+            else:
+                segment = 'none'
+            
+            result = {
+                'can_proceed': can_proceed,
+                'segment': segment,
+                'status': usage_info.get('subscription_status', 'no_subscription'),
+                'words_available': allowance_check['words_available'],
+                'words_remaining_after': allowance_check.get('words_remaining_after', 0),
+                'show_warning': can_proceed and usage_info.get('words_available', 0) < 5000,
+                'renewal_date': usage_info.get('current_period_end').strftime('%B %d, %Y') if usage_info.get('current_period_end') else 'Unknown',
+                'org_id': org_id,
+                'upgrade_link': '/dashboard',
+                'total_words': words_needed
+            }
+            
+            if not can_proceed:
+                result['error_message'] = allowance_check['reason']
+            
+            logger.info(f"Allowance check for org {org_id}: {words_needed} words, can_proceed={can_proceed}, segment={segment}")
+            
+            return jsonify(result), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Check subscription allowance error: {e}")
+        return jsonify({'error': 'Failed to check subscription allowance'}), 500
+
+
 @app.route('/api/subscription/status', methods=['GET'])
 def get_subscription_status():
     """Get current subscription status for user's organization"""
