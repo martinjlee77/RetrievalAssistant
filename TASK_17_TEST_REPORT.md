@@ -307,11 +307,18 @@ Use this checklist to track manual testing:
 ### Before Production Launch:
 - [ ] Complete manual testing checklist above
 - [ ] Add reCAPTCHA keys to Railway environment
-- [ ] Configure Stripe webhooks in production
+- [ ] **Configure Stripe webhooks in production:**
+  - Go to Stripe Dashboard → Developers → Webhooks
+  - Add endpoint: `https://[your-production-domain]/api/webhooks/stripe`
+  - Select events: `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`
+  - Copy webhook signing secret (starts with `whsec_...`)
+  - Add `STRIPE_WEBHOOK_SECRET` to Railway environment variables
+  - **Critical:** Without webhooks, trial-to-paid conversions won't sync to your database
 - [ ] Test with real Stripe test mode checkout
 - [ ] Verify email delivery (Postmark) working
 - [ ] Monitor `signup_attempts` for abuse patterns
 - [ ] Set up database backups
+- [ ] Verify `stripe_price_id` column exists in `subscription_plans` table (added in Nov 2025)
 
 ---
 
