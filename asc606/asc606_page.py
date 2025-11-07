@@ -12,7 +12,6 @@ from shared.ui_components import SharedUIComponents
 from shared.auth_utils import require_authentication, show_credits_warning, auth_manager
 from shared.billing_manager import billing_manager
 from shared.preflight_pricing import preflight_pricing
-from shared.wallet_manager import wallet_manager
 from shared.analysis_manager import analysis_manager
 from shared.job_manager import job_manager
 # CleanMemoGenerator import moved to initialization section
