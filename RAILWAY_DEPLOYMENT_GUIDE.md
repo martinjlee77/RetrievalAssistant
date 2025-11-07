@@ -1,249 +1,423 @@
-# Railway Deployment Guide - Redis Background Jobs
+# Railway Production Deployment Guide
+## Subscription System Migration
 
-## Understanding the Architecture Change
+---
 
-### Before (Session-Based)
-```
-User's Browser → Streamlit (Railway) → Runs Analysis → Browser displays results
-                    ↑
-                    └─ Analysis runs HERE in Streamlit process
-                    └─ If browser closes/locks, analysis STOPS
-```
+## ⚠️ CRITICAL: Read This First
 
-### After (Background Jobs)
-```
-User's Browser → Streamlit (Railway) → Submits Job to Redis Queue
-                                              ↓
-                                         RQ Worker (Railway) → Runs Analysis
-                                              ↓
-                                         Saves to Database
-                                              ↓
-                                         Browser polls for results
-```
+This deployment migrates from credit-based to subscription-based billing. The migration is **irreversible** without a database backup. Follow these steps exactly.
 
-**Key Change**: Analysis now runs in a **separate worker process on Railway's servers**, completely independent of the user's browser session.
+**Estimated Time:** 30-45 minutes  
+**Downtime:** 5-10 minutes (during migration)
 
-- **User's Browser**: Only displays UI and polls for updates (can close/lock safely)
-- **Streamlit Process**: Just shows the UI and submits jobs (on Railway)
-- **Worker Process**: NEW - Actually runs the analysis (on Railway, separate from browser)
-- **Redis**: Job queue connecting Streamlit and Worker (on Railway)
+---
 
-## Step-by-Step Deployment
+## PRE-DEPLOYMENT CHECKLIST
 
-### Step 1: Add memo_content Column to Production Database
+### ✅ Backups
+- [ ] Database backup completed
+- [ ] Current git commit noted for rollback
+- [ ] Current Railway deployment screenshot saved
 
-**Option A: Using Railway Dashboard (Recommended)**
-1. Go to Railway dashboard
-2. Click on your PostgreSQL database
-3. Click "Data" tab
-4. Click "Query" button
-5. Paste this SQL:
-   ```sql
-   ALTER TABLE analyses ADD COLUMN IF NOT EXISTS memo_content TEXT;
-   ```
-6. Click "Run Query"
+### ✅ Prerequisites
+- [ ] PostgreSQL client (`psql`) installed locally
+- [ ] Railway `DATABASE_PUBLIC_URL` copied from project dashboard
+- [ ] Git repository clean (no uncommitted changes)
+- [ ] All team members notified of maintenance window
 
-**Option B: Using Railway CLI**
+---
+
+## DEPLOYMENT SEQUENCE
+
+### PHASE 1: DATABASE MIGRATION (15 minutes)
+
+#### Step 1: Connect to Railway PostgreSQL
+
 ```bash
-railway run psql $DATABASE_URL -c "ALTER TABLE analyses ADD COLUMN IF NOT EXISTS memo_content TEXT;"
+psql "postgresql://postgres:YOUR_PASSWORD@ballast.proxy.rlwy.net:15493/railway"
 ```
 
-**Verify it worked:**
+**How to get the connection string:**
+1. Go to Railway project dashboard
+2. Click on PostgreSQL service
+3. Go to "Variables" tab
+4. Copy `DATABASE_PUBLIC_URL` value
+5. Replace the placeholder above with your actual connection string
+6. **Important:** Keep the double quotes around the entire URL
+
+#### Step 2: Verify Current Schema
+
+Before running migration, verify you're connected to the right database:
+
 ```sql
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'analyses' AND column_name = 'memo_content';
+-- Check current tables
+\dt
+
+-- Should see: analyses, credit_transactions, email_verification_tokens, 
+-- password_reset_tokens, users
+
+-- Count existing users
+SELECT COUNT(*) FROM users;
+
+-- Exit psql
+\q
 ```
 
-You should see:
-```
-column_name   | data_type
---------------+-----------
-memo_content  | text
-```
+#### Step 3: Run Migration Script
 
-### Step 2: Deploy Your Code to Railway
-
-Your code changes are ready. Just deploy:
+**IMPORTANT:** Copy the entire contents of `database/railway_migration.sql` and paste into psql session.
 
 ```bash
-# Commit changes
+# Connect again
+psql "postgresql://postgres:YOUR_PASSWORD@ballast.proxy.rlwy.net:15493/railway"
+
+# Then paste the ENTIRE contents of database/railway_migration.sql
+# (Copy from line 1 to the very last line)
+```
+
+**Expected Output:**
+```
+CREATE TABLE
+CREATE TABLE
+...
+NOTICE: ==============================================
+NOTICE: VeritasLogic Subscription Migration Complete!
+NOTICE: ==============================================
+```
+
+#### Step 4: Verify Migration Success
+
+```sql
+-- Check new tables were created
+\dt
+
+-- Should now see: organizations, subscription_plans, subscription_instances, 
+-- subscription_usage, rollover_ledger, stripe_webhook_events, lead_sources
+
+-- Verify subscription plans were seeded
+SELECT id, plan_key, name, price_monthly, word_allowance FROM subscription_plans;
+
+-- Expected output:
+--  id | plan_key     | name         | price_monthly | word_allowance
+-- ----+--------------+--------------+---------------+----------------
+--   1 | professional | Professional |        295.00 |          30000
+--   2 | team         | Team         |        595.00 |          75000
+--   3 | enterprise   | Enterprise   |       1195.00 |         180000
+
+-- Exit psql
+\q
+```
+
+**✅ Checkpoint:** If you don't see all 3 plans, DO NOT PROCEED. Check migration logs for errors.
+
+---
+
+### PHASE 2: UPDATE STRIPE PRICE IDs (5 minutes)
+
+You need to update the placeholder Stripe price IDs with your actual Stripe prices.
+
+#### Step 1: Get Stripe Price IDs
+
+1. Log into Stripe Dashboard → Products
+2. Find your three subscription products
+3. Copy the `price_xxxxx` IDs for each tier
+
+#### Step 2: Update Database
+
+```bash
+# Connect to Railway database
+psql "postgresql://postgres:YOUR_PASSWORD@ballast.proxy.rlwy.net:15493/railway"
+```
+
+```sql
+-- Update with your actual Stripe price IDs
+UPDATE subscription_plans SET stripe_price_id = 'price_ACTUAL_PROFESSIONAL_ID' WHERE plan_key = 'professional';
+UPDATE subscription_plans SET stripe_price_id = 'price_ACTUAL_TEAM_ID' WHERE plan_key = 'team';
+UPDATE subscription_plans SET stripe_price_id = 'price_ACTUAL_ENTERPRISE_ID' WHERE plan_key = 'enterprise';
+
+-- Verify
+SELECT plan_key, stripe_price_id FROM subscription_plans;
+
+\q
+```
+
+---
+
+### PHASE 3: ENVIRONMENT VARIABLES (10 minutes)
+
+#### Required Variables Checklist
+
+Go to Railway Project → Settings → Variables and verify these exist:
+
+**Database (Auto-configured by Railway):**
+- ✅ `DATABASE_URL` (should already exist)
+
+**Redis (CRITICAL for worker queue):**
+- ⚠️ `REDIS_URL` - Must be configured! Check Redis addon is attached.
+
+**API Keys:**
+- ⚠️ `OPENAI_API_KEY` - Required for analysis
+- ⚠️ `POSTMARK_API_KEY` - Required for emails (signup verification, password resets)
+
+**Stripe:**
+- ⚠️ `STRIPE_SECRET_KEY` - Payment processing
+- ⚠️ `STRIPE_PUBLISHABLE_KEY` - Frontend Stripe integration  
+- ⚠️ `STRIPE_WEBHOOK_SECRET` - Webhook signature verification
+
+**Security:**
+- ⚠️ `SECRET_KEY` - JWT token signing (use long random string)
+
+**URLs (Optional - auto-detected):**
+- `WEBSITE_URL` (defaults to production URL)
+- `STREAMLIT_URL` (defaults to production URL)
+
+**Bot Protection (Optional but recommended):**
+- `RECAPTCHA_SECRET_KEY`
+- `RECAPTCHA_SITE_KEY`
+
+#### Generate Strong SECRET_KEY
+
+```bash
+# Run this locally to generate a secure key
+python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+```
+
+Copy the output and set it as `SECRET_KEY` in Railway.
+
+---
+
+### PHASE 4: CODE DEPLOYMENT (10 minutes)
+
+#### Step 1: Push to Git
+
+```bash
+# Verify you're on the right branch
+git branch
+
+# Stage all changes
 git add .
-git commit -m "Add Redis background job processing for ASC 606"
 
-# Push to Railway (deploys automatically)
-git push
+# Commit with descriptive message
+git commit -m "feat: Migrate to subscription-based billing system
+
+- Add subscription tables (plans, instances, usage, rollover_ledger)
+- Update users and analyses tables for org support
+- Implement word allowance tracking
+- Add trial subscription flow with credit card
+- Stripe integration for recurring billing
+- Past-due blocking enforcement"
+
+# Push to your main branch (this triggers Railway deployment)
+git push origin main
 ```
 
-**What Railway will deploy:**
-- Web process: `gunicorn backend_api:app` (your Flask API)
-- Worker process: `python worker.py` (NEW - but will fail until Redis is added)
+#### Step 2: Monitor Railway Deployment
 
-The worker will show errors until you add Redis - **this is expected**.
+1. Go to Railway project dashboard
+2. Click on your service
+3. Watch the "Deployments" tab
+4. Wait for status: **"Success"** (usually 3-5 minutes)
 
-### Step 3: Add Redis Service to Railway
+**⚠️ If deployment fails:**
+- Check build logs in Railway
+- Common issues: Missing environment variables, Python dependency errors
+- Fix and push again
 
-1. Go to your Railway project dashboard
-2. Click **"+ New"** button
-3. Select **"Database"**
-4. Click **"Add Redis"**
-5. Railway will automatically:
-   - Create a Redis instance
-   - Set the `REDIS_URL` environment variable
-   - Restart your services
+---
 
-**Cost**: ~$5-10/month for Redis
+### PHASE 5: VERIFICATION (10 minutes)
 
-### Step 4: Verify Everything is Running
+#### Test 1: Backend Health Check
 
-Wait 2-3 minutes for services to restart, then check logs:
-
-**Check Worker is Running:**
 ```bash
-railway logs --service worker
+# Test if backend is responding
+curl https://www.veritaslogic.ai/api/subscription/plans
+
+# Expected: JSON array with 3 subscription plans
 ```
 
-You should see:
-```
-🚀 RQ Worker started. Waiting for jobs...
-```
+#### Test 2: Signup Flow (CRITICAL)
 
-**Check Web is Running:**
+1. Open incognito browser → `https://www.veritaslogic.ai/signup`
+2. Fill out signup form with test email
+3. Enter test credit card (Stripe test mode):
+   - Card: `4242 4242 4242 4242`
+   - Expiry: Any future date
+   - CVC: Any 3 digits
+4. Submit signup
+5. **Verify:**
+   - Account created successfully
+   - Email verification sent
+   - Trial subscription created
+
+#### Test 3: Verify Trial in Database
+
 ```bash
-railway logs --service web
+psql "postgresql://postgres:YOUR_PASSWORD@ballast.proxy.rlwy.net:15493/railway"
 ```
 
-Should show Flask server running without errors.
+```sql
+-- Check latest subscription instance
+SELECT 
+    o.name as org_name, 
+    u.email,
+    si.status, 
+    si.trial_end_date,
+    sp.name as plan_name,
+    su.word_allowance,
+    su.words_used
+FROM subscription_instances si
+JOIN organizations o ON si.org_id = o.id
+JOIN subscription_plans sp ON si.plan_id = sp.id
+JOIN users u ON u.org_id = o.id
+LEFT JOIN subscription_usage su ON su.subscription_id = si.id
+ORDER BY si.created_at DESC
+LIMIT 1;
 
-**Check Redis is Accessible:**
+-- Expected:
+-- status = 'trial'
+-- word_allowance = 9000
+-- words_used = 0
+
+\q
+```
+
+#### Test 4: Analysis Flow (Critical Path)
+
+1. Log into test account
+2. Navigate to ASC 606 analysis page
+3. Upload a sample contract
+4. **Verify pricing display shows:**
+   - Total words in contract
+   - Words remaining in allowance
+   - "9,000 words available" for trial
+5. Click "Confirm & Analyze"
+6. **Wait for analysis to complete** (3-20 minutes)
+7. **Verify:**
+   - Memo generated successfully
+   - Words deducted from allowance
+
+#### Test 5: Word Deduction Verification
+
 ```bash
-railway run redis-cli ping
+psql "postgresql://postgres:YOUR_PASSWORD@ballast.proxy.rlwy.net:15493/railway"
 ```
 
-Should return: `PONG`
+```sql
+-- Check that words were deducted
+SELECT 
+    o.name,
+    su.words_used,
+    su.word_allowance,
+    (su.word_allowance - su.words_used) as remaining
+FROM subscription_usage su
+JOIN organizations o ON su.org_id = o.id
+ORDER BY su.updated_at DESC
+LIMIT 1;
 
-### Step 5: Test with a Real Analysis
+-- words_used should be > 0 after analysis
 
-1. Go to your production website
-2. Navigate to ASC 606 page
-3. Upload a **small test contract** (< 1000 words)
-4. Click "Confirm & Analyze"
-5. **Close the browser tab** immediately
-6. Wait 2-3 minutes
-7. Reopen the ASC 606 page
-8. Verify analysis completed and memo is displayed
-
-**What to check:**
-- ✅ Analysis completes even though you closed the browser
-- ✅ User was charged correct amount (check database)
-- ✅ Memo is saved in database (memo_content column)
-- ✅ No duplicate charges (check credit_transactions table)
-
-### Step 6: Monitor for Issues
-
-**Check for failed jobs:**
-```bash
-railway run redis-cli LLEN rq:queue:failed
+\q
 ```
 
-If > 0, inspect failed jobs:
-```bash
-railway run redis-cli LRANGE rq:queue:failed 0 -1
-```
+---
 
-**Check analysis records:**
-```bash
-railway run psql $DATABASE_URL -c "SELECT analysis_id, status, final_charged_credits, error_message FROM analyses ORDER BY started_at DESC LIMIT 10;"
-```
+## POST-DEPLOYMENT MONITORING
 
-**Verify no double charges:**
-```bash
-railway run psql $DATABASE_URL -c "SELECT memo_uuid, COUNT(*) FROM credit_transactions WHERE reason = 'analysis_charge' GROUP BY memo_uuid HAVING COUNT(*) > 1;"
-```
+### First 24 Hours
 
-Should return 0 rows.
+Monitor these metrics:
 
-## Deployment Order Summary
-
-```
-1. Add memo_content column to production DB ✅
-   └─ Prevents "column does not exist" errors
-
-2. Deploy code to Railway ✅
-   └─ Worker will fail (expected) - needs Redis
-
-3. Add Redis service ✅
-   └─ Railway auto-sets REDIS_URL and restarts services
-
-4. Verify all services running ✅
-   └─ Check logs for worker, web, redis
-
-5. Test with real analysis ✅
-   └─ Close browser and verify it completes
-
-6. Monitor for issues ✅
-   └─ Check failed jobs, double charges
-```
-
-## Environment Variables to Verify
-
-Make sure these are set in Railway:
-- ✅ `DATABASE_URL` - PostgreSQL connection (set by Railway)
-- ✅ `REDIS_URL` - Redis connection (set by Railway after Step 3)
-- ✅ `WEBSITE_URL` - Your production URL (e.g., https://www.veritaslogic.ai)
-- ✅ `OPENAI_API_KEY` - Your OpenAI key
-- ✅ `STRIPE_SECRET_KEY` - Your Stripe key
-- ✅ All other existing secrets
-
-## Troubleshooting
-
-### Worker Shows "Connection Refused"
-**Cause**: Redis not added yet  
-**Fix**: Complete Step 3 (add Redis service)
-
-### "Column memo_content does not exist"
-**Cause**: Step 1 not completed  
-**Fix**: Run the ALTER TABLE command on production DB
-
-### Worker Shows "Cannot assign requested address"
-**Cause**: REDIS_URL not set correctly  
-**Fix**: Check Railway dashboard that Redis service is running and REDIS_URL env var is set
-
-### Analysis Never Completes
-**Cause**: Worker not processing jobs  
-**Fix**: Check worker logs, verify Redis connection, check queue length:
-```bash
-railway run redis-cli LLEN rq:queue:analysis
-```
-
-### User Charged Twice
-**Cause**: Idempotency check not working  
-**Fix**: This shouldn't happen with our implementation. Contact support if it does.
-
-## Rollback Plan (If Needed)
-
-If something goes wrong, you can temporarily disable background jobs:
-
-1. In `asc606/asc606_page.py`, line 343-350:
-   ```python
-   # Comment out job submission
-   # from asc606.job_analysis_runner import submit_and_monitor_asc606_job
-   # submit_and_monitor_asc606_job(...)
-   
-   # Uncomment old synchronous analysis
-   perform_asc606_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames)
+1. **Signup Success Rate**
+   ```sql
+   -- Count signups in last 24 hours
+   SELECT COUNT(*) FROM users WHERE created_at > NOW() - INTERVAL '24 hours';
    ```
 
-2. Deploy
-3. Analyses will run synchronously again (user must keep browser open)
+2. **Trial Activations**
+   ```sql
+   -- Count trials created
+   SELECT COUNT(*) FROM subscription_instances 
+   WHERE status = 'trial' AND created_at > NOW() - INTERVAL '24 hours';
+   ```
 
-## Success Criteria
+3. **Analysis Completion Rate**
+   ```sql
+   -- Check for failed analyses
+   SELECT COUNT(*) FROM analyses 
+   WHERE status = 'failed' AND created_at > NOW() - INTERVAL '24 hours';
+   ```
 
-✅ Worker logs show "RQ Worker started"  
-✅ Test analysis completes with browser closed  
-✅ User charged correct amount (1 transaction only)  
-✅ Memo saved to database  
-✅ No errors in logs  
-✅ Failed analyses show $0 charge
+4. **Stripe Webhook Delivery**
+   - Check Stripe Dashboard → Developers → Webhooks
+   - Verify events are being received successfully
 
-Once all green, you're production-ready! 🚀
+---
+
+## TROUBLESHOOTING
+
+### Issue: "Invalid token" errors after deployment
+
+**Cause:** JWT tokens signed with old SECRET_KEY are invalid  
+**Fix:** Users need to log out and log in again
+
+### Issue: Analysis stuck in queue
+
+**Cause:** REDIS_URL not configured  
+**Fix:** 
+1. Verify Redis addon is attached in Railway
+2. Check `REDIS_URL` environment variable exists
+3. Restart worker service
+
+### Issue: Email verification not sending
+
+**Cause:** POSTMARK_API_KEY missing or invalid  
+**Fix:** Verify Postmark API key in Railway environment variables
+
+### Issue: Stripe payment fails during signup
+
+**Cause:** STRIPE_SECRET_KEY or STRIPE_PUBLISHABLE_KEY incorrect  
+**Fix:** Verify Stripe keys match your account (test vs production)
+
+### Issue: "Table does not exist" errors
+
+**Cause:** Migration script not run or failed  
+**Fix:** Re-run migration script and check for errors
+
+---
+
+## ROLLBACK PROCEDURE (Emergency Only)
+
+If critical issues arise:
+
+### Step 1: Revert Code
+```bash
+# Get commit hash from before migration
+git log --oneline
+
+# Revert to previous commit
+git revert <commit-hash>
+git push origin main
+```
+
+### Step 2: Restore Database Backup
+- Use your Railway database backup
+- This is why the pre-deployment backup is CRITICAL
+- Contact Railway support if needed
+
+---
+
+## SUCCESS CRITERIA
+
+✅ Migration is successful when:
+- [ ] New users can signup with credit card
+- [ ] Trial subscriptions created automatically (9,000 words)
+- [ ] Allowance check displays correctly before analysis
+- [ ] Analysis completes and deducts words from allowance
+- [ ] No 500 errors in production logs
+- [ ] Stripe webhooks receiving events successfully
+
+---
+
+**Last Updated:** November 2025  
+**Migration Version:** 1.0

@@ -1,0 +1,42 @@
+To connect to your Railway PostgreSQL database using the `psql` command-line tool, follow these steps:
+
+1. **Obtain the Connection String:**
+    
+    - Go to your Railway project's dashboard.
+    - Locate your PostgreSQL service.
+    - Go to the "Variables" tab.
+    - Copy the value of the `DATABASE_PUBLIC_URL` environment variable. This is your connection string. **Keep this string secure; never share it publicly.**
+2. **Install the PostgreSQL Client:**
+    
+    - If you haven't already, install the PostgreSQL client tools appropriate for your operating system (see previous responses for instructions on Windows, macOS, and Linux). This installs the `psql` command. On Windows, ensure you've added the correct PostgreSQL `bin` directory to your system's PATH environment variable.
+3. **Connect using `psql`:**
+    
+    - Open your terminal or command prompt.
+        
+    - Execute the following command, replacing `<YOUR_DATABASE_PUBLIC_URL>` with the actual connection string you copied:
+        
+        `psql "postgresql://postgres:JtCytwKIRQHrqYwdvDKbJZNQRErpfsdl@ballast.proxy.rlwy.net:15493/railway"`
+        
+        _Important:_ The entire connection string must be enclosed in double quotes (`"`).
+        
+4. **Authenticate:**
+    
+    - If prompted, enter the password associated with your Railway PostgreSQL database user. (The user and password are embedded in the `DATABASE_PUBLIC_URL`)
+5. **Execute SQL commands:**
+    
+    - Once connected (you'll see a prompt like `railway=#`), you can execute any SQL commands you need.
+6. **Exit:**
+    
+    - When finished, type `\q` and press Enter to exit the `psql` session.
+
+**Example:**
+
+Let's say your `DATABASE_PUBLIC_URL` is:
+
+`postgresql://user:password@host:port/database`
+
+The command would be:
+
+`psql "postgresql://user:password@host:port/database"`
+
+Remember to replace the placeholders (`user`, `password`, `host`, `port`, `database`) with your actual values. Always be cautious with your connection string; treat it like a password.
