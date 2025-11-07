@@ -13,7 +13,22 @@ logger = logging.getLogger(__name__)
 
 # Backend API configuration - Use environment variables for cross-deployment support
 import os
-WEBSITE_URL = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+
+# Auto-detect development environment
+def _get_website_url():
+    """Auto-detect the correct website URL based on environment"""
+    env_url = os.getenv('WEBSITE_URL')
+    if env_url:
+        return env_url
+    
+    # Check if we're running in Replit development (backend on port 3000)
+    if os.getenv('REPL_ID') or os.path.exists('/home/runner'):
+        return 'http://localhost:3000'
+    
+    # Default to production
+    return 'https://www.veritaslogic.ai'
+
+WEBSITE_URL = _get_website_url()
 STREAMLIT_URL = os.getenv('STREAMLIT_URL', 'https://tas.veritaslogic.ai')
 
 # Log the current configuration for debugging
