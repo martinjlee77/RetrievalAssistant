@@ -381,66 +381,61 @@ def render_asc805_page():
                         key="original_preview"
                     )
         
-        # Step 2: Calculate pricing from cached word count (no re-extraction)
+        # Step 2: Check subscription allowance from cached word count (no re-extraction)
         if cached_word_count_key in st.session_state:
             word_count = st.session_state[cached_word_count_key]
-            pricing_result = preflight_pricing.calculate_pricing_from_word_count(word_count, len(uploaded_files))
+            user_token = auth_manager.get_auth_token()
+            if not user_token:
+                st.error("❌ Authentication required. Please refresh the page and log in again.")
+                return
+            
+            # Check subscription word allowance
+            allowance_result = preflight_pricing.check_subscription_allowance(
+                user_token=user_token,
+                total_words=word_count
+            )
+            
+            # Store as pricing_result for backwards compatibility
+            pricing_result = allowance_result
 
-            if pricing_result['success']:
-                with pricing_container.container():
-                    st.markdown("### :primary[Analysis Pricing]")
-                    st.info(pricing_result['billing_summary'])
+            if allowance_result['can_proceed']:
+                # Show allowance status with inline warning if needed
+                if allowance_result['show_warning']:
+                    with pricing_container.container():
+                        # Show inline warning card
+                        msg_parts = []
+                        if allowance_result['segment'] == 'trial':
+                            msg_parts.append(f"🎉 **Trial Analysis** ({allowance_result['total_words']:,} words)")
+                            msg_parts.append(f"• Remaining after this analysis: **{allowance_result['words_remaining_after']:,} words**")
+                            msg_parts.append(f"• Trial resets: **{allowance_result['renewal_date']}**")
+                        elif allowance_result['segment'] == 'paid':
+                            msg_parts.append(f"📊 **Analysis** ({allowance_result['total_words']:,} words)")
+                            msg_parts.append(f"• Remaining after: **{allowance_result['words_remaining_after']:,} words**")
+                            msg_parts.append(f"• Allowance resets: **{allowance_result['renewal_date']}**")
+                        elif allowance_result['segment'] == 'past_due':
+                            msg_parts.append("⚠️ **Subscription Past Due**")
+                            msg_parts.append(f"Analysis will use rollover words ({allowance_result['total_words']:,} words)")
+                        
+                        if allowance_result.get('upgrade_link'):
+                            msg_parts.append(f"\n[View Dashboard →]({allowance_result['upgrade_link']})")
+                        
+                        st.info("\n".join(msg_parts))
             else:
-                st.error(f"❌ **Pricing Calculation Failed**\n\n{pricing_result['error']}")
+                # Cannot proceed - show error and upgrade link
+                st.error(f"❌ {allowance_result['error_message']}")
+                if allowance_result.get('upgrade_link'):
+                    st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
 
-    # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
-    if is_ready and pricing_result and pricing_result['success']:
-        
-        # Get required price and check wallet balance
-        required_price = pricing_result['tier_info']['price']
+    # Subscription allowance flow (only proceed if allowance check passed)
+    if is_ready and pricing_result and pricing_result.get('can_proceed'):
+        # Subscription system - no credit checks needed
         user_token = auth_manager.get_auth_token()
-        
-        # Get wallet balance
         if not user_token:
             st.error("❌ Authentication required. Please refresh the page and log in again.")
             return
-        wallet_info = wallet_manager.get_user_balance(user_token)
-        current_balance = wallet_info.get('balance', 0.0)
         
-        # Check if user has sufficient credits
-        credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
-        
-        # Credit balance display - store in variable so we can clear it
-        credit_container = st.empty()       
-        if credit_check['can_proceed']:
-            msg = (
-                f"{credit_check['message']}\n"
-                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
-            )
-            credit_container.info(msg)
-            can_proceed = True
-        else:
-            credit_container.error(credit_check['message'])
-            
-            # Show wallet top-up options
-            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
-            
-            if selected_amount:
-                # Process credit purchase
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
-                
-                if purchase_result['success']:
-                    st.success(purchase_result['message'])
-                    st.rerun()  # Refresh to update balance
-                else:
-                    st.error(purchase_result['message'])
-            
-            can_proceed = False
-        
-        # Analysis section
+        # Analysis section (allowance already verified)
+        can_proceed = True
         if can_proceed:
             warning_placeholder = st.empty()
             warning_placeholder.info(
@@ -455,7 +450,6 @@ def render_asc805_page():
                 warning_placeholder.empty()
                 processing_container.empty()
                 pricing_container.empty()
-                credit_container.empty()
                 upload_form_container.empty()
                 
                 if not user_token:

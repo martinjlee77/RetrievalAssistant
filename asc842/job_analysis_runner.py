@@ -78,15 +78,22 @@ def submit_and_monitor_asc842_job(
         # Submit job to Redis queue with service token (not user token)
         # Service token is long-lived (24h) to prevent expiration during analysis
         try:
+            # Extract subscription data for word deduction
+            org_id = pricing_result.get('org_id')  # Organization ID for subscription
+            total_words = pricing_result.get('total_words')  # Word count for deduction
+            
             job_id = job_manager.submit_analysis_job(
                 asc_standard='ASC 842',
                 analysis_id=db_analysis_id,  # Pass database INTEGER id to worker
                 user_id=user_id,
                 user_token=service_token,  # Use service token instead of user token
-                pricing_result=pricing_result,
+                allowance_result=pricing_result,  # New: subscription allowance data
+                pricing_result=pricing_result,  # Legacy: kept for backwards compatibility
                 additional_context=additional_context,
                 combined_text=cached_combined_text,
-                uploaded_filenames=uploaded_filenames
+                uploaded_filenames=uploaded_filenames,
+                org_id=org_id,  # For subscription word deduction
+                total_words=total_words  # For subscription word deduction
             )
             
             logger.info(f"Job submitted: {job_id}")
