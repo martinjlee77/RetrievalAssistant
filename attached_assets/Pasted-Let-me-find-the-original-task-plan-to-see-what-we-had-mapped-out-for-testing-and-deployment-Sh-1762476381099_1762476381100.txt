@@ -1,0 +1,89 @@
+Let me find the original task plan to see what we had mapped out for testing and deployment.
+
+
+Show 4 more
+
+Planned next testing and deployment steps
+Perfect! Here's where we are and what's next:
+
+📋 TESTING & DEPLOYMENT ROADMAP
+Task 17: End-to-End Testing (In Progress)
+You have 6 manual tests to complete. These verify the entire subscription flow works in production:
+
+✅ Already Passed (Automated)
+API endpoints working
+Database schema created
+Trial protection integrated
+reCAPTCHA configured
+🧪 Manual Tests Remaining
+Test 17.2: Trial Signup
+
+Sign up with test business email
+Verify 14-day trial created with 9,000 words
+Check organization and user created correctly
+Test 17.3: Rate Limiting
+
+Test IP rate limiting (3 attempts max)
+Test domain limiting (prevents trial abuse)
+Test 17.4: Domain Eligibility
+
+Verify only 1 trial per domain
+Second signup from same domain joins existing org
+Test 17.5: Usage Tracking
+
+Run an analysis
+Verify word usage tracked correctly
+Check dashboard shows accurate usage
+Test 17.6: Trial Limit Reached
+
+Exceed 9,000 word limit
+Verify upgrade prompt appears
+Check Stripe checkout loads
+Test 17.7: Stripe Checkout Flow
+
+Complete full payment with test card (4242 4242 4242 4242)
+Verify subscription upgrades to paid
+Check word allowance increases to 30,000
+Task 18: Microsoft AppSource Preparation
+Based on appsource_listing_content.md, you'll need:
+
+Content Ready:
+
+✅ App description & keywords
+✅ Pricing structure documented
+✅ Target industries/roles defined
+Still Needed:
+
+ Demo video (2-3 min walkthrough)
+ Screenshots (5-10 images of platform)
+ Landing page at veritaslogic.com/appsource
+ Privacy policy & terms of service URLs
+Production Deployment Checklist
+Before launching to customers:
+
+Environment Variables (Railway):
+
+ Stripe live mode keys (replace test keys)
+ reCAPTCHA keys (production domain)
+ Postmark API key (email delivery)
+ DATABASE_URL (production Postgres)
+Stripe Setup:
+
+ Webhook endpoint configured in production
+ Test webhook with Stripe CLI
+ Verify all 3 subscription plans published
+Database:
+
+ Ensure analyses table has error_message column
+ Verify all subscription tables exist
+ Set up automated backups
+Testing:
+
+ Complete Task 17 manual tests in staging
+ Test full flow: signup → trial → analysis → upgrade
+ Verify emails deliver correctly
+What Would You Like to Tackle First?
+Start Manual Testing (Task 17.2-17.7) - Test the subscription flow yourself
+Production Setup - Get Railway environment ready for launch
+AppSource Prep - Create demo video and screenshots
+Which makes most sense for your timeline?

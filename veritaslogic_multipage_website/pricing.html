@@ -47,10 +47,18 @@
     <section class="page-header">
         <div class="container">
             <h1>Flexible Subscription Plans</h1>
-            <p>Choose the plan that fits your team. Our pricing is based on the number of words in your source documents (1 page &asymp; 300 words).</p>
+            <p>Choose the plan that fits your team.</p>
         </div>
     </section>
 
+    <!-- Pricing Explainer Bar -->
+    <section class="pricing-explainer-bar">
+        <div class="container">
+            <p>Pricing is based on word count in your source documents (300 words ≈ 1 page). Any number of analyses and memos can be generated up to the word count limit.</p>
+        </div>
+    </section>
+
+    
     <!-- Subscription Plans -->
     <section class="pricing-section">
         <div class="container">
@@ -65,30 +73,30 @@
                     </div>
                     <div class="pricing-word-box team">
                         <strong class="pricing-word-count">9,000 words</strong>
-                        <p class="pricing-word-details">Any number of analyses up to 9,000 words (~30 pgs) in the source docs</p>
+                        <p class="pricing-word-details">per user, granted upfront</p>
                     </div>
                     <div class="pricing-features">
                         <p>Auto-renews to Professional after 14 days unless cancelled</p>
                     </div>
                     <div class="pricing-cta">
-                        <a href="signup.html" class="btn">Start Your Free Trial</a>
+                        <a href="signup.html" class="btn">Start Free Trial</a>
                     </div>
                 </div>
                 
                 <!-- Professional Plan -->
                 <div class="pricing-card">
                     <h3>Professional</h3>
-                    <p class="pricing-card-description">For individual controllers and technical accounting professionals</p>
+                    <p class="pricing-card-description">For individual accounting professionals</p>
                     <div class="pricing-price">
                         <span class="pricing-amount">$295</span>
                         <span class="pricing-period">/month</span>
                     </div>
-                    <div class="pricing-word-box">
-                        <strong class="pricing-word-count">30,000 words/month</strong>
-                        <p class="pricing-word-details">Rolls over 12 months</p>
+                    <div class="pricing-word-box team">
+                        <strong class="pricing-word-count">30,000 words</strong>
+                        <p class="pricing-word-details">per user per month, granted upfront</p>
                     </div>
                     <div class="pricing-features">
-                        <p>1 user seat</p>
+                        <p>Example: ~10 ASC 606 revenue contracts at 3,000 words each</p>
                     </div>
                     <div class="pricing-cta">
                         <button onclick="startCheckout('professional')" class="btn">Select Professional</button>
@@ -96,51 +104,49 @@
                 </div>
 
                 <!-- Team Plan -->
-                <div class="pricing-card team-card">
+                <div class="pricing-card">
                     <h3>Team</h3>
-                    <p class="pricing-card-description">For accounting teams and small firms with shared usage</p>
+                    <p class="pricing-card-description">For technical accounting teams and small firms</p>
                     <div class="pricing-price">
                         <span class="pricing-amount">$595</span>
                         <span class="pricing-period">/month</span>
                     </div>
                     <div class="pricing-word-box team">
-                        <strong class="pricing-word-count">75,000 words/month</strong>
-                        <p class="pricing-word-details">Pooled, rolls over 12 months</p>
+                        <strong class="pricing-word-count">75,000 words</strong>
+                        <p class="pricing-word-details">per user per month, granted upfront</p>
                     </div>
                     <div class="pricing-features">
-                        <p>3 user seats</p>
-                        <p class="detail">Pooled usage</p>
+                        <p>Example: ~15 ASC 842 lease agreement at 5,000 words each</p>
                     </div>
                     <div class="pricing-cta">
-                        <button onclick="startCheckout('team')" class="btn">Select Team Plan</button>
+                        <button onclick="startCheckout('team')" class="btn">Select Team</button>
                     </div>
                 </div>
 
                 <!-- Enterprise Plan -->
                 <div class="pricing-card">
                     <h3>Enterprise</h3>
-                    <p class="pricing-card-description">For large enterprises and Big 4 firms with custom SLA</p>
+                    <p class="pricing-card-description">For large enterprises</p>
                     <div class="pricing-price">
                         <span class="pricing-amount">$1,195</span>
                         <span class="pricing-period">/month</span>
                     </div>
-                    <div class="pricing-word-box">
-                        <strong class="pricing-word-count">180,000 words/month</strong>
-                        <p class="pricing-word-details">Enterprise-grade</p>
+                    <div class="pricing-word-box team">
+                        <strong class="pricing-word-count">180,000 words</strong>
+                        <p class="pricing-word-details">enterprise bundle with managed service</p>
                     </div>
                     <div class="pricing-features">
-                        <p>Unlimited user seats</p>
-                        <p class="detail">Custom SLA & dedicated support</p>
+                        <p>Example: ~60 complex transactions</p>
                     </div>
                     <div class="pricing-cta">
-                        <a href="contact.html?subject=Enterprise Plan Inquiry" class="btn">Contact Sales</a>
+                        <a href="contact.html?inquiry=enterprise-sales" class="btn">Contact Sales</a>
                     </div>
                 </div>
             </div>
             
             <!-- Included in All Tiers -->
             <div class="pricing-included">
-                <h3>Included in All Tiers</h3>
+                <h3>Included in All Plans</h3>
                 <div class="pricing-included-grid">
                     <div class="pricing-included-item">
                         <span class="checkmark">✓</span>
@@ -151,7 +157,7 @@
                     <div class="pricing-included-item">
                         <span class="checkmark">✓</span>
                         <div>
-                            <p>Multiple document uploads (up to 10 files per analysis)</p>
+                            <p>Multiple document uploads</p>
                         </div>
                     </div>
                     <div class="pricing-included-item">
@@ -187,7 +193,7 @@
                     <div class="pricing-included-item">
                         <span class="checkmark">✓</span>
                         <div>
-                            <p>ASC Research Assistant (AI chat with authoritative citations) for guidance</p>
+                            <p>ASC Research Assistant (AI chat with authoritative citations) for guidance - for approved users</p>
                         </div>
                     </div>
                     <div class="pricing-included-item">
@@ -211,7 +217,7 @@
             <div class="faq-list">
                 <div class="faq-item">
                     <h4>What's included in the 14-day free trial?</h4>
-                    <p>Your trial includes 9,000 words (~$295 value), which is enough to run a full technical accounting analysis. A payment method is required to start the trial, but you won't be charged if you cancel before the trial ends. After 14 days, your subscription automatically continues at the Professional plan rate ($295/mo) unless canceled.</p>
+                    <p>Your trial includes 9,000 words, which is enough to run a full technical accounting analysis for a source document page of about 30 pages. A payment method is required to start the trial, but you won't be charged if you cancel before the trial ends. After 14 days, your subscription automatically continues at the Professional plan rate ($295/mo) unless canceled.</p>
                 </div>
 
                 <div class="faq-item">
@@ -226,17 +232,17 @@
 
                 <div class="faq-item">
                     <h4>Can I upgrade or downgrade my plan?</h4>
-                    <p>Yes! You can upgrade at any time through your account dashboard. Downgrades take effect at your next billing cycle. Any rollover words you've accumulated will carry forward regardless of plan changes.</p>
+                    <p>You can upgrade at any time through your account dashboard. Downgrades take effect at your next billing cycle. Any rollover words you've accumulated will carry forward regardless of plan changes.</p>
                 </div>
 
                 <div class="faq-item">
                     <h4>Is my contract data secure?</h4>
-                    <p>Absolutely. We operate on a strict zero-retention policy. Your contract documents are never stored after analysis, and your data is never used to train AI models. All processing is ephemeral, and we maintain enterprise-grade encryption at rest and in transit.</p>
+                    <p>Absolutely. Original uploaded files are not stored. De-identified memo outputs and analysis metadata (file names, dates, sizes, tier, cost) are retained to enable access to your completed analyses and for billing and support purposes. Data shared with OpenAI is not used to train models and it is de-identified before transmission. Your de-identified data is deleted by OpenAI after 30 days for abuse monitoring. </p>
                 </div>
 
                 <div class="faq-item">
                     <h4>Do you offer annual billing?</h4>
-                    <p>Currently we offer monthly billing only. Annual billing with a discount will be available soon. Contact us at <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a> if you're interested in annual prepayment options.</p>
+                    <p>Currently we offer monthly billing only. If you require annual billing, contact us at <a href="mailto:support@veritaslogic.ai">support@veritaslogic.ai</a>.</p>
                 </div>
 
                 <div class="faq-item">
@@ -255,7 +261,7 @@
                 <p>Start your 14-day free trial with 9,000 words included. Credit card required, cancel anytime before trial ends - no charge.</p>
             </div>
             <div class="cta-actions">
-                <a href="signup.html" class="btn btn--primary">Start Your Free 14-Day Trial</a>
+                <a href="signup.html" class="btn btn--primary">Start Your 14-Day Free Trial</a>
                 <a href="contact.html?inquiry=pricing" class="secondary-cta">Questions? Contact Us</a>
             </div>
             <p class="cta-note">Technical Accounting Memos in Minutes.</p>

@@ -1494,6 +1494,23 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.4;
 }
 
+.pricing-explainer-bar {
+    background: rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 1.25rem 0;
+    margin-bottom: 0;
+}
+
+.pricing-explainer-bar p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: center;
+    margin: 0;
+    font-weight: 500;
+    padding: 0 14rem;
+}
+
 /* Included features section */
 .pricing-included {
     max-width: 1200px;
@@ -1550,6 +1567,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .faq-section h2 {
     color: white;
+    text-align: center;
 }
 
 .faq-list {
