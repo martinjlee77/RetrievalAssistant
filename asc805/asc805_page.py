@@ -397,33 +397,38 @@ def render_asc805_page():
             # Store as pricing_result for backwards compatibility
             pricing_result = allowance_result
 
-            if allowance_result['can_proceed']:
-                # Show allowance status with inline warning if needed
-                if allowance_result['show_warning']:
-                    with pricing_container.container():
-                        # Show inline warning card
-                        msg_parts = []
-                        if allowance_result['segment'] == 'trial':
-                            msg_parts.append(f"🎉 **Trial Analysis** ({allowance_result['total_words']:,} words)")
-                            msg_parts.append(f"• Remaining after this analysis: **{allowance_result['words_remaining_after']:,} words**")
-                            msg_parts.append(f"• Trial resets: **{allowance_result['renewal_date']}**")
-                        elif allowance_result['segment'] == 'paid':
-                            msg_parts.append(f"📊 **Analysis** ({allowance_result['total_words']:,} words)")
-                            msg_parts.append(f"• Remaining after: **{allowance_result['words_remaining_after']:,} words**")
-                            msg_parts.append(f"• Allowance resets: **{allowance_result['renewal_date']}**")
-                        elif allowance_result['segment'] == 'past_due':
-                            msg_parts.append("⚠️ **Subscription Past Due**")
-                            msg_parts.append(f"Analysis will use rollover words ({allowance_result['total_words']:,} words)")
-                        
-                        if allowance_result.get('upgrade_link'):
-                            msg_parts.append(f"\n[View Dashboard →]({allowance_result['upgrade_link']})")
-                        
+            # Always show allowance information (not just when there's a warning)
+            with pricing_container.container():
+                if allowance_result['can_proceed']:
+                    # Show allowance status
+                    msg_parts = []
+                    if allowance_result['segment'] == 'trial':
+                        msg_parts.append(f"🎉 **Trial Analysis** ({allowance_result['total_words']:,} words)")
+                        msg_parts.append(f"• Words available: **{allowance_result['words_available']:,}**")
+                        msg_parts.append(f"• Remaining after this analysis: **{allowance_result['words_remaining_after']:,} words**")
+                        msg_parts.append(f"• Trial resets: **{allowance_result['renewal_date']}**")
+                    elif allowance_result['segment'] == 'paid':
+                        msg_parts.append(f"📊 **Subscription Analysis** ({allowance_result['total_words']:,} words)")
+                        msg_parts.append(f"• Words available: **{allowance_result['words_available']:,}**")
+                        msg_parts.append(f"• Remaining after: **{allowance_result['words_remaining_after']:,} words**")
+                        msg_parts.append(f"• Allowance resets: **{allowance_result['renewal_date']}**")
+                    elif allowance_result['segment'] == 'past_due':
+                        msg_parts.append("⚠️ **Subscription Past Due**")
+                        msg_parts.append(f"Analysis will use rollover words ({allowance_result['total_words']:,} words)")
+                    
+                    if allowance_result.get('upgrade_link'):
+                        msg_parts.append(f"\n[View Dashboard →]({allowance_result['upgrade_link']})")
+                    
+                    # Use warning styling if low on words, otherwise info
+                    if allowance_result.get('show_warning'):
+                        st.warning("\n".join(msg_parts))
+                    else:
                         st.info("\n".join(msg_parts))
-            else:
-                # Cannot proceed - show error and upgrade link
-                st.error(f"❌ {allowance_result['error_message']}")
-                if allowance_result.get('upgrade_link'):
-                    st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
+                else:
+                    # Cannot proceed - show error and upgrade link
+                    st.error(f"❌ {allowance_result['error_message']}")
+                    if allowance_result.get('upgrade_link'):
+                        st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
 
     # Subscription allowance flow (only proceed if allowance check passed)
     if is_ready and pricing_result and pricing_result.get('can_proceed'):
