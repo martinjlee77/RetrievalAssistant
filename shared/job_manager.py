@@ -32,10 +32,13 @@ class JobManager:
                            analysis_id: int,
                            user_id: int,
                            user_token: str,
-                           pricing_result: Dict[str, Any],
                            additional_context: str,
                            combined_text: str,
-                           uploaded_filenames: list) -> str:
+                           uploaded_filenames: list,
+                           allowance_result: Optional[Dict[str, Any]] = None,
+                           pricing_result: Optional[Dict[str, Any]] = None,
+                           org_id: Optional[int] = None,
+                           total_words: Optional[int] = None) -> str:
         """
         Submit an analysis job to the background queue
         
@@ -44,10 +47,13 @@ class JobManager:
             analysis_id: Database INTEGER analysis ID
             user_id: User ID for authentication
             user_token: JWT token for API calls
-            pricing_result: Pricing calculation result
             additional_context: User-provided context
             combined_text: De-identified contract text
             uploaded_filenames: List of uploaded file names
+            allowance_result: Subscription allowance check result (new subscription system)
+            pricing_result: Pricing calculation result (legacy)
+            org_id: Organization ID for word deduction (subscription system)
+            total_words: Total words used for this analysis (subscription system)
             
         Returns:
             Job ID for tracking (string representation of analysis_id)
@@ -79,10 +85,13 @@ class JobManager:
                 'analysis_id': analysis_id,
                 'user_id': user_id,
                 'user_token': user_token,
+                'allowance_result': allowance_result,
                 'pricing_result': pricing_result,
                 'additional_context': additional_context,
                 'combined_text': combined_text,
-                'uploaded_filenames': uploaded_filenames
+                'uploaded_filenames': uploaded_filenames,
+                'org_id': org_id,
+                'total_words': total_words
             }
             
             job = self.queue.enqueue(
