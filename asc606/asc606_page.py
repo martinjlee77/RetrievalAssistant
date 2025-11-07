@@ -436,71 +436,61 @@ def render_asc606_page():
                         key="original_preview"
                     )
         
-        # Step 2: Check subscription word allowance from cached word count
-        allowance_result = None
+        # Step 2: Check subscription allowance from cached word count (no re-extraction)
         if cached_word_count_key in st.session_state:
             word_count = st.session_state[cached_word_count_key]
-            
-            # Get user's org_id
-            user_data = st.session_state.get('user_data', {})
-            org_id = user_data.get('org_id')
-            
-            if not org_id:
-                st.error("❌ **Organization ID not found**. Please log out and log back in.")
+            user_token = auth_manager.get_auth_token()
+            if not user_token:
+                st.error("❌ Authentication required. Please refresh the page and log in again.")
                 return
             
             # Check subscription word allowance
-            allowance_result = preflight_pricing.check_subscription_allowance(org_id, word_count, len(uploaded_files))
+            allowance_result = preflight_pricing.check_subscription_allowance(
+                user_token=user_token,
+                total_words=word_count
+            )
             
-            if allowance_result['success']:
-                with pricing_container.container():
-                    st.markdown("### :primary[Word Allowance Check]")
-                    
-                    # Display tailored UI message based on allowance status
-                    ui_msg = allowance_result['ui_message']
-                    if ui_msg['type'] == 'success':
-                        st.success(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
-                    elif ui_msg['type'] == 'warning':
-                        st.warning(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
-                    elif ui_msg['type'] == 'error':
-                        st.error(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
-                    else:
-                        st.info(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
-            else:
-                st.error(f"❌ **Allowance Check Failed**\n\n{allowance_result.get('error', 'Unknown error')}")
+            # Store as pricing_result for backwards compatibility
+            pricing_result = allowance_result
 
-    # Subscription allowance flow (only proceed if ready AND allowance check passed)
-    if is_ready and allowance_result and allowance_result['success']:
-        
+            if allowance_result['can_proceed']:
+                # Show allowance status with inline warning if needed
+                if allowance_result['show_warning']:
+                    with pricing_container.container():
+                        # Show inline warning card
+                        msg_parts = []
+                        if allowance_result['segment'] == 'trial':
+                            msg_parts.append(f"🎉 **Trial Analysis** ({allowance_result['total_words']:,} words)")
+                            msg_parts.append(f"• Remaining after this analysis: **{allowance_result['words_remaining_after']:,} words**")
+                            msg_parts.append(f"• Trial resets: **{allowance_result['renewal_date']}**")
+                        elif allowance_result['segment'] == 'paid':
+                            msg_parts.append(f"📊 **Analysis** ({allowance_result['total_words']:,} words)")
+                            msg_parts.append(f"• Remaining after: **{allowance_result['words_remaining_after']:,} words**")
+                            msg_parts.append(f"• Allowance resets: **{allowance_result['renewal_date']}**")
+                        elif allowance_result['segment'] == 'past_due':
+                            msg_parts.append("⚠️ **Subscription Past Due**")
+                            msg_parts.append(f"Analysis will use rollover words ({allowance_result['total_words']:,} words)")
+                        
+                        if allowance_result.get('upgrade_link'):
+                            msg_parts.append(f"\n[View Dashboard →]({allowance_result['upgrade_link']})")
+                        
+                        st.info("\n".join(msg_parts))
+            else:
+                # Cannot proceed - show error and upgrade link
+                st.error(f"❌ {allowance_result['error_message']}")
+                if allowance_result.get('upgrade_link'):
+                    st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
+
+    # Subscription allowance flow (only proceed if allowance check passed)
+    if is_ready and pricing_result and pricing_result.get('can_proceed'):
+        # Subscription system - no credit checks needed
         user_token = auth_manager.get_auth_token()
         if not user_token:
             st.error("❌ Authentication required. Please refresh the page and log in again.")
             return
         
-        can_proceed = allowance_result['allowed']
-        
-        # Show upgrade options if insufficient allowance
-        if not can_proceed:
-            ui_msg = allowance_result['ui_message']
-            action = ui_msg.get('action', 'upgrade_plan')
-            cta_text = ui_msg.get('cta_text', 'Manage Subscription')
-            
-            st.markdown("---")
-            
-            if action == 'update_payment':
-                st.button(f"💳 {cta_text}", type="primary", use_container_width=True, key="goto_payment", 
-                         help="Click to update your payment method in the dashboard")
-            else:
-                # Upgrade or start trial
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.button(f"⬆️ {cta_text}", type="primary", use_container_width=True, key="goto_upgrade",
-                             help="Click to manage your subscription in the dashboard")
-                with col2:
-                    st.button("💬 Contact Support", type="secondary", use_container_width=True, key="goto_support",
-                             help="Email: support@veritaslogic.ai")
-        
-        # Analysis section
+        # Analysis section (allowance already verified)
+        can_proceed = True
         if can_proceed:
             warning_placeholder = st.empty()
             warning_placeholder.info(
