@@ -459,7 +459,7 @@ def render_asc606_page():
                     # Show allowance status
                     msg_parts = []
                     if allowance_result['segment'] == 'trial':
-                        msg_parts.append(f"🎉 **Trial Analysis** ({allowance_result['total_words']:,} words)")
+                        msg_parts.append(f"➡️ **Trial Analysis** ({allowance_result['total_words']:,} words)")
                         msg_parts.append(f"• Words available: **{allowance_result['words_available']:,}**")
                         msg_parts.append(f"• Remaining after this analysis: **{allowance_result['words_remaining_after']:,} words**")
                         msg_parts.append(f"• Trial resets: **{allowance_result['renewal_date']}**")
@@ -468,9 +468,6 @@ def render_asc606_page():
                         msg_parts.append(f"• Words available: **{allowance_result['words_available']:,}**")
                         msg_parts.append(f"• Remaining after: **{allowance_result['words_remaining_after']:,} words**")
                         msg_parts.append(f"• Allowance resets: **{allowance_result['renewal_date']}**")
-                    elif allowance_result['segment'] == 'past_due':
-                        msg_parts.append("⚠️ **Subscription Past Due**")
-                        msg_parts.append(f"Analysis will use rollover words ({allowance_result['total_words']:,} words)")
                     
                     if allowance_result.get('upgrade_link'):
                         msg_parts.append(f"\n[View Dashboard →]({allowance_result['upgrade_link']})")
@@ -481,7 +478,7 @@ def render_asc606_page():
                     else:
                         st.info("\n".join(msg_parts))
                 else:
-                    # Cannot proceed - show error and upgrade link
+                    # Cannot proceed - past_due, insufficient allowance, or no subscription
                     st.error(f"❌ {allowance_result['error_message']}")
                     if allowance_result.get('upgrade_link'):
                         st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
@@ -499,7 +496,7 @@ def render_asc606_page():
         if can_proceed:
             warning_placeholder = st.empty()
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
+                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**."
             )
             
             if st.button("3️⃣ Confirm & Analyze",
