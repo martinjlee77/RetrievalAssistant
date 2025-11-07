@@ -437,64 +437,69 @@ def render_asc606_page():
                         key="original_preview"
                     )
         
-        # Step 2: Calculate pricing from cached word count (no re-extraction)
+        # Step 2: Check subscription word allowance from cached word count
+        allowance_result = None
         if cached_word_count_key in st.session_state:
             word_count = st.session_state[cached_word_count_key]
-            pricing_result = preflight_pricing.calculate_pricing_from_word_count(word_count, len(uploaded_files))
-
-            if pricing_result['success']:
+            
+            # Get user's org_id
+            user_data = st.session_state.get('user_data', {})
+            org_id = user_data.get('org_id')
+            
+            if not org_id:
+                st.error("❌ **Organization ID not found**. Please log out and log back in.")
+                return
+            
+            # Check subscription word allowance
+            allowance_result = preflight_pricing.check_subscription_allowance(org_id, word_count, len(uploaded_files))
+            
+            if allowance_result['success']:
                 with pricing_container.container():
-                    st.markdown("### :primary[Analysis Pricing]")
-                    st.info(pricing_result['billing_summary'])
+                    st.markdown("### :primary[Word Allowance Check]")
+                    
+                    # Display tailored UI message based on allowance status
+                    ui_msg = allowance_result['ui_message']
+                    if ui_msg['type'] == 'success':
+                        st.success(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
+                    elif ui_msg['type'] == 'warning':
+                        st.warning(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
+                    elif ui_msg['type'] == 'error':
+                        st.error(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
+                    else:
+                        st.info(f"**{ui_msg['title']}**\n\n{ui_msg['content']}")
             else:
-                st.error(f"❌ **Pricing Calculation Failed**\n\n{pricing_result['error']}")
+                st.error(f"❌ **Allowance Check Failed**\n\n{allowance_result.get('error', 'Unknown error')}")
 
-    # Preflight pricing and payment flow (only proceed if ready AND pricing successful)
-    if is_ready and pricing_result and pricing_result['success']:
+    # Subscription allowance flow (only proceed if ready AND allowance check passed)
+    if is_ready and allowance_result and allowance_result['success']:
         
-        # Get required price and check wallet balance
-        required_price = pricing_result['tier_info']['price']
         user_token = auth_manager.get_auth_token()
-        
-        # Get wallet balance
         if not user_token:
             st.error("❌ Authentication required. Please refresh the page and log in again.")
             return
-        wallet_info = wallet_manager.get_user_balance(user_token)
-        current_balance = wallet_info.get('balance', 0.0)
         
-        # Check if user has sufficient credits
-        credit_check = preflight_pricing.check_sufficient_credits(required_price, current_balance)
+        can_proceed = allowance_result['allowed']
         
-        # Credit balance display - store in variable so we can clear it
-        credit_container = st.empty()       
-        if credit_check['can_proceed']:
-            msg = (
-                f"{credit_check['message']}\n"
-                f"After this analysis, you will have \\${credit_check['credits_remaining']:.0f} remaining."
-            )
-            credit_container.info(msg)
-            can_proceed = True
-        else:
-            credit_container.error(credit_check['message'])
+        # Show upgrade options if insufficient allowance
+        if not can_proceed:
+            ui_msg = allowance_result['ui_message']
+            action = ui_msg.get('action', 'upgrade_plan')
+            cta_text = ui_msg.get('cta_text', 'Manage Subscription')
             
-            # Show wallet top-up options
-            selected_amount = wallet_manager.show_wallet_top_up_options(current_balance, required_price)
+            st.markdown("---")
             
-            if selected_amount:
-                # Process credit purchase
-                if not user_token:
-                    st.error("❌ Authentication required. Please refresh the page and log in again.")
-                    return
-                purchase_result = wallet_manager.process_credit_purchase(user_token, selected_amount)
-                
-                if purchase_result['success']:
-                    st.success(purchase_result['message'])
-                    st.rerun()  # Refresh to update balance
-                else:
-                    st.error(purchase_result['message'])
-            
-            can_proceed = False
+            if action == 'update_payment':
+                st.button(f"💳 {cta_text}", type="primary", use_container_width=True, key="goto_payment", 
+                         help="Click to update your payment method in the dashboard")
+            else:
+                # Upgrade or start trial
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.button(f"⬆️ {cta_text}", type="primary", use_container_width=True, key="goto_upgrade",
+                             help="Click to manage your subscription in the dashboard")
+                with col2:
+                    st.button("💬 Contact Support", type="secondary", use_container_width=True, key="goto_support",
+                             help="Email: support@veritaslogic.ai")
         
         # Analysis section
         if can_proceed:
@@ -514,7 +519,6 @@ def render_asc606_page():
                 warning_placeholder.empty()
                 processing_container.empty()
                 pricing_container.empty()
-                credit_container.empty()
                 upload_form_container.empty()
                 
                 if not user_token:
@@ -542,17 +546,23 @@ def render_asc606_page():
                 # Import job runner
                 from asc606.job_analysis_runner import submit_and_monitor_asc606_job
                 
+                # Get user's org_id for word deduction
+                user_data = st.session_state.get('user_data', {})
+                org_id = user_data.get('org_id')
+                
                 # Submit job and monitor progress
                 submit_and_monitor_asc606_job(
-                    pricing_result=pricing_result,
+                    allowance_result=allowance_result,
                     additional_context=additional_context,
                     user_token=user_token,
                     cached_combined_text=cached_text,
                     uploaded_filenames=uploaded_filenames,
-                    session_id=session_id
+                    session_id=session_id,
+                    org_id=org_id,
+                    total_words=allowance_result['total_words']
                 )
         else:
-            st.button("3️⃣ Insufficient Credits", 
+            st.button("3️⃣ Insufficient Word Allowance", 
                      disabled=True, 
                      use_container_width=True,
                      key="asc606_analyze_disabled")

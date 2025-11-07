@@ -1968,6 +1968,8 @@ def save_worker_analysis():
         api_cost = Decimal(str(data.get('api_cost', 0)))  # For logging only
         success = data.get('success', False)
         error_message = sanitize_string(data.get('error_message', ''), 500) if data.get('error_message') else None
+        org_id = data.get('org_id')  # For subscription word deduction
+        total_words = data.get('total_words')  # For subscription word deduction
         
         if not analysis_id or analysis_id <= 0:
             return jsonify({'error': 'Valid analysis_id required'}), 400
@@ -2073,8 +2075,35 @@ def save_worker_analysis():
             
             logger.info(f"Analysis updated: {db_analysis_id}, status: {analysis_status}")
             
-            # Only charge credits if successful
-            if success and cost_charged > 0:
+            # Subscription-based word deduction (new system)
+            if success and org_id and total_words:
+                try:
+                    from shared.subscription_manager import SubscriptionManager
+                    subscription_manager = SubscriptionManager(conn)
+                    
+                    # Deduct words from subscription allowance
+                    deduction_result = subscription_manager.deduct_words(
+                        org_id=org_id,
+                        words_used=total_words,
+                        analysis_id=db_analysis_id
+                    )
+                    
+                    logger.info(
+                        f"✓ Word deduction successful for org {org_id}: {total_words} words, "
+                        f"breakdown: {deduction_result['from_allowance']} from allowance, "
+                        f"{deduction_result['from_rollover']} from rollover"
+                    )
+                    balance_after = 0  # Not used in subscription system, but keep for response consistency
+                    
+                except Exception as e:
+                    # Log error but don't fail the analysis save
+                    logger.error(f"Word deduction failed for org {org_id}, analysis {db_analysis_id}: {str(e)}")
+                    # Rollback to preserve transaction consistency
+                    conn.rollback()
+                    raise e
+            
+            # Legacy credit-based billing (for backwards compatibility during migration)
+            elif success and cost_charged > 0:
                 balance_after = max(current_balance - cost_charged, 0)
                 
                 # Deduct credits
@@ -2094,8 +2123,8 @@ def save_worker_analysis():
                 
                 logger.info(f"Credits charged: {cost_charged}, new balance: {balance_after}")
             else:
-                balance_after = current_balance
-                logger.info(f"No credits charged (success={success})")
+                balance_after = current_balance if 'balance_after' not in locals() else balance_after
+                logger.info(f"No billing applied (success={success}, org_id={org_id}, total_words={total_words})")
             
             conn.commit()
             

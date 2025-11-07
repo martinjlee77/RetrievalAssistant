@@ -115,10 +115,13 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
     analysis_id = job_data['analysis_id']  # This is now the database INTEGER
     user_id = job_data['user_id']
     user_token = job_data['user_token']
-    pricing_result = job_data['pricing_result']
+    allowance_result = job_data.get('allowance_result')  # New subscription-based data
+    pricing_result = job_data.get('pricing_result')  # Legacy fallback
     additional_context = job_data['additional_context']
     combined_text = job_data['combined_text']
     uploaded_filenames = job_data['uploaded_filenames']
+    org_id = job_data.get('org_id')  # For word deduction
+    total_words = job_data.get('total_words')  # For word deduction
     
     logger.info(f"🚀 Worker starting ASC 606 analysis: {analysis_id}")
     
@@ -225,7 +228,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
         
         # NOTE: Server will look up analysis by analysis_id (database INTEGER)
-        # Worker only sends analysis_id, memo_content, api_cost, and success flag
+        # Worker sends analysis_id, memo_content, api_cost, success flag, and word deduction data
         save_result = _save_analysis_with_retry(
             backend_url=backend_url,
             user_token=user_token,
@@ -233,7 +236,9 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 'analysis_id': analysis_id,  # Database INTEGER id
                 'memo_content': memo_content,
                 'api_cost': api_cost,
-                'success': True
+                'success': True,
+                'org_id': org_id,  # For word deduction
+                'total_words': total_words  # For word deduction
             },
             max_retries=5
         )

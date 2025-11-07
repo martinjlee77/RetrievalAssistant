@@ -16,23 +16,27 @@ from shared.analysis_manager import analysis_manager
 logger = logging.getLogger(__name__)
 
 def submit_and_monitor_asc606_job(
-    pricing_result: Dict[str, Any],
+    allowance_result: Dict[str, Any],
     additional_context: str,
     user_token: str,
     cached_combined_text: str,
     uploaded_filenames: List[str],
-    session_id: str
+    session_id: str,
+    org_id: int,
+    total_words: int
 ):
     """
     Submit ASC 606 analysis job to background queue and monitor progress
     
     Args:
-        pricing_result: Pricing calculation result
+        allowance_result: Subscription allowance check result
         additional_context: User-provided context
         user_token: JWT authentication token
         cached_combined_text: De-identified contract text
         uploaded_filenames: List of uploaded file names
         session_id: Session ID for caching results
+        org_id: Organization ID for word deduction
+        total_words: Total words used for this analysis
     """
     try:
         # Get user ID from session state (set during login)
@@ -53,9 +57,9 @@ def submit_and_monitor_asc606_job(
             headers={'Authorization': f'Bearer {user_token}'},
             json={
                 'asc_standard': 'ASC 606',
-                'words_count': pricing_result['total_words'],
-                'tier_name': pricing_result['tier_info']['name'],
-                'file_count': pricing_result['file_count']
+                'words_count': total_words,
+                'file_count': allowance_result['file_count'],
+                'org_id': org_id  # For word deduction tracking
             },
             timeout=10
         )
@@ -83,10 +87,12 @@ def submit_and_monitor_asc606_job(
                 analysis_id=db_analysis_id,  # Pass database INTEGER id to worker
                 user_id=user_id,
                 user_token=service_token,  # Use service token instead of user token
-                pricing_result=pricing_result,
+                allowance_result=allowance_result,
                 additional_context=additional_context,
                 combined_text=cached_combined_text,
-                uploaded_filenames=uploaded_filenames
+                uploaded_filenames=uploaded_filenames,
+                org_id=org_id,  # For word deduction
+                total_words=total_words  # For word deduction
             )
             
             logger.info(f"Job submitted: {job_id}")
