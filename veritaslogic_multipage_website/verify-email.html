@@ -55,7 +55,6 @@
                 <div class="contact-form">
                     <div class="form-header">
                         <h2>Verify Your Email Address</h2>
-                        <p>Please wait while we verify your email address...</p>
                     </div>
                 
                     <div id="messageContainer" aria-live="polite" role="status"></div>
@@ -133,18 +132,18 @@
             // Check if token is present
             if (!verificationToken) {
                 // No token means user came from signup - show friendly message
-                showMessage('📧 Account created successfully! Please check your email inbox and click the verification link to activate your account.', 'info');
+                showMessage('✅ Account created successfully! Please check your email inbox and click the verification link to activate your account.', 'info');
                 statusContainer.innerHTML = `
                     <div class="verification-instructions">
-                        <h3>📋 What to do next:</h3>
-                        <ol>
+                        <h3>📋 What to do next</h3>
+                        <ol style="text-align: left;">
                             <li><strong>Check your email inbox</strong> for a message from VeritasLogic</li>
                             <li><strong>Click the verification link</strong> in the email</li>
-                            <li><strong>Return to login page</strong> - your 14-day trial with 9,000 words will be activated</li>
+                            <li><strong>Return to login page</strong> and your 14-day trial will be activated</li>
                         </ol>
                         <div class="verification-actions">
                             <a href="login.html" class="btn btn--secondary">Go to Login Page</a>
-                            <a href="contact.html" class="btn btn--secondary">Need Help?</a>
+                            <a href="contact.html?inquiry=technical-support" class="btn btn--secondary">Need Help?</a>
                         </div>
                     </div>
                 `;

@@ -2915,6 +2915,7 @@ a:focus {
 .verification-actions .btn {
     flex: 1;
     min-width: 200px;
+    justify-content: center;
 }
 
 .verification-help {
