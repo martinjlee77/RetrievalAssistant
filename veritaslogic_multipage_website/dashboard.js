@@ -666,12 +666,11 @@ async function upgradeToPlan(planKey) {
         
         const data = await response.json();
         
-        if (response.ok && data.success) {
-            alert(`Successfully upgraded to ${planName} plan!`);
-            // Reload subscription data
-            await loadSubscriptionData();
+        if (response.ok && data.checkout_url) {
+            // Redirect to Stripe checkout page
+            window.location.href = data.checkout_url;
         } else {
-            alert(`Failed to upgrade: ${data.error || 'Unknown error'}`);
+            alert(`Failed to upgrade: ${data.error || data.message || 'Unknown error'}`);
         }
     } catch (error) {
         console.error('Upgrade error:', error);
@@ -692,11 +691,17 @@ async function updatePaymentMethod() {
         
         const data = await response.json();
         
-        if (response.ok && data.success) {
+        if (response.ok && data.url) {
             // Redirect to Stripe Customer Portal
             window.location.href = data.url;
         } else {
-            alert(`Failed to access billing portal: ${data.error || 'Unknown error'}`);
+            // Show helpful error message if Customer Portal not configured
+            const errorMsg = data.error || 'Unknown error';
+            if (errorMsg.includes('configuration') || errorMsg.includes('Customer Portal')) {
+                alert('Stripe Customer Portal is not yet configured. Please contact support at support@veritaslogic.ai');
+            } else {
+                alert(`Failed to access billing portal: ${errorMsg}`);
+            }
         }
     } catch (error) {
         console.error('Update payment method error:', error);

@@ -1,0 +1,100 @@
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjYyOTgxNywicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDhUMTU6MjM6MzcuMDg1MTAyIn0.hUSwF_Umx2TtB0MpASJCgKi7D3yN1vBlJ_3ERY7TQBg
+100.64.0.4 - - [08/Nov/2025:15:23:37 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.13 - - [08/Nov/2025:15:24:06 +0000] "GET /.gitignore HTTP/1.1" 404 14 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.3"
+INFO:backend_api:Allowance check for org 3: 682 words, can_proceed=True, segment=trial
+100.64.0.2 - - [08/Nov/2025:15:24:47 +0000] "POST /api/subscription/check-allowance HTTP/1.1" 200 221 "-" "python-requests/2.31.0"
+INFO:backend_api:Allowance check for org 3: 682 words, can_proceed=True, segment=trial
+100.64.0.2 - - [08/Nov/2025:15:24:49 +0000] "POST /api/subscription/check-allowance HTTP/1.1" 200 221 "-" "python-requests/2.31.0"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjYzMDExNywicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDhUMTU6Mjg6MzcuMDUzOTcyIn0.3hLHQWtGz7ncirunRpM-OL5iidTHTb3klt3-pe2brWU
+100.64.0.10 - - [08/Nov/2025:15:28:37 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjYzMDQxNywicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDhUMTU6MzM6MzcuMTMyMTg5In0.QbJadzX_qu9ITxH3txF6nBAXt5H6VuYEkKusrZVh9dc
+100.64.0.6 - - [08/Nov/2025:15:33:37 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjYzMDcxNywicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDhUMTU6Mzg6MzcuMTMwNTQwIn0.ulqtjWzrKASas4aEwe6GxVaW_WDxLWfaNvXdRbjnMqs
+100.64.0.7 - - [08/Nov/2025:15:38:37 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+INFO:backend_api:Created Stripe checkout session for org 3: cs_test_a1TQl53JWUTGArwKrgTDc8rmv5g94oePJ8xvRqHjfuUbxdUqpRWCr2OwgR
+100.64.0.5 - - [08/Nov/2025:15:43:20 +0000] "POST /api/subscription/upgrade HTTP/1.1" 200 634 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+INFO:backend_api:Created Stripe checkout session for org 3: cs_test_a10fZ5Mx2SP6aMNfbi4TbEexg4Ok1BAV3YSIHzcuSCP5Y9j7fnzoSwFI3t
+100.64.0.5 - - [08/Nov/2025:15:43:26 +0000] "POST /api/subscription/upgrade HTTP/1.1" 200 618 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjYzMTAxNiwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDhUMTU6NDM6MzYuOTQ1MTEzIn0.87W_HPecsPcZ_kCQQWxbkUrKum6vkh7c2XhEoYnU99g
+100.64.0.5 - - [08/Nov/2025:15:43:36 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=200
+INFO:backend_api:Created Stripe checkout session for org 3: cs_test_a1u0lJ4tkFKuZBje0vBO1znaLnTpwA7tKyJmwKNBSCWHahmG6vrZej2k93
+100.64.0.6 - - [08/Nov/2025:15:44:30 +0000] "POST /api/subscription/upgrade HTTP/1.1" 200 618 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=None error_message='No configuration provided and your test mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in test mode at https://dashboard.stripe.com/test/settings/billing/portal.' error_param=None error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Exception on /api/subscription/customer-portal [POST]
+Traceback (most recent call last):
+  File "/app/backend_api.py", line 4645, in create_customer_portal_session
+    session = stripe.billing_portal.Session.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/billing_portal/_session.py", line 273, in create
+    cls._static_request(
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_resource.py", line 172, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 210, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders, api_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 868, in _interpret_response
+    self.handle_error_response(
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 351, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_oOhHCfr52pr87N: No configuration provided and your test mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in test mode at https://dashboard.stripe.com/test/settings/billing/portal.
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/stripe/__init__.py", line 872, in __getattr__
+    target, is_submodule = _import_map[name]
+                           ~~~~~~~~~~~^^^^^^
+KeyError: 'error'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+           ^^^^^^^^^^^^
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/__init__.py", line 882, in __getattr__
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    raise AttributeError()
+    rv = self.handle_user_exception(e)
+AttributeError
+100.64.0.3 - - [08/Nov/2025:15:45:22 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 265 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/backend_api.py", line 4660, in create_customer_portal_session
+    except stripe.error.StripeError as se:
+INFO:stripe:message='Request to Stripe api' method=get url=https://api.stripe.com/v1/invoices?customer=cus_TNphIArInRqQeR&limit=50
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/invoices?customer=cus_TNphIArInRqQeR&limit=50 response_code=200
