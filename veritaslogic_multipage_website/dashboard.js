@@ -680,11 +680,114 @@ async function upgradeToPlan(planKey) {
 }
 
 async function updatePaymentMethod() {
-    alert('Payment method update coming soon. Please contact support@veritaslogic.ai for assistance.');
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/subscription/customer-portal', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            // Redirect to Stripe Customer Portal
+            window.location.href = data.url;
+        } else {
+            alert(`Failed to access billing portal: ${data.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Update payment method error:', error);
+        alert('Network error. Please try again.');
+    }
 }
 
 async function viewInvoiceHistory() {
-    alert('Invoice history coming soon. Please contact support@veritaslogic.ai for records.');
+    try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/subscription/invoices', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            displayInvoiceModal(data.invoices);
+        } else {
+            alert(`Failed to retrieve invoices: ${data.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('View invoice history error:', error);
+        alert('Network error. Please try again.');
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function displayInvoiceModal(invoices) {
+    // Create modal overlay
+    const modalHTML = `
+        <div id="invoiceModal" class="modal-overlay" onclick="closeInvoiceModal(event)">
+            <div class="modal-content invoice-modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3>Invoice History</h3>
+                    <button class="modal-close" onclick="closeInvoiceModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    ${invoices.length === 0 ? 
+                        '<div class="empty-state"><p>No invoices found.</p></div>' :
+                        `<table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${invoices.map(invoice => `
+                                    <tr>
+                                        <td>${escapeHtml(new Date(invoice.created * 1000).toLocaleDateString())}</td>
+                                        <td>${escapeHtml(invoice.description || 'Subscription')}</td>
+                                        <td>$${(invoice.amount_paid || 0).toFixed(2)} ${escapeHtml(invoice.currency)}</td>
+                                        <td><span class="invoice-status ${escapeHtml(invoice.status)}">${escapeHtml(invoice.status)}</span></td>
+                                        <td>
+                                            ${invoice.invoice_pdf ? 
+                                                `<a href="${escapeHtml(invoice.invoice_pdf)}" target="_blank" class="btn btn-small">Download PDF</a>` :
+                                                `<a href="${escapeHtml(invoice.hosted_invoice_url)}" target="_blank" class="btn btn-small">View Invoice</a>`
+                                            }
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>`
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Append modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeInvoiceModal(event) {
+    const modal = document.getElementById('invoiceModal');
+    if (modal && (!event || event.target === modal || event.target.classList.contains('modal-close'))) {
+        modal.remove();
+    }
 }
 
 async function cancelSubscription() {

@@ -4603,6 +4603,156 @@ def cancel_subscription():
         return jsonify({'error': 'Failed to cancel subscription'}), 500
 
 
+@app.route('/api/subscription/customer-portal', methods=['POST'])
+def create_customer_portal_session():
+    """Create Stripe Customer Portal session for payment method and billing management"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Get user's organization and Stripe customer ID
+            cursor.execute("""
+                SELECT o.stripe_customer_id
+                FROM users u
+                JOIN organizations o ON u.org_id = o.id
+                WHERE u.id = %s
+            """, (user_id,))
+            result = cursor.fetchone()
+            
+            if not result or not result['stripe_customer_id']:
+                return jsonify({'error': 'No billing account found'}), 404
+            
+            stripe_customer_id = result['stripe_customer_id']
+            
+            # Create Stripe Customer Portal session
+            import stripe
+            stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+            
+            session = stripe.billing_portal.Session.create(
+                customer=stripe_customer_id,
+                return_url=f"{WEBSITE_URL}/dashboard.html"
+            )
+            
+            logger.info(f"Created Customer Portal session for customer {stripe_customer_id}")
+            
+            return jsonify({
+                'success': True,
+                'url': session.url
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error creating customer portal session: {se}")
+        return jsonify({
+            'error': 'Unable to access billing portal',
+            'message': str(se)
+        }), 500
+    except Exception as e:
+        logger.error(f"Create customer portal session error: {e}")
+        return jsonify({'error': 'Failed to create billing portal session'}), 500
+
+
+@app.route('/api/subscription/invoices', methods=['GET'])
+def get_customer_invoices():
+    """Get customer's invoice history from Stripe"""
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        if not token:
+            return jsonify({'error': 'Authorization token required'}), 401
+        
+        payload = verify_token(token)
+        if 'error' in payload:
+            return jsonify({'error': payload['error']}), 401
+        
+        user_id = payload['user_id']
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Get user's organization and Stripe customer ID
+            cursor.execute("""
+                SELECT o.stripe_customer_id
+                FROM users u
+                JOIN organizations o ON u.org_id = o.id
+                WHERE u.id = %s
+            """, (user_id,))
+            result = cursor.fetchone()
+            
+            if not result or not result['stripe_customer_id']:
+                return jsonify({
+                    'success': True,
+                    'invoices': []
+                }), 200
+            
+            stripe_customer_id = result['stripe_customer_id']
+            
+            # Fetch invoices from Stripe
+            import stripe
+            stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+            
+            invoices = stripe.Invoice.list(
+                customer=stripe_customer_id,
+                limit=50
+            )
+            
+            # Format invoice data for frontend
+            invoice_list = []
+            for invoice in invoices.data:
+                invoice_list.append({
+                    'id': invoice.id,
+                    'number': invoice.number,
+                    'amount_due': invoice.amount_due / 100,  # Convert from cents
+                    'amount_paid': invoice.amount_paid / 100,
+                    'currency': invoice.currency.upper(),
+                    'status': invoice.status,
+                    'created': invoice.created,
+                    'due_date': invoice.due_date,
+                    'invoice_pdf': invoice.invoice_pdf,
+                    'hosted_invoice_url': invoice.hosted_invoice_url,
+                    'description': invoice.lines.data[0].description if invoice.lines.data else 'Subscription'
+                })
+            
+            logger.info(f"Retrieved {len(invoice_list)} invoices for customer {stripe_customer_id}")
+            
+            return jsonify({
+                'success': True,
+                'invoices': invoice_list
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except stripe.error.StripeError as se:
+        logger.error(f"Stripe error fetching invoices: {se}")
+        return jsonify({
+            'error': 'Unable to fetch invoice history',
+            'message': str(se)
+        }), 500
+    except Exception as e:
+        logger.error(f"Get customer invoices error: {e}")
+        return jsonify({'error': 'Failed to retrieve invoices'}), 500
+
+
 @app.route('/api/leads/appsource', methods=['POST'])
 def track_appsource_lead():
     """Track lead from Microsoft AppSource (handles both anonymous visits and identified leads)"""
