@@ -402,7 +402,7 @@ def render_asc340_page():
                 total_words=word_count
             )
             
-            # Store as pricing_result for backwards compatibility
+            # Use allowance_result directly (no more pricing_result)
             pricing_result = allowance_result
 
             # Always show allowance information (not just when there's a warning)
@@ -475,9 +475,17 @@ def render_asc340_page():
                 else:
                     cached_text = None
                 
+                # Get user's org_id for word deduction
+                user_data = st.session_state.get('user_data', {})
+                org_id = user_data.get('org_id')
+                
                 # Run analysis with cached text and pass uploaded filenames
                 uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
-                perform_asc340_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames)
+                
+                # Add file_count to allowance_result (needed by job submission)
+                pricing_result['file_count'] = len(uploaded_filenames)
+                
+                perform_asc340_analysis_new(pricing_result, additional_context, user_token, cached_combined_text=cached_text, uploaded_filenames=uploaded_filenames, org_id=org_id)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -628,16 +636,17 @@ def _upload_and_process_asc340():
 # Old validation function removed - using progressive disclosure approach instead
 
 
-def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
+def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_context: str, user_token: str, cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None, org_id: Optional[int] = None):
     """
     Perform ASC 340-40 analysis with background job processing.
     
     Args:
-        pricing_result: Pricing information dict
+        pricing_result: Allowance/pricing information dict
         additional_context: User-provided additional context
         user_token: User authentication token
         cached_combined_text: Pre-extracted and de-identified contract text (optional)
         uploaded_filenames: List of uploaded filenames (optional)
+        org_id: Organization ID for word deduction (optional)
     """
     
     # Use cached text if available, otherwise reconstruct from file details
@@ -668,12 +677,14 @@ def perform_asc340_analysis_new(pricing_result: Dict[str, Any], additional_conte
     
     # Submit background job for analysis
     submit_and_monitor_asc340_job(
-        pricing_result=pricing_result,
+        allowance_result=pricing_result,
         additional_context=additional_context,
         user_token=user_token,
         cached_combined_text=combined_text,
         uploaded_filenames=uploaded_filenames,
-        session_id=session_id
+        session_id=session_id,
+        org_id=org_id,
+        total_words=pricing_result['total_words']
     )
 
 
