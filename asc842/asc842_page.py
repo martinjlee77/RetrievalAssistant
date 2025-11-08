@@ -716,13 +716,23 @@ def perform_asc842_analysis(contract_text: str, additional_context: str, pricing
     
     # Submit background job for analysis
     user_token = st.session_state.get('auth_token', '')
+    
+    # Get user's org_id for word deduction
+    user_data = st.session_state.get('user_data', {})
+    org_id = user_data.get('org_id')
+    
+    # Add file_count to pricing_result (needed by job submission)
+    pricing_result['file_count'] = len(uploaded_filenames) if uploaded_filenames else 0
+    
     submit_and_monitor_asc842_job(
-        pricing_result=pricing_result,
+        allowance_result=pricing_result,
         additional_context=additional_context,
         user_token=user_token,
         cached_combined_text=contract_text,
         uploaded_filenames=uploaded_filenames,
-        session_id=session_id
+        session_id=session_id,
+        org_id=org_id,
+        total_words=pricing_result['total_words']
     )
 
 
