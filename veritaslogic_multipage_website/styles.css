@@ -2949,6 +2949,51 @@ a:focus {
     max-height: 500px;
     overflow-y: auto;
 }
+
+/* Analysis History Table */
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.analysis-table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.analysis-table th {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.analysis-table td {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+}
+
+.analysis-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.analysis-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.analysis-table .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
 /* Empty State Styling */
 .empty-state {
     text-align: center;

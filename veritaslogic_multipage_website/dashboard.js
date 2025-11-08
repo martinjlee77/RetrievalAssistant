@@ -837,9 +837,7 @@ function loadRecentAnalyses(analyses) {
                     <th>ASC Standard</th>
                     <th>Document Size</th>
                     <th>Files</th>
-                    <th>Tier</th>
-                    <th>Cost</th>
-                    <th>Actions</th>
+                    <th>Memo</th>
                 </tr>
             </thead>
             <tbody id="analysisTableBody">
@@ -858,8 +856,6 @@ function loadRecentAnalyses(analyses) {
             <td>${analysis.asc_standard}</td>
             <td>${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</td>
             <td>${analysis.file_count || 0}</td>
-            <td>${analysis.tier_name || 'N/A'}</td>
-            <td>${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(analysis.cost)}</td>
             <td><a href="${viewUrl}" target="_blank" class="btn btn-primary btn-sm">View</a></td>
         `;
         tbody.appendChild(row);
