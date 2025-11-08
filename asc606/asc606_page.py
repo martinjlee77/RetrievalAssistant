@@ -496,7 +496,7 @@ def render_asc606_page():
         if can_proceed:
             warning_placeholder = st.empty()
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**."
+                "⚠️ **IMPORTANT:** Please confirm that the documents uploaded above are complete. Also, note that analysis takes up to **3-20 minutes**."
             )
             
             if st.button("3️⃣ Confirm & Analyze",

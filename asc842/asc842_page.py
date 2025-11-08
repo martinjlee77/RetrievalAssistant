@@ -473,7 +473,7 @@ def render_asc842_page():
         if can_proceed:
             warning_placeholder = st.empty()  # Create a placeholder for the warning
             warning_placeholder.info(
-                "⚠️ **IMPORTANT:** Analysis takes up to **3-20 minutes**. Please don't close this tab until complete"
+                "⚠️ **IMPORTANT:** ** Please confirm that the documents uploaded above are complete. Also, note that analysis takes up to **3-20 minutes**."
             )
             
             if st.button("3️⃣ Confirm & Analyze",
