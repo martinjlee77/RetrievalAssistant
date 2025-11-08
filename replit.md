@@ -40,9 +40,8 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Enterprise Web Platform**: Professional website with unified contact system, enterprise messaging, and sophisticated user account management.
 - **Dashboard System**: Comprehensive analysis history tracking with detailed metrics for enterprise reporting.
 - **Authentication Flow**: Secure user registration, login, and password recovery with unified professional styling.
-- **Initial Credits System**: New users receive $295 in credits upon signup ("run your first analysis free" model); email verification required.
-- **Pricing**: Per analysis, tiered by word count ($95 for 3000 words to $895 for 60000 words).
-- **Payment**: Enterprise credit packages ($500/$1000/$2000) with 12-month expiration; custom amounts available.
+- **Subscription Model**: Three tiers (Professional $295/mo, Team $595/mo, Enterprise $1195/mo) with monthly word allowances (30K, 75K, 180K). 14-day trial with 9K words included. All tiers are single-user accounts (customers share login credentials).
+- **Stripe Integration**: Subscription management with Customer Portal for upgrades, downgrades, payment updates, and invoice history.
 - **Responsive Design**: Professional mobile-first design with consistent Big 4 inspired color schemes and dark gradient styling.
 
 ### Core Components and Design Decisions
@@ -54,6 +53,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Knowledge Hierarchy System**: Enhanced prompt functions with systematic knowledge hierarchy (Contract Text → Authoritative Guidance → Interpretive Guidance) and IAC framework.
 - **Hybrid Financial Calculation System**: "Extract-Then-Calculate" pattern for financial amounts, using Python for calculations after AI extraction.
 - **Unified LLM Request Architecture**: Standardized `_make_llm_request()` helper method for centralized API routing between GPT-5 (Responses API) and GPT-4o (Chat Completions API) across all ASC standards.
+- **Subscription Model Architecture**: All ASC standards (606, 340-40, 718, 805, 842) use consistent subscription model pattern. Job analysis runners accept `allowance_result`, `org_id`, and `total_words` parameters. Legacy `pricing_result` and `tier_info` references have been removed. Page files extract org_id from user session and pass all required parameters for word deduction tracking.
 - **Privacy Protection - Contract De-identification**: Automated dual-party extraction and text replacement system across ALL ASC standards.
   - Extracts both contract parties using GPT-5-mini JSON output, replaces names with generic identifiers (e.g., "the Company", "the Customer").
   - Includes comprehensive text normalization and base name extraction (removing legal suffixes) to catch standalone references.
