@@ -1,0 +1,56 @@
+SUBSCRIPTION_PLANS = {
+    'professional': {
+        'plan_key': 'professional',
+        'name': 'Professional',
+        'description': 'For individual accounting professionals',
+        'price_monthly': 295.00,
+        'word_allowance': 30000,
+        'seats': 1,
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Priority email support',
+            'Professional-grade analysis quality'
+        ],
+        'ideal_for': 'Individual accounting professionals',
+        'stripe_product_id': 'prod_TMZYA0436dZmL1',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PqqOL6uAu',
+    },
+    'team': {
+        'plan_key': 'team',
+        'name': 'Team',
+        'description': 'For technial accounting teams and small firms',
+        'price_monthly': 595.00,
+        'word_allowance': 75000,
+        'seats': 1,
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Priority email support',
+            'Professional-grade analysis quality'
+        ],
+        'ideal_for': 'Accounting teams and small firms',
+        'stripe_product_id': 'prod_TMZYrJj8yswA2r',
+        'stripe_price_id': 'price_1SPqP82M206TZw8PDTLc5DTU',
+    },
+    'enterprise': {
+        'plan_key': 'enterprise',
+        'name': 'Enterprise',
+        'description': 'For large enterprises',
+        'price_monthly': 1195.00,
+        'word_allowance': 180000,
+        'seats': 1,
+        'features': [
+            'All ASC standards (606, 842, 718, 805, 340-40)',
+            'Research Assistant with RAG-powered citations',
+            'DOCX and PDF memo export',
+            'Dedicated customer success manager',
+            'Professional-grade analysis quality'
+        ],
+        'ideal_for': 'Large enterprises',
+        'stripe_product_id': 'prod_TMZY36SH65ts7H',
+        'stripe_price_id': 'price_1SPqP92M206TZw8P1uY9VdzR',
+    }
+}

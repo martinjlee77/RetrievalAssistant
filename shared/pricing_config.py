@@ -10,7 +10,7 @@ SUBSCRIPTION_PLANS = {
     'professional': {
         'plan_key': 'professional',
         'name': 'Professional',
-        'description': 'For individual controllers and technical accounting professionals',
+        'description': 'For individual accounting professionals',
         'price_monthly': 295.00,
         'word_allowance': 30000,
         'seats': 1,
@@ -21,25 +21,23 @@ SUBSCRIPTION_PLANS = {
             'Priority email support',
             'Professional-grade analysis quality'
         ],
-        'ideal_for': 'Individual controllers and technical accounting professionals',
+        'ideal_for': 'Individual accounting professionals',
         'stripe_product_id': 'prod_TMZYA0436dZmL1',
         'stripe_price_id': 'price_1SPqP82M206TZw8PqqOL6uAu',
     },
     'team': {
         'plan_key': 'team',
         'name': 'Team',
-        'description': 'For accounting teams and small firms with shared usage',
+        'description': 'For technical accounting teams and small firms',
         'price_monthly': 595.00,
         'word_allowance': 75000,
-        'seats': 3,
+        'seats': 1,
         'features': [
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
             'Priority email support',
-            'Multi-user organization with pooled usage',
-            'Audit logs and user management',
-            'Shared analysis history across team'
+            'Professional-grade analysis quality'
         ],
         'ideal_for': 'Accounting teams and small firms',
         'stripe_product_id': 'prod_TMZYrJj8yswA2r',
@@ -48,22 +46,18 @@ SUBSCRIPTION_PLANS = {
     'enterprise': {
         'plan_key': 'enterprise',
         'name': 'Enterprise',
-        'description': 'For large enterprises and Big 4 firms with custom SLA and dedicated support',
+        'description': 'For large enterprises',
         'price_monthly': 1195.00,
         'word_allowance': 180000,
-        'seats': 999,  # Effectively unlimited
+        'seats': 1,
         'features': [
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
             'Dedicated customer success manager',
-            'Custom SLA with guaranteed response times',
-            'Azure OpenAI deployment option (data residency)',
-            'Unlimited internal viewers',
-            'Advanced security and compliance features',
-            'SSO integration (coming soon)'
+            'Professional-grade analysis quality'
         ],
-        'ideal_for': 'Large enterprises and Big 4 accounting firms',
+        'ideal_for': 'Large enterprises',
         'stripe_product_id': 'prod_TMZY36SH65ts7H',
         'stripe_price_id': 'price_1SPqP92M206TZw8P1uY9VdzR',
     }
