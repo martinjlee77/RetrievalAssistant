@@ -649,6 +649,14 @@ async function upgradeToPlan(planKey) {
     
     const planName = planNames[planKey] || planKey;
     
+    // Handle Enterprise differently - contact sales instead of self-service checkout
+    if (planKey === 'enterprise') {
+        if (confirm('Enterprise plans include custom pricing and dedicated support. Would you like to contact our sales team?')) {
+            window.location.href = 'mailto:support@veritaslogic.ai?subject=Enterprise Plan Inquiry&body=I am interested in the Enterprise plan. Please contact me to discuss pricing and features.';
+        }
+        return;
+    }
+    
     if (!confirm(`Upgrade to ${planName} plan? Your trial will end and billing will begin immediately.`)) {
         return;
     }
@@ -796,13 +804,10 @@ function closeInvoiceModal(event) {
 }
 
 async function cancelSubscription() {
-    if (!confirm('Are you sure you want to cancel your subscription? You will lose access at the end of your current billing period.')) {
-        return;
-    }
-    
+    // Redirect to Stripe Customer Portal for subscription management
     try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('/api/subscription/cancel', {
+        const response = await fetch('/api/subscription/customer-portal', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -812,15 +817,20 @@ async function cancelSubscription() {
         
         const data = await response.json();
         
-        if (response.ok && data.success) {
-            alert('Subscription canceled. You will retain access until the end of your current billing period.');
-            // Reload subscription data
-            await loadSubscriptionData();
+        if (response.ok && data.url) {
+            // Redirect to Stripe Customer Portal where they can cancel
+            window.location.href = data.url;
         } else {
-            alert(`Failed to cancel: ${data.error || 'Unknown error'}`);
+            // Show helpful error message if Customer Portal not configured
+            const errorMsg = data.error || 'Unknown error';
+            if (errorMsg.includes('configuration') || errorMsg.includes('Customer Portal')) {
+                alert('Stripe Customer Portal is not yet configured. Please contact support at support@veritaslogic.ai');
+            } else {
+                alert(`Failed to access billing portal: ${errorMsg}`);
+            }
         }
     } catch (error) {
-        console.error('Cancel error:', error);
+        console.error('Cancel subscription error:', error);
         alert('Network error. Please try again.');
     }
 }
