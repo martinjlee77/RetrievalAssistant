@@ -555,15 +555,6 @@ def perform_asc805_analysis_new(pricing_result: Dict[str, Any], additional_conte
     analysis_id = None
     
     try:
-        # Step 1: Start analysis tracking
-        analysis_details = {
-            'asc_standard': 'ASC 805',
-            'total_words': pricing_result['total_words'],
-            'file_count': pricing_result['file_count'],
-            'tier_info': pricing_result['tier_info'],
-            'cost_charged': pricing_result['tier_info']['price']
-        }
-        
         # Get contract text from cached text or pricing result
         contract_text = cached_combined_text if cached_combined_text else pricing_result.get('combined_text', '')
         
