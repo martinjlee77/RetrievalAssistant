@@ -2103,7 +2103,7 @@ def save_worker_analysis():
                     raise e
             
             # Legacy credit-based billing (for backwards compatibility during migration)
-            elif success and cost_charged > 0:
+            elif success and cost_charged and cost_charged > 0:
                 balance_after = max(current_balance - cost_charged, 0)
                 
                 # Deduct credits

@@ -1,0 +1,27 @@
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=200
+INFO:backend_api:Created Customer Portal session for customer cus_TNphIArInRqQeR
+100.64.0.11 - - [08/Nov/2025:23:26:21 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 200 152 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.9 - - [08/Nov/2025:23:30:04 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 68, status: completed
+INFO:backend_api:Analysis updated: 68, status: completed
+ERROR:backend_api:Failed to save analysis: '>' not supported between instances of 'NoneType' and 'int'
+ERROR:backend_api:Failed to save analysis: '>' not supported between instances of 'NoneType' and 'int'
+ERROR:backend_api:Save analysis error: '>' not supported between instances of 'NoneType' and 'int'
+100.64.0.11 - - [08/Nov/2025:23:30:03 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+ERROR:backend_api:Save analysis error: '>' not supported between instances of 'NoneType' and 'int'
+INFO:backend_api:Analysis updated: 68, status: completed
+100.64.0.11 - - [08/Nov/2025:23:30:06 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+ERROR:backend_api:Failed to save analysis: '>' not supported between instances of 'NoneType' and 'int'
+ERROR:backend_api:Save analysis error: '>' not supported between instances of 'NoneType' and 'int'
+INFO:backend_api:Analysis updated: 68, status: completed
+ERROR:backend_api:Failed to save analysis: '>' not supported between instances of 'NoneType' and 'int'
+ERROR:backend_api:Save analysis error: '>' not supported between instances of 'NoneType' and 'int'
+100.64.0.12 - - [08/Nov/2025:23:30:10 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 68, status: completed
+ERROR:backend_api:Failed to save analysis: '>' not supported between instances of 'NoneType' and 'int'
+ERROR:backend_api:Save analysis error: '>' not supported between instances of 'NoneType' and 'int'
+100.64.0.9 - - [08/Nov/2025:23:30:18 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 68, status: failed
+INFO:backend_api:No billing applied (success=False, org_id=None, total_words=None)
+100.64.0.8 - - [08/Nov/2025:23:30:19 +0000] "POST /api/analysis/save HTTP/1.1" 200 106 "-" "python-requests/2.31.0"
