@@ -4425,6 +4425,22 @@ def create_upgrade_checkout():
             if user['role'] != 'owner':
                 return jsonify({'error': 'Only organization owners can upgrade subscriptions'}), 403
             
+            # Check if organization already has a subscription (active, trialing, past_due, etc.)
+            cursor.execute("""
+                SELECT id, status FROM subscriptions
+                WHERE org_id = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (user['org_id'],))
+            existing_subscription = cursor.fetchone()
+            
+            # If org has any subscription, no trial (immediate billing)
+            # If no subscription, give 14-day trial (new customer)
+            has_existing_subscription = existing_subscription is not None
+            trial_days = 0 if has_existing_subscription else 14
+            
+            logger.info(f"Org {user['org_id']} upgrade: existing_sub={has_existing_subscription}, trial_days={trial_days}")
+            
             # Get plan details
             from shared.pricing_config import get_plan_by_key
             plan = get_plan_by_key(plan_key)
@@ -4484,7 +4500,7 @@ def create_upgrade_checkout():
                     'plan_key': plan_key
                 },
                 subscription_data={
-                    'trial_period_days': 14 if not user.get('has_trialed') else 0,
+                    'trial_period_days': trial_days,
                     'metadata': {
                         'org_id': user['org_id'],
                         'plan_key': plan_key
