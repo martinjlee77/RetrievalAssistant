@@ -4405,6 +4405,10 @@ def create_upgrade_checkout():
         if not plan_key or plan_key not in ['professional', 'team', 'enterprise']:
             return jsonify({'error': 'Valid plan_key required (professional, team, or enterprise)'}), 400
         
+        # Import stripe at function level so exception handler can reference it
+        import stripe
+        stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+        
         conn = get_db_connection()
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
@@ -4427,7 +4431,7 @@ def create_upgrade_checkout():
             
             # Check if organization already has a subscription (active, trialing, past_due, etc.)
             cursor.execute("""
-                SELECT id, status FROM subscriptions
+                SELECT id, status FROM subscription_instances
                 WHERE org_id = %s
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -4449,9 +4453,6 @@ def create_upgrade_checkout():
                 return jsonify({'error': f'Plan {plan_key} not found'}), 404
             
             # Get or create Stripe customer
-            import stripe
-            stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-            
             if user['stripe_customer_id']:
                 customer_id = user['stripe_customer_id']
             else:
