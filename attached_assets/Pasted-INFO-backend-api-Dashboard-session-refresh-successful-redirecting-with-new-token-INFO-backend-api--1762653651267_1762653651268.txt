@@ -1,0 +1,55 @@
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjY2Nzk4MCwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMDlUMDE6NTk6NDAuMDU4MzYzIn0.9GR1XO3tLVq9-va5W6SlY0gVZMPcJY9bunfOl7CtGyA
+100.64.0.2 - - [09/Nov/2025:01:59:40 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Org 3 upgrade: existing_sub=True, trial_days=0
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/checkout/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/checkout/sessions response_code=400
+INFO:stripe:error_code=None error_message='The minimum number of trial period days is 1.' error_param=subscription_data[trial_period_days] error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Exception on /api/subscription/upgrade [POST]
+Traceback (most recent call last):
+  File "/app/backend_api.py", line 4488, in create_upgrade_checkout
+    checkout_session = stripe.checkout.Session.create(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/checkout/_session.py", line 2394, in create
+    cls._static_request(
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_resource.py", line 172, in _static_request
+    return _APIRequestor._global_instance().request(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 210, in request
+    resp = requestor._interpret_response(rbody, rcode, rheaders, api_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 868, in _interpret_response
+AttributeError
+100.64.0.2 - - [09/Nov/2025:01:59:42 +0000] "POST /api/subscription/upgrade HTTP/1.1" 500 265 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+    self.handle_error_response(
+  File "/usr/local/lib/python3.11/site-packages/stripe/_api_requestor.py", line 351, in handle_error_response
+    raise err
+stripe._error.InvalidRequestError: Request req_NwKnyMxH1jeEKT: The minimum number of trial period days is 1.
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/stripe/__init__.py", line 872, in __getattr__
+    target, is_submodule = _import_map[name]
+                           ~~~~~~~~~~~^^^^^^
+KeyError: 'error'
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask_cors/extension.py", line 176, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/backend_api.py", line 4528, in create_upgrade_checkout
+    except stripe.error.StripeError as se:
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/stripe/__init__.py", line 882, in __getattr__
+    raise AttributeError()
