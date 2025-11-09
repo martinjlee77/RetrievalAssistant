@@ -589,6 +589,57 @@ function updateSubscriptionUI(data) {
             usageBar.className = 'usage-bar normal';
         }
     }
+    
+    // Update plan features in subscription section
+    const featuresEl = document.getElementById('currentPlanFeatures');
+    if (featuresEl) {
+        const features = {
+            'professional': [
+                '30,000 words/month',
+                'All ASC standards',
+                'Standard support',
+                'Rollover unused words'
+            ],
+            'team': [
+                '75,000 words/month',
+                'All ASC standards',
+                'Priority support',
+                'Rollover unused words',
+                'Team collaboration'
+            ],
+            'enterprise': [
+                '180,000 words/month',
+                'All ASC standards',
+                'Dedicated support',
+                'Rollover unused words',
+                'Team collaboration',
+                'Custom integrations'
+            ]
+        };
+        
+        const planFeatures = features[sub.plan_key] || [];
+        
+        if (planFeatures.length > 0) {
+            featuresEl.innerHTML = planFeatures.map(feature => `
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>${feature}</span>
+                </div>
+            `).join('');
+        } else {
+            // Fallback for unknown plan types
+            featuresEl.innerHTML = `
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>${sub.word_allowance ? sub.word_allowance.toLocaleString() : '0'} words/month</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">✓</span>
+                    <span>All ASC standards</span>
+                </div>
+            `;
+        }
+    }
 }
 
 function showNoSubscriptionState() {
