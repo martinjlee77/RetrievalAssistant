@@ -2609,7 +2609,7 @@ def create_checkout_session():
             'session_id': checkout_session.id
         }), 200
         
-    except stripe.error.StripeError as se:
+    except stripe.StripeError as se:
         logger.error(f"Stripe error creating checkout session: {se}")
         return jsonify({
             'error': 'Payment processing error',
@@ -2751,7 +2751,7 @@ def process_checkout_success():
             'email_sent': email_sent
         }), 200
         
-    except stripe.error.StripeError as se:
+    except stripe.StripeError as se:
         logger.error(f"Stripe error processing checkout: {se}")
         return jsonify({'error': 'Failed to verify payment'}), 500
     except Exception as e:
@@ -4485,6 +4485,16 @@ def create_upgrade_checkout():
                     'message': f'Please contact support to set up {plan["name"]} subscription'
                 }), 503
             
+            # Build subscription_data - only include trial_period_days if > 0 (Stripe minimum is 1)
+            subscription_data = {
+                'metadata': {
+                    'org_id': user['org_id'],
+                    'plan_key': plan_key
+                }
+            }
+            if trial_days > 0:
+                subscription_data['trial_period_days'] = trial_days
+            
             checkout_session = stripe.checkout.Session.create(
                 customer=customer_id,
                 payment_method_types=['card'],
@@ -4500,13 +4510,7 @@ def create_upgrade_checkout():
                     'user_id': user_id,
                     'plan_key': plan_key
                 },
-                subscription_data={
-                    'trial_period_days': trial_days,
-                    'metadata': {
-                        'org_id': user['org_id'],
-                        'plan_key': plan_key
-                    }
-                }
+                subscription_data=subscription_data
             )
             
             logger.info(f"Created Stripe checkout session for org {user['org_id']}: {checkout_session.id}")
@@ -4525,7 +4529,7 @@ def create_upgrade_checkout():
         finally:
             conn.close()
         
-    except stripe.error.StripeError as se:
+    except stripe.StripeError as se:
         logger.error(f"Stripe error creating checkout session: {se}")
         return jsonify({
             'error': 'Payment processing error',
@@ -4593,7 +4597,7 @@ def cancel_subscription():
                         cancel_at_period_end=True
                     )
                     logger.info(f"Canceled Stripe subscription {subscription['stripe_subscription_id']}")
-                except stripe.error.StripeError as se:
+                except stripe.StripeError as se:
                     logger.error(f"Stripe cancellation error: {se}")
                     return jsonify({'error': 'Failed to cancel subscription with payment provider'}), 500
             
@@ -4674,7 +4678,7 @@ def create_customer_portal_session():
         finally:
             conn.close()
         
-    except stripe.error.StripeError as se:
+    except stripe.StripeError as se:
         logger.error(f"Stripe error creating customer portal session: {se}")
         return jsonify({
             'error': 'Unable to access billing portal',
@@ -4759,7 +4763,7 @@ def get_customer_invoices():
         finally:
             conn.close()
         
-    except stripe.error.StripeError as se:
+    except stripe.StripeError as se:
         logger.error(f"Stripe error fetching invoices: {se}")
         return jsonify({
             'error': 'Unable to fetch invoice history',
