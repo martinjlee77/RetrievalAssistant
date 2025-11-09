@@ -651,9 +651,7 @@ async function upgradeToPlan(planKey) {
     
     // Handle Enterprise differently - contact sales instead of self-service checkout
     if (planKey === 'enterprise') {
-        if (confirm('Enterprise plans include custom pricing and dedicated support. Would you like to contact our sales team?')) {
-            window.location.href = 'mailto:support@veritaslogic.ai?subject=Enterprise Plan Inquiry&body=I am interested in the Enterprise plan. Please contact me to discuss pricing and features.';
-        }
+        window.location.href = 'contact.html';
         return;
     }
     
