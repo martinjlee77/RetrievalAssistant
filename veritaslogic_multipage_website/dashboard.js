@@ -651,7 +651,7 @@ async function upgradeToPlan(planKey) {
     
     // Handle Enterprise differently - contact sales instead of self-service checkout
     if (planKey === 'enterprise') {
-        window.location.href = 'contact.html';
+        window.location.href = 'contact.html?inquiry=enterprise-sales';
         return;
     }
     
