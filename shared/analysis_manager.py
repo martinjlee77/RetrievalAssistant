@@ -151,9 +151,15 @@ class AnalysisManager:
         return True
     
     def clear_active_analysis(self):
-        """Clear the currently active analysis"""
+        """Clear the currently active analysis and all tracking state"""
         if self.session_key_active in st.session_state:
             del st.session_state[self.session_key_active]
+        
+        # Clear tracking IDs used by job runners
+        if 'current_ui_analysis_id' in st.session_state:
+            del st.session_state['current_ui_analysis_id']
+        if 'current_db_analysis_id' in st.session_state:
+            del st.session_state['current_db_analysis_id']
     
     def show_active_analysis_warning(self) -> bool:
         """
