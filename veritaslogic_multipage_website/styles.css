@@ -3942,4 +3942,9 @@ a:focus {
         grid-template-columns: 1fr;
         gap: 2rem;
     }
+    
+    .review-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
 }
