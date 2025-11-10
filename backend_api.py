@@ -4216,7 +4216,7 @@ def check_subscription_allowance():
                 'show_warning': can_proceed and usage_info.get('words_available', 0) < 5000,
                 'renewal_date': usage_info.get('current_period_end').strftime('%B %d, %Y') if usage_info.get('current_period_end') else 'Unknown',
                 'org_id': org_id,
-                'upgrade_link': '/dashboard',
+                'upgrade_link': 'https://www.veritaslogic.ai/dashboard',
                 'total_words': words_needed
             }
             
