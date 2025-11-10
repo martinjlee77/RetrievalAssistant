@@ -491,6 +491,7 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
     margin-bottom: 1rem;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
 }
 .section-header p {
     font-size: 1.2rem;
