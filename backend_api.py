@@ -4592,10 +4592,19 @@ def verify_and_process_upgrade():
         try:
             cursor = conn.cursor()
             
+            # Get plan_id from subscription_plans table
+            cursor.execute("""
+                SELECT id FROM subscription_plans WHERE plan_key = %s
+            """, (plan_key,))
+            plan_row = cursor.fetchone()
+            if not plan_row:
+                return jsonify({'error': 'Plan not found in database'}), 400
+            plan_id = plan_row['id']
+            
             # Cancel existing active/trial subscription for this org
             cursor.execute("""
                 UPDATE subscription_instances
-                SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
+                SET status = 'cancelled', updated_at = NOW()
                 WHERE org_id = %s AND status IN ('active', 'trial')
             """, (org_id,))
             
@@ -4605,11 +4614,11 @@ def verify_and_process_upgrade():
             
             cursor.execute("""
                 INSERT INTO subscription_instances 
-                (org_id, plan_key, stripe_subscription_id, status, 
+                (org_id, plan_id, stripe_subscription_id, status, 
                  current_period_start, current_period_end, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING id
-            """, (org_id, plan_key, stripe_subscription_id, stripe_sub.status,
+            """, (org_id, plan_id, stripe_subscription_id, stripe_sub.status,
                   current_period_start, current_period_end))
             
             new_sub_id = cursor.fetchone()['id']
