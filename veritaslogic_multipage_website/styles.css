@@ -2577,6 +2577,37 @@ a:focus {
     color: #ffffff;
     font-weight: 600;
 }
+
+/* Role Badge */
+.role-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+.role-badge.owner {
+    background: linear-gradient(135deg, #2d5a41, #3a7050);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.role-badge.member {
+    background: rgba(100, 100, 100, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Organization Usage Message */
+.org-usage-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(45, 90, 65, 0.1);
+    border: 1px solid rgba(45, 90, 65, 0.3);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
 /* --- Profile Page Redesign --- */
 
 /* 1. Style the new main title and intro paragraph */

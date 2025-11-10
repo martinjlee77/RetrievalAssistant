@@ -377,6 +377,9 @@ function showLoginMessage(message, type) {
 }
 
 async function populateDashboard(userData) {
+    // Store userData globally for access in other functions
+    window.currentUserData = userData;
+    
     // Update welcome section (backend returns snake_case fields)
     document.getElementById('userName').textContent = userData.first_name || 'User';
     document.getElementById('memberSince').textContent = userData.member_since ? `Member since ${new Date(userData.member_since).toLocaleDateString()}` : 'Member since —';
@@ -387,6 +390,14 @@ async function populateDashboard(userData) {
     document.getElementById('userEmail').textContent = userData.email || '-';
     document.getElementById('userCompany').textContent = userData.company_name || '-';
     document.getElementById('memberSinceDate').textContent = userData.member_since ? new Date(userData.member_since).toLocaleDateString() : '—';
+    
+    // Add organization role badge
+    const roleElement = document.getElementById('userRole');
+    if (roleElement) {
+        const isOwner = userData.role === 'owner';
+        roleElement.innerHTML = isOwner ? '🔑 Organization Owner' : '👤 Organization Member';
+        roleElement.className = isOwner ? 'role-badge owner' : 'role-badge member';
+    }
     
     // Pre-fill edit profile form
     document.getElementById('editFirstName').value = userData.first_name || '';
@@ -575,6 +586,15 @@ function updateSubscriptionUI(data) {
         wordsAvailableStat.textContent = `${wordsRemaining.toLocaleString()} words available`;
     }
     
+    // Add shared organization usage message
+    const orgUsageMessage = document.getElementById('orgUsageMessage');
+    if (orgUsageMessage && window.currentUserData) {
+        const userEmail = window.currentUserData.email || '';
+        const domain = userEmail.split('@')[1] || 'your organization';
+        orgUsageMessage.innerHTML = `📊 <strong>Organization Usage:</strong> ${wordsUsed.toLocaleString()} / ${wordsAllowed.toLocaleString()} words<br><small style="color: #888;">(Shared across all @${domain} users)</small>`;
+        orgUsageMessage.style.display = 'block';
+    }
+    
     // Update usage bar
     const usageBar = document.getElementById('usageBar');
     if (usageBar) {
@@ -690,6 +710,13 @@ function showNoSubscriptionState() {
 
 // Subscription Management Functions
 async function upgradeToPlan(planKey) {
+    // Check if user is organization owner
+    if (window.currentUserData && window.currentUserData.role !== 'owner') {
+        const ownerEmail = window.currentUserData.owner_email || 'your organization owner';
+        alert(`Only organization owners can manage billing.\n\nContact ${ownerEmail} to upgrade or update payment methods.`);
+        return;
+    }
+    
     const planNames = {
         'professional': 'Professional',
         'team': 'Team',
@@ -734,6 +761,13 @@ async function upgradeToPlan(planKey) {
 }
 
 async function updatePaymentMethod() {
+    // Check if user is organization owner
+    if (window.currentUserData && window.currentUserData.role !== 'owner') {
+        const ownerEmail = window.currentUserData.owner_email || 'your organization owner';
+        alert(`Only organization owners can manage billing.\n\nContact ${ownerEmail} to upgrade or update payment methods.`);
+        return;
+    }
+    
     try {
         const token = localStorage.getItem('authToken');
         const response = await fetch('/api/subscription/customer-portal', {
