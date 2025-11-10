@@ -85,7 +85,15 @@ def monitor_job_progress(
         auth_token = service_token if service_token else user_token
         
         # Determine session key prefix based on ASC standard
-        asc_prefix = asc_standard.lower().replace(' ', '').replace('-', '')  # e.g., 'asc606'
+        # Map to exact prefixes used by page files
+        prefix_map = {
+            'ASC 606': 'asc606',
+            'ASC 340-40': 'asc340',  # NOT asc34040 - matches page file
+            'ASC 718': 'asc718',
+            'ASC 805': 'asc805',
+            'ASC 842': 'asc842'
+        }
+        asc_prefix = prefix_map.get(asc_standard, asc_standard.lower().replace(' ', '').replace('-', ''))
         
         # Poll for job completion
         st.markdown("### 🔄 Analysis Progress")
