@@ -23,7 +23,7 @@ def check_and_resume_polling(asc_standard: str, session_id: str):
     """
     try:
         # Get active analysis from analysis_manager
-        active_analysis = analysis_manager.get_active_analysis()
+        active_analysis = analysis_manager.get_active_analysis_info()
         
         if not active_analysis:
             return  # No active analysis to resume
