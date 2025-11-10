@@ -197,8 +197,8 @@ def render_asc606_page():
         st.markdown(":primary[**Purpose:**] Automatically analyze revenue contracts and generate a first draft of professional ASC 606 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
-    if analysis_manager.show_active_analysis_warning():
-        return  # User has active analysis, show warning and exit
+    if analysis_manager.show_active_analysis_warning(current_asc_standard='ASC 606'):
+        return  # User has active analysis on different ASC, show warning and exit
     
     # Check for analysis to auto-load (URL parameter or recent analysis)
     loaded, source, timestamp = check_for_analysis_to_load()

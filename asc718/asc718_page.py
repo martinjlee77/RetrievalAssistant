@@ -173,8 +173,8 @@ def render_asc718_page():
         st.markdown(":primary[**Purpose:**] Automatically analyze stock compensation arrangements and generate a first draft of professional ASC 718 memo. Simply upload your documents to begin.")
     
     # Check for active analysis first
-    if analysis_manager.show_active_analysis_warning():
-        return  # User has active analysis, show warning and exit
+    if analysis_manager.show_active_analysis_warning(current_asc_standard='ASC 718'):
+        return  # User has active analysis on different ASC, show warning and exit
     
     # Check for existing completed analysis in session state (restore persistence)
     session_id = st.session_state.get('user_session_id', '')
