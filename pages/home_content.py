@@ -159,8 +159,8 @@ left.markdown("""
 
 2. **Privacy:** 
 
-- Files stay in your session (i.e., your data is session-limited), which means that your data is not retained beyond the duration of your session and promptly and permanently deleted after your session closes. 
-- Your data sent to the LLM in the operation of the analysis and memo generation is encrypted using industry standard enryption protocols. Also, it is never used to train our AI models or OpenAI's models, ensuring confidentiality and compliance with data privacy regulations.
+- Files stay in your session (i.e., your data is session-limited), which means that your data is not retained beyond the duration of your session and promptly and permanently deleted after your session closes except for the de-identified memo and billing/admin related details. 
+- Your data sent to the LLM in the operation of the analysis and memo generation is encrypted using industry standard enryption protocols. Also, it is never used to train our AI models or OpenAI's models, ensuring confidentiality and compliance with data privacy regulations. The data is sent on an de-identified basis and is retained for 30 days for abuse monitoring purposes, after which it is permanently deleted.
 
 3. **First-draft only:** 
 
