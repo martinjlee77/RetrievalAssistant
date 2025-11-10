@@ -79,6 +79,21 @@ def submit_and_monitor_asc805_job(
         
         logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
+        # Start analysis tracking in session state (for UI blocking)
+        ui_analysis_id = analysis_manager.start_analysis({
+            'asc_standard': 'ASC 805',
+            'total_words': total_words,
+            'file_count': allowance_result['file_count'],
+            'tier_info': allowance_result.get('tier_info', {}),
+            'cost_charged': allowance_result.get('cost_charged', 0.0)
+        })
+        
+        # Store analysis IDs in session state for tracking across navigation
+        st.session_state['current_ui_analysis_id'] = ui_analysis_id
+        st.session_state['current_db_analysis_id'] = db_analysis_id
+        
+        logger.info(f"✓ Started analysis tracking: UI ID={ui_analysis_id}, DB ID={db_analysis_id}")
+        
         # Submit job to Redis queue with service token (not user token)
         # Service token is long-lived (24h) to prevent expiration during analysis
         try:
@@ -100,6 +115,8 @@ def submit_and_monitor_asc805_job(
         except Exception as e:
             logger.error(f"Failed to submit job: {str(e)}")
             st.error(f"❌ Failed to submit analysis job: {str(e)}")
+            # Clear analysis tracking on submission failure
+            analysis_manager.clear_active_analysis()
             return
         
         # Poll for job completion
@@ -168,19 +185,37 @@ def submit_and_monitor_asc805_job(
                             
                             logger.info(f"✓ Session state stored. Keys in session: {list(st.session_state.keys())}")
                             
+                            # Mark analysis as complete before rerun
+                            ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+                            if ui_analysis_id:
+                                analysis_manager.complete_analysis(ui_analysis_id, success=True)
+                                logger.info(f"✓ Marked analysis {ui_analysis_id} as complete")
+                            
                             st.info("📄 **Memo ready!** Refreshing page to display results...")
                             time.sleep(2)
                             st.rerun()
                         else:
                             st.error("❌ Analysis completed but memo not available.")
                             logger.error(f"Analysis status: {analysis_data.get('status')}, memo length: {len(analysis_data.get('memo_content', ''))}")
+                            # Mark analysis as failed (memo not available)
+                            ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+                            if ui_analysis_id:
+                                analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message="Memo not available after completion")
                     else:
                         st.error(f"❌ Failed to retrieve analysis: {status_response.text}")
                         logger.error(f"Status fetch failed: {status_response.status_code}")
+                        # Mark analysis as failed (status fetch failed)
+                        ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+                        if ui_analysis_id:
+                            analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=f"Status fetch failed: {status_response.status_code}")
                         
                 except Exception as e:
                     st.error(f"❌ Error retrieving analysis: {str(e)}")
                     logger.error(f"Failed to fetch analysis status: {str(e)}")
+                    # Mark analysis as failed (exception during status fetch)
+                    ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+                    if ui_analysis_id:
+                        analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=str(e))
                 
                 return
                 
@@ -193,6 +228,12 @@ def submit_and_monitor_asc805_job(
                 st.error(f"❌ **Analysis Failed**: {error_msg}")
                 
                 logger.error(f"Job {job_id} failed: {error_msg}")
+                
+                # Mark analysis as failed
+                ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+                if ui_analysis_id:
+                    analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=error_msg)
+                
                 return
                 
             elif job_status == 'started':
@@ -233,6 +274,16 @@ def submit_and_monitor_asc805_job(
         st.error("⏱️ **Analysis timed out** - The job took longer than expected. Please contact support.")
         logger.error(f"Job {job_id} timed out after {max_polls * 10} seconds")
         
+        # Mark analysis as failed due to timeout
+        ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+        if ui_analysis_id:
+            analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message="Analysis timed out after 30 minutes")
+        
     except Exception as e:
         logger.error(f"Error in job submission/monitoring: {str(e)}")
         st.error(f"❌ **Error**: {str(e)}")
+        
+        # Clear analysis tracking on exception
+        ui_analysis_id = st.session_state.get('current_ui_analysis_id')
+        if ui_analysis_id:
+            analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=str(e))
