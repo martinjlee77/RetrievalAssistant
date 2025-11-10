@@ -134,6 +134,7 @@
                         <label for="email">Business Email Address <span class="required"></span></label>
                         <input type="email" id="email" name="email" placeholder="your.name@yourcompany.com" required autocomplete="email" inputmode="email">
                         <small>Must be a valid business email address (no gmail, outlook, yahoo, etc.)</small>
+                        <div id="domainCheckMessage" class="domain-check-message" style="display: none;"></div>
                     </div>
                     
                     <div class="form-group">
@@ -305,6 +306,62 @@
             }
         });
         
+        // Domain checking functionality
+        let requiresPayment = true; // Default to requiring payment
+        let domainCheckCompleted = false;
+        
+        document.getElementById('email').addEventListener('blur', async function(e) {
+            const email = e.target.value.trim();
+            const messageEl = document.getElementById('domainCheckMessage');
+            const cardSection = document.querySelector('.card-section');
+            
+            if (!email || !email.includes('@')) {
+                messageEl.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/check-domain', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    requiresPayment = data.requires_payment;
+                    domainCheckCompleted = true;
+                    
+                    if (data.organization_exists) {
+                        // User joining existing org - hide card section
+                        messageEl.innerHTML = `<strong>✓ ${data.message}</strong>`;
+                        messageEl.className = 'domain-check-message success';
+                        messageEl.style.display = 'block';
+                        cardSection.style.display = 'none';
+                    } else {
+                        // New org - show card section
+                        messageEl.innerHTML = `<strong>ℹ️ ${data.message}</strong>`;
+                        messageEl.className = 'domain-check-message info';
+                        messageEl.style.display = 'block';
+                        cardSection.style.display = 'block';
+                    }
+                } else if (data.error && !data.is_business_email) {
+                    // Personal email - show error
+                    messageEl.innerHTML = `<strong>✗ ${data.error}</strong>`;
+                    messageEl.className = 'domain-check-message error';
+                    messageEl.style.display = 'block';
+                    cardSection.style.display = 'none';
+                    requiresPayment = true;
+                }
+            } catch (error) {
+                console.error('Domain check failed:', error);
+                // On error, default to showing card section
+                requiresPayment = true;
+                cardSection.style.display = 'block';
+            }
+        });
+        
     </script>
     <script>
         // Initialize Stripe and Card Element
@@ -418,8 +475,8 @@
                 return;
             }
             
-            // Validate Stripe is ready
-            if (!stripe || !cardElement) {
+            // Validate Stripe is ready (only if payment required)
+            if (requiresPayment && (!stripe || !cardElement)) {
                 showMessage('Payment system is not ready. Please refresh the page and try again.', 'error');
                 return;
             }
@@ -430,6 +487,27 @@
             form.classList.add('loading');
             
             try {
+                // Fallback: Check domain if user never blurred email field
+                if (!domainCheckCompleted) {
+                    const email = formData.email;
+                    try {
+                        const response = await fetch('/api/check-domain', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: email })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            requiresPayment = data.requires_payment;
+                            domainCheckCompleted = true;
+                        }
+                    } catch (error) {
+                        console.error('Domain check fallback failed:', error);
+                        // Default to requiring payment on error
+                        requiresPayment = true;
+                    }
+                }
+                
                 // Step 1: Generate reCAPTCHA token if configured
                 if (window.RECAPTCHA_SITE_KEY && window.RECAPTCHA_READY) {
                     try {
@@ -448,43 +526,48 @@
                     }
                 }
                 
-                // Step 2: Create Setup Intent on backend
-                submitButton.textContent = 'Validating payment method...';
-                const setupIntentResponse = await fetch('/api/signup/create-setup-intent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: formData.email })
-                });
-                
-                if (!setupIntentResponse.ok) {
-                    const errorData = await setupIntentResponse.json();
-                    throw new Error(errorData.error || 'Failed to initialize payment');
-                }
-                
-                const { client_secret } = await setupIntentResponse.json();
-                
-                // Step 3: Confirm Setup Intent with Stripe
-                const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(client_secret, {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            name: `${formData.first_name} ${formData.last_name}`,
-                            email: formData.email
-                        }
+                // Step 2-4: Handle payment (only if required for new organizations)
+                if (requiresPayment) {
+                    // Step 2: Create Setup Intent on backend
+                    submitButton.textContent = 'Validating payment method...';
+                    const setupIntentResponse = await fetch('/api/signup/create-setup-intent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: formData.email })
+                    });
+                    
+                    if (!setupIntentResponse.ok) {
+                        const errorData = await setupIntentResponse.json();
+                        throw new Error(errorData.error || 'Failed to initialize payment');
                     }
-                });
-                
-                if (stripeError) {
-                    throw new Error(stripeError.message);
+                    
+                    const { client_secret } = await setupIntentResponse.json();
+                    
+                    // Step 3: Confirm Setup Intent with Stripe
+                    const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(client_secret, {
+                        payment_method: {
+                            card: cardElement,
+                            billing_details: {
+                                name: `${formData.first_name} ${formData.last_name}`,
+                                email: formData.email
+                            }
+                        }
+                    });
+                    
+                    if (stripeError) {
+                        throw new Error(stripeError.message);
+                    }
+                    
+                    if (setupIntent.status !== 'succeeded') {
+                        throw new Error('Card verification failed. Please try a different card.');
+                    }
+                    
+                    // Step 4: Add payment method ID to form data
+                    formData.payment_method_id = setupIntent.payment_method;
                 }
                 
-                if (setupIntent.status !== 'succeeded') {
-                    throw new Error('Card verification failed. Please try a different card.');
-                }
-                
-                // Step 4: Complete signup with payment method ID
+                // Complete signup (with or without payment method)
                 submitButton.textContent = 'Creating account...';
-                formData.payment_method_id = setupIntent.payment_method;
                 
                 const signupResponse = await fetch('/api/signup', {
                     method: 'POST',

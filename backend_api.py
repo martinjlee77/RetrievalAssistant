@@ -742,6 +742,65 @@ def generate_verification_token():
 
 # API Routes
 
+@app.route('/api/check-domain', methods=['POST'])
+def check_domain():
+    """Check if an organization exists for the given email domain"""
+    try:
+        data = request.get_json()
+        email = data.get('email', '').strip().lower()
+        
+        if not email or '@' not in email:
+            return jsonify({'error': 'Valid email required'}), 400
+        
+        # Validate business email
+        if not is_business_email(email):
+            return jsonify({
+                'error': 'Only business email addresses are accepted',
+                'is_business_email': False
+            }), 400
+        
+        # Extract domain
+        email_domain = email.split('@')[1].lower()
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        # Check if organization exists for this domain (no PII exposure)
+        cursor.execute("""
+            SELECT o.id, o.name, COUNT(u.id) as user_count
+            FROM organizations o
+            LEFT JOIN users u ON u.org_id = o.id
+            WHERE o.domain = %s
+            GROUP BY o.id, o.name
+        """, (email_domain,))
+        
+        org = cursor.fetchone()
+        conn.close()
+        
+        if org:
+            user_count_text = f"{org['user_count']} existing member(s)" if org['user_count'] > 0 else "your organization"
+            return jsonify({
+                'success': True,
+                'organization_exists': True,
+                'organization_name': org['name'],
+                'requires_payment': False,
+                'message': f"You'll be joining {user_count_text} at {org['name']}. No credit card needed."
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'organization_exists': False,
+                'requires_payment': True,
+                'message': 'You\'ll create a new organization. Credit card required to activate your 14-day trial.'
+            })
+    
+    except Exception as e:
+        logger.error(f"Error checking domain: {e}")
+        return jsonify({'error': 'Failed to check domain'}), 500
+
 @app.route('/api/signup', methods=['POST'])
 def signup():
     """Handle user registration"""
@@ -872,10 +931,12 @@ def signup():
         """, (email_domain,))
         
         org_result = cursor.fetchone()
+        is_new_org = False  # Track if we're creating a new organization
         
         if org_result:
             # Organization exists - add user to existing org and update attribution if provided
             org_id = org_result['id']
+            is_new_org = False
             logger.info(f"Adding user {email} to existing organization (domain: {email_domain})")
             
             # If UTM parameters provided, append to existing org settings
@@ -904,6 +965,7 @@ def signup():
                 logger.info(f"Appended signup attribution for {email}: {utm_tracking}")
         else:
             # Create new organization with UTM tracking in settings
+            is_new_org = True
             org_settings = {}
             if utm_tracking:
                 org_settings['attribution'] = utm_tracking
@@ -950,9 +1012,9 @@ def signup():
             VALUES (%s, %s, %s)
         """, (user_id, verification_token, expires_at))
         
-        # Create trial subscription for organization (only if first user / owner)
+        # Create trial subscription for organization (only if creating new org as owner)
         trial_info = None
-        if user_role == 'owner':
+        if user_role == 'owner' and is_new_org:
             # Check if org already has a subscription
             cursor.execute("""
                 SELECT id FROM subscription_instances 
@@ -964,13 +1026,13 @@ def signup():
                 from shared.subscription_manager import SubscriptionManager
                 sub_mgr = SubscriptionManager(conn)
                 
-                # Get payment_method_id from signup data (required for trials)
+                # Get payment_method_id from signup data (required for new org trials)
                 payment_method_id = data.get('payment_method_id')
                 
                 if not payment_method_id:
                     conn.rollback()
                     conn.close()
-                    logger.error(f"Signup blocked - payment method required for trial: {email}")
+                    logger.error(f"Signup blocked - payment method required for new org trial: {email}")
                     return jsonify({
                         'error': 'Payment method is required to activate your trial. Please refresh and try again.'
                     }), 400

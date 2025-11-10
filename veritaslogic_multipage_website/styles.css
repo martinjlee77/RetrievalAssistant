@@ -3979,3 +3979,30 @@ a:focus {
         gap: 2rem;
     }
 }
+
+/* Domain Check Message Styles */
+.domain-check-message {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.domain-check-message.success {
+    background: rgba(45, 90, 65, 0.15);
+    border: 1px solid rgba(45, 90, 65, 0.4);
+    color: #4CAF50;
+}
+
+.domain-check-message.info {
+    background: rgba(33, 150, 243, 0.15);
+    border: 1px solid rgba(33, 150, 243, 0.4);
+    color: #2196F3;
+}
+
+.domain-check-message.error {
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.4);
+    color: #f44336;
+}
