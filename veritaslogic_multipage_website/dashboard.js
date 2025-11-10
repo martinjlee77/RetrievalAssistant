@@ -631,7 +631,6 @@ function updateSubscriptionUI(data) {
                 'All ASC standards',
                 'Dedicated support',
                 'Rollover unused words',
-                'Custom integrations'
             ]
         };
         

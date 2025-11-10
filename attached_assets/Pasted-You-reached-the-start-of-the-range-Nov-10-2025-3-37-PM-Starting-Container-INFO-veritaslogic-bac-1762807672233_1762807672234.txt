@@ -1,0 +1,52 @@
+You reached the start of the range
+Nov 10, 2025, 3:37 PM
+Starting Container
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+[2025-11-10 20:39:16 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-11-10 20:39:16 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-10 20:39:16 +0000] [5] [INFO] Booting worker with pid: 5
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-11-10 20:39:16 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-11-10 20:39:16 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-10 20:39:16 +0000] [1] [INFO] Using worker: sync
+[2025-11-10 20:39:16 +0000] [2] [INFO] Booting worker with pid: 2
+100.64.0.2 - - [10/Nov/2025:20:44:20 +0000] "GET /pricing.html HTTP/1.1" 200 0 "https://www.veritaslogic.ai/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:20 +0000] "GET /images/favicon/favicon.ico HTTP/1.1" 200 0 "https://www.veritaslogic.ai/pricing.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [10/Nov/2025:20:44:20 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "https://www.veritaslogic.ai/pricing.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.4 - - [10/Nov/2025:20:44:30 +0000] "GET /robots.txt HTTP/1.1" 404 14 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36; compatible; OAI-SearchBot/1.0; +https://openai.com/searchbot"
+100.64.0.2 - - [10/Nov/2025:20:44:37 +0000] "GET /login.html HTTP/1.1" 200 0 "https://www.veritaslogic.ai/pricing.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [10/Nov/2025:20:44:37 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:42 +0000] "POST /api/login HTTP/1.1" 404 27 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:45 +0000] "GET /signup.html HTTP/1.1" 200 0 "https://www.veritaslogic.ai/login.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:45 +0000] "GET /api/stripe/public-key HTTP/1.1" 200 125 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:45 +0000] "GET /api/recaptcha-config HTTP/1.1" 200 56 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [10/Nov/2025:20:44:45 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [10/Nov/2025:20:44:48 +0000] "POST /api/check-domain HTTP/1.1" 400 81 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:shared.pricing_config:Email jmartinlee@gmail.com rejected: personal email provider gmail.com
+INFO:shared.pricing_config:Email martin.lee@veritaslogic.ai approved: pre-approved business domain veritaslogic.ai
+100.64.0.2 - - [10/Nov/2025:20:44:57 +0000] "POST /api/check-domain HTTP/1.1" 200 167 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Created Setup Intent for signup: martin.lee@veritaslogic.ai
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/setup_intents
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/setup_intents response_code=200
+100.64.0.3 - - [10/Nov/2025:20:46:19 +0000] "POST /api/signup/create-setup-intent HTTP/1.1" 200 89 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:shared.pricing_config:Email martin.lee@veritaslogic.ai approved: pre-approved business domain veritaslogic.ai
+INFO:shared.trial_protection:reCAPTCHA Enterprise API Response: {'name': 'projects/370482674531/assessments/95ea58a509000000', 'event': {'token': '0cAFcWeA4v7t7M-WDxrbcAy1h73IL2dyknJWkKEkJdFTf2gAws_eIuWsA5Iyw2UbVZcX2vkAdPrBRTYrw7jKh8YRCHJIJnbz2GI58vcDN7E1grhmFZSpbqI91gnJdre-kk4ZOAi-W6ZoYa5iJkX-QnBDWACB2m9OYtJJYQ23mbUi0o1SY98YEBY2-RII94giPyeLkjJsF-_79Pakbn0KZK2cuAIIfYWyxrKDxbMNluUchJPREs7Y64wFjGT9jFQtIWe4XO1RogLLmJe5oPw2GvceFHsYPCrzAtX_kirpLQTyUYDJb-ibXPzARt_neN6tKalJueCZ8zcKat9bay651APYpw1edtQYtuI_yUEZMpWZ2L04w-6EAJoEbH-rldHU4I1vAW3ODjzsOJY-pYf_jAUWUzQ4A_1GQx1MT_CsK9LQZgS-qxGXMDVnegbbqcXcq5iLi8Cj2zR-w5Hi-jcSt2vtbAYWUvTOpiTY2eKfayA57PIHQIW_MH4-eYCkH0PZrTG0Evvaq5EiTwsbDdxM2FARjPN8lcToH1nvSSFXtZAN7szoJL8sR_PJpVhkZ-rZqAf-W_0M9Gikw7nIfmXKurtU8WUvtqM5YvlG6ey1vX6JyAQxpKeHgHqTMjt0hDHGVVBoINw8oeU_Bx2jUSfjjxJQpnUsepLIXj5ehWB-BcCwQsL2xTs4syHrQZP0VT1F8u4vIiyWHPkXkPPXmls1Xm98Zvl0GxnzX55Q2llCZ15PG80kCu9BlDVS0FRDtCA27FiNXMoZf799ATWmTKsgMRmVE1RFrdFeEP2LRPrWCChiFFWtsubkBWlRH1RBWjunkOSOHz0Edtm5SNvRIMHttp8PjIpRdPjJpYzGqES7z0wRribs0OOniVSdGGz6MRvxqUpQ7h6ltZ9w42BGHqN8cFPR3EnWlRNYQGEgpEF2Jb6R4STm5oM3RrueoxTRcs6Pw_BqkVOuMbOkoJF57r3mGVMfxJoLUdlZYiAxwEBBSxbrX_XJvwEWQdD9Lt4fhaSf-Tves-JYsnjmMVChnry5d4TsbJnUv8xtBn6VMfVXYIWbeb8h8h3aYGGlFuEmLa3iqz0rMn58On7oBSzk0IqTMSNnccv8fIOxz7A4tzj98Bv997TGIXptWGSQxRXBfrOE8mlqHZwjVzTcEabfkPhkC6nKU37buVj5hEjgDpSFkijVetUUfhBfReUC6R32sVGRlFbhxt1yiijV6IXCIq9eYW0iu245ppzk8EB7shQB_gazmPSTdv75dNIoXDArspkUsn_pu43yKWfhQfZ_nk1K279jcFARVGKJsZtt-aeYmX5uOSXRVcsb7Q8OWc4WJuPq3X7dvQOKNiyuTpBWxNYe-9e3tZVi1S0zdhrzPxTKZiGihRBXREBBCX8qE0Vb_SAo99ALyoxqo3iJmQeWVSaMTR3Oil9MZKTbfIeb04W3yQY0YjV7AhHRtgn8rQKMYpUawsN5YiFbEMU4z8i-PLDL7HZM90-QeNkbdyJu5ygSC9Fquzl8VUBippCvD7U00PPA9ndWWbNRxYVs9tiH13PGYsk3UtuHU5qTudevM7FdUTiZUSzdMrQV3J9Z4hp3fxYiKbjYrC6Kk0LnpC18A00ydsvj99UVEl4LaFmE9INcfX_qadqP3itCjY2bQ', 'siteKey': '6LeWoAIsAAAAANOiRuGDXA4wt6y8tFIMnudkilZE', 'userAgent': '', 'userIpAddress': '173.61.89.108', 'expectedAction': 'signup', 'hashedAccountId': '', 'express': False, 'requestedUri': '', 'wafTokenAssessment': False, 'ja3': '', 'ja4': '', 'headers': [], 'firewallPolicyEvaluation': False, 'fraudPrevention': 'FRAUD_PREVENTION_UNSPECIFIED'}, 'riskAnalysis': {'score': 1, 'reasons': [], 'extendedVerdictReasons': [], 'challenge': 'CHALLENGE_UNSPECIFIED', 'verifiedBots': []}, 'tokenProperties': {'valid': True, 'invalidReason': 'INVALID_REASON_UNSPECIFIED', 'hostname': 'www.veritaslogic.ai', 'androidPackageName': '', 'iosBundleId': '', 'action': 'signup', 'createTime': '2025-11-10T20:44:45.865Z'}, 'accountDefenderAssessment': {'labels': []}}
+INFO:stripe:error_code=resource_missing error_message="No such price: 'price_1SPqP82M206TZw8PqqOL6uAu'" error_param=items[0][price] error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Failed to create trial subscription: 
+ERROR:backend_api:Signup error: AttributeError - 
+INFO:shared.trial_protection:reCAPTCHA Enterprise Details - valid=True, score=1, hostname=www.veritaslogic.ai, action=signup, create_time=2025-11-10T20:44:45.865Z, reasons=[]
+INFO:shared.postmark_client:PostmarkClient initialized with token: 21cac18c...4ef9 (length: 36)
+INFO:shared.trial_protection:reCAPTCHA Enterprise verified successfully: score=1.00, IP=173.61.89.108
+INFO:shared.postmark_client:Database error alert sent to support for user signup
+INFO:backend_api:Database error alert sent to support
+INFO:backend_api:reCAPTCHA verified for martin.lee@veritaslogic.ai: score=1.00
+INFO:backend_api:Created new organization for martin.lee@veritaslogic.ai (domain: veritaslogic.ai)
+INFO:shared.subscription_manager:Created Stripe customer cus_TOpeVtPT5I5nmr for org 4
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/subscriptions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/subscriptions response_code=400
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/customers
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/customers response_code=200
+100.64.0.3 - - [10/Nov/2025:20:46:23 +0000] "POST /api/signup HTTP/1.1" 500 32 "https://www.veritaslogic.ai/signup.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"

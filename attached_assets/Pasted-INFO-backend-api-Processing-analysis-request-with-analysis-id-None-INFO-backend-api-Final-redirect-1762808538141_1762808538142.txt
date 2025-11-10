@@ -1,0 +1,17 @@
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjgyMjgzMSwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMTBUMjE6MDA6MzEuMzk2OTM2In0.ppNC_P-DAEMAIK15kZ41sW1YcYtyyfKiy0kqJDlsonU
+100.64.0.2 - - [10/Nov/2025:21:00:33 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=None error_message='No configuration provided and your live mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in live mode at https://dashboard.stripe.com/settings/billing/portal.' error_param=None error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error creating customer portal session: Request req_8vdnfiAb50HfJx: No configuration provided and your live mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in live mode at https://dashboard.stripe.com/settings/billing/portal.
+100.64.0.2 - - [10/Nov/2025:21:00:45 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 330 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=get url=https://api.stripe.com/v1/invoices?customer=cus_TOprNJdYeANF5N&limit=50
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/invoices?customer=cus_TOprNJdYeANF5N&limit=50 response_code=200
+INFO:backend_api:Retrieved 1 invoices for customer cus_TOprNJdYeANF5N
+100.64.0.2 - - [10/Nov/2025:21:00:51 +0000] "GET /api/subscription/invoices HTTP/1.1" 200 615 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=None error_message='No configuration provided and your live mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in live mode at https://dashboard.stripe.com/settings/billing/portal.' error_param=None error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error creating customer portal session: Request req_5wAUSD09qK7AJv: No configuration provided and your live mode default configuration has not been created. Provide a configuration or create your default by saving your customer portal settings in live mode at https://dashboard.stripe.com/settings/billing/portal.
+100.64.0.2 - - [10/Nov/2025:21:00:54 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 330 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
