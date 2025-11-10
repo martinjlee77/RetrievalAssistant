@@ -161,16 +161,27 @@ class AnalysisManager:
         if 'current_db_analysis_id' in st.session_state:
             del st.session_state['current_db_analysis_id']
     
-    def show_active_analysis_warning(self) -> bool:
+    def show_active_analysis_warning(self, current_asc_standard: Optional[str] = None) -> bool:
         """
         Show warning message if user tries to start analysis while one is active
         
+        Args:
+            current_asc_standard: The ASC standard of the current page (e.g., 'ASC 606')
+                                If provided and matches the active analysis, no warning is shown
+                                (allows progress bar to display on the same ASC page)
+        
         Returns:
-            True if warning was shown, False if no active analysis
+            True if warning was shown, False if no active analysis or same standard
         """
         active_analysis = self.get_active_analysis_info()
         
         if not active_analysis:
+            return False
+        
+        # If on the same ASC page as the running analysis, don't show warning
+        # This allows the progress bar to display normally
+        if current_asc_standard and active_analysis['asc_standard'] == current_asc_standard:
+            logger.info(f"Same ASC standard ({current_asc_standard}) - allowing progress bar display")
             return False
         
         # Calculate time elapsed
