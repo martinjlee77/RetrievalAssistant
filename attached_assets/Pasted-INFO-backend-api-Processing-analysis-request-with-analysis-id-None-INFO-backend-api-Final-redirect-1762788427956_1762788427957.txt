@@ -1,0 +1,23 @@
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxNSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2MjgwMjczNCwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTEtMTBUMTU6MjU6MzQuNjY2MDYxIn0.6gtkahiCS5eQjAB1oY8ZVsbFTdSmQ06NmALrENfP5mU
+100.64.0.8 - - [10/Nov/2025:15:25:36 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=resource_missing error_message="No such customer: 'cus_TNphIArInRqQeR'" error_param=customer error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error creating customer portal session: Request req_9A69oVXWC0ZKQH: No such customer: 'cus_TNphIArInRqQeR'
+100.64.0.8 - - [10/Nov/2025:15:25:49 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 123 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=get url=https://api.stripe.com/v1/invoices?customer=cus_TNphIArInRqQeR&limit=50
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/invoices?customer=cus_TNphIArInRqQeR&limit=50 response_code=400
+INFO:stripe:error_code=resource_missing error_message="No such customer: 'cus_TNphIArInRqQeR'" error_param=customer error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error fetching invoices: Request req_WYc1Y5kYRBNclI: No such customer: 'cus_TNphIArInRqQeR'
+100.64.0.8 - - [10/Nov/2025:15:25:55 +0000] "GET /api/subscription/invoices HTTP/1.1" 500 123 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=resource_missing error_message="No such customer: 'cus_TNphIArInRqQeR'" error_param=customer error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error creating customer portal session: Request req_qTwZDpF0VuO0Nr: No such customer: 'cus_TNphIArInRqQeR'
+100.64.0.8 - - [10/Nov/2025:15:25:59 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 123 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:stripe:message='Request to Stripe api' method=post url=https://api.stripe.com/v1/billing_portal/sessions
+INFO:stripe:message='Stripe API response' path=https://api.stripe.com/v1/billing_portal/sessions response_code=400
+INFO:stripe:error_code=resource_missing error_message="No such customer: 'cus_TNphIArInRqQeR'" error_param=customer error_type=invalid_request_error message='Stripe v1 API error received'
+ERROR:backend_api:Stripe error creating customer portal session: Request req_n0DghVHUKARD9l: No such customer: 'cus_TNphIArInRqQeR'
+100.64.0.8 - - [10/Nov/2025:15:26:04 +0000] "POST /api/subscription/customer-portal HTTP/1.1" 500 123 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"

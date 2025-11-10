@@ -760,11 +760,28 @@ async function upgradeToPlan(planKey) {
     }
 }
 
-async function updatePaymentMethod() {
-    // Check if user is organization owner
+// Helper function to check owner permissions for billing actions
+function checkOwnerPermission(actionLabel) {
     if (window.currentUserData && window.currentUserData.role !== 'owner') {
         const ownerEmail = window.currentUserData.owner_email || 'your organization owner';
-        alert(`Only organization owners can manage billing.\n\nContact ${ownerEmail} to upgrade or update payment methods.`);
+        alert(`Only organization owners can ${actionLabel}.\n\nContact ${ownerEmail} to manage billing and subscriptions.`);
+        return false;
+    }
+    return true;
+}
+
+// Helper function to handle backend permission errors
+function handlePermissionError(data) {
+    if (data.error === 'permission_denied' && data.owner_email) {
+        alert(`Only organization owners can access this feature.\n\nContact ${data.owner_email} to manage billing and subscriptions.`);
+        return true;
+    }
+    return false;
+}
+
+async function updatePaymentMethod() {
+    // Check if user is organization owner
+    if (!checkOwnerPermission('update payment methods')) {
         return;
     }
     
@@ -784,6 +801,11 @@ async function updatePaymentMethod() {
             // Redirect to Stripe Customer Portal
             window.location.href = data.url;
         } else {
+            // Check for permission error first
+            if (handlePermissionError(data)) {
+                return;
+            }
+            
             // Show helpful error message if Customer Portal not configured
             const errorMsg = data.error || 'Unknown error';
             if (errorMsg.includes('configuration') || errorMsg.includes('Customer Portal')) {
@@ -799,6 +821,11 @@ async function updatePaymentMethod() {
 }
 
 async function viewInvoiceHistory() {
+    // Check if user is organization owner
+    if (!checkOwnerPermission('view invoice history')) {
+        return;
+    }
+    
     try {
         const token = localStorage.getItem('authToken');
         const response = await fetch('/api/subscription/invoices', {
@@ -814,6 +841,11 @@ async function viewInvoiceHistory() {
         if (response.ok && data.success) {
             displayInvoiceModal(data.invoices);
         } else {
+            // Check for permission error first
+            if (handlePermissionError(data)) {
+                return;
+            }
+            
             alert(`Failed to retrieve invoices: ${data.error || 'Unknown error'}`);
         }
     } catch (error) {
@@ -885,6 +917,11 @@ function closeInvoiceModal(event) {
 }
 
 async function cancelSubscription() {
+    // Check if user is organization owner
+    if (!checkOwnerPermission('cancel subscription')) {
+        return;
+    }
+    
     // Redirect to Stripe Customer Portal for subscription management
     try {
         const token = localStorage.getItem('authToken');
@@ -902,6 +939,11 @@ async function cancelSubscription() {
             // Redirect to Stripe Customer Portal where they can cancel
             window.location.href = data.url;
         } else {
+            // Check for permission error first
+            if (handlePermissionError(data)) {
+                return;
+            }
+            
             // Show helpful error message if Customer Portal not configured
             const errorMsg = data.error || 'Unknown error';
             if (errorMsg.includes('configuration') || errorMsg.includes('Customer Portal')) {
