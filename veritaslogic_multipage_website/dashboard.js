@@ -613,28 +613,41 @@ function updateSubscriptionUI(data) {
     // Update plan features in subscription section
     const featuresEl = document.getElementById('currentPlanFeatures');
     if (featuresEl) {
-        const features = {
-            'professional': [
-                '15,000 words/month',
+        let planFeatures;
+        
+        // Check if user is on trial - show trial-specific features
+        if (sub.status === 'trial') {
+            planFeatures = [
+                '9,000 words (trial period)',
                 'All ASC standards',
                 'Standard support',
-                'Rollover unused words'
-            ],
-            'team': [
-                '30,000 words/month',
-                'All ASC standards',
-                'Priority support',
-                'Rollover unused words',
-            ],
-            'enterprise': [
-                '100,000 words/month',
-                'All ASC standards',
-                'Dedicated support',
-                'Rollover unused words',
-            ]
-        };
-        
-        const planFeatures = features[sub.plan_key] || [];
+                'Full platform access'
+            ];
+        } else {
+            // Active subscription - show plan-specific features
+            const features = {
+                'professional': [
+                    '15,000 words/month',
+                    'All ASC standards',
+                    'Standard support',
+                    'Rollover unused words'
+                ],
+                'team': [
+                    '30,000 words/month',
+                    'All ASC standards',
+                    'Priority support',
+                    'Rollover unused words',
+                ],
+                'enterprise': [
+                    '100,000 words/month',
+                    'All ASC standards',
+                    'Dedicated support',
+                    'Rollover unused words',
+                ]
+            };
+            
+            planFeatures = features[sub.plan_key] || [];
+        }
         
         if (planFeatures.length > 0) {
             featuresEl.innerHTML = planFeatures.map(feature => `
