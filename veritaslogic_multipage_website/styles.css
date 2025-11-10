@@ -3905,6 +3905,12 @@ a:focus {
         display: none;
     }
     
+    /* Mobile Pricing - Fix Banner Text Wrapping */
+    .pricing-explainer-bar p {
+        padding: 0 1rem;
+        font-size: 0.95rem;
+    }
+    
     /* Mobile Pricing Grid - Stack Cards Vertically */
     .pricing-grid {
         grid-template-columns: 1fr;
@@ -3914,5 +3920,26 @@ a:focus {
     
     .pricing-card {
         max-width: 100%;
+    }
+    
+    /* Mobile Two-Column Sections - Stack Vertically */
+    .feature-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .feature-content.two-column {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .story-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
     }
 }
