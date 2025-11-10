@@ -548,14 +548,10 @@ def get_asc718_inputs_new():
 
 
 def perform_asc718_analysis(pricing_result, additional_context: str = "", user_token: str = "", 
-                           cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[List[str]] = None):
+                           cached_combined_text: Optional[str] = None, uploaded_filenames: Optional[str] = None):
     """Perform the complete ASC 718 analysis and display results with session isolation."""
     
-    # Validate pricing result and user token
-    if not pricing_result or not pricing_result.get('success'):
-        st.error("❌ Invalid pricing information.")
-        return
-    
+    # Validate user token
     if not user_token:
         st.error("❌ Authentication required.")
         return
