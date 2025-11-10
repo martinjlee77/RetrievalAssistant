@@ -4636,13 +4636,16 @@ def verify_and_process_upgrade():
             new_sub_id = cursor.fetchone()['id']
             
             # Create subscription_usage record with monthly allowance
+            # Convert timestamps to dates for month_start/month_end
+            month_start = current_period_start.date()
+            month_end = current_period_end.date()
+            
             cursor.execute("""
                 INSERT INTO subscription_usage
-                (subscription_id, org_id, period_start, period_end, 
-                 words_included, words_used, overage_words, overage_cost,
-                 created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, 0, 0, 0.00, NOW(), NOW())
-            """, (new_sub_id, org_id, current_period_start, current_period_end, 
+                (subscription_id, org_id, month_start, month_end, 
+                 word_allowance, words_used, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, 0, NOW(), NOW())
+            """, (new_sub_id, org_id, month_start, month_end, 
                   plan['word_allowance']))
             
             # Update organization with Stripe customer ID
