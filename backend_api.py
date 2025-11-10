@@ -4970,6 +4970,36 @@ def create_customer_portal_session():
         try:
             cursor = conn.cursor()
             
+            # Check if user is organization owner
+            cursor.execute("""
+                SELECT u.role, u.org_id
+                FROM users u
+                WHERE u.id = %s
+            """, (user_id,))
+            user_result = cursor.fetchone()
+            
+            if not user_result:
+                return jsonify({'error': 'User not found'}), 404
+            
+            if user_result['role'] != 'owner':
+                # Get owner email for error message
+                cursor.execute("""
+                    SELECT email
+                    FROM users
+                    WHERE org_id = %s AND role = 'owner'
+                    LIMIT 1
+                """, (user_result['org_id'],))
+                owner_result = cursor.fetchone()
+                owner_email = owner_result['email'] if owner_result else 'your organization owner'
+                
+                logger.info(f"Permission denied: User {user_id} (role: {user_result['role']}) attempted to access customer portal for org {user_result['org_id']}")
+                
+                return jsonify({
+                    'error': 'permission_denied',
+                    'message': 'Only organization owners can access billing portal',
+                    'owner_email': owner_email
+                }), 403
+            
             # Get user's organization and Stripe customer ID
             cursor.execute("""
                 SELECT o.stripe_customer_id
@@ -5034,6 +5064,36 @@ def get_customer_invoices():
         
         try:
             cursor = conn.cursor()
+            
+            # Check if user is organization owner
+            cursor.execute("""
+                SELECT u.role, u.org_id
+                FROM users u
+                WHERE u.id = %s
+            """, (user_id,))
+            user_result = cursor.fetchone()
+            
+            if not user_result:
+                return jsonify({'error': 'User not found'}), 404
+            
+            if user_result['role'] != 'owner':
+                # Get owner email for error message
+                cursor.execute("""
+                    SELECT email
+                    FROM users
+                    WHERE org_id = %s AND role = 'owner'
+                    LIMIT 1
+                """, (user_result['org_id'],))
+                owner_result = cursor.fetchone()
+                owner_email = owner_result['email'] if owner_result else 'your organization owner'
+                
+                logger.info(f"Permission denied: User {user_id} (role: {user_result['role']}) attempted to view invoices for org {user_result['org_id']}")
+                
+                return jsonify({
+                    'error': 'permission_denied',
+                    'message': 'Only organization owners can view invoice history',
+                    'owner_email': owner_email
+                }), 403
             
             # Get user's organization and Stripe customer ID
             cursor.execute("""
