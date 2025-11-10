@@ -7,6 +7,8 @@ VeritasLogic.ai is a premium enterprise AI platform for accounting firms and lar
 1. **ASC 842 Subscription Migration Completed**: Fully migrated ASC 842 from legacy credit-based pricing to subscription model with word allowances. Removed all `tier_info` and `pricing_result` references in favor of `allowance_result`.
 2. **Session Key Standardization**: Fixed session key prefix mapping in `shared/job_progress_monitor.py` to match page file conventions, resolving blank page issues after analysis completion (ASC 340-40: `asc340` not `asc34040`).
 3. **Resume Polling Enhancement**: All 5 ASC standards now use standardized session key prefixes for reliable memo retrieval after background job completion.
+4. **Dashboard Trial Features Fix**: Updated `dashboard.js` to display trial-specific features (9,000 words, no rollover) instead of showing active subscription features during trial period.
+5. **Legal Documents Updated**: Completely revised `privacy.html` and `terms.html` to reflect subscription model (Professional/Team/Enterprise tiers, monthly word allowances, 14-day trial, 12-month rollover, organization accounts, Stripe cancellation). Removed all outdated credit-based terminology (credits, $1K blocks, tier/cost, per-analysis deduction).
 
 ## User Preferences
 - **Communication Style**: Simple, everyday language for technical explanations
