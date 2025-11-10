@@ -1716,11 +1716,12 @@ def get_user_profile():
         
         cursor = conn.cursor()
         
-        # Get user data with organization
+        # Get user data with organization and owner info
         cursor.execute("""
-            SELECT u.id, u.email, u.first_name, u.last_name, u.job_title, u.org_id,
+            SELECT u.id, u.email, u.first_name, u.last_name, u.job_title, u.org_id, u.role,
                    u.created_at, u.email_verified, u.research_assistant_access,
-                   o.name as company_name
+                   o.name as company_name,
+                   (SELECT email FROM users WHERE org_id = u.org_id AND role = 'owner' LIMIT 1) as owner_email
             FROM users u
             LEFT JOIN organizations o ON u.org_id = o.id
             WHERE u.id = %s
@@ -1753,6 +1754,8 @@ def get_user_profile():
                 'company_name': user['company_name'] or '',
                 'job_title': user['job_title'] or '',
                 'org_id': user['org_id'],
+                'role': user['role'],
+                'owner_email': user['owner_email'],
                 'member_since': user['created_at'].isoformat(),
                 'email_verified': bool(user['email_verified']),
                 'research_assistant_access': bool(user['research_assistant_access'])
