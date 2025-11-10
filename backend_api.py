@@ -10,6 +10,7 @@ import psycopg2.extras
 import jwt
 import os
 import re
+import time
 from datetime import datetime, timedelta, date, timezone
 from decimal import Decimal
 import logging
@@ -4575,7 +4576,8 @@ def verify_and_process_upgrade():
         
         # Get subscription details from Stripe
         try:
-            stripe_sub = stripe.Subscription.retrieve(stripe_subscription_id)
+            stripe_sub_obj = stripe.Subscription.retrieve(stripe_subscription_id)
+            stripe_sub = stripe_sub_obj.to_dict()
         except stripe.StripeError as se:
             logger.error(f"Failed to retrieve subscription {stripe_subscription_id}: {se}")
             return jsonify({'error': 'Failed to retrieve subscription'}), 500
@@ -4609,9 +4611,18 @@ def verify_and_process_upgrade():
             """, (org_id,))
             
             # Create new subscription instance
-            # Access Stripe subscription fields as dictionary
-            current_period_start = datetime.fromtimestamp(stripe_sub['current_period_start'], tz=timezone.utc)
-            current_period_end = datetime.fromtimestamp(stripe_sub['current_period_end'], tz=timezone.utc)
+            # Safely extract period timestamps with null checks
+            period_start_ts = stripe_sub.get('current_period_start')
+            period_end_ts = stripe_sub.get('current_period_end')
+            
+            if not period_start_ts or not period_end_ts:
+                logger.warning(f"Missing period timestamps for subscription {stripe_subscription_id}: start={period_start_ts}, end={period_end_ts}")
+                # Use start_date as fallback or current time
+                period_start_ts = stripe_sub.get('start_date') or int(time.time())
+                period_end_ts = period_start_ts + (30 * 24 * 60 * 60)  # Add 30 days
+            
+            current_period_start = datetime.fromtimestamp(period_start_ts, tz=timezone.utc)
+            current_period_end = datetime.fromtimestamp(period_end_ts, tz=timezone.utc)
             
             cursor.execute("""
                 INSERT INTO subscription_instances 
@@ -4619,7 +4630,7 @@ def verify_and_process_upgrade():
                  current_period_start, current_period_end, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING id
-            """, (org_id, plan_id, stripe_subscription_id, stripe_sub['status'],
+            """, (org_id, plan_id, stripe_subscription_id, stripe_sub.get('status', 'active'),
                   current_period_start, current_period_end))
             
             new_sub_id = cursor.fetchone()['id']
