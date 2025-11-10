@@ -4503,8 +4503,8 @@ def create_upgrade_checkout():
                     'price': stripe_price_id,
                     'quantity': 1
                 }],
-                success_url=f"{WEBSITE_URL}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}",
-                cancel_url=f"{WEBSITE_URL}/subscription/cancel",
+                success_url=f"{WEBSITE_URL}/subscription-success.html?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{WEBSITE_URL}/subscription-cancel.html",
                 metadata={
                     'org_id': user['org_id'],
                     'user_id': user_id,
