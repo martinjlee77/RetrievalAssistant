@@ -10,7 +10,7 @@ import psycopg2.extras
 import jwt
 import os
 import re
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from decimal import Decimal
 import logging
 import bcrypt
