@@ -1555,6 +1555,209 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.5;
 }
 
+/* Add-On Services Section */
+.addon-services {
+    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+    padding: 4rem 0;
+}
+
+.addon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 2rem auto 0;
+}
+
+.addon-card {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.addon-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.addon-card h3 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.addon-card p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.addon-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+}
+
+.addon-card ul li {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem 0;
+    padding-left: 2rem;
+    position: relative;
+    line-height: 1.6;
+}
+
+.addon-card ul li::before {
+    content: '✓';
+    color: #4a90e2;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    font-size: 1.2rem;
+}
+
+.addon-price {
+    margin-top: auto;
+}
+
+.addon-price .pricing-cta {
+    display: inline-block;
+    padding: 0.85rem 2rem;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.addon-price .pricing-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* Cost Comparison Section */
+.cost-comparison {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
+    padding: 4rem 0;
+}
+
+.cost-comparison .comparison-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 1rem auto 3rem;
+    font-size: 1rem;
+    max-width: 800px;
+}
+
+.comparison-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.comparison-card {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.comparison-card.highlighted {
+    background: rgba(74, 144, 226, 0.15);
+    border: 2px solid #4a90e2;
+    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
+}
+
+.comparison-card h3 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    text-align: center;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.cost-breakdown {
+    margin-bottom: 1.5rem;
+}
+
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cost-item:last-of-type {
+    border-bottom: none;
+}
+
+.cost-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.cost-amount {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.cost-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0 1rem;
+    margin-top: 1rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.cost-total .cost-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.cost-total .cost-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4a90e2;
+}
+
+.time-estimate {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.savings-badge {
+    text-align: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
 /* FAQ Section Styles */
 .faq-section {
     background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
@@ -3865,6 +4068,37 @@ a:focus {
     .pricing-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.5rem;
+    }
+}
+
+/* Mobile - Responsive addon services and cost comparison */
+@media (max-width: 768px) {
+    .addon-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .addon-card {
+        padding: 2rem;
+    }
+    
+    .comparison-cards {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .comparison-card {
+        padding: 2rem;
+    }
+    
+    .cost-comparison .comparison-subtitle {
+        padding: 0 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .pricing-explainer-bar p {
+        padding: 0 2rem;
+        font-size: 0.95rem;
     }
 }
 
