@@ -4543,6 +4543,8 @@ def create_upgrade_checkout():
 @app.route('/api/subscription/verify-upgrade', methods=['POST'])
 def verify_and_process_upgrade():
     """Verify Stripe checkout session and immediately process subscription upgrade"""
+    from shared.pricing_config import SUBSCRIPTION_PLANS
+    
     try:
         data = request.get_json()
         session_id = data.get('session_id')
