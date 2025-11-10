@@ -22,8 +22,8 @@ SUBSCRIPTION_PLANS = {
             'Professional-grade analysis quality'
         ],
         'ideal_for': 'Individual accounting professionals',
-        'stripe_product_id': 'prod_TMZYA0436dZmL1',
-        'stripe_price_id': 'price_1SPqP82M206TZw8PqqOL6uAu',
+        'stripe_product_id': 'prod_TNnuf4rHPxkbcG',
+        'stripe_price_id': 'price_1SR2IfRv8INdmIMmZxyMP74i',
     },
     'team': {
         'plan_key': 'team',
@@ -40,8 +40,8 @@ SUBSCRIPTION_PLANS = {
             'Professional-grade analysis quality'
         ],
         'ideal_for': 'Accounting teams and small firms',
-        'stripe_product_id': 'prod_TMZYrJj8yswA2r',
-        'stripe_price_id': 'price_1SPqP82M206TZw8PDTLc5DTU',
+        'stripe_product_id': 'prod_TNnv6BDbyecKpM',
+        'stripe_price_id': 'price_1SR2JVRv8INdmIMmLjcEHRsE',
     },
     'enterprise': {
         'plan_key': 'enterprise',
@@ -58,8 +58,8 @@ SUBSCRIPTION_PLANS = {
             'Professional-grade analysis quality'
         ],
         'ideal_for': 'Large enterprises',
-        'stripe_product_id': 'prod_TMZY36SH65ts7H',
-        'stripe_price_id': 'price_1SPqP92M206TZw8P1uY9VdzR',
+        'stripe_product_id': 'prod_TNnvdE1lfTtSXm',
+        'stripe_price_id': 'price_1SR2JyRv8INdmIMmAzoYW9oJ',
     }
 }
 
