@@ -4540,6 +4540,116 @@ def create_upgrade_checkout():
         return jsonify({'error': 'Failed to create checkout session'}), 500
 
 
+@app.route('/api/subscription/verify-upgrade', methods=['POST'])
+def verify_and_process_upgrade():
+    """Verify Stripe checkout session and immediately process subscription upgrade"""
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        
+        if not session_id:
+            return jsonify({'error': 'Session ID required'}), 400
+        
+        # Retrieve the checkout session from Stripe
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+        except stripe.StripeError as se:
+            logger.error(f"Failed to retrieve Stripe session {session_id}: {se}")
+            return jsonify({'error': 'Invalid checkout session'}), 400
+        
+        # Verify payment was successful
+        if session.payment_status != 'paid':
+            return jsonify({'error': 'Payment not completed'}), 400
+        
+        # Extract metadata
+        org_id = session.metadata.get('org_id')
+        plan_key = session.metadata.get('plan_key')
+        stripe_subscription_id = session.subscription
+        customer_id = session.customer
+        
+        if not org_id or not plan_key or not stripe_subscription_id:
+            logger.error(f"Missing metadata in session {session_id}")
+            return jsonify({'error': 'Invalid session metadata'}), 400
+        
+        # Get subscription details from Stripe
+        try:
+            stripe_sub = stripe.Subscription.retrieve(stripe_subscription_id)
+        except stripe.StripeError as se:
+            logger.error(f"Failed to retrieve subscription {stripe_subscription_id}: {se}")
+            return jsonify({'error': 'Failed to retrieve subscription'}), 500
+        
+        # Get plan details
+        plan = SUBSCRIPTION_PLANS.get(plan_key)
+        if not plan:
+            return jsonify({'error': 'Invalid plan'}), 400
+        
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        try:
+            cursor = conn.cursor()
+            
+            # Cancel existing active/trial subscription for this org
+            cursor.execute("""
+                UPDATE subscription_instances
+                SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
+                WHERE org_id = %s AND status IN ('active', 'trial')
+            """, (org_id,))
+            
+            # Create new subscription instance
+            current_period_start = datetime.fromtimestamp(stripe_sub.current_period_start, tz=timezone.utc)
+            current_period_end = datetime.fromtimestamp(stripe_sub.current_period_end, tz=timezone.utc)
+            
+            cursor.execute("""
+                INSERT INTO subscription_instances 
+                (org_id, plan_key, stripe_subscription_id, status, 
+                 current_period_start, current_period_end, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+                RETURNING id
+            """, (org_id, plan_key, stripe_subscription_id, stripe_sub.status,
+                  current_period_start, current_period_end))
+            
+            new_sub_id = cursor.fetchone()['id']
+            
+            # Create subscription_usage record with monthly allowance
+            cursor.execute("""
+                INSERT INTO subscription_usage
+                (subscription_id, org_id, period_start, period_end, 
+                 words_included, words_used, overage_words, overage_cost,
+                 created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, 0, 0, 0.00, NOW(), NOW())
+            """, (new_sub_id, org_id, current_period_start, current_period_end, 
+                  plan['word_allowance']))
+            
+            # Update organization with Stripe customer ID
+            cursor.execute("""
+                UPDATE organizations
+                SET stripe_customer_id = %s, updated_at = NOW()
+                WHERE id = %s
+            """, (customer_id, org_id))
+            
+            conn.commit()
+            
+            logger.info(f"✅ Subscription upgraded: org={org_id}, plan={plan_key}, sub_id={new_sub_id}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Subscription upgraded successfully',
+                'plan': {
+                    'name': plan['name'],
+                    'word_allowance': plan['word_allowance']
+                }
+            }), 200
+            
+        finally:
+            conn.close()
+        
+    except Exception as e:
+        logger.error(f"Verify upgrade error: {e}")
+        return jsonify({'error': 'Failed to process upgrade'}), 500
+
+
 @app.route('/api/subscription/cancel', methods=['POST'])
 def cancel_subscription():
     """Cancel user's subscription (remains active until end of billing period)"""

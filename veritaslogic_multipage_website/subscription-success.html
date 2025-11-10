@@ -154,18 +154,31 @@
             }
             
             try {
-                // Verify the checkout session completed successfully
-                // The webhook should handle the actual subscription update
-                // This page just confirms and redirects
+                // Call backend to verify and process the upgrade immediately
+                const apiUrl = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:3000/api/subscription/verify-upgrade'
+                    : '/api/subscription/verify-upgrade';
                 
-                // Wait a moment for webhook to process
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
                 
-                // Show success and redirect to dashboard
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to process subscription update');
+                }
+                
+                const data = await response.json();
+                
+                // Show success state
                 document.getElementById('loading-state').classList.add('hidden');
                 document.getElementById('success-state').classList.remove('hidden');
                 
-                // Auto-redirect after 3 seconds
+                // Auto-redirect to dashboard after 3 seconds
                 setTimeout(() => {
                     window.location.href = '/dashboard.html';
                 }, 3000);
