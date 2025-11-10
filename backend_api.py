@@ -4609,8 +4609,9 @@ def verify_and_process_upgrade():
             """, (org_id,))
             
             # Create new subscription instance
-            current_period_start = datetime.fromtimestamp(stripe_sub.current_period_start, tz=timezone.utc)
-            current_period_end = datetime.fromtimestamp(stripe_sub.current_period_end, tz=timezone.utc)
+            # Access Stripe subscription fields as dictionary
+            current_period_start = datetime.fromtimestamp(stripe_sub['current_period_start'], tz=timezone.utc)
+            current_period_end = datetime.fromtimestamp(stripe_sub['current_period_end'], tz=timezone.utc)
             
             cursor.execute("""
                 INSERT INTO subscription_instances 
@@ -4618,7 +4619,7 @@ def verify_and_process_upgrade():
                  current_period_start, current_period_end, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING id
-            """, (org_id, plan_id, stripe_subscription_id, stripe_sub.status,
+            """, (org_id, plan_id, stripe_subscription_id, stripe_sub['status'],
                   current_period_start, current_period_end))
             
             new_sub_id = cursor.fetchone()['id']
