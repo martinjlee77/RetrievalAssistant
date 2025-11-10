@@ -615,19 +615,19 @@ function updateSubscriptionUI(data) {
     if (featuresEl) {
         const features = {
             'professional': [
-                '30,000 words/month',
+                '15,000 words/month',
                 'All ASC standards',
                 'Standard support',
                 'Rollover unused words'
             ],
             'team': [
-                '75,000 words/month',
+                '30,000 words/month',
                 'All ASC standards',
                 'Priority support',
                 'Rollover unused words',
             ],
             'enterprise': [
-                '180,000 words/month',
+                '100,000 words/month',
                 'All ASC standards',
                 'Dedicated support',
                 'Rollover unused words',

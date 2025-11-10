@@ -47,7 +47,7 @@ For a small number of enterprise customers (<50), we use **manual subscription m
 ```sql
 -- See admin_sql_scripts.sql - OPERATION 1
 UPDATE subscription_instances SET status = 'active' WHERE ...;
-UPDATE subscription_usage SET word_allowance = 30000, words_used = 0 WHERE ...;
+UPDATE subscription_usage SET word_allowance = 15000, words_used = 0 WHERE ...;
 ```
 
 ### Reset Words for Monthly Renewal

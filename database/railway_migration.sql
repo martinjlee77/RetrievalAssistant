@@ -211,13 +211,13 @@ WHERE status IN ('active', 'trial', 'past_due');
 
 INSERT INTO subscription_plans (plan_key, name, price_monthly, word_allowance, seats, features, stripe_price_id)
 VALUES 
-    ('professional', 'Professional', 295.00, 30000, 1, 
+    ('professional', 'Professional', 295.00, 15000, 1, 
      '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support"]',
      'price_professional_placeholder'),
-    ('team', 'Team', 595.00, 75000, 3, 
+    ('team', 'Team', 595.00, 30000, 3, 
      '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support", "Multi-user organization", "Audit logs"]',
      'price_team_placeholder'),
-    ('enterprise', 'Enterprise', 1195.00, 180000, 999, 
+    ('enterprise', 'Enterprise', 1195.00, 100000, 999, 
      '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Dedicated success manager", "Custom SLA", "Azure OpenAI option", "Unlimited internal viewers"]',
      'price_enterprise_placeholder')
 ON CONFLICT (plan_key) DO UPDATE SET
@@ -248,7 +248,7 @@ BEGIN
     RAISE NOTICE '  - users (added org_id, role, job_title, etc.)';
     RAISE NOTICE '  - analyses (added org_id, words_charged)';
     RAISE NOTICE '';
-    RAISE NOTICE 'Plans: Professional ($295/30K), Team ($595/75K), Enterprise ($1195/180K)';
+    RAISE NOTICE 'Plans: Professional ($295/15K), Team ($595/30K), Enterprise ($1195/100K)';
     RAISE NOTICE '';
     RAISE NOTICE 'IMPORTANT: Update Stripe price IDs in subscription_plans table';
     RAISE NOTICE '==============================================';

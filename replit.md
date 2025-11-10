@@ -45,7 +45,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Enterprise Web Platform**: Professional website with unified contact system, enterprise messaging, and sophisticated user account management.
 - **Dashboard System**: Comprehensive analysis history tracking with detailed metrics for enterprise reporting.
 - **Authentication Flow**: Secure user registration, login, and password recovery with unified professional styling.
-- **Subscription Model**: Three tiers (Professional $295/mo, Team $595/mo, Enterprise $1195/mo) with monthly word allowances (30K, 75K, 180K). 14-day trial with 9K words included. All tiers are single-user accounts (customers share login credentials).
+- **Subscription Model**: Three tiers (Professional $295/mo, Team $595/mo, Enterprise $1195/mo) with monthly word allowances (15K, 30K, 100K). 14-day trial with 9K words included. All tiers are single-user accounts (customers share login credentials).
 - **Stripe Integration**: Subscription management with Customer Portal for upgrades, downgrades, payment updates, and invoice history.
 - **Responsive Design**: Professional mobile-first design with consistent Big 4 inspired color schemes and dark gradient styling.
 
