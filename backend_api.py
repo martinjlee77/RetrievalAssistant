@@ -3768,10 +3768,19 @@ def log_platform_activity():
 # STRIPE WEBHOOK HANDLERS
 # ==========================================
 
-def upsert_subscription_usage(org_id, subscription_id, plan_key, conn):
+def create_usage_record(subscription_id, org_id, plan_key, period_start_dt, period_end_dt, conn, words_used=0):
     """
-    Create or update subscription_usage record for current month.
-    Uses first/last day of month for consistency with dashboard queries.
+    Create subscription_usage record based on Stripe billing period (not calendar month).
+    Preserves words_used for mid-period updates.
+    
+    Args:
+        subscription_id: Database subscription_instances.id
+        org_id: Organization ID
+        plan_key: Plan identifier (professional, team, enterprise)
+        period_start_dt: Stripe current_period_start as datetime
+        period_end_dt: Stripe current_period_end as datetime
+        conn: Database connection
+        words_used: Existing word usage to preserve (default 0 for new periods)
     """
     from shared.pricing_config import SUBSCRIPTION_PLANS
     
@@ -3785,29 +3794,37 @@ def upsert_subscription_usage(org_id, subscription_id, plan_key, conn):
     
     word_allowance = plan['word_allowance']
     
-    # Calculate first and last day of current month
-    today = date.today()
-    month_start = today.replace(day=1)
-    if today.month == 12:
-        month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
+    # Convert Stripe period to dates for storage
+    month_start = period_start_dt.date()
+    month_end = period_end_dt.date()
+    
+    # Check if usage record already exists for this period
+    cursor.execute("""
+        SELECT id, words_used FROM subscription_usage
+        WHERE subscription_id = %s AND month_start = %s
+    """, (subscription_id, month_start))
+    
+    existing = cursor.fetchone()
+    
+    if existing:
+        # Update existing record (plan change during period)
+        cursor.execute("""
+            UPDATE subscription_usage
+            SET word_allowance = %s,
+                month_end = %s,
+                updated_at = NOW()
+            WHERE id = %s
+        """, (word_allowance, month_end, existing['id']))
+        logger.info(f"Updated usage record for org {org_id}: {word_allowance} words, preserved {existing['words_used']} used")
     else:
-        month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
-    
-    # Delete any existing usage records for this month
-    cursor.execute("""
-        DELETE FROM subscription_usage
-        WHERE org_id = %s AND month_start = %s
-    """, (org_id, month_start))
-    
-    # Insert new usage record
-    cursor.execute("""
-        INSERT INTO subscription_usage
-        (subscription_id, org_id, month_start, month_end, 
-         word_allowance, words_used, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, 0, NOW(), NOW())
-    """, (subscription_id, org_id, month_start, month_end, word_allowance))
-    
-    logger.info(f"Created usage record for org {org_id}: {word_allowance} words for {month_start}")
+        # Create new record (new billing period)
+        cursor.execute("""
+            INSERT INTO subscription_usage
+            (subscription_id, org_id, month_start, month_end, 
+             word_allowance, words_used, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+        """, (subscription_id, org_id, month_start, month_end, word_allowance, words_used))
+        logger.info(f"Created usage record for org {org_id}: {word_allowance} words, period {month_start} to {month_end}")
 
 
 @app.route('/api/webhooks/stripe', methods=['POST'])
@@ -4010,8 +4027,9 @@ def handle_subscription_created(event, conn):
     
     logger.info(f"Subscription created for org {org_id}")
     
-    # Create subscription_usage record for current month
-    upsert_subscription_usage(org_id, subscription_id, plan_key, conn)
+    # Create subscription_usage record for this billing period
+    create_usage_record(subscription_id, org_id, plan_key, 
+                       current_period_start, current_period_end, conn, words_used=0)
 
 
 def handle_subscription_updated(event, conn):
@@ -4066,8 +4084,29 @@ def handle_subscription_updated(event, conn):
         logger.warning(f"No subscription found for Stripe subscription {stripe_sub_id}")
         # Fallback: create it using subscription.created logic
         handle_subscription_created(event, conn)
-    else:
-        logger.info(f"Subscription {stripe_sub_id} updated")
+        return
+    
+    logger.info(f"Subscription {stripe_sub_id} updated")
+    
+    # Get subscription_id and org_id
+    cursor.execute("""
+        SELECT id, org_id FROM subscription_instances
+        WHERE stripe_subscription_id = %s
+    """, (stripe_sub_id,))
+    
+    sub_inst = cursor.fetchone()
+    if not sub_inst:
+        logger.error(f"Failed to find subscription_instance after update")
+        return
+    
+    subscription_id = sub_inst['id']
+    org_id = sub_inst['org_id']
+    
+    # Handle usage record creation/update
+    if plan_key:
+        # Plan change or renewal - update/create usage record
+        create_usage_record(subscription_id, org_id, plan_key,
+                           current_period_start, current_period_end, conn)
 
 
 def handle_subscription_deleted(event, conn):
