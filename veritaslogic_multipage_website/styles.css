@@ -3860,6 +3860,14 @@ a:focus {
     color: #ff6b6b;
 }
 
+/* Tablet/Medium Width - 2 Column Pricing Grid */
+@media (max-width: 1000px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
 /* Responsive adjustments for demo page */
 @media (max-width: 768px) {
     .demo-hero {
