@@ -3873,4 +3873,46 @@ a:focus {
     .demo-registration-section {
         padding: 60px 0;
     }
+    
+    /* Mobile Navigation */
+    .mobile-menu-btn {
+        display: block;
+    }
+    
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: var(--color-dark-bg);
+        flex-direction: column;
+        padding: 1rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    .nav-links.mobile-open {
+        display: flex;
+    }
+    
+    .nav-links li {
+        margin: 0;
+        padding: 0.75rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-auth-buttons {
+        display: none;
+    }
+    
+    /* Mobile Pricing Grid - Stack Cards Vertically */
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 0 1rem;
+    }
+    
+    .pricing-card {
+        max-width: 100%;
+    }
 }
