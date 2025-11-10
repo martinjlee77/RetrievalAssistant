@@ -113,8 +113,7 @@ def submit_and_monitor_asc340_job(
             'asc_standard': 'ASC 340-40',
             'total_words': total_words,
             'file_count': allowance_result['file_count'],
-            'tier_info': allowance_result.get('tier_info', {}),
-            'cost_charged': allowance_result.get('cost_charged', 0.0),
+            'cost_charged': 0.0,  # Subscription model - word deduction handled by backend
             'job_id': job_id,  # Store for resume polling
             'db_analysis_id': db_analysis_id,  # Store database ID
             'service_token': service_token  # Store long-lived token for resume polling
