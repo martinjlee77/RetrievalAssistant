@@ -3768,6 +3768,48 @@ def log_platform_activity():
 # STRIPE WEBHOOK HANDLERS
 # ==========================================
 
+def upsert_subscription_usage(org_id, subscription_id, plan_key, conn):
+    """
+    Create or update subscription_usage record for current month.
+    Uses first/last day of month for consistency with dashboard queries.
+    """
+    from shared.pricing_config import SUBSCRIPTION_PLANS
+    
+    cursor = conn.cursor()
+    
+    # Get plan details
+    plan = SUBSCRIPTION_PLANS.get(plan_key)
+    if not plan:
+        logger.error(f"Plan {plan_key} not found in SUBSCRIPTION_PLANS")
+        return
+    
+    word_allowance = plan['word_allowance']
+    
+    # Calculate first and last day of current month
+    today = date.today()
+    month_start = today.replace(day=1)
+    if today.month == 12:
+        month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
+    else:
+        month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
+    
+    # Delete any existing usage records for this month
+    cursor.execute("""
+        DELETE FROM subscription_usage
+        WHERE org_id = %s AND month_start = %s
+    """, (org_id, month_start))
+    
+    # Insert new usage record
+    cursor.execute("""
+        INSERT INTO subscription_usage
+        (subscription_id, org_id, month_start, month_end, 
+         word_allowance, words_used, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, 0, NOW(), NOW())
+    """, (subscription_id, org_id, month_start, month_end, word_allowance))
+    
+    logger.info(f"Created usage record for org {org_id}: {word_allowance} words for {month_start}")
+
+
 @app.route('/api/webhooks/stripe', methods=['POST'])
 def stripe_subscription_webhook():
     """
@@ -3960,9 +4002,16 @@ def handle_subscription_created(event, conn):
             current_period_start = EXCLUDED.current_period_start,
             current_period_end = EXCLUDED.current_period_end,
             updated_at = NOW()
+        RETURNING id
     """, (org_id, plan_id, stripe_sub_id, status, current_period_start, current_period_end))
     
+    sub_instance = cursor.fetchone()
+    subscription_id = sub_instance['id']
+    
     logger.info(f"Subscription created for org {org_id}")
+    
+    # Create subscription_usage record for current month
+    upsert_subscription_usage(org_id, subscription_id, plan_key, conn)
 
 
 def handle_subscription_updated(event, conn):
@@ -4636,10 +4685,22 @@ def verify_and_process_upgrade():
             new_sub_id = cursor.fetchone()['id']
             
             # Create subscription_usage record with monthly allowance
-            # Convert timestamps to dates for month_start/month_end
-            month_start = current_period_start.date()
-            month_end = current_period_end.date()
+            # Use first day of current month (not exact upgrade date)
+            today = date.today()
+            month_start = today.replace(day=1)
+            # Calculate last day of current month
+            if today.month == 12:
+                month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
+            else:
+                month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
             
+            # Delete any existing usage records for this month (handles mid-month upgrades)
+            cursor.execute("""
+                DELETE FROM subscription_usage
+                WHERE org_id = %s AND month_start = %s
+            """, (org_id, month_start))
+            
+            # Insert new usage record with current plan allowance
             cursor.execute("""
                 INSERT INTO subscription_usage
                 (subscription_id, org_id, month_start, month_end, 
