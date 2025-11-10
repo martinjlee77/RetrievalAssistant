@@ -15,8 +15,8 @@ SUBSCRIPTION_PLANS = {
         'word_allowance': 30000,
         'seats': 1,
         'features': [
+            'Up to 30,000 words per user per month, granted upfront',
             'All ASC standards (606, 842, 718, 805, 340-40)',
-            'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
             'Priority email support',
             'Professional-grade analysis quality'
@@ -33,6 +33,7 @@ SUBSCRIPTION_PLANS = {
         'word_allowance': 75000,
         'seats': 1,
         'features': [
+            'Up to 75,000 words per user per month, granted upfront',
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
@@ -51,6 +52,7 @@ SUBSCRIPTION_PLANS = {
         'word_allowance': 180000,
         'seats': 1,
         'features': [
+            'Up to 180,000 words per user per month, granted upfront',
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',

@@ -605,14 +605,12 @@ function updateSubscriptionUI(data) {
                 'All ASC standards',
                 'Priority support',
                 'Rollover unused words',
-                'Team collaboration'
             ],
             'enterprise': [
                 '180,000 words/month',
                 'All ASC standards',
                 'Dedicated support',
                 'Rollover unused words',
-                'Team collaboration',
                 'Custom integrations'
             ]
         };
