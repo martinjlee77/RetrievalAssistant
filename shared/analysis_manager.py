@@ -86,6 +86,8 @@ class AnalysisManager:
             'file_count': analysis_details.get('file_count', 0),
             'tier_info': analysis_details.get('tier_info', {}),
             'cost_charged': analysis_details.get('cost_charged', 0.0),
+            'job_id': analysis_details.get('job_id'),  # Store job_id for resume polling
+            'db_analysis_id': analysis_details.get('db_analysis_id'),  # Store database ID
             'start_time': time.time(),
             'start_timestamp': datetime.now().isoformat(),
             'status': 'running',

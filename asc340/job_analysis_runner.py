@@ -83,21 +83,6 @@ def submit_and_monitor_asc340_job(
         
         logger.info(f"✓ Analysis record created with database ID: {db_analysis_id}")
         
-        # Start analysis tracking in session state (for UI blocking)
-        ui_analysis_id = analysis_manager.start_analysis({
-            'asc_standard': 'ASC 340-40',
-            'total_words': total_words,
-            'file_count': allowance_result['file_count'],
-            'tier_info': allowance_result.get('tier_info', {}),
-            'cost_charged': allowance_result.get('cost_charged', 0.0)
-        })
-        
-        # Store analysis IDs in session state for tracking across navigation
-        st.session_state['current_ui_analysis_id'] = ui_analysis_id
-        st.session_state['current_db_analysis_id'] = db_analysis_id
-        
-        logger.info(f"✓ Started analysis tracking: UI ID={ui_analysis_id}, DB ID={db_analysis_id}")
-        
         # Submit job to Redis queue with service token (not user token)
         # Service token is long-lived (24h) to prevent expiration during analysis
         try:
@@ -119,9 +104,25 @@ def submit_and_monitor_asc340_job(
         except Exception as e:
             logger.error(f"Failed to submit job: {str(e)}")
             st.error(f"❌ Failed to submit analysis job: {str(e)}")
-            # Clear analysis tracking on submission failure
-            analysis_manager.clear_active_analysis()
             return
+        
+        # Start analysis tracking in session state (for UI blocking and resume polling)
+        # This must happen AFTER job submission so we have job_id
+        ui_analysis_id = analysis_manager.start_analysis({
+            'asc_standard': 'ASC 340-40',
+            'total_words': total_words,
+            'file_count': allowance_result['file_count'],
+            'tier_info': allowance_result.get('tier_info', {}),
+            'cost_charged': allowance_result.get('cost_charged', 0.0),
+            'job_id': job_id,  # Store for resume polling
+            'db_analysis_id': db_analysis_id  # Store database ID
+        })
+        
+        # Store analysis IDs in session state for tracking across navigation
+        st.session_state['current_ui_analysis_id'] = ui_analysis_id
+        st.session_state['current_db_analysis_id'] = db_analysis_id
+        
+        logger.info(f"✓ Started analysis tracking: UI ID={ui_analysis_id}, DB ID={db_analysis_id}, Job ID={job_id}")
         
         # Poll for job completion
         st.markdown("### 🔄 Analysis Progress")
