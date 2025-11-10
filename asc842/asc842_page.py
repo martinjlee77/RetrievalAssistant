@@ -190,6 +190,10 @@ def render_asc842_page():
     # File uploader key initialization (for clearing file uploads)
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
+
+    # Resume polling hook - check if there's an active analysis that needs monitoring
+    from shared.job_progress_monitor import check_and_resume_polling
+    check_and_resume_polling(asc_standard='ASC 842', session_id=st.session_state.user_session_id)
     
     # Check for analysis to auto-load (URL parameter or recent analysis)
     loaded, source, timestamp = check_for_analysis_to_load()
