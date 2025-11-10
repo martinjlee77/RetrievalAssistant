@@ -3,6 +3,11 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
+## Recent Changes (November 10, 2025)
+1. **ASC 842 Subscription Migration Completed**: Fully migrated ASC 842 from legacy credit-based pricing to subscription model with word allowances. Removed all `tier_info` and `pricing_result` references in favor of `allowance_result`.
+2. **Session Key Standardization**: Fixed session key prefix mapping in `shared/job_progress_monitor.py` to match page file conventions, resolving blank page issues after analysis completion (ASC 340-40: `asc340` not `asc34040`).
+3. **Resume Polling Enhancement**: All 5 ASC standards now use standardized session key prefixes for reliable memo retrieval after background job completion.
+
 ## User Preferences
 - **Communication Style**: Simple, everyday language for technical explanations
 - **Business Focus**: Enterprise-grade professional service targeting Big 4 and large enterprise teams

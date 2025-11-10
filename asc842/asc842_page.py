@@ -298,8 +298,8 @@ def render_asc842_page():
     with upload_form_container.container():
         uploaded_files, additional_context, is_ready = get_asc842_inputs_new()
 
-    # Process files when uploaded - extract, de-identify, and price
-    pricing_result = None
+    # Process files when uploaded - extract, de-identify, and check allowance
+    allowance_result = None
     processing_container = st.empty()
     pricing_container = st.empty()
     
@@ -430,9 +430,6 @@ def render_asc842_page():
                 user_token=user_token,
                 total_words=word_count
             )
-            
-            # Store as pricing_result for backwards compatibility
-            pricing_result = allowance_result
 
             # Always show allowance information (not just when there's a warning)
             with pricing_container.container():
@@ -465,7 +462,7 @@ def render_asc842_page():
                         st.markdown(f"[View Dashboard to Upgrade →]({allowance_result['upgrade_link']})")
 
     # Subscription allowance flow (only proceed if allowance check passed)
-    if is_ready and pricing_result and pricing_result.get('can_proceed'):
+    if is_ready and allowance_result and allowance_result.get('can_proceed'):
         # Subscription system - no credit checks needed
         user_token = auth_manager.get_auth_token()
         if not user_token:
@@ -500,7 +497,7 @@ def render_asc842_page():
                     final_text = deidentify_result['text']
                     uploaded_filenames = [f.name for f in uploaded_files] if uploaded_files else []
                     perform_asc842_analysis_new(
-                        pricing_result, 
+                        allowance_result, 
                         additional_context, 
                         user_token,
                         cached_combined_text=final_text,
@@ -508,7 +505,7 @@ def render_asc842_page():
                     )
                 else:
                     # Fallback to original flow if no cached text
-                    perform_asc842_analysis_new(pricing_result, additional_context, user_token)
+                    perform_asc842_analysis_new(allowance_result, additional_context, user_token)
         else:
             st.button("3️⃣ Insufficient Credits", 
                      disabled=True, 
@@ -642,7 +639,7 @@ def _upload_and_process_asc842():
         return None, None
 
 
-def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, user_token: str, cached_combined_text: str = None, uploaded_filenames: list = None):
+def perform_asc842_analysis_new(allowance_result: dict, additional_context: str, user_token: str, cached_combined_text: str = None, uploaded_filenames: list = None):
     """Perform the complete ASC 842 analysis using new file processing system."""
     
     # Session isolation - create unique session ID for this user
@@ -660,28 +657,24 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
         st.session_state[analysis_key] = False
     
     try:
-        # Process billing using wallet manager (like ASC 340-40)
-        required_price = pricing_result['tier_info']['price']
+        # Subscription model - no upfront billing required
         analysis_details = {
             'asc_standard': 'ASC 842',
-            'total_words': pricing_result.get('total_words', 0),
-            'file_count': pricing_result.get('file_count', 0),
-            'tier_info': pricing_result['tier_info'],
-            'cost_charged': pricing_result['tier_info']['price']
+            'total_words': allowance_result.get('total_words', 0),
+            'file_count': allowance_result.get('file_count', 0),
+            'cost_charged': 0.0  # Subscription model - word deduction handled by backend
         }
-        
-        # Payment will be processed when analysis completes (no upfront charging)
         
         # Use cached text if available, otherwise extract from file details
         if cached_combined_text:
             combined_text = cached_combined_text
             filename_string = ", ".join(uploaded_filenames) if uploaded_filenames else "lease_contract.txt"
         else:
-            # Extract combined text from file details (like ASC 340-40)
+            # Extract combined text from file details
             combined_text = ""
             filename_list = []
             
-            for file_detail in pricing_result.get('file_details', []):
+            for file_detail in allowance_result.get('file_details', []):
                 if 'text_content' in file_detail and file_detail['text_content'].strip():
                     combined_text += f"\n\n=== {file_detail['filename']} ===\n\n{file_detail['text_content']}"
                     filename_list.append(file_detail['filename'])
@@ -697,13 +690,13 @@ def perform_asc842_analysis_new(pricing_result: dict, additional_context: str, u
             uploaded_filenames = filename_list if 'filename_list' in locals() else []
         
         # Proceed with background job submission
-        perform_asc842_analysis(combined_text, additional_context, pricing_result, uploaded_filenames)
+        perform_asc842_analysis(combined_text, additional_context, allowance_result, uploaded_filenames)
         
     except Exception as e:
         logger.error(f"ASC 842 analysis error for session {session_id[:8]}: {str(e)}")
         st.error("❌ Analysis failed. Please try again. Contact support if this issue persists.")
 
-def perform_asc842_analysis(contract_text: str, additional_context: str, pricing_result: Dict[str, Any], uploaded_filenames: List[str]):
+def perform_asc842_analysis(contract_text: str, additional_context: str, allowance_result: Dict[str, Any], uploaded_filenames: List[str]):
     """Perform ASC 842 analysis with background job processing."""
     
     # Session isolation - create unique session ID for this user
@@ -725,18 +718,18 @@ def perform_asc842_analysis(contract_text: str, additional_context: str, pricing
     user_data = st.session_state.get('user_data', {})
     org_id = user_data.get('org_id')
     
-    # Add file_count to pricing_result (needed by job submission)
-    pricing_result['file_count'] = len(uploaded_filenames) if uploaded_filenames else 0
+    # Add file_count to allowance_result (needed by job submission)
+    allowance_result['file_count'] = len(uploaded_filenames) if uploaded_filenames else 0
     
     submit_and_monitor_asc842_job(
-        allowance_result=pricing_result,
+        allowance_result=allowance_result,
         additional_context=additional_context,
         user_token=user_token,
         cached_combined_text=contract_text,
         uploaded_filenames=uploaded_filenames,
         session_id=session_id,
         org_id=org_id,
-        total_words=pricing_result['total_words']
+        total_words=allowance_result['total_words']
     )
 
 
