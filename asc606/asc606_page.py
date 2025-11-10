@@ -191,6 +191,10 @@ def render_asc606_page():
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
 
+    # Resume polling hook - check if there's an active analysis that needs monitoring
+    from shared.job_progress_monitor import check_and_resume_polling
+    check_and_resume_polling(asc_standard='ASC 606', session_id=st.session_state.user_session_id)
+
     # Page header
     st.title(":primary[ASC 606: Revenue Recognition]")
     with st.container(border=True):

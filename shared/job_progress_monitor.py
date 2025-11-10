@@ -13,6 +13,54 @@ from shared.analysis_manager import analysis_manager
 
 logger = logging.getLogger(__name__)
 
+def check_and_resume_polling(asc_standard: str, session_id: str):
+    """
+    Check if there's an active analysis for this ASC standard and resume polling if needed
+    
+    Args:
+        asc_standard: ASC standard name (e.g., 'ASC 606')
+        session_id: Session ID for caching results
+    """
+    try:
+        # Get active analysis from analysis_manager
+        active_analysis = analysis_manager.get_active_analysis()
+        
+        if not active_analysis:
+            return  # No active analysis to resume
+        
+        # Check if the active analysis is for this ASC standard
+        if active_analysis.get('asc_standard') != asc_standard:
+            return  # Different ASC standard, don't resume here
+        
+        # Extract stored polling information
+        job_id = active_analysis.get('job_id')
+        db_analysis_id = active_analysis.get('db_analysis_id')
+        service_token = active_analysis.get('service_token')
+        
+        if not job_id or not db_analysis_id:
+            logger.warning(f"Active analysis missing job_id or db_analysis_id: {active_analysis}")
+            return
+        
+        logger.info(f"📌 Resume polling: ASC={asc_standard}, job_id={job_id}, db_analysis_id={db_analysis_id}")
+        
+        # Get user token from session (fallback to service_token if user not logged in)
+        user_token = st.session_state.get('user_data', {}).get('auth_token', service_token)
+        
+        # Resume polling by calling monitor_job_progress
+        monitor_job_progress(
+            asc_standard=asc_standard,
+            job_id=job_id,
+            db_analysis_id=db_analysis_id,
+            session_id=session_id,
+            user_token=user_token,
+            service_token=service_token
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in check_and_resume_polling: {str(e)}")
+        # Don't show error to user - just log it and continue page rendering
+
+
 def monitor_job_progress(
     asc_standard: str,
     job_id: str,
