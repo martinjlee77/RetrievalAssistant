@@ -4691,12 +4691,48 @@ def verify_and_process_upgrade():
                 return jsonify({'error': 'Plan not found in database'}), 400
             plan_id = plan_row['id']
             
-            # Cancel existing active/trial subscription for this org
+            # Find and cancel existing active/trial subscription (always cancel, even if usage missing)
             cursor.execute("""
-                UPDATE subscription_instances
-                SET status = 'cancelled', updated_at = NOW()
-                WHERE org_id = %s AND status IN ('active', 'trial')
+                SELECT si.id, sp.plan_key
+                FROM subscription_instances si
+                JOIN subscription_plans sp ON si.plan_id = sp.id
+                WHERE si.org_id = %s AND si.status IN ('active', 'trial')
+                ORDER BY si.created_at DESC
+                LIMIT 1
             """, (org_id,))
+            
+            old_sub = cursor.fetchone()
+            old_sub_id = old_sub['id'] if old_sub else None
+            old_plan_key = old_sub['plan_key'] if old_sub else None
+            
+            # Get usage data for rollover calculation (separate query, won't block cancellation)
+            rollover_words = 0
+            if old_sub_id and plan_key == 'team' and old_plan_key == 'professional':
+                cursor.execute("""
+                    SELECT word_allowance, words_used
+                    FROM subscription_usage
+                    WHERE subscription_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 1
+                """, (old_sub_id,))
+                
+                old_usage = cursor.fetchone()
+                if old_usage:
+                    prev_allowance = old_usage['word_allowance']
+                    prev_used = old_usage['words_used']
+                    rollover_words = max(0, prev_allowance - prev_used)
+                    logger.info(f"Pro→Team rollover: {rollover_words} words will carry over (used {prev_used}/{prev_allowance})")
+            
+            # Always cancel old subscription (prevents duplicate active subscriptions)
+            if old_sub_id:
+                cursor.execute("""
+                    UPDATE subscription_instances
+                    SET status = 'cancelled', updated_at = NOW()
+                    WHERE id = %s
+                """, (old_sub_id,))
+                logger.info(f"Cancelled old subscription {old_sub_id}")
+            
+            # PRESERVE historical usage data - do NOT delete old usage records
             
             # Create new subscription instance
             # Safely extract period timestamps with null checks
@@ -4723,30 +4759,18 @@ def verify_and_process_upgrade():
             
             new_sub_id = cursor.fetchone()['id']
             
-            # Create subscription_usage record with monthly allowance
-            # Use first day of current month (not exact upgrade date)
-            today = date.today()
-            month_start = today.replace(day=1)
-            # Calculate last day of current month
-            if today.month == 12:
-                month_end = date(today.year + 1, 1, 1) - timedelta(days=1)
-            else:
-                month_end = date(today.year, today.month + 1, 1) - timedelta(days=1)
+            # Create usage record aligned with Stripe billing period (matches create_usage_record logic)
+            base_allowance = plan['word_allowance']
+            total_allowance = base_allowance + rollover_words
+            month_start = current_period_start.date()
+            month_end = current_period_end.date()
             
-            # Delete any existing usage records for this month (handles mid-month upgrades)
-            cursor.execute("""
-                DELETE FROM subscription_usage
-                WHERE org_id = %s AND month_start = %s
-            """, (org_id, month_start))
-            
-            # Insert new usage record with current plan allowance
             cursor.execute("""
                 INSERT INTO subscription_usage
                 (subscription_id, org_id, month_start, month_end, 
                  word_allowance, words_used, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, 0, NOW(), NOW())
-            """, (new_sub_id, org_id, month_start, month_end, 
-                  plan['word_allowance']))
+            """, (new_sub_id, org_id, month_start, month_end, total_allowance))
             
             # Update organization with Stripe customer ID
             cursor.execute("""
