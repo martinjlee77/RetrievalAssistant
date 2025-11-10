@@ -88,6 +88,7 @@ class AnalysisManager:
             'cost_charged': analysis_details.get('cost_charged', 0.0),
             'job_id': analysis_details.get('job_id'),  # Store job_id for resume polling
             'db_analysis_id': analysis_details.get('db_analysis_id'),  # Store database ID
+            'service_token': analysis_details.get('service_token'),  # Store long-lived token for worker
             'start_time': time.time(),
             'start_timestamp': datetime.now().isoformat(),
             'status': 'running',
