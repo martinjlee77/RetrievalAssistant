@@ -284,15 +284,26 @@ def show_user_sidebar(auth_manager: AuthManager):
         # User info
         st.markdown(f"Logged in as {user_data['first_name']} {user_data['last_name']}")
         st.markdown(f"{user_data['company_name']}")
-        # st.text(user_data['email'])
+        
+        # Organization role badge
+        user_role = user_data.get('role', 'member')
+        if user_role == 'owner':
+            st.markdown("🔑 **Organization Owner**")
+        else:
+            st.markdown("👤 **Organization Member**")
+            owner_email = user_data.get('owner_email')
+            if owner_email:
+                st.caption(f"Contact {owner_email} to manage billing")
+        
+        st.divider()
               
         # Action buttons
         col1, col2 = st.columns(2)
         with col1:
-            st.link_button("My Account", f"{WEBSITE_URL}/dashboard.html", width="stretch")
+            st.link_button("My Account", f"{WEBSITE_URL}/dashboard.html", use_container_width=True)
         
         with col2:
-            if st.button("Logout", width="stretch"):
+            if st.button("Logout", use_container_width=True):
                 auth_manager.logout()
 
 def show_credits_warning(required_credits: float, auth_manager: AuthManager):
