@@ -521,20 +521,34 @@ function updateSubscriptionUI(data) {
     const usagePercent = wordsAllowed > 0 ? Math.min(100, (wordsUsed / wordsAllowed) * 100) : 0;
     
     // Update overview section subscription card
+    // Check if subscription period has expired
+    const periodEnd = new Date(sub.current_period_end);
+    const now = new Date();
+    const isPeriodExpired = periodEnd < now;
+    
     if (sub.status === 'trial') {
-        const daysLeft = Math.ceil((new Date(sub.trial_end_date) - new Date()) / (1000 * 60 * 60 * 24));
+        const daysLeft = Math.ceil((new Date(sub.trial_end_date) - now) / (1000 * 60 * 60 * 24));
         document.getElementById('planName').textContent = `${sub.plan_name} (Trial)`;
         document.getElementById('planStatus').textContent = `${daysLeft} days remaining`;
         document.getElementById('planStatus').className = 'plan-status trial';
         
         const trialEnd = new Date(sub.trial_end_date).toLocaleDateString();
         document.getElementById('renewalInfo').textContent = `Trial ends ${trialEnd}`;
+    } else if (sub.status === 'active' && sub.cancel_at_period_end) {
+        // Subscription is active but will cancel at period end
+        const daysLeft = Math.ceil((periodEnd - now) / (1000 * 60 * 60 * 24));
+        document.getElementById('planName').textContent = sub.plan_name;
+        document.getElementById('planStatus').textContent = `Cancelling - ${daysLeft} days left`;
+        document.getElementById('planStatus').className = 'plan-status cancelling';
+        
+        const endsDate = periodEnd.toLocaleDateString();
+        document.getElementById('renewalInfo').textContent = `Access ends ${endsDate}`;
     } else if (sub.status === 'active') {
         document.getElementById('planName').textContent = sub.plan_name;
         document.getElementById('planStatus').textContent = 'Active';
         document.getElementById('planStatus').className = 'plan-status active';
         
-        const nextBilling = new Date(sub.current_period_end).toLocaleDateString();
+        const nextBilling = periodEnd.toLocaleDateString();
         document.getElementById('renewalInfo').textContent = `Next billing: ${nextBilling}`;
     } else if (sub.status === 'past_due') {
         document.getElementById('planName').textContent = sub.plan_name;
@@ -542,12 +556,19 @@ function updateSubscriptionUI(data) {
         document.getElementById('planStatus').className = 'plan-status past-due';
         
         document.getElementById('renewalInfo').textContent = 'Please update payment method';
-    } else if (sub.status === 'canceled') {
+    } else if (sub.status === 'cancelled' || sub.status === 'expired') {
+        // Fully cancelled or expired subscription
         document.getElementById('planName').textContent = sub.plan_name;
-        const endsDate = new Date(sub.current_period_end).toLocaleDateString();
-        document.getElementById('planStatus').textContent = 'Canceled';
-        document.getElementById('planStatus').className = 'plan-status canceled';
-        document.getElementById('renewalInfo').textContent = `Access ends ${endsDate}`;
+        if (isPeriodExpired) {
+            document.getElementById('planStatus').textContent = 'Expired';
+            document.getElementById('planStatus').className = 'plan-status expired';
+            document.getElementById('renewalInfo').textContent = 'Subscription ended - Please resubscribe';
+        } else {
+            const daysLeft = Math.ceil((periodEnd - now) / (1000 * 60 * 60 * 24));
+            document.getElementById('planStatus').textContent = `Cancelled - ${daysLeft} days left`;
+            document.getElementById('planStatus').className = 'plan-status cancelled';
+            document.getElementById('renewalInfo').textContent = `Access ends ${periodEnd.toLocaleDateString()}`;
+        }
     }
     
     // Update word allowance display in overview
