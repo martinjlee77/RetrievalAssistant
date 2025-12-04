@@ -59,8 +59,15 @@ class SubscriptionManager:
                 FROM subscription_instances si
                 JOIN subscription_plans sp ON si.plan_id = sp.id
                 WHERE si.org_id = %s 
-                AND si.status IN ('active', 'trial', 'past_due')
-                ORDER BY si.created_at DESC
+                AND si.status IN ('active', 'trial', 'past_due', 'cancelled')
+                ORDER BY 
+                    CASE si.status 
+                        WHEN 'active' THEN 1 
+                        WHEN 'trial' THEN 2 
+                        WHEN 'past_due' THEN 3 
+                        WHEN 'cancelled' THEN 4 
+                    END,
+                    si.created_at DESC
                 LIMIT 1
             """, (org_id,))
             return cur.fetchone()
@@ -163,6 +170,27 @@ class SubscriptionManager:
                 'upgrade_needed': True,
                 'suggested_action': 'start_trial'
             }
+        
+        # Check if subscription is cancelled and period has expired
+        if usage['subscription_status'] == 'cancelled':
+            period_end = usage.get('current_period_end')
+            if period_end:
+                # Handle both datetime and date objects
+                if hasattr(period_end, 'date'):
+                    period_end_date = period_end.date()
+                else:
+                    period_end_date = period_end
+                
+                if date.today() > period_end_date:
+                    return {
+                        'allowed': False,
+                        'reason': 'Your subscription has expired. Please resubscribe to continue using the platform.',
+                        'words_available': 0,
+                        'upgrade_needed': True,
+                        'suggested_action': 'resubscribe'
+                    }
+            # If within the cancelled period, allow usage with remaining words
+            logger.info(f"Cancelled subscription for org {org_id} still within access period")
         
         if usage['subscription_status'] == 'past_due':
             return {
