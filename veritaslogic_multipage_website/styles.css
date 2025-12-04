@@ -2332,9 +2332,19 @@ html {
     color: #c62828;
 }
 
-.plan-status.canceled {
-    background: #f5f5f5;
-    color: #616161;
+.plan-status.cancelling {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.plan-status.cancelled {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+.plan-status.expired {
+    background: #ffebee;
+    color: #b71c1c;
 }
 
 .plan-status.inactive {
