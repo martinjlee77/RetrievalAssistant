@@ -914,7 +914,10 @@ def signup():
         # Get marketing opt-in preference (defaults to False if not provided)
         marketing_opt_in = data.get('marketing_opt_in', False)
         
-        # Extract UTM parameters for attribution tracking
+        # Extract source and UTM parameters for attribution tracking
+        signup_source = sanitize_string(data.get('source', 'direct'), 100)
+        landing_page = sanitize_string(data.get('landing_page', ''), 500)
+        
         utm_tracking = {}
         if data.get('utm_source'):
             utm_tracking['utm_source'] = sanitize_string(data.get('utm_source', ''), 100)
@@ -924,6 +927,10 @@ def signup():
             utm_tracking['utm_campaign'] = sanitize_string(data.get('utm_campaign', ''), 100)
         if data.get('plan'):
             utm_tracking['selected_plan'] = sanitize_string(data.get('plan', ''), 50)
+        
+        # Add source to utm_tracking for org settings
+        if signup_source and signup_source != 'direct':
+            utm_tracking['source'] = signup_source
         
         # Check if organization already exists for this domain
         cursor.execute("""
@@ -1001,6 +1008,22 @@ def signup():
         """, (email, first_name, last_name, job_title, org_id, user_role, password_hash, marketing_opt_in))
         
         user_id = cursor.fetchone()['id']
+        
+        # Record lead source for attribution tracking (for Microsoft AppSource, etc.)
+        cursor.execute("""
+            INSERT INTO lead_sources (
+                user_id, source, utm_source, utm_medium, utm_campaign, landing_page, created_at
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            user_id,
+            signup_source,
+            utm_tracking.get('utm_source'),
+            utm_tracking.get('utm_medium'),
+            utm_tracking.get('utm_campaign'),
+            landing_page
+        ))
+        logger.info(f"Lead source tracked for {email}: source={signup_source}")
         
         # Generate verification token
         verification_token = generate_verification_token()

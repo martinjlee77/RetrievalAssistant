@@ -423,13 +423,15 @@
             const submitButton = document.getElementById('submitButton');
             const messageContainer = document.getElementById('messageContainer');
             
-            // Extract UTM parameters from URL
+            // Extract source and UTM parameters from URL
             const urlParams = new URLSearchParams(window.location.search);
             const utmParams = {
+                source: urlParams.get('source') || 'direct',
                 utm_source: urlParams.get('utm_source') || null,
                 utm_medium: urlParams.get('utm_medium') || null,
                 utm_campaign: urlParams.get('utm_campaign') || null,
-                plan: urlParams.get('plan') || null
+                plan: urlParams.get('plan') || null,
+                landing_page: window.location.href
             };
             
             // Get form data
