@@ -4127,7 +4127,7 @@ def handle_subscription_updated(event, conn):
     stripe_sub_id = subscription['id']
     status = subscription['status']
     plan_key = subscription['metadata'].get('plan_key')
-    cancel_at_period_end = subscription.get('cancel_at_period_end', False)
+    cancel_at_period_end = bool(subscription.get('cancel_at_period_end', False))
     
     current_period_start = datetime.fromtimestamp(subscription['current_period_start'], tz=timezone.utc)
     current_period_end = datetime.fromtimestamp(subscription['current_period_end'], tz=timezone.utc)
@@ -4201,7 +4201,7 @@ def handle_subscription_updated(event, conn):
 
 
 def handle_subscription_deleted(event, conn):
-    """Handle subscription cancellation"""
+    """Handle subscription cancellation (immediate or at period end)"""
     subscription = event['data']['object']
     
     stripe_sub_id = subscription['id']
@@ -4210,9 +4210,12 @@ def handle_subscription_deleted(event, conn):
     
     logger.info(f"Cancelling subscription {stripe_sub_id}")
     
+    # When subscription is fully deleted, set status to cancelled and clear cancel_at_period_end
     cursor.execute("""
         UPDATE subscription_instances
-        SET status = 'cancelled', updated_at = NOW()
+        SET status = 'cancelled', 
+            cancel_at_period_end = false,
+            updated_at = NOW()
         WHERE stripe_subscription_id = %s
     """, (stripe_sub_id,))
     
