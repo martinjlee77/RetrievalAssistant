@@ -4127,13 +4127,14 @@ def handle_subscription_updated(event, conn):
     stripe_sub_id = subscription['id']
     status = subscription['status']
     plan_key = subscription['metadata'].get('plan_key')
+    cancel_at_period_end = subscription.get('cancel_at_period_end', False)
     
     current_period_start = datetime.fromtimestamp(subscription['current_period_start'], tz=timezone.utc)
     current_period_end = datetime.fromtimestamp(subscription['current_period_end'], tz=timezone.utc)
     
     cursor = conn.cursor()
     
-    logger.info(f"Updating subscription {stripe_sub_id}: status={status}")
+    logger.info(f"Updating subscription {stripe_sub_id}: status={status}, cancel_at_period_end={cancel_at_period_end}")
     
     # Look up plan ID if plan_key provided
     plan_id = None
@@ -4147,7 +4148,7 @@ def handle_subscription_updated(event, conn):
         if plan:
             plan_id = plan['id']
     
-    # Update subscription instance
+    # Update subscription instance including cancel_at_period_end
     if plan_id:
         cursor.execute("""
             UPDATE subscription_instances
@@ -4155,18 +4156,20 @@ def handle_subscription_updated(event, conn):
                 current_period_start = %s,
                 current_period_end = %s,
                 plan_id = %s,
+                cancel_at_period_end = %s,
                 updated_at = NOW()
             WHERE stripe_subscription_id = %s
-        """, (status, current_period_start, current_period_end, plan_id, stripe_sub_id))
+        """, (status, current_period_start, current_period_end, plan_id, cancel_at_period_end, stripe_sub_id))
     else:
         cursor.execute("""
             UPDATE subscription_instances
             SET status = %s,
                 current_period_start = %s,
                 current_period_end = %s,
+                cancel_at_period_end = %s,
                 updated_at = NOW()
             WHERE stripe_subscription_id = %s
-        """, (status, current_period_start, current_period_end, stripe_sub_id))
+        """, (status, current_period_start, current_period_end, cancel_at_period_end, stripe_sub_id))
     
     if cursor.rowcount == 0:
         logger.warning(f"No subscription found for Stripe subscription {stripe_sub_id}")
