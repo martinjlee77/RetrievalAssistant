@@ -12,10 +12,10 @@ SUBSCRIPTION_PLANS = {
         'name': 'Professional',
         'description': 'For individual accounting professionals',
         'price_monthly': 295.00,
-        'word_allowance': 15000,
+        'word_allowance': 150000,
         'seats': 1,
         'features': [
-            'Up to 15,000 words per user per month, granted upfront',
+            '150,000 words per month',
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'DOCX and PDF memo export',
             'Priority email support',
@@ -30,10 +30,10 @@ SUBSCRIPTION_PLANS = {
         'name': 'Team',
         'description': 'For technical accounting teams and small firms',
         'price_monthly': 595.00,
-        'word_allowance': 35000,
+        'word_allowance': 400000,
         'seats': 1,
         'features': [
-            'Up to 35,000 words per user per month, granted upfront',
+            '400,000 words per month',
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
@@ -49,10 +49,10 @@ SUBSCRIPTION_PLANS = {
         'name': 'Enterprise',
         'description': 'For large enterprises',
         'price_monthly': 1195.00,
-        'word_allowance': 100000,
+        'word_allowance': 1000000,
         'seats': 1,
         'features': [
-            'Up to 100,000 words per user per month, granted upfront',
+            '1,000,000 words per month',
             'All ASC standards (606, 842, 718, 805, 340-40)',
             'Research Assistant with RAG-powered citations',
             'DOCX and PDF memo export',
@@ -68,7 +68,7 @@ SUBSCRIPTION_PLANS = {
 # Trial Configuration
 TRIAL_CONFIG = {
     'duration_days': 14,
-    'word_allowance': 9000,  # Enough for 1-2 typical analyses
+    'word_allowance': 20000,  # Enough for real-world contract analysis
     'requires_payment_method': True,
     'cancellation_policy': 'Cancel anytime during trial - no charge if canceled before trial ends'
 }
