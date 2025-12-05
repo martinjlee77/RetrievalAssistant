@@ -3,12 +3,15 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
-## Recent Changes (November 10, 2025)
-1. **ASC 842 Subscription Migration Completed**: Fully migrated ASC 842 from legacy credit-based pricing to subscription model with word allowances. Removed all `tier_info` and `pricing_result` references in favor of `allowance_result`.
-2. **Session Key Standardization**: Fixed session key prefix mapping in `shared/job_progress_monitor.py` to match page file conventions, resolving blank page issues after analysis completion (ASC 340-40: `asc340` not `asc34040`).
-3. **Resume Polling Enhancement**: All 5 ASC standards now use standardized session key prefixes for reliable memo retrieval after background job completion.
-4. **Dashboard Trial Features Fix**: Updated `dashboard.js` to display trial-specific features (9,000 words, no rollover) instead of showing active subscription features during trial period.
-5. **Legal Documents Updated**: Completely revised `privacy.html` and `terms.html` to reflect subscription model (Professional/Team/Enterprise tiers, monthly word allowances, 14-day trial, 12-month rollover, organization accounts, Stripe cancellation). Removed all outdated credit-based terminology (credits, $1K blocks, tier/cost, per-analysis deduction).
+## Recent Changes (December 5, 2025)
+1. **Major Pricing Update**: 10-20x increase in word allowances across all tiers:
+   - Trial: 9K → 20K words
+   - Professional: 15K → 150K words/month
+   - Team: 30K → 400K words/month
+   - Enterprise: 100K → 1M words/month
+2. **Updated All Pricing References**: pricing.html, signup.html, terms.html, privacy.html, dashboard.js, pricing_config.py, and database schema files now reflect new word allowances.
+3. **Enhanced Rollover Policy Language**: Terms now clearly state words are deducted on FIFO basis (oldest first) and expire 12 months from when earned.
+4. **Stripe Subscription Cancellation Fix**: `handle_subscription_updated` and `handle_subscription_deleted` webhooks now properly extract and save `cancel_at_period_end` from Stripe events.
 
 ## User Preferences
 - **Communication Style**: Simple, everyday language for technical explanations
@@ -47,7 +50,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Enterprise Web Platform**: Professional website with unified contact system, enterprise messaging, and sophisticated user account management.
 - **Dashboard System**: Comprehensive analysis history tracking with detailed metrics for enterprise reporting.
 - **Authentication Flow**: Secure user registration, login, and password recovery with unified professional styling.
-- **Subscription Model**: Three tiers (Professional $295/mo, Team $595/mo, Enterprise $1195/mo) with monthly word allowances (15K, 30K, 100K). 14-day trial with 9K words included. All tiers are single-user accounts (customers share login credentials).
+- **Subscription Model**: Three tiers (Professional $295/mo, Team $595/mo, Enterprise $1195/mo) with monthly word allowances (150K, 400K, 1M). 14-day trial with 20K words included. All tiers are single-user accounts (customers share login credentials). Unused words roll over for 12 months (FIFO deduction).
 - **Stripe Integration**: Subscription management with Customer Portal for upgrades, downgrades, payment updates, and invoice history.
 - **Responsive Design**: Professional mobile-first design with consistent Big 4 inspired color schemes and dark gradient styling.
 

@@ -235,9 +235,9 @@ CREATE INDEX IF NOT EXISTS idx_stripe_webhook_events_event_id ON stripe_webhook_
 -- ==========================================
 INSERT INTO subscription_plans (plan_key, name, price_monthly, word_allowance, seats, features)
 VALUES 
-    ('professional', 'Professional', 295.00, 15000, 1, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support"]'),
-    ('team', 'Team', 595.00, 30000, 3, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support", "Multi-user organization", "Audit logs"]'),
-    ('enterprise', 'Enterprise', 1195.00, 100000, 999, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Dedicated success manager", "Custom SLA", "Azure OpenAI option", "Unlimited internal viewers"]')
+    ('professional', 'Professional', 295.00, 150000, 1, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support", "12-month word rollover"]'),
+    ('team', 'Team', 595.00, 400000, 1, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Priority support", "12-month word rollover"]'),
+    ('enterprise', 'Enterprise', 1195.00, 1000000, 1, '["All ASC standards", "Research Assistant", "DOCX/PDF output", "Dedicated success manager", "Custom SLA", "12-month word rollover"]')
 ON CONFLICT (plan_key) DO UPDATE SET
     price_monthly = EXCLUDED.price_monthly,
     word_allowance = EXCLUDED.word_allowance,
@@ -251,5 +251,5 @@ DO $$
 BEGIN
     RAISE NOTICE 'VeritasLogic subscription database schema created successfully!';
     RAISE NOTICE 'Tables created: organizations, subscription_plans, subscription_instances, subscription_usage, users, analyses, lead_sources';
-    RAISE NOTICE 'Default plans: Professional ($295/15K), Team ($595/30K), Enterprise ($1195/100K)';
+    RAISE NOTICE 'Default plans: Professional ($295/150K), Team ($595/400K), Enterprise ($1195/1M)';
 END $$;
