@@ -639,7 +639,7 @@ function updateSubscriptionUI(data) {
         // Check if user is on trial - show trial-specific features
         if (sub.status === 'trial') {
             planFeatures = [
-                '9,000 words (trial period)',
+                '20,000 words (trial period)',
                 'All ASC standards',
                 'Standard support',
                 'Full platform access'
@@ -648,22 +648,22 @@ function updateSubscriptionUI(data) {
             // Active subscription - show plan-specific features
             const features = {
                 'professional': [
-                    '15,000 words/month',
+                    '150,000 words/month',
                     'All ASC standards',
                     'Standard support',
-                    'Rollover unused words'
+                    'Rollover unused words (12 months)'
                 ],
                 'team': [
-                    '30,000 words/month',
+                    '400,000 words/month',
                     'All ASC standards',
                     'Priority support',
-                    'Rollover unused words',
+                    'Rollover unused words (12 months)',
                 ],
                 'enterprise': [
-                    '100,000 words/month',
+                    '1,000,000 words/month',
                     'All ASC standards',
                     'Dedicated support',
-                    'Rollover unused words',
+                    'Rollover unused words (12 months)',
                 ]
             };
             
