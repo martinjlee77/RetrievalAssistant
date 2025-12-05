@@ -37,7 +37,7 @@ class ASC718StepAnalyzer:
         
         # Model selection based on configuration
         if self.use_premium_models:
-            self.main_model = "gpt-5"           # For 5-step analysis
+            self.main_model = "gpt-5.1"           # For 5-step analysis
             self.light_model = "gpt-5-mini"     # For summaries/background
         else:
             self.main_model = "gpt-4o"          # For 5-step analysis  
