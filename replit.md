@@ -14,7 +14,8 @@ VeritasLogic.ai is a premium enterprise AI platform for accounting firms and lar
    - Button text: "Analyze & Review"
    - **Phase 2**: Review comment generation comparing uploaded memo vs vLogic analysis
      - Helper functions: `_generate_review_comments()` and `_format_review_comments_section()`
-     - Categories: Missing Analysis, Different Conclusions, Documentation Gaps, Technical Accuracy, Formatting Suggestions
+     - Categories: Missing Analysis, Different Conclusions, Different Analysis (methodology/reasoning differences + technical accuracy), Documentation Gaps
+     - Full vLogic analysis content (not just summaries) used for comparison
      - Review comments appended to output memo as a dedicated section
    - **Phase 3 - Complete Separation of Analysis vs Review**:
      - Session state key separation: `review_asc606_*` prefix for reviews vs `asc606_*` for regular analyses

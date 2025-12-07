@@ -1004,54 +1004,79 @@ def _generate_review_comments(
     from shared.api_cost_tracker import track_openai_request
     import json
     
-    # Extract key conclusions from vLogic analysis
-    vlogic_conclusions = []
+    # Build comprehensive vLogic analysis content (full analysis, not just conclusions)
+    vlogic_full_analysis = []
+    
+    # Add executive summary and background if available
+    executive_summary = vlogic_analysis.get('executive_summary', '')
+    background = vlogic_analysis.get('background', '')
+    
+    if executive_summary:
+        vlogic_full_analysis.append(f"EXECUTIVE SUMMARY:\n{executive_summary}")
+    if background:
+        vlogic_full_analysis.append(f"BACKGROUND:\n{background}")
+    
+    # Extract FULL step content (analysis + conclusion, not just conclusion)
     for step_key, step_data in vlogic_analysis.get('steps', {}).items():
         if isinstance(step_data, dict):
+            step_content = []
+            step_content.append(f"\n--- {step_key.upper()} ---")
+            
+            # Include full analysis content
+            analysis = step_data.get('analysis', '')
+            if analysis:
+                step_content.append(f"Analysis:\n{analysis}")
+            
+            # Include conclusion
             conclusion = step_data.get('conclusion', '')
             if conclusion:
-                vlogic_conclusions.append(f"{step_key}: {conclusion}")
+                step_content.append(f"Conclusion:\n{conclusion}")
+            
+            # Include any guidance or citations referenced
+            guidance = step_data.get('guidance', '')
+            if guidance:
+                step_content.append(f"Guidance Referenced:\n{guidance}")
+            
+            if len(step_content) > 1:  # More than just the header
+                vlogic_full_analysis.append("\n".join(step_content))
     
-    vlogic_summary = "\n".join(vlogic_conclusions)
-    executive_summary = vlogic_analysis.get('executive_summary', '')
+    # Add final conclusion
     final_conclusion = vlogic_analysis.get('conclusion', '')
+    if final_conclusion:
+        vlogic_full_analysis.append(f"\nFINAL CONCLUSION:\n{final_conclusion}")
     
-    # Build the comparison prompt
+    vlogic_memo_content = "\n\n".join(vlogic_full_analysis)
+    
+    # Build the comparison prompt with full content
     messages = [
         {
             "role": "system",
             "content": f"""You are an expert technical accounting reviewer specializing in {asc_standard}. 
-Your task is to compare an existing memo prepared by someone else against an independent analysis.
-Provide constructive, professional review comments that will help improve the memo's quality and compliance."""
+Your task is to compare a user-prepared memo against vLogic's independent analysis of the same contract.
+Provide constructive, professional review comments that will help improve the memo's quality and compliance with {asc_standard}."""
         },
         {
             "role": "user",
-            "content": f"""Compare the following existing memo with our independent {asc_standard} analysis and generate review comments.
+            "content": f"""Compare the following user-provided memo with vLogic's independent {asc_standard} analysis and generate review comments.
 
-=== EXISTING MEMO TO REVIEW ===
-{uploaded_memo[:12000]}
+=== USER-PROVIDED MEMO TO REVIEW ===
+{uploaded_memo}
 
 === VLOGIC INDEPENDENT ANALYSIS ===
-Executive Summary: {executive_summary}
-
-Key Conclusions:
-{vlogic_summary}
-
-Final Conclusion: {final_conclusion}
+{vlogic_memo_content}
 
 === INSTRUCTIONS ===
-Generate structured review comments in the following categories. For each category, provide specific, actionable comments. If no issues in a category, say "No issues identified."
+Generate structured review comments in the following categories. For each category, provide specific, actionable comments referencing actual content from both documents. If no issues in a category, respond with ["No issues identified."]
 
 Respond with ONLY a JSON object in this exact format:
 {{
-    "missing_analysis": ["List of topics or analysis steps that appear in vLogic but are missing or inadequate in the existing memo"],
-    "different_conclusions": ["List of areas where conclusions differ between the memos, with explanation"],
-    "documentation_gaps": ["List of areas where the existing memo lacks sufficient documentation, citations, or supporting evidence"],
-    "technical_accuracy": ["List of any technical accuracy concerns or areas needing clarification"],
-    "formatting_suggestions": ["List of formatting or presentation improvements"]
+    "missing_analysis": ["List of topics, analysis steps, or considerations that appear in vLogic's analysis but are missing or inadequately addressed in the user-provided memo"],
+    "different_conclusions": ["List of areas where the final conclusions differ between the memos, with explanation of the discrepancy"],
+    "different_analysis": ["List of areas where the analytical reasoning, methodology, or technical approach differs between the memos, even if conclusions are similar. Include any technical accuracy concerns."],
+    "documentation_gaps": ["List of areas where the user-provided memo lacks sufficient documentation, citations to authoritative guidance, or supporting evidence compared to vLogic's analysis"]
 }}
 
-Be specific and reference actual content from both memos. Focus on substantive issues rather than stylistic preferences."""
+Focus on substantive accounting and compliance issues. Be specific and reference actual content from both documents."""
         }
     ]
     
@@ -1100,9 +1125,8 @@ def _format_review_comments_section(review_comments: Dict[str, list], memo_filen
     section_titles = {
         "missing_analysis": "Missing or Incomplete Analysis",
         "different_conclusions": "Areas with Different Conclusions",
+        "different_analysis": "Differences in Analytical Approach",
         "documentation_gaps": "Documentation Gaps",
-        "technical_accuracy": "Technical Accuracy Concerns",
-        "formatting_suggestions": "Formatting & Presentation Suggestions",
         "error": "Review Notes"
     }
     
