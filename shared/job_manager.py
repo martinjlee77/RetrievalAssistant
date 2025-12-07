@@ -78,12 +78,16 @@ class JobManager:
                 'ASC 718': run_asc718_analysis,
                 'ASC 805': run_asc805_analysis,
                 'ASC 340-40': run_asc340_analysis,
-                'MEMO_REVIEW': run_memo_review_analysis
             }
             
-            worker_function = worker_map.get(asc_standard)
-            if not worker_function:
-                raise ValueError(f"Unknown ASC standard: {asc_standard}")
+            # If source_memo_text is provided, this is a memo review job
+            if source_memo_text:
+                worker_function = run_memo_review_analysis
+                logger.info(f"Routing to memo review worker for {asc_standard}")
+            else:
+                worker_function = worker_map.get(asc_standard)
+                if not worker_function:
+                    raise ValueError(f"Unknown ASC standard: {asc_standard}")
             
             job_data = {
                 'analysis_id': analysis_id,

@@ -1,0 +1,18 @@
+You reached the start of the range
+Dec 7, 2025, 9:05 AM
+Starting Container
+  URL: http://0.0.0.0:8080
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.

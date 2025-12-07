@@ -83,7 +83,7 @@ def submit_and_monitor_memo_review_job(
         
         try:
             job_id = job_manager.submit_analysis_job(
-                asc_standard='MEMO_REVIEW',
+                asc_standard=asc_standard,
                 analysis_id=db_analysis_id,
                 user_id=user_id,
                 user_token=service_token,

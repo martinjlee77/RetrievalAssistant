@@ -1,0 +1,36 @@
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+INFO:shared.job_manager:✓ Job submitted for MEMO_REVIEW: 100 (analysis 100)
+INFO:pages.memo_review_job_runner:Memo Review job submitted: 100
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-12-07T14:14:23.911161", "analysis_id": "92feb99e", "asc_standard": "ASC 606", "total_words": 9505, "file_count": 1, "tier": null, "cost": 0.0, "user_id": 19, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis 92feb99e: ASC 606 - 9505 words
+INFO:pages.memo_review_job_runner:Started Memo Review analysis tracking: UI ID=92feb99e, DB ID=100, Job ID=100
+INFO:shared.job_progress_monitor:Job 100 status: JobStatus.QUEUED
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: 92feb99e
+ERROR:shared.job_progress_monitor:Job 100 failed: Traceback (most recent call last):
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-12-07T14:14:34.198124", "analysis_id": "92feb99e", "asc_standard": "ASC 606", "total_words": 9505, "file_count": 1, "tier": null, "cost": 0.0, "user_id": 19, "status": "failed", "success": false, "duration": 10.019304990768433, "error": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.11/site-packages/rq/worker.py\", line 1439, in perform_job\n    return_value = job.perform()\n                   ^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1318, in perform\n    self._result = self._execute()\n                   ^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1376, in _execute\n    result = self.func(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/workers/analysis_worker.py\", line 1211, in run_memo_review_analysis\n    raise ValueError(f\"Unsupported ASC standard for memo review: {asc_standard}\")\nValueError: Unsupported ASC standard for memo review: MEMO_REVIEW\n"}
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1439, in perform_job
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+INFO:shared.job_progress_monitor:Job 100 status: JobStatus.FAILED
+    self._result = self._execute()
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/workers/analysis_worker.py", line 1211, in run_memo_review_analysis
+    raise ValueError(f"Unsupported ASC standard for memo review: {asc_standard}")
+ValueError: Unsupported ASC standard for memo review: MEMO_REVIEW
+INFO:shared.analysis_manager:💾 Saving analysis record: 92feb99e
+INFO:shared.analysis_manager:Completed analysis 92feb99e: failed - 10.0s
