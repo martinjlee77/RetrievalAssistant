@@ -1,0 +1,110 @@
+You reached the start of the range
+Dec 7, 2025, 6:26 PM
+Starting Container
+Collecting usage statistics. To deactivate, set browser.gatherUsageStats to false.
+  You can now view your Streamlit app in your browser.
+  URL: http://0.0.0.0:8080
+Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'LYNX FINHEALTH, INC.' (normalized: 'LYNX FINHEALTH, INC.') not found in contract text
+Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'LYNX FINHEALTH, INC.' (normalized: 'LYNX FINHEALTH, INC.') not found in contract text
+INFO:shared.job_manager:Routing to memo review worker for ASC 606
+INFO:shared.job_manager:✓ Job submitted for ASC 606: 123 (analysis 123)
+INFO:pages.memo_review_job_runner:Memo Review job submitted: 123
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-12-07T23:28:28.399798", "analysis_id": "f80bd7d7", "asc_standard": "ASC 606", "total_words": 58961, "file_count": 4, "tier": null, "cost": 0.0, "user_id": 20, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis f80bd7d7: ASC 606 - 58961 words
+INFO:pages.memo_review_job_runner:Started Memo Review analysis tracking: UI ID=f80bd7d7, DB ID=123, Job ID=123
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.QUEUED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:shared.job_progress_monitor:Job 123 status: JobStatus.STARTED
+INFO:__main__:Memo Review page load - session_id: 80fb4018
+INFO:shared.job_progress_monitor:Skipping resume: analysis_type mismatch (active=standard, requested=review)
+INFO:__main__:Checking ASC 606: analysis_key=review_asc606_analysis_complete_80fb4018-6887-48ff-83f0-ae570d37a96f, has_key=False
+INFO:__main__:Checking ASC 340-40: analysis_key=review_asc340_analysis_complete_80fb4018-6887-48ff-83f0-ae570d37a96f, has_key=False
+INFO:__main__:Checking ASC 718: analysis_key=review_asc718_analysis_complete_80fb4018-6887-48ff-83f0-ae570d37a96f, has_key=False
+INFO:__main__:Checking ASC 805: analysis_key=review_asc805_analysis_complete_80fb4018-6887-48ff-83f0-ae570d37a96f, has_key=False
+INFO:__main__:Checking ASC 842: analysis_key=review_asc842_analysis_complete_80fb4018-6887-48ff-83f0-ae570d37a96f, has_key=False
+INFO:utils.document_extractor:📄 Processing document: MSA - Priority Health.docx (0.26 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 27233 words (~91 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: MSA Amendment 1_ 11-17-25.docx (0.03 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 2164 words (~7 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: PH Order 2 Medicare Rewards.docx (0.08 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 7416 words (~25 pages) via python-docx
+INFO:utils.document_extractor:📄 Processing document: SOW - Priority Health.docx (0.27 MB)
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 17200 words (~57 pages) via python-docx
+INFO:asc606.step_analyzer:🤖 Using GPT-5 for main analysis, GPT-5-mini for light tasks
+INFO:asc606.step_analyzer:🔒 Extracting both party names for de-identification...
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+WARNING:shared.api_cost_tracker:Failed to get encoding for model gpt-5-mini, using default: 'Could not automatically map gpt-5-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+INFO:shared.api_cost_tracker:API Cost - Model: gpt-5-mini, Input tokens: 1099, Output tokens: 21, Cost: $0.0012
+INFO:shared.api_cost_tracker:Tracked party_extraction request: $0.0012 (Total: $0.0012)
+INFO:asc606.step_analyzer:Raw LLM response for party extraction: {"vendor": "LYNX FINHEALTH, INC.", "customer": "COREWELL HEALTH"}
+INFO:asc606.step_analyzer:✓ Parties extracted - Vendor: LYNX FINHEALTH, INC., Customer: COREWELL HEALTH
+INFO:asc606.step_analyzer:  → Also replaced vendor base name 'LYNX FINHEALTH' (6 occurrences)
+INFO:asc606.step_analyzer:  → Also replaced vendor alias 'Lynx' (155 occurrences)
+INFO:asc606.step_analyzer:  → Also replaced vendor alias 'Supplier' (964 occurrences)

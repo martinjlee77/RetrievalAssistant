@@ -1,0 +1,68 @@
+You reached the start of the range
+Dec 7, 2025, 6:26 PM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-12-07 23:27:32 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-12-07 23:27:32 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-12-07 23:27:32 +0000] [1] [INFO] Using worker: sync
+[2025-12-07 23:27:32 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-12-07 23:27:32 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-12-07 23:27:32 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-12-07 23:27:32 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxOTMyNTksInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIzOjI3OjM5LjkxNTk5MSJ9.7ddqOPoCBbq4_PWZ9OZ2aBKoXbIdFfykn7rw2fEMTSk
+100.64.0.2 - - [07/Dec/2025:23:27:39 +0000] "GET /analysis HTTP/1.1" 200 12173 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [07/Dec/2025:23:27:46 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 225 "-" "python-requests/2.31.0"
+100.64.0.4 - - [07/Dec/2025:23:28:27 +0000] "POST /api/analysis/create HTTP/1.1" 200 377 "-" "python-requests/2.31.0"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxOTM0ODAsInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIzOjMxOjIwLjkyMDI0NyJ9.IHzwIaJ7AjDC3LxX_J6q0e5w-hJJKLB3sShgQiDFk74
+100.64.0.2 - - [07/Dec/2025:23:31:20 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxOTM3ODAsInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIzOjM2OjIwLjg0MzU1NyJ9.B14xaJ1bLmBBpMVTbb8i4noxUxaJ4qJRlnQytwGb0NY
+100.64.0.4 - - [07/Dec/2025:23:36:20 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Analysis updated: 123, status: completed
+ERROR:shared.subscription_manager:Error deducting words for org 6: Usage record not found
+ERROR:backend_api:Word deduction failed for org 6, analysis 123: Usage record not found
+ERROR:backend_api:Failed to save analysis: Usage record not found
+INFO:backend_api:Analysis updated: 123, status: completed
+ERROR:shared.subscription_manager:Error deducting words for org 6: Usage record not found
+ERROR:backend_api:Word deduction failed for org 6, analysis 123: Usage record not found
+ERROR:backend_api:Failed to save analysis: Usage record not found
+ERROR:backend_api:Save analysis error: Usage record not found
+ERROR:backend_api:Save analysis error: Usage record not found
+100.64.0.5 - - [07/Dec/2025:23:41:13 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+100.64.0.5 - - [07/Dec/2025:23:41:12 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 123, status: completed
+ERROR:shared.subscription_manager:Error deducting words for org 6: Usage record not found
+ERROR:backend_api:Word deduction failed for org 6, analysis 123: Usage record not found
+ERROR:backend_api:Failed to save analysis: Usage record not found
+ERROR:backend_api:Save analysis error: Usage record not found
+100.64.0.3 - - [07/Dec/2025:23:41:15 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 123, status: completed
+ERROR:shared.subscription_manager:Error deducting words for org 6: Usage record not found
+ERROR:backend_api:Word deduction failed for org 6, analysis 123: Usage record not found
+ERROR:backend_api:Failed to save analysis: Usage record not found
+ERROR:backend_api:Save analysis error: Usage record not found
+100.64.0.3 - - [07/Dec/2025:23:41:19 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+100.64.0.3 - - [07/Dec/2025:23:41:28 +0000] "POST /api/analysis/save HTTP/1.1" 200 107 "-" "python-requests/2.31.0"
+ERROR:shared.subscription_manager:Error deducting words for org 6: Usage record not found
+ERROR:backend_api:Word deduction failed for org 6, analysis 123: Usage record not found
+INFO:backend_api:Analysis updated: 123, status: completed
+ERROR:backend_api:Failed to save analysis: Usage record not found
+ERROR:backend_api:Save analysis error: Usage record not found
+100.64.0.6 - - [07/Dec/2025:23:41:27 +0000] "POST /api/analysis/save HTTP/1.1" 500 36 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 123, status: failed
+INFO:backend_api:No billing applied (success=False, org_id=None, total_words=None)

@@ -248,22 +248,42 @@ class SubscriptionManager:
         if not subscription:
             raise ValueError("No active subscription found")
         
-        current_month_start = date.today().replace(day=1)
+        today = date.today()
         
         try:
             with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-                # Get current usage
+                # Get current usage - match billing period, not just calendar month
                 cur.execute("""
                     SELECT * FROM subscription_usage
                     WHERE org_id = %s 
                     AND subscription_id = %s
-                    AND month_start = %s
+                    AND month_start <= %s
+                    AND month_end >= %s
                     FOR UPDATE
-                """, (org_id, subscription['id'], current_month_start))
+                """, (org_id, subscription['id'], today, today))
                 
                 usage = cur.fetchone()
                 if not usage:
-                    raise ValueError("Usage record not found")
+                    # Create usage record if missing (handles mid-period upgrades)
+                    logger.info(f"Creating missing usage record for org {org_id} during deduction")
+                    usage = self._create_usage_record(
+                        org_id, 
+                        subscription['id'],
+                        subscription['word_allowance']
+                    )
+                    # Re-fetch with lock
+                    cur.execute("""
+                        SELECT * FROM subscription_usage
+                        WHERE org_id = %s 
+                        AND subscription_id = %s
+                        AND month_start <= %s
+                        AND month_end >= %s
+                        FOR UPDATE
+                    """, (org_id, subscription['id'], today, today))
+                    usage = cur.fetchone()
+                    
+                    if not usage:
+                        raise ValueError("Failed to create usage record")
                 
                 # Strategy: Deduct from current month allowance first, then rollover
                 remaining_to_deduct = words_used
