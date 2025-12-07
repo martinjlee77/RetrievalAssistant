@@ -120,6 +120,8 @@ CREATE TABLE IF NOT EXISTS analyses (
     duration_seconds INTEGER,
     file_count INTEGER,
     error_message TEXT,
+    analysis_type VARCHAR(50) DEFAULT 'standard',  -- 'standard' or 'review'
+    source_memo_filename VARCHAR(500),  -- Original memo filename for review analyses
     created_at TIMESTAMP DEFAULT NOW()
 );
 
