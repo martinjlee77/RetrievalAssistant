@@ -15,6 +15,12 @@ from shared.auth_utils import require_authentication, auth_manager, WEBSITE_URL
 from shared.subscription_manager import SubscriptionManager
 from utils.document_extractor import DocumentExtractor
 
+from asc606.step_analyzer import ASC606StepAnalyzer
+from asc340.step_analyzer import ASC340StepAnalyzer
+from asc842.step_analyzer import ASC842StepAnalyzer
+from asc718.step_analyzer import ASC718StepAnalyzer
+from asc805.step_analyzer import ASC805StepAnalyzer
+
 logger = logging.getLogger(__name__)
 
 ASC_STANDARDS = {
@@ -85,6 +91,52 @@ def extract_document_text(uploaded_file) -> Dict[str, Any]:
             'error': str(e),
             'text': '',
             'word_count': 0
+        }
+
+
+def get_analyzer_for_standard(standard_key: str):
+    """Get the appropriate analyzer based on ASC standard key."""
+    analyzers = {
+        'asc606': ASC606StepAnalyzer,
+        'asc340': ASC340StepAnalyzer,
+        'asc842': ASC842StepAnalyzer,
+        'asc718': ASC718StepAnalyzer,
+        'asc805': ASC805StepAnalyzer
+    }
+    analyzer_class = analyzers.get(standard_key, ASC606StepAnalyzer)
+    return analyzer_class()
+
+
+def deidentify_text(contract_text: str, standard_key: str) -> Dict[str, Any]:
+    """Apply de-identification to contract text using the appropriate analyzer."""
+    try:
+        analyzer = get_analyzer_for_standard(standard_key)
+        parties = analyzer.extract_contract_parties(contract_text)
+        vendor_name = parties.get('vendor')
+        customer_name = parties.get('customer')
+        
+        if not vendor_name and not customer_name:
+            return {
+                'success': False,
+                'text': contract_text,
+                'error': 'Could not identify contract parties',
+                'vendor_name': None,
+                'customer_name': None
+            }
+        
+        result = analyzer.deidentify_contract_text(contract_text, vendor_name, customer_name)
+        result['vendor_name'] = vendor_name
+        result['customer_name'] = customer_name
+        return result
+        
+    except Exception as e:
+        logger.error(f"De-identification error: {e}")
+        return {
+            'success': False,
+            'text': contract_text,
+            'error': str(e),
+            'vendor_name': None,
+            'customer_name': None
         }
 
 
@@ -189,10 +241,29 @@ def render_page():
             else:
                 st.error(f"❌ {uploaded_file.name}: {result.get('error', 'Failed to extract')}")
         
-        contract_text = "\n\n---\n\n".join(all_contract_text)
+        raw_contract_text = "\n\n---\n\n".join(all_contract_text)
         contract_word_count = total_words
         
         if contract_word_count > 0:
+            with st.spinner("Applying privacy protection..."):
+                deidentify_result = deidentify_text(raw_contract_text, standard_config['key'])
+            
+            if deidentify_result.get('success'):
+                contract_text = deidentify_result['text']
+                vendor_name = deidentify_result.get('vendor_name', 'Unknown')
+                customer_name = deidentify_result.get('customer_name', 'Unknown')
+                st.success("Privacy protection applied successfully")
+                
+                with st.container(border=True):
+                    st.markdown("**Party names replaced:**")
+                    if vendor_name:
+                        st.markdown(f"• Vendor: **\"{vendor_name}\"** → **\"the Company\"**")
+                    if customer_name:
+                        st.markdown(f"• Customer: **\"{customer_name}\"** → **\"the Customer\"**")
+            else:
+                contract_text = raw_contract_text
+                st.warning(f"Could not apply privacy protection: {deidentify_result.get('error', 'Unknown error')}. Proceeding with original text.")
+            
             with st.expander(f"View Contract Text ({contract_word_count:,} words)", expanded=False):
                 st.text_area("Contract content", contract_text[:5000] + ("..." if len(contract_text) > 5000 else ""), height=200, disabled=True)
     
