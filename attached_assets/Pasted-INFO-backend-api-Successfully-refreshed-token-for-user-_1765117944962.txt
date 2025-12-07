@@ -1,0 +1,30 @@
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2NTEzMjEyMSwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTItMDdUMTQ6Mjg6NDEuNTUwOTI1In0.CIlSWtwwrZuODw8lCy0pUuzhMd8YJHGYPeVDGxzRlYI
+100.64.0.2 - - [07/Dec/2025:14:28:41 +0000] "GET /analysis HTTP/1.1" 200 12184 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [07/Dec/2025:14:28:48 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 241 "-" "python-requests/2.31.0"
+100.64.0.4 - - [07/Dec/2025:14:29:02 +0000] "POST /api/analysis/create HTTP/1.1" 200 387 "-" "python-requests/2.31.0"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin.lee@veritaslogic.ai
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOSwiZW1haWwiOiJtYXJ0aW4ubGVlQHZlcml0YXNsb2dpYy5haSIsImV4cCI6MTc2NTEzMjE0OCwicHVycG9zZSI6ImFjY2VzcyIsImRvbWFpbiI6InZlcml0YXNsb2dpYy5haSIsImlzc3VlZF9hdCI6IjIwMjUtMTItMDdUMTQ6Mjk6MDguOTM0MTExIn0.w8VnA3aPKR8KqH52oCnzGXWO0hVibSdZqYNAgcFz7LM
+100.64.0.2 - - [07/Dec/2025:14:29:08 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Analysis updated: 106, status: completed
+INFO:shared.subscription_manager:Deducted 9505 words from org 5: 9505 from allowance, 0 from rollover
+INFO:backend_api:✓ Word deduction successful for org 5: 9505 words, breakdown: 9505 from allowance, 0 from rollover
+100.64.0.4 - - [07/Dec/2025:14:30:16 +0000] "POST /api/analysis/save HTTP/1.1" 200 107 "-" "python-requests/2.31.0"
+100.64.0.5 - - [07/Dec/2025:14:30:23 +0000] "GET /api/analysis/status/106 HTTP/1.1" 200 28122 "-" "python-requests/2.31.0"
+100.64.0.6 - - [07/Dec/2025:14:30:24 +0000] "GET /api/auth/validate-token HTTP/1.1" 200 241 "-" "python-requests/2.31.0"
+INFO:veritaslogic.backend:BACKEND: Starting analysis completion for user 19
+INFO:backend_api:Starting analysis completion for user 19
+INFO:veritaslogic.backend:BACKEND: Checking idempotency for key: manager_65c322f4_1765117743600
+INFO:backend_api:Checking idempotency for key: manager_65c322f4_1765117743600
+INFO:backend_api:Inserting analysis record for user 19 with status: completed
+INFO:backend_api:Analysis record created with ID: 107, status: completed
+INFO:shared.subscription_manager:Deducted 9505 words from org 5: 9505 from allowance, 0 from rollover
+INFO:backend_api:Successfully deducted 9505 words from org 5: 9505 from allowance, 0 from rollover
+INFO:backend_api:Committing transaction for analysis 107
+INFO:backend_api:Transaction committed successfully
+INFO:backend_api:Analysis completed for user 19: ASC 606, memo: 229dd799, words charged: 9505
+100.64.0.7 - - [07/Dec/2025:14:30:24 +0000] "POST /api/analysis/complete HTTP/1.1" 200 337 "-" "python-requests/2.31.0"

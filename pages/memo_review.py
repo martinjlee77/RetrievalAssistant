@@ -153,11 +153,69 @@ def deidentify_text(contract_text: str, standard_key: str) -> Dict[str, Any]:
         }
 
 
+def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
+    """Display completed memo review results."""
+    st.success("✅ **Memo Review Complete!** This AI-generated analysis requires review by qualified accounting professionals.")
+    
+    st.markdown(f"**Standard:** {asc_standard}")
+    
+    if memo_data.get('source_memo_filename'):
+        st.markdown(f"**Reviewed Memo:** {memo_data.get('source_memo_filename')}")
+    
+    st.markdown("---")
+    
+    memo_content = memo_data.get('memo_content', '')
+    if memo_content:
+        st.markdown(memo_content, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        st.subheader("💾 Save Your Review")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.download_button(
+                label="📄 Download as Word (.docx)",
+                data=memo_content.encode('utf-8'),
+                file_name=f"memo_review_{memo_data.get('memo_uuid', 'result')}.html",
+                mime="text/html",
+                use_container_width=True
+            )
+        with col2:
+            if st.button("🔄 Start New Review", type="secondary", use_container_width=True):
+                keys_to_clear = [k for k in st.session_state.keys() 
+                               if isinstance(k, str) and ('_analysis_complete_' in k or '_memo_data_' in k or 'memo_review' in k.lower())]
+                for key in keys_to_clear:
+                    del st.session_state[key]
+                st.rerun()
+    else:
+        st.error("Memo content not available")
+
+
 def render_page():
     """Main page rendering function."""
     
     if not require_authentication():
         return
+    
+    session_id = st.session_state.get('user_session_id', '')
+    
+    prefix_map = {
+        'ASC 606': 'asc606',
+        'ASC 340-40': 'asc340',
+        'ASC 718': 'asc718',
+        'ASC 805': 'asc805',
+        'ASC 842': 'asc842'
+    }
+    
+    for asc_standard, asc_prefix in prefix_map.items():
+        analysis_key = f'{asc_prefix}_analysis_complete_{session_id}'
+        memo_key = f'{asc_prefix}_memo_data_{session_id}'
+        
+        if st.session_state.get(analysis_key) and st.session_state.get(memo_key):
+            memo_data = st.session_state.get(memo_key, {})
+            st.title("Memo Review - Results")
+            display_completed_memo(memo_data, asc_standard)
+            return
     
     st.title("Memo Review")
     st.markdown("""
