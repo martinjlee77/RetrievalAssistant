@@ -128,7 +128,8 @@ def submit_and_monitor_memo_review_job(
             db_analysis_id=db_analysis_id,
             session_id=session_id,
             user_token=user_token,
-            service_token=service_token
+            service_token=service_token,
+            analysis_type='review'
         )
         
     except Exception as e:

@@ -67,7 +67,8 @@ def monitor_job_progress(
     db_analysis_id: int,
     session_id: str,
     user_token: str,
-    service_token: Optional[str] = None
+    service_token: Optional[str] = None,
+    analysis_type: str = 'standard'
 ):
     """
     Monitor analysis job progress and handle completion
@@ -79,6 +80,7 @@ def monitor_job_progress(
         session_id: Session ID for caching results
         user_token: User authentication token (or service token)
         service_token: Optional service token (if different from user_token)
+        analysis_type: Type of analysis ('standard' or 'review')
     """
     try:
         # Determine which token to use for API calls
@@ -97,9 +99,14 @@ def monitor_job_progress(
         
         # Poll for job completion
         st.markdown("### 🔄 Analysis Progress")
-        st.info("""
-        ✅ **Your analysis is running. Upon completion, the page will refresh with your memo.**
-        """)
+        if analysis_type == 'review':
+            st.info("""
+            ✅ **Your review is running. Upon completion, the page will refresh with your analysis and review comments.**
+            """)
+        else:
+            st.info("""
+            ✅ **Your analysis is running. Upon completion, the page will refresh with your memo.**
+            """)
         
         # Create progress display components
         progress_bar = st.progress(0)
