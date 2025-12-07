@@ -11,7 +11,7 @@ import os
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from shared.auth_utils import require_authentication, auth_manager
+from shared.auth_utils import require_authentication, auth_manager, WEBSITE_URL
 from shared.subscription_manager import SubscriptionManager
 from utils.document_extractor import DocumentExtractor
 
@@ -100,8 +100,8 @@ def render_page():
     st.divider()
     
     if not auth_manager.is_authenticated():
-        st.warning("🔒 Please log in to use Memo Review.")
-        st.markdown("[Log in to your account](https://www.veritaslogic.ai/login.html)")
+        st.warning("Please log in to use Memo Review.")
+        st.markdown(f"[Log in to your account]({WEBSITE_URL}/login.html)")
         return
     
     org_id = get_org_id_from_session()
