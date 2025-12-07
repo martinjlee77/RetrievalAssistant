@@ -393,7 +393,7 @@ def render_page():
     
     st.title("Memo Review")
     st.markdown("""
-    Compare an existing memo with what vLogic would produce for the same contract.
+    Compare an user provided memo with what vLogic would produce for the same contract.
     Upload the original contract and the memo you want to review.
     """)
     
@@ -453,14 +453,14 @@ def render_page():
         )
     
     with upload_col2:
-        st.markdown("**Existing Memo to Review**")
+        st.markdown("**User Memo to Review**")
         st.caption("The memo you want to compare against vLogic")
         memo_file = st.file_uploader(
-            "Upload existing memo",
+            "Upload your memo",
             type=['pdf', 'docx', 'doc', 'txt'],
             accept_multiple_files=False,
             key="memo_upload",
-            help="Upload the memo that was prepared by someone else"
+            help="Upload the memo that was prepared by someone else and needs to be reviewed"
         )
     
     contract_text = ""
@@ -516,7 +516,7 @@ def render_page():
     
     if memo_file:
         st.markdown("---")
-        st.markdown("**Existing Memo Preview**")
+        st.markdown("**User Memo Preview**")
         
         result = extract_document_text(memo_file)
         if result.get('success', False) or result.get('text'):
@@ -561,7 +561,7 @@ def render_page():
     if not contract_files:
         st.caption("Upload the source contract to continue")
     elif not memo_file:
-        st.caption("Upload the existing memo to compare")
+        st.caption("Upload your memo to compare")
     elif not can_proceed:
         st.caption("Please resolve the issues above to continue")
     else:
