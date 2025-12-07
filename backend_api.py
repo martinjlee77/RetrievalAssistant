@@ -4490,15 +4490,15 @@ def get_subscription_status():
                     'error': 'No subscription found'
                 }), 404
             
-            # Get current usage
-            current_month = date.today().replace(day=1)
+            # Get current usage - use subscription_id to get the correct record
+            # This handles mid-period upgrades where month_start differs from calendar month
             cursor.execute("""
                 SELECT words_used, word_allowance
                 FROM subscription_usage
-                WHERE org_id = %s AND month_start = %s
+                WHERE subscription_id = %s
                 ORDER BY created_at DESC
                 LIMIT 1
-            """, (user['org_id'], current_month))
+            """, (subscription['id'],))
             
             usage = cursor.fetchone()
             words_used = usage['words_used'] if usage else 0

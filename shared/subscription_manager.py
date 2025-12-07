@@ -93,27 +93,39 @@ class SubscriptionManager:
                 'status': 'no_subscription'
             }
         
-        # Get or create current month's usage record
-        current_month_start = date.today().replace(day=1)
+        # Get current usage record for this subscription
+        # Use subscription_id to handle mid-period upgrades where month_start differs from calendar month
+        today = date.today()
         
         with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
-            # Get current month usage
+            # Get the most recent usage record for this subscription where today is within the period
             cur.execute("""
                 SELECT * FROM subscription_usage
                 WHERE org_id = %s 
                 AND subscription_id = %s
-                AND month_start = %s
-            """, (org_id, subscription['id'], current_month_start))
+                AND month_start <= %s
+                AND month_end >= %s
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (org_id, subscription['id'], today, today))
             
             usage = cur.fetchone()
             
-            # If no usage record for this month, create it
+            # If no usage record found, create one based on subscription period
             if not usage:
+                # Use subscription's current period if available, otherwise fallback to calendar month
+                period_start = subscription.get('current_period_start') or today.replace(day=1)
+                if hasattr(period_start, 'date'):
+                    period_start = period_start.date() if callable(getattr(period_start, 'date', None)) else period_start
+                elif isinstance(period_start, str):
+                    from datetime import datetime
+                    period_start = datetime.fromisoformat(period_start).date()
+                
                 usage = self._create_usage_record(
                     org_id, 
                     subscription['id'], 
                     subscription['word_allowance'],
-                    current_month_start
+                    period_start
                 )
                 if self.owns_connection:
                     self.conn.commit()
