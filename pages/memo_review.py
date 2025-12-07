@@ -18,6 +18,7 @@ from shared.subscription_manager import SubscriptionManager
 from utils.document_extractor import DocumentExtractor
 
 from asc606.step_analyzer import ASC606StepAnalyzer
+from asc606.clean_memo_generator import CleanMemoGenerator as ASC606CleanMemoGenerator
 from asc340.step_analyzer import ASC340StepAnalyzer
 from asc842.step_analyzer import ASC842StepAnalyzer
 from asc718.step_analyzer import ASC718StepAnalyzer
@@ -172,17 +173,38 @@ def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
         
         st.markdown("---")
         st.subheader("💾 Save Your Review")
+        st.info("**IMPORTANT:** Choose your preferred format to save this review before navigating away.")
         
-        col1, col2 = st.columns(2)
+        memo_generator = ASC606CleanMemoGenerator()
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        base_filename = f"memo_review_{timestamp}"
+        
+        col1, col2, col3 = st.columns(3)
         with col1:
+            docx_data = memo_generator._generate_docx(memo_content)
+            if docx_data:
+                st.download_button(
+                    label="📄 Word (.docx)",
+                    data=docx_data,
+                    file_name=f"{base_filename}.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    key=f"download_docx_review_{hash(memo_content[:100]) if len(memo_content) > 100 else hash(memo_content)}",
+                    use_container_width=True
+                )
+            else:
+                st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
+        
+        with col2:
             st.download_button(
-                label="📄 Download as Word (.docx)",
+                label="📝 Markdown (.md)",
                 data=memo_content.encode('utf-8'),
-                file_name=f"memo_review_{memo_data.get('memo_uuid', 'result')}.html",
-                mime="text/html",
+                file_name=f"{base_filename}.md",
+                mime="text/markdown",
+                key=f"download_md_review_{hash(memo_content[:100]) if len(memo_content) > 100 else hash(memo_content)}",
                 use_container_width=True
             )
-        with col2:
+        
+        with col3:
             if st.button("🔄 Start New Review", type="secondary", use_container_width=True):
                 keys_to_clear = [k for k in st.session_state.keys() 
                                if isinstance(k, str) and ('_analysis_complete_' in k or '_memo_data_' in k or 'memo_review' in k.lower())]
