@@ -8,10 +8,12 @@ along with the source contract, and compare it with what vLogic would produce.
 import streamlit as st
 import logging
 import os
+import uuid
 from typing import Dict, Any, Optional
 from datetime import datetime
 
 from shared.auth_utils import require_authentication, auth_manager, WEBSITE_URL
+from shared.job_progress_monitor import check_and_resume_polling
 from shared.subscription_manager import SubscriptionManager
 from utils.document_extractor import DocumentExtractor
 
@@ -197,7 +199,13 @@ def render_page():
     if not require_authentication():
         return
     
+    # Initialize user session ID for memo persistence (same pattern as ASC pages)
+    if 'user_session_id' not in st.session_state:
+        st.session_state.user_session_id = str(uuid.uuid4())
+        logger.info(f"Created new user session: {st.session_state.user_session_id[:8]}...")
+    
     session_id = st.session_state.get('user_session_id', '')
+    logger.info(f"Memo Review page load - session_id: {session_id[:8] if session_id else 'empty'}")
     
     prefix_map = {
         'ASC 606': 'asc606',
@@ -207,9 +215,16 @@ def render_page():
         'ASC 842': 'asc842'
     }
     
+    # Resume polling for any active analysis
+    for asc_standard, asc_prefix in prefix_map.items():
+        check_and_resume_polling(asc_standard=asc_standard, session_id=session_id)
+    
+    # Check for completed analysis in session state
     for asc_standard, asc_prefix in prefix_map.items():
         analysis_key = f'{asc_prefix}_analysis_complete_{session_id}'
         memo_key = f'{asc_prefix}_memo_data_{session_id}'
+        
+        logger.info(f"Checking {asc_standard}: analysis_key={analysis_key}, has_key={st.session_state.get(analysis_key, False)}")
         
         if st.session_state.get(analysis_key) and st.session_state.get(memo_key):
             memo_data = st.session_state.get(memo_key, {})
