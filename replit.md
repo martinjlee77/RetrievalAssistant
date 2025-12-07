@@ -3,6 +3,14 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
+## Recent Changes (December 7, 2025)
+1. **Memo Review Feature (Phase 1)**: New tool allowing users to upload an existing memo and source contract for comparison against vLogic-generated analysis.
+   - New page: `pages/memo_review.py` with ASC standard selector, dual file upload
+   - Job runner: `pages/memo_review_job_runner.py` for background job submission
+   - Worker function: `run_memo_review_analysis` in `workers/analysis_worker.py`
+   - Database: Added `analysis_type` (default 'standard', also 'review') and `source_memo_filename` columns to analyses table
+   - Billing: Charges based on contract words only (uploaded memo is reference material)
+
 ## Recent Changes (December 5, 2025)
 1. **Major Pricing Update**: 10-20x increase in word allowances across all tiers:
    - Trial: 9K → 20K words
