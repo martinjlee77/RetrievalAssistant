@@ -115,7 +115,7 @@ def attempt_token_refresh(request_obj):
         new_access_token = jwt.encode({
             'user_id': payload['user_id'],
             'email': payload['email'],
-            'exp': datetime.utcnow() + timedelta(hours=4),  # Extended for large contracts
+            'exp': datetime.utcnow() + timedelta(hours=12),  # Extended for long-running memo reviews
             'purpose': 'access',
             'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()
@@ -1216,7 +1216,7 @@ def login():
         access_token = jwt.encode({
             'user_id': user['id'],
             'email': user['email'],
-            'exp': datetime.utcnow() + timedelta(hours=4),  # Extended for large contracts
+            'exp': datetime.utcnow() + timedelta(hours=12),  # Extended for long-running memo reviews
             'purpose': 'access',
             'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()
@@ -1320,7 +1320,7 @@ def refresh_access_token():
         new_access_token = jwt.encode({
             'user_id': payload['user_id'],
             'email': payload['email'],
-            'exp': datetime.utcnow() + timedelta(hours=4),  # Extended for large contracts
+            'exp': datetime.utcnow() + timedelta(hours=12),  # Extended for long-running memo reviews
             'purpose': 'access',
             'domain': 'veritaslogic.ai',
             'issued_at': datetime.utcnow().isoformat()
@@ -1328,7 +1328,7 @@ def refresh_access_token():
         
         return jsonify({
             'token': new_access_token,
-            'expires_in': 600  # 10 minutes in seconds
+            'expires_in': 43200  # 12 hours in seconds
         }), 200
         
     except jwt.ExpiredSignatureError:
