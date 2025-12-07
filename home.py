@@ -37,6 +37,7 @@ pages = {
         ],
     "Tools": [
         st.Page("pages/research_assistant.py", title="ASC Research Assistant", icon=":material/search:"),
+        st.Page("pages/memo_review.py", title="Memo Review", icon=":material/compare:"),
         ],
     "Get Help": [
         st.Page("pages/gethelp.py", title="Contact Support", icon=":material/contact_support:"),
