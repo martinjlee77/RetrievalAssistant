@@ -91,18 +91,16 @@ def extract_document_text(uploaded_file) -> Dict[str, Any]:
 def render_page():
     """Main page rendering function."""
     
-    st.title("📋 Memo Review")
+    if not require_authentication():
+        return
+    
+    st.title("Memo Review")
     st.markdown("""
     Compare an existing memo with what vLogic would produce for the same contract.
     Upload the original contract and the memo you want to review.
     """)
     
     st.divider()
-    
-    if not auth_manager.is_authenticated():
-        st.warning("Please log in to use Memo Review.")
-        st.markdown(f"[Log in to your account]({WEBSITE_URL}/login.html)")
-        return
     
     org_id = get_org_id_from_session()
     if not org_id:
