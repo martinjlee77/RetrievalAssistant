@@ -215,16 +215,17 @@ def render_page():
     
     can_proceed = contract_files and memo_file and contract_word_count > 0 and memo_word_count > 0
     
+    total_words_to_charge = contract_word_count + memo_word_count
+    
     if can_proceed:
-        allowance_check = check_subscription_allowance(org_id, contract_word_count)
+        allowance_check = check_subscription_allowance(org_id, total_words_to_charge)
         
         if not allowance_check.get('allowed', False):
-            st.error(f"⚠️ {allowance_check.get('reason', 'Insufficient word allowance')}")
-            st.info("Words are charged based on the contract document size only. The existing memo is not counted.")
+            st.error(f"{allowance_check.get('reason', 'Insufficient word allowance')}")
             can_proceed = False
         else:
             remaining_after = allowance_check.get('words_remaining_after', 0)
-            st.info(f"📊 This analysis will use **{contract_word_count:,} words**. You'll have {remaining_after:,} words remaining after.")
+            st.info(f"This analysis will use **{total_words_to_charge:,} words** ({contract_word_count:,} contract + {memo_word_count:,} memo). You'll have {remaining_after:,} words remaining after.")
     
     st.subheader("3️⃣ Start Review")
     
@@ -235,7 +236,7 @@ def render_page():
     elif not can_proceed:
         st.caption("Please resolve the issues above to continue")
     else:
-        if st.button("Compare Memos", type="primary", use_container_width=True):
+        if st.button("Analyze & Review", type="primary", use_container_width=True):
             from pages.memo_review_job_runner import submit_and_monitor_memo_review_job
             
             standard_key = standard_config['key']
@@ -254,8 +255,8 @@ def render_page():
             contract_filenames = [f.name for f in contract_files]
             memo_filename = memo_file.name if memo_file else 'Unknown'
             
-            allowance_check['file_count'] = len(contract_filenames)
-            allowance_check['total_words'] = contract_word_count
+            allowance_check['file_count'] = len(contract_filenames) + 1
+            allowance_check['total_words'] = total_words_to_charge
             
             submit_and_monitor_memo_review_job(
                 allowance_result=allowance_check,
@@ -267,7 +268,7 @@ def render_page():
                 contract_filenames=contract_filenames,
                 session_id=session_id,
                 org_id=org_id,
-                total_words=contract_word_count
+                total_words=total_words_to_charge
             )
 
 
