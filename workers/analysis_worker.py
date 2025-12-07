@@ -981,3 +981,207 @@ def run_asc340_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         
         # Re-raise exception so RQ marks job as failed
         raise
+
+
+def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Run Memo Review analysis in background worker
+    
+    This generates a vLogic memo from the uploaded contract using the selected
+    ASC standard analyzer, for comparison against the user's uploaded memo.
+    
+    Args:
+        job_data: Dictionary containing analysis parameters including:
+            - asc_standard: The ASC standard to use for analysis (e.g., 'ASC 606')
+            - combined_text: The contract text to analyze
+            - source_memo_text: The user's uploaded memo for comparison (Phase 2)
+            - source_memo_filename: Name of the user's uploaded memo file
+        
+    Returns:
+        Dictionary with analysis results including generated memo content
+    """
+    analysis_id = job_data['analysis_id']
+    user_id = job_data['user_id']
+    user_token = job_data['user_token']
+    asc_standard = job_data.get('asc_standard', 'ASC 606')
+    combined_text = job_data['combined_text']
+    source_memo_text = job_data.get('source_memo_text', '')
+    uploaded_filenames = job_data['uploaded_filenames']
+    additional_context = job_data.get('additional_context', '')
+    org_id = job_data.get('org_id')
+    total_words = job_data.get('total_words')
+    
+    job = get_current_job()
+    
+    try:
+        reset_cost_tracking()
+        logger.info(f"🔍 Starting Memo Review Analysis (ID: {analysis_id})")
+        logger.info(f"   ASC Standard: {asc_standard}")
+        logger.info(f"   Contract words: {len(combined_text.split())}")
+        logger.info(f"   Source memo words: {len(source_memo_text.split())}")
+        
+        # Update progress - Step 1: Initialize
+        if job:
+            job.meta['progress'] = {
+                'current_step': 1,
+                'total_steps': 3,
+                'step_name': 'Initializing analysis',
+                'updated_at': datetime.now().isoformat()
+            }
+            job.save_meta()
+        
+        # Select the appropriate analyzer and components based on ASC standard
+        if asc_standard == 'ASC 606':
+            analyzer = ASC606StepAnalyzer()
+            knowledge_search = ASC606KnowledgeSearch()
+            memo_generator = CleanMemoGenerator()
+            step_count = 5
+        elif asc_standard == 'ASC 842':
+            analyzer = ASC842StepAnalyzer()
+            knowledge_search = ASC842KnowledgeSearch()
+            memo_generator = ASC842CleanMemoGenerator()
+            step_count = 2
+        elif asc_standard == 'ASC 718':
+            analyzer = ASC718StepAnalyzer()
+            knowledge_search = ASC718KnowledgeSearch()
+            memo_generator = ASC718CleanMemoGenerator()
+            step_count = 2
+        elif asc_standard == 'ASC 805':
+            analyzer = ASC805StepAnalyzer()
+            knowledge_search = ASC805KnowledgeSearch()
+            memo_generator = ASC805CleanMemoGenerator()
+            step_count = 2
+        elif asc_standard == 'ASC 340-40':
+            analyzer = ASC340StepAnalyzer()
+            knowledge_search = ASC340KnowledgeSearch()
+            memo_generator = ASC340CleanMemoGenerator()
+            step_count = 2
+        else:
+            raise ValueError(f"Unsupported ASC standard for memo review: {asc_standard}")
+        
+        # Extract company name
+        company_name = analyzer._extract_company_name(combined_text)
+        logger.info(f"   Company identified: {company_name}")
+        
+        # Update progress - Step 2: Running Analysis
+        if job:
+            job.meta['progress'] = {
+                'current_step': 2,
+                'total_steps': 3,
+                'step_name': f'Analyzing contract for {asc_standard}',
+                'updated_at': datetime.now().isoformat()
+            }
+            job.save_meta()
+        
+        # Run the analysis steps
+        analysis_results = {
+            'steps': {},
+            'asc_standard': asc_standard
+        }
+        
+        for step_num in range(1, step_count + 1):
+            logger.info(f"📋 Analyzing Step {step_num}/{step_count}...")
+            
+            try:
+                authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
+                
+                step_result = analyzer._analyze_step_with_retry(
+                    step_num=step_num,
+                    contract_text=combined_text,
+                    authoritative_context=authoritative_context,
+                    customer_name=company_name,
+                    additional_context=additional_context
+                )
+                
+                analysis_results['steps'][f'step_{step_num}'] = step_result
+                logger.info(f"✓ Completed Step {step_num}")
+                
+            except Exception as e:
+                logger.error(f"Error in Step {step_num}: {str(e)}")
+                raise Exception(f"Step {step_num} failed: {str(e)}")
+        
+        # Update progress - Step 3: Generating Memo
+        if job:
+            job.meta['progress'] = {
+                'current_step': 3,
+                'total_steps': 3,
+                'step_name': 'Generating memo',
+                'updated_at': datetime.now().isoformat()
+            }
+            job.save_meta()
+        
+        logger.info("📝 Generating memo sections...")
+        conclusions_text = analyzer._extract_conclusions_from_steps(analysis_results['steps'])
+        
+        analysis_results['executive_summary'] = analyzer.generate_executive_summary(conclusions_text, company_name)
+        analysis_results['background'] = analyzer.generate_background_section(conclusions_text, company_name)
+        analysis_results['conclusion'] = analyzer.generate_final_conclusion(analysis_results['steps'])
+        
+        filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
+        analysis_results['filename'] = filename
+        
+        memo_content = memo_generator.combine_clean_steps(
+            analysis_results,
+            analysis_id=analysis_id
+        )
+        
+        api_cost = get_total_estimated_cost()
+        
+        # Save analysis to database
+        logger.info("💾 Saving memo review analysis to database...")
+        backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+        
+        save_result = _save_analysis_with_retry(
+            backend_url=backend_url,
+            user_token=user_token,
+            save_data={
+                'analysis_id': analysis_id,
+                'memo_content': memo_content,
+                'api_cost': api_cost,
+                'success': True,
+                'org_id': org_id,
+                'total_words': total_words
+            },
+            max_retries=5
+        )
+        
+        memo_uuid = save_result.get('memo_uuid')
+        logger.info(f"✓ Memo Review analysis saved successfully: {memo_uuid}")
+        
+        return {
+            'success': True,
+            'analysis_id': analysis_id,
+            'memo_uuid': memo_uuid,
+            'memo_content': memo_content,
+            'api_cost': api_cost,
+            'asc_standard': asc_standard,
+            'message': 'Memo Review analysis completed successfully'
+        }
+        
+    except Exception as e:
+        logger.error(f"❌ Memo Review analysis failed: {str(e)}", exc_info=True)
+        
+        try:
+            api_cost = get_total_estimated_cost()
+            backend_url = os.getenv('WEBSITE_URL', 'https://www.veritaslogic.ai')
+            
+            _save_analysis_with_retry(
+                backend_url=backend_url,
+                user_token=user_token,
+                save_data={
+                    'analysis_id': analysis_id,
+                    'success': False,
+                    'error_message': str(e)[:500],
+                    'api_cost': api_cost
+                },
+                max_retries=5
+            )
+            
+            logger.info(f"✓ Failure status saved to database")
+            
+        except Exception as save_error:
+            logger.critical(f"🔥 CRITICAL: Failed to save failure status: {str(save_error)}")
+            logger.critical(f"🔥 Original error: {str(e)}")
+            logger.critical(f"🔥 Analysis {analysis_id} may be stuck in 'processing' status!")
+        
+        raise

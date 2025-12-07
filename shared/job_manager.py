@@ -65,7 +65,8 @@ class JobManager:
                 run_asc842_analysis,
                 run_asc718_analysis,
                 run_asc805_analysis,
-                run_asc340_analysis
+                run_asc340_analysis,
+                run_memo_review_analysis
             )
             
             # Map ASC standard to worker function
@@ -74,7 +75,8 @@ class JobManager:
                 'ASC 842': run_asc842_analysis,
                 'ASC 718': run_asc718_analysis,
                 'ASC 805': run_asc805_analysis,
-                'ASC 340-40': run_asc340_analysis
+                'ASC 340-40': run_asc340_analysis,
+                'MEMO_REVIEW': run_memo_review_analysis
             }
             
             worker_function = worker_map.get(asc_standard)
@@ -91,7 +93,8 @@ class JobManager:
                 'combined_text': combined_text,
                 'uploaded_filenames': uploaded_filenames,
                 'org_id': org_id,
-                'total_words': total_words
+                'total_words': total_words,
+                'asc_standard': asc_standard
             }
             
             job = self.queue.enqueue(

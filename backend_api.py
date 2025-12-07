@@ -1965,6 +1965,8 @@ def create_pending_analysis():
         words_count = max(0, int(data.get('words_count', 0)))
         tier_name = sanitize_string(data.get('tier_name', ''), 100)
         file_count = max(0, int(data.get('file_count', 0)))
+        analysis_type = sanitize_string(data.get('analysis_type', 'standard'), 50)
+        source_memo_filename = sanitize_string(data.get('source_memo_filename', ''), 500) if data.get('source_memo_filename') else None
         
         conn = get_db_connection()
         if not conn:
@@ -1998,11 +2000,11 @@ def create_pending_analysis():
             
             cursor.execute("""
                 INSERT INTO analyses (user_id, org_id, asc_standard, words_count, tier_name, 
-                                    status, memo_uuid, started_at, file_count)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)
+                                    status, memo_uuid, started_at, file_count, analysis_type, source_memo_filename)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), %s, %s, %s)
                 RETURNING analysis_id
             """, (user_id, user_check['org_id'], asc_standard, words_count,
-                  tier_name, 'processing', memo_uuid, file_count))
+                  tier_name, 'processing', memo_uuid, file_count, analysis_type, source_memo_filename))
             
             result = cursor.fetchone()
             db_analysis_id = result['analysis_id']

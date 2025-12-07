@@ -231,31 +231,46 @@ def render_page():
     st.subheader("3️⃣ Start Review")
     
     if not contract_files:
-        st.caption("⏳ Upload the source contract to continue")
+        st.caption("Upload the source contract to continue")
     elif not memo_file:
-        st.caption("⏳ Upload the existing memo to compare")
+        st.caption("Upload the existing memo to compare")
     elif not can_proceed:
-        st.caption("⚠️ Please resolve the issues above to continue")
+        st.caption("Please resolve the issues above to continue")
     else:
-        if st.button("🔍 Compare Memos", type="primary", use_container_width=True):
-            st.session_state['memo_review_contract_text'] = contract_text
-            st.session_state['memo_review_contract_words'] = contract_word_count
-            st.session_state['memo_review_existing_memo'] = memo_text
-            st.session_state['memo_review_standard'] = selected_standard
-            st.session_state['memo_review_standard_key'] = standard_config['key']
-            st.session_state['memo_review_org_id'] = org_id
+        if st.button("Compare Memos", type="primary", use_container_width=True):
+            from pages.memo_review_job_runner import submit_and_monitor_memo_review_job
             
-            st.success("✅ Documents uploaded successfully!")
-            st.info("🚧 **Phase 1 Checkpoint**: Document upload and extraction working. Background job processing coming in next phase.")
+            standard_key = standard_config['key']
+            asc_standard_map = {
+                'asc606': 'ASC 606',
+                'asc340': 'ASC 340-40',
+                'asc842': 'ASC 842',
+                'asc718': 'ASC 718',
+                'asc805': 'ASC 805'
+            }
+            asc_standard = asc_standard_map.get(standard_key, 'ASC 606')
             
-            with st.expander("Debug: Session State", expanded=False):
-                st.json({
-                    'standard': selected_standard,
-                    'standard_key': standard_config['key'],
-                    'contract_words': contract_word_count,
-                    'memo_words': memo_word_count,
-                    'org_id': org_id
-                })
+            user_data = st.session_state.get('user_data', {})
+            user_token = user_data.get('token', st.session_state.get('auth_token'))
+            session_id = st.session_state.get('user_session_id', str(datetime.now().timestamp()))
+            contract_filenames = [f.name for f in contract_files]
+            memo_filename = memo_file.name if memo_file else 'Unknown'
+            
+            allowance_check['file_count'] = len(contract_filenames)
+            allowance_check['total_words'] = contract_word_count
+            
+            submit_and_monitor_memo_review_job(
+                allowance_result=allowance_check,
+                asc_standard=asc_standard,
+                user_token=user_token,
+                contract_text=contract_text,
+                source_memo_text=memo_text,
+                source_memo_filename=memo_filename,
+                contract_filenames=contract_filenames,
+                session_id=session_id,
+                org_id=org_id,
+                total_words=contract_word_count
+            )
 
 
 render_page()
