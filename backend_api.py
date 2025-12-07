@@ -3470,6 +3470,7 @@ def get_analysis_history():
                 a.words_count,
                 a.file_count,
                 a.tier_name,
+                COALESCE(a.analysis_type, 'standard') as analysis_type,
                 CONCAT(a.asc_standard, ' Analysis') as document_name
             FROM analyses a
             WHERE a.user_id = %s 
@@ -3481,11 +3482,13 @@ def get_analysis_history():
         
         analyses = []
         for row in cursor.fetchall():
+            analysis_type = row['analysis_type'] or 'standard'
             analyses.append({
                 'id': row['id'],
                 'analysis_id': row['analysis_id'],
                 'title': row['document_name'] or f"{row['asc_standard']} Analysis",
                 'asc_standard': row['asc_standard'] or 'Unknown',
+                'analysis_type': analysis_type,
                 'created_at': row['completed_at'].isoformat() if row['completed_at'] else '',
                 'status': row['status'],
                 'cost': float(row['cost']) if row['cost'] else 0,

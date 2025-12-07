@@ -1022,9 +1022,13 @@ function loadRecentAnalyses(analyses) {
         const viewUrl = `/analysis?analysis_id=${analysis.analysis_id}`;
         
         const row = document.createElement('tr');
+        const isReview = analysis.analysis_type === 'review';
+        const standardLabel = isReview 
+            ? `${analysis.asc_standard} <span class="badge-review">Review</span>` 
+            : analysis.asc_standard;
         row.innerHTML = `
             <td>${new Date(analysis.created_at).toLocaleDateString()}</td>
-            <td>${analysis.asc_standard}</td>
+            <td>${standardLabel}</td>
             <td>${analysis.words_count ? analysis.words_count.toLocaleString() + ' words' : 'N/A'}</td>
             <td>${analysis.file_count || 0}</td>
             <td><a href="${viewUrl}" target="_blank" class="btn btn-primary btn-sm">View</a></td>
