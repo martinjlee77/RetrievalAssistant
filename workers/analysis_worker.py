@@ -1226,9 +1226,9 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         else:
             logger.warning("   ⚠️ Could not identify contract parties for de-identification")
         
-        # Extract company name from de-identified text
-        company_name = analyzer._extract_company_name(combined_text)
-        logger.info(f"   Company identified: {company_name}")
+        # Use standard de-identified company name
+        company_name = "the Company"
+        logger.info(f"   Using de-identified company name: {company_name}")
         
         # Update progress - Step 2: Running Analysis
         if job:

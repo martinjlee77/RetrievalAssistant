@@ -1,0 +1,20 @@
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+INFO:shared.job_progress_monitor:Job 102 status: JobStatus.FAILED
+ERROR:shared.job_progress_monitor:Job 102 failed: Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 1230, in run_memo_review_analysis
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1439, in perform_job
+    company_name = analyzer._extract_company_name(combined_text)
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+AttributeError: 'ASC606StepAnalyzer' object has no attribute '_extract_company_name'
+    self._result = self._execute()
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+INFO:shared.analysis_manager:💾 Saving analysis record: 208fc34c
+    result = self.func(*self.args, **self.kwargs)
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: 208fc34c
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-12-07T14:22:08.623441", "analysis_id": "208fc34c", "asc_standard": "ASC 606", "total_words": 9505, "file_count": 1, "tier": null, "cost": 0.0, "user_id": 19, "status": "failed", "success": false, "duration": 10.033538103103638, "error": "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.11/site-packages/rq/worker.py\", line 1439, in perform_job\n    return_value = job.perform()\n                   ^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1318, in perform\n    self._result = self._execute()\n                   ^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1376, in _execute\n    result = self.func(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/workers/analysis_worker.py\", line 1230, in run_memo_review_analysis\n    company_name = analyzer._extract_company_name(combined_text)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'ASC606StepAnalyzer' object has no attribute '_extract_company_name'\n"}
+INFO:shared.analysis_manager:Completed analysis 208fc34c: failed - 10.0s
