@@ -725,40 +725,29 @@ Respond with ONLY a JSON object in this exact format:
             additional_context=additional_context
         )
         
-        # Make API call
+        # Make API call - use _make_llm_request helper for proper GPT-5/GPT-4o routing
         try:
-            # Build request parameters
-            request_params = {
-                "model": self.model,
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": self._get_markdown_system_prompt()
-                    },
-                    {
-                        "role": "user", 
-                        "content": prompt
-                    }
-                ],
-                **self._get_max_tokens_param("step_analysis"),
-                "temperature": self._get_temperature()
-            }
+            messages = [
+                {
+                    "role": "system",
+                    "content": self._get_markdown_system_prompt()
+                },
+                {
+                    "role": "user", 
+                    "content": prompt
+                }
+            ]
             
-            # Add response_format only for GPT-5
-            if self.model in ["gpt-5", "gpt-5-mini"]:
-                request_params["response_format"] = {"type": "text"}
-            
-            response = self.client.chat.completions.create(**request_params)
+            # Use helper method that properly routes between Responses API (GPT-5) and Chat Completions API (GPT-4o)
+            markdown_content = self._make_llm_request(messages, self.model, "step_analysis")
             
             # Track API cost for step analysis
             track_openai_request(
-                messages=request_params["messages"],
-                response_text=response.choices[0].message.content or "",
+                messages=messages,
+                response_text=markdown_content or "",
                 model=self.model,
                 request_type=f"step_{step_num}_analysis"
             )
-            
-            markdown_content = response.choices[0].message.content
             
             if markdown_content is None or (markdown_content and len(markdown_content.strip()) < 50):
                 # Handle empty or very short response - retry once
@@ -766,17 +755,15 @@ Respond with ONLY a JSON object in this exact format:
                 
                 # Retry the API call once
                 time.sleep(2)  # Brief pause before retry
-                retry_response = self.client.chat.completions.create(**request_params)
+                markdown_content = self._make_llm_request(messages, self.model, "step_analysis")
                 
                 # Track retry API cost
                 track_openai_request(
-                    messages=request_params["messages"],
-                    response_text=retry_response.choices[0].message.content or "",
+                    messages=messages,
+                    response_text=markdown_content or "",
                     model=self.model,
                     request_type=f"step_{step_num}_analysis_retry"
                 )
-                
-                markdown_content = retry_response.choices[0].message.content
                 
                 if markdown_content is None or (markdown_content and len(markdown_content.strip()) < 50):
                     # Retry also failed - generate error message

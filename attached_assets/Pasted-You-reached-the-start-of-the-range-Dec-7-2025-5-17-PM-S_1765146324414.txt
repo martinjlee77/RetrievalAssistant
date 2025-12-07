@@ -1,0 +1,61 @@
+You reached the start of the range
+Dec 7, 2025, 5:17 PM
+Starting Container
+Starting Flask marketing website with Gunicorn on port: 8080
+[2025-12-07 22:18:59 +0000] [1] [INFO] Starting gunicorn 21.2.0
+[2025-12-07 22:18:59 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-12-07 22:18:59 +0000] [1] [INFO] Using worker: sync
+[2025-12-07 22:18:59 +0000] [2] [INFO] Booting worker with pid: 2
+[2025-12-07 22:18:59 +0000] [3] [INFO] Booting worker with pid: 3
+[2025-12-07 22:18:59 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-12-07 22:18:59 +0000] [5] [INFO] Booting worker with pid: 5
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+INFO:veritaslogic.backend:Enhanced VeritasLogic backend logging initialized
+100.64.0.2 - - [07/Dec/2025:22:19:12 +0000] "GET /dashboard.html HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/user/profile HTTP/1.1" 200 317 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [07/Dec/2025:22:19:13 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /dashboard.html HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/subscription/status HTTP/1.1" 200 352 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.3 - - [07/Dec/2025:22:19:13 +0000] "GET /images/favicon/site.webmanifest HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 86 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/user/profile HTTP/1.1" 200 317 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/subscription/status HTTP/1.1" 200 352 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/user/usage-stats HTTP/1.1" 200 86 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.2 - - [07/Dec/2025:22:19:13 +0000] "GET /api/user/analysis-history HTTP/1.1" 200 31 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxNjAzNTUsInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIyOjE5OjE1LjM1MTE3MCJ9.BkUwQB5jfPu6tdwZNRVhN-BzSmeHZ9NrgQcGyK2E0J8
+100.64.0.2 - - [07/Dec/2025:22:19:15 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxNjAzNjIsInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIyOjE5OjIyLjIxODM3NCJ9.-NHh0u6jCKWEd16pa1mLJfFSt3v1R09AAQMDmtqEDis
+100.64.0.2 - - [07/Dec/2025:22:19:22 +0000] "GET /analysis HTTP/1.1" 200 12173 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+100.64.0.4 - - [07/Dec/2025:22:19:29 +0000] "POST /api/auth/validate-token HTTP/1.1" 200 225 "-" "python-requests/2.31.0"
+100.64.0.5 - - [07/Dec/2025:22:22:56 +0000] "POST /api/analysis/create HTTP/1.1" 200 377 "-" "python-requests/2.31.0"
+INFO:backend_api:Analysis updated: 114, status: failed
+INFO:backend_api:No billing applied (success=False, org_id=None, total_words=None)
+100.64.0.6 - - [07/Dec/2025:22:23:14 +0000] "POST /api/analysis/save HTTP/1.1" 200 107 "-" "python-requests/2.31.0"
+100.64.0.4 - - [07/Dec/2025:22:23:18 +0000] "GET /api/auth/validate-token HTTP/1.1" 200 225 "-" "python-requests/2.31.0"
+INFO:veritaslogic.backend:BACKEND: Starting analysis completion for user 20
+INFO:backend_api:Starting analysis completion for user 20
+INFO:veritaslogic.backend:BACKEND: Checking idempotency for key: manager_bac4450b_1765146177982
+INFO:backend_api:Checking idempotency for key: manager_bac4450b_1765146177982
+INFO:backend_api:Inserting analysis record for user 20 with status: failed
+INFO:backend_api:Analysis record created with ID: 115, status: failed
+INFO:backend_api:Analysis failed - no words charged. Error: Traceback most recent call last   File "appasc606step_analyzer.py" line 636 in _analyze_step_with_retry     result  self._analyze_step                 File "appasc606step_analyzer.py" line 751 in _analyze_step     response  self.client.chat.completions.createrequest_params                   File "usrlocallibpython3.11site-packagesopenai_utils_utils.py" line 286 in wrapper     return funcargs
+INFO:backend_api:Committing transaction for analysis 115
+INFO:backend_api:Transaction committed successfully
+INFO:backend_api:Analysis completed for user 20: ASC 606, memo: 98298af0, words charged: 0
+100.64.0.7 - - [07/Dec/2025:22:23:18 +0000] "POST /api/analysis/complete HTTP/1.1" 200 238 "-" "python-requests/2.31.0"
+INFO:backend_api:Final redirect URL: https://tas.veritaslogic.ai?auth_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMCwiZW1haWwiOiJtYXJ0aW5AbHlueC1maC5jb20iLCJleHAiOjE3NjUxNjA2NTUsInB1cnBvc2UiOiJhY2Nlc3MiLCJkb21haW4iOiJ2ZXJpdGFzbG9naWMuYWkiLCJpc3N1ZWRfYXQiOiIyMDI1LTEyLTA3VDIyOjI0OjE1LjU1NzA5NCJ9.PlUUNyORG6ZSrWTsIh5RDnuAzCJrF5wItqEfT1IvGks
+100.64.0.7 - - [07/Dec/2025:22:24:15 +0000] "HEAD /analysis HTTP/1.1" 200 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36"
+INFO:backend_api:Processing /analysis request with analysis_id=None
+INFO:backend_api:Successfully refreshed token for user martin@lynx-fh.com
+INFO:backend_api:No token found, attempting refresh from dashboard session
+INFO:backend_api:Dashboard session refresh successful, redirecting with new token
