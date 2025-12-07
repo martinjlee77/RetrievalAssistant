@@ -1006,6 +1006,7 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
     asc_standard = job_data.get('asc_standard', 'ASC 606')
     combined_text = job_data['combined_text']
     source_memo_text = job_data.get('source_memo_text', '')
+    source_memo_filename = job_data.get('source_memo_filename', '')
     uploaded_filenames = job_data['uploaded_filenames']
     additional_context = job_data.get('additional_context', '')
     org_id = job_data.get('org_id')

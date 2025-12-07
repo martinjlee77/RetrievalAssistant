@@ -92,18 +92,9 @@ def submit_and_monitor_memo_review_job(
                 combined_text=contract_text,
                 uploaded_filenames=contract_filenames,
                 org_id=org_id,
-                total_words=total_words
-            )
-            
-            job_manager.queue.connection.hset(
-                f'rq:job:{db_analysis_id}',
-                'asc_standard',
-                asc_standard
-            )
-            job_manager.queue.connection.hset(
-                f'rq:job:{db_analysis_id}',
-                'source_memo_text',
-                source_memo_text
+                total_words=total_words,
+                source_memo_text=source_memo_text,
+                source_memo_filename=source_memo_filename
             )
             
             logger.info(f"Memo Review job submitted: {job_id}")

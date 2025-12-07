@@ -38,7 +38,9 @@ class JobManager:
                            allowance_result: Optional[Dict[str, Any]] = None,
                            pricing_result: Optional[Dict[str, Any]] = None,
                            org_id: Optional[int] = None,
-                           total_words: Optional[int] = None) -> str:
+                           total_words: Optional[int] = None,
+                           source_memo_text: Optional[str] = None,
+                           source_memo_filename: Optional[str] = None) -> str:
         """
         Submit an analysis job to the background queue
         
@@ -94,7 +96,9 @@ class JobManager:
                 'uploaded_filenames': uploaded_filenames,
                 'org_id': org_id,
                 'total_words': total_words,
-                'asc_standard': asc_standard
+                'asc_standard': asc_standard,
+                'source_memo_text': source_memo_text,
+                'source_memo_filename': source_memo_filename
             }
             
             job = self.queue.enqueue(
