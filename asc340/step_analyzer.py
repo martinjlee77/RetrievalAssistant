@@ -502,10 +502,15 @@ OR if it's a third-party contractor:
             "error": None
         }
     
+    def _is_gpt5_model(self, model_name=None):
+        """Check if the model is a GPT-5 family model (gpt-5, gpt-5.1, gpt-5-mini, etc.)."""
+        target_model = model_name or self.model
+        return target_model.startswith("gpt-5") if target_model else False
+    
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
         target_model = model_name or self.model
-        if target_model in ["gpt-5", "gpt-5-mini"]:
+        if self._is_gpt5_model(target_model):
             return 1  # GPT-5 models only support default temperature of 1
         else:
             return 0.3  # GPT-4o models can use 0.3
@@ -513,7 +518,7 @@ OR if it's a third-party contractor:
     def _get_max_tokens_param(self, request_type="default", model_name=None):
         """Get appropriate max tokens parameter based on model and request type."""
         target_model = model_name or self.model
-        if target_model in ["gpt-5", "gpt-5-mini"]:
+        if self._is_gpt5_model(target_model):
             # GPT-5 models need high token counts due to reasoning overhead
             token_limits = {
                 "step_analysis": 10000,
@@ -538,7 +543,7 @@ OR if it's a third-party contractor:
         """Helper method to route between Responses API (GPT-5) and Chat Completions API (GPT-4o)."""
         target_model = model or self.model
         
-        if target_model in ["gpt-5", "gpt-5-mini"]:
+        if self._is_gpt5_model(target_model):
             # Use Responses API for GPT-5 models
             response = self.client.responses.create(
                 model=target_model,
@@ -775,7 +780,7 @@ OR if it's a third-party contractor:
             }
             
             # Add response_format only for GPT-5
-            if self.model in ["gpt-5", "gpt-5-mini"]:
+            if self._is_gpt5_model(self.model):
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)

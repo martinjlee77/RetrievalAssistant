@@ -113,10 +113,15 @@ class ASCResearchAssistant:
             logger.error(f"Error generating response: {str(e)}")
             return f"Error generating response: {str(e)}", []
     
+    def _is_gpt5_model(self, model_name=None):
+        """Check if the model is a GPT-5 family model (gpt-5, gpt-5.1, gpt-5-mini, etc.)."""
+        target_model = model_name or self.main_model
+        return target_model.startswith("gpt-5") if target_model else False
+    
     def _get_temperature(self, model_name=None):
         """Get appropriate temperature based on model."""
         target_model = model_name or self.main_model
-        if target_model in ["gpt-5", "gpt-5-mini"]:
+        if self._is_gpt5_model(target_model):
             return 1  # GPT-5 models only support default temperature of 1
         else:
             return 0.1  # GPT-4o models can use 0.1 for research consistency
@@ -124,7 +129,7 @@ class ASCResearchAssistant:
     def _get_max_tokens_param(self, request_type="main", model_name=None):
         """Get appropriate max tokens parameter based on model and request type."""
         target_model = model_name or self.main_model
-        if target_model in ["gpt-5", "gpt-5-mini"]:
+        if self._is_gpt5_model(target_model):
             # GPT-5 models need much higher token counts for complex research tasks
             token_limits = {
                 "main": 20000,        # Main research answers - increased for complex prompts
@@ -169,7 +174,7 @@ Answer:"""
             }
             
             # Add response_format only for GPT-5
-            if self.main_model in ["gpt-5", "gpt-5-mini"]:
+            if self._is_gpt5_model(self.main_model):
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
@@ -222,7 +227,7 @@ Return only the questions, one per line, without numbering or bullets."""
             }
             
             # Add response_format only for GPT-5
-            if self.light_model in ["gpt-5", "gpt-5-mini"]:
+            if self._is_gpt5_model(self.light_model):
                 request_params["response_format"] = {"type": "text"}
             
             response = self.client.chat.completions.create(**request_params)
