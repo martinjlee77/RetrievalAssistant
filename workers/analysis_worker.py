@@ -1062,7 +1062,7 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         
         # De-identify contract text for privacy protection
         logger.info("🔒 Applying privacy protection (de-identification)...")
-        parties = analyzer.extract_contract_parties(combined_text)
+        parties = analyzer.extract_party_names_llm(combined_text)
         vendor_name = parties.get('vendor')
         customer_name = parties.get('customer')
         

@@ -111,7 +111,7 @@ def deidentify_text(contract_text: str, standard_key: str) -> Dict[str, Any]:
     """Apply de-identification to contract text using the appropriate analyzer."""
     try:
         analyzer = get_analyzer_for_standard(standard_key)
-        parties = analyzer.extract_contract_parties(contract_text)
+        parties = analyzer.extract_party_names_llm(contract_text)
         vendor_name = parties.get('vendor')
         customer_name = parties.get('customer')
         
