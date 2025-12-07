@@ -1060,7 +1060,23 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         else:
             raise ValueError(f"Unsupported ASC standard for memo review: {asc_standard}")
         
-        # Extract company name
+        # De-identify contract text for privacy protection
+        logger.info("🔒 Applying privacy protection (de-identification)...")
+        parties = analyzer.extract_contract_parties(combined_text)
+        vendor_name = parties.get('vendor')
+        customer_name = parties.get('customer')
+        
+        if vendor_name or customer_name:
+            deidentify_result = analyzer.deidentify_contract_text(combined_text, vendor_name, customer_name)
+            if deidentify_result.get('success'):
+                combined_text = deidentify_result['text']
+                logger.info(f"   ✓ De-identified: vendor '{vendor_name}' → 'the Company', customer '{customer_name}' → 'the Customer'")
+            else:
+                logger.warning(f"   ⚠️ De-identification failed: {deidentify_result.get('error', 'Unknown error')}")
+        else:
+            logger.warning("   ⚠️ Could not identify contract parties for de-identification")
+        
+        # Extract company name from de-identified text
         company_name = analyzer._extract_company_name(combined_text)
         logger.info(f"   Company identified: {company_name}")
         

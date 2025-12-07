@@ -9,7 +9,9 @@ VeritasLogic.ai is a premium enterprise AI platform for accounting firms and lar
    - Job runner: `pages/memo_review_job_runner.py` for background job submission
    - Worker function: `run_memo_review_analysis` in `workers/analysis_worker.py`
    - Database: Added `analysis_type` (default 'standard', also 'review') and `source_memo_filename` columns to analyses table
-   - Billing: Charges based on contract words only (uploaded memo is reference material)
+   - Billing: Charges combined contract + uploaded memo word counts (updated from contract-only)
+   - Privacy: De-identification applied to contract text before analysis
+   - Button text: "Analyze & Review" (not "Compare Memos")
 
 ## Recent Changes (December 5, 2025)
 1. **Major Pricing Update**: 10-20x increase in word allowances across all tiers:
