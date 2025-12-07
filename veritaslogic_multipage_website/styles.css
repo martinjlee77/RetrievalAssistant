@@ -2810,7 +2810,21 @@ a:focus {
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Memo Review Badge */
+/* Analysis Type Badges */
+.badge-analysis {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin-left: 0.5rem;
+    background: linear-gradient(135deg, #2d5a41, #3a7050);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
 .badge-review {
     display: inline-block;
     padding: 0.2rem 0.5rem;

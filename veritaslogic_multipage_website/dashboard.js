@@ -1025,7 +1025,7 @@ function loadRecentAnalyses(analyses) {
         const isReview = analysis.analysis_type === 'review';
         const standardLabel = isReview 
             ? `${analysis.asc_standard} <span class="badge-review">Review</span>` 
-            : analysis.asc_standard;
+            : `${analysis.asc_standard} <span class="badge-analysis">Analysis</span>`;
         row.innerHTML = `
             <td>${new Date(analysis.created_at).toLocaleDateString()}</td>
             <td>${standardLabel}</td>

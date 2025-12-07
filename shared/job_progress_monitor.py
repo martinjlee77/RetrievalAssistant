@@ -13,13 +13,14 @@ from shared.analysis_manager import analysis_manager
 
 logger = logging.getLogger(__name__)
 
-def check_and_resume_polling(asc_standard: str, session_id: str):
+def check_and_resume_polling(asc_standard: str, session_id: str, analysis_type: str = 'standard'):
     """
     Check if there's an active analysis for this ASC standard and resume polling if needed
     
     Args:
         asc_standard: ASC standard name (e.g., 'ASC 606')
         session_id: Session ID for caching results
+        analysis_type: Type of analysis ('standard' or 'review') - prevents cross-contamination
     """
     try:
         # Get active analysis from analysis_manager
@@ -32,6 +33,12 @@ def check_and_resume_polling(asc_standard: str, session_id: str):
         if active_analysis.get('asc_standard') != asc_standard:
             return  # Different ASC standard, don't resume here
         
+        # Check if the analysis type matches - prevent review jobs from resuming on Analysis page
+        active_type = active_analysis.get('analysis_type', 'standard')
+        if active_type != analysis_type:
+            logger.info(f"Skipping resume: analysis_type mismatch (active={active_type}, requested={analysis_type})")
+            return  # Different analysis type, don't resume here
+        
         # Extract stored polling information
         job_id = active_analysis.get('job_id')
         db_analysis_id = active_analysis.get('db_analysis_id')
@@ -41,7 +48,7 @@ def check_and_resume_polling(asc_standard: str, session_id: str):
             logger.warning(f"Active analysis missing job_id or db_analysis_id: {active_analysis}")
             return
         
-        logger.info(f"📌 Resume polling: ASC={asc_standard}, job_id={job_id}, db_analysis_id={db_analysis_id}")
+        logger.info(f"📌 Resume polling: ASC={asc_standard}, type={analysis_type}, job_id={job_id}, db_analysis_id={db_analysis_id}")
         
         # Get user token from session (fallback to service_token if user not logged in)
         user_token = st.session_state.get('user_data', {}).get('auth_token', service_token)
@@ -53,7 +60,8 @@ def check_and_resume_polling(asc_standard: str, session_id: str):
             db_analysis_id=db_analysis_id,
             session_id=session_id,
             user_token=user_token,
-            service_token=service_token
+            service_token=service_token,
+            analysis_type=analysis_type
         )
         
     except Exception as e:
@@ -86,7 +94,7 @@ def monitor_job_progress(
         # Determine which token to use for API calls
         auth_token = service_token if service_token else user_token
         
-        # Determine session key prefix based on ASC standard
+        # Determine session key prefix based on ASC standard and analysis type
         # Map to exact prefixes used by page files
         prefix_map = {
             'ASC 606': 'asc606',
@@ -95,7 +103,9 @@ def monitor_job_progress(
             'ASC 805': 'asc805',
             'ASC 842': 'asc842'
         }
-        asc_prefix = prefix_map.get(asc_standard, asc_standard.lower().replace(' ', '').replace('-', ''))
+        base_prefix = prefix_map.get(asc_standard, asc_standard.lower().replace(' ', '').replace('-', ''))
+        # Use different prefix for review vs standard analysis to prevent cross-contamination
+        asc_prefix = f'review_{base_prefix}' if analysis_type == 'review' else base_prefix
         
         # Poll for job completion
         st.markdown("### 🔄 Analysis Progress")
@@ -159,7 +169,9 @@ def monitor_job_progress(
                                 'memo_content': analysis_data['memo_content'],
                                 'analysis_id': db_analysis_id,
                                 'memo_uuid': analysis_data.get('memo_uuid'),
-                                'completion_timestamp': analysis_data.get('completed_at')
+                                'completion_timestamp': analysis_data.get('completed_at'),
+                                'source_memo_filename': analysis_data.get('source_memo_filename'),
+                                'analysis_type': analysis_type
                             }
                             
                             logger.info(f"✓ Session state stored. Keys in session: {list(st.session_state.keys())}")

@@ -156,11 +156,11 @@ def serve_streamlit_app():
     
     if analysis_id:
         try:
-            # Query database to get asc_standard for this analysis
+            # Query database to get asc_standard and analysis_type for this analysis
             conn = get_db_connection()
             cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
             cursor.execute(
-                "SELECT asc_standard FROM analyses WHERE analysis_id = %s",
+                "SELECT asc_standard, COALESCE(analysis_type, 'standard') as analysis_type FROM analyses WHERE analysis_id = %s",
                 (int(analysis_id),)
             )
             result = cursor.fetchone()
@@ -171,22 +171,28 @@ def serve_streamlit_app():
             
             if result:
                 asc_standard = result['asc_standard']
-                logger.info(f"Found asc_standard: {asc_standard}")
+                analysis_type = result['analysis_type']
+                logger.info(f"Found asc_standard: {asc_standard}, analysis_type: {analysis_type}")
                 
-                # Map ASC standards to Streamlit page file names (used in URLs)
-                page_mapping = {
-                    'ASC 606': 'asc606_page',
-                    'ASC 340-40': 'asc340_page',
-                    'ASC 842': 'asc842_page',
-                    'ASC 718': 'asc718_page',
-                    'ASC 805': 'asc805_page',
-                }
-                page_name = page_mapping.get(asc_standard)
-                logger.info(f"Mapped to page_name: {page_name}")
-                
-                if page_name:
-                    page_path = f"/{page_name}"
-                    logger.info(f"Set page_path: {page_path}")
+                # Check if this is a review - redirect to memo_review page
+                if analysis_type == 'review':
+                    page_path = "/memo_review"
+                    logger.info(f"Redirecting to memo_review page for review analysis")
+                else:
+                    # Map ASC standards to Streamlit page file names (used in URLs)
+                    page_mapping = {
+                        'ASC 606': 'asc606_page',
+                        'ASC 340-40': 'asc340_page',
+                        'ASC 842': 'asc842_page',
+                        'ASC 718': 'asc718_page',
+                        'ASC 805': 'asc805_page',
+                    }
+                    page_name = page_mapping.get(asc_standard)
+                    logger.info(f"Mapped to page_name: {page_name}")
+                    
+                    if page_name:
+                        page_path = f"/{page_name}"
+                        logger.info(f"Set page_path: {page_path}")
             else:
                 logger.warning(f"No analysis found for analysis_id {analysis_id}")
         except Exception as e:
@@ -2263,7 +2269,7 @@ def get_analysis_status(analysis_id):
             cursor.execute("""
                 SELECT analysis_id, memo_uuid, status, memo_content, error_message, 
                        completed_at, asc_standard, words_count, tier_name, file_count,
-                       final_charged_credits
+                       final_charged_credits, analysis_type, source_memo_filename
                 FROM analyses 
                 WHERE analysis_id = %s
                 AND user_id = %s
@@ -2281,7 +2287,9 @@ def get_analysis_status(analysis_id):
                 'asc_standard': analysis['asc_standard'],
                 'words_count': analysis['words_count'],
                 'tier_name': analysis['tier_name'],
-                'file_count': analysis['file_count']
+                'file_count': analysis['file_count'],
+                'analysis_type': analysis['analysis_type'] or 'standard',
+                'source_memo_filename': analysis['source_memo_filename']
             }
             
             if analysis['status'] == 'completed' and analysis['memo_content']:
@@ -3458,7 +3466,7 @@ def get_analysis_history():
         
         # Get recent analyses with details
         # Include both analysis_id and memo_uuid for different use cases
-        # Only show completed analyses (not failed/processing ones)
+        # Only show completed analyses with actual memo content (not failed/processing/empty ones)
         cursor.execute("""
             SELECT 
                 a.analysis_id,
@@ -3476,6 +3484,8 @@ def get_analysis_history():
             WHERE a.user_id = %s 
                 AND a.status = 'completed'
                 AND a.completed_at IS NOT NULL
+                AND a.memo_content IS NOT NULL
+                AND LENGTH(a.memo_content) > 100
             ORDER BY a.completed_at DESC
             LIMIT 20
         """, (user_id,))

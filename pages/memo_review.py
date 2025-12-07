@@ -156,6 +156,43 @@ def deidentify_text(contract_text: str, standard_key: str) -> Dict[str, Any]:
         }
 
 
+def _extract_review_comments_section(memo_content: str) -> tuple:
+    """
+    Extract the review comments section from memo content.
+    
+    Returns:
+        Tuple of (review_comments_html, vlogic_memo_html)
+    """
+    # Look for the review comments section marker
+    review_marker = '<div class="review-comments-section"'
+    
+    if review_marker in memo_content:
+        parts = memo_content.split(review_marker, 1)
+        vlogic_memo = parts[0].strip()
+        review_comments = review_marker + parts[1]
+        return review_comments, vlogic_memo
+    
+    # No review comments found
+    return None, memo_content
+
+
+def _fix_review_comments_styling(review_html: str) -> str:
+    """
+    Fix review comments styling for dark background display.
+    Replace blue colors with white for better visibility.
+    """
+    if not review_html:
+        return review_html
+    
+    # Replace blue header colors with white
+    fixed = review_html.replace('color: #1a365d;', 'color: #ffffff;')
+    fixed = fixed.replace('color: #2d5a87;', 'color: #e0e0e0;')
+    fixed = fixed.replace('color: #666;', 'color: rgba(255,255,255,0.8);')
+    fixed = fixed.replace('border-top: 2px solid #1a365d;', 'border-top: 2px solid #4a7c59;')
+    
+    return fixed
+
+
 def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
     """Display completed memo review results."""
     st.success("✅ **Memo Review Complete!** This AI-generated analysis requires review by qualified accounting professionals.")
@@ -169,7 +206,25 @@ def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
     
     memo_content = memo_data.get('memo_content', '')
     if memo_content:
-        st.markdown(memo_content, unsafe_allow_html=True)
+        # Parse out the review comments and vLogic memo
+        review_comments_html, vlogic_memo_html = _extract_review_comments_section(memo_content)
+        
+        # Display Review Comments FIRST (primary purpose of this page)
+        if review_comments_html:
+            st.subheader("📋 Review Comments")
+            st.markdown("*Comparison of your uploaded memo against vLogic's independent analysis:*")
+            
+            # Fix styling for dark background
+            fixed_review_html = _fix_review_comments_styling(review_comments_html)
+            st.markdown(fixed_review_html, unsafe_allow_html=True)
+            
+            st.markdown("---")
+        
+        # Display vLogic Memo in collapsible section
+        if vlogic_memo_html:
+            with st.expander("📄 View vLogic's Independent Analysis", expanded=False):
+                st.markdown("*This is the memo vLogic would generate for the same contract:*")
+                st.markdown(vlogic_memo_html, unsafe_allow_html=True)
         
         st.markdown("---")
         st.subheader("💾 Save Your Review")
@@ -179,22 +234,42 @@ def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         base_filename = f"memo_review_{timestamp}"
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
+        
         with col1:
+            # Download full document (review + memo)
             docx_data = memo_generator._generate_docx(memo_content)
             if docx_data:
                 st.download_button(
-                    label="📄 Word (.docx)",
+                    label="📄 Full Review (.docx)",
                     data=docx_data,
-                    file_name=f"{base_filename}.docx",
+                    file_name=f"{base_filename}_full.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    key=f"download_docx_review_{hash(memo_content[:100]) if len(memo_content) > 100 else hash(memo_content)}",
+                    key=f"download_docx_full_{hash(memo_content[:100]) if len(memo_content) > 100 else hash(memo_content)}",
                     use_container_width=True
                 )
             else:
-                st.button("📄 Word", disabled=True, use_container_width=True, help="Word generation failed")
+                st.button("📄 Full Review", disabled=True, use_container_width=True, help="Word generation failed")
         
         with col2:
+            # Download just review comments
+            if review_comments_html:
+                review_docx_data = memo_generator._generate_docx(review_comments_html)
+                if review_docx_data:
+                    st.download_button(
+                        label="💬 Comments Only (.docx)",
+                        data=review_docx_data,
+                        file_name=f"{base_filename}_comments.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        key=f"download_docx_comments_{hash(review_comments_html[:100]) if len(review_comments_html) > 100 else hash(review_comments_html)}",
+                        use_container_width=True
+                    )
+                else:
+                    st.button("💬 Comments Only", disabled=True, use_container_width=True, help="Word generation failed")
+            else:
+                st.button("💬 Comments Only", disabled=True, use_container_width=True, help="No review comments")
+        
+        with col3:
             st.download_button(
                 label="📝 Markdown (.md)",
                 data=memo_content.encode('utf-8'),
@@ -204,15 +279,46 @@ def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
                 use_container_width=True
             )
         
-        with col3:
+        with col4:
             if st.button("🔄 Start New Review", type="secondary", use_container_width=True):
+                # Only clear review_* keys, not regular analysis keys
                 keys_to_clear = [k for k in st.session_state.keys() 
-                               if isinstance(k, str) and ('_analysis_complete_' in k or '_memo_data_' in k or 'memo_review' in k.lower())]
+                               if isinstance(k, str) and (k.startswith('review_') or 'memo_review' in k.lower())]
                 for key in keys_to_clear:
                     del st.session_state[key]
                 st.rerun()
     else:
         st.error("Memo content not available")
+
+
+def load_analysis_from_db(analysis_id: int, user_token: str) -> Optional[Dict[str, Any]]:
+    """Load an existing analysis from the database for viewing."""
+    try:
+        import requests
+        response = requests.get(
+            f'{WEBSITE_URL}/api/analysis/status/{analysis_id}',
+            headers={'Authorization': f'Bearer {user_token}'},
+            timeout=10
+        )
+        
+        if response.ok:
+            data = response.json()
+            if data.get('status') == 'completed' and data.get('memo_content'):
+                return {
+                    'memo_content': data['memo_content'],
+                    'analysis_id': analysis_id,
+                    'memo_uuid': data.get('memo_uuid'),
+                    'asc_standard': data.get('asc_standard', 'ASC 606'),
+                    'source_memo_filename': data.get('source_memo_filename'),
+                    'analysis_type': data.get('analysis_type', 'review')
+                }
+        
+        logger.error(f"Failed to load analysis {analysis_id}: {response.text if response else 'No response'}")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error loading analysis from DB: {e}")
+        return None
 
 
 def render_page():
@@ -229,6 +335,35 @@ def render_page():
     session_id = st.session_state.get('user_session_id', '')
     logger.info(f"Memo Review page load - session_id: {session_id[:8] if session_id else 'empty'}")
     
+    # Check if we're loading an existing analysis from history (via URL param)
+    query_params = st.query_params
+    analysis_id_param = query_params.get('analysis_id')
+    
+    if analysis_id_param:
+        try:
+            analysis_id_int = int(analysis_id_param)
+            logger.info(f"Loading existing review from history: analysis_id={analysis_id_int}")
+            
+            # Try multiple sources for auth token
+            user_token = st.session_state.get('auth_token') or st.session_state.get('user_data', {}).get('auth_token')
+            
+            if user_token:
+                memo_data = load_analysis_from_db(analysis_id_int, user_token)
+                if memo_data and memo_data.get('memo_content'):
+                    asc_standard = memo_data.get('asc_standard', 'ASC 606')
+                    st.title("Memo Review - Results")
+                    display_completed_memo(memo_data, asc_standard)
+                    return
+                else:
+                    logger.warning(f"Failed to load memo data for analysis_id={analysis_id_int}")
+                    st.error("Unable to load the requested review. It may have been deleted or you don't have access.")
+            else:
+                logger.warning("No auth token available for loading analysis from history")
+                st.error("Please log in to view this analysis.")
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid analysis_id in URL: {analysis_id_param}, error: {e}")
+            st.warning("Invalid analysis ID in URL")
+    
     prefix_map = {
         'ASC 606': 'asc606',
         'ASC 340-40': 'asc340',
@@ -237,14 +372,16 @@ def render_page():
         'ASC 842': 'asc842'
     }
     
-    # Resume polling for any active analysis
+    # Resume polling for any active REVIEW analysis (not standard analysis)
     for asc_standard, asc_prefix in prefix_map.items():
-        check_and_resume_polling(asc_standard=asc_standard, session_id=session_id)
+        check_and_resume_polling(asc_standard=asc_standard, session_id=session_id, analysis_type='review')
     
-    # Check for completed analysis in session state
+    # Check for completed REVIEW analysis in session state (use review_* prefix)
     for asc_standard, asc_prefix in prefix_map.items():
-        analysis_key = f'{asc_prefix}_analysis_complete_{session_id}'
-        memo_key = f'{asc_prefix}_memo_data_{session_id}'
+        # Use review_ prefix to separate from regular analysis results
+        review_prefix = f'review_{asc_prefix}'
+        analysis_key = f'{review_prefix}_analysis_complete_{session_id}'
+        memo_key = f'{review_prefix}_memo_data_{session_id}'
         
         logger.info(f"Checking {asc_standard}: analysis_key={analysis_key}, has_key={st.session_state.get(analysis_key, False)}")
         
