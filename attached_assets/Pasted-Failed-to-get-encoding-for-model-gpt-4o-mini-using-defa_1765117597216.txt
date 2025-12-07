@@ -1,0 +1,20 @@
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+Failed to get encoding for model gpt-4o-mini, using default: 'Could not automatically map gpt-4o-mini to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+⚠️ Vendor name 'ABC Communications, Inc.' (normalized: 'ABC Communications, Inc.') not found in contract text
+⚠️ Customer name 'Global Health Corp.' (normalized: 'Global Health Corp.') not found in contract text
+⚠️ Privacy extraction did not detect party names in the contract text. Extracted names (vendor: 'ABC Communications, Inc.', customer: 'Global Health Corp.') were not found in the contract.
+INFO:shared.job_manager:Routing to memo review worker for ASC 606
+INFO:shared.job_manager:✓ Job submitted for ASC 606: 104 (analysis 104)
+INFO:pages.memo_review_job_runner:Memo Review job submitted: 104
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-12-07T14:26:06.422441", "analysis_id": "a25a40ac", "asc_standard": "ASC 606", "total_words": 9505, "file_count": 1, "tier": null, "cost": 0.0, "user_id": 19, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.analysis_manager:Started analysis a25a40ac: ASC 606 - 9505 words
+INFO:pages.memo_review_job_runner:Started Memo Review analysis tracking: UI ID=a25a40ac, DB ID=104, Job ID=104
+INFO:shared.job_progress_monitor:Job 104 status: JobStatus.QUEUED
