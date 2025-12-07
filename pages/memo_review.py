@@ -107,6 +107,19 @@ def get_analyzer_for_standard(standard_key: str):
     return analyzer_class()
 
 
+def deidentify_with_known_parties(text: str, vendor_name: str, customer_name: str, standard_key: str) -> str:
+    """Apply de-identification using already-known party names."""
+    try:
+        analyzer = get_analyzer_for_standard(standard_key)
+        result = analyzer.deidentify_contract_text(text, vendor_name, customer_name)
+        if result.get('success'):
+            return result['text']
+        return text
+    except Exception as e:
+        logger.error(f"De-identification error: {e}")
+        return text
+
+
 def deidentify_text(contract_text: str, standard_key: str) -> Dict[str, Any]:
     """Apply de-identification to contract text using the appropriate analyzer."""
     try:
@@ -222,6 +235,8 @@ def render_page():
     contract_word_count = 0
     memo_text = ""
     memo_word_count = 0
+    detected_vendor = None
+    detected_customer = None
     
     if contract_files:
         st.markdown("---")
@@ -250,16 +265,16 @@ def render_page():
             
             if deidentify_result.get('success'):
                 contract_text = deidentify_result['text']
-                vendor_name = deidentify_result.get('vendor_name', 'Unknown')
-                customer_name = deidentify_result.get('customer_name', 'Unknown')
+                detected_vendor = deidentify_result.get('vendor_name')
+                detected_customer = deidentify_result.get('customer_name')
                 st.success("Privacy protection applied successfully")
                 
                 with st.container(border=True):
                     st.markdown("**Party names replaced:**")
-                    if vendor_name:
-                        st.markdown(f"• Vendor: **\"{vendor_name}\"** → **\"the Company\"**")
-                    if customer_name:
-                        st.markdown(f"• Customer: **\"{customer_name}\"** → **\"the Customer\"**")
+                    if detected_vendor:
+                        st.markdown(f"• Vendor: **\"{detected_vendor}\"** → **\"the Company\"**")
+                    if detected_customer:
+                        st.markdown(f"• Customer: **\"{detected_customer}\"** → **\"the Customer\"**")
             else:
                 contract_text = raw_contract_text
                 st.warning(f"Could not apply privacy protection: {deidentify_result.get('error', 'Unknown error')}. Proceeding with original text.")
@@ -273,9 +288,20 @@ def render_page():
         
         result = extract_document_text(memo_file)
         if result.get('success', False) or result.get('text'):
-            memo_text = result.get('text', '')
-            memo_word_count = len(memo_text.split())
+            raw_memo_text = result.get('text', '')
+            memo_word_count = len(raw_memo_text.split())
             st.success(f"✅ {memo_file.name}: {memo_word_count:,} words extracted")
+            
+            if detected_vendor or detected_customer:
+                memo_text = deidentify_with_known_parties(
+                    raw_memo_text, 
+                    detected_vendor, 
+                    detected_customer, 
+                    standard_config['key']
+                )
+                st.caption("Privacy protection applied using party names from contract")
+            else:
+                memo_text = raw_memo_text
             
             with st.expander(f"View Memo Text ({memo_word_count:,} words)", expanded=False):
                 st.text_area("Memo content", memo_text[:5000] + ("..." if len(memo_text) > 5000 else ""), height=200, disabled=True)
