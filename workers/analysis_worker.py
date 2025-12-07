@@ -983,6 +983,156 @@ def run_asc340_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         raise
 
 
+def _generate_review_comments(
+    vlogic_analysis: Dict[str, Any],
+    uploaded_memo: str,
+    asc_standard: str,
+    analyzer
+) -> Dict[str, list]:
+    """
+    Compare vLogic's analysis with the uploaded memo and generate review comments.
+    
+    Args:
+        vlogic_analysis: The step-by-step analysis results from vLogic
+        uploaded_memo: The user's uploaded memo text
+        asc_standard: The ASC standard being analyzed
+        analyzer: The step analyzer instance (has _make_llm_request method)
+    
+    Returns:
+        Dictionary with review comment categories
+    """
+    from shared.api_cost_tracker import track_openai_request
+    import json
+    
+    # Extract key conclusions from vLogic analysis
+    vlogic_conclusions = []
+    for step_key, step_data in vlogic_analysis.get('steps', {}).items():
+        if isinstance(step_data, dict):
+            conclusion = step_data.get('conclusion', '')
+            if conclusion:
+                vlogic_conclusions.append(f"{step_key}: {conclusion}")
+    
+    vlogic_summary = "\n".join(vlogic_conclusions)
+    executive_summary = vlogic_analysis.get('executive_summary', '')
+    final_conclusion = vlogic_analysis.get('conclusion', '')
+    
+    # Build the comparison prompt
+    messages = [
+        {
+            "role": "system",
+            "content": f"""You are an expert technical accounting reviewer specializing in {asc_standard}. 
+Your task is to compare an existing memo prepared by someone else against an independent analysis.
+Provide constructive, professional review comments that will help improve the memo's quality and compliance."""
+        },
+        {
+            "role": "user",
+            "content": f"""Compare the following existing memo with our independent {asc_standard} analysis and generate review comments.
+
+=== EXISTING MEMO TO REVIEW ===
+{uploaded_memo[:12000]}
+
+=== VLOGIC INDEPENDENT ANALYSIS ===
+Executive Summary: {executive_summary}
+
+Key Conclusions:
+{vlogic_summary}
+
+Final Conclusion: {final_conclusion}
+
+=== INSTRUCTIONS ===
+Generate structured review comments in the following categories. For each category, provide specific, actionable comments. If no issues in a category, say "No issues identified."
+
+Respond with ONLY a JSON object in this exact format:
+{{
+    "missing_analysis": ["List of topics or analysis steps that appear in vLogic but are missing or inadequate in the existing memo"],
+    "different_conclusions": ["List of areas where conclusions differ between the memos, with explanation"],
+    "documentation_gaps": ["List of areas where the existing memo lacks sufficient documentation, citations, or supporting evidence"],
+    "technical_accuracy": ["List of any technical accuracy concerns or areas needing clarification"],
+    "formatting_suggestions": ["List of formatting or presentation improvements"]
+}}
+
+Be specific and reference actual content from both memos. Focus on substantive issues rather than stylistic preferences."""
+        }
+    ]
+    
+    try:
+        response_content = analyzer._make_llm_request(messages, analyzer.main_model, "default")
+        
+        track_openai_request(
+            messages=messages,
+            response_text=response_content or "",
+            model=analyzer.main_model,
+            request_type="review_comparison"
+        )
+        
+        if not response_content:
+            logger.warning("LLM returned empty response for review comparison")
+            return {"error": ["Unable to generate review comments"]}
+        
+        # Parse JSON response
+        response_content = response_content.strip()
+        if response_content.startswith("```"):
+            import re
+            response_content = re.sub(r'^```(?:json)?\s*|\s*```$', '', response_content, flags=re.MULTILINE)
+        
+        review_data = json.loads(response_content)
+        return review_data
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error in review comparison: {str(e)}")
+        return {"error": [f"Failed to parse review comments: {str(e)}"]}
+    except Exception as e:
+        logger.error(f"Error generating review comments: {str(e)}")
+        return {"error": [f"Error generating review comments: {str(e)}"]}
+
+
+def _format_review_comments_section(review_comments: Dict[str, list], memo_filename: str) -> str:
+    """
+    Format review comments into a readable HTML section for the memo.
+    
+    Args:
+        review_comments: Dictionary of review comment categories
+        memo_filename: Name of the reviewed memo file
+    
+    Returns:
+        Formatted HTML string for the review comments section
+    """
+    section_titles = {
+        "missing_analysis": "Missing or Incomplete Analysis",
+        "different_conclusions": "Areas with Different Conclusions",
+        "documentation_gaps": "Documentation Gaps",
+        "technical_accuracy": "Technical Accuracy Concerns",
+        "formatting_suggestions": "Formatting & Presentation Suggestions",
+        "error": "Review Notes"
+    }
+    
+    html_parts = [
+        '<div class="review-comments-section" style="margin-top: 40px; border-top: 2px solid #1a365d; padding-top: 20px;">',
+        f'<h2 style="color: #1a365d;">Review Comments</h2>',
+        f'<p style="color: #666; font-style: italic;">Review of: {memo_filename}</p>',
+    ]
+    
+    has_content = False
+    
+    for category, title in section_titles.items():
+        comments = review_comments.get(category, [])
+        if comments and not (len(comments) == 1 and "No issues identified" in comments[0]):
+            has_content = True
+            html_parts.append(f'<h3 style="color: #2d5a87; margin-top: 20px;">{title}</h3>')
+            html_parts.append('<ul style="margin-left: 20px;">')
+            for comment in comments:
+                if comment and comment.strip():
+                    html_parts.append(f'<li style="margin-bottom: 8px;">{comment}</li>')
+            html_parts.append('</ul>')
+    
+    if not has_content:
+        html_parts.append('<p style="color: #28a745; font-weight: bold;">No significant issues identified. The memo appears to align well with our independent analysis.</p>')
+    
+    html_parts.append('</div>')
+    
+    return '\n'.join(html_parts)
+
+
 def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Run Memo Review analysis in background worker
@@ -1137,10 +1287,36 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         filename = ", ".join(uploaded_filenames) if uploaded_filenames else "Uploaded Documents"
         analysis_results['filename'] = filename
         
+        # Phase 2: Generate review comments comparing uploaded memo with vLogic analysis
+        if source_memo_text:
+            logger.info("🔍 Generating review comments (comparing with uploaded memo)...")
+            if job:
+                job.meta['progress'] = {
+                    'current_step': 3,
+                    'total_steps': 4,
+                    'step_name': 'Generating review comments',
+                    'updated_at': datetime.now().isoformat()
+                }
+                job.save_meta()
+            
+            review_comments = _generate_review_comments(
+                vlogic_analysis=analysis_results,
+                uploaded_memo=source_memo_text,
+                asc_standard=asc_standard,
+                analyzer=analyzer
+            )
+            analysis_results['review_comments'] = review_comments
+            logger.info(f"✓ Generated {len(review_comments)} review comment categories")
+        
         memo_content = memo_generator.combine_clean_steps(
             analysis_results,
             analysis_id=analysis_id
         )
+        
+        # Append review comments section if available
+        if source_memo_text and analysis_results.get('review_comments'):
+            review_section = _format_review_comments_section(analysis_results['review_comments'], source_memo_filename)
+            memo_content = memo_content + "\n\n" + review_section
         
         api_cost = get_total_estimated_cost()
         

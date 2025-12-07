@@ -4,14 +4,18 @@
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
 ## Recent Changes (December 7, 2025)
-1. **Memo Review Feature (Phase 1)**: New tool allowing users to upload an existing memo and source contract for comparison against vLogic-generated analysis.
+1. **Memo Review Feature (Phase 1 & 2 Complete)**: Tool allowing users to upload an existing memo and source contract for comparison against vLogic-generated analysis with review comments.
    - New page: `pages/memo_review.py` with ASC standard selector, dual file upload
    - Job runner: `pages/memo_review_job_runner.py` for background job submission
    - Worker function: `run_memo_review_analysis` in `workers/analysis_worker.py`
    - Database: Added `analysis_type` (default 'standard', also 'review') and `source_memo_filename` columns to analyses table
-   - Billing: Charges combined contract + uploaded memo word counts (updated from contract-only)
-   - Privacy: De-identification applied to contract text before analysis
-   - Button text: "Analyze & Review" (not "Compare Memos")
+   - Billing: Charges combined contract + uploaded memo word counts
+   - Privacy: De-identification applied to BOTH contract and uploaded memo
+   - Button text: "Analyze & Review"
+   - **Phase 2**: Review comment generation comparing uploaded memo vs vLogic analysis
+     - Helper functions: `_generate_review_comments()` and `_format_review_comments_section()`
+     - Categories: Missing Analysis, Different Conclusions, Documentation Gaps, Technical Accuracy, Formatting Suggestions
+     - Review comments appended to output memo as a dedicated section
 
 ## Recent Changes (December 5, 2025)
 1. **Major Pricing Update**: 10-20x increase in word allowances across all tiers:
