@@ -1,0 +1,65 @@
+INFO:utils.document_extractor:→ Extracting text using DOCX extractor...
+INFO:utils.document_extractor:✓ Text extracted: 5720 words (~19 pages) via python-docx
+INFO:asc606.step_analyzer:🤖 Using GPT-5 for main analysis, GPT-5-mini for light tasks
+WARNING:asc606.step_analyzer:⚠️ Vendor name 'LYNX FINHEALTH, INC.' (normalized: 'LYNX FINHEALTH, INC.') not found in contract text
+INFO:asc606.step_analyzer:✓ De-identification complete: customer 'COREWELL HEALTH' → 'the Customer' (1 occurrences)
+INFO:pages.memo_review_job_runner:Memo Review analysis record created with database ID: 118
+INFO:shared.job_manager:Routing to memo review worker for ASC 606
+INFO:shared.analysis_manager:Started analysis 1569cb37: ASC 606 - 58961 words
+INFO:shared.job_manager:✓ Job submitted for ASC 606: 118 (analysis 118)
+INFO:pages.memo_review_job_runner:Started Memo Review analysis tracking: UI ID=1569cb37, DB ID=118, Job ID=118
+INFO:pages.memo_review_job_runner:Memo Review job submitted: 118
+INFO:shared.api_cost_tracker:API cost tracker reset
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "start", "timestamp": "2025-12-07T22:31:11.816053", "analysis_id": "1569cb37", "asc_standard": "ASC 606", "total_words": 58961, "file_count": 4, "tier": null, "cost": 0.0, "user_id": 20, "status": "running", "success": null, "duration": null, "error": null}
+INFO:shared.job_progress_monitor:Job 118 status: JobStatus.QUEUED
+INFO:shared.job_progress_monitor:Job 118 status: JobStatus.STARTED
+           ^^^^^^^^^^^
+INFO:shared.job_progress_monitor:Job 118 status: JobStatus.FAILED
+ERROR:shared.job_progress_monitor:Job 118 failed: Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/openai/_base_client.py", line 1259, in post
+  File "/app/asc606/step_analyzer.py", line 636, in _analyze_step_with_retry
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+    result = self._analyze_step(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/app/asc606/step_analyzer.py", line 742, in _analyze_step
+    markdown_content = self._make_llm_request(messages, self.model, "step_analysis")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/asc606/step_analyzer.py", line 540, in _make_llm_request
+    response = self.client.chat.completions.create(**request_params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/_utils/_utils.py", line 286, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 1192, in create
+    return self._post(
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/openai/_base_client.py", line 1047, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.BadRequestError: Error code: 400 - {'error': {'message': "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/app/workers/analysis_worker.py", line 1279, in run_memo_review_analysis
+    step_result = analyzer._analyze_step_with_retry(
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/asc606/step_analyzer.py", line 687, in _analyze_step_with_retry
+    raise RuntimeError(f"OpenAI API error: {str(e)}")
+RuntimeError: OpenAI API error: Error code: 400 - {'error': {'message': "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}
+During handling of the above exception, another exception occurred:
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/rq/worker.py", line 1439, in perform_job
+    return_value = job.perform()
+                   ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1318, in perform
+    self._result = self._execute()
+                   ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/rq/job.py", line 1376, in _execute
+    result = self.func(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/workers/analysis_worker.py", line 1292, in run_memo_review_analysis
+    raise Exception(f"Step {step_num} failed: {str(e)}")
+Exception: Step 1 failed: OpenAI API error: Error code: 400 - {'error': {'message': "Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}
+INFO:shared.analysis_manager:💾 Saving analysis record: 1569cb37
+INFO:shared.analysis_manager:Current auth token is valid
+INFO:shared.analysis_manager:✓ Analysis saved to database: 1569cb37
+INFO:shared.analysis_manager:ANALYSIS_EVENT: {"event_type": "complete", "timestamp": "2025-12-07T22:31:32.049439", "analysis_id": "1569cb37", "asc_standard": "ASC 606", "total_words": 58961, "file_count": 4, "tier": null, "cost": 0.0, "user_id": 20, "status": "failed", "success": false, "duration": 20.067775011062622, "error": "Traceback (most recent call last):\n  File \"/app/asc606/step_analyzer.py\", line 636, in _analyze_step_with_retry\n    result = self._analyze_step(\n             ^^^^^^^^^^^^^^^^^^^\n  File \"/app/asc606/step_analyzer.py\", line 742, in _analyze_step\n    markdown_content = self._make_llm_request(messages, self.model, \"step_analysis\")\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/asc606/step_analyzer.py\", line 540, in _make_llm_request\n    response = self.client.chat.completions.create(**request_params)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/openai/_utils/_utils.py\", line 286, in wrapper\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py\", line 1192, in create\n    return self._post(\n           ^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/openai/_base_client.py\", line 1259, in post\n    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/openai/_base_client.py\", line 1047, in request\n    raise self._make_status_error_from_response(err.response) from None\nopenai.BadRequestError: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/app/workers/analysis_worker.py\", line 1279, in run_memo_review_analysis\n    step_result = analyzer._analyze_step_with_retry(\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/asc606/step_analyzer.py\", line 687, in _analyze_step_with_retry\n    raise RuntimeError(f\"OpenAI API error: {str(e)}\")\nRuntimeError: OpenAI API error: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/usr/local/lib/python3.11/site-packages/rq/worker.py\", line 1439, in perform_job\n    return_value = job.perform()\n                   ^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1318, in perform\n    self._result = self._execute()\n                   ^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/rq/job.py\", line 1376, in _execute\n    result = self.func(*self.args, **self.kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/app/workers/analysis_worker.py\", line 1292, in run_memo_review_analysis\n    raise Exception(f\"Step {step_num} failed: {str(e)}\")\nException: Step 1 failed: OpenAI API error: Error code: 400 - {'error': {'message': \"Unsupported parameter: 'max_tokens' is not supported with this model. Use 'max_completion_tokens' instead.\", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'unsupported_parameter'}}\n"}
+INFO:shared.analysis_manager:Completed analysis 1569cb37: failed - 20.1s
