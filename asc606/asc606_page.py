@@ -191,8 +191,16 @@ def render_asc606_page():
     if 'file_uploader_key' not in st.session_state:
         st.session_state.file_uploader_key = 0
 
-    # Resume polling hook - check if there's an active analysis that needs monitoring
-    from shared.job_progress_monitor import check_and_resume_polling
+    # Resume polling hook - check for persisted job in URL first (survives page reloads)
+    from shared.job_progress_monitor import check_and_resume_polling, resume_job_from_url, get_job_from_url
+    
+    url_job = get_job_from_url()
+    if url_job and url_job.get('analysis_type') == 'standard':
+        logger.info(f"Found persisted job in URL, resuming: {url_job['job_id']}")
+        if resume_job_from_url(asc_standard='ASC 606', session_id=st.session_state.user_session_id):
+            return  # Job is still running, polling resumed
+    
+    # Fallback: check session state for active analysis
     check_and_resume_polling(asc_standard='ASC 606', session_id=st.session_state.user_session_id)
 
     # Page header

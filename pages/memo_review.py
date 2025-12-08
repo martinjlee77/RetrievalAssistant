@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 
 from shared.auth_utils import require_authentication, auth_manager, WEBSITE_URL
-from shared.job_progress_monitor import check_and_resume_polling
+from shared.job_progress_monitor import check_and_resume_polling, resume_job_from_url, get_job_from_url
 from shared.subscription_manager import SubscriptionManager
 from utils.document_extractor import DocumentExtractor
 
@@ -334,6 +334,15 @@ def render_page():
     
     session_id = st.session_state.get('user_session_id', '')
     logger.info(f"Memo Review page load - session_id: {session_id[:8] if session_id else 'empty'}")
+    
+    # Check for persisted job in URL (survives page reloads)
+    url_job = get_job_from_url()
+    if url_job:
+        logger.info(f"Found persisted job in URL, resuming: {url_job['job_id']}")
+        # Determine ASC standard from URL or default to ASC 606 for review
+        asc_standard = 'ASC 606'  # Default for memo review
+        if resume_job_from_url(asc_standard, session_id):
+            return  # Job is still running, polling resumed
     
     # Check if we're loading an existing analysis from history (via URL param)
     query_params = st.query_params

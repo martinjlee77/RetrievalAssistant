@@ -6,12 +6,114 @@ Provides reusable polling logic for all ASC standards
 import streamlit as st
 import logging
 import time
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from shared.job_manager import job_manager
 from shared.analysis_manager import analysis_manager
 
 logger = logging.getLogger(__name__)
+
+
+def persist_job_to_url(job_id: str, db_analysis_id: int, analysis_type: str = 'standard'):
+    """
+    Store job info in URL query params for persistence across page reloads.
+    Note: Only stores non-sensitive identifiers. Auth tokens are retrieved from session state.
+    """
+    try:
+        st.query_params['job_id'] = job_id
+        st.query_params['db_id'] = str(db_analysis_id)
+        st.query_params['type'] = analysis_type
+        logger.info(f"Persisted job to URL: job_id={job_id}, db_id={db_analysis_id}")
+    except Exception as e:
+        logger.warning(f"Failed to persist job to URL: {e}")
+
+
+def clear_job_from_url():
+    """
+    Remove job tracking params from URL after job completes.
+    """
+    try:
+        for key in ['job_id', 'db_id', 'type']:
+            if key in st.query_params:
+                del st.query_params[key]
+        logger.info("Cleared job params from URL")
+    except Exception as e:
+        logger.warning(f"Failed to clear job from URL: {e}")
+
+
+def get_job_from_url() -> Optional[Dict[str, Any]]:
+    """
+    Retrieve job info from URL query params if present.
+    
+    Returns:
+        Dict with job_id, db_analysis_id, analysis_type or None if not found
+    """
+    try:
+        job_id = st.query_params.get('job_id')
+        db_id = st.query_params.get('db_id')
+        analysis_type = st.query_params.get('type', 'standard')
+        
+        if job_id and db_id:
+            return {
+                'job_id': job_id,
+                'db_analysis_id': int(db_id),
+                'analysis_type': analysis_type
+            }
+    except Exception as e:
+        logger.warning(f"Error reading job from URL: {e}")
+    
+    return None
+
+
+def resume_job_from_url(asc_standard: str, session_id: str) -> bool:
+    """
+    Check URL for persisted job and resume polling if found.
+    Auth tokens are retrieved from session state (not URL) for security.
+    
+    Returns:
+        True if a job was resumed, False otherwise
+    """
+    url_job = get_job_from_url()
+    
+    if not url_job:
+        return False
+    
+    logger.info(f"Found persisted job in URL: {url_job}")
+    
+    # Get auth token from session state (secure - not from URL)
+    user_token = st.session_state.get('user_data', {}).get('auth_token') or st.session_state.get('auth_token')
+    
+    if not user_token:
+        logger.warning("No auth token in session, cannot resume job")
+        clear_job_from_url()
+        return False
+    
+    # Verify job is still running/queued (not already completed)
+    try:
+        status_info = job_manager.get_job_status(url_job['job_id'])
+        job_status = status_info.get('status', 'unknown')
+        
+        if job_status in ['finished', 'failed']:
+            logger.info(f"Persisted job already {job_status}, clearing URL")
+            clear_job_from_url()
+            return False
+        
+        # Job is still active, resume polling using session auth token
+        monitor_job_progress(
+            asc_standard=asc_standard,
+            job_id=url_job['job_id'],
+            db_analysis_id=url_job['db_analysis_id'],
+            session_id=session_id,
+            user_token=user_token,
+            service_token=None,  # Not stored in URL for security
+            analysis_type=url_job['analysis_type']
+        )
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error resuming job from URL: {e}")
+        clear_job_from_url()
+        return False
 
 def check_and_resume_polling(asc_standard: str, session_id: str, analysis_type: str = 'standard'):
     """
@@ -93,6 +195,10 @@ def monitor_job_progress(
     try:
         # Determine which token to use for API calls
         auth_token = service_token if service_token else user_token
+        
+        # Persist job to URL for resilience across page reloads
+        # Note: Only stores non-sensitive identifiers, tokens come from session state
+        persist_job_to_url(job_id, db_analysis_id, analysis_type)
         
         # Determine session key prefix based on ASC standard and analysis type
         # Map to exact prefixes used by page files
@@ -183,6 +289,7 @@ def monitor_job_progress(
                                 logger.info(f"✓ Marked analysis {ui_analysis_id} as complete")
                             
                             st.info("📄 **Memo ready!** Refreshing page to display results...")
+                            clear_job_from_url()
                             time.sleep(2)
                             st.rerun()
                         else:
@@ -192,6 +299,7 @@ def monitor_job_progress(
                             ui_analysis_id = st.session_state.get('current_ui_analysis_id')
                             if ui_analysis_id:
                                 analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message="Memo not available after completion")
+                            clear_job_from_url()
                     else:
                         st.error(f"❌ Failed to retrieve analysis: {status_response.text}")
                         logger.error(f"Status fetch failed: {status_response.status_code}")
@@ -199,6 +307,7 @@ def monitor_job_progress(
                         ui_analysis_id = st.session_state.get('current_ui_analysis_id')
                         if ui_analysis_id:
                             analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=f"Status fetch failed: {status_response.status_code}")
+                        clear_job_from_url()
                         
                 except Exception as e:
                     st.error(f"❌ Error retrieving analysis: {str(e)}")
@@ -207,6 +316,7 @@ def monitor_job_progress(
                     ui_analysis_id = st.session_state.get('current_ui_analysis_id')
                     if ui_analysis_id:
                         analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=str(e))
+                    clear_job_from_url()
                 
                 return
                 
@@ -225,6 +335,7 @@ def monitor_job_progress(
                 if ui_analysis_id:
                     analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=error_msg)
                 
+                clear_job_from_url()
                 return
                 
             elif job_status == 'started':
@@ -270,6 +381,8 @@ def monitor_job_progress(
         if ui_analysis_id:
             analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message="Analysis timed out after 30 minutes")
         
+        clear_job_from_url()
+        
     except Exception as e:
         logger.error(f"Error in job monitoring: {str(e)}")
         st.error(f"❌ **Error**: {str(e)}")
@@ -278,3 +391,5 @@ def monitor_job_progress(
         ui_analysis_id = st.session_state.get('current_ui_analysis_id')
         if ui_analysis_id:
             analysis_manager.complete_analysis(ui_analysis_id, success=False, error_message=str(e))
+        
+        clear_job_from_url()
