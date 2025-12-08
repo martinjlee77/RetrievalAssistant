@@ -1021,6 +1021,8 @@ Analyze the contract for Step {step_num} focusing on:
 
 REQUIRED OUTPUT FORMAT (Clean Markdown):
 
+CRITICAL: You MUST use these EXACT section headers - **Analysis:** and **Conclusion:** - with bold asterisks and colon. Do not use markdown headers (##, ###) for these sections.
+
 ### {step['title']}
 
 [Write comprehensive analysis in flowing paragraphs with professional reasoning. Include specific contract evidence and ASC 606 citations. Quote contract language only when the exact wording is outcome‑determinative; paraphrase ASC 606 with pinpoint citations and use only brief decisive phrases when directly supportive.]
@@ -1105,18 +1107,24 @@ FORMATTING:
                     if marker_match:
                         conclusion = marker_match.group(1).strip()
                     else:
-                        # Try all four conclusion patterns for maximum robustness
-                        # Pattern 1: **Conclusion:** (bold with colon)
+                        # Try multiple conclusion patterns for maximum robustness
+                        # Pattern 1: **Conclusion:** (bold with colon) - preferred format
                         conclusion_match = re.search(r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
                         if not conclusion_match:
-                            # Pattern 2: Conclusion: (plain text with colon)
+                            # Pattern 2: ### Conclusion or ## Conclusion (markdown headers)
+                            conclusion_match = re.search(r'^#{2,3}\s*Conclusion[:\s]*\n(.+?)(?:\n#{2,3}\s|\n\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        if not conclusion_match:
+                            # Pattern 3: Conclusion: (plain text with colon)
                             conclusion_match = re.search(r'^Conclusion:\s*(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
                         if not conclusion_match:
-                            # Pattern 3: **Conclusion** (bold without colon)
+                            # Pattern 4: **Conclusion** (bold without colon)
                             conclusion_match = re.search(r'\*\*Conclusion\*\*\s+(.+?)(?:\n\s*\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL)
                         if not conclusion_match:
-                            # Pattern 4: Conclusion (plain text without colon)
+                            # Pattern 5: Conclusion (plain text without colon)
                             conclusion_match = re.search(r'^Conclusion\s+(.+?)(?:\n\s*(?:\*\*|[A-Z][a-z]+:)|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+                        if not conclusion_match:
+                            # Pattern 6: #### Conclusion (h4 header)
+                            conclusion_match = re.search(r'^#{4}\s*Conclusion[:\s]*\n(.+?)(?:\n#{2,4}\s|\n\*\*|$)', markdown_content, re.IGNORECASE | re.DOTALL | re.MULTILINE)
                         
                         if conclusion_match:
                             conclusion = conclusion_match.group(1).strip()
