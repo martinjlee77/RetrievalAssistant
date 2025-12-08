@@ -153,8 +153,9 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         }
         
         # Run 5 ASC 606 steps with progress reporting
-        # Sequential execution with accumulated context (analyzer handles context passing internally)
+        # Sequential execution with accumulated context - pass full prior step outputs to each subsequent step
         step_failures = []
+        accumulated_prior_steps = []  # Accumulate full markdown outputs from completed steps
         
         for step_num in range(1, 6):
             # Update job progress
@@ -173,21 +174,32 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 # Get relevant knowledge for this step
                 authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
                 
+                # Build prior steps context for Steps 2-5
+                prior_steps_context = None
+                if accumulated_prior_steps:
+                    prior_steps_context = "\n\n".join(accumulated_prior_steps)
+                    logger.info(f"   Passing {len(accumulated_prior_steps)} prior step(s) context ({len(prior_steps_context)} chars)")
+                
                 # Build step kwargs
                 step_kwargs = {
                     'step_num': step_num,
                     'contract_text': combined_text,
                     'authoritative_context': authoritative_context,
                     'customer_name': customer_name,
-                    'additional_context': additional_context
+                    'additional_context': additional_context,
+                    'prior_steps_context': prior_steps_context
                 }
                 
-                # Analyze the step with retry logic (analyzer handles sequential context passing internally)
+                # Analyze the step with retry logic
                 step_result = analyzer._analyze_step_with_retry(**step_kwargs)
                 
                 # Store under 'steps' key to match original flow structure
                 analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
+                
+                # Accumulate this step's output for subsequent steps
+                if 'markdown_content' in step_result:
+                    accumulated_prior_steps.append(step_result['markdown_content'])
                 
             except Exception as e:
                 logger.error(f"Error in Step {step_num}: {str(e)}")
@@ -1270,11 +1282,12 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             job.save_meta()
         
         # Run the analysis steps
-        # Sequential execution with accumulated context (analyzer handles context passing internally)
+        # Sequential execution with accumulated context - pass full prior step outputs to each subsequent step
         analysis_results = {
             'steps': {},
             'asc_standard': asc_standard
         }
+        accumulated_prior_steps = []  # Accumulate full markdown outputs from completed steps
         
         for step_num in range(1, step_count + 1):
             logger.info(f"📋 Analyzing Step {step_num}/{step_count}...")
@@ -1282,19 +1295,30 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
                 
+                # Build prior steps context for Steps 2+
+                prior_steps_context = None
+                if accumulated_prior_steps:
+                    prior_steps_context = "\n\n".join(accumulated_prior_steps)
+                    logger.info(f"   Passing {len(accumulated_prior_steps)} prior step(s) context ({len(prior_steps_context)} chars)")
+                
                 step_kwargs = {
                     'step_num': step_num,
                     'contract_text': combined_text,
                     'authoritative_context': authoritative_context,
                     'customer_name': company_name,
-                    'additional_context': additional_context
+                    'additional_context': additional_context,
+                    'prior_steps_context': prior_steps_context
                 }
                 
-                # Analyze the step with retry logic (analyzer handles sequential context passing internally)
+                # Analyze the step with retry logic
                 step_result = analyzer._analyze_step_with_retry(**step_kwargs)
                 
                 analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
+                
+                # Accumulate this step's output for subsequent steps
+                if 'markdown_content' in step_result:
+                    accumulated_prior_steps.append(step_result['markdown_content'])
                 
             except Exception as e:
                 logger.error(f"Error in Step {step_num}: {str(e)}")

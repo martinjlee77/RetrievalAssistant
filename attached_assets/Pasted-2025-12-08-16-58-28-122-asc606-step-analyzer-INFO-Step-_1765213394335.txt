@@ -1,0 +1,26 @@
+2025-12-08 16:58:28,122 - asc606.step_analyzer - INFO - ✓ Step 1: Completed in 107.8s
+2025-12-08 16:58:28,122 - workers.analysis_worker - INFO - ✓ Completed Step 1
+2025-12-08 16:58:28,122 - workers.analysis_worker - INFO - 📋 Analyzing Step 2/5...
+2025-12-08 16:58:28,131 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-12-08 16:58:28,826 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-12-08 16:58:28,833 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.70s)
+2025-12-08 16:58:28,833 - asc606.knowledge_search - INFO - Retrieved guidance for Step 2
+2025-12-08 16:58:28,833 - asc606.step_analyzer - INFO - → Step 2: Starting analysis using gpt-5.1...
+2025-12-08 16:58:28,833 - asc606.step_analyzer - INFO - 💰 Extracting transaction price components and variable consideration...
+2025-12-08 17:00:50,932 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-12-08 17:00:50.934 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:00:50.934 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:00:50,934 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 17:00:50,934 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:00:51,009 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:00:51,014 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 75109, Output tokens: 4907, Cost: $0.4491
+2025-12-08 17:00:51,014 - shared.api_cost_tracker - INFO - Tracked step_2_analysis request: $0.4491 (Total: $0.8806)
+2025-12-08 17:00:51,014 - asc606.step_analyzer - WARNING - Step 2 validation issues: ['Missing Analysis section in Step 2', 'Missing Conclusion section in Step 2']
+2025-12-08 17:00:51,014 - asc606.step_analyzer - INFO - ✓ Step 2: Completed in 142.2s
+2025-12-08 17:00:51,014 - workers.analysis_worker - INFO - ✓ Completed Step 2
+2025-12-08 17:00:51,014 - workers.analysis_worker - INFO - 📋 Analyzing Step 3/5...
+2025-12-08 17:00:51,026 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-12-08 17:00:51,266 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-12-08 17:00:51,272 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.25s)
+2025-12-08 17:00:51,272 - asc606.knowledge_search - INFO - Retrieved guidance for Step 3
+2025-12-08 17:00:51,272 - asc606.step_analyzer - INFO - → Step 3: Starting analysis using gpt-5.1...
