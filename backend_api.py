@@ -4133,6 +4133,40 @@ def handle_subscription_created(event, conn):
     # Create subscription_usage record for this billing period
     create_usage_record(subscription_id, org_id, plan_key, 
                        current_period_start, current_period_end, conn, words_used=0)
+    
+    # Send upgrade confirmation email to user
+    try:
+        # Get user info for this organization
+        cursor.execute("""
+            SELECT email, name FROM users WHERE org_id = %s LIMIT 1
+        """, (org_id,))
+        user = cursor.fetchone()
+        
+        if user:
+            # Get plan details for email
+            from shared.pricing_config import SUBSCRIPTION_PLANS
+            plan_info = SUBSCRIPTION_PLANS.get(plan_key, {})
+            plan_name = plan_info.get('name', plan_key.title())
+            word_allowance = plan_info.get('word_allowance', 150000)
+            monthly_words = f"{word_allowance:,}"
+            
+            postmark = PostmarkClient()
+            email_sent = postmark.send_upgrade_confirmation_email(
+                to_email=user['email'],
+                customer_name=user['name'] or 'Valued Customer',
+                plan_name=plan_name,
+                monthly_words=monthly_words,
+                login_url=f"{os.getenv('WEBSITE_URL', 'https://veritaslogic.ai')}/login.html"
+            )
+            
+            if email_sent:
+                logger.info(f"Upgrade confirmation email sent to {user['email']}")
+            else:
+                logger.warning(f"Failed to send upgrade confirmation email to {user['email']}")
+        else:
+            logger.warning(f"No user found for org {org_id} - skipping upgrade email")
+    except Exception as email_error:
+        logger.error(f"Error sending upgrade confirmation email: {email_error}")
 
 
 def handle_subscription_updated(event, conn):
