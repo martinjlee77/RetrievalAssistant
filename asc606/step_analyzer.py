@@ -822,8 +822,29 @@ Respond with ONLY a JSON object in this exact format:
             validation_result = self.validate_step_output(markdown_content, step_num)
             if not validation_result["valid"]:
                 logger.warning(f"Step {step_num} validation issues: {validation_result['issues']}")
-                # Append validation issues to the Issues section
-                if "**Issues or Uncertainties:**" in markdown_content:
+                
+                # Check if missing Conclusion section - this is critical, retry once
+                if "**Conclusion:**" not in markdown_content:
+                    logger.warning(f"⚠️ Step {step_num}: Missing **Conclusion:** section - retrying with explicit format instruction...")
+                    time.sleep(1)
+                    
+                    # Add explicit format reminder to prompt for retry
+                    retry_prompt = prompt + "\n\nIMPORTANT REMINDER: You MUST include a **Conclusion:** section (bold with colon). This is required."
+                    retry_messages = [
+                        {"role": "system", "content": self._get_markdown_system_prompt()},
+                        {"role": "user", "content": retry_prompt}
+                    ]
+                    
+                    retry_content = self._make_llm_request(retry_messages, self.model, "step_analysis_conclusion_retry")
+                    if retry_content and "**Conclusion:**" in retry_content:
+                        logger.info(f"✓ Step {step_num}: Retry successful - Conclusion section now present")
+                        markdown_content = retry_content.strip()
+                        validation_result = self.validate_step_output(markdown_content, step_num)
+                    else:
+                        logger.warning(f"Step {step_num}: Retry still missing Conclusion - using original content")
+                
+                # Append validation issues to the Issues section if still invalid
+                if not validation_result["valid"] and "**Issues or Uncertainties:**" in markdown_content:
                     issues_section = "\n\n**Validation Notes:** " + "; ".join(validation_result["issues"])
                     markdown_content = markdown_content.replace(
                         "**Issues or Uncertainties:**", 
