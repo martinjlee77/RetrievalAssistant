@@ -922,3 +922,135 @@ Thanks for choosing VeritasLogic.ai!
         except Exception as e:
             logger.error(f"Error sending purchase welcome email: {e}")
             return False
+    
+    def send_upgrade_confirmation_email(self, to_email: str, customer_name: str, 
+                                        plan_name: str, monthly_words: str, 
+                                        login_url: str) -> bool:
+        """
+        Send confirmation email when existing user upgrades from Trial to paid plan
+        
+        Args:
+            to_email: Customer's email address
+            customer_name: Customer's name
+            plan_name: Name of upgraded plan (e.g., "Professional")
+            monthly_words: Monthly word allowance (e.g., "150,000")
+            login_url: URL to login page
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': to_email,
+                'Subject': f'Upgrade Confirmed - VeritasLogic.ai {plan_name} Plan',
+                'HtmlBody': f"""
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #2c3e50;">
+                    <div style="background: linear-gradient(135deg, #1a4d6d 0%, #2C5F7F 100%); padding: 2rem; text-align: center; border-radius: 8px 8px 0 0;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 2rem;">Upgrade Confirmed</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0;">Your {plan_name} subscription is now active</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 2rem; border-radius: 0 0 8px 8px;">
+                        <h2 style="color: #2c3e50; margin-top: 0;">Thank You for Upgrading!</h2>
+                        
+                        <p>Hi {customer_name},</p>
+                        
+                        <p>Your upgrade to the <strong>{plan_name}</strong> plan has been processed successfully. Your new subscription is now active.</p>
+                        
+                        <div style="background: white; border-left: 4px solid #28a745; padding: 1.5rem; margin: 1.5rem 0; border-radius: 4px;">
+                            <h3 style="margin-top: 0; color: #2c3e50;">Your New Plan Details</h3>
+                            <p style="margin: 0.5rem 0;"><strong>Plan:</strong> {plan_name}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Monthly Word Allowance:</strong> {monthly_words} words</p>
+                            <p style="margin: 0.5rem 0;"><strong>Unused Words:</strong> Roll over for up to 12 months</p>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 2rem 0;">
+                            <a href="{login_url}" style="display: inline-block; background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                                Continue to Dashboard
+                            </a>
+                        </div>
+                        
+                        <h3 style="color: #2c3e50;">What's Included</h3>
+                        <ul style="line-height: 1.8;">
+                            <li>Full access to all ASC standards (606, 842, 718, 805, 340-40)</li>
+                            <li>Unlimited analyses within your word allowance</li>
+                            <li>Priority AI processing</li>
+                            <li>Export to Word and PDF formats</li>
+                        </ul>
+                        
+                        <div style="background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 4px; padding: 1rem; margin: 1.5rem 0;">
+                            <p style="margin: 0; color: #0c5460;">
+                                <strong>Manage Your Subscription</strong><br>
+                                You can view invoices, update payment methods, or change plans anytime from your account dashboard.
+                            </p>
+                        </div>
+                        
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 1rem; margin: 1.5rem 0;">
+                            <p style="margin: 0; color: #856404;">
+                                <strong>Need Help?</strong><br>
+                                Reply to this email or contact us at <a href="mailto:support@veritaslogic.ai" style="color: #4a90e2;">support@veritaslogic.ai</a>
+                            </p>
+                        </div>
+                        
+                        <p style="margin-top: 2rem; color: #666; font-size: 0.9rem;">
+                            Thanks for choosing VeritasLogic.ai!<br>
+                            <em>— The VeritasLogic Team</em>
+                        </p>
+                    </div>
+                </div>
+                """,
+                'TextBody': f"""
+Upgrade Confirmed - VeritasLogic.ai {plan_name} Plan
+
+Hi {customer_name},
+
+Your upgrade to the {plan_name} plan has been processed successfully. Your new subscription is now active.
+
+YOUR NEW PLAN DETAILS
+Plan: {plan_name}
+Monthly Word Allowance: {monthly_words} words
+Unused Words: Roll over for up to 12 months
+
+WHAT'S INCLUDED
+- Full access to all ASC standards (606, 842, 718, 805, 340-40)
+- Unlimited analyses within your word allowance
+- Priority AI processing
+- Export to Word and PDF formats
+
+Continue to Dashboard: {login_url}
+
+MANAGE YOUR SUBSCRIPTION
+You can view invoices, update payment methods, or change plans anytime from your account dashboard.
+
+NEED HELP?
+Reply to this email or contact us at support@veritaslogic.ai
+
+Thanks for choosing VeritasLogic.ai!
+— The VeritasLogic Team
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Upgrade confirmation email sent to {to_email}")
+                return True
+            else:
+                logger.error(f"Failed to send upgrade confirmation email: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending upgrade confirmation email: {e}")
+            return False
