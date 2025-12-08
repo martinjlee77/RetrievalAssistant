@@ -1,0 +1,84 @@
+1. Summary of performance obligations (from Step 2)
+Based on the Master Agreement and Orders No. 1 and 2, the key promised goods and services (from the vendor to the Company) can be summarized as follows (subject to confirmation of Step 2 conclusions):
+
+Professional / implementation services
+
+Planning, configuration, and implementation of the OTC, Wellness, Flex, and Rewards & Incentives programs, including project management, requirements, configuration, integration, user-acceptance testing, and go‑live support [Contract, “Implementation Plan will be followed as set forth in Exhibit E”].
+Training of Company personnel on the Client Admin Portal and member‑facing tools [Contract, “Training | the Company Company will provide up to six (6) hours of training…”; Order No. 2, “Train the trainer training…”].
+Hosted (SaaS) platform / card program services
+
+Ongoing access to and use of the “the Company Company Platform” and Client Admin Portal to set up and manage OTC, Flex, Wellness, and Rewards programs [Contract, “the Company Company Platform…to offer: An Over‑the‑Counter… Fitness and Wellness… Flexible carded solution…”, Order No. 2, “the Company Company Platform…to offer…Rewards and Incentives Program”].
+Member web portal and mobile app for balances, transactions, e‑commerce purchases, claims submissions, and account management [Contract, “Member User Interface (UI)… Mobile Application…”].
+Tier 2 member support and client support, including ticket resolution and escalation handling [Contract, “Tier 2 Member Support… Client Support will be available 8am – 5pm ET…”].
+Card program management (BIN sponsorship, issuing, configuration of restricted spend rules, replacement cards) and catalog program administration [Contract, “Cards. the Company Company will provide card program management…”; “Catalog. the Company Company will send a physical catalog to all eligible Members…”].
+E‑commerce store operation, including product procurement, warehousing, order fulfillment, shipping, returns/refunds, and vendor management (Modify Health, Helper Bees, etc.) [Contract, “E‑commerce. the Company Company will provide an E‑commerce experience…”; Exhibit 1 to Annex A identifying subcontractors].
+Manual claims / reimbursement processing and related decisioning [Contract, “Manual Claims and Reimbursement. the Company Company will support a manual claims process…”].
+Ongoing reporting, CMS/VBID/Medicare/Medicaid addendum compliance, and service level monitoring [Contract, “Reports | the Company Company will provide the Company Reports…”, plus Exhibits B, Medicare/Medicaid/HIDE SNP Addenda].
+Per‑unit services and deliverables
+
+Physical cards and card carriers, including custom designs, mailed to members, including replacements [Contract, “Physical Card Fee | For Plan Year 2025 Cards under 182,500: 
+0
+…
+C
+a
+r
+d
+s
+i
+n
+e
+x
+c
+e
+s
+s
+o
+f
+182
+,
+500
+:
+0…Cardsinexcessof182,500:2.75…”].
+Physical catalogs and welcome kits mailed to members [Contract, “Physical Catalog… Per catalog issued…”, “Welcome Kit | Custom Quote…”].
+Per‑transaction / per‑event services: manual claim processing, ACH, check issuance, optional custom development, custom APL management, etc. [Contract, Exhibit F and Exhibit E fee tables, e.g., “Claims Processing | 
+0.88
+p
+e
+r
+m
+a
+n
+u
+a
+l
+c
+l
+a
+i
+m
+p
+r
+o
+c
+e
+s
+s
+e
+d
+”
+,
+“
+A
+C
+H
+F
+e
+e
+∣
+0.88permanualclaimprocessed”,“ACHFee∣0.15”, “Custom Development | $250 per hour”].
+Orders No. 1 and 2 each bundle many of these items into a single, integrated program (OTC/Flex/Wellness program in Order 1; Rewards & Incentives program in Order 2). Step 2 likely concluded that:
+
+Implementation / professional services are distinct from ongoing hosted services (they are separately described and can be contracted on time‑and‑materials, fixed‑fee or not‑to‑exceed bases [Contract, “Professional Service Fees | Check one: Fixed Fee / Time and Material / Not‑to‑Exceed”]).
+Ongoing hosted platform, card program, e‑commerce, and support form a combined performance obligation, because the customer receives a single integrated benefit (a functioning supplemental benefits/rewards card program) and the various activities (hosting, cards, catalogs, e‑commerce, claims handling, reporting) are highly interdependent.
+Per‑unit items (cards, catalogs, claims, ACH, checks) are either (a) part of that integrated service (usage‑based consideration), or (b) distinct, per‑use performance obligations that are satisfied as each service is rendered.
+Because the allocation in Step 4 depends on how Step 2 grouped or separated these promises, management must ensure that the final list of performance obligations from Step 2 is used as the allocation basis.

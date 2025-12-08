@@ -1,0 +1,23 @@
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Added clean step 1 content (17670 chars)
+2025-12-08 00:13:46.601 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 00:13:46,601 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Added clean step 2 content (24841 chars)
+2025-12-08 00:13:46,601 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 00:13:46,608 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 00:13:46,613 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 7832, Output tokens: 4962, Cost: $0.1136
+2025-12-08 00:13:46,613 - shared.api_cost_tracker - INFO - Tracked review_comparison request: $0.1136 (Total: $2.3315)
+2025-12-08 00:13:46,613 - workers.analysis_worker - INFO - ✓ Generated 4 review comment categories
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Added clean step 3 content (20873 chars)
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Added clean step 4 content (22115 chars)
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Added clean step 5 content (19436 chars)
+2025-12-08 00:13:46,614 - asc606.clean_memo_generator - INFO - Clean memo generated: 117170 chars, 5/5 steps
+2025-12-08 00:13:46.614 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 00:13:46.614 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 00:13:46,614 - workers.analysis_worker - INFO - 💾 Saving memo review analysis to database...
+2025-12-08 00:13:46,614 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-12-08 00:13:46,799 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-12-08 00:13:46,802 - workers.analysis_worker - INFO - ✓ Memo Review analysis saved successfully: c50e2d3d
+2025-12-08 00:13:46,837 - rq.worker - INFO - Successfully completed workers.analysis_worker.run_memo_review_analysis({'analysis_id': 124, 'user_id': 20, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5...) job in 0:14:23.919015s on worker cea0fa8344234388b0908421d497b7fb
+2025-12-08 00:13:46,837 - rq.worker - INFO - analysis: Job OK (124)
+2025-12-08 00:13:46,839 - rq.worker - INFO - Result is kept for 86400 seconds
+2025-12-08 00:13:46,879 - rq.worker - INFO - Worker cea0fa8344234388b0908421d497b7fb: cleaning registries for queue: analysis
