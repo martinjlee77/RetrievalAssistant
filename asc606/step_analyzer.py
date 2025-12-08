@@ -579,10 +579,14 @@ Respond with ONLY a JSON object in this exact format:
             'steps': {}
         }
         
-        # Analyze steps in parallel with error recovery
+        # ═══════════════════════════════════════════════════════════════════════
+        # TWO-PHASE EXECUTION: Ensures Steps 4-5 use Step 2's PO conclusions
+        # ═══════════════════════════════════════════════════════════════════════
+        
+        # PHASE 1: Run Steps 1, 2, 3 in parallel (Step 2 determines POs)
+        logger.info("📋 Phase 1: Analyzing Steps 1, 2, 3 in parallel...")
         with ThreadPoolExecutor(max_workers=3) as executor:
-            # Submit all step analyses
-            futures = {
+            phase1_futures = {
                 executor.submit(
                     self._analyze_step_with_retry,
                     step_num=step_num,
@@ -591,12 +595,51 @@ Respond with ONLY a JSON object in this exact format:
                     customer_name=customer_name,
                     additional_context=additional_context
                 ): step_num
-                for step_num in range(1, 6)
+                for step_num in [1, 2, 3]  # Phase 1: Steps 1-3 only
             }
             
-            # Collect results as they complete
-            for future in futures:
-                step_num = futures[future]
+            for future in phase1_futures:
+                step_num = phase1_futures[future]
+                try:
+                    results['steps'][f'step_{step_num}'] = future.result()
+                    logger.info(f"Completed Step {step_num}")
+                except Exception as e:
+                    logger.error(f"Final error in Step {step_num}: {str(e)}")
+                    results['steps'][f'step_{step_num}'] = {
+                        'title': self._get_step_title(step_num),
+                        'analysis': f"Error analyzing this step: {str(e)}",
+                        'conclusion': "Analysis incomplete due to error"
+                    }
+        
+        # Extract Step 2 PO summary for use in Steps 4 and 5
+        step2_po_summary = None
+        if 'step_2' in results['steps']:
+            step2_data = results['steps']['step_2']
+            if isinstance(step2_data, dict) and 'markdown_content' in step2_data:
+                step2_po_summary = self._extract_po_summary_from_step2(step2_data['markdown_content'])
+                if step2_po_summary:
+                    logger.info(f"✓ Extracted Step 2 PO summary for Steps 4-5 ({len(step2_po_summary)} chars)")
+                else:
+                    logger.warning("⚠️ Could not extract PO summary from Step 2 - Steps 4-5 will analyze independently")
+        
+        # PHASE 2: Run Steps 4 and 5 with Step 2 context
+        logger.info("📋 Phase 2: Analyzing Steps 4, 5 with Step 2 PO context...")
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            phase2_futures = {
+                executor.submit(
+                    self._analyze_step_with_retry,
+                    step_num=step_num,
+                    contract_text=contract_text,
+                    authoritative_context=authoritative_context,
+                    customer_name=customer_name,
+                    additional_context=additional_context,
+                    step2_po_summary=step2_po_summary  # Pass Step 2 conclusions
+                ): step_num
+                for step_num in [4, 5]  # Phase 2: Steps 4-5 with PO context
+            }
+            
+            for future in phase2_futures:
+                step_num = phase2_futures[future]
                 try:
                     results['steps'][f'step_{step_num}'] = future.result()
                     logger.info(f"Completed Step {step_num}")
@@ -625,13 +668,25 @@ Respond with ONLY a JSON object in this exact format:
                                contract_text: str,
                                authoritative_context: str,
                                customer_name: str,
-                               additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single step with enhanced retry logic for production scalability."""
+                               additional_context: str = "",
+                               step2_po_summary: str = None) -> Dict[str, str]:
+        """Analyze a single step with enhanced retry logic for production scalability.
+        
+        Args:
+            step_num: Step number (1-5)
+            contract_text: Contract document text
+            authoritative_context: Retrieved ASC 606 guidance
+            customer_name: Customer name
+            additional_context: Optional user-provided context
+            step2_po_summary: For Steps 4/5 - the PO conclusions from Step 2
+        """
         max_retries = 4  # Increased from 2
         base_delay = 1
         step_start_time = time.time()
         
         logger.info(f"→ Step {step_num}: Starting analysis using {self.main_model}...")
+        if step_num in [4, 5] and step2_po_summary:
+            logger.info(f"   Step {step_num}: Using Step 2 PO conclusions ({len(step2_po_summary)} chars)")
         
         for attempt in range(max_retries):
             try:
@@ -643,7 +698,8 @@ Respond with ONLY a JSON object in this exact format:
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     customer_name=customer_name,
-                    additional_context=additional_context
+                    additional_context=additional_context,
+                    step2_po_summary=step2_po_summary
                 )
                 
                 step_time = time.time() - step_start_time
@@ -714,8 +770,18 @@ Respond with ONLY a JSON object in this exact format:
                      contract_text: str,
                      authoritative_context: str,
                      customer_name: str,
-                     additional_context: str = "") -> Dict[str, str]:
-        """Analyze a single ASC 606 step - returns clean markdown."""
+                     additional_context: str = "",
+                     step2_po_summary: str = None) -> Dict[str, str]:
+        """Analyze a single ASC 606 step - returns clean markdown.
+        
+        Args:
+            step_num: Step number (1-5)
+            contract_text: Contract document text
+            authoritative_context: Retrieved ASC 606 guidance
+            customer_name: Customer name
+            additional_context: Optional user-provided context
+            step2_po_summary: For Steps 4/5 - the PO conclusions from Step 2
+        """
         
         # Log financial calculations for Step 2 (Transaction Price)
         if step_num == 2:
@@ -727,7 +793,8 @@ Respond with ONLY a JSON object in this exact format:
             contract_text=contract_text,
             authoritative_context=authoritative_context,
             customer_name=customer_name,
-            additional_context=additional_context
+            additional_context=additional_context,
+            step2_po_summary=step2_po_summary
         )
         
         # Make API call - use _make_llm_request helper for proper GPT-5/GPT-4o routing
@@ -842,8 +909,19 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         contract_text: str, 
                         authoritative_context: str,
                         customer_name: str,
-                        additional_context: str = "") -> str:
-        """Generate markdown prompt for a specific step."""
+                        additional_context: str = "",
+                        step2_po_summary: str = None) -> str:
+        """Generate markdown prompt for a specific step.
+        
+        Args:
+            step_num: The step number (1-5)
+            contract_text: The contract document text
+            authoritative_context: Retrieved ASC 606 guidance
+            customer_name: Customer name
+            additional_context: Optional user-provided context
+            step2_po_summary: For Steps 4 and 5 only - the performance obligations 
+                             concluded in Step 2 that MUST be used as the basis
+        """
         
         step_info = {
             1: {
@@ -944,6 +1022,28 @@ CONTRACT TEXT:
 ADDITIONAL CONTEXT:
 {additional_context}"""
 
+        # For Steps 4 and 5: Inject the Step 2 PO conclusions as ESTABLISHED FACTS
+        # This ensures consistency - Steps 4/5 must use the same POs as Step 2
+        if step_num in [4, 5] and step2_po_summary:
+            prompt += f"""
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: STEP 2 PERFORMANCE OBLIGATIONS (USE THESE AS YOUR BASIS)
+═══════════════════════════════════════════════════════════════════════════════
+
+The following performance obligations were identified and concluded in Step 2 of this analysis.
+YOU MUST USE THESE EXACT PERFORMANCE OBLIGATIONS as the basis for your Step {step_num} analysis.
+Do NOT re-analyze or re-identify performance obligations - treat these as established facts.
+
+STEP 2 CONCLUSIONS:
+{step2_po_summary}
+
+═══════════════════════════════════════════════════════════════════════════════
+Your Step {step_num} analysis must be consistent with the performance obligations listed above.
+{"Allocate the transaction price to THESE performance obligations." if step_num == 4 else "Determine revenue recognition timing for EACH of THESE performance obligations."}
+═══════════════════════════════════════════════════════════════════════════════
+"""
+
         prompt += f"""
 
 AUTHORITATIVE GUIDANCE:
@@ -1014,6 +1114,55 @@ FORMATTING:
             5: "Step 5: Recognize Revenue"
         }
         return titles.get(step_num, f"Step {step_num}")
+    
+    def _extract_po_summary_from_step2(self, step2_markdown: str) -> Optional[str]:
+        """
+        Extract the Performance Obligation summary from Step 2's output.
+        
+        Looks for [BEGIN_PO_SUMMARY]...[END_PO_SUMMARY] markers first,
+        then falls back to extracting the conclusion section.
+        
+        Returns:
+            The PO summary text, or None if not found
+        """
+        if not step2_markdown:
+            return None
+        
+        # Try structured markers first (most reliable)
+        marker_match = re.search(
+            r'\[BEGIN_PO_SUMMARY\](.*?)\[END_PO_SUMMARY\]', 
+            step2_markdown, 
+            re.DOTALL | re.IGNORECASE
+        )
+        if marker_match:
+            po_summary = marker_match.group(1).strip()
+            logger.info(f"Extracted PO summary from markers ({len(po_summary)} chars)")
+            return po_summary
+        
+        # Fallback: Extract the conclusion section from Step 2
+        conclusion_match = re.search(
+            r'\*\*Conclusion:\*\*\s*(.+?)(?:\n\s*\*\*Issues|$)', 
+            step2_markdown, 
+            re.DOTALL | re.IGNORECASE
+        )
+        if conclusion_match:
+            conclusion = conclusion_match.group(1).strip()
+            logger.info(f"Extracted PO summary from conclusion ({len(conclusion)} chars)")
+            return conclusion
+        
+        # Last resort: Look for performance obligation summary section
+        po_section_match = re.search(
+            r'(?:performance obligation[s]? (?:summary|identified|concluded)|summary of.*performance obligation[s]?)[\s:]*(.+?)(?:\n\s*\*\*|$)',
+            step2_markdown,
+            re.DOTALL | re.IGNORECASE
+        )
+        if po_section_match:
+            po_text = po_section_match.group(1).strip()
+            logger.info(f"Extracted PO summary from section heading ({len(po_text)} chars)")
+            return po_text
+        
+        logger.warning("Could not extract PO summary from Step 2 output")
+        return None
     
     # REMOVED: _apply_basic_formatting - using clean GPT-4o markdown directly
     
