@@ -1319,9 +1319,9 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
                 
-                # After Step 2 completes, extract PO summary for Steps 4-5
+                # After Step 2 completes, extract PO summary for Steps 4-5 (ASC 606 only)
                 if asc_standard == 'ASC 606' and step_num == 2:
-                    if 'markdown_content' in step_result:
+                    if 'markdown_content' in step_result and hasattr(analyzer, '_extract_po_summary_from_step2'):
                         step2_po_summary = analyzer._extract_po_summary_from_step2(step_result['markdown_content'])
                         if step2_po_summary:
                             logger.info(f"✓ Extracted Step 2 PO summary for Steps 4-5 ({len(step2_po_summary)} chars)")

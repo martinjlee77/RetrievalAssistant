@@ -669,7 +669,7 @@ Respond with ONLY a JSON object in this exact format:
                                authoritative_context: str,
                                customer_name: str,
                                additional_context: str = "",
-                               step2_po_summary: str = None) -> Dict[str, str]:
+                               step2_po_summary: Optional[str] = None) -> Dict[str, str]:
         """Analyze a single step with enhanced retry logic for production scalability.
         
         Args:
@@ -771,7 +771,7 @@ Respond with ONLY a JSON object in this exact format:
                      authoritative_context: str,
                      customer_name: str,
                      additional_context: str = "",
-                     step2_po_summary: str = None) -> Dict[str, str]:
+                     step2_po_summary: Optional[str] = None) -> Dict[str, str]:
         """Analyze a single ASC 606 step - returns clean markdown.
         
         Args:
@@ -910,7 +910,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         authoritative_context: str,
                         customer_name: str,
                         additional_context: str = "",
-                        step2_po_summary: str = None) -> str:
+                        step2_po_summary: Optional[str] = None) -> str:
         """Generate markdown prompt for a specific step.
         
         Args:
