@@ -153,9 +153,8 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
         }
         
         # Run 5 ASC 606 steps with progress reporting
-        # TWO-PHASE APPROACH: Steps 1-3 first, then Steps 4-5 with Step 2 PO context
+        # Sequential execution with accumulated context (analyzer handles context passing internally)
         step_failures = []
-        step2_po_summary = None  # Will be extracted after Step 2 completes
         
         for step_num in range(1, 6):
             # Update job progress
@@ -174,7 +173,7 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                 # Get relevant knowledge for this step
                 authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
                 
-                # Build step kwargs - for Steps 4-5, include Step 2 PO summary
+                # Build step kwargs
                 step_kwargs = {
                     'step_num': step_num,
                     'contract_text': combined_text,
@@ -183,25 +182,12 @@ def run_asc606_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     'additional_context': additional_context
                 }
                 
-                # Steps 4-5 need Step 2's PO conclusions for consistency
-                if step_num in [4, 5] and step2_po_summary:
-                    step_kwargs['step2_po_summary'] = step2_po_summary
-                    logger.info(f"   Step {step_num}: Using Step 2 PO conclusions")
-                
-                # Analyze the step with retry logic (matches original flow)
+                # Analyze the step with retry logic (analyzer handles sequential context passing internally)
                 step_result = analyzer._analyze_step_with_retry(**step_kwargs)
                 
                 # Store under 'steps' key to match original flow structure
                 analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
-                
-                # After Step 2 completes, extract PO summary for Steps 4-5
-                if step_num == 2 and 'markdown_content' in step_result:
-                    step2_po_summary = analyzer._extract_po_summary_from_step2(step_result['markdown_content'])
-                    if step2_po_summary:
-                        logger.info(f"✓ Extracted Step 2 PO summary for Steps 4-5 ({len(step2_po_summary)} chars)")
-                    else:
-                        logger.warning("⚠️ Could not extract PO summary from Step 2")
                 
             except Exception as e:
                 logger.error(f"Error in Step {step_num}: {str(e)}")
@@ -1284,15 +1270,11 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             job.save_meta()
         
         # Run the analysis steps
-        # NOTE: For ASC 606 (5 steps), we use two-phase approach:
-        # - Steps 1-3 run first, Step 2 determines performance obligations
-        # - Steps 4-5 receive Step 2's PO conclusions for consistency
+        # Sequential execution with accumulated context (analyzer handles context passing internally)
         analysis_results = {
             'steps': {},
             'asc_standard': asc_standard
         }
-        
-        step2_po_summary = None  # Will be extracted after Step 2 completes
         
         for step_num in range(1, step_count + 1):
             logger.info(f"📋 Analyzing Step {step_num}/{step_count}...")
@@ -1300,7 +1282,6 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 authoritative_context = knowledge_search.search_for_step(step_num, combined_text)
                 
-                # For Steps 4-5 in ASC 606, pass the Step 2 PO summary
                 step_kwargs = {
                     'step_num': step_num,
                     'contract_text': combined_text,
@@ -1309,24 +1290,11 @@ def run_memo_review_analysis(job_data: Dict[str, Any]) -> Dict[str, Any]:
                     'additional_context': additional_context
                 }
                 
-                # ASC 606 Steps 4-5 need Step 2's PO conclusions for consistency
-                if asc_standard == 'ASC 606' and step_num in [4, 5] and step2_po_summary:
-                    step_kwargs['step2_po_summary'] = step2_po_summary
-                    logger.info(f"   Step {step_num}: Using Step 2 PO conclusions")
-                
+                # Analyze the step with retry logic (analyzer handles sequential context passing internally)
                 step_result = analyzer._analyze_step_with_retry(**step_kwargs)
                 
                 analysis_results['steps'][f'step_{step_num}'] = step_result
                 logger.info(f"✓ Completed Step {step_num}")
-                
-                # After Step 2 completes, extract PO summary for Steps 4-5 (ASC 606 only)
-                if asc_standard == 'ASC 606' and step_num == 2:
-                    if 'markdown_content' in step_result and hasattr(analyzer, '_extract_po_summary_from_step2'):
-                        step2_po_summary = analyzer._extract_po_summary_from_step2(step_result['markdown_content'])
-                        if step2_po_summary:
-                            logger.info(f"✓ Extracted Step 2 PO summary for Steps 4-5 ({len(step2_po_summary)} chars)")
-                        else:
-                            logger.warning("⚠️ Could not extract PO summary from Step 2")
                 
             except Exception as e:
                 logger.error(f"Error in Step {step_num}: {str(e)}")

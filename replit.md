@@ -3,6 +3,16 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
+## Recent Changes (December 8, 2025)
+1. **Sequential Execution Architecture for All ASC Standards**: Refactored all ASC standards (606, 842, 718, 805, 340-40) from parallel to sequential step execution with accumulated context passing.
+   - Each step receives full markdown output from ALL prior steps for perfect consistency
+   - Prior steps context injected with approved prompt language: "The following conclusions have been established in prior steps of this analysis. Use these as facts - do not re-analyze these determinations."
+   - Removed ASC 606-specific two-phase `_extract_po_summary_from_step2` pattern - replaced with universal sequential approach
+   - Removed ThreadPoolExecutor imports (no longer parallel)
+   - Updated `analyze_contract`, `_analyze_step_with_retry`, `_analyze_step`, and `_get_step_markdown_prompt` methods across all analyzers
+   - Cleaned up `workers/analysis_worker.py` to remove legacy PO extraction logic
+   - Performance tradeoff: 2-3x slower but dramatically improved accuracy and consistency
+
 ## Recent Changes (December 7, 2025)
 1. **Memo Review Feature (Phase 1, 2 & 3 Complete)**: Tool allowing users to upload an existing memo and source contract for comparison against vLogic-generated analysis with review comments.
    - New page: `pages/memo_review.py` with ASC standard selector, dual file upload

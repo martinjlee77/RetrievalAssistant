@@ -14,7 +14,7 @@ import random
 import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+# ThreadPoolExecutor removed - now using sequential execution with accumulated context
 
 logger = logging.getLogger(__name__)
 
@@ -598,34 +598,48 @@ OR if it's a third-party contractor:
             'steps': {}
         }
         
-        # Analyze steps in parallel with error recovery
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            # Submit all step analyses
-            futures = {
-                executor.submit(
-                    self._analyze_step_with_retry,
+        # ═══════════════════════════════════════════════════════════════════════
+        # SEQUENTIAL EXECUTION WITH ACCUMULATED CONTEXT
+        # Each step receives FULL outputs from ALL prior steps for consistency
+        # ═══════════════════════════════════════════════════════════════════════
+        
+        accumulated_prior_steps = []  # Will hold full markdown from each completed step
+        
+        for step_num in range(1, 3):  # ASC 340-40 has 2 steps
+            logger.info(f"📋 Analyzing Step {step_num}/2...")
+            
+            # Build prior steps context from accumulated outputs
+            prior_steps_context = None
+            if accumulated_prior_steps:
+                prior_steps_context = "\n\n".join(accumulated_prior_steps)
+                logger.info(f"   Passing {len(accumulated_prior_steps)} prior step(s) context ({len(prior_steps_context)} chars)")
+            
+            try:
+                step_result = self._analyze_step_with_retry(
                     step_num=step_num,
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     customer_name=customer_name,
-                    additional_context=additional_context
-                ): step_num
-                for step_num in range(1, 3)
-            }
-            
-            # Collect results as they complete
-            for future in futures:
-                step_num = futures[future]
-                try:
-                    results['steps'][f'step_{step_num}'] = future.result()
-                    logger.info(f"Completed Step {step_num}")
-                except Exception as e:
-                    logger.error(f"Final error in Step {step_num}: {str(e)}")
-                    results['steps'][f'step_{step_num}'] = {
-                        'title': self._get_step_title(step_num),
-                        'analysis': f"Error analyzing this step: {str(e)}",
-                        'conclusion': "Analysis incomplete due to error"
-                    }
+                    additional_context=additional_context,
+                    prior_steps_context=prior_steps_context
+                )
+                
+                results['steps'][f'step_{step_num}'] = step_result
+                logger.info(f"✓ Completed Step {step_num}")
+                
+                # Accumulate this step's output for subsequent steps
+                if isinstance(step_result, dict) and 'markdown_content' in step_result:
+                    step_title = self._get_step_title(step_num)
+                    accumulated_prior_steps.append(f"=== {step_title} ===\n{step_result['markdown_content']}")
+                    
+            except Exception as e:
+                logger.error(f"Final error in Step {step_num}: {str(e)}")
+                results['steps'][f'step_{step_num}'] = {
+                    'title': self._get_step_title(step_num),
+                    'analysis': f"Error analyzing this step: {str(e)}",
+                    'conclusion': "Analysis incomplete due to error"
+                }
+                # Don't accumulate error results, but continue to next step
         
         # Generate additional sections using clean LLM calls
         logger.info("Starting additional section generation")
@@ -658,13 +672,16 @@ OR if it's a third-party contractor:
                                contract_text: str,
                                authoritative_context: str,
                                customer_name: str,
-                               additional_context: str = "") -> Dict[str, str]:
+                               additional_context: str = "",
+                               prior_steps_context: Optional[str] = None) -> Dict[str, str]:
         """Analyze a single step with enhanced retry logic for production scalability."""
         max_retries = 4  # Increased from 2
         base_delay = 1
         step_start_time = time.time()
         
         logger.info(f"→ Step {step_num}: Starting analysis using {self.main_model}...")
+        if prior_steps_context:
+            logger.info(f"   Step {step_num}: Has prior steps context ({len(prior_steps_context)} chars)")
         
         for attempt in range(max_retries):
             try:
@@ -676,7 +693,8 @@ OR if it's a third-party contractor:
                     contract_text=contract_text,
                     authoritative_context=authoritative_context,
                     customer_name=customer_name,
-                    additional_context=additional_context
+                    additional_context=additional_context,
+                    prior_steps_context=prior_steps_context
                 )
                 
                 step_time = time.time() - step_start_time
@@ -747,7 +765,8 @@ OR if it's a third-party contractor:
                      contract_text: str,
                      authoritative_context: str,
                      customer_name: str,
-                     additional_context: str = "") -> Dict[str, str]:
+                     additional_context: str = "",
+                     prior_steps_context: Optional[str] = None) -> Dict[str, str]:
         """Analyze a single ASC 340-40 step - returns clean markdown."""
         
         # Get step-specific prompt for markdown output
@@ -756,7 +775,8 @@ OR if it's a third-party contractor:
             contract_text=contract_text,
             authoritative_context=authoritative_context,
             customer_name=customer_name,
-            additional_context=additional_context
+            additional_context=additional_context,
+            prior_steps_context=prior_steps_context
         )
         
         # Make API call
@@ -898,7 +918,8 @@ Follow ALL formatting instructions in the user prompt precisely."""
                         contract_text: str, 
                         authoritative_context: str,
                         customer_name: str,
-                        additional_context: str = "") -> str:
+                        additional_context: str = "",
+                        prior_steps_context: Optional[str] = None) -> str:
         """Generate markdown prompt for a specific step."""
         
         step_info = {
@@ -947,6 +968,24 @@ CONTRACT TEXT:
 
 ADDITIONAL CONTEXT:
 {additional_context}"""
+
+        # Inject prior steps context for Step 2 to ensure consistency
+        if prior_steps_context:
+            prompt += f"""
+
+═══════════════════════════════════════════════════════════════════════════════
+PRIOR ANALYSIS CONCLUSIONS (USE THESE AS ESTABLISHED FACTS)
+═══════════════════════════════════════════════════════════════════════════════
+
+The following conclusions have been established in prior steps of this analysis.
+Use these as facts - do not re-analyze these determinations.
+
+{prior_steps_context}
+
+═══════════════════════════════════════════════════════════════════════════════
+Your Step {step_num} analysis must be consistent with the conclusions above.
+═══════════════════════════════════════════════════════════════════════════════
+"""
 
         prompt += f"""
 
