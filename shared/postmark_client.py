@@ -1054,3 +1054,80 @@ Thanks for choosing VeritasLogic.ai!
         except Exception as e:
             logger.error(f"Error sending upgrade confirmation email: {e}")
             return False
+    
+    def send_admin_upgrade_notification(self, customer_email: str, customer_name: str,
+                                        plan_name: str, monthly_price: float) -> bool:
+        """
+        Send notification to support@ when a customer upgrades from trial to paid
+        
+        Args:
+            customer_email: Customer's email address
+            customer_name: Customer's name
+            plan_name: Name of the plan they upgraded to
+            monthly_price: Monthly price of the plan
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Postmark-Server-Token': self.api_key
+            }
+            
+            email_data = {
+                'From': self.from_email,
+                'To': 'support@veritaslogic.ai',
+                'Subject': f'New Upgrade: {customer_name} - {plan_name} (${monthly_price:.0f}/mo)',
+                'HtmlBody': f"""
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #2c3e50;">
+                    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 1.5rem; text-align: center; border-radius: 8px 8px 0 0;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 1.5rem;">New Subscription Upgrade</h1>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 0 0 8px 8px;">
+                        <h2 style="color: #28a745; margin-top: 0;">A customer has upgraded!</h2>
+                        
+                        <div style="background: white; border-left: 4px solid #28a745; padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                            <p style="margin: 0.5rem 0;"><strong>Customer:</strong> {customer_name}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Email:</strong> {customer_email}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Plan:</strong> {plan_name}</p>
+                            <p style="margin: 0.5rem 0;"><strong>Monthly Revenue:</strong> ${monthly_price:.2f}</p>
+                        </div>
+                        
+                        <p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">
+                            This is an automated notification from VeritasLogic.ai
+                        </p>
+                    </div>
+                </div>
+                """,
+                'TextBody': f"""
+New Subscription Upgrade
+
+Customer: {customer_name}
+Email: {customer_email}
+Plan: {plan_name}
+Monthly Revenue: ${monthly_price:.2f}
+
+This is an automated notification from VeritasLogic.ai
+                """
+            }
+            
+            response = requests.post(
+                f'{self.api_url}/email',
+                json=email_data,
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                logger.info(f"Admin upgrade notification sent for {customer_email}")
+                return True
+            else:
+                logger.error(f"Failed to send admin upgrade notification: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending admin upgrade notification: {e}")
+            return False

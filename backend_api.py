@@ -4163,6 +4163,19 @@ def handle_subscription_created(event, conn):
                 logger.info(f"Upgrade confirmation email sent to {user['email']}")
             else:
                 logger.warning(f"Failed to send upgrade confirmation email to {user['email']}")
+            
+            # Send admin notification to support@
+            try:
+                admin_email_sent = postmark.send_admin_upgrade_notification(
+                    customer_email=user['email'],
+                    customer_name=user['name'] or 'Unknown',
+                    plan_name=plan_name,
+                    monthly_price=plan_info.get('price_monthly', 295.00)
+                )
+                if admin_email_sent:
+                    logger.info(f"Admin upgrade notification sent for {user['email']}")
+            except Exception as admin_email_error:
+                logger.error(f"Failed to send admin upgrade notification: {admin_email_error}")
         else:
             logger.warning(f"No user found for org {org_id} - skipping upgrade email")
     except Exception as email_error:
