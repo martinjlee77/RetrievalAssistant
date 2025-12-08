@@ -921,7 +921,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Assess warranties (assurance-type vs service-type), since service-type warranties are separate POs (ASC 606-10-55-30 through 55-35)',
                     'Consider consignment indicators when relevant (affects control and timing, not a separate PO) (ASC 606-10-55-80 through 55-84)',
                     'Combine non-distinct goods/services into a single performance obligation (ASC 606-10-25-22)',
-                    'Consider principal vs. agent determination if a third party or parties are involved (ASC 606-10-55-36 to 55-40)',
+                    'If third parties are involved, perform a full principal vs. agent analysis: evaluate whether the entity is a principal if it controls the specified good or service before that good or service is transferred to a customer (ASC 606-10-55-27); also analyze the control indicators - (a) primary responsibility for fulfillment, (b) inventory risk, (c) pricing discretion',
                     'Identify any customer options for additional goods/services or material rights (ASC 606-10-55-41 to 55-45)',
                     'Provide a summary of the performance obligations identified in your analysis. This summary should list each distinct performance obligation and its key characteristics for executive review.',
                      '',
@@ -966,7 +966,7 @@ Follow ALL formatting instructions in the user prompt precisely."""
                     'Determine over-time vs. point-in-time recognition for each performance obligation. Over time if one of the three criteria is met (simultaneous receipt/consumption, customer controls the asset as created, or no alternative use and enforceable right to payment (ASC 606-10-25-27)), otherwise point in time (ASC 606-10-25-30)',
                     'Analyze when control transfers to the customer',
                     'Specify revenue recognition timing for each obligation',
-                    'Identify any measurement methods for over-time recognition'
+                    'Identify any measurement methods for over-time recognition (make sure to identify only one single method for each PO per ASC 606-10-25-32)'
                 ]
             }
         }
