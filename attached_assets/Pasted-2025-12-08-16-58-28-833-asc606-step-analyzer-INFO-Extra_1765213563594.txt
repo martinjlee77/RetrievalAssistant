@@ -1,0 +1,50 @@
+2025-12-08 16:58:28,833 - asc606.step_analyzer - INFO - 💰 Extracting transaction price components and variable consideration...
+2025-12-08 17:00:50,932 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-12-08 17:00:50.934 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:00:50.934 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:00:50,934 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 17:00:50,934 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:00:51,009 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:00:51,014 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 75109, Output tokens: 4907, Cost: $0.4491
+2025-12-08 17:00:51,014 - shared.api_cost_tracker - INFO - Tracked step_2_analysis request: $0.4491 (Total: $0.8806)
+2025-12-08 17:00:51,014 - asc606.step_analyzer - WARNING - Step 2 validation issues: ['Missing Analysis section in Step 2', 'Missing Conclusion section in Step 2']
+2025-12-08 17:00:51,014 - asc606.step_analyzer - INFO - ✓ Step 2: Completed in 142.2s
+2025-12-08 17:00:51,014 - workers.analysis_worker - INFO - ✓ Completed Step 2
+2025-12-08 17:00:51,014 - workers.analysis_worker - INFO - 📋 Analyzing Step 3/5...
+2025-12-08 17:00:51,026 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-12-08 17:00:51,266 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-12-08 17:00:51,272 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.25s)
+2025-12-08 17:00:51,272 - asc606.knowledge_search - INFO - Retrieved guidance for Step 3
+2025-12-08 17:00:51,272 - asc606.step_analyzer - INFO - → Step 3: Starting analysis using gpt-5.1...
+2025-12-08 17:03:15,472 - workers.analysis_worker - INFO - ✓ Completed Step 3
+2025-12-08 17:03:15,381 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-12-08 17:03:15,472 - workers.analysis_worker - INFO - 📋 Analyzing Step 4/5...
+2025-12-08 17:03:15,386 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 17:03:15.386 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:03:15,472 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 74941, Output tokens: 5417, Cost: $0.4560
+2025-12-08 17:03:15.386 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:03:15,472 - shared.api_cost_tracker - INFO - Tracked step_3_analysis request: $0.4560 (Total: $1.3366)
+2025-12-08 17:03:15,386 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:03:15,472 - asc606.step_analyzer - INFO - ✓ Step 3: Completed in 144.2s
+2025-12-08 17:03:15,466 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:03:15,484 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-12-08 17:03:16,278 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-12-08 17:03:16,283 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.80s)
+2025-12-08 17:03:16,284 - asc606.knowledge_search - INFO - Retrieved guidance for Step 4
+2025-12-08 17:03:16,284 - asc606.step_analyzer - INFO - → Step 4: Starting analysis using gpt-5.1...
+2025-12-08 17:05:15,773 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-12-08 17:05:15.775 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:05:15.775 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:05:15,775 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 17:05:15,775 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:05:15,860 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:05:15,864 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 74727, Output tokens: 3440, Cost: $0.4252
+2025-12-08 17:05:15,865 - shared.api_cost_tracker - INFO - Tracked step_4_analysis request: $0.4252 (Total: $1.7618)
+2025-12-08 17:05:15,865 - asc606.step_analyzer - INFO - ✓ Step 4: Completed in 119.6s
+2025-12-08 17:05:15,865 - workers.analysis_worker - INFO - ✓ Completed Step 4
+2025-12-08 17:05:15,865 - workers.analysis_worker - INFO - 📋 Analyzing Step 5/5...
+2025-12-08 17:05:16,103 - asc606.step_analyzer - INFO - → Step 5: Starting analysis using gpt-5.1...
+2025-12-08 17:05:15,875 - shared.knowledge_base - INFO - 🔍 Querying asc606_guidance knowledge base...
+2025-12-08 17:05:16,096 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-12-08 17:05:16,103 - shared.knowledge_base - INFO - ✓ Retrieved 8 chunks from ChromaDB (0.23s)
+2025-12-08 17:05:16,103 - asc606.knowledge_search - INFO - Retrieved guidance for Step 5
