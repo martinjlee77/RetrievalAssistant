@@ -2039,6 +2039,48 @@ h1, h2, h3, h4, h5, h6 {
 .footer-section a:hover {
     color: #ffffff;
 }
+.footer-trust-badges {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+.footer-trust-badges-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.footer-trust-badges-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+.footer-trust-badges-icons a {
+    display: flex;
+    align-items: center;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+}
+.footer-trust-badges-icons a:hover {
+    opacity: 1;
+}
+.footer-trust-badges-icons img {
+    height: 36px;
+    width: auto;
+}
+.footer-trust-badges-icons .stripe-badge {
+    height: 28px;
+}
+.footer-trust-badges-icons .stripe-text {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
 .footer-bottom {
     border-top: 1px solid rgba(255,255,255,0.1);
     padding-top: 2rem;
