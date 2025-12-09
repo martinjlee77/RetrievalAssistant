@@ -281,14 +281,193 @@ def display_completed_memo(memo_data: Dict[str, Any], asc_standard: str):
         
         with col4:
             if st.button("🔄 Start New Review", type="secondary", use_container_width=True):
+                # Set flag to skip auto-load on next page render
+                st.session_state['skip_review_auto_load'] = True
                 # Only clear review_* keys, not regular analysis keys
                 keys_to_clear = [k for k in st.session_state.keys() 
                                if isinstance(k, str) and (k.startswith('review_') or 'memo_review' in k.lower())]
                 for key in keys_to_clear:
-                    del st.session_state[key]
+                    if key != 'skip_review_auto_load':  # Don't clear the skip flag
+                        del st.session_state[key]
                 st.rerun()
     else:
         st.error("Memo content not available")
+
+
+def fetch_and_load_memo_review(analysis_id: int, source: str = 'url'):
+    """
+    Fetch memo review from backend and load into session state.
+    
+    Args:
+        analysis_id: Database analysis_id to fetch
+        source: 'url' for URL parameter, 'recent' for auto-load
+    
+    Returns:
+        Tuple of (success: bool, message: str, asc_standard: str or None)
+    """
+    import requests
+    
+    try:
+        # Get auth token
+        token = st.session_state.get('auth_token') or st.session_state.get('user_data', {}).get('auth_token')
+        if not token:
+            return False, "Authentication required", None
+        
+        # Fetch analysis from backend
+        response = requests.get(
+            f'{WEBSITE_URL}/api/analysis/status/{analysis_id}',
+            headers={'Authorization': f'Bearer {token}'},
+            timeout=10
+        )
+        
+        if response.status_code == 404:
+            return False, "Review not found", None
+        elif response.status_code != 200:
+            return False, f"Failed to fetch review: {response.status_code}", None
+        
+        data = response.json()
+        
+        # Verify it's completed and is a review type
+        if data.get('status') != 'completed':
+            return False, f"Review is {data.get('status')}", None
+        
+        if data.get('analysis_type') != 'review':
+            return False, "Not a memo review analysis", None
+        
+        memo_content = data.get('memo_content')
+        if not memo_content:
+            return False, "No memo content found", None
+        
+        # Determine ASC standard from response
+        asc_standard_raw = data.get('asc_standard', 'ASC 606')
+        # Normalize to match prefix_map keys
+        asc_standard = asc_standard_raw.replace(' - Revenue Recognition', '').replace(' - Contract Costs', '')
+        asc_standard = asc_standard.replace(' - Leases (Lessee)', '').replace(' - Stock Compensation', '')
+        asc_standard = asc_standard.replace(' - Business Combinations', '')
+        
+        # Get the prefix for this standard
+        prefix_map = {
+            'ASC 606': 'asc606',
+            'ASC 340-40': 'asc340',
+            'ASC 718': 'asc718',
+            'ASC 805': 'asc805',
+            'ASC 842': 'asc842'
+        }
+        asc_prefix = prefix_map.get(asc_standard, 'asc606')
+        
+        # Load into session state with review_ prefix
+        session_id = st.session_state.get('user_session_id', '')
+        review_prefix = f'review_{asc_prefix}'
+        analysis_key = f'{review_prefix}_analysis_complete_{session_id}'
+        memo_key = f'{review_prefix}_memo_data_{session_id}'
+        
+        # Store memo data with metadata
+        st.session_state[analysis_key] = True
+        st.session_state[memo_key] = {
+            'memo_content': memo_content,
+            'analysis_id': analysis_id,
+            'loaded_from': source,
+            'completed_at': data.get('completed_at'),
+            'source_memo_filename': data.get('source_memo_filename'),
+            'asc_standard': asc_standard,
+            'analysis_type': 'review'
+        }
+        
+        logger.info(f"✓ Loaded memo review into session state: analysis_id={analysis_id}, source={source}, asc_standard={asc_standard}")
+        
+        # Clear skip_review_auto_load flag since we successfully loaded a memo
+        if 'skip_review_auto_load' in st.session_state:
+            del st.session_state['skip_review_auto_load']
+        
+        # Clear URL parameter after loading (to prevent reload loops)
+        if source == 'url' and 'analysis_id' in st.query_params:
+            st.query_params.clear()
+        
+        return True, "Review loaded successfully", asc_standard
+        
+    except Exception as e:
+        logger.error(f"Error loading memo review: {str(e)}")
+        return False, str(e), None
+
+
+def check_for_review_to_load():
+    """
+    Check for memo review to auto-load on page load.
+    Priority: 1) URL parameter, 2) Recent review (within 24 hours)
+    
+    Returns:
+        Tuple of (loaded: bool, source: str, asc_standard: str or None)
+    """
+    import requests
+    
+    # Skip if user explicitly wants to start fresh (clicked "Start New Review")
+    if st.session_state.get('skip_review_auto_load', False):
+        return False, None, None
+    
+    # Skip if already have memo in session (check all review prefixes)
+    session_id = st.session_state.get('user_session_id', '')
+    prefix_map = {
+        'ASC 606': 'asc606',
+        'ASC 340-40': 'asc340',
+        'ASC 718': 'asc718',
+        'ASC 805': 'asc805',
+        'ASC 842': 'asc842'
+    }
+    
+    for asc_standard, asc_prefix in prefix_map.items():
+        review_prefix = f'review_{asc_prefix}'
+        memo_key = f'{review_prefix}_memo_data_{session_id}'
+        if st.session_state.get(memo_key):
+            return False, None, None
+    
+    # Priority 1: Check URL parameter ?analysis_id=X
+    query_params = st.query_params
+    if 'analysis_id' in query_params:
+        try:
+            analysis_id = int(query_params['analysis_id'])
+            success, message, asc_standard = fetch_and_load_memo_review(analysis_id, source='url')
+            if success:
+                return True, 'url', asc_standard
+            else:
+                logger.warning(f"Could not load review from URL: {message}")
+        except ValueError:
+            st.warning("Invalid analysis_id in URL")
+        return False, None, None
+    
+    # Priority 2: Check for recent completed review (within 24 hours)
+    try:
+        token = st.session_state.get('auth_token') or st.session_state.get('user_data', {}).get('auth_token')
+        if not token:
+            return False, None, None
+        
+        # Check for recent review-type analysis
+        response = requests.get(
+            f'{WEBSITE_URL}/api/analysis/recent/review',
+            headers={'Authorization': f'Bearer {token}'},
+            timeout=10
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_id = data.get('analysis_id')
+            
+            # Guard: Only load if analysis_id is present
+            if not analysis_id:
+                logger.info("No recent review found")
+                return False, None, None
+            
+            # Load this review into session state
+            success, message, asc_standard = fetch_and_load_memo_review(analysis_id, source='recent')
+            if success:
+                logger.info(f"Auto-loaded recent review: analysis_id={analysis_id}")
+                return True, 'recent', asc_standard
+        elif response.status_code != 404:
+            logger.warning(f"Failed to check for recent review: {response.status_code}")
+        
+    except Exception as e:
+        logger.error(f"Error checking for recent review: {str(e)}")
+    
+    return False, None, None
 
 
 def load_analysis_from_db(analysis_id: int, user_token: str) -> Optional[Dict[str, Any]]:
@@ -334,6 +513,13 @@ def render_page():
     
     session_id = st.session_state.get('user_session_id', '')
     logger.info(f"Memo Review page load - session_id: {session_id[:8] if session_id else 'empty'}")
+    
+    # Auto-load check: Load recent completed review if session state is empty
+    # This is the KEY fix - ensures review results display even if session state was lost
+    loaded, load_source, loaded_standard = check_for_review_to_load()
+    if loaded:
+        logger.info(f"Auto-loaded review from {load_source} for {loaded_standard}")
+        # The session state is now populated, continue to display check below
     
     # Check for persisted job in URL (survives page reloads)
     url_job = get_job_from_url()

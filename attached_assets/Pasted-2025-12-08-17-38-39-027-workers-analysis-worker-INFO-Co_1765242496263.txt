@@ -1,0 +1,50 @@
+2025-12-08 17:38:39,027 - workers.analysis_worker - INFO - ✓ Completed Step 5
+2025-12-08 17:38:39,029 - workers.analysis_worker - INFO - 📝 Generating memo sections...
+2025-12-08 17:38:39,029 - asc606.step_analyzer - INFO - Extracting conclusions from 5 steps
+2025-12-08 17:38:39,029 - asc606.step_analyzer - INFO - Extracted conclusion for Step 1 (length: 863 chars)
+2025-12-08 17:38:39,030 - asc606.step_analyzer - INFO - Extracted conclusion for Step 2 (length: 664 chars)
+2025-12-08 17:38:39,032 - asc606.step_analyzer - WARNING - Could not extract conclusion from Step 3 content
+2025-12-08 17:38:39,032 - asc606.step_analyzer - INFO - Extracted conclusion for Step 4 (length: 733 chars)
+2025-12-08 17:38:39,032 - asc606.step_analyzer - INFO - Extracted conclusion for Step 5 (length: 880 chars)
+2025-12-08 17:38:47,374 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 17:38:47,385 - asc606.step_analyzer - INFO - ✓ Executive summary generated (2316 chars)
+2025-12-08 17:38:47,385 - asc606.step_analyzer - INFO - → Generating background section...
+2025-12-08 17:38:50,478 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 17:38:50,479 - asc606.step_analyzer - INFO - ✓ Background section generated (688 chars)
+2025-12-08 17:38:50,480 - asc606.step_analyzer - INFO - → Generating final conclusion...
+2025-12-08 17:39:34,854 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-12-08 17:39:34,856 - asc606.step_analyzer - INFO - ✓ Final conclusion generated (962 chars)
+2025-12-08 17:39:34,856 - workers.analysis_worker - INFO - 🔍 Generating review comments (comparing with uploaded memo)...
+2025-12-08 17:41:55,063 - asc606.clean_memo_generator - INFO - Added clean step 1 content (16215 chars)
+2025-12-08 17:41:55,037 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:41:55,055 - shared.api_cost_tracker - WARNING - Failed to get encoding for model gpt-4o, using default: 'Could not automatically map gpt-4o to a tokeniser. Please use `tiktok.get_encoding` to explicitly get the tokeniser you expect.'
+2025-12-08 17:41:55,063 - shared.api_cost_tracker - INFO - API Cost - Model: gpt-4o, Input tokens: 7856, Output tokens: 5064, Cost: $0.1152
+2025-12-08 17:41:55,063 - shared.api_cost_tracker - INFO - Tracked review_comparison request: $0.1152 (Total: $2.4902)
+2025-12-08 17:41:55,063 - workers.analysis_worker - INFO - ✓ Generated 4 review comment categories
+2025-12-08 17:41:55,031 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-12-08 17:41:55.036 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:41:55.036 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:41:55,036 - shared.api_cost_tracker - WARNING - Unknown model gpt-5.1, using gpt-4o pricing
+2025-12-08 17:41:55,064 - asc606.clean_memo_generator - INFO - Added clean step 2 content (22654 chars)
+2025-12-08 17:41:55,064 - asc606.clean_memo_generator - INFO - Added clean step 3 content (21456 chars)
+2025-12-08 17:41:55,064 - asc606.clean_memo_generator - INFO - Added clean step 4 content (11687 chars)
+2025-12-08 17:41:55,064 - asc606.clean_memo_generator - INFO - Added clean step 5 content (15321 chars)
+2025-12-08 17:41:55,064 - asc606.clean_memo_generator - INFO - Clean memo generated: 99629 chars, 5/5 steps
+2025-12-08 17:41:55.064 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:41:55.064 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2025-12-08 17:41:55,064 - workers.analysis_worker - INFO - 💾 Saving memo review analysis to database...
+2025-12-08 17:41:55,064 - workers.analysis_worker - INFO - Saving analysis (attempt 1/5)...
+2025-12-08 17:41:55,427 - workers.analysis_worker - INFO - ✓ Analysis saved successfully on attempt 1
+2025-12-08 17:41:55,431 - workers.analysis_worker - INFO - ✓ Memo Review analysis saved successfully: bee75dc7
+2025-12-08 17:41:55,462 - rq.worker - INFO - Successfully completed workers.analysis_worker.run_memo_review_analysis({'analysis_id': 128, 'user_id': 20, 'user_token': 'eyJhbGciOiJIUzI1NiIsInR5...) job in 0:25:57.855345s on worker 02e429b98884487c8d3a40bae371436f
+2025-12-08 17:41:55,462 - rq.worker - INFO - analysis: Job OK (128)
+2025-12-08 17:41:55,464 - rq.worker - INFO - Result is kept for 86400 seconds
+2025-12-08 17:41:55,546 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 17:55:25,648 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 18:08:55,729 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 18:22:25,895 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 18:35:56,042 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 18:49:26,134 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 19:02:56,199 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+2025-12-08 19:16:26,312 - rq.worker - INFO - Worker 02e429b98884487c8d3a40bae371436f: cleaning registries for queue: analysis
+Stopping Container

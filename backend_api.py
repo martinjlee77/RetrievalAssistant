@@ -2311,7 +2311,10 @@ def get_analysis_status(analysis_id):
 
 @app.route('/api/analysis/recent/<asc_standard>', methods=['GET'])
 def get_recent_analysis(asc_standard):
-    """Get user's most recent completed analysis for a specific ASC standard (within 24 hours)"""
+    """Get user's most recent completed analysis for a specific ASC standard (within 24 hours)
+    
+    Special case: If asc_standard is 'review', returns most recent memo review analysis
+    """
     try:
         token = request.headers.get('Authorization', '').replace('Bearer ', '')
         if not token:
@@ -2324,14 +2327,6 @@ def get_recent_analysis(asc_standard):
         
         user_id = payload['user_id']
         
-        # Normalize ASC standard format (handle 'asc606' and 'ASC 606')
-        asc_standard_clean = sanitize_string(asc_standard, 50).upper().replace(' ', '')
-        # Convert 'ASC606' to 'ASC 606' format for database match
-        if asc_standard_clean.startswith('ASC') and len(asc_standard_clean) > 3:
-            asc_standard_db = f"ASC {asc_standard_clean[3:]}"
-        else:
-            asc_standard_db = asc_standard
-        
         conn = get_db_connection()
         if not conn:
             return jsonify({'error': 'Database connection failed'}), 500
@@ -2339,20 +2334,44 @@ def get_recent_analysis(asc_standard):
         cursor = conn.cursor()
         
         try:
-            # Query most recent completed analysis for this user and ASC standard
-            # Only return analyses completed within the last 24 hours
-            # Use ILIKE for case-insensitive match
-            cursor.execute("""
-                SELECT analysis_id, memo_uuid, status, memo_content, completed_at, 
-                       asc_standard, words_count, tier_name, file_count, final_charged_credits
-                FROM analyses 
-                WHERE user_id = %s
-                AND asc_standard ILIKE %s
-                AND status = 'completed'
-                AND completed_at > NOW() - INTERVAL '24 hours'
-                ORDER BY completed_at DESC
-                LIMIT 1
-            """, (user_id, asc_standard_db))
+            # Special case: 'review' returns most recent memo review analysis (any ASC standard)
+            if asc_standard.lower() == 'review':
+                cursor.execute("""
+                    SELECT analysis_id, memo_uuid, status, memo_content, completed_at, 
+                           asc_standard, words_count, tier_name, file_count, final_charged_credits,
+                           analysis_type, source_memo_filename
+                    FROM analyses 
+                    WHERE user_id = %s
+                    AND analysis_type = 'review'
+                    AND status = 'completed'
+                    AND completed_at > NOW() - INTERVAL '24 hours'
+                    ORDER BY completed_at DESC
+                    LIMIT 1
+                """, (user_id,))
+            else:
+                # Normalize ASC standard format (handle 'asc606' and 'ASC 606')
+                asc_standard_clean = sanitize_string(asc_standard, 50).upper().replace(' ', '')
+                # Convert 'ASC606' to 'ASC 606' format for database match
+                if asc_standard_clean.startswith('ASC') and len(asc_standard_clean) > 3:
+                    asc_standard_db = f"ASC {asc_standard_clean[3:]}"
+                else:
+                    asc_standard_db = asc_standard
+                
+                # Query most recent completed analysis for this user and ASC standard
+                # Only return analyses completed within the last 24 hours
+                # Use ILIKE for case-insensitive match
+                cursor.execute("""
+                    SELECT analysis_id, memo_uuid, status, memo_content, completed_at, 
+                           asc_standard, words_count, tier_name, file_count, final_charged_credits,
+                           analysis_type, source_memo_filename
+                    FROM analyses 
+                    WHERE user_id = %s
+                    AND asc_standard ILIKE %s
+                    AND status = 'completed'
+                    AND completed_at > NOW() - INTERVAL '24 hours'
+                    ORDER BY completed_at DESC
+                    LIMIT 1
+                """, (user_id, asc_standard_db))
             
             analysis = cursor.fetchone()
             
@@ -2370,7 +2389,9 @@ def get_recent_analysis(asc_standard):
                 'words_count': analysis['words_count'],
                 'tier_name': analysis['tier_name'],
                 'file_count': analysis['file_count'],
-                'credits_charged': float(analysis['final_charged_credits']) if analysis['final_charged_credits'] else 0
+                'credits_charged': float(analysis['final_charged_credits']) if analysis['final_charged_credits'] else 0,
+                'analysis_type': analysis.get('analysis_type', 'standard'),
+                'source_memo_filename': analysis.get('source_memo_filename')
             }
             
             return jsonify(response), 200

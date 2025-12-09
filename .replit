@@ -131,4 +131,4 @@ localPort = 46133
 externalPort = 8081
 
 [agent]
-integrations = ["python_sendgrid==1.0.0"]
+integrations = ["python_sendgrid:1.0.0"]
