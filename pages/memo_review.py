@@ -517,9 +517,24 @@ def render_page():
     # Auto-load check: Load recent completed review if session state is empty
     # This is the KEY fix - ensures review results display even if session state was lost
     loaded, load_source, loaded_standard = check_for_review_to_load()
-    if loaded:
+    if loaded and loaded_standard:
         logger.info(f"Auto-loaded review from {load_source} for {loaded_standard}")
-        # The session state is now populated, continue to display check below
+        # IMMEDIATELY display the loaded review - don't continue to other checks
+        prefix_map = {
+            'ASC 606': 'asc606',
+            'ASC 340-40': 'asc340',
+            'ASC 718': 'asc718',
+            'ASC 805': 'asc805',
+            'ASC 842': 'asc842'
+        }
+        asc_prefix = prefix_map.get(loaded_standard, 'asc606')
+        review_prefix = f'review_{asc_prefix}'
+        memo_key = f'{review_prefix}_memo_data_{session_id}'
+        memo_data = st.session_state.get(memo_key)
+        if memo_data and memo_data.get('memo_content'):
+            st.title("Memo Review - Results")
+            display_completed_memo(memo_data, loaded_standard)
+            return  # Exit render_page after displaying
     
     # Check for persisted job in URL (survives page reloads)
     url_job = get_job_from_url()
