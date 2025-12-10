@@ -36,7 +36,7 @@ pages = {
         st.Page("asc805/asc805_page.py", title="ASC 805: Business Combinations", icon=":material/expand_circle_right:"),
         ],
     "Review": [
-        st.Page("pages/memo_review.py", title="Memo Review", icon=":material/compare:"),
+        st.Page("pages/memo_review.py", title="Memo Review (beta)", icon=":material/compare:"),
         ],
     "Tools": [
         st.Page("pages/research_assistant.py", title="ASC Research Assistant", icon=":material/search:"),
