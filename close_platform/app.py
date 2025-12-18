@@ -656,11 +656,8 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     total_liabs = df[df['Group'].str.startswith(
         ('05', '06', '07'))]['curr_bal'].sum()
     total_equity = df[df['Group'].str.startswith(('08'))]['curr_bal'].sum()
-    
-    y, m = int(month_id[:4]), int(month_id[5:7])
-    last_day = calendar.monthrange(y, m)[1]
-    month_end_date_str = f"{month_id}-{last_day:02d}"
-    ytd_net_income = qbo_connector.get_ytd_net_income(month_end_date_str)
+    ytd_net_income = df[df['Group'].str.startswith(
+        ('09', '10', '11', '12'))]['curr_bal'].sum()
     
     bs_check_val = total_assets + total_liabs + total_equity + ytd_net_income
     is_bs_balanced = abs(bs_check_val) < 0.01
