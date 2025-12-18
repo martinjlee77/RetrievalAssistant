@@ -10,7 +10,8 @@ from close_platform.db_config import get_connection
 
 CLIENT_ID = os.getenv("QBO_CLIENT_ID")
 CLIENT_SECRET = os.getenv("QBO_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("QBO_REDIRECT_URI")
+_raw_redirect = os.getenv("QBO_REDIRECT_URI", "")
+REDIRECT_URI = _raw_redirect.rstrip("/") if _raw_redirect else ""
 ENV = os.getenv("QBO_ENVIRONMENT", "production")
 
 def _get_encryption_key():
