@@ -1130,6 +1130,8 @@ def render_workspace(month_id):
             auth_url = qbo_connector.get_auth_url()
             if auth_url:
                 st.link_button("🔗 Login to Intuit", auth_url)
+                with st.expander("Debug: Auth URL"):
+                    st.code(auth_url, language=None)
             else:
                 st.error(
                     "QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets."
