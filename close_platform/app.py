@@ -14,14 +14,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from close_platform.db_config import get_connection, init_close_tables
 from close_platform import qbo_connector
 
-APP_TITLE = "VeritasLogic Close Platform"
+APP_TITLE = "Lynx Close Platform"
 
-st.set_page_config(
-    page_title=APP_TITLE,
-    page_icon="assets/images/favicon.ico",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title=APP_TITLE,
+                   page_icon="assets/images/favicon.ico",
+                   layout="wide",
+                   initial_sidebar_state="expanded")
 
 try:
     st.logo("assets/images/nobkg.png", size="large")
@@ -40,6 +38,7 @@ st.html("""
 </style>
 """)
 
+
 def get_all_months():
     conn = get_connection()
     cursor = conn.cursor()
@@ -48,20 +47,27 @@ def get_all_months():
     conn.close()
     return pd.DataFrame(rows) if rows else pd.DataFrame()
 
+
 def create_new_month_close(month_str):
     conn = get_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("INSERT INTO close_monthly_close (month_id, status) VALUES (%s, 'Open')", (month_str,))
+        cursor.execute(
+            "INSERT INTO close_monthly_close (month_id, status) VALUES (%s, 'Open')",
+            (month_str, ))
 
-        cursor.execute("SELECT month_id FROM close_monthly_close WHERE month_id < %s ORDER BY month_id DESC LIMIT 1", (month_str,))
+        cursor.execute(
+            "SELECT month_id FROM close_monthly_close WHERE month_id < %s ORDER BY month_id DESC LIMIT 1",
+            (month_str, ))
         last_month_row = cursor.fetchone()
 
         if last_month_row:
             last_month_id = last_month_row['month_id']
-            st.toast(f"Found history. Cloning tasks from {last_month_id}...", icon="📋")
-            cursor.execute("""
+            st.toast(f"Found history. Cloning tasks from {last_month_id}...",
+                     icon="📋")
+            cursor.execute(
+                """
                 INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status)
                 SELECT %s, task_name, phase, day_due, owner, instructions_link, 'Pending'
                 FROM close_monthly_tasks
@@ -69,17 +75,19 @@ def create_new_month_close(month_str):
             """, (month_str, last_month_id))
         else:
             st.toast("First run detected. Using Master Template.", icon="🆕")
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, status)
                 SELECT %s, task_name, phase, day_due, default_owner, 'Pending'
                 FROM close_checklist_template
-            """, (month_str,))
+            """, (month_str, ))
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO close_monthly_balances (month_id, account_number, status)
             SELECT %s, account_number, 'Open'
             FROM close_accounts
-        """, (month_str,))
+        """, (month_str, ))
 
         conn.commit()
         st.toast(f"Successfully initialized {month_str}", icon="✅")
@@ -93,12 +101,15 @@ def create_new_month_close(month_str):
     finally:
         conn.close()
 
+
 def update_task_status(task_id, new_status):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE close_monthly_tasks SET status = %s WHERE id = %s", (new_status, task_id))
+    cursor.execute("UPDATE close_monthly_tasks SET status = %s WHERE id = %s",
+                   (new_status, task_id))
     conn.commit()
     conn.close()
+
 
 def update_account_entry(entry_id, field, value):
     conn = get_connection()
@@ -108,20 +119,27 @@ def update_account_entry(entry_id, field, value):
     conn.commit()
     conn.close()
 
+
 def update_permanent_link(account_number, link):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE close_accounts SET permanent_link = %s WHERE account_number = %s", (link, account_number))
+    cursor.execute(
+        "UPDATE close_accounts SET permanent_link = %s WHERE account_number = %s",
+        (link, account_number))
     conn.commit()
     conn.close()
+
 
 def get_last_sync_time(month_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT last_synced_at FROM close_monthly_close WHERE month_id = %s", (month_id,))
+    cursor.execute(
+        "SELECT last_synced_at FROM close_monthly_close WHERE month_id = %s",
+        (month_id, ))
     row = cursor.fetchone()
     conn.close()
     return row['last_synced_at'] if row else None
+
 
 def get_account_group(acct_num):
     try:
@@ -145,6 +163,7 @@ def get_account_group(acct_num):
         pass
     return "13. Other / Unmapped"
 
+
 def get_prior_month_id(curr_month_id):
     try:
         curr_date = datetime.strptime(curr_month_id, "%Y-%m")
@@ -156,10 +175,12 @@ def get_prior_month_id(curr_month_id):
     except:
         return None
 
+
 def update_month_totals(month_id, debits, credits):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE close_monthly_close 
         SET qbo_total_debits = %s, qbo_total_credits = %s 
         WHERE month_id = %s
@@ -167,13 +188,18 @@ def update_month_totals(month_id, debits, credits):
     conn.commit()
     conn.close()
 
+
 def get_month_totals(month_id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT qbo_total_debits, qbo_total_credits FROM close_monthly_close WHERE month_id = %s", (month_id,))
+    cursor.execute(
+        "SELECT qbo_total_debits, qbo_total_credits FROM close_monthly_close WHERE month_id = %s",
+        (month_id, ))
     row = cursor.fetchone()
     conn.close()
-    return (row['qbo_total_debits'] or 0.0, row['qbo_total_credits'] or 0.0) if row else (0.0, 0.0)
+    return (row['qbo_total_debits'] or 0.0,
+            row['qbo_total_credits'] or 0.0) if row else (0.0, 0.0)
+
 
 def get_business_day_delta(month_id):
     y, m = map(int, month_id.split('-'))
@@ -185,16 +211,25 @@ def get_business_day_delta(month_id):
     t_days = np.busday_count(month_end_date, today)
     return int(t_days)
 
+
+def delete_month_close(month_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM close_monthly_tasks WHERE month_id = %s", (month_id,))
+    cursor.execute("DELETE FROM close_monthly_balances WHERE month_id = %s", (month_id,))
+    cursor.execute("DELETE FROM close_monthly_close WHERE month_id = %s", (month_id,))
+    conn.commit()
+    conn.close()
+
+
 def render_lobby():
     st.title(f"📂 {APP_TITLE}")
 
-    with st.expander("Start a New Month Close", expanded=False):
-        c1, c2 = st.columns([1, 4])
-        with c1:
+    col_left, col_center, col_right = st.columns([1, 1, 1])
+    with col_left:
+        with st.expander("Start a New Month Close", expanded=False, width="stretch"):
             current_month = datetime.now().strftime("%Y-%m")
-            new_month_input = st.text_input("Month (YYYY-MM)", value=current_month)
-        with c2:
-            st.write("")
+            new_month_input = st.text_input("Enter a New Month to Close", value=current_month)
             st.write("")
             if st.button("Initialize Close"):
                 create_new_month_close(new_month_input)
@@ -214,15 +249,31 @@ def render_lobby():
         with col:
             status_color = "🟢" if row['status'] == 'Closed' else "🔵"
             lock_icon = "🔒 Closed" if row['is_locked'] else "🔓 Open"
+            is_open = row['status'] != 'Closed'
 
-            with st.container(border=True, key=f"close_card_{row['month_id']}"):
+            with st.container(border=True,
+                              key=f"close_card_{row['month_id']}"):
                 st.markdown(f"### {row['month_id']}")
-                st.markdown(f"**Close Status:** {status_color} {row['status']}")
+                st.markdown(
+                    f"**Close Status:** {status_color} {row['status']}")
                 st.markdown(f"**QBO:** {lock_icon}")
 
-                if st.button(f"Open {row['month_id']}", key=f"btn_{row['month_id']}"):
-                    st.session_state['active_month'] = row['month_id']
-                    st.rerun()
+                btn_col1, btn_col2 = st.columns(2)
+                with btn_col1:
+                    if st.button(f"Open",
+                                 key=f"btn_{row['month_id']}",
+                                 use_container_width=True):
+                        st.session_state['active_month'] = row['month_id']
+                        st.rerun()
+                with btn_col2:
+                    if is_open:
+                        if st.button("🗑️",
+                                     key=f"del_{row['month_id']}",
+                                     use_container_width=True,
+                                     type="secondary"):
+                            delete_month_close(row['month_id'])
+                            st.rerun()
+
 
 def render_checklist_tab(month_id, owner_filter):
     conn = get_connection()
@@ -244,7 +295,9 @@ def render_checklist_tab(month_id, owner_filter):
     df = pd.DataFrame(rows) if rows else pd.DataFrame()
 
     if df.empty:
-        st.info("No tasks found for this month. Add tasks to the template or clone from a prior month.")
+        st.info(
+            "No tasks found for this month. Add tasks to the template or clone from a prior month."
+        )
         return
 
     current_t_day = get_business_day_delta(month_id)
@@ -262,7 +315,9 @@ def render_checklist_tab(month_id, owner_filter):
         st.metric("Completion", f"{done_tasks}/{total_tasks}")
 
     with c3:
-        save_clicked = st.button("💾 Save Changes", type="primary", use_container_width=True)
+        save_clicked = st.button("💾 Save Changes",
+                                 type="primary",
+                                 use_container_width=True)
 
     st.progress(prog, text=f"Overall Completion: {int(prog*100)}%")
 
@@ -285,30 +340,48 @@ def render_checklist_tab(month_id, owner_filter):
     STATUS_OPTS = ["Pending", "In Progress", "Done", "N/A"]
 
     column_config = {
-        "id": None,
-        "month_id": None,
-        "Health": st.column_config.TextColumn("Health", width="small", disabled=True),
-        "task_name": st.column_config.TextColumn("Task Name", width="large", required=True),
-        "phase": st.column_config.SelectboxColumn("Phase", options=PHASES, required=True),
-        "day_due": st.column_config.NumberColumn("Due (T+)", min_value=1, max_value=20, format="%d"),
-        "owner": st.column_config.SelectboxColumn("Owner", options=ROLES, required=True),
-        "instructions_link": st.column_config.LinkColumn("SOP", display_text="Open Doc"),
-        "status": st.column_config.SelectboxColumn("Status", options=STATUS_OPTS, required=True)
+        "id":
+        None,
+        "month_id":
+        None,
+        "Health":
+        st.column_config.TextColumn("Health", width="small", disabled=True),
+        "task_name":
+        st.column_config.TextColumn("Task Name", width="large", required=True),
+        "phase":
+        st.column_config.SelectboxColumn("Phase",
+                                         options=PHASES,
+                                         required=True),
+        "day_due":
+        st.column_config.NumberColumn("Due (T+)",
+                                      min_value=1,
+                                      max_value=20,
+                                      format="%d"),
+        "owner":
+        st.column_config.SelectboxColumn("Owner", options=ROLES,
+                                         required=True),
+        "instructions_link":
+        st.column_config.LinkColumn("SOP", display_text="Open Doc"),
+        "status":
+        st.column_config.SelectboxColumn("Status",
+                                         options=STATUS_OPTS,
+                                         required=True)
     }
 
-    display_df = df[['id', 'Health', 'phase', 'task_name', 'day_due', 'owner', 'instructions_link', 'status', 'month_id']]
+    display_df = df[[
+        'id', 'Health', 'phase', 'task_name', 'day_due', 'owner',
+        'instructions_link', 'status', 'month_id'
+    ]]
 
     dynamic_height = min((len(df) + 1) * 35, 1500)
 
-    edited_df = st.data_editor(
-        display_df,
-        key="checklist_editor",
-        hide_index=True,
-        column_config=column_config,
-        use_container_width=True,
-        num_rows="dynamic",
-        height=dynamic_height
-    )
+    edited_df = st.data_editor(display_df,
+                               key="checklist_editor",
+                               hide_index=True,
+                               column_config=column_config,
+                               use_container_width=True,
+                               num_rows="dynamic",
+                               height=dynamic_height)
 
     if save_clicked:
         conn = get_connection()
@@ -319,25 +392,32 @@ def render_checklist_tab(month_id, owner_filter):
         deleted_ids = original_ids - current_ids
 
         for del_id in deleted_ids:
-            cursor.execute("DELETE FROM close_monthly_tasks WHERE id = %s", (del_id,))
+            cursor.execute("DELETE FROM close_monthly_tasks WHERE id = %s",
+                           (del_id, ))
 
         for index, row in edited_df.iterrows():
             if pd.notna(row['id']):
-                cursor.execute("""
+                cursor.execute(
+                    """
                     UPDATE close_monthly_tasks 
                     SET task_name=%s, phase=%s, day_due=%s, owner=%s, instructions_link=%s, status=%s
                     WHERE id=%s
-                """, (row['task_name'], row['phase'], row['day_due'], row['owner'], row['instructions_link'], row['status'], row['id']))
+                """, (row['task_name'], row['phase'], row['day_due'],
+                      row['owner'], row['instructions_link'], row['status'],
+                      row['id']))
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (month_id, row['task_name'], row['phase'], row['day_due'], row['owner'], row['instructions_link'], row['status']))
+                """, (month_id, row['task_name'], row['phase'], row['day_due'],
+                      row['owner'], row['instructions_link'], row['status']))
 
         conn.commit()
         conn.close()
         st.toast("Checklist Updated!", icon="✅")
         st.rerun()
+
 
 def render_tb_tab(month_id):
     conn = get_connection()
@@ -358,14 +438,16 @@ def render_tb_tab(month_id):
         WHERE mb.month_id = %s
         ORDER BY mb.account_number ASC
     """
-    cursor.execute(query, (month_id,))
+    cursor.execute(query, (month_id, ))
     rows = cursor.fetchall()
     conn.close()
 
     df_bal = pd.DataFrame(rows) if rows else pd.DataFrame()
 
     if df_bal.empty:
-        st.warning("No account data found. Connect to QBO and sync data, or add accounts manually.")
+        st.warning(
+            "No account data found. Connect to QBO and sync data, or add accounts manually."
+        )
         return
 
     df_bal['Group'] = df_bal['account_number'].apply(get_account_group)
@@ -374,7 +456,11 @@ def render_tb_tab(month_id):
     done_accts = len(df_bal[df_bal['status'].isin(['Supported', 'Reviewed'])])
     progress = done_accts / total_accts if total_accts > 0 else 0
 
-    st.progress(progress, text=f"Reconciliation Progress: {int(progress*100)}% ({done_accts}/{total_accts})")
+    st.progress(
+        progress,
+        text=
+        f"Reconciliation Progress: {int(progress*100)}% ({done_accts}/{total_accts})"
+    )
     st.divider()
 
     groups = sorted(df_bal['Group'].unique())
@@ -383,76 +469,107 @@ def render_tb_tab(month_id):
         with st.expander(f"📂 {group}", expanded=False):
             group_rows = df_bal[df_bal['Group'] == group].copy()
 
-            group_rows['Variance'] = group_rows['qbo_balance'] - group_rows['expected_balance']
-            group_rows['qbo_balance_fmt'] = group_rows['qbo_balance'].apply(lambda x: "{:,.2f}".format(x))
-            group_rows['Variance_fmt'] = group_rows['Variance'].apply(lambda x: "{:,.2f}".format(x))
+            group_rows['Variance'] = group_rows['qbo_balance'] - group_rows[
+                'expected_balance']
+            group_rows['qbo_balance_fmt'] = group_rows['qbo_balance'].apply(
+                lambda x: "{:,.2f}".format(x))
+            group_rows['Variance_fmt'] = group_rows['Variance'].apply(
+                lambda x: "{:,.2f}".format(x))
 
             column_config = {
-                "id": None,
-                "Group": None,
-                "qbo_balance": None,
-                "Variance": None,
-                "account_number": "Acct #",
-                "account_name": "Account Name",
-                "permanent_link": st.column_config.LinkColumn("Workpaper Link", display_text="Open Folder"),
-                "rec_note": st.column_config.TextColumn("Reconciliation Note", width="medium"),
-                "qbo_balance_fmt": st.column_config.TextColumn("QBO Balance", disabled=True),
-                "expected_balance": st.column_config.NumberColumn("Expected Balance", format="$%.2f"),
-                "Variance_fmt": st.column_config.TextColumn("Diff", disabled=True),
-                "status": st.column_config.SelectboxColumn(
+                "id":
+                None,
+                "Group":
+                None,
+                "qbo_balance":
+                None,
+                "Variance":
+                None,
+                "account_number":
+                "Acct #",
+                "account_name":
+                "Account Name",
+                "permanent_link":
+                st.column_config.LinkColumn("Workpaper Link",
+                                            display_text="Open Folder"),
+                "rec_note":
+                st.column_config.TextColumn("Reconciliation Note",
+                                            width="medium"),
+                "qbo_balance_fmt":
+                st.column_config.TextColumn("QBO Balance", disabled=True),
+                "expected_balance":
+                st.column_config.NumberColumn("Expected Balance",
+                                              format="$%.2f"),
+                "Variance_fmt":
+                st.column_config.TextColumn("Diff", disabled=True),
+                "status":
+                st.column_config.SelectboxColumn(
                     "Status",
                     options=["Open", "Supported", "Reviewed"],
-                    required=True
-                )
+                    required=True)
             }
 
-            display_cols = ['id', 'account_number', 'account_name', 'qbo_balance_fmt', 'expected_balance', 'Variance_fmt', 'status', 'permanent_link', 'rec_note']
+            display_cols = [
+                'id', 'account_number', 'account_name', 'qbo_balance_fmt',
+                'expected_balance', 'Variance_fmt', 'status', 'permanent_link',
+                'rec_note'
+            ]
 
-            edited_df = st.data_editor(
-                group_rows[display_cols],
-                key=f"editor_{group}",
-                hide_index=True,
-                column_config=column_config,
-                use_container_width=True,
-                height=min((len(group_rows) + 1) * 35, 600)
-            )
+            edited_df = st.data_editor(group_rows[display_cols],
+                                       key=f"editor_{group}",
+                                       hide_index=True,
+                                       column_config=column_config,
+                                       use_container_width=True,
+                                       height=min((len(group_rows) + 1) * 35,
+                                                  600))
 
             changes_detected = False
             for index, row in edited_df.iterrows():
                 orig_row = df_bal[df_bal['id'] == row['id']].iloc[0]
 
-                if abs(row['expected_balance'] - orig_row['expected_balance']) > 0.001:
-                    update_account_entry(row['id'], 'expected_balance', row['expected_balance'])
+                if abs(row['expected_balance'] -
+                       orig_row['expected_balance']) > 0.001:
+                    update_account_entry(row['id'], 'expected_balance',
+                                         row['expected_balance'])
                     changes_detected = True
 
                 if row['rec_note'] != orig_row['rec_note']:
                     conn = get_connection()
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE close_monthly_balances SET rec_note = %s WHERE id = %s", (row['rec_note'], row['id']))
+                    cursor.execute(
+                        "UPDATE close_monthly_balances SET rec_note = %s WHERE id = %s",
+                        (row['rec_note'], row['id']))
                     conn.commit()
                     conn.close()
                     changes_detected = True
 
                 if row['permanent_link'] != orig_row['permanent_link']:
-                    update_permanent_link(row['account_number'], row['permanent_link'])
+                    update_permanent_link(row['account_number'],
+                                          row['permanent_link'])
                     changes_detected = True
 
                 if row['status'] != orig_row['status']:
-                    new_variance = orig_row['qbo_balance'] - row['expected_balance']
+                    new_variance = orig_row['qbo_balance'] - row[
+                        'expected_balance']
 
-                    if row['status'] in ['Supported', 'Reviewed'] and abs(new_variance) > 0.01:
-                        st.toast(f"❌ Account {row['account_number']}: Cannot mark complete. Variance is {new_variance:,.2f}", icon="🚫")
+                    if row['status'] in ['Supported', 'Reviewed'
+                                         ] and abs(new_variance) > 0.01:
+                        st.toast(
+                            f"❌ Account {row['account_number']}: Cannot mark complete. Variance is {new_variance:,.2f}",
+                            icon="🚫")
 
                         if f"editor_{group}" in st.session_state:
                             del st.session_state[f"editor_{group}"]
 
                         st.rerun()
                     else:
-                        update_account_entry(row['id'], 'status', row['status'])
+                        update_account_entry(row['id'], 'status',
+                                             row['status'])
                         changes_detected = True
 
             if changes_detected:
                 st.rerun()
+
 
 def render_flux_tab(month_id, threshold_amt, threshold_pct):
     conn = get_connection()
@@ -478,9 +595,12 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     cursor.execute(query, (prev_month_id, month_id))
     rows = cursor.fetchall()
 
-    cursor.execute("SELECT SUM(qbo_balance) FROM close_monthly_balances WHERE month_id = %s", (month_id,))
+    cursor.execute(
+        "SELECT SUM(qbo_balance) FROM close_monthly_balances WHERE month_id = %s",
+        (month_id, ))
     sub_ledger_result = cursor.fetchone()
-    sub_ledger_total = sub_ledger_result[0] if sub_ledger_result and sub_ledger_result[0] else 0.0
+    sub_ledger_total = sub_ledger_result[
+        0] if sub_ledger_result and sub_ledger_result[0] else 0.0
     conn.close()
 
     df = pd.DataFrame(rows) if rows else pd.DataFrame()
@@ -492,19 +612,22 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     df['Group'] = df['account_number'].apply(get_account_group)
     df['prev_bal'] = df['prev_bal'].fillna(0.0)
     df['diff_amt'] = df['curr_bal'] - df['prev_bal']
-    df['diff_pct'] = df.apply(
-        lambda x: (x['diff_amt'] / x['prev_bal'] * 100) if x['prev_bal'] != 0 else 0.0, axis=1
-    )
+    df['diff_pct'] = df.apply(lambda x: (x['diff_amt'] / x['prev_bal'] * 100)
+                              if x['prev_bal'] != 0 else 0.0,
+                              axis=1)
 
     count_db = len(df)
     count_tab2 = len(df[df['Group'] != "13. Other / Unmapped"])
     count_tab3 = len(df)
     is_pop_match = (count_db == count_tab2 == count_tab3)
 
-    total_assets = df[df['Group'].str.startswith(('01', '02', '03', '04'))]['curr_bal'].sum()
-    total_liabs = df[df['Group'].str.startswith(('05', '06', '07'))]['curr_bal'].sum()
+    total_assets = df[df['Group'].str.startswith(
+        ('01', '02', '03', '04'))]['curr_bal'].sum()
+    total_liabs = df[df['Group'].str.startswith(
+        ('05', '06', '07'))]['curr_bal'].sum()
     total_equity = df[df['Group'].str.startswith(('08'))]['curr_bal'].sum()
-    total_pnl = df[df['Group'].str.startswith(('09', '10', '11', '12'))]['curr_bal'].sum()
+    total_pnl = df[df['Group'].str.startswith(
+        ('09', '10', '11', '12'))]['curr_bal'].sum()
     bs_check_val = total_assets + total_liabs + total_equity + total_pnl
     is_bs_balanced = abs(bs_check_val) < 0.01
 
@@ -558,7 +681,8 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
                 st.markdown(f"**{total_assets:,.0f}**")
             with c2:
                 st.caption("L+E+NI")
-                st.markdown(f"**{(total_liabs + total_equity + total_pnl):,.0f}**")
+                st.markdown(
+                    f"**{(total_liabs + total_equity + total_pnl):,.0f}**")
             with c3:
                 st.caption("Net Check")
                 st.markdown(f"**{bs_check_val:,.2f}**")
@@ -571,7 +695,8 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
 
     with st.container(border=True):
         st.markdown("**3. External 3-Way Tie-Out**")
-        st.caption("Sub-Ledger (Tab 2) vs. General Ledger (Tab 3) vs. QBO PDF.")
+        st.caption(
+            "Sub-Ledger (Tab 2) vs. General Ledger (Tab 3) vs. QBO PDF.")
 
         c_lbl, c_t2, c_t3, c_qbo = st.columns([1, 1.5, 1.5, 2])
 
@@ -583,12 +708,20 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         c_lbl.markdown("Total Dr")
         c_t2.markdown(f"**{tab2_dr:,.2f}**")
         c_t3.markdown(f"**{tab3_dr:,.2f}**")
-        val_dr = c_qbo.number_input("Dr", value=saved_debits, key="aud_dr", label_visibility="collapsed", format="%.2f")
+        val_dr = c_qbo.number_input("Dr",
+                                    value=saved_debits,
+                                    key="aud_dr",
+                                    label_visibility="collapsed",
+                                    format="%.2f")
 
         c_lbl.markdown("Total Cr")
         c_t2.markdown(f"**{tab2_cr:,.2f}**")
         c_t3.markdown(f"**{tab3_cr:,.2f}**")
-        val_cr = c_qbo.number_input("Cr", value=saved_credits, key="aud_cr", label_visibility="collapsed", format="%.2f")
+        val_cr = c_qbo.number_input("Cr",
+                                    value=saved_credits,
+                                    key="aud_cr",
+                                    label_visibility="collapsed",
+                                    format="%.2f")
 
         if val_dr != saved_debits or val_cr != saved_credits:
             update_month_totals(month_id, val_dr, val_cr)
@@ -600,7 +733,9 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
             c_err1, c_err2 = st.columns(2)
 
             if not (internal_dr_match and internal_cr_match):
-                c_err1.error(f"🚨 Internal Var: Dr {tab2_dr - tab3_dr:.2f} | Cr {tab2_cr - tab3_cr:.2f}")
+                c_err1.error(
+                    f"🚨 Internal Var: Dr {tab2_dr - tab3_dr:.2f} | Cr {tab2_cr - tab3_cr:.2f}"
+                )
 
             if not (external_dr_match and external_cr_match):
                 v_dr = tab3_dr - saved_debits
@@ -613,8 +748,10 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
 
     updates_made = False
     for index, row in df.iterrows():
-        is_material = (abs(row['diff_amt']) >= threshold_amt) and (abs(row['diff_pct']) >= threshold_pct)
-        current_note = str(row['variance_note']) if row['variance_note'] else ""
+        is_material = (abs(row['diff_amt']) >= threshold_amt) and (abs(
+            row['diff_pct']) >= threshold_pct)
+        current_note = str(
+            row['variance_note']) if row['variance_note'] else ""
         if not is_material and current_note == "":
             update_account_entry(row['id'], 'variance_note', "N/A")
             df.at[index, 'variance_note'] = "N/A"
@@ -623,15 +760,21 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         st.rerun()
 
     display_df = df.copy()
-    display_df['prev_bal'] = display_df['prev_bal'].apply(lambda x: "{:,.2f}".format(x))
-    display_df['curr_bal'] = display_df['curr_bal'].apply(lambda x: "{:,.2f}".format(x))
-    display_df['diff_amt'] = display_df['diff_amt'].apply(lambda x: "{:,.2f}".format(x))
-    display_df['diff_pct'] = display_df['diff_pct'].apply(lambda x: "{:.1f}%".format(x))
+    display_df['prev_bal'] = display_df['prev_bal'].apply(
+        lambda x: "{:,.2f}".format(x))
+    display_df['curr_bal'] = display_df['curr_bal'].apply(
+        lambda x: "{:,.2f}".format(x))
+    display_df['diff_amt'] = display_df['diff_amt'].apply(
+        lambda x: "{:,.2f}".format(x))
+    display_df['diff_pct'] = display_df['diff_pct'].apply(
+        lambda x: "{:.1f}%".format(x))
 
     def get_status_icon(row):
         orig_row = df[df['id'] == row['id']].iloc[0]
-        is_material = (abs(orig_row['diff_amt']) >= threshold_amt) and (abs(orig_row['diff_pct']) >= threshold_pct)
-        note = str(orig_row['variance_note']) if orig_row['variance_note'] else ""
+        is_material = (abs(orig_row['diff_amt']) >= threshold_amt) and (abs(
+            orig_row['diff_pct']) >= threshold_pct)
+        note = str(
+            orig_row['variance_note']) if orig_row['variance_note'] else ""
         if not is_material:
             return "⚪️"
         elif is_material and (note == "" or note == "None"):
@@ -647,23 +790,28 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         "account_number": "Acct #",
         "account_name": "Account Name",
         "prev_bal": st.column_config.TextColumn("Prior Month", disabled=True),
-        "curr_bal": st.column_config.TextColumn("Current Month", disabled=True),
+        "curr_bal": st.column_config.TextColumn("Current Month",
+                                                disabled=True),
         "diff_amt": st.column_config.TextColumn("Var $", disabled=True),
         "diff_pct": st.column_config.TextColumn("Var %", disabled=True),
-        "variance_note": st.column_config.TextColumn("Explanation", width="large"),
-        "Action": st.column_config.TextColumn("St", width="small", disabled=True)
+        "variance_note": st.column_config.TextColumn("Explanation",
+                                                     width="large"),
+        "Action": st.column_config.TextColumn("St",
+                                              width="small",
+                                              disabled=True)
     }
 
-    final_view = display_df[['id', 'account_number', 'account_name', 'prev_bal', 'curr_bal', 'diff_amt', 'diff_pct', 'Action', 'variance_note']]
+    final_view = display_df[[
+        'id', 'account_number', 'account_name', 'prev_bal', 'curr_bal',
+        'diff_amt', 'diff_pct', 'Action', 'variance_note'
+    ]]
 
-    edited_df = st.data_editor(
-        final_view,
-        key=f"audit_flux_editor_{month_id}",
-        hide_index=True,
-        column_config=column_config,
-        use_container_width=True,
-        height=min((len(df) + 1) * 35, 1200)
-    )
+    edited_df = st.data_editor(final_view,
+                               key=f"audit_flux_editor_{month_id}",
+                               hide_index=True,
+                               column_config=column_config,
+                               use_container_width=True,
+                               height=min((len(df) + 1) * 35, 1200))
 
     changes_detected = False
     for index, row in edited_df.iterrows():
@@ -677,20 +825,27 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         st.toast("Saved!", icon="💾")
         st.rerun()
 
+
 def generate_excel_export(month_id):
     from openpyxl import Workbook
-    
+
     conn = get_connection()
     cursor = conn.cursor()
-    
-    cursor.execute("""
+
+    cursor.execute(
+        """
         SELECT task_name, phase, day_due, owner, instructions_link, status
         FROM close_monthly_tasks WHERE month_id = %s ORDER BY day_due ASC
-    """, (month_id,))
+    """, (month_id, ))
     tasks_data = cursor.fetchall()
-    df_tasks = pd.DataFrame(tasks_data, columns=['Task Name', 'Phase', 'Due (T+)', 'Owner', 'SOP Link', 'Status']) if tasks_data else pd.DataFrame()
-    
-    cursor.execute("""
+    df_tasks = pd.DataFrame(tasks_data,
+                            columns=[
+                                'Task Name', 'Phase', 'Due (T+)', 'Owner',
+                                'SOP Link', 'Status'
+                            ]) if tasks_data else pd.DataFrame()
+
+    cursor.execute(
+        """
         SELECT 
             mb.account_number,
             a.account_name,
@@ -704,12 +859,18 @@ def generate_excel_export(month_id):
         JOIN close_accounts a ON mb.account_number = a.account_number
         WHERE mb.month_id = %s
         ORDER BY mb.account_number ASC
-    """, (month_id,))
+    """, (month_id, ))
     tb_data = cursor.fetchall()
-    df_tb = pd.DataFrame(tb_data, columns=['Acct #', 'Account Name', 'QBO Balance', 'Expected Balance', 'Variance', 'Status', 'Rec Note', 'Workpaper Link']) if tb_data else pd.DataFrame()
-    
+    df_tb = pd.DataFrame(
+        tb_data,
+        columns=[
+            'Acct #', 'Account Name', 'QBO Balance', 'Expected Balance',
+            'Variance', 'Status', 'Rec Note', 'Workpaper Link'
+        ]) if tb_data else pd.DataFrame()
+
     prev_month_id = get_prior_month_id(month_id)
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT 
             curr.account_number,
             a.account_name,
@@ -727,31 +888,42 @@ def generate_excel_export(month_id):
     """, (prev_month_id, month_id))
     flux_data = cursor.fetchall()
     conn.close()
-    
-    df_flux = pd.DataFrame(flux_data, columns=['Acct #', 'Account Name', 'Prior Month', 'Current Month', 'Variance $', 'Explanation']) if flux_data else pd.DataFrame()
+
+    df_flux = pd.DataFrame(flux_data,
+                           columns=[
+                               'Acct #', 'Account Name', 'Prior Month',
+                               'Current Month', 'Variance $', 'Explanation'
+                           ]) if flux_data else pd.DataFrame()
     if not df_flux.empty:
         df_flux['Prior Month'] = df_flux['Prior Month'].fillna(0)
         df_flux['Variance %'] = df_flux.apply(
-            lambda x: (x['Variance $'] / x['Prior Month'] * 100) if x['Prior Month'] != 0 else 0.0, axis=1
-        )
-        df_flux = df_flux[['Acct #', 'Account Name', 'Prior Month', 'Current Month', 'Variance $', 'Variance %', 'Explanation']]
-    
+            lambda x: (x['Variance $'] / x['Prior Month'] * 100)
+            if x['Prior Month'] != 0 else 0.0,
+            axis=1)
+        df_flux = df_flux[[
+            'Acct #', 'Account Name', 'Prior Month', 'Current Month',
+            'Variance $', 'Variance %', 'Explanation'
+        ]]
+
     wb = Workbook()
-    
+
     header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="36404A", end_color="36404A", fill_type="solid")
-    header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    thin_border = Border(
-        left=Side(style='thin'),
-        right=Side(style='thin'),
-        top=Side(style='thin'),
-        bottom=Side(style='thin')
-    )
-    
+    header_fill = PatternFill(start_color="36404A",
+                              end_color="36404A",
+                              fill_type="solid")
+    header_alignment = Alignment(horizontal="center",
+                                 vertical="center",
+                                 wrap_text=True)
+    thin_border = Border(left=Side(style='thin'),
+                         right=Side(style='thin'),
+                         top=Side(style='thin'),
+                         bottom=Side(style='thin'))
+
     ws_tasks = wb.active
     ws_tasks.title = "Checklist"
     if not df_tasks.empty:
-        for r_idx, row in enumerate(dataframe_to_rows(df_tasks, index=False, header=True), 1):
+        for r_idx, row in enumerate(
+                dataframe_to_rows(df_tasks, index=False, header=True), 1):
             for c_idx, value in enumerate(row, 1):
                 cell = ws_tasks.cell(row=r_idx, column=c_idx, value=value)
                 cell.border = thin_border
@@ -761,11 +933,13 @@ def generate_excel_export(month_id):
                     cell.alignment = header_alignment
         for col in ws_tasks.columns:
             max_length = max(len(str(cell.value or "")) for cell in col)
-            ws_tasks.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
-    
+            ws_tasks.column_dimensions[col[0].column_letter].width = min(
+                max_length + 2, 50)
+
     ws_tb = wb.create_sheet(title="Trial Balance")
     if not df_tb.empty:
-        for r_idx, row in enumerate(dataframe_to_rows(df_tb, index=False, header=True), 1):
+        for r_idx, row in enumerate(
+                dataframe_to_rows(df_tb, index=False, header=True), 1):
             for c_idx, value in enumerate(row, 1):
                 cell = ws_tb.cell(row=r_idx, column=c_idx, value=value)
                 cell.border = thin_border
@@ -775,11 +949,13 @@ def generate_excel_export(month_id):
                     cell.alignment = header_alignment
         for col in ws_tb.columns:
             max_length = max(len(str(cell.value or "")) for cell in col)
-            ws_tb.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
-    
+            ws_tb.column_dimensions[col[0].column_letter].width = min(
+                max_length + 2, 50)
+
     ws_flux = wb.create_sheet(title="Flux Analysis")
     if not df_flux.empty:
-        for r_idx, row in enumerate(dataframe_to_rows(df_flux, index=False, header=True), 1):
+        for r_idx, row in enumerate(
+                dataframe_to_rows(df_flux, index=False, header=True), 1):
             for c_idx, value in enumerate(row, 1):
                 cell = ws_flux.cell(row=r_idx, column=c_idx, value=value)
                 cell.border = thin_border
@@ -789,12 +965,14 @@ def generate_excel_export(month_id):
                     cell.alignment = header_alignment
         for col in ws_flux.columns:
             max_length = max(len(str(cell.value or "")) for cell in col)
-            ws_flux.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
-    
+            ws_flux.column_dimensions[col[0].column_letter].width = min(
+                max_length + 2, 50)
+
     output = BytesIO()
     wb.save(output)
     output.seek(0)
     return output
+
 
 def render_workspace(month_id):
     with st.sidebar:
@@ -805,7 +983,9 @@ def render_workspace(month_id):
 
         st.divider()
         st.subheader("Filters")
-        owner_filter = st.selectbox("Task Owner", ["All", "VP Accounting", "Ops", "CFO", "Accounting Firm"])
+        owner_filter = st.selectbox(
+            "Task Owner",
+            ["All", "VP Accounting", "Ops", "CFO", "Accounting Firm"])
 
         st.divider()
         st.subheader("Flux Thresholds")
@@ -819,17 +999,19 @@ def render_workspace(month_id):
             label="📥 Download Close Package",
             data=excel_data,
             file_name=f"close_package_{month_id}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True
-        )
+            mime=
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True)
 
         st.divider()
         st.subheader("Data Sync")
 
         has_encryption_key = qbo_connector._has_encryption_key()
-        
+
         if not has_encryption_key:
-            st.warning("⚠️ QBO_ENCRYPTION_KEY not set. Add this secret before connecting to QuickBooks.")
+            st.warning(
+                "⚠️ QBO_ENCRYPTION_KEY not set. Add this secret before connecting to QuickBooks."
+            )
             client = None
         else:
             try:
@@ -853,7 +1035,8 @@ def render_workspace(month_id):
                         last_day = calendar.monthrange(y, m)[1]
                         end_date_str = f"{month_id}-{last_day}"
 
-                        qbo_data = qbo_connector.fetch_trial_balance(end_date_str)
+                        qbo_data = qbo_connector.fetch_trial_balance(
+                            end_date_str)
 
                         if qbo_data:
                             conn = get_connection()
@@ -866,30 +1049,47 @@ def render_workspace(month_id):
                                 name = details['name']
                                 bal = details['balance']
 
-                                cursor.execute("SELECT account_number FROM close_accounts WHERE account_number = %s", (acct_num,))
+                                cursor.execute(
+                                    "SELECT account_number FROM close_accounts WHERE account_number = %s",
+                                    (acct_num, ))
                                 if not cursor.fetchone():
-                                    cat = 'BS' if int(acct_num) < 40000 else 'PL'
-                                    cursor.execute("INSERT INTO close_accounts (account_number, account_name, category, permanent_link) VALUES (%s, %s, %s, '')", (acct_num, name, cat))
+                                    cat = 'BS' if int(
+                                        acct_num) < 40000 else 'PL'
+                                    cursor.execute(
+                                        "INSERT INTO close_accounts (account_number, account_name, category, permanent_link) VALUES (%s, %s, %s, '')",
+                                        (acct_num, name, cat))
                                     new_accounts_found += 1
 
-                                cursor.execute("SELECT id FROM close_monthly_balances WHERE month_id = %s AND account_number = %s", (month_id, acct_num))
+                                cursor.execute(
+                                    "SELECT id FROM close_monthly_balances WHERE month_id = %s AND account_number = %s",
+                                    (month_id, acct_num))
                                 row = cursor.fetchone()
 
                                 if row:
-                                    cursor.execute("UPDATE close_monthly_balances SET qbo_balance = %s WHERE id = %s", (bal, row['id']))
+                                    cursor.execute(
+                                        "UPDATE close_monthly_balances SET qbo_balance = %s WHERE id = %s",
+                                        (bal, row['id']))
                                 else:
-                                    cursor.execute("INSERT INTO close_monthly_balances (month_id, account_number, qbo_balance, status) VALUES (%s, %s, %s, 'Open')", (month_id, acct_num, bal))
+                                    cursor.execute(
+                                        "INSERT INTO close_monthly_balances (month_id, account_number, qbo_balance, status) VALUES (%s, %s, %s, 'Open')",
+                                        (month_id, acct_num, bal))
                                 updated_balances += 1
 
-                            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                            cursor.execute("UPDATE close_monthly_close SET last_synced_at = %s WHERE month_id = %s", (now_str, month_id))
+                            now_str = datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S")
+                            cursor.execute(
+                                "UPDATE close_monthly_close SET last_synced_at = %s WHERE month_id = %s",
+                                (now_str, month_id))
 
                             conn.commit()
                             conn.close()
 
                             if new_accounts_found > 0:
-                                st.toast(f"Auto-discovered {new_accounts_found} new accounts!")
-                            st.toast(f"Synced {updated_balances} balances.", icon="✅")
+                                st.toast(
+                                    f"Auto-discovered {new_accounts_found} new accounts!"
+                                )
+                            st.toast(f"Synced {updated_balances} balances.",
+                                     icon="✅")
                             st.rerun()
                         else:
                             st.error("Failed to fetch data.")
@@ -901,11 +1101,15 @@ def render_workspace(month_id):
             if auth_url:
                 st.link_button("🔗 Login to Intuit", auth_url)
             else:
-                st.error("QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets.")
+                st.error(
+                    "QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets."
+                )
 
     st.title(f"Close Workspace: {month_id}")
 
-    tab1, tab2, tab3 = st.tabs(["📋 Process (Checklist)", "⚖️ Substantiation (TB)", "📊 Reporting (Flux)"])
+    tab1, tab2, tab3 = st.tabs([
+        "📋 Process (Checklist)", "⚖️ Substantiation (TB)", "📊 Reporting (Flux)"
+    ])
 
     with tab1:
         render_checklist_tab(month_id, owner_filter)
@@ -915,6 +1119,7 @@ def render_workspace(month_id):
 
     with tab3:
         render_flux_tab(month_id, thresh_amt, thresh_pct)
+
 
 def main():
     try:
@@ -938,6 +1143,7 @@ def main():
         render_workspace(st.session_state['active_month'])
     else:
         render_lobby()
+
 
 if __name__ == '__main__':
     main()
