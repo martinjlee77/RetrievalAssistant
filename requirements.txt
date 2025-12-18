@@ -21,3 +21,5 @@ gunicorn==21.2.0
 redis
 rq
 fakeredis
+intuit-oauth
+openpyxl
