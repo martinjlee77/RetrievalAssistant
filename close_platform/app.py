@@ -1132,6 +1132,10 @@ def render_workspace(month_id):
                 st.link_button("🔗 Login to Intuit", auth_url)
                 with st.expander("Debug: Auth URL"):
                     st.code(auth_url, language=None)
+                    redirect_uri = os.getenv("QBO_REDIRECT_URI", "")
+                    st.write("**Redirect URI (raw repr to show hidden chars):**")
+                    st.code(repr(redirect_uri), language="python")
+                    st.write(f"**Length:** {len(redirect_uri)} characters")
             else:
                 st.error(
                     "QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets."
