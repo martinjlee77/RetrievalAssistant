@@ -707,17 +707,22 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     with r1_c2:
         with st.container(border=True):
             st.markdown("**2. Balance Sheet Logic Check**")
-            st.caption("Assets = Liabilities + Equity")
+            st.caption("Assets + Liabilities + Equity + YTD NI = 0")
 
-            c1, c2, c3 = st.columns(3)
+            c1, c2, c3, c4, c5 = st.columns(5)
             with c1:
                 st.caption("Assets")
                 st.markdown(f"**{total_assets:,.0f}**")
             with c2:
-                st.caption("L+E+YTD NI")
-                st.markdown(
-                    f"**{(total_liabs + total_equity + ytd_net_income):,.0f}**")
+                st.caption("Liabilities")
+                st.markdown(f"**{total_liabs:,.0f}**")
             with c3:
+                st.caption("Equity")
+                st.markdown(f"**{total_equity:,.0f}**")
+            with c4:
+                st.caption("YTD NI")
+                st.markdown(f"**{ytd_net_income:,.0f}**")
+            with c5:
                 st.caption("Net Check")
                 st.markdown(f"**{bs_check_val:,.2f}**")
 
