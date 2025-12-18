@@ -233,3 +233,51 @@ def fetch_trial_balance(date_str):
             }
 
     return final_map
+
+
+def get_ytd_net_income(end_date_str: str) -> float:
+    """
+    Fetch YTD Net Income from QuickBooks P&L report.
+    
+    Args:
+        end_date_str: End date in YYYY-MM-DD format (typically month-end date)
+    
+    Returns:
+        YTD Net Income as a float, or 0.0 if unavailable
+    """
+    client = get_active_client()
+    if not client:
+        return 0.0
+
+    base_url = "https://sandbox-quickbooks.api.intuit.com" if ENV == 'sandbox' else "https://quickbooks.api.intuit.com"
+    url = f"{base_url}/v3/company/{client.realm_id}/reports/ProfitAndLoss"
+    headers = {"Authorization": f"Bearer {client.access_token}", "Accept": "application/json"}
+
+    dt_end = datetime.strptime(end_date_str, "%Y-%m-%d")
+    fy_start_str = dt_end.replace(month=1, day=1).strftime("%Y-%m-%d")
+
+    params = {
+        "start_date": fy_start_str,
+        "end_date": end_date_str,
+        "accounting_method": "Accrual",
+        "minorversion": 65
+    }
+
+    data = call_qbo_api(url, headers, params)
+    if not data:
+        return 0.0
+
+    try:
+        rows = data.get("Rows", {}).get("Row", [])
+        for row in rows:
+            if "Summary" in row:
+                col_data = row["Summary"].get("ColData", [])
+                if len(col_data) >= 2:
+                    label = col_data[0].get("value", "")
+                    if label == "Net Income":
+                        value_str = col_data[1].get("value", "0")
+                        return float(value_str.replace(",", ""))
+    except Exception as e:
+        print(f"Error parsing P&L report for Net Income: {e}")
+
+    return 0.0
