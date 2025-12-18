@@ -631,6 +631,20 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         (month_id, ))
     sub_ledger_result = cursor.fetchone()
     sub_ledger_total = sub_ledger_result['total'] if sub_ledger_result and sub_ledger_result.get('total') else 0.0
+    
+    year = int(month_id[:4])
+    fy_start = f"{year}-01"
+    cursor.execute("""
+        SELECT COALESCE(SUM(b.qbo_balance), 0) as ytd_pnl
+        FROM close_monthly_balances b
+        JOIN close_accounts a ON b.account_number = a.account_number
+        WHERE b.month_id >= %s AND b.month_id <= %s
+          AND CAST(b.account_number AS INTEGER) >= 40000
+          AND CAST(b.account_number AS INTEGER) <= 89999
+    """, (fy_start, month_id))
+    ytd_result = cursor.fetchone()
+    ytd_net_income_from_db = ytd_result['ytd_pnl'] if ytd_result else 0.0
+    
     conn.close()
 
     df = pd.DataFrame(rows) if rows else pd.DataFrame()
@@ -656,8 +670,7 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     total_liabs = df[df['Group'].str.startswith(
         ('05', '06', '07'))]['curr_bal'].sum()
     total_equity = df[df['Group'].str.startswith(('08'))]['curr_bal'].sum()
-    ytd_net_income = df[df['Group'].str.startswith(
-        ('09', '10', '11', '12'))]['curr_bal'].sum()
+    ytd_net_income = ytd_net_income_from_db
     
     bs_check_val = total_assets + total_liabs + total_equity + ytd_net_income
     is_bs_balanced = abs(bs_check_val) < 0.01
