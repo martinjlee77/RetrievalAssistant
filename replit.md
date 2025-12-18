@@ -3,6 +3,16 @@
 ## Overview
 VeritasLogic.ai is a premium enterprise AI platform for accounting firms and large enterprise technical accounting teams. It provides audit-ready, professional-quality accounting analyses across multiple FASB standards (ASC 606, ASC 842, ASC 718, ASC 805, ASC 340-40) using advanced AI. The platform transforms weeks of manual analysis into professional memos within minutes, maintaining professional rigor and citation quality, allowing professionals to focus on judgment and client advisory.
 
+## Recent Changes (December 18, 2025)
+1. **Monthly Close Platform**: New Streamlit instance on port 5001 for month-end close management.
+   - Directory: `close_platform/` with app.py, db_config.py, qbo_connector.py, close_worker.py
+   - Features: Close checklist with task rollover, trial balance substantiation with auto-account discovery, flux analysis with audit controls
+   - QuickBooks Online Integration: OAuth2 connection with Fernet-encrypted token storage
+   - Excel Export: Download close package with all three tabs (Checklist, Trial Balance, Flux)
+   - Background Sync: RQ worker on 'close' queue for scheduled QBO sync
+   - Required Secrets: QBO_CLIENT_ID, QBO_CLIENT_SECRET, QBO_REDIRECT_URI, QBO_ENCRYPTION_KEY (Fernet key)
+   - Database Tables: close_accounts, close_monthly_close, close_monthly_balances, close_monthly_tasks, close_qbo_tokens
+
 ## Recent Changes (December 8, 2025)
 1. **Sequential Execution Architecture for All ASC Standards**: Refactored all ASC standards (606, 842, 718, 805, 340-40) from parallel to sequential step execution with accumulated context passing.
    - Each step receives full markdown output from ALL prior steps for perfect consistency
@@ -79,6 +89,7 @@ The platform combines enterprise-grade business infrastructure with sophisticate
 - **Research Assistant**: Integrated RAG-powered chat interface for methodology development, supporting standard-specific knowledge base selection and comprehensive guidance with authoritative citations.
 - **Knowledge Base**: Separated database architecture with dedicated ChromaDB instances per standard, using paragraph-aware chunking and topic classification.
 - **Document Processing**: Unified document extractor for various formats, including multi-document processing.
+- **Monthly Close Platform**: Separate Streamlit instance (port 5001) in `close_platform/` directory. Three-tab interface: Process (checklist with task rollover), Substantiation (trial balance reconciliation with QBO integration), Reporting (flux analysis with audit controls). QuickBooks Online OAuth tokens are Fernet-encrypted before storage. Excel export available for close package.
 
 ### Website & User Interface Architecture
 - **Enterprise Web Platform**: Professional website with unified contact system, enterprise messaging, and sophisticated user account management.

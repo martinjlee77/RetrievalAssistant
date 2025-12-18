@@ -826,10 +826,16 @@ def render_workspace(month_id):
         st.divider()
         st.subheader("Data Sync")
 
-        try:
-            client = qbo_connector.get_active_client()
-        except Exception:
+        has_encryption_key = qbo_connector._has_encryption_key()
+        
+        if not has_encryption_key:
+            st.warning("⚠️ QBO_ENCRYPTION_KEY not set. Add this secret before connecting to QuickBooks.")
             client = None
+        else:
+            try:
+                client = qbo_connector.get_active_client()
+            except Exception:
+                client = None
 
         if client:
             st.success("✅ QBO Connected")
@@ -889,13 +895,13 @@ def render_workspace(month_id):
                             st.error("Failed to fetch data.")
                     except Exception as e:
                         st.error(f"Sync Error: {e}")
-        else:
+        elif has_encryption_key:
             st.warning("Not Connected")
             auth_url = qbo_connector.get_auth_url()
             if auth_url:
                 st.link_button("🔗 Login to Intuit", auth_url)
             else:
-                st.error("QBO credentials not configured. Add QBO_CLIENT_ID and QBO_CLIENT_SECRET to secrets.")
+                st.error("QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets.")
 
     st.title(f"Close Workspace: {month_id}")
 

@@ -25,8 +25,8 @@ def main():
     """Start the RQ worker"""
     redis_conn = get_redis_connection()
     
-    worker = Worker(['analysis'], connection=redis_conn)
-    logger.info("🚀 RQ Worker started. Waiting for jobs...")
+    worker = Worker(['analysis', 'close'], connection=redis_conn)
+    logger.info("🚀 RQ Worker started. Listening on 'analysis' and 'close' queues...")
     worker.work()
 
 if __name__ == '__main__':

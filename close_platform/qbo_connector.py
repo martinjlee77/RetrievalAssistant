@@ -1,15 +1,49 @@
 import streamlit as st
 import os
 import requests
+import base64
 from datetime import datetime, timedelta
 from intuitlib.client import AuthClient
 from intuitlib.enums import Scopes
+from cryptography.fernet import Fernet
 from close_platform.db_config import get_connection
 
 CLIENT_ID = os.getenv("QBO_CLIENT_ID")
 CLIENT_SECRET = os.getenv("QBO_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("QBO_REDIRECT_URI")
 ENV = os.getenv("QBO_ENVIRONMENT", "production")
+
+def _get_encryption_key():
+    key = os.getenv("QBO_ENCRYPTION_KEY")
+    if not key:
+        raise ValueError("QBO_ENCRYPTION_KEY not configured. Add a Fernet key to secrets before connecting to QuickBooks.")
+    if isinstance(key, str):
+        key = key.encode()
+    return key
+
+def _has_encryption_key() -> bool:
+    return bool(os.getenv("QBO_ENCRYPTION_KEY"))
+
+def _encrypt_token(token: str) -> str:
+    if not token:
+        return ""
+    key = _get_encryption_key()
+    f = Fernet(key)
+    encrypted = f.encrypt(token.encode())
+    return base64.urlsafe_b64encode(encrypted).decode()
+
+def _decrypt_token(encrypted_token: str) -> str:
+    if not encrypted_token:
+        return ""
+    try:
+        key = _get_encryption_key()
+        f = Fernet(key)
+        decoded = base64.urlsafe_b64decode(encrypted_token.encode())
+        decrypted = f.decrypt(decoded)
+        return decrypted.decode()
+    except Exception as e:
+        print(f"Token decryption failed: {e}")
+        return ""
 
 def get_auth_client():
     if not CLIENT_ID or not CLIENT_SECRET:
@@ -33,13 +67,16 @@ def handle_callback(auth_code, realm_id):
         raise Exception("QBO credentials not configured")
     client.get_bearer_token(auth_code, realm_id=realm_id)
 
+    encrypted_access = _encrypt_token(client.access_token)
+    encrypted_refresh = _encrypt_token(client.refresh_token)
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM close_qbo_tokens")
     cursor.execute("""
         INSERT INTO close_qbo_tokens (realm_id, access_token, refresh_token, updated_at)
         VALUES (%s, %s, %s, %s)
-    """, (realm_id, client.access_token, client.refresh_token, datetime.now()))
+    """, (realm_id, encrypted_access, encrypted_refresh, datetime.now()))
     conn.commit()
     conn.close()
 
@@ -57,16 +94,25 @@ def get_active_client():
     if not client:
         return None
     
-    client.access_token = row['access_token']
-    client.refresh_token = row['refresh_token']
+    decrypted_access = _decrypt_token(row['access_token'])
+    decrypted_refresh = _decrypt_token(row['refresh_token'])
+    
+    if not decrypted_access or not decrypted_refresh:
+        print("Token decryption failed - tokens may be corrupted or key changed")
+        return None
+    
+    client.access_token = decrypted_access
+    client.refresh_token = decrypted_refresh
     client.realm_id = row['realm_id']
 
     try:
         client.refresh()
+        encrypted_access = _encrypt_token(client.access_token)
+        encrypted_refresh = _encrypt_token(client.refresh_token)
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE close_qbo_tokens SET access_token=%s, refresh_token=%s, updated_at=%s",
-                       (client.access_token, client.refresh_token, datetime.now()))
+                       (encrypted_access, encrypted_refresh, datetime.now()))
         conn.commit()
         conn.close()
     except Exception as e:
