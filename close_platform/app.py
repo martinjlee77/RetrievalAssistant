@@ -268,7 +268,7 @@ def render_lobby():
                 with btn_col2:
                     if is_open:
                         with st.popover("🗑️", use_container_width=True):
-                            st.warning(f"Delete {row['month_id']}? This cannot be undone.")
+                            st.info(f"Delete {row['month_id']}? This cannot be undone.")
                             if st.button("Yes, Delete",
                                          key=f"confirm_del_{row['month_id']}",
                                          type="primary"):

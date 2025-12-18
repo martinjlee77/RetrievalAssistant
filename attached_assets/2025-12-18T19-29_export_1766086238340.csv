@@ -1,0 +1,26 @@
+﻿Health,phase,task_name,day_due,owner,instructions_link,status
+✅,Phase 1,Download Interchange/Processor Reports,1,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:w:/g/personal/martin_lynx-fh_com/IQCGc6Ip0hM3TLi6CKJPsSxhAQSeiVJi-hMNKcb00cuMUkI?e=0wOm6y,Done
+✅,Phase 1,Download Card/Catalog Vendor Reports,1,VP,,Done
+🔴,Phase 1,Download Payroll Reports,1,VP,,Pending
+🔴,Phase 1,Sync Bill.com / Ramp / Amex to QBO,1,VP,,Pending
+🔴,Phase 1,Reconcile Operating Cash (SVB/Merc/Chase),2,VP,,Pending
+🔴,Phase 1,Reconcile FBO & Clearing Accounts,3,VP,,Pending
+✅,Phase 1,Complete AR invoicing and review related AR accounts,3,VP Accounting,,Done
+✅,Phase 3,Process Interest Revenue,3,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:w:/g/personal/martin_lynx-fh_com/IQBmfV3cgR1CT7kJHvdoWxnPAe3LT7733aJhCLayF6f-IOg?e=kypf4w,Done
+✅,Phase 2,Process MC Incentive Revenue,4,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:w:/g/personal/martin_lynx-fh_com/IQDdpHVnMPTpQJkvq6xT_uFkAVVJfZEn818Vzj8y4sLj3Mg?e=66SVTu,Done
+🔴,Phase 2,Update Prepaids Schedule (General),5,VP,,Pending
+🔴,Phase 2,Update Costs to Fulfill - Card & Catalog,5,VP,,Pending
+🔴,Phase 2,Update Fixed Assets & Amortization,6,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:w:/g/personal/martin_lynx-fh_com/IQAzsAE5NN0cRKJy-dRbtsCTAcvVm3wRP3kulb0_4E_Kb0w?e=OaSZPP,In Progress
+🔴,Phase 2,Review AP Aging,6,VP,,Pending
+🔴,Phase 2,Reconcile Credit Cards,6,VP,,Pending
+🔴,Phase 2,Book Accruals (Legal/AWS/Est),6,VP,,Pending
+✅,Phase 2,"Process eCommerce Revenues (PH, THB, CTN)",6,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:w:/g/personal/martin_lynx-fh_com/IQAX4DICxypmSL5cbcRtVXl9AUUtBJj1w8n_UOFxYFUZY84?e=dmFZ1R,Done
+🔴,Phase 2,Payroll Rec & True-up,7,VP,,Pending
+🔴,Phase 2,Tax Payables (State/Interchange),7,VP,,Pending
+✅,Phase 3,Process Interchange Rev & Share,8,VP Accounting,https://lynxfinhealthinc.sharepoint.com/:w:/s/LYNXFINHEALTHINC/IQA77FGxkwNiSo-VDvqP8zYFAfagcWXN_4NXzKG4MGwxwfU?e=CGLaNg,Done
+🔴,Phase 3,Process Transaction/Card Fees,8,VP,,Pending
+✅,Phase 3,Update Deferred Revenue Waterfall,9,VP Accounting,https://lynxfinhealthinc-my.sharepoint.com/:f:/g/personal/martin_lynx-fh_com/IgCY4CPoeQDhSYeOz6LWZse-ARI7U9aqsYBoK5fMcQ2JHYo?e=rl457o,Done
+🔴,Phase 3,Book Interest & Equity Activity,9,VP,,Pending
+🔴,Phase 4,Run P&L Flux Analysis,10,VP,,Pending
+🔴,Phase 4,Check Gross Margins,10,VP,,Pending
+🔴,Phase 4,Lock Books in QBO,10,VP,,Pending
