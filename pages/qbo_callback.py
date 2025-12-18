@@ -50,3 +50,9 @@ else:
         st.success("✅ QuickBooks is currently connected!")
     else:
         st.warning("⚠️ QuickBooks is not connected.")
+    
+    st.divider()
+    st.subheader("Debug Info")
+    redirect_uri = os.getenv("QBO_REDIRECT_URI", "NOT SET")
+    st.code(f"Current QBO_REDIRECT_URI: {redirect_uri}")
+    st.caption("This URL must match EXACTLY what's in your Intuit Developer Portal (including trailing slashes)")
