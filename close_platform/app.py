@@ -306,7 +306,7 @@ def render_checklist_tab(month_id, owner_filter):
     done_tasks = len(df[df['status'].isin(['Done', 'N/A'])])
     prog = done_tasks / total_tasks if total_tasks > 0 else 0
 
-    c1, c2, c3 = st.columns([2.5, 1, 1])
+    c1, c2, c3, c4, c5 = st.columns([2, 1, 0.5, 0.5, 0.5])
 
     with c1:
         st.markdown(f"### 📅 Today is T+{current_t_day}")
@@ -316,9 +316,39 @@ def render_checklist_tab(month_id, owner_filter):
         st.metric("Completion", f"{done_tasks}/{total_tasks}")
 
     with c3:
-        save_clicked = st.button("💾 Save Changes",
+        save_clicked = st.button("💾",
                                  type="primary",
-                                 use_container_width=True)
+                                 use_container_width=True,
+                                 help="Save Changes")
+
+    with c4:
+        with st.popover("➕", use_container_width=True, help="Add Task"):
+            st.subheader("Add New Task")
+            new_task_name = st.text_input("Task Name", key="new_task_name")
+            new_phase = st.selectbox("Phase", ["Phase 1", "Phase 2", "Phase 3", "Phase 4"], key="new_phase")
+            new_day = st.number_input("Due Day (T+)", min_value=1, max_value=20, value=1, key="new_day")
+            new_owner = st.selectbox("Owner", ["VP Accounting", "Ops", "CFO", "Accounting Firm"], key="new_owner")
+            new_link = st.text_input("Instructions Link (optional)", key="new_link")
+            if st.button("Add Task", type="primary", key="add_task_btn"):
+                if new_task_name:
+                    conn = get_connection()
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status) VALUES (%s, %s, %s, %s, %s, %s, 'Pending')",
+                        (month_id, new_task_name, new_phase, new_day, new_owner, new_link))
+                    conn.commit()
+                    conn.close()
+                    st.toast("Task added!", icon="✅")
+                    st.rerun()
+
+    with c5:
+        csv_data = df.to_csv(index=False)
+        st.download_button("📥",
+                           data=csv_data,
+                           file_name=f"checklist_{month_id}.csv",
+                           mime="text/csv",
+                           use_container_width=True,
+                           help="Download CSV")
 
     st.progress(prog, text=f"Overall Completion: {int(prog*100)}%")
 
