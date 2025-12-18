@@ -627,11 +627,10 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     rows = cursor.fetchall()
 
     cursor.execute(
-        "SELECT SUM(qbo_balance) FROM close_monthly_balances WHERE month_id = %s",
+        "SELECT SUM(qbo_balance) as total FROM close_monthly_balances WHERE month_id = %s",
         (month_id, ))
     sub_ledger_result = cursor.fetchone()
-    sub_ledger_total = sub_ledger_result[
-        0] if sub_ledger_result and sub_ledger_result[0] else 0.0
+    sub_ledger_total = sub_ledger_result['total'] if sub_ledger_result and sub_ledger_result.get('total') else 0.0
     conn.close()
 
     df = pd.DataFrame(rows) if rows else pd.DataFrame()
