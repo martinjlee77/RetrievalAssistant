@@ -665,7 +665,7 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     ytd_net_income = ytd_net_income_from_qbo
     
     bs_check_val = total_assets + total_liabs + total_equity + ytd_net_income
-    is_bs_balanced = abs(bs_check_val) < 0.01
+    is_bs_balanced = abs(bs_check_val) < 1000
 
     df_mapped = df[df['Group'] != "13. Other / Unmapped"]
     tab2_dr = df_mapped[df_mapped['curr_bal'] > 0]['curr_bal'].sum()

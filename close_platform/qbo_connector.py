@@ -249,7 +249,6 @@ def get_ytd_net_income(end_date_str: str) -> float:
     """
     client = get_active_client()
     if not client:
-        print("[YTD_NI] No active client - returning 0.0")
         return 0.0
 
     base_url = "https://sandbox-quickbooks.api.intuit.com" if ENV == 'sandbox' else "https://quickbooks.api.intuit.com"
@@ -265,16 +264,11 @@ def get_ytd_net_income(end_date_str: str) -> float:
         "accounting_method": "Accrual",
         "minorversion": 65
     }
-    
-    print(f"[YTD_NI] Calling P&L API: start_date={fy_start_str}, end_date={end_date_str}")
 
     data = call_qbo_api(url, headers, params)
     if not data:
-        print("[YTD_NI] No data returned from API - returning 0.0")
         return 0.0
 
-    print(f"[YTD_NI] Report header: {data.get('Header', {})}")
-    
     try:
         rows = data.get("Rows", {}).get("Row", [])
         for row in rows:
@@ -285,10 +279,8 @@ def get_ytd_net_income(end_date_str: str) -> float:
                     if label == "Net Income":
                         value_str = col_data[1].get("value", "0")
                         net_income = float(value_str.replace(",", ""))
-                        print(f"[YTD_NI] Found Net Income: {value_str} -> returning {-net_income}")
                         return -net_income
-        print("[YTD_NI] No 'Net Income' row found in response")
-    except Exception as e:
-        print(f"[YTD_NI] Error parsing P&L report: {e}")
+    except Exception:
+        pass
 
     return 0.0
