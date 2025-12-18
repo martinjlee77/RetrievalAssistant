@@ -44,6 +44,9 @@ pages = {
     "Get Help": [
         st.Page("pages/gethelp.py", title="Contact Support", icon=":material/contact_support:"),
     ],
+    "Settings": [
+        st.Page("pages/qbo_callback.py", title="QuickBooks Connection", icon=":material/link:"),
+    ],
 }
 
 pg = st.navigation(pages)
