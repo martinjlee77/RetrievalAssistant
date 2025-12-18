@@ -5,6 +5,9 @@ import calendar
 import numpy as np
 import sys
 import os
+from io import BytesIO
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.utils.dataframe import dataframe_to_rows
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -674,6 +677,125 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         st.toast("Saved!", icon="💾")
         st.rerun()
 
+def generate_excel_export(month_id):
+    from openpyxl import Workbook
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT task_name, phase, day_due, owner, instructions_link, status
+        FROM close_monthly_tasks WHERE month_id = %s ORDER BY day_due ASC
+    """, (month_id,))
+    tasks_data = cursor.fetchall()
+    df_tasks = pd.DataFrame(tasks_data, columns=['Task Name', 'Phase', 'Due (T+)', 'Owner', 'SOP Link', 'Status']) if tasks_data else pd.DataFrame()
+    
+    cursor.execute("""
+        SELECT 
+            mb.account_number,
+            a.account_name,
+            mb.qbo_balance,
+            mb.expected_balance,
+            (mb.qbo_balance - mb.expected_balance) as variance,
+            mb.status,
+            mb.rec_note,
+            a.permanent_link
+        FROM close_monthly_balances mb
+        JOIN close_accounts a ON mb.account_number = a.account_number
+        WHERE mb.month_id = %s
+        ORDER BY mb.account_number ASC
+    """, (month_id,))
+    tb_data = cursor.fetchall()
+    df_tb = pd.DataFrame(tb_data, columns=['Acct #', 'Account Name', 'QBO Balance', 'Expected Balance', 'Variance', 'Status', 'Rec Note', 'Workpaper Link']) if tb_data else pd.DataFrame()
+    
+    prev_month_id = get_prior_month_id(month_id)
+    cursor.execute("""
+        SELECT 
+            curr.account_number,
+            a.account_name,
+            prev.qbo_balance as prev_bal,
+            curr.qbo_balance as curr_bal,
+            (curr.qbo_balance - COALESCE(prev.qbo_balance, 0)) as diff_amt,
+            curr.variance_note
+        FROM close_monthly_balances curr
+        LEFT JOIN close_monthly_balances prev 
+            ON curr.account_number = prev.account_number 
+            AND prev.month_id = %s
+        JOIN close_accounts a ON curr.account_number = a.account_number
+        WHERE curr.month_id = %s
+        ORDER BY curr.account_number ASC
+    """, (prev_month_id, month_id))
+    flux_data = cursor.fetchall()
+    conn.close()
+    
+    df_flux = pd.DataFrame(flux_data, columns=['Acct #', 'Account Name', 'Prior Month', 'Current Month', 'Variance $', 'Explanation']) if flux_data else pd.DataFrame()
+    if not df_flux.empty:
+        df_flux['Prior Month'] = df_flux['Prior Month'].fillna(0)
+        df_flux['Variance %'] = df_flux.apply(
+            lambda x: (x['Variance $'] / x['Prior Month'] * 100) if x['Prior Month'] != 0 else 0.0, axis=1
+        )
+        df_flux = df_flux[['Acct #', 'Account Name', 'Prior Month', 'Current Month', 'Variance $', 'Variance %', 'Explanation']]
+    
+    wb = Workbook()
+    
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="36404A", end_color="36404A", fill_type="solid")
+    header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    ws_tasks = wb.active
+    ws_tasks.title = "Checklist"
+    if not df_tasks.empty:
+        for r_idx, row in enumerate(dataframe_to_rows(df_tasks, index=False, header=True), 1):
+            for c_idx, value in enumerate(row, 1):
+                cell = ws_tasks.cell(row=r_idx, column=c_idx, value=value)
+                cell.border = thin_border
+                if r_idx == 1:
+                    cell.font = header_font
+                    cell.fill = header_fill
+                    cell.alignment = header_alignment
+        for col in ws_tasks.columns:
+            max_length = max(len(str(cell.value or "")) for cell in col)
+            ws_tasks.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
+    
+    ws_tb = wb.create_sheet(title="Trial Balance")
+    if not df_tb.empty:
+        for r_idx, row in enumerate(dataframe_to_rows(df_tb, index=False, header=True), 1):
+            for c_idx, value in enumerate(row, 1):
+                cell = ws_tb.cell(row=r_idx, column=c_idx, value=value)
+                cell.border = thin_border
+                if r_idx == 1:
+                    cell.font = header_font
+                    cell.fill = header_fill
+                    cell.alignment = header_alignment
+        for col in ws_tb.columns:
+            max_length = max(len(str(cell.value or "")) for cell in col)
+            ws_tb.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
+    
+    ws_flux = wb.create_sheet(title="Flux Analysis")
+    if not df_flux.empty:
+        for r_idx, row in enumerate(dataframe_to_rows(df_flux, index=False, header=True), 1):
+            for c_idx, value in enumerate(row, 1):
+                cell = ws_flux.cell(row=r_idx, column=c_idx, value=value)
+                cell.border = thin_border
+                if r_idx == 1:
+                    cell.font = header_font
+                    cell.fill = header_fill
+                    cell.alignment = header_alignment
+        for col in ws_flux.columns:
+            max_length = max(len(str(cell.value or "")) for cell in col)
+            ws_flux.column_dimensions[col[0].column_letter].width = min(max_length + 2, 50)
+    
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output
+
 def render_workspace(month_id):
     with st.sidebar:
         st.header(f"🗓 {month_id}")
@@ -689,6 +811,17 @@ def render_workspace(month_id):
         st.subheader("Flux Thresholds")
         thresh_amt = st.number_input("Min Variance ($)", value=5000, step=1000)
         thresh_pct = st.number_input("Min Variance (%)", value=10, step=1)
+
+        st.divider()
+        st.subheader("Export")
+        excel_data = generate_excel_export(month_id)
+        st.download_button(
+            label="📥 Download Close Package",
+            data=excel_data,
+            file_name=f"close_package_{month_id}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
 
         st.divider()
         st.subheader("Data Sync")
