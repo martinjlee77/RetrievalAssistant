@@ -243,7 +243,9 @@ def get_ytd_net_income(end_date_str: str) -> float:
         end_date_str: End date in YYYY-MM-DD format (typically month-end date)
     
     Returns:
-        YTD Net Income as a float, or 0.0 if unavailable
+        YTD Net Income as a float (negative for profit, positive for loss),
+        matching the credit sign convention used by liabilities/equity in the trial balance.
+        Returns 0.0 if unavailable.
     """
     client = get_active_client()
     if not client:
@@ -253,11 +255,8 @@ def get_ytd_net_income(end_date_str: str) -> float:
     url = f"{base_url}/v3/company/{client.realm_id}/reports/ProfitAndLoss"
     headers = {"Authorization": f"Bearer {client.access_token}", "Accept": "application/json"}
 
-    dt_end = datetime.strptime(end_date_str, "%Y-%m-%d")
-    fy_start_str = dt_end.replace(month=1, day=1).strftime("%Y-%m-%d")
-
     params = {
-        "start_date": fy_start_str,
+        "date_macro": "This Fiscal Year-to-date",
         "end_date": end_date_str,
         "accounting_method": "Accrual",
         "minorversion": 65
@@ -276,7 +275,8 @@ def get_ytd_net_income(end_date_str: str) -> float:
                     label = col_data[0].get("value", "")
                     if label == "Net Income":
                         value_str = col_data[1].get("value", "0")
-                        return float(value_str.replace(",", ""))
+                        net_income = float(value_str.replace(",", ""))
+                        return -net_income
     except Exception as e:
         print(f"Error parsing P&L report for Net Income: {e}")
 
