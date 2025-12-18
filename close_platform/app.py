@@ -260,19 +260,20 @@ def render_lobby():
 
                 btn_col1, btn_col2 = st.columns(2)
                 with btn_col1:
-                    if st.button(f":orange[Work On]",
+                    if st.button(f":orange[Open]",
                                  key=f"btn_{row['month_id']}",
                                  use_container_width=True):
                         st.session_state['active_month'] = row['month_id']
                         st.rerun()
                 with btn_col2:
                     if is_open:
-                        if st.button("🗑️",
-                                     key=f"del_{row['month_id']}",
-                                     use_container_width=True,
-                                     type="secondary"):
-                            delete_month_close(row['month_id'])
-                            st.rerun()
+                        with st.popover("🗑️", use_container_width=True):
+                            st.warning(f"Delete {row['month_id']}? This cannot be undone.")
+                            if st.button("Yes, Delete",
+                                         key=f"confirm_del_{row['month_id']}",
+                                         type="primary"):
+                                delete_month_close(row['month_id'])
+                                st.rerun()
 
 
 def render_checklist_tab(month_id, owner_filter):
