@@ -1127,19 +1127,29 @@ def render_workspace(month_id):
                         st.error(f"Sync Error: {e}")
         elif has_encryption_key:
             st.warning("Not Connected")
+            
+            with st.expander("📋 Manual Token Entry (from OAuth Playground)"):
+                st.caption("Get tokens from Intuit OAuth 2.0 Playground, then paste them here:")
+                manual_realm = st.text_input("Realm ID", key="manual_realm")
+                manual_access = st.text_area("Access Token", key="manual_access", height=100)
+                manual_refresh = st.text_input("Refresh Token", key="manual_refresh")
+                
+                if st.button("💾 Save Tokens", type="primary"):
+                    if manual_realm and manual_access and manual_refresh:
+                        try:
+                            qbo_connector.save_manual_tokens(manual_realm, manual_access, manual_refresh)
+                            st.success("Tokens saved! Refreshing...")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Failed to save tokens: {e}")
+                    else:
+                        st.warning("Please fill in all three fields.")
+            
             auth_url = qbo_connector.get_auth_url()
             if auth_url:
-                st.link_button("🔗 Login to Intuit", auth_url)
-                with st.expander("Debug: Auth URL"):
-                    st.code(auth_url, language=None)
-                    redirect_uri = os.getenv("QBO_REDIRECT_URI", "")
-                    st.write("**Redirect URI (raw repr to show hidden chars):**")
-                    st.code(repr(redirect_uri), language="python")
-                    st.write(f"**Length:** {len(redirect_uri)} characters")
-            else:
-                st.error(
-                    "QBO credentials not configured. Add QBO_CLIENT_ID, QBO_CLIENT_SECRET, and QBO_REDIRECT_URI to secrets."
-                )
+                with st.expander("🔗 OAuth Login (Alternative)"):
+                    st.link_button("Login to Intuit", auth_url)
+                    st.caption("Note: Requires redirect URI configured in Intuit Developer Portal")
 
     st.title(f"Close Workspace: {month_id}")
 

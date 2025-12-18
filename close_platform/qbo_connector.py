@@ -81,6 +81,21 @@ def handle_callback(auth_code, realm_id):
     conn.commit()
     conn.close()
 
+def save_manual_tokens(realm_id, access_token, refresh_token):
+    """Save manually obtained tokens from OAuth Playground."""
+    encrypted_access = _encrypt_token(access_token.strip())
+    encrypted_refresh = _encrypt_token(refresh_token.strip())
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM close_qbo_tokens")
+    cursor.execute("""
+        INSERT INTO close_qbo_tokens (realm_id, access_token, refresh_token, updated_at)
+        VALUES (%s, %s, %s, %s)
+    """, (realm_id.strip(), encrypted_access, encrypted_refresh, datetime.now()))
+    conn.commit()
+    conn.close()
+
 def get_active_client():
     conn = get_connection()
     cursor = conn.cursor()
