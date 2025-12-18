@@ -46,11 +46,6 @@ else:
     st.write("3. Authorize the connection")
     st.write("4. You'll be redirected back here automatically")
     
-    if qbo_connector and qbo_connector.is_connected():
-        st.success("✅ QuickBooks is currently connected!")
-    else:
-        st.warning("⚠️ QuickBooks is not connected.")
-    
     st.divider()
     st.subheader("Debug Info")
     redirect_uri = os.getenv("QBO_REDIRECT_URI", "NOT SET")
