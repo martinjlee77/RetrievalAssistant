@@ -56,5 +56,22 @@ from shared.auth_utils import try_cross_domain_auth
 # Check for SSO auto-login tokens in URL parameters
 try_cross_domain_auth()
 
+# 6b. Handle QBO OAuth callback if present
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'close_platform'))
+query_params = st.query_params
+if "code" in query_params and "realmId" in query_params:
+    try:
+        import qbo_connector
+        auth_code = query_params.get("code")
+        realm_id = query_params.get("realmId")
+        qbo_connector.handle_callback(auth_code, realm_id)
+        st.toast("Successfully connected to QuickBooks!", icon="✅")
+        st.query_params.clear()
+        st.rerun()
+    except Exception as e:
+        st.error(f"QBO Connection failed: {e}")
+
 # 7. Run the app.
 pg.run()
