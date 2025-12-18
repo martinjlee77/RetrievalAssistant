@@ -212,16 +212,6 @@ def get_business_day_delta(month_id):
     return int(t_days)
 
 
-def delete_month_close(month_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM close_monthly_tasks WHERE month_id = %s", (month_id,))
-    cursor.execute("DELETE FROM close_monthly_balances WHERE month_id = %s", (month_id,))
-    cursor.execute("DELETE FROM close_monthly_close WHERE month_id = %s", (month_id,))
-    conn.commit()
-    conn.close()
-
-
 def render_lobby():
     st.title(f"📂 {APP_TITLE}")
 
@@ -247,32 +237,20 @@ def render_lobby():
     for index, row in df_months.iterrows():
         col = cols[index % 4]
         with col:
-            status_color = "🟢" if row['status'] == 'Closed' else "🔵"
-            lock_icon = "🔒 Closed" if row['is_locked'] else "🔓 Open"
-            is_open = row['status'] != 'Closed'
+            status_color = "⚪️" if row['status'] == 'Closed' else "🟢"
+            lock_icon = "🔒 Closed" if row['is_locked'] else "🟢 Open"
 
             with st.container(border=True,
-                              key=f"close_card_{row['month_id']}"):
-                st.markdown(f"### {row['month_id']}")
+                              key=f"close_card_{row['month_id']}", horizontal_alignment="center"):
+                st.markdown(f"### {row['month_id']}", text_alignment="center")
                 st.markdown(
                     f"**Close Status:** {status_color} {row['status']}")
                 st.markdown(f"**QBO:** {lock_icon}")
 
-                btn_col1, btn_col2 = st.columns(2)
-                with btn_col1:
-                    if st.button(f"Open",
-                                 key=f"btn_{row['month_id']}",
-                                 use_container_width=True):
-                        st.session_state['active_month'] = row['month_id']
-                        st.rerun()
-                with btn_col2:
-                    if is_open:
-                        if st.button("🗑️",
-                                     key=f"del_{row['month_id']}",
-                                     use_container_width=True,
-                                     type="secondary"):
-                            delete_month_close(row['month_id'])
-                            st.rerun()
+                if st.button(f"Open {row['month_id']}",
+                             key=f"btn_{row['month_id']}"):
+                    st.session_state['active_month'] = row['month_id']
+                    st.rerun()
 
 
 def render_checklist_tab(month_id, owner_filter):
