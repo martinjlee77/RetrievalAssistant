@@ -68,8 +68,8 @@ def create_new_month_close(month_str):
                      icon="📋")
             cursor.execute(
                 """
-                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, status)
-                SELECT %s, task_name, day_due, owner, instructions_link, 'Pending'
+                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, task_note, status)
+                SELECT %s, task_name, day_due, owner, instructions_link, task_note, 'Pending'
                 FROM close_monthly_tasks
                 WHERE month_id = %s
             """, (month_str, last_month_id))
@@ -77,8 +77,8 @@ def create_new_month_close(month_str):
             st.toast("First run detected. Using Master Template.", icon="🆕")
             cursor.execute(
                 """
-                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, status)
-                SELECT %s, task_name, day_due, default_owner, 'Pending'
+                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, task_note, status)
+                SELECT %s, task_name, day_due, default_owner, task_note, 'Pending'
                 FROM close_checklist_template
             """, (month_str, ))
 
@@ -371,19 +371,22 @@ def render_checklist_tab(month_id, owner_filter):
         "month_id":
         None,
         "Health":
-        st.column_config.TextColumn("Health", width="small", disabled=True),
-        "task_name":
-        st.column_config.TextColumn("Task Name", width="large", required=True),
+        st.column_config.TextColumn("", width=40, disabled=True),
         "day_due":
-        st.column_config.NumberColumn("Due (T+)",
+        st.column_config.NumberColumn("Due",
+                                      width=50,
                                       min_value=1,
                                       max_value=20,
                                       format="%d"),
+        "task_name":
+        st.column_config.TextColumn("Task Name", width="large", required=True),
         "owner":
         st.column_config.SelectboxColumn("Owner", options=ROLES,
                                          required=True),
         "instructions_link":
-        st.column_config.LinkColumn("SOP", display_text="Open", validate="^https?://.*"),
+        st.column_config.LinkColumn("SOP", display_text="Open"),
+        "task_note":
+        st.column_config.TextColumn("Notes"),
         "status":
         st.column_config.SelectboxColumn("Status",
                                          options=STATUS_OPTS,
@@ -392,7 +395,7 @@ def render_checklist_tab(month_id, owner_filter):
 
     display_df = df[[
         'id', 'Health', 'day_due', 'task_name', 'owner',
-        'instructions_link', 'status', 'month_id'
+        'instructions_link', 'task_note', 'status', 'month_id'
     ]]
 
     dynamic_height = min((len(df) + 1) * 35, 1500)
@@ -422,18 +425,18 @@ def render_checklist_tab(month_id, owner_filter):
                 cursor.execute(
                     """
                     UPDATE close_monthly_tasks 
-                    SET task_name=%s, day_due=%s, owner=%s, instructions_link=%s, status=%s
+                    SET task_name=%s, day_due=%s, owner=%s, instructions_link=%s, task_note=%s, status=%s
                     WHERE id=%s
                 """, (row['task_name'], row['day_due'],
-                      row['owner'], row['instructions_link'], row['status'],
+                      row['owner'], row['instructions_link'], row['task_note'], row['status'],
                       row['id']))
             else:
                 cursor.execute(
                     """
-                    INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, status)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+                    INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, task_note, status)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, (month_id, row['task_name'], row['day_due'],
-                      row['owner'], row['instructions_link'], row['status']))
+                      row['owner'], row['instructions_link'], row['task_note'], row['status']))
 
         conn.commit()
         conn.close()
@@ -852,14 +855,14 @@ def generate_excel_export(month_id):
 
     cursor.execute(
         """
-        SELECT task_name, day_due, owner, instructions_link, status
+        SELECT task_name, day_due, owner, instructions_link, task_note, status
         FROM close_monthly_tasks WHERE month_id = %s ORDER BY day_due ASC
     """, (month_id, ))
     tasks_data = cursor.fetchall()
     df_tasks = pd.DataFrame(tasks_data,
                             columns=[
                                 'Task Name', 'Due (T+)', 'Owner',
-                                'SOP Link', 'Status'
+                                'SOP Link', 'Notes', 'Status'
                             ]) if tasks_data else pd.DataFrame()
 
     cursor.execute(
