@@ -201,6 +201,30 @@ def get_month_totals(month_id):
             row['qbo_total_credits'] or 0.0) if row else (0.0, 0.0)
 
 
+def update_qbo_net_income(month_id, net_income):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        UPDATE close_monthly_close 
+        SET qbo_net_income = %s 
+        WHERE month_id = %s
+    """, (net_income, month_id))
+    conn.commit()
+    conn.close()
+
+
+def get_qbo_net_income(month_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT qbo_net_income FROM close_monthly_close WHERE month_id = %s",
+        (month_id, ))
+    row = cursor.fetchone()
+    conn.close()
+    return row['qbo_net_income'] or 0.0 if row else 0.0
+
+
 def get_business_day_delta(month_id):
     y, m = map(int, month_id.split('-'))
     last_day = calendar.monthrange(y, m)[1]
@@ -668,17 +692,17 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
     is_bs_balanced = abs(bs_check_val) < 1000
 
     df_mapped = df[df['Group'] != "13. Other / Unmapped"]
-    tab2_dr = df_mapped[df_mapped['curr_bal'] > 0]['curr_bal'].sum()
-    tab2_cr = df_mapped[df_mapped['curr_bal'] < 0]['curr_bal'].sum()
-    tab3_dr = df[df['curr_bal'] > 0]['curr_bal'].sum()
-    tab3_cr = df[df['curr_bal'] < 0]['curr_bal'].sum()
-    saved_debits, saved_credits = get_month_totals(month_id)
+    
+    df_pnl_mapped = df_mapped[df_mapped['Group'].str.startswith(('09', '10', '11', '12'))]
+    df_pnl_all = df[df['Group'].str.startswith(('09', '10', '11', '12'))]
+    
+    tab2_month_ni = -(df_pnl_mapped['curr_bal'].sum() - df_pnl_mapped['prev_bal'].sum())
+    tab3_month_ni = -(df_pnl_all['curr_bal'].sum() - df_pnl_all['prev_bal'].sum())
+    saved_qbo_ni = get_qbo_net_income(month_id)
 
-    internal_dr_match = abs(tab2_dr - tab3_dr) < 0.01
-    internal_cr_match = abs(tab2_cr - tab3_cr) < 0.01
-    external_dr_match = abs(tab3_dr - saved_debits) < 0.01
-    external_cr_match = abs(tab3_cr - saved_credits) < 0.01
-    is_tied_out = internal_dr_match and internal_cr_match and external_dr_match and external_cr_match
+    internal_ni_match = abs(tab2_month_ni - tab3_month_ni) < 1.0
+    external_ni_match = abs(tab3_month_ni - saved_qbo_ni) < 1000
+    is_tied_out = internal_ni_match and (saved_qbo_ni == 0.0 or external_ni_match)
 
     st.markdown("### 🛡 Audit Control Center")
 
@@ -735,53 +759,38 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
                 st.error("🚨 Out of Balance")
 
     with st.container(border=True):
-        st.markdown("**3. External 3-Way Tie-Out**")
+        st.markdown("**3. Income Statement Tie-Out**")
         st.caption(
-            "Sub-Ledger (Tab 2) vs. General Ledger (Tab 3) vs. QBO PDF.")
+            "Current month Net Income: Tab 2 vs. Tab 3 vs. QBO P&L Report")
 
-        c_lbl, c_t2, c_t3, c_qbo = st.columns([1, 1.5, 1.5, 2])
+        c_lbl, c_t2, c_t3, c_qbo = st.columns([1.2, 1.2, 1.2, 2])
 
-        c_lbl.markdown("###### Label")
+        c_lbl.markdown("###### ")
         c_t2.markdown("###### Tab 2")
         c_t3.markdown("###### Tab 3")
         c_qbo.markdown("###### QBO Input")
 
-        c_lbl.markdown("Total Dr")
-        c_t2.markdown(f"**{tab2_dr:,.2f}**")
-        c_t3.markdown(f"**{tab3_dr:,.2f}**")
-        val_dr = c_qbo.number_input("Dr",
-                                    value=saved_debits,
-                                    key="aud_dr",
+        c_lbl.markdown("Net Income")
+        c_t2.markdown(f"**{tab2_month_ni:,.2f}**")
+        c_t3.markdown(f"**{tab3_month_ni:,.2f}**")
+        val_ni = c_qbo.number_input("Net Income from QBO P&L",
+                                    value=saved_qbo_ni,
+                                    key="aud_ni",
                                     label_visibility="collapsed",
                                     format="%.2f")
 
-        c_lbl.markdown("Total Cr")
-        c_t2.markdown(f"**{tab2_cr:,.2f}**")
-        c_t3.markdown(f"**{tab3_cr:,.2f}**")
-        val_cr = c_qbo.number_input("Cr",
-                                    value=saved_credits,
-                                    key="aud_cr",
-                                    label_visibility="collapsed",
-                                    format="%.2f")
-
-        if val_dr != saved_debits or val_cr != saved_credits:
-            update_month_totals(month_id, val_dr, val_cr)
+        if val_ni != saved_qbo_ni:
+            update_qbo_net_income(month_id, val_ni)
             st.rerun()
 
         if is_tied_out:
-            st.success("✅ 3-Way Match Confirmed")
+            st.success("✅ Income Statement Matched")
         else:
-            c_err1, c_err2 = st.columns(2)
+            if not internal_ni_match:
+                st.error(f"🚨 Internal Variance: {tab2_month_ni - tab3_month_ni:,.2f}")
 
-            if not (internal_dr_match and internal_cr_match):
-                c_err1.error(
-                    f"🚨 Internal Var: Dr {tab2_dr - tab3_dr:.2f} | Cr {tab2_cr - tab3_cr:.2f}"
-                )
-
-            if not (external_dr_match and external_cr_match):
-                v_dr = tab3_dr - saved_debits
-                v_cr = tab3_cr - saved_credits
-                c_err2.error(f"🚨 External Var: Dr {v_dr:.2f} | Cr {v_cr:.2f}")
+            if saved_qbo_ni != 0.0 and not external_ni_match:
+                st.error(f"🚨 External Variance: {tab3_month_ni - saved_qbo_ni:,.2f}")
 
     st.divider()
 

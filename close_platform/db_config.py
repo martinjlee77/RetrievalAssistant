@@ -40,6 +40,7 @@ def init_close_tables():
         variance_threshold_amt REAL DEFAULT 5000.0,
         qbo_total_debits REAL DEFAULT 0.0,
         qbo_total_credits REAL DEFAULT 0.0,
+        qbo_net_income REAL DEFAULT 0.0,
         last_synced_at TIMESTAMP
     );
     """)
