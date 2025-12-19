@@ -68,8 +68,8 @@ def create_new_month_close(month_str):
                      icon="📋")
             cursor.execute(
                 """
-                INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status)
-                SELECT %s, task_name, phase, day_due, owner, instructions_link, 'Pending'
+                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, status)
+                SELECT %s, task_name, day_due, owner, instructions_link, 'Pending'
                 FROM close_monthly_tasks
                 WHERE month_id = %s
             """, (month_str, last_month_id))
@@ -77,8 +77,8 @@ def create_new_month_close(month_str):
             st.toast("First run detected. Using Master Template.", icon="🆕")
             cursor.execute(
                 """
-                INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, status)
-                SELECT %s, task_name, phase, day_due, default_owner, 'Pending'
+                INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, status)
+                SELECT %s, task_name, day_due, default_owner, 'Pending'
                 FROM close_checklist_template
             """, (month_str, ))
 
@@ -330,7 +330,7 @@ def render_checklist_tab(month_id, owner_filter):
     done_tasks = len(df[df['status'].isin(['Done', 'N/A'])])
     prog = done_tasks / total_tasks if total_tasks > 0 else 0
 
-    c1, c2, c3, c4, c5 = st.columns([2, 1, 0.5, 0.5, 0.5])
+    c1, c2, c3 = st.columns([5, 1, 2])
 
     with c1:
         st.markdown(f"### 📅 Today is T+{current_t_day}")
@@ -340,39 +340,11 @@ def render_checklist_tab(month_id, owner_filter):
         st.metric("Completion", f"{done_tasks}/{total_tasks}")
 
     with c3:
-        save_clicked = st.button("💾",
+        save_clicked = st.button("**Please Save Manually**",
+                                 icon="💾",
                                  type="primary",
                                  use_container_width=True,
                                  help="Save Changes")
-
-    with c4:
-        with st.popover("➕", use_container_width=True, help="Add Task"):
-            st.subheader("Add New Task")
-            new_task_name = st.text_input("Task Name", key="new_task_name")
-            new_phase = st.selectbox("Phase", ["Phase 1", "Phase 2", "Phase 3", "Phase 4"], key="new_phase")
-            new_day = st.number_input("Due Day (T+)", min_value=1, max_value=20, value=1, key="new_day")
-            new_owner = st.selectbox("Owner", ["VP Accounting", "Ops", "CFO", "Accounting Firm"], key="new_owner")
-            new_link = st.text_input("Instructions Link (optional)", key="new_link")
-            if st.button("Add Task", type="primary", key="add_task_btn"):
-                if new_task_name:
-                    conn = get_connection()
-                    cursor = conn.cursor()
-                    cursor.execute(
-                        "INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status) VALUES (%s, %s, %s, %s, %s, %s, 'Pending')",
-                        (month_id, new_task_name, new_phase, new_day, new_owner, new_link))
-                    conn.commit()
-                    conn.close()
-                    st.toast("Task added!", icon="✅")
-                    st.rerun()
-
-    with c5:
-        csv_data = df.to_csv(index=False)
-        st.download_button("📥",
-                           data=csv_data,
-                           file_name=f"checklist_{month_id}.csv",
-                           mime="text/csv",
-                           use_container_width=True,
-                           help="Download CSV")
 
     st.progress(prog, text=f"Overall Completion: {int(prog*100)}%")
 
@@ -391,7 +363,6 @@ def render_checklist_tab(month_id, owner_filter):
     st.divider()
 
     ROLES = ["VP Accounting", "Ops", "CFO", "Accounting Firm"]
-    PHASES = ["Phase 1", "Phase 2", "Phase 3", "Phase 4"]
     STATUS_OPTS = ["Pending", "In Progress", "Done", "N/A"]
 
     column_config = {
@@ -403,10 +374,6 @@ def render_checklist_tab(month_id, owner_filter):
         st.column_config.TextColumn("Health", width="small", disabled=True),
         "task_name":
         st.column_config.TextColumn("Task Name", width="large", required=True),
-        "phase":
-        st.column_config.SelectboxColumn("Phase",
-                                         options=PHASES,
-                                         required=True),
         "day_due":
         st.column_config.NumberColumn("Due (T+)",
                                       min_value=1,
@@ -416,7 +383,7 @@ def render_checklist_tab(month_id, owner_filter):
         st.column_config.SelectboxColumn("Owner", options=ROLES,
                                          required=True),
         "instructions_link":
-        st.column_config.LinkColumn("SOP", display_text="Open Doc"),
+        st.column_config.TextColumn("SOP"),
         "status":
         st.column_config.SelectboxColumn("Status",
                                          options=STATUS_OPTS,
@@ -424,7 +391,7 @@ def render_checklist_tab(month_id, owner_filter):
     }
 
     display_df = df[[
-        'id', 'Health', 'phase', 'task_name', 'day_due', 'owner',
+        'id', 'Health', 'task_name', 'day_due', 'owner',
         'instructions_link', 'status', 'month_id'
     ]]
 
@@ -455,17 +422,17 @@ def render_checklist_tab(month_id, owner_filter):
                 cursor.execute(
                     """
                     UPDATE close_monthly_tasks 
-                    SET task_name=%s, phase=%s, day_due=%s, owner=%s, instructions_link=%s, status=%s
+                    SET task_name=%s, day_due=%s, owner=%s, instructions_link=%s, status=%s
                     WHERE id=%s
-                """, (row['task_name'], row['phase'], row['day_due'],
+                """, (row['task_name'], row['day_due'],
                       row['owner'], row['instructions_link'], row['status'],
                       row['id']))
             else:
                 cursor.execute(
                     """
-                    INSERT INTO close_monthly_tasks (month_id, task_name, phase, day_due, owner, instructions_link, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (month_id, row['task_name'], row['phase'], row['day_due'],
+                    INSERT INTO close_monthly_tasks (month_id, task_name, day_due, owner, instructions_link, status)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (month_id, row['task_name'], row['day_due'],
                       row['owner'], row['instructions_link'], row['status']))
 
         conn.commit()
@@ -885,13 +852,13 @@ def generate_excel_export(month_id):
 
     cursor.execute(
         """
-        SELECT task_name, phase, day_due, owner, instructions_link, status
+        SELECT task_name, day_due, owner, instructions_link, status
         FROM close_monthly_tasks WHERE month_id = %s ORDER BY day_due ASC
     """, (month_id, ))
     tasks_data = cursor.fetchall()
     df_tasks = pd.DataFrame(tasks_data,
                             columns=[
-                                'Task Name', 'Phase', 'Due (T+)', 'Owner',
+                                'Task Name', 'Due (T+)', 'Owner',
                                 'SOP Link', 'Status'
                             ]) if tasks_data else pd.DataFrame()
 
