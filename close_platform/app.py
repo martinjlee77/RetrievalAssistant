@@ -371,10 +371,10 @@ def render_checklist_tab(month_id, owner_filter):
         "month_id":
         None,
         "Health":
-        st.column_config.TextColumn("", width=40, disabled=True),
+        st.column_config.TextColumn("", width=10, disabled=True),
         "day_due":
         st.column_config.NumberColumn("Due",
-                                      width=50,
+                                      width=25,
                                       min_value=1,
                                       max_value=20,
                                       format="%d"),
@@ -484,7 +484,7 @@ def render_tb_tab(month_id):
     st.progress(
         progress,
         text=
-        f"Reconciliation Progress: {int(progress*100)}% ({done_accts}/{total_accts})"
+        f"Substantiation Progress: {int(progress*100)}% ({done_accts}/{total_accts})"
     )
     st.divider()
 
@@ -518,13 +518,13 @@ def render_tb_tab(month_id):
                 st.column_config.LinkColumn("Workpaper Link",
                                             display_text="Open Folder"),
                 "rec_note":
-                st.column_config.TextColumn("Reconciliation Note",
+                st.column_config.TextColumn("Notes",
                                             width="medium"),
                 "qbo_balance_fmt":
-                st.column_config.TextColumn("QBO Balance", disabled=True),
+                st.column_config.TextColumn("QBO Bal", disabled=True),
                 "expected_balance":
-                st.column_config.NumberColumn("Expected Balance",
-                                              format="$%.2f"),
+                st.column_config.NumberColumn("Exp Bal",
+                                              format="%.2f"),
                 "Variance_fmt":
                 st.column_config.TextColumn("Diff", disabled=True),
                 "status":
