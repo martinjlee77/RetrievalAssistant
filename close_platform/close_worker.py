@@ -60,19 +60,37 @@ def sync_qbo_trial_balance(month_id: str) -> dict:
         
         new_accounts_found = 0
         updated_balances = 0
+        updated_names = 0
+        deactivated_accounts = 0
+        reactivated_accounts = 0
+        
+        qbo_account_nums = set(qbo_data.keys())
         
         for acct_num, details in qbo_data.items():
             name = details['name']
             bal = details['balance']
             
-            cursor.execute("SELECT account_number FROM close_accounts WHERE account_number = %s", (acct_num,))
-            if not cursor.fetchone():
+            cursor.execute("SELECT account_number, account_name, is_active FROM close_accounts WHERE account_number = %s", (acct_num,))
+            existing = cursor.fetchone()
+            
+            if not existing:
                 cat = 'BS' if int(acct_num) < 40000 else 'PL'
                 cursor.execute(
-                    "INSERT INTO close_accounts (account_number, account_name, category, permanent_link) VALUES (%s, %s, %s, '')", 
+                    "INSERT INTO close_accounts (account_number, account_name, category, permanent_link, is_active) VALUES (%s, %s, %s, '', TRUE)", 
                     (acct_num, name, cat)
                 )
                 new_accounts_found += 1
+            else:
+                if existing['account_name'] != name:
+                    cursor.execute(
+                        "UPDATE close_accounts SET account_name = %s WHERE account_number = %s",
+                        (name, acct_num))
+                    updated_names += 1
+                if not existing.get('is_active', True):
+                    cursor.execute(
+                        "UPDATE close_accounts SET is_active = TRUE WHERE account_number = %s",
+                        (acct_num,))
+                    reactivated_accounts += 1
             
             cursor.execute(
                 "SELECT id FROM close_monthly_balances WHERE month_id = %s AND account_number = %s", 
@@ -89,18 +107,29 @@ def sync_qbo_trial_balance(month_id: str) -> dict:
                 )
             updated_balances += 1
         
+        cursor.execute("SELECT account_number FROM close_accounts WHERE is_active = TRUE")
+        all_active = cursor.fetchall()
+        for row in all_active:
+            if row['account_number'] not in qbo_account_nums:
+                cursor.execute(
+                    "UPDATE close_accounts SET is_active = FALSE WHERE account_number = %s",
+                    (row['account_number'],))
+                deactivated_accounts += 1
+        
         now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute("UPDATE close_monthly_close SET last_synced_at = %s WHERE month_id = %s", (now_str, month_id))
         
         conn.commit()
         conn.close()
         
-        logger.info(f"QBO sync complete: {updated_balances} accounts synced, {new_accounts_found} new accounts discovered")
+        logger.info(f"QBO sync complete: {updated_balances} balances, {new_accounts_found} new, {updated_names} renamed, {deactivated_accounts} removed")
         
         return {
             'success': True,
             'accounts_synced': updated_balances,
             'new_accounts': new_accounts_found,
+            'updated_names': updated_names,
+            'deactivated_accounts': deactivated_accounts,
             'synced_at': now_str
         }
         

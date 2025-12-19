@@ -17,8 +17,13 @@ def init_close_tables():
         account_number TEXT PRIMARY KEY,
         account_name TEXT NOT NULL,
         category TEXT,
-        permanent_link TEXT DEFAULT ''
+        permanent_link TEXT DEFAULT '',
+        is_active BOOLEAN DEFAULT TRUE
     );
+    """)
+    
+    cursor.execute("""
+    ALTER TABLE close_accounts ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
     """)
     
     cursor.execute("""

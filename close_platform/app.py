@@ -460,7 +460,7 @@ def render_tb_tab(month_id):
             mb.rec_note
         FROM close_monthly_balances mb
         JOIN close_accounts a ON mb.account_number = a.account_number
-        WHERE mb.month_id = %s
+        WHERE mb.month_id = %s AND COALESCE(a.is_active, TRUE) = TRUE
         ORDER BY mb.account_number ASC
     """
     cursor.execute(query, (month_id, ))
@@ -617,7 +617,7 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
             ON curr.account_number = prev.account_number 
             AND prev.month_id = %s
         JOIN close_accounts a ON curr.account_number = a.account_number
-        WHERE curr.month_id = %s
+        WHERE curr.month_id = %s AND COALESCE(a.is_active, TRUE) = TRUE
         ORDER BY curr.account_number ASC
     """
     cursor.execute(query, (prev_month_id, month_id))
@@ -1070,21 +1070,38 @@ def render_workspace(month_id):
 
                             new_accounts_found = 0
                             updated_balances = 0
+                            updated_names = 0
+                            deactivated_accounts = 0
+                            reactivated_accounts = 0
+                            
+                            qbo_account_nums = set(qbo_data.keys())
 
                             for acct_num, details in qbo_data.items():
                                 name = details['name']
                                 bal = details['balance']
 
                                 cursor.execute(
-                                    "SELECT account_number FROM close_accounts WHERE account_number = %s",
+                                    "SELECT account_number, account_name, is_active FROM close_accounts WHERE account_number = %s",
                                     (acct_num, ))
-                                if not cursor.fetchone():
-                                    cat = 'BS' if int(
-                                        acct_num) < 40000 else 'PL'
+                                existing = cursor.fetchone()
+                                
+                                if not existing:
+                                    cat = 'BS' if int(acct_num) < 40000 else 'PL'
                                     cursor.execute(
-                                        "INSERT INTO close_accounts (account_number, account_name, category, permanent_link) VALUES (%s, %s, %s, '')",
+                                        "INSERT INTO close_accounts (account_number, account_name, category, permanent_link, is_active) VALUES (%s, %s, %s, '', TRUE)",
                                         (acct_num, name, cat))
                                     new_accounts_found += 1
+                                else:
+                                    if existing['account_name'] != name:
+                                        cursor.execute(
+                                            "UPDATE close_accounts SET account_name = %s WHERE account_number = %s",
+                                            (name, acct_num))
+                                        updated_names += 1
+                                    if not existing.get('is_active', True):
+                                        cursor.execute(
+                                            "UPDATE close_accounts SET is_active = TRUE WHERE account_number = %s",
+                                            (acct_num,))
+                                        reactivated_accounts += 1
 
                                 cursor.execute(
                                     "SELECT id FROM close_monthly_balances WHERE month_id = %s AND account_number = %s",
@@ -1100,6 +1117,15 @@ def render_workspace(month_id):
                                         "INSERT INTO close_monthly_balances (month_id, account_number, qbo_balance, status) VALUES (%s, %s, %s, 'Open')",
                                         (month_id, acct_num, bal))
                                 updated_balances += 1
+                            
+                            cursor.execute("SELECT account_number FROM close_accounts WHERE is_active = TRUE")
+                            all_active = cursor.fetchall()
+                            for row in all_active:
+                                if row['account_number'] not in qbo_account_nums:
+                                    cursor.execute(
+                                        "UPDATE close_accounts SET is_active = FALSE WHERE account_number = %s",
+                                        (row['account_number'],))
+                                    deactivated_accounts += 1
 
                             now_str = datetime.now().strftime(
                                 "%Y-%m-%d %H:%M:%S")
@@ -1110,10 +1136,18 @@ def render_workspace(month_id):
                             conn.commit()
                             conn.close()
 
+                            msgs = []
                             if new_accounts_found > 0:
-                                st.toast(
-                                    f"Auto-discovered {new_accounts_found} new accounts!"
-                                )
+                                msgs.append(f"{new_accounts_found} new")
+                            if updated_names > 0:
+                                msgs.append(f"{updated_names} renamed")
+                            if deactivated_accounts > 0:
+                                msgs.append(f"{deactivated_accounts} removed")
+                            if reactivated_accounts > 0:
+                                msgs.append(f"{reactivated_accounts} restored")
+                            
+                            if msgs:
+                                st.toast(f"Accounts: {', '.join(msgs)}")
                             st.toast(f"Synced {updated_balances} balances.",
                                      icon="✅")
                             st.rerun()
