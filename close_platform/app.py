@@ -383,7 +383,7 @@ def render_checklist_tab(month_id, owner_filter):
         st.column_config.SelectboxColumn("Owner", options=ROLES,
                                          required=True),
         "instructions_link":
-        st.column_config.TextColumn("SOP"),
+        st.column_config.LinkColumn("SOP", display_text="Open", validate="^https?://.*"),
         "status":
         st.column_config.SelectboxColumn("Status",
                                          options=STATUS_OPTS,
@@ -391,7 +391,7 @@ def render_checklist_tab(month_id, owner_filter):
     }
 
     display_df = df[[
-        'id', 'Health', 'task_name', 'day_due', 'owner',
+        'id', 'Health', 'day_due', 'task_name', 'owner',
         'instructions_link', 'status', 'month_id'
     ]]
 
