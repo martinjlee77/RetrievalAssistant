@@ -496,19 +496,11 @@ def render_tb_tab(month_id):
 
             group_rows['Variance'] = group_rows['qbo_balance'] - group_rows[
                 'expected_balance']
-            group_rows['qbo_balance_fmt'] = group_rows['qbo_balance'].apply(
-                lambda x: "{:,.2f}".format(x))
-            group_rows['Variance_fmt'] = group_rows['Variance'].apply(
-                lambda x: "{:,.2f}".format(x))
 
             column_config = {
                 "id":
                 None,
                 "Group":
-                None,
-                "qbo_balance":
-                None,
-                "Variance":
                 None,
                 "account_number":
                 "Acct #",
@@ -520,13 +512,17 @@ def render_tb_tab(month_id):
                 "rec_note":
                 st.column_config.TextColumn("Notes",
                                             width="medium"),
-                "qbo_balance_fmt":
-                st.column_config.TextColumn("QBO Bal", disabled=True),
+                "qbo_balance":
+                st.column_config.NumberColumn("QBO Bal",
+                                              format="%,.2f",
+                                              disabled=True),
                 "expected_balance":
                 st.column_config.NumberColumn("Exp Bal",
-                                              format="%.2f"),
-                "Variance_fmt":
-                st.column_config.TextColumn("Diff", disabled=True),
+                                              format="%,.2f"),
+                "Variance":
+                st.column_config.NumberColumn("Diff",
+                                              format="%,.2f",
+                                              disabled=True),
                 "status":
                 st.column_config.SelectboxColumn(
                     "Status",
@@ -535,8 +531,8 @@ def render_tb_tab(month_id):
             }
 
             display_cols = [
-                'id', 'account_number', 'account_name', 'qbo_balance_fmt',
-                'expected_balance', 'Variance_fmt', 'status', 'permanent_link',
+                'id', 'account_number', 'account_name', 'qbo_balance',
+                'expected_balance', 'Variance', 'status', 'permanent_link',
                 'rec_note'
             ]
 
@@ -781,21 +777,11 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         st.rerun()
 
     display_df = df.copy()
-    display_df['prev_bal'] = display_df['prev_bal'].apply(
-        lambda x: "{:,.2f}".format(x))
-    display_df['curr_bal'] = display_df['curr_bal'].apply(
-        lambda x: "{:,.2f}".format(x))
-    display_df['diff_amt'] = display_df['diff_amt'].apply(
-        lambda x: "{:,.2f}".format(x))
-    display_df['diff_pct'] = display_df['diff_pct'].apply(
-        lambda x: "{:.1f}%".format(x))
 
     def get_status_icon(row):
-        orig_row = df[df['id'] == row['id']].iloc[0]
-        is_material = (abs(orig_row['diff_amt']) >= threshold_amt) and (abs(
-            orig_row['diff_pct']) >= threshold_pct)
-        note = str(
-            orig_row['variance_note']) if orig_row['variance_note'] else ""
+        is_material = (abs(row['diff_amt']) >= threshold_amt) and (abs(
+            row['diff_pct']) >= threshold_pct)
+        note = str(row['variance_note']) if row['variance_note'] else ""
         if not is_material:
             return "⚪️"
         elif is_material and (note == "" or note == "None"):
@@ -810,11 +796,18 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
         "Group": None,
         "account_number": "Acct #",
         "account_name": "Account Name",
-        "prev_bal": st.column_config.TextColumn("Prior Month", disabled=True),
-        "curr_bal": st.column_config.TextColumn("Current Month",
-                                                disabled=True),
-        "diff_amt": st.column_config.TextColumn("Var $", disabled=True),
-        "diff_pct": st.column_config.TextColumn("Var %", disabled=True),
+        "prev_bal": st.column_config.NumberColumn("Prior Month",
+                                                  format="%,.2f",
+                                                  disabled=True),
+        "curr_bal": st.column_config.NumberColumn("Current Month",
+                                                  format="%,.2f",
+                                                  disabled=True),
+        "diff_amt": st.column_config.NumberColumn("Var $",
+                                                  format="%,.2f",
+                                                  disabled=True),
+        "diff_pct": st.column_config.NumberColumn("Var %",
+                                                  format="%.1f%%",
+                                                  disabled=True),
         "variance_note": st.column_config.TextColumn("Explanation",
                                                      width="large"),
         "Action": st.column_config.TextColumn("St",
