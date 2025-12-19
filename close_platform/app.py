@@ -703,7 +703,7 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
 
     internal_ni_match = abs(tab2_month_ni - tab3_month_ni) < 1.0
     external_ni_match = abs(tab3_month_ni - saved_qbo_ni) < 1000
-    is_tied_out = internal_ni_match and (saved_qbo_ni == 0.0 or external_ni_match)
+    is_tied_out = internal_ni_match and saved_qbo_ni != 0.0 and external_ni_match
 
     st.markdown("### 🛡 Audit Control Center")
 
