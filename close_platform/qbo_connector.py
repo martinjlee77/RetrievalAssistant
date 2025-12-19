@@ -209,10 +209,28 @@ def fetch_trial_balance(date_str):
 
     for acct_num, details in map_curr.items():
         curr_bal = details['balance']
-        final_map[acct_num] = {
-            'name': details['name'],
-            'balance': curr_bal
-        }
+        
+        is_pnl = False
+        try:
+            if int(acct_num) >= 40000:
+                is_pnl = True
+        except:
+            pass
+
+        if is_pnl and dt_curr.month > 1:
+            prior_bal = 0.0
+            if acct_num in map_prior:
+                prior_bal = map_prior[acct_num]['balance']
+            monthly_activity = curr_bal - prior_bal
+            final_map[acct_num] = {
+                'name': details['name'],
+                'balance': monthly_activity
+            }
+        else:
+            final_map[acct_num] = {
+                'name': details['name'],
+                'balance': curr_bal
+            }
 
     return final_map
 
