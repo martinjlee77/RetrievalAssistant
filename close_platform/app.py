@@ -693,11 +693,12 @@ def render_flux_tab(month_id, threshold_amt, threshold_pct):
 
     df_mapped = df[df['Group'] != "13. Other / Unmapped"]
     
-    df_pnl_mapped = df_mapped[df_mapped['Group'].str.startswith(('09', '10', '11', '12'))]
-    df_pnl_all = df[df['Group'].str.startswith(('09', '10', '11', '12'))]
+    df['acct_num_int'] = df['account_number'].apply(lambda x: int(x) if str(x).isdigit() else 0)
+    df_pnl_all = df[df['acct_num_int'] >= 40000]
+    df_pnl_mapped = df_pnl_all[df_pnl_all['Group'] != "13. Other / Unmapped"]
     
-    tab2_month_ni = -(df_pnl_mapped['curr_bal'].sum() - df_pnl_mapped['prev_bal'].sum())
-    tab3_month_ni = -(df_pnl_all['curr_bal'].sum() - df_pnl_all['prev_bal'].sum())
+    tab2_month_ni = -df_pnl_mapped['diff_amt'].sum()
+    tab3_month_ni = -df_pnl_all['diff_amt'].sum()
     saved_qbo_ni = get_qbo_net_income(month_id)
 
     internal_ni_match = abs(tab2_month_ni - tab3_month_ni) < 1.0
