@@ -552,6 +552,39 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255,255,255,0.8);
     margin-bottom: 1rem;
 }
+.compliance-item a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #ffffff;
+}
+.compliance-item a:hover {
+    text-decoration: underline;
+}
+.compliance-grid-two-col {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.compliance-item-highlight {
+    border: 2px solid rgba(255,255,255,0.4);
+}
+.compliance-section-light {
+    background-color: #f8f9fa;
+}
+.compliance-section-light .compliance-item {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+}
+.compliance-section-light .compliance-item h4 {
+    color: #1a1a2e;
+}
+.compliance-section-light .compliance-item p {
+    color: #4a4a6a;
+}
+.compliance-section-light .compliance-item a {
+    color: #1a1a2e;
+}
+.compliance-section-light .compliance-item-highlight {
+    border: 2px solid #1a1a2e;
+}
 .status {
     display: inline-block;
     padding: 0.25rem 1rem;
