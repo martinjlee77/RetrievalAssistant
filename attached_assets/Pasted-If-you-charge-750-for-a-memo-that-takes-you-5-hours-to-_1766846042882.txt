@@ -1,0 +1,100 @@
+If you charge $750 for a memo that takes you 5 hours to untangle, you are effectively working for $150/hour—which is far below your value as a VP/Partner.
+However, you need a specific number on the website to anchor expectations and signal "This is affordable," unlike Big 4 consulting which signals "This starts at $10k."
+Here is the "Tiered Productized Service" model I recommend for your pivot:
+1. The "Starting At" Strategy
+On the website, change the pricing to "From $750 per memo."
+This filters out the cheap clients who want a $50 solution, but doesn't scare away the Controller who has a $2,000 budget.
+2. The Three-Tier Menu
+You categorize the work internally (and on the quote you send them) into three buckets.
+Tier 1: The "Standard" Memo ($750)
+What it is: Routine transactions where your vLogic AI does 90% of the work.
+Examples: Standard SaaS (ASC 606), Real Estate Lease (ASC 842), Simple Stock Option Grant (ASC 718).
+Your Time: ~30-45 minutes (Reviewing the AI output).
+Margin: Excellent. This is your volume play.
+Tier 2: The "Complex" Memo ($1,500 - $2,000)
+What it is: Requires human judgment, "whiteboarding" the accounting flow, or multiple document synthesis.
+Examples: Software + Hardware + Professional Services bundles (allocation of transaction price), Contract Modifications, Debt Refinancing.
+Your Time: 2-3 hours.
+Margin: Good. This is where your expertise shines.
+Tier 3: The "Special Project" (Custom Quote)
+What it is: High risk, high complexity.
+Examples: ASC 805 Business Combinations (Purchase Price Allocation memos), Variable Interest Entities, complex Equity/Debt instruments.
+Pricing: Hourly or fixed project fee (e.g., $3,500+).
+3. The Workflow (How to price it without friction)
+You don't want a "Checkout Now" button because you need to see the contract first.
+The Process:
+Website: CTA says "Get a Free Quote & Initial Review."
+Intake: They upload the contract (or NDA first).
+The Triage (Your "Secret Sauce"): You look at the contract for 5 minutes.
+If it looks standard, you reply: "Confirmed. I can draft this for our Standard Rate of $750. Delivery by Thursday."
+If it looks hairy, you reply: "I've reviewed the agreement. Due to the complex revenue allocation/modification clauses, this falls under our Complex tier ($1,500). However, this includes a specific analysis of the [Specific Clause] to ensure audit readiness."
+4. Revised Pricing Section for HTML
+Here is how I would modify the pricing section in the HTML instructions for your developer to reflect this nuance.
+Replace the previous pricing block with this:
+code
+Html
+<section class="service-pricing">
+    <div class="container">
+        <div class="section-header">
+            <h2>Transparent, Flat-Fee Pricing</h2>
+            <p>Expert technical accounting memos. No hourly billing surprises.</p>
+        </div>
+        <div class="pricing-grid">
+            
+            <!-- Standard Tier -->
+            <div class="pricing-card">
+                <h3>Standard Memo</h3>
+                <div class="pricing-price">
+                    <span class="pricing-amount">$750</span>
+                    <span class="pricing-period">/memo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li><strong>Best for:</strong> Standard ASC 606 contracts, Routine Leases (ASC 842), Stock Comp (ASC 718).</li>
+                    <li><strong>Includes:</strong> Full technical analysis, authoritative citations, and Executive Summary.</li>
+                    <li><strong>Turnaround:</strong> 24-48 Hours.</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="contact.html?subject=StandardMemo" class="btn btn--primary">Get Started</a>
+                </div>
+            </div>
+
+            <!-- Complex Tier -->
+            <div class="pricing-card highlighted">
+                <h3>Complex Transactions</h3>
+                <div class="pricing-price">
+                    <span class="pricing-amount">From $1,500</span>
+                    <span class="pricing-period">/memo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li><strong>Best for:</strong> Multi-element arrangements, Contract Modifications, Debt/Equity financing.</li>
+                    <li><strong>Includes:</strong> Deep-dive judgment analysis, allocation tables, and audit defense support.</li>
+                    <li><strong>Turnaround:</strong> 2-3 Business Days.</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="contact.html?subject=ComplexMemo" class="btn btn--secondary">Request Review</a>
+                </div>
+            </div>
+
+            <!-- Custom Tier -->
+            <div class="pricing-card">
+                <h3>Special Projects</h3>
+                <div class="pricing-price">
+                    <span class="pricing-amount">Custom</span>
+                </div>
+                <ul class="pricing-features">
+                    <li><strong>Best for:</strong> M&A (ASC 805), IPO Readiness, Policy creation, Restatements.</li>
+                    <li><strong>Includes:</strong> Partner-level consultation and bespoke documentation.</li>
+                    <li><strong>Turnaround:</strong> Based on Scope.</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="contact.html?subject=CustomProject" class="btn">Contact Us</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+Why this works for you (The VP with a Day Job):
+Screening: It stops people from sending you a massive M&A deal expecting a $750 output.
+Upsell: If they come in for the $750 tier but the contract is complex, you have a justified reason to bump them to $1,500.
+Speed: You can likely knock out the $750 memos on your lunch break or in the evening using vLogic. The $1,500 ones are your weekend work.

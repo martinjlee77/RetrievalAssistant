@@ -1,0 +1,69 @@
+I have decided to pivot veritaslogic.ai from a self-service SaaS platform to a high-end service offering. We are moving away from "Sign Up for a Trial" and moving toward "Request a Service."
+Please make the following changes to the HTML code. These changes are urgent to capitalize on the upcoming audit busy season.
+1. Navigation & Header (All Pages)
+Remove/Hide: The "Sign Up" and "Login" buttons.
+Change: Any "Free Trial" button should now say "Request a Draft" and link to contact.html.
+Logo/Branding: If we have a tagline near the logo, change it to: The On-Demand Technical Accounting Desk.
+2. Hero Section (index.html)
+We need to change the main call to action.
+Headline: Change to: "Big 4 Quality Technical Memos. Delivered in 24 Hours."
+Sub-headline: Change to: "Stop writing complex accounting memos from scratch. Send us your contracts. Our vLogic AI engine + expert CPAs will draft your ASC 606, 842, and 718 documentation for a flat fee."
+Buttons:
+Primary Button: Text "Get a Memo Draft" (Link to contact.html or an embedded form anchor).
+Secondary Button: Text "See How It Works" (Link to #demo).
+3. Pricing Section (pricing.html or index.html)
+CRITICAL: Comment out the entire "Subscription Plans" grid (Free Trial, Professional, Team, Enterprise). Do not delete it (in case we revert), but hide it.
+Insert this "Service Pricing" block instead:
+code
+Html
+<section class="service-pricing">
+    <div class="container">
+        <div class="section-header">
+            <h2>Simple, Flat-Fee Pricing</h2>
+            <p>No subscriptions. No hourly billing surprises. Pay only for the memos you need.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card highlighted">
+                <h3>Standard Memo</h3>
+                <div class="pricing-price">
+                    <span class="pricing-amount">$750</span>
+                    <span class="pricing-period">/memo</span>
+                </div>
+                <ul class="pricing-features">
+                    <li><strong>Best for:</strong> Standard ASC 606 contracts, ASC 842 leases, or stock comp grants.</li>
+                    <li><strong>Includes:</strong> Full technical analysis, authoritative citations, and Executive Summary.</li>
+                    <li><strong>Turnaround:</strong> 24-48 Hours.</li>
+                    <li><strong>Review:</strong> Reviewed by former Big 4 Audit Partner.</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="contact.html?subject=StandardMemo" class="btn btn--primary">Request Draft</a>
+                </div>
+            </div>
+            <div class="pricing-card">
+                <h3>Complex Transaction</h3>
+                <div class="pricing-price">
+                    <span class="pricing-amount">Custom</span>
+                </div>
+                <ul class="pricing-features">
+                    <li><strong>Best for:</strong> M&A (ASC 805), Debt Modifications, or Multi-element arrangements.</li>
+                    <li><strong>Includes:</strong> White-glove consultation + Memo drafting.</li>
+                    <li><strong>Turnaround:</strong> 3-5 Business Days.</li>
+                </ul>
+                <div class="pricing-cta">
+                    <a href="contact.html?subject=ComplexMemo" class="btn btn--secondary">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+4. "About Us" Refinement (about.html or index.html)
+Update the Founder Bio section to sound like a firm, not a resume.
+Change: "VeritasLogic was founded by a former Audit Partner..."
+To: "The vLogic Technical Desk is operated by former Big 4 Audit Partners and National Office SMEs. We combine 16+ years of technical leadership with our proprietary AI engine to deliver audit-ready documentation at 10x the speed of traditional consulting."
+5. The "Platform" Section (features.html)
+Rename Section: Change "Core Features" to "Our Technology: The vLogic Engine".
+Context: Add a small banner or text above this section: "We use this proprietary technology to draft your memos with unmatched speed and precision." (This clarifies that we use the tool, the client gets the result).
+6. Call to Action (Footer/Global)
+Text: Change "Ready to start your free trial?" to "Ready to clear your desk?"
+Button: "Submit a Contract for Review"
+Please implement these changes immediately so we can launch the new service offering for the busy season.
