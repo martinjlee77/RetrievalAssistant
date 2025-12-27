@@ -1983,6 +1983,30 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-2px);
     box-shadow: 0 6px 18px rgba(255,255,255,0.3);
 }
+.form-group.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+.form-group.checkbox-inline input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+.form-group.checkbox-inline label {
+    font-weight: normal;
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+}
+.form-group small.form-hint {
+    display: block;
+    color: rgba(255,255,255,0.6);
+    margin-top: 5px;
+    font-size: 0.85rem;
+}
+.form-group.honeypot-field {
+    display: none;
+}
 .demo-form-section,
 .enterprise-form-section,
 .form-container {

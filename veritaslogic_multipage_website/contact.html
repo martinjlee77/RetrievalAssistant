@@ -39,7 +39,7 @@
             </ul>
             <button class="mobile-menu-btn">☰</button>
             <div class="nav-auth-buttons">
-                <a href="contact.html?inquiry=professional-services" class="nav-cta primary">Request a Draft</a>
+                <a href="contact.html#contact-form" class="nav-cta primary">Request a Draft</a>
             </div>
         </div>
     </nav>
@@ -52,146 +52,66 @@
         </div>
     </section>
 
-    <!-- Unified Contact Form -->
+    <!-- Service Intake Form -->
     <section class="unified-contact-section" id="contact-form">
         <div class="container">
             <div class="form-container">
-              <p>Use the form below for review services, enterprise sales, demo and rerun requests, tech support, or any other questions.</p>
-                    <form id="unified-contact-form" class="contact-form">
-                        <!-- Inquiry Type -->
-                        <div class="form-group">
-                            <label for="inquiry-type">What can we help you with?</label>
-                            <select id="inquiry-type" name="inquiry_type" required>
-                                <option value="">Select inquiry type</option>
-                                <option value="professional-services">Professional Services (Expert Review, Custom AI Workflows)</option>
-                                <option value="enterprise-sales">Enterprise Sales & Volume Pricing</option>
-                                <option value="demo-request">Schedule a Live Demo</option>
-                                <option value="memo-rerun">Request Memo Rerun</option>
-                                <option value="technical-support">Technical Support</option>
-                                <option value="general-inquiry">General Inquiry</option>
-                            </select>
-                        </div>
-
-                        <!-- Full Name -->
-                        <div class="form-group">
-                            <label for="contact-name">Full Name</label>
-                            <input type="text" id="contact-name" name="name" required autocomplete="name">
-                        </div>
-
-                        <!-- Email -->
-                        <div class="form-group">
-                            <label for="contact-email">Email</label>
-                            <input type="email" id="contact-email" name="email" required autocomplete="email">
-                        </div>
-
-                        <!-- Company -->
-                        <div class="form-group">
-                            <label for="contact-company">Company</label>
-                            <input type="text" id="contact-company" name="company" required autocomplete="organization">
-                        </div>
-
-                        <!-- Your Role -->
-                        <div class="form-group">
-                            <label for="contact-role">Your Role</label>
-                            <input type="text" id="contact-role" name="role" required placeholder="e.g., Controller, Technical Accountant" autocomplete="organization-title">
-                        </div>
-
-                        <!-- Phone Number (Optional) -->
-                        <div class="form-group">
-                            <label for="contact-phone">Phone Number (Optional)</label>
-                            <input type="tel" id="contact-phone" name="phone" placeholder="212-222-2222" autocomplete="tel">
-                        </div>
-
-                        <!-- Honeypot field (hidden from users, visible to spam bots) -->
-                        <div class="form-group" style="display: none;">
-                            <label for="website">Website</label>
-                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-                        </div>
+                <form id="unified-contact-form" class="contact-form">
                     
-                    <!-- Conditional fields that show based on inquiry type -->
-                    <div id="enterprise-fields" class="conditional-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="monthly-volume">Expected monthly analysis volume</label>
-                            <select id="monthly-volume" name="monthly_volume">
-                                <option value="">Select volume</option>
-                                <option value="1-10">1-10 analyses</option>
-                                <option value="10-50">10-50 analyses</option>
-                                <option value="50-100">50-100 analyses</option>
-                                <option value="100-250">100-250 analyses</option>
-                                <option value="250+">250+ analyses</option>
-                                <option value="unsure">Not sure yet</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div id="memo-rerun-fields" class="conditional-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="memo-id">Memo ID</label>
-                            <input type="text" id="memo-id" name="memo_id" placeholder="e.g., MEM-23fdc477 or 23fdc477">
-                            <small>Enter the Memo ID shown at the top of your analysis memo</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="change-type">Change Type</label>
-                            <select id="change-type" name="change_type">
-                                <option value="">Select change type</option>
-                                <option value="methodology_change">Change accounting methodology or approach</option>
-                                <option value="data_correction">Correct contract data or interpretation</option>
-                                <option value="conclusion_revision">Revise conclusions or judgments</option>
-                                <option value="formatting_change">Formatting or presentation changes</option>
-                                <option value="additional_analysis">Add additional analysis or considerations</option>
-                                <option value="other">Other (please specify in message)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="urgency-level">Urgency Level</label>
-                            <select id="urgency-level" name="urgency_level">
-                                <option value="standard">Standard (1-2 business days)</option>
-                                <option value="high">High (Same day)</option>
-                                <option value="urgent">Urgent (Within 4 hours)</option>
-                            </select>
-                            <small>Additional fees may apply for High/Urgent requests</small>
-                        </div>
-                        <div class="memo-rerun-scope">
-                            <p><strong>Memo Rerun Scope:</strong> Covers input corrections or extractable text issues. Methodology changes or expanded scope may require a new analysis.</p>
-                        </div>
-                    </div>
-                    
-                    <div id="demo-fields" class="conditional-fields" style="display: none;">
-                        <div class="form-group">
-                            <label for="team-size">How many people would use VeritasLogic.ai?</label>
-                            <select id="team-size" name="team_size">
-                                <option value="">Select team size</option>
-                                <option value="1">Just me</option>
-                                <option value="2-5">2-5 people</option>
-                                <option value="6-15">6-15 people</option>
-                                <option value="16-50">16-50 people</option>
-                                <option value="50+">50+ people</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="implementation-timeframe">When are you looking to implement?</label>
-                            <select id="implementation-timeframe" name="implementation_timeframe">
-                                <option value="">Select timeframe</option>
-                                <option value="immediately">Immediately</option>
-                                <option value="1-3-months">1-3 months</option>
-                                <option value="3-6-months">3-6 months</option>
-                                <option value="6-12-months">6-12 months</option>
-                                <option value="just-exploring">Just exploring</option>
-                            </select>
-                        </div>
-                    </div>
-                    
+                    <!-- Simplified Inquiry Type -->
                     <div class="form-group">
-                        <label for="contact-message">Message</label>
-                        <textarea id="contact-message" name="message" rows="5" required placeholder="Please provide details about your inquiry..."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="form-submit">Send Message</button>
-                    
-                    <div id="form-success-message" class="form-success" style="display: none;">
-                        <p><strong>Thank you!</strong> Your request is in. We'll reply within one business day with next steps.</p>
+                        <label for="inquiry-type">How can we help?</label>
+                        <select id="inquiry-type" name="inquiry_type" required>
+                            <option value="new-memo" selected>Request a Memo Draft (Standard or Complex)</option>
+                            <option value="enterprise">Enterprise / Volume Inquiry</option>
+                            <option value="general">General Question</option>
+                        </select>
                     </div>
 
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="contact-name">Full Name</label>
+                        <input type="text" id="contact-name" name="name" required autocomplete="name">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="contact-email">Work Email</label>
+                        <input type="email" id="contact-email" name="email" required autocomplete="email">
+                    </div>
+
+                    <!-- Company -->
+                    <div class="form-group">
+                        <label for="contact-company">Company</label>
+                        <input type="text" id="contact-company" name="company" required autocomplete="organization">
+                    </div>
+
+                    <!-- The NDA Checkbox (Trust Signal) -->
+                    <div class="form-group checkbox-inline">
+                        <input type="checkbox" id="nda-request" name="nda_request">
+                        <label for="nda-request"><strong>I have sensitive documents.</strong> Please send me an NDA before I upload files.</label>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="form-group">
+                        <label for="contact-message">Project Details</label>
+                        <textarea id="contact-message" name="message" rows="5" required placeholder="Tell us about the contract (e.g., 'Need ASC 606 memo for a 3-year SaaS deal with usage-based pricing')..."></textarea>
+                        <small class="form-hint">For security, do not paste sensitive contract text here. We will email you a secure upload link after you submit.</small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="form-submit">Request Review</button>
+                    
+                    <!-- Success Message -->
+                    <div id="form-success-message" class="form-success">
+                        <p><strong>Request Received.</strong> We will email you shortly (typically within 4 hours) with a secure upload link and next steps.</p>
+                    </div>
+
+                    <!-- Honeypot -->
+                    <div class="form-group honeypot-field">
+                        <label for="website">Website</label>
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
                 </form>
             </div>
         </div>
@@ -212,7 +132,7 @@
                     <h4>Services</h4>
                     <a href="features.html">Technology</a>
                     <a href="pricing.html">Pricing</a>
-                    <a href="contact.html?inquiry=demo-request">Request Demo</a>
+                    <a href="contact.html#contact-form">Request Quote</a>
                 </div>
                 
                 <div class="footer-section">
@@ -251,61 +171,14 @@
 
     <script src="script.js"></script>
     <script>
-        // Handle conditional fields based on inquiry type
-        function selectInquiryType(type) {
-            const inquirySelect = document.getElementById('inquiry-type');
-            inquirySelect.value = type;
-            showConditionalFields(type);
-            
-            // Scroll to form
-            document.getElementById('contact-form').scrollIntoView({ 
-                behavior: 'smooth' 
-            });
-        }
-        
-        function showConditionalFields(inquiryType) {
-            // Hide all conditional fields first
-            const enterpriseFields = document.getElementById('enterprise-fields');
-            const demoFields = document.getElementById('demo-fields');
-            const memoRerunFields = document.getElementById('memo-rerun-fields');
-            
-            if (enterpriseFields) enterpriseFields.style.display = 'none';
-            if (demoFields) demoFields.style.display = 'none';
-            if (memoRerunFields) memoRerunFields.style.display = 'none';
-            
-            // Show relevant fields based on inquiry type
-            if (inquiryType === 'enterprise-sales' && enterpriseFields) {
-                enterpriseFields.style.display = 'block';
-            } else if (inquiryType === 'demo-request' && demoFields) {
-                demoFields.style.display = 'block';
-            } else if (inquiryType === 'memo-rerun' && memoRerunFields) {
-                memoRerunFields.style.display = 'block';
-                // Make memo fields required when shown
-                const memoIdField = document.getElementById('memo-id');
-                const changeTypeField = document.getElementById('change-type');
-                if (memoIdField) memoIdField.required = true;
-                if (changeTypeField) changeTypeField.required = true;
-            } else {
-                // Remove required attribute when memo rerun not selected
-                const memoIdField = document.getElementById('memo-id');
-                const changeTypeField = document.getElementById('change-type');
-                if (memoIdField) memoIdField.required = false;
-                if (changeTypeField) changeTypeField.required = false;
-            }
-        }
-        
-        // Contact page specific functionality
+        // Contact page functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Add event listener to inquiry type dropdown
-            const inquiryTypeSelect = document.getElementById('inquiry-type');
-            if (inquiryTypeSelect) {
-                inquiryTypeSelect.addEventListener('change', function() {
-                    showConditionalFields(this.value);
-                });
-            }
-            
-            // Handle unified form submission
             const unifiedForm = document.getElementById('unified-contact-form');
+            const successMessage = document.getElementById('form-success-message');
+            
+            // Hide success message initially
+            if (successMessage) successMessage.style.display = 'none';
+            
             if (unifiedForm) {
                 unifiedForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
@@ -319,8 +192,8 @@
                         const formData = new FormData(this);
                         const data = Object.fromEntries(formData.entries());
                         
-                        // Fix multi-select field serialization
-                        data.standards_interest = formData.getAll('standards_interest');
+                        // Handle checkbox value
+                        data.nda_request = formData.has('nda_request') ? 'yes' : 'no';
                         
                         // Honeypot field check - if filled, it's likely spam
                         if (data.website) {
@@ -337,13 +210,11 @@
                         
                         if (response.ok) {
                             // Show inline success message
-                            const successMessage = document.getElementById('form-success-message');
                             if (successMessage) {
                                 successMessage.style.display = 'block';
                                 successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
                             this.reset();
-                            showConditionalFields(''); // Hide conditional fields
                         } else {
                             throw new Error('Failed to send message');
                         }
@@ -355,13 +226,6 @@
                         submitBtn.disabled = false;
                     }
                 });
-            }
-            
-            // Check URL parameters for pre-selecting inquiry type
-            const urlParams = new URLSearchParams(window.location.search);
-            const inquiry = urlParams.get('inquiry');
-            if (inquiry) {
-                selectInquiryType(inquiry);
             }
         });
     </script>

@@ -1,0 +1,124 @@
+
+You are absolutely right. Your instinct as a VP is spot on: Do not make a Controller navigate a support-ticket dropdown menu to give you money.
+Currently, this form treats a "New Client" (
+750
+r
+e
+v
+e
+n
+u
+e
+)
+t
+h
+e
+s
+a
+m
+e
+w
+a
+y
+i
+t
+t
+r
+e
+a
+t
+s
+a
+"
+B
+u
+g
+R
+e
+p
+o
+r
+t
+"
+(
+750revenue)thesamewayittreatsa"BugReport"(
+0 revenue).
+We need to gut this form. It needs to be a "Service Intake" form, not a "Contact Us" form.
+The Strategy: The "Velvet Rope" Intake
+We will simplify this to three options. We will also add the "NDA Checkbox"—this is a psychological trigger that says "We are professionals who handle sensitive data."
+Feedback for Your Developer
+1. Simplify the Dropdown (The 3-Option Rule)
+Kill the "Memo Rerun," "Technical Support," and "Demo" complexity.
+New Options:
+New Memo Request (Standard/Complex) - The money maker
+Enterprise / Volume Pricing - The big fish
+General Inquiry - Everything else
+2. The "NDA" Checkbox (Critical Trust Signal)
+Add a checkbox that says: "I have sensitive documents. Please send an NDA first."
+Why: This stops them from hesitating. They know they don't have to upload the file right now to start the conversation.
+3. The "Secure Upload" Instruction
+Since we aren't building a complex file uploader right now (which is risky for security if not done perfectly), we will tell them: "After you submit this form, we will email you a secure upload link for your contracts."
+Code Adjustments for contact.html
+Here is the simplified code. Ask your developer to replace the entire <form> section with this. It deletes all the "conditional logic" JavaScript complexity and leaves a clean, high-conversion form.
+code
+Html
+<!-- REPLACEMENT FORM CODE -->
+<form id="unified-contact-form" class="contact-form">
+    
+    <!-- Simplified Inquiry Type -->
+    <div class="form-group">
+        <label for="inquiry-type">How can we help?</label>
+        <select id="inquiry-type" name="inquiry_type" required>
+            <option value="new-memo" selected>Request a Memo Draft (Standard or Complex)</option>
+            <option value="enterprise">Enterprise / Volume Inquiry</option>
+            <option value="general">General Question</option>
+        </select>
+    </div>
+
+    <!-- Full Name -->
+    <div class="form-group">
+        <label for="contact-name">Full Name</label>
+        <input type="text" id="contact-name" name="name" required autocomplete="name">
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+        <label for="contact-email">Work Email</label>
+        <input type="email" id="contact-email" name="email" required autocomplete="email">
+    </div>
+
+    <!-- Company -->
+    <div class="form-group">
+        <label for="contact-company">Company</label>
+        <input type="text" id="contact-company" name="company" required autocomplete="organization">
+    </div>
+
+    <!-- The NDA Checkbox (Trust Signal) -->
+    <div class="form-group checkbox-group" style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+        <input type="checkbox" id="nda-request" name="nda_request" style="width: auto; margin: 0;">
+        <label for="nda-request" style="font-weight: normal; margin: 0;"><strong>I have sensitive documents.</strong> Please send me an NDA before I upload files.</label>
+    </div>
+
+    <!-- Message -->
+    <div class="form-group">
+        <label for="contact-message">Project Details</label>
+        <textarea id="contact-message" name="message" rows="5" required placeholder="Tell us about the contract (e.g., 'Need ASC 606 memo for a 3-year SaaS deal with usage-based pricing')..."></textarea>
+        <small style="display: block; color: #666; margin-top: 5px;">*Note: For security, do not paste sensitive contract text here. We will email you a secure upload link after you submit.</small>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="form-submit">Request Review</button>
+    
+    <!-- Success Message -->
+    <div id="form-success-message" class="form-success" style="display: none;">
+        <p><strong>Request Received.</strong> We will email you shortly (typically within 4 hours) with a secure upload link and next steps.</p>
+    </div>
+
+    <!-- Honeypot -->
+    <div class="form-group" style="display: none;">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+</form>
+
+<!-- CLEANUP: Ask developer to DELETE the <div id="enterprise-fields">, <div id="memo-rerun-fields">, and <div id="demo-fields"> blocks entirely. They are no longer needed. -->
