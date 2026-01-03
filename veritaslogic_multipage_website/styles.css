@@ -1,4389 +1,1165 @@
 /* ================================
-   VERITASLOGIC.AI WEBSITE STYLES
-   ================================
-   TABLE OF CONTENTS:
-   ==================
-   1. CSS RESET & BASE STYLES (line ~4)
-   2. TYPOGRAPHY & FONTS (line ~18)  
-   3. GLOBAL CONTAINERS & LAYOUT (line ~24)
-   4. NAVIGATION & HEADER (line ~33)
-   5. PAGE HEADERS (line ~140)
-   6. HERO SECTION - HOME PAGE (line ~174)
-   7. SECTION HEADERS - GLOBAL (line ~382)
-   8. HOW IT WORKS SECTION (line ~272)
-   9. DEMO PREVIEW SECTION (line ~297)
-   10. TRUST INDICATORS (line ~354)
-   11. FEATURE CARDS & GRIDS (line ~406)
-   12. COMPLIANCE SECTION (line ~489)
-   13. HUMAN REVIEW SECTION (line ~554)
-   14. BLOG SECTIONS (line ~708)
-   15. CTA SECTIONS (line ~2384)
-   16. FOOTER (line ~2630)
-   17. ABOUT PAGE STYLES (line ~1046)
-   18. FEATURES PAGE STYLES (line ~1162)
-   19. PRICING PAGE STYLES (line ~1226)
-   20. CONTACT PAGE STYLES (line ~1867)
-   21. AUTHENTICATION PAGES (line ~2606)
-   22. FORM STYLES (line ~2641)
-   23. UTILITY CLASSES (line ~2563)
-   24. RESPONSIVE DESIGN (line ~2456)
-   ================================ 
-   USAGE NOTES:
-   - Use .section-header for consistent subheaders
-   - Use .standard-section class for 100px 0 padding
-   - Hero section padding left unchanged per user request
-   - All major sections now have consistent spacing
+   VERITASLOGIC.AI - MINIMAL CSS
    ================================ */
-/* ================================
-   1. CSS RESET & BASE STYLES
-   ================================ */
+
+/* ============================================
+   UNIVERSAL RESET
+   ============================================
+   This applies to EVERY element on the page.
+   It removes default browser spacing and makes
+   padding/borders count inside the element's width.
+   ============================================ */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    margin: 0;        /* Remove all default spacing around elements */
+    padding: 0;       /* Remove all default spacing inside elements */
+    box-sizing: border-box;  /* Make padding and borders count inside the element's total width */
 }
-/* ================================
-   CSS DESIGN TOKENS
-   ================================ */
+
+/* ============================================
+   CSS VARIABLES (Design Tokens)
+   ============================================
+   These are reusable values you can change in one place.
+   Use var(--variable-name) anywhere in the CSS to use these values.
+   Change colors, spacing, etc. here and it updates everywhere.
+   ============================================ */
 :root {
-    /* Colors */
-    --color-primary: #212F3C;
-    --color-primary-light: #2C3E50;
-    --color-secondary: #1A252F;
-    --color-accent: #ffffff;
-    --color-text: #ffffff;
-    --color-text-muted: rgba(255,255,255,0.8);
-    /* Navbar Colors */
-    --navbar-bg: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
-    --navbar-active-bg: linear-gradient(135deg, #2A353F 0%, #31434C 100%);
-    --navbar-active-light: rgba(42, 53, 63, 0.8);
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
-    --gradient-secondary: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
-    --gradient-tertiary: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
-    --gradient-quaternary: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
-    /* Spacing */
-    --space-section: 100px;
-    --space-section-sm: 80px;
-    --space-section-lg: 120px;
-    --space-content: 4rem;f
-    --space-header: 2rem;
-    /* Typography */
-    --font-size-h1: 3rem;
-    --font-size-h2: 2.5rem;
-    --font-size-h3: 2rem;
-    --font-size-body: 1rem;
-    --font-size-large: 1.2rem;
-    /* Effects */
-    --shadow-card: 0 12px 40px rgba(0,0,0,0.3);
-    --shadow-hover: 0 6px 18px rgba(255,255,255,0.3);
-    --border-subtle: 1px solid rgba(255,255,255,0.1);
-    --border-radius: 12px;
-    --border-radius-sm: 8px;
-    /* Navigation */
-    --nav-gap: 1rem; /* Controls spacing between buttons */
-    --nav-pad-x: 0.5rem; /* Controls button width */
-    --nav-pad-y: 0.5rem; /* Controls button height */
+    /* Colors - Change these to update your color scheme site-wide */
+    --primary: #212F3C;           /* Main dark blue-gray background color */
+    --secondary: #1A252F;         /* Darker blue-gray for secondary backgrounds */
+    --text: #ffffff;              /* Main text color (white) */
+    --text-muted: rgba(255,255,255,0.8);  /* Muted/secondary text (white at 80% opacity) */
+    
+    /* Gradients - Smooth color transitions for backgrounds */
+    --gradient: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);  /* Main gradient (diagonal from top-left) */
+    --gradient-alt: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);  /* Alternative gradient with middle color */
+    
+    /* Spacing - Standard spacing values used throughout */
+    --space: 100px;      /* Standard section padding (top and bottom) */
+    --space-sm: 80px;    /* Smaller section padding (currently unused but available) */
+    --radius: 12px;      /* Standard border radius for rounded corners on cards */
+    --radius-sm: 8px;    /* Smaller border radius for buttons and small elements */
+    
+    /* Effects - Shadows and borders */
+    --shadow: 0 12px 40px rgba(0,0,0,0.3);  /* Drop shadow effect (currently unused but available) */
+    --border: 1px solid rgba(255,255,255,0.1);  /* Subtle white border at 10% opacity */
 }
+
+/* ============================================
+   TYPOGRAPHY - Text Styling
+   ============================================ */
+
+/* Body text - applies to all text on the page unless overridden */
 body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    line-height: 1.6;
-    color: var(--color-text);
-    background-color: var(--color-primary);
-    overflow-x: hidden;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Font stack: tries Poppins first, then system fonts as fallback */
+    line-height: 1.6;           /* Space between lines (1.6x the font size) */
+    color: var(--text);         /* Text color (white) */
+    background: var(--primary); /* Page background color */
+    overflow-x: hidden;         /* Hide horizontal scrollbar if content is too wide */
 }
-/* ================================
-   2. TYPOGRAPHY & FONTS
-   ================================ */
+
+/* All headings (h1, h2, h3, h4, h5, h6) use this font */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
-    line-height: 1.2;
+    font-family: 'Playfair Display', Georgia, serif;  /* Elegant serif font for headings */
+    line-height: 1.5;  /* Tighter line spacing for headings */
 }
-/* ================================
-   3. GLOBAL CONTAINERS & LAYOUT
-   ================================ */
+
+/* ============================================
+   LAYOUT - Container for Content
+   ============================================ */
+
+/* Main content container - centers content and limits width */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    position: relative;
-    z-index: 1;
+    max-width: 1200px;  /* Maximum width of content (prevents it from being too wide on large screens) */
+    margin: 0 auto;     /* Centers the container horizontally (auto margins on left/right) */
+    padding: 0 2rem;    /* Adds 2rem (32px) padding on left and right sides */
 }
-/* ================================
-   4. NAVIGATION & HEADER
-   ================================ */
+
+/* ============================================
+   NAVIGATION BAR
+   ============================================ */
+
+/* The main navigation bar at the top of the page */
 .navbar {
-    background: var(--navbar-bg);
-    padding: 1rem 0;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.4);
-    border-bottom: var(--border-subtle);
+    background: var(--gradient);     /* Gradient background */
+    padding: 1rem 0;                 /* 1rem (16px) padding top and bottom */
+    position: fixed;                  /* Stays at top when scrolling */
+    width: 100%;                      /* Full width of the page */
+    top: 0;                           /* Positioned at the very top */
+    z-index: 1000;                    /* Appears above other content (higher number = on top) */
+    box-shadow: 0 2px 15px rgba(0,0,0,0.4);  /* Shadow below navbar for depth */
+    border-bottom: var(--border);     /* Subtle border at bottom */
 }
+
+/* Container inside navbar that holds logo and links */
 .nav-container {
-    max-width: clamp(1000px, 95vw, 1200px); /* Restored generous width from original */
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 2rem;
+    max-width: clamp(1000px, 95vw, 1200px);  /* Responsive width: minimum 1000px, max 1200px, or 95% of viewport */
+    margin: 0 auto;      /* Centers horizontally */
+    display: flex;       /* Makes children (logo, links, button) sit side-by-side */
+    justify-content: space-between;  /* Pushes logo to left, links/button to right */
+    align-items: center; /* Vertically centers all items */
+    padding: 0 2rem;    /* Horizontal padding */
 }
+
+/* Logo text styling */
 .logo {
-    font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-    text-decoration: none;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-family: 'Playfair Display', serif;  /* Same elegant font as headings */
+    font-size: 1.8rem;   /* 28.8px - larger than body text */
+    font-weight: 700;     /* Bold */
+    color: white;          /* White text */
+    text-decoration: none;  /* Removes underline from link */
 }
+
+/* Navigation links container (the <ul> element) */
 .nav-links {
-    display: flex;
-    list-style: none;
-    gap: var(--nav-gap, 2rem);
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-}
-.nav-links li {
-    flex: 0 0 auto;
-    min-width: 0;
+    display: flex;        /* Makes links sit side-by-side horizontally */
+    list-style: none;    /* Removes bullet points from list */
+    gap: 1rem;           /* Space between each link (16px) */
+    margin: 0;           /* No margin */
+    padding: 0;          /* No padding */
 }
 
+/* Individual navigation links */
 .nav-links a {
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, text-shadow 0.2s ease;
-    position: relative;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: var(--nav-pad-y, 0.5rem) var(--nav-pad-x, 1rem);
-    min-height: 44px;
-    border-radius: var(--border-radius-sm);
-    white-space: nowrap;
-    box-sizing: border-box;
-    width: auto;
-}
-.nav-links a:hover {
-    color: var(--color-accent);
-    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
-}
-.nav-links a.active {
-    color: var(--color-accent);
-    background: rgba(255, 255, 255, 0.15);
-    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.2);
+    color: var(--text-muted);     /* Muted white color (80% opacity) */
+    text-decoration: none;        /* No underline */
+    font-weight: 600;             /* Semi-bold */
+    padding: 0.5rem 1rem;        /* Vertical and horizontal padding inside link */
+    border-radius: var(--radius-sm);  /* Rounded corners */
+    transition: all 0.2s ease;    /* Smooth animation when properties change */
 }
 
-/* Focus state to match active state exactly */
-.nav-links a:focus-visible {
-    outline: none;
-    color: var(--color-accent);
-    background: rgba(255, 255, 255, 0.15);
-    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.2);
+/* Navigation links when hovered or active (current page) */
+.nav-links a:hover,      /* When mouse hovers over link */
+.nav-links a.active {    /* When link has "active" class (current page) */
+    color: var(--text);              /* Full white color */
+    background: rgba(255, 255, 255, 0.15);  /* Semi-transparent white background */
 }
 
-/* Ensure focus state doesn't override active state */
-.nav-links a.active:focus-visible {
-    outline: none;
-}
-/* Navigation button styling */
-.btn-nav {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-}
-.btn-nav:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.4);
-    text-shadow: 0 2px 4px rgba(255,255,255,0.3);
-}
-/* Enhanced active state - background styling replaces underline */
-.nav-cta {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    color: #212F3C;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
-}
-.nav-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(255,255,255,0.3);
-}
-
-/* Primary nav button (main CTA) */
-.nav-cta.primary {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    color: #212F3C;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-}
-.nav-cta.primary:hover {
-    background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
-    color: #1A252F;
-}
-
-/* Secondary nav button (outline style) */
-.nav-cta.secondary {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    border: 1px solid rgba(255,255,255,0.3);
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-}
-.nav-cta.secondary:hover {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.5);
-    color: #ffffff;
-}
+/* Mobile menu button (hamburger icon) - hidden on desktop */
 .mobile-menu-btn {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-/* ================================
-   5. PAGE HEADERS (NON-HOME PAGES)
-   ================================ */
-.page-header {
-    padding: 150px 0 80px 0;
-    text-align: center;
-    background: var(--gradient-primary);
-    position: relative;
-    overflow: hidden;
-}
-.page-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 30% 40%, rgba(255,255,255,0.04) 0%, transparent 50%),
-        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.03) 0%, transparent 50%);
-}
-.page-header h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.5);
-}
-.page-header p {
-    font-size: 1.25rem;
-    color: rgba(255,255,255,0.85);
-    max-width: 700px;
-    margin: 0 auto;
+    display: none;        /* Hidden by default (shown only on mobile via media query) */
+    background: none;    /* No background */
+    border: none;        /* No border */
+    color: white;        /* White icon/text */
+    font-size: 1.5rem;  /* 24px - larger icon */
+    cursor: pointer;     /* Shows hand cursor on hover */
 }
 
-/* --- Signup Page Header Benefits List --- */
-.page-header .signup-benefits {
-    /* 1. Aligned left in a smaller container */
-    max-width: 800px; 
-    margin: 2.5rem auto; /* Centers the container and adds space */
-    padding-left: 0; 
-    list-style: none;
-    text-align: left;
+/* Call-to-action button in navigation (e.g., "Request a Draft") */
+.nav-cta {
+    background: white;           /* White background */
+    color: var(--primary);       /* Dark text color */
+    padding: 0.75rem 1.5rem;    /* Vertical and horizontal padding */
+    border-radius: var(--radius-sm);  /* Rounded corners */
+    text-decoration: none;      /* No underline */
+    font-weight: 600;            /* Semi-bold */
+    transition: transform 0.2s ease;  /* Smooth animation when hovered */
+    display: inline-block; /*Needed for the hover effect to work*/
 }
 
-.page-header .signup-benefits li {
-    position: relative;
-    padding-left: 2.25rem; /* Space for the checkmark icon */
-    margin-bottom: 1.25rem;
-
-    /* 2 & 4. Inherits font-family. Font-size is set to match your <p> tag */
-    font-size: 1.25rem; /* Matches your .page-header p rule */
-    line-height: 1.2;
-    color: rgba(255,255,255,0.85); /* Matches your .page-header p rule */
-
-
+/* CTA button when hovered */
+.nav-cta:hover {
+    transform: translateY(-2px);  /* Moves button up 2px when hovered (lift effect) */
 }
 
-/* Specific rule for the checkmarks */
-.page-header .signup-benefits li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    top: 3px;
-    color: #ffffff;
-    font-weight: bold;
+/* ============================================
+   SECTIONS - Reusable Page Sections
+   ============================================ */
+
+/* All <section> elements get this default padding */
+section {
+    padding: 60px 0;  /* 60px padding top and bottom, 0 on sides */
 }
-/* ================================
-   6. HERO SECTION - HOME PAGE
-   ================================
-   Note: Padding left unchanged per user request */
+
+/* Page headers (on non-home pages) and hero section (home page) */
+.page-header,  /* Used on: About, Pricing, Contact, etc. */
+.hero {        /* Used on: Home page */
+    padding: 150px 0 80px;      /* Large top padding (150px), smaller bottom (80px) */
+    text-align: center;          /* Centers all text */
+    background: var(--gradient-alt);  /* Gradient background */
+    position: relative;          /* Allows positioning of child elements */
+}
+
+/* Hero section has extra top padding to account for fixed navbar */
 .hero {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 230px 0 100px 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    padding-top: 180px;  /* More top padding so content isn't hidden behind navbar */
 }
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
-}
-.hero-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    position: relative;
-    z-index: 1;
-}
+
+/* Headings inside page headers and hero sections */
+.page-header h1,
 .hero h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    font-size: 3rem;      /* 48px - very large */
+    margin-bottom: 1rem;  /* Space below heading */
 }
-.hero p {
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
-    color: rgba(255,255,255,0.85);
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
-}
-.hero-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem; /* ← Change this value to adjust spacing */
-}
-.hero p.hero-footnote {
-    font-size: 0.9rem; 
-    font-style: italic; 
-    color: rgba(255, 255, 255, 0.75);
-    margin-top: 3rem; 
-    margin-bottom: 0;
-    max-width: 800px;
-}
-/* Use .btn.btn--primary instead */
-.demo-link,
-.secondary-cta {
-    display: inline-flex;
-    align-items: center;
-    background: transparent;
-    color: #f2f2f2;
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    margin-right: 1rem;
-    /* box-shadow: 0 6px 18px rgba(255,255,255,0.2); */
-    border: 1px solid #f2f2f2;
-}
-.demo-link:hover,
-.secondary-cta:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
-}
-.hero .hero-microcopy {
-    font-size: 1rem;        /* Smaller font size */
-    line-height: 1.5;       /* Adjust line height for better readability */
-    margin-top: 1rem;         /* Reduced space from CTA buttons */ 
-}
-/* ================================
-   8. HOW IT WORKS SECTION
-   ================================ */
-.how-it-works {
-    background: var(--color-primary);
-    color: white;
-    padding: var(--space-section) 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-/* hiw-container removed - using standard .container instead */
-.how-it-works-content {
-    /* max-width: 800px;*/ /* Adjust to fit your diagram's width */
-    margin-left: auto;
-    margin-right: auto;
-}
-.how-it-works-content img {
-    width: 100%; /* Make the image responsive */
-    /*max-width: 800px;*/
-    display: block; /* Removes extra space below the image */
-}
-/* ================================
-   9. DEMO PREVIEW SECTION
-   ================================ */
-.demo-preview {
-    padding: var(--space-section) 0;
-    text-align: center; 
-    background: var(--gradient-primary);
-}
-.demo-container {
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    max-width: 1000px;
-    margin: 0 auto;
-}
-/* demo-container h2 removed - using standard .section-header h2 instead */
-.demo-container p {
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 2rem;
-  font-size: 1rem; /* Adjust if needed */
-}
-.demo-description {
-    margin-bottom: 2rem;
-    text-align: center;
-}
-.demo-fallback {
-    margin-top: 1.5rem;
-    text-align: center;
-    color: rgba(255,255,255,0.8);
-}
-.demo-fallback a {
-    color: rgba(255,255,255,0.9);
-    text-decoration: underline;
-    font-weight: 600;
-}
-.demo-fallback a:hover {
-    color: #ffffff;
-}
-.video-container {
-    margin-top: 2rem; 
-    width: 100%; 
-    max-width: 900px; 
-    margin-left: auto;
-    margin-right: auto;
-    aspect-ratio: 16/9;
-}
-.video-container video {
-    width: 100%; 
-    height: auto;
-    display: block;
-}
-.section-header h2 {
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-}
+
+/* Paragraphs inside page headers and hero sections */
+.page-header p,
+.hero p,
 .section-header p {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.8);
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
+    font-size: 1.25rem;        /* 20px - larger than body text */
+    color: var(--text-muted);   /* Muted white */
+    max-width: 700px;          /* Limits width so text doesn't stretch too wide */
+    margin: 0 auto;            /* Centers the paragraph */
+    line-height: 1.3;          /* Space between lines */
 }
-/* ================================
-   11. FEATURE CARDS & GRIDS
-   ================================ */
-.features-summary,
-.features-grid,
-/* Use .glass-panel.glass-panel--centered.glass-panel--interactive.glass-panel--highlight instead */
-.feature-card h3,
-.value-card h3 {
-    font-size: 1.5rem;
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-weight: 700;
+
+/* Section with gradient background */  
+.section-gradient {
+    background: var(--gradient);   /* Gradient background */
 }
-.feature-card p,
-.value-card p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
+
+/* Section with alternative gradient background */
+.section-gradient-alt {
+    background: var(--gradient-alt);   /* Gradient background */
 }
-/* Use .btn.btn--ghost instead */
-/* ================================
-   12. COMPLIANCE SECTION
-   ================================ */
-.compliance-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-primary);
+
+/* Section headers - used for "How It Works", "Expert Analysis For:", etc. */
+.section-header {
+    text-align: center;      /* Centers the header */
+    margin-bottom: 3rem;    /* Space below header (48px) */
 }
-.compliance-grid {
-    display: grid;
+
+/* H2 headings inside section headers */
+.section-header h2 {
+    font-size: 2.5rem;      /* 40px */
+    margin-bottom: 1rem;    /* Space below heading */
+}
+
+/* ============================================
+   CARDS - Reusable Card Pattern
+   ============================================
+   Cards are used for: items, pricing cards,
+   blog posts, feature cards, etc. They all share
+   the same base styling.
+   ============================================ */
+
+/* All card types share these base styles */
+.section,  /* Section containing cards */
+.item,     /* Individual ASC 606, 842, etc. cards */
+.pricing-card,        /* Pricing tier cards */
+.addon-card,          /* Add-on service cards */
+.comparison-card,     /* Cost comparison cards */
+.blog-card,           /* Blog post cards */
+.value-card {        /* Value proposition cards */
+    background: rgba(255,255,255,0.08);  /* Semi-transparent white (8% opacity) */
+    padding: 2rem;                        /* 32px padding inside card */
+    border-radius: var(--radius);        /* 12px rounded corners */
+    border: var(--border);               /* Subtle white border */
+}
+
+/* Grid containers that hold multiple cards */
+.grid,     /* Grid of items */
+.pricing-grid,        /* Grid of pricing cards */
+.addon-grid,          /* Grid of add-on cards */
+.comparison-cards,    /* Grid of comparison cards */
+.blog-grid,           /* Grid of blog cards */
+.values-grid {        /* Grid of value cards */
+    display: grid;     /* CSS Grid layout */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
+    /* Creates responsive columns: minimum 250px wide, fills available space */
+    /* "auto-fit" means: fit as many columns as possible */
+    gap: 2rem;         /* 32px space between cards */
+    margin-top: 3rem;  /* 48px space above grid */
 }
-.compliance-item {
-    background: rgba(255,255,255,0.08);
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-}
-.compliance-item h4 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-}
-.compliance-item p {
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 1rem;
-}
-.compliance-item a {
-    font-weight: 600;
-    text-decoration: none;
-    color: #ffffff;
-}
-.compliance-item a:hover {
-    text-decoration: underline;
-}
-.compliance-grid-two-col {
+
+/* Two-column grid variant (used for "Service Options" section) */
+.grid-two-col {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-.compliance-grid-spaced {
-    margin-top: 1.5rem;
-}
-.compliance-item-highlight {
-    border: 2px solid rgba(255,255,255,0.4);
-}
-.compliance-section-light .compliance-item {
-    background: linear-gradient(135deg, #212F3C 0%, #212F3C 100%);
-    border: 1px solid rgba(255,255,255,0.2);
-}
-.compliance-section-light .compliance-item h4 {
-    color: #ffffff;
-}
-.compliance-section-light .compliance-item p {
-    color: rgba(255,255,255,0.85);
-}
-.compliance-section-light .compliance-item a {
-    color: #ffffff;
-}
-.compliance-section-light .compliance-item-highlight {
-    border: 2px solid rgba(255,255,255,0.4);
-}
-.status {
-    display: inline-block;
-    padding: 0.25rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-.status.available {
-    background: #738596;
-    color: #f2f2f2;
-    border: 1px solid #f2f2f2;
-}
-.roadmap-note {
-    text-align: left;
-    margin: 2rem auto;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 1.1rem;
-    font-weight: 400;
-    max-width: 600px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    /* Same as above but minimum 300px per column (makes fewer, wider columns) */
 }
 
-/* Two-column feature layout */
-.feature-content.two-column {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
+/* Headings inside cards - these three headings are grouped together*/
+.item h4,  /* H4 in cards */
+.pricing-card h3,     /* H3 in pricing cards */
+.addon-card h3 {      /* H3 in add-on cards */
+    font-size: 1.5rem;    /* 24px */
+    margin-bottom: 1rem;  /* Space below heading */
+    text-align: center;    /* Center-align headings */
 }
 
-.feature-left h2 {
-    margin-bottom: 1rem;
+/* Paragraphs inside cards */
+.item p,
+.pricing-card p,
+.addon-card p {
+    color: var(--text-muted);  /* Muted white text */
+    line-height: 1.7;          /* More space between lines for readability */
 }
 
-.feature-left .value-statement {
-    margin-bottom: 1.5rem;
+.item ul, 
+.feature-benefits ul{
+    list-style: none;           /* Removes default bullet points */
+    padding-left: 0;            /* Removes default left padding */
+    margin: 0;                  /* Removes default margin */
+    color: var(--text-muted);   /* Muted white text */
+    line-height: 1;           /* Space between lines */
 }
 
-.feature-right p {
-    margin-bottom: 2rem;
+.item ul li,
+.feature-benefits ul li {
+    position: relative;         /* Needed for custom bullet positioning */
+    padding-left: 1.5rem;      /* Space for custom bullet (if not centered) */
+    margin-bottom: 0.75rem;    /* Space between list items */
 }
 
-/* ================================
-   13. HUMAN REVIEW SECTION
-   ================================ */
-.human-review-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-secondary);
-    position: relative;
-    text-align: center; /* Center the overall content */
+/* Links inside item list items */
+.item ul li a {
+    color: var(--text-muted);  /* Muted white color (or use var(--text) for full white) */
+    text-decoration: underline;  /* Optional: adds underline to make it clear it's a link */
+    transition: color 0.3s ease;  /* Smooth color change on hover */
 }
-.human-review-section::before {
-    content: '';
+
+/* Link hover effect */
+.item ul li a:hover {
+    color: var(--text);  /* Full white on hover */
+}
+
+/* Custom bullet point (checkmark or circle) */
+.item ul li::before,
+.feature-benefits ul li::before {
+    content: '•';              /* Bullet point (or use '✓' for checkmark) */
     position: absolute;
-    top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.03) 25%, transparent 50%, rgba(255,255,255,0.03) 75%, transparent 100%);
-}
-.review-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    justify-content: center; /* Centers content horizontally */
-}
-.review-text {
-    text-align: left; /* Align text to the left */
-}
-/* review-text h2 removed - using standard .section-header h2 instead */
-.review-text p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-}
-.review-benefits {
-    list-style: none;
-    margin: 2rem 0;
-}
-.review-benefits li {
-    color: rgba(255,255,255,0.8);
-    padding: 0.5rem 0;
-    position: relative;
-    padding-left: 2rem;
-}
-.review-benefits li::before {
-    content: '✓';
-    color: #ffffff;
+    color: var(--text);        /* White bullet */
     font-weight: bold;
-    position: absolute;
-    left: 0;
 }
 
-/* ================================
-   14. BLOG SECTIONS
-   ================================ */
-.blog-preview {
-    padding: var(--space-section) 0;
-    background: var(--gradient-tertiary);
-    position: relative;
-}
-.blog-preview::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 70% 30%, rgba(255,255,255,0.05) 0%, transparent 50%);
-}
-.blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2.5rem;
-    margin-top: 3rem;
-}
-.blog-card {
-    background: rgba(255,255,255,0.08);
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.15);
-    backdrop-filter: blur(15px);
-    transition: all 0.3s ease;
-}
-.blog-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(255,255,255,0.25);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-.blog-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.7rem;
-}
-.blog-date {
-    color: rgba(255,255,255,0.6);
-}
-.blog-category {
-    background: rgba(255,255,255,0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    color: rgba(255,255,255,0.9);
-}
-.blog-card h3 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-}
-.blog-card h3 a {
-    color: #ffffff;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-.blog-card h3 a:hover {
-    color: rgba(255,255,255,0.8);
-}
-.blog-card p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-.read-more {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-}
-.read-more:hover {
-    color: #ffffff;
-}
-.blog-cta {
-    text-align: center;
-    margin-top: 3rem;
-}
-.blog-link {
-    color: rgba(255,255,255,0.9);
-    text-decoration: none;
-    font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 1rem 2rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-.blog-link:hover {
-    border-color: rgba(255,255,255,0.6);
-    background: rgba(255,255,255,0.1);
-}
-/* Blog Page Specific Styles */
-.blog-content {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
-}
-.blog-main {
-    max-width: 800px;
-    margin: 0 auto;
-}
-.blog-filters {
-    display: flex;
-    justify-content: center; /* Center the filters on the page */
-    margin-bottom: 4rem;
-}
-.featured-post,
-.blog-post {
-    background: rgba(255,255,255,0.05);
-    padding: 3rem;
-    border-radius: 16px;
-    margin-bottom: 3rem;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-}
-.featured-post {
-    border-left: 4px solid rgba(255,255,255,0.4);
-}
-.post-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    flex-wrap: wrap;
-}
-.post-date {
-    color: rgba(255,255,255,0.6);
-}
-.post-category,
-.post-read-time {
-    background: rgba(255,255,255,0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    color: rgba(255,255,255,0.9);
-}
-.featured-post h2,
-.blog-post h2 {
-    font-size: 2rem;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    line-height: 1.3;
-}
-.post-excerpt {
-    margin-bottom: 2rem;
-}
-.post-excerpt p {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.9);
-    font-weight: 500;
-    line-height: 1.6;
-}
-.post-content h3 {
-    font-size: 1.5rem;
-    color: #ffffff;
-    margin: 2rem 0 1rem 0;
-}
-.post-content h4 {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.9);
-    margin: 1.5rem 0 0.75rem 0;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
-}
-.post-content p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1rem;
-}
-.post-content ul {
-    color: rgba(255,255,255,0.8);
-    padding-left: 2rem;
-    margin: 1rem 0;
-}
-.post-content li {
-    margin-bottom: 0.5rem;
-    line-height: 1.6;
-}
-.post-tags {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-}
-.tag {
-    background: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.9);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-.category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap; /* Allows filters to wrap on smaller screens */
-    gap: 0.75rem;
-    justify-content: center;
-}
-.category-list li {
-    margin-bottom: 0.5rem;
-}
-.category-list a {
-    display: block;
-    padding: 0.6rem 1.25rem;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.8);
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease-in-out;
-}
-.category-list a:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.2);
-}
-.category-list span {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.9rem;
-}
-.category-list a.active {
-    background: #ffffff;
-    color: #212F3C;
-    border-color: #ffffff;
-    font-weight: 600;
-}
+/* ============================================
+   Services Styles
+   ============================================ */
 
-/* ================================
-   17. ABOUT PAGE STYLES
-   ================================ */
-.founder-section,
-.company-story-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-primary);
-    position: relative;
-}
-.founder-section::before,
-.company-story-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-        linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
-}
-.story-content {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-.story-content h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 2rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-}
-.story-content p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-}
-
-/* --- Founder Section Styles --- */
-.founder-section {
-    display: grid;
-    grid-template-columns: 1fr 2.5fr;
-    gap: 3rem;
-    /* FIX 1: Vertical alignment set to 'top' */
-    align-items: flex-start; 
-    margin: 4rem 0;
-    padding-top: 3rem;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    background: transparent; /* Explicitly set for clarity */
-}
-
-.founder-section.no-image {
-    grid-template-columns: 1fr;
-    max-width: 800px;
-}
-
-.founder-image img {
-    width: 100%;
-    max-width: 220px; 
-    border-radius: 50%;
-    display: block;
-    margin: 0 auto;
-    border: 3px solid rgba(255,255,255,0.1);
-}
-
-/* FIX 2: Styling for the new title block */
-.founder-title {
-    margin-bottom: 2rem;
-}
-.founder-title p {
-    margin: 0;
-    line-height: 1.4;
-}
-.founder-title .name {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ffffff;
-    font-family: 'Playfair Display', sans-serif;
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.founder-title .role {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.9);
-    margin-top: 0.25rem;
-}
-.founder-title .past-role {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,0.7);
-    font-style: italic;
-}
-
-/* Styling for the highlights list */
-.founder-highlights {
-    list-style: none;
-    padding-left: 0;
-    margin: 0;
-}
-
-.founder-highlights li {
-    padding-left: 2rem;
-    position: relative;
-    margin-bottom: 1.25rem;
-    line-height: 1.6;
-    color: rgba(255,255,255,0.9);
-}
-
-.founder-highlights li::before {
-    content: '•';
-    color: #ffffff;
-    position: absolute;
-    left: 0;
-    top: 2px;
-    font-weight: 600;
-}
-
-
-.differentiator-box {
-    background: rgba(255,255,255,0.08);
-    padding: 2.5rem;
-    border-radius: 16px;
-    margin-top: 3rem;
-    border: 1px solid rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    position: relative;
-}
-.differentiator-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-    border-radius: 16px;
-    z-index: -1;
-}
-.differentiator-box h3 {
-    font-size: 1.6rem;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-.differentiator-box p {
-    color: rgba(255,255,255,0.9);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-
-.values-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-primary);
-}
-.values-section h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 2rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-}
-.values-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2.5rem;
-    margin-top: 3rem;
-}
-.value-card {
-    background: rgba(255,255,255,0.08);
-    padding: 2.5rem;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-}
-.value-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(255,255,255,0.2);
-}
-.value-icon {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-    display: block;
-}
-.value-icon img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
-}
-/* Features Page Specific Styles */
-.features-detailed {
-    padding: var(--space-section-sm) 0;
-    background: var(--gradient-quaternary);
-}
-/* New Features Page Section Styles */
-.feature-memo-generation {
-    background: var(--gradient-primary);
-}
-.feature-standards {
-    background: var(--gradient-tertiary);
-}
-.feature-human-review {
-    background: var(--gradient-secondary);
-}
-.feature-security {
-    background: var(--gradient-primary);
-}
-/* ================================
-   UTILITY CLASSES & COMPONENT SYSTEMS
-   ================================ */
-/* Unified Button System */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius-sm);
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-    cursor: pointer;
-    gap: 0.5rem;
-    font-family: inherit;
-}
-.btn--primary {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    color: var(--color-primary);
-    box-shadow: var(--shadow-hover);
-}
-.btn--primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255,255,255,0.3);
-}
-.btn--secondary {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
-    border-color: rgba(255,255,255,0.2);
-}
-.btn--secondary:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.4);
-}
-/* Grid Utilities */
-/* Background Utilities */
-/* Spacing Utilities */
-.standard-section {
-    padding: var(--space-section) 0;
-}
-/* Text Utilities */
-/* Legacy .feature-section removed - now using specific section classes with gradient backgrounds */
-.feature-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-}
-.feature-content.reverse {
-    direction: rtl;
-}
-.feature-content.reverse .feature-text,
-.feature-content.reverse .feature-visual {
-    direction: ltr;
-}
-.feature-text h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-}
-.feature-text p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-.feature-benefits {
-    list-style: none;
-    margin: 2rem 0;
-}
-.feature-benefits li {
-    color: rgba(255,255,255,0.8);
-    padding: 0.75rem 0;
-    position: relative;
-    padding-left: 2rem;
-    line-height: 1.6;
-}
-.feature-benefits li::before {
-    content: '✓';
-    color: #f2f2f2;
-    font-weight: bold;
-    position: absolute;
-    left: 0;
-}
-.feature-visual {
-    background: rgba(255,255,255,0.05);
-    padding: 2rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-}
-.demo-screenshot h4,
-.feature-visual h4 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-/* New styles for standards boxes in right column */
-.standards-grid-visual {
-    padding: 2rem;
-    background: rgba(255,255,255,0.05);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-}
-.standards-grid-visual h4 {
-    color: #ffffff;
-    text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
-}
-.standards-boxes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-}
-.standard-box {
-    background: rgba(255,255,255,0.08);
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.3s ease;
-}
-.standard-box:hover {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.25);
-    transform: translateY(-2px);
-}
-.standards-boxes .status {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 16px;
-}
-.standards-boxes .status.available {
-    background: #738596;
-    color: #f2f2f2;
-    border: 1px solid #f2f2f2;
-}
-.standard-number {
-    font-weight: 700;
-    color: #ffffff;
-    font-size: 1.1rem;
-}
-.standard-name {
-    color: rgba(255,255,255,0.8);
-    font-size: 0.9rem;
-    margin: 0.5rem 0;
-}
-.security-architecture,
-.security-layers {
+/* Service card specific styles */
+.service-card {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 2rem;
+    gap: 1.2rem;  /* More breathing room between sections */
 }
-.security-layer {
-    background: rgba(255,255,255,0.08);
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-left: 4px solid rgba(255,255,255,0.3);
-    text-align: left;
-}
-.security-layer strong {
-    color: #ffffff;
-    display: block;
+
+/* Badge at top of service card */
+.service-badge {
+    display: inline-block;
+    background: rgb(55, 84, 146);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: var(--text);
+    font-weight: 400;
+    text-align: center;
+    width: fit-content;
+    margin: 0 auto;
     margin-bottom: 0.5rem;
 }
-.feature-comparison {
-    padding: 50px 0;
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+
+/* Pricing section at bottom of card */
+.service-pricing {
+    margin-top: auto;  /* Pushes pricing to bottom */
+    padding-top: 1.5rem;
+    border-top: var(--border);
+    text-align: center;
+    display: flex;  /* NEW: Makes elements sit side-by-side */
+    align-items: baseline;  /* Aligns baseline of text */
+    justify-content: center;  /* Centers the group */
+    gap: 0.5rem;  /* Small gap between elements */
 }
-.feature-comparison h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+/* Pricing badge/box */
+.pricing-badge {
+    background: rgba(255,255,255,0.1);
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+}
+
+.pricing-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.service-pricing .pricing-amount {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    font-family: 'Playfair Display', serif;
+}
+
+.pricing-note {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Pricing link */
+.pricing-link {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
     text-align: center;
 }
-.comparison-table {
-    overflow-x: auto;
+
+.pricing-link:hover {
+    color: var(--text-muted);
+}
+
+/* Adjust list spacing in service cards */
+.service-card ul {
+    margin-top: 0;
+    line-height: 1.2;
+}
+
+.service-card ul li {
+    margin-bottom: 1rem;  /* More space between bullets */
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+
+   .feature-comparison {
+    padding: var(--space) 0;
+    background: var(--gradient);
+}
+
+.comparison-table-wrapper {
+    overflow-x: auto;  /* Allows horizontal scrolling on mobile */
     margin-top: 3rem;
 }
-.comparison-table table {
-    max-width: 1200px;
+
+.comparison-table {
     width: 100%;
-    margin: 0 auto;
     border-collapse: collapse;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border-radius: var(--radius);
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: var(--border);
 }
+
+.comparison-table thead {
+    background: rgba(255,255,255,0.12);
+}
+
 .comparison-table th {
-    background: rgba(255,255,255,0.1);
-    color: #ffffff;
+    padding: 1.25rem 1rem;
+    text-align: left;
     font-weight: 600;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text);
+    font-size: 1rem;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
 }
+
+.comparison-table th:first-child {
+    font-weight: 700;
+}
+
 .comparison-table td {
-    color: rgba(255,255,255,0.8);
+    padding: 1rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    vertical-align: top;
 }
-.comparison-table tr:last-child th,
-.comparison-table tr:last-child td {
+
+.comparison-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* ================================
-   SUBSCRIPTION PRICING GRID STYLES
-   ================================ */
-
-.pricing-section {
-    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
-    padding: 4rem 0;
+.comparison-table tbody tr:hover {
+    background: rgba(255,255,255,0.05);
+    transition: background 0.2s ease;
 }
 
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    justify-content: center;
+.comparison-table td:first-child {
+    font-weight: 500;
+    color: var(--text);
+    min-width: 180px;
 }
 
-.pricing-card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 2rem;
-    display: grid;
-    grid-template-rows: auto minmax(80px, auto) auto minmax(120px, auto) minmax(110px, auto) auto;
-    gap: 1.5rem;
-    height: 100%;
-    position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
+/* Highlight VeritasLogic.ai column */
+.comparison-table td:nth-child(2) {
+    background: rgba(255,255,255,0.03);
+    font-weight: 500;
 }
 
-.pricing-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transform: translateY(-2px);
+/* Responsive: Stack on mobile */
+@media (max-width: 768px) {
+    .comparison-table {
+        font-size: 0.9rem;
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .comparison-table td:first-child {
+        min-width: 120px;
+        font-size: 0.85rem;
+    }
 }
 
-.pricing-card.trial-card {
-    border: 2px solid #4a90e2;
+
+/* ============================================
+   STANDARDS LIST - Compact Badge/Tag Style
+   ============================================ */
+
+   .standards-list {
+    max-width: 450px;
+    margin: 2rem auto;
 }
 
-.pricing-card.team-card {
-    border: 2px solid #4a90e2;
-    box-shadow: 0 4px 12px rgba(74,144,226,0.15);
-}
-
-.pricing-card h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-    grid-row: 1;
-    text-align: center;
-}
-
-.pricing-card-description {
-    color: #6b7280;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    margin: 0;
-    grid-row: 2;
-    text-align: center;
-}
-
-.pricing-price {
-    margin: 0;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
-    grid-row: 3;
-    text-align: center;
-}
-
-.pricing-amount {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    line-height: 1;
-}
-
-.pricing-amount.trial {
-    color: #059669;
-}
-
-.pricing-period {
-    color: #6b7280;
-    font-size: 1rem;
-    margin-left: 0.25rem;
-}
-
-.pricing-word-box {
-    background: #f9fafb;
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin: 0;
+.standard-item {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    grid-row: 4;
-    text-align: center;
-}
-
-.pricing-word-box.trial {
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-}
-
-.pricing-word-box.team {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-}
-
-.pricing-word-count {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.25rem;
-}
-
-.pricing-word-details {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0;
-}
-
-.pricing-features {
-    margin: 0;
-    padding: 0;
-    grid-row: 5;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    text-align: center;
-}
-
-.pricing-features p {
-    color: #1f2937;
-    font-size: 0.9375rem;
-    margin: 0.5rem 0;
-}
-
-.pricing-features .detail {
-    color: #6b7280;
-    font-size: 0.875rem;
-    font-weight: 400;
-}
-
-.pricing-cta {
-    margin: 0;
-    padding: 0;
-    grid-row: 6;
-    align-self: end;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 1rem;
-}
-
-.pricing-cta .btn {
-    width: auto;
-    max-width: none;
-    padding: 0.85rem 1.75rem;
-    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    overflow: visible;
-    transition: all 0.2s ease;
-}
-
-.pricing-cta .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74,144,226,0.4);
-}
-
-.pricing-notice {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background: #fef3c7;
-    border-left: 3px solid #f59e0b;
-    border-radius: 6px;
-    font-size: 0.8125rem;
-    color: #92400e;
-    line-height: 1.4;
-}
-
-.pricing-explainer-bar {
-    background: rgba(255, 255, 255, 0.08);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 1.25rem 0;
-    margin-bottom: 0;
-}
-
-.pricing-explainer-bar p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
-    text-align: center;
-    margin: 0;
-    font-weight: 500;
-    padding: 0 14rem;
-}
-
-/* Included features section */
-.pricing-included {
-    max-width: 1200px;
-    margin: 4rem auto 0;
-    padding: 3rem;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-}
-
-.pricing-included h3 {
-    color: white;
-    text-align: center;
-    font-size: 1.75rem;
-    margin-bottom: 2.5rem;
-}
-
-.pricing-included-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-}
-
-.pricing-included-item {
-    display: flex;
-    align-items: start;
-    gap: 1rem;
-}
-
-.pricing-included-item .checkmark {
-    color: #27ae60;
-    font-size: 1.3rem;
-    flex-shrink: 0;
-}
-
-.pricing-included-item p {
-    color: white;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-/* Add-On Services Section */
-.addon-services {
-    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
-    padding: 4rem 0;
-}
-
-.addon-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3rem;
-    max-width: 1200px;
-    margin: 2rem auto 0;
-}
-
-.addon-card {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 2.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-}
-
-.addon-card:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.addon-card h3 {
-    color: #ffffff;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.addon-card p {
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.addon-card ul {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 2rem 0;
-}
-
-.addon-card ul li {
-    color: rgba(255, 255, 255, 0.8);
     padding: 0.75rem 0;
-    padding-left: 2rem;
-    position: relative;
-    line-height: 1.6;
+    border-bottom: var(--border);
 }
 
-.addon-card ul li::before {
-    content: '✓';
-    color: #4a90e2;
-    font-weight: bold;
-    position: absolute;
-    left: 0;
-    font-size: 1.2rem;
+.standard-item:last-child {
+    border-bottom: none;
 }
 
-.addon-price {
-    margin-top: auto;
-}
-
-.addon-price .pricing-cta {
+.standard-code {
     display: inline-block;
-    padding: 0.85rem 2rem;
-    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.addon-price .pricing-cta:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
-}
-
-/* Cost Comparison Section */
-.cost-comparison {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
-    padding: 4rem 0;
-}
-
-.cost-comparison .comparison-subtitle {
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    min-width: 80px;
     text-align: center;
-    margin: 1rem auto 3rem;
-    font-size: 1rem;
-    max-width: 800px;
+    color: var(--text);
 }
 
-.comparison-cards {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3rem;
-    max-width: 1200px;
-    margin: 0 auto;
+.standard-name {
+    color: var(--text-muted);
+    flex: 1;
 }
 
-.comparison-card {
-    background: rgba(255, 255, 255, 0.08);
-    padding: 2.5rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+/* Mobile adjustments for standards list */
+@media (max-width: 768px) {
+    .standards-list {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    
+    .standard-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .standard-code {
+        min-width: auto;
+    }
 }
+
+/* ============================================
+   HOW IT WORKS - Image Styling
+   ============================================ */
+
+.how-it-works-content {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.how-it-works-content img,
+.how-it-works-content video {
+    max-width: 900px;
+    height: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.how-it-works-content .video-container {
+    display: inline-block; /* Keeps video centered */
+}
+
+.how-it-works-content .demo-fallback {
+    margin-top: 1rem;
+    color: var(--text-muted);
+}
+
+/* ============================================
+   BUTTONS - Reusable Button Styles
+   ============================================ */
+
+/* Base button styles - applies to all buttons */
+.btn,              /* Standard button class */
+.secondary-cta {   /* Secondary call-to-action links */
+    display: inline-block;     /* Allows padding and width/height */
+    padding: 1rem 2rem;        /* 16px vertical, 32px horizontal padding */
+    border-radius: var(--radius-sm);  /* 8px rounded corners */
+    text-decoration: none;     /* No underline (for links styled as buttons) */
+    font-weight: 600;          /* Semi-bold text */
+    transition: all 0.3s ease; /* Smooth animation for all property changes */
+    border: none;              /* No border */
+    cursor: pointer;           /* Hand cursor on hover */
+}
+
+/* Primary button (main action button - white background) */
+.btn--primary {
+    background: white;         /* White background */
+    color: var(--primary);     /* Dark text */
+}
+
+/* Primary button when hovered */
+.btn--primary:hover {
+    transform: translateY(-2px);  /* Moves up 2px */
+    box-shadow: 0 6px 18px rgba(255,255,255,0.3);  /* White glow shadow */
+}
+
+/* Secondary button (outline style - transparent with border) */
+.btn--secondary,
+.secondary-cta {
+    background: transparent;   /* No background */
+    color: var(--text);        /* White text */
+    border: 1px solid var(--text);  /* White border */
+}
+
+/* Secondary button when hovered */
+.btn--secondary:hover,
+.secondary-cta:hover {
+    background: rgba(255,255,255,0.1);  /* Slight white background appears */
+}
+
+/* Container for buttons in hero and CTA sections */
+.hero-actions,   /* Buttons in hero section */
+.cta-actions {   /* Buttons in call-to-action sections */
+    display: flex;              /* Side-by-side layout */
+    gap: 2rem;                  /* 32px space between buttons */
+    justify-content: center;     /* Centers buttons */
+    flex-wrap: wrap;            /* Wraps to new line if needed */
+    margin-top: 2rem;           /* Space above buttons */
+}
+
+/* ============================================
+   COST COMPARISON - Minimal Styles
+   ============================================ */
 
 .comparison-card.highlighted {
-    background: rgba(74, 144, 226, 0.15);
-    border: 2px solid #4a90e2;
-    box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
-}
-
-.comparison-card h3 {
-    color: #ffffff;
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-    font-weight: 600;
-    text-align: center;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    border: 2px solid rgba(255,255,255,0.4);
 }
 
 .cost-breakdown {
-    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 .cost-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.cost-item:last-of-type {
-    border-bottom: none;
-}
-
-.cost-label {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-}
-
-.cost-amount {
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .cost-total {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 0 1rem;
+    padding: 1.25rem 0;
     margin-top: 1rem;
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    border-top: 2px solid rgba(255,255,255,0.2);
 }
 
-.cost-total .cost-label {
-    font-size: 1.1rem;
+.cost-label {
+    color: var(--text-muted);
+}
+
+.cost-amount {
+    color: var(--text);
     font-weight: 600;
-    color: #ffffff;
 }
 
+.cost-total .cost-label,
 .cost-total .cost-amount {
-    font-size: 1.5rem;
     font-weight: 700;
-    color: #4a90e2;
+    font-size: 1.2rem;
 }
 
 .time-estimate {
     text-align: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 0.9rem;
     margin-top: 1rem;
-}
-
-.savings-badge {
-    text-align: center;
-    padding: 1rem;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    border-radius: 8px;
-    color: white;
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-top: 1.5rem;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-/* FAQ Section Styles */
-.faq-section {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a2332 100%);
-    padding: 4rem 0;
-}
-
-.faq-section .container {
-    max-width: 900px;
-}
-
-.faq-section h2 {
-    color: white;
-    text-align: center;
-}
-
-.faq-list {
-    margin-top: 2rem;
-}
-
-.faq-item:last-child {
-    margin-bottom: 0;
-}
-
-.faq-item h4 {
-    color: white;
-    margin-bottom: 1rem;
-}
-/* Features Section (Right Column) */
-.features-section {
-    background: rgba(255,255,255,0.05);
-    padding: 1.8rem 1.8rem 0.5rem 1.8rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 2rem;
-}
-.features-section h3 {
-    color: #ffffff;
-    font-size: 1.4rem;
-    margin-bottom: 1.2rem;
-    font-weight: 600;
-    text-align: left;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-.faq-item {
-    background: rgba(255,255,255,0.05);
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-}
-.faq-item h3 {
-    color: #ffffff;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
-}
-.faq-item p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.6;
-}
-.faq-item a {
-    color: #ffffff;
-    text-decoration: underline;
-}
-.faq-item a:hover {
-    text-decoration: none;
-}
-.unified-contact-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-primary);
-}
-.contact-form {
-    background: rgba(255,255,255,0.05);
-    padding: 3rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-}
-.contact-form h3 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #ffffff;
-    margin-bottom: 2rem;
-    text-align: center;
-    font-size: 1.5rem;
-}
-/* Ensure contact form labels are visible */
-.contact-form .form-group label,
-.unified-contact-section .form-group label {
-    color: #ffffff !important;
-}
-/* Form header styling */
-.form-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.form-header h2 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #ffffff;
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-}
-.form-header p {
-    color: rgba(255,255,255,0.8);
-    font-size: 1.1rem;
-}
-/* Form links styling */
-.form-links {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     border-top: 1px solid rgba(255,255,255,0.1);
 }
-.form-links p {
-    margin: 0.75rem 0;
-    color: rgba(255,255,255,0.8);
+
+/* Standout savings badge - reusing service-badge style but more prominent */
+.savings-badge {
+    display: block;
+    background: #4CAF50;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
-.form-links a {
-    color: #ffffff;
-    text-decoration: none;
+
+/* ============================================
+   PRICING PAGE SPECIFIC STYLES
+   ============================================ */
+
+/* Container for price display */
+.pricing-price {
+    margin: 1.5rem 0;  /* 24px margin top and bottom */
+}
+
+/* The dollar amount (e.g., "$750") */
+.pricing-amount {
+    font-size: 2.5rem;   /* 40px - very large */
+    font-weight: 700;     /* Bold */
+}
+
+/* List of features in pricing card */
+.pricing-features {
+    list-style: none;     /* Removes bullet points */
+    margin: 1.5rem 0;     /* 24px margin top and bottom */
+}
+
+/* Individual feature items in the list */
+.pricing-features li {
+    padding: 0.5rem 0;        /* 8px padding top and bottom */
+    color: var(--text-muted); /* Muted white text */
+}
+
+/* Checkmark symbol (✓) */
+.checkmark {
+    color: #4CAF50;    /* Green color */
+    font-weight: bold; /* Bold checkmark */
+}
+
+/* Custom quote notice box */
+.custom-quote-box {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    border: var(--border);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.custom-quote-box p:first-child {
+    color: var(--text);
     font-weight: 500;
-    transition: color 0.3s ease;
+    margin-bottom: 0.5rem;
 }
-.form-links a:hover {
-    color: rgba(255,255,255,0.8);
+
+.custom-quote-box p:last-child {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.custom-quote-box a {
+    color: var(--text);
     text-decoration: underline;
 }
 
-.sidebar-footer .btn {
-    width: 100%; /* Make the button take the full width of the sidebar */
+
+
+/* ============================================
+   FORMS - Contact Form Styling
+   ============================================ */
+
+/* Container that wraps the entire form */
+.form-container {
+    max-width: 800px;   /* Limits form width */
+    margin: 0 auto;     /* Centers form */
+    text-align: center; /* Centers form title */
 }
-/* Cancel Button Styling */
-.btn.btn-secondary[onclick*="cancelPayment"] {
-    background-color: #6c757d;
-    color: white;
-    border: 1px solid #6c757d;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+
+/* Each form field group (label + input) */
+.form-group {
+    margin-bottom: 1.5rem;  /* 24px space below each field */
+    text-align: left;        /* Left-aligns labels and inputs */
 }
-.btn.btn-secondary[onclick*="cancelPayment"]:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+
+/* Form labels (e.g., "Full Name", "Email") */
+.form-group label {
+    display: block;          /* Makes label take full width (on its own line) */
+    margin-bottom: 0.5rem;   /* 8px space below label */
+    color: var(--text);      /* White text */
+    font-weight: 500;        /* Medium weight */
 }
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 0.55rem 1rem;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: #212F3C;
-    color: #ffffff;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+
+/* All form inputs (text, email, select dropdown, textarea) */
+.form-group input,      /* Text inputs, email inputs */
+.form-group select,     /* Dropdown menus */
+.form-group textarea { /* Multi-line text areas */
+    width: 100%;                              /* Full width of container */
+    padding: 0.85rem 1rem;                    /* 13.6px vertical, 16px horizontal padding */
+    border: 2px solid rgba(255,255,255,0.2); /* Semi-transparent white border */
+    border-radius: var(--radius-sm);          /* 8px rounded corners */
+    background: rgba(0,0,0,0.2);              /* Semi-transparent dark background */
+    color: var(--text);                       /* White text */
+    font-size: 1rem;                          /* 16px font size */
+    transition: all 0.3s ease;                /* Smooth animation */
 }
+
+/* Form inputs when focused (clicked/selected) */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    outline: none;
-    border-color: rgba(255,255,255,0.6);
-    background: rgba(255,255,255,0.9);
-    color: #2c3e50;
-}
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-    color: rgba(255,255,255,0.5);
-    opacity: 1;
-}
-.form-submit {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
-    color: #212F3C;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    width: 100%;
-    margin-top: 1rem;
-}
-.form-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(255,255,255,0.3);
-}
-.form-group.checkbox-inline {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-}
-.form-group.checkbox-inline input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-}
-.form-group.checkbox-inline label {
-    font-weight: normal;
-    margin: 0;
-    color: rgba(255,255,255,0.9);
-}
-.form-group small.form-hint {
-    display: block;
-    color: rgba(255,255,255,0.6);
-    margin-top: 5px;
-    font-size: 0.85rem;
-}
-.form-group.honeypot-field {
-    display: none;
-}
-.demo-form-section,
-.enterprise-form-section,
-.form-container {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-.form-container h2 {
-    font-size: 2.2rem;
-    color: #ffffff;
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-.form-container p {
-    color: rgba(255,255,255,0.8);
-    line-height: 1.7;
-    margin-bottom: 3rem;
-    font-size: 1.1rem;
+    outline: none;                            /* Removes browser default outline */
+    border-color: rgba(255,255,255,0.6);     /* Brighter border */
+    background: white;                        /* White background */
+    color: var(--primary);                    /* Dark text (for contrast) */
 }
 
-/* ================================
-   15. CTA SECTIONS
-   ================================ */
-.cta-section {
-    padding: var(--space-section) 0;
-    background: var(--gradient-secondary);
-    text-align: center;
+/* Submit button */
+.form-submit {
+    width: 100%;              /* Full width */
+    padding: 1rem;            /* 16px padding all around */
+    background: white;        /* White background */
+    color: var(--primary);    /* Dark text */
+    border: none;            /* No border */
+    border-radius: var(--radius-sm);  /* 8px rounded corners */
+    font-size: 1.1rem;       /* 17.6px - slightly larger */
+    font-weight: 600;        /* Semi-bold */
+    cursor: pointer;          /* Hand cursor */
+    transition: transform 0.2s ease;  /* Smooth animation */
 }
-.cta-content {
-    max-width: 700px;
-    margin: 0 auto;
+
+/* Submit button when hovered */
+.form-submit:hover {
+    transform: translateY(-2px);  /* Moves up 2px */
 }
-.cta-content h2 {
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin-bottom: 1rem;
+
+/* Success message (shown after form submission) */
+.form-success {
+    margin-top: 1.5rem;      /* 24px space above */
+    padding: 1rem;           /* 16px padding */
+    background: rgba(45, 90, 65, 0.15);  /* Semi-transparent green background */
+    border: 1px solid rgba(45, 90, 65, 0.4);  /* Green border */
+    border-radius: var(--radius-sm);     /* 8px rounded corners */
+    color: #4CAF50;          /* Green text */
+    display: none;            /* Hidden by default (shown via JavaScript) */
 }
-.cta-content p {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 2rem;
-}
-.cta-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-.cta-note {
-    color: rgba(255,255,255,0.6);
-    font-size: 1rem;
-    margin-top: 2rem;
-}
-/* Footer */
+
+/* ============================================
+   FOOTER - Bottom of Page
+   ============================================ */
+
+/* Main footer container */
 .footer {
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
-    color: white;
-    padding: 4rem 0 2rem 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    background: var(--gradient);
+    padding: 4rem 0 2rem;
+    border-top: var(--border);
 }
+/* Grid container for footer sections */
 .footer-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 3rem;
-    margin-bottom: 2rem;
-}
-.footer-section h4 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    color: #ffffff;
-    font-size: 1.2rem;
-}
-.footer-section p {
-    color: rgba(255,255,255,0.7);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-}
-.footer-section a {
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    display: block;
-    margin-bottom: 0.75rem;
-    transition: color 0.3s ease;
-    line-height: 1.5;
-}
-.footer-section a:hover {
-    color: #ffffff;
-}
-.footer-trust-badges {
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: 2rem 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     gap: 1rem;
+    margin-bottom: 2rem;
+    max-width: 1200px;  /* Add this */
+    margin-left: auto;   /* Add this */
+    margin-right: auto;  /* Add this */
+    padding: 0 2rem;    /* Add this if container padding isn't enough */
 }
-.footer-trust-badges-label {
-    color: rgba(255,255,255,0.5);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+
+/* Headings in footer sections (e.g., "Services", "Company") */
+.footer-section h4 {
+    font-weight: 600;      /* Semi-bold */
+    margin-bottom: 1.5rem; /* 24px space below */
+    font-size: 1.2rem;     /* 19.2px */
 }
+
+/* Links in footer */
+.footer-section a {
+    display: block;           /* Each link on its own line */
+    color: var(--text-muted); /* Muted white */
+    text-decoration: none;   /* No underline */
+    margin-bottom: 0.75rem;  /* 12px space below each link */
+    transition: color 0.3s ease;  /* Smooth color change */
+}
+
+/* Footer links when hovered */
+.footer-section a:hover {
+    color: var(--text);  /* Full white color */
+}
+
+/* Container for trust badges (Stripe, AppSource) */
+.footer-trust-badges {
+    text-align: center;   /* Centers badges */
+    margin: 2rem 0;       /* 32px margin top and bottom */
+}
+
+/* Icons container inside trust badges */
 .footer-trust-badges-icons {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2.5rem;
-    flex-wrap: wrap;
+    display: flex;              /* Side-by-side layout */
+    justify-content: center;    /* Centers icons */
+    gap: 2rem;                  /* 32px space between icons */
+    align-items: center;        /* Vertically centers */
+    flex-wrap: wrap;            /* Wraps to new line if needed */
 }
+
+/* Size and style the badge images */
+.footer-trust-badges-icons img {
+    max-width: 150px;  /* Limits image width to 150px */
+    height: auto;      /* Maintains aspect ratio */
+    display: block;    /* Removes any inline spacing */
+}
+
+/* Style for Stripe badge container (if it needs special handling) */
 .footer-trust-badges-icons a {
     display: flex;
     align-items: center;
-    opacity: 0.85;
-    transition: opacity 0.3s ease;
-}
-.footer-trust-badges-icons a:hover {
-    opacity: 1;
-}
-.footer-trust-badges-icons img {
-    height: 70px;
-    width: auto;
-}
-.footer-trust-badges-icons .stripe-badge {
-    height: 28px;
-}
-.footer-trust-badges-icons .stripe-text {
-    color: rgba(255,255,255,0.7);
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-}
-.footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding-top: 2rem;
-    text-align: center;
-    color: rgba(255,255,255,0.6);
-}
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .feature-content,
-    .about-content,
-    .feature-content.reverse {
-        direction: ltr;
-    }
-    .blog-layout {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
+    gap: 0.5rem;
+    text-decoration: none;
 }
 
-@media (max-width: 480px) {
+/* Style for Stripe text next to badge */
+.stripe-text {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* Footer bottom (copyright text) */
+.footer-bottom {
+    text-align: center;      /* Centers text */
+    padding-top: 2rem;      /* 32px space above */
+    border-top: var(--border);  /* Subtle border at top */
+    color: var(--text-muted);   /* Muted white text */
+}
+
+/* ============================================
+   CONTACT FORM - Contact Form Styling
+   ============================================ */
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-inline input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0;
+    width: auto !important;  /* Override the 100% width */
+    padding: 0;  /* Remove padding for checkbox */
+}
+
+.checkbox-inline label {
+    margin: 0 !important;  /* Override the margin-bottom */
+    display: inline !important;  /* Override display: block */
+    cursor: pointer;
+    font-weight: 500;  /* Keep the font weight */
+}
+
+.honeypot-field {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+}
+/* ============================================
+   PAGE-SPECIFIC STYLES (Minimal)
+   ============================================ */
+
+/* Two-column layouts (used on About, Features pages) */
+.feature-content { /* Feature descriptions */
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Two equal columns */
+    gap: 3rem;      /* 48px space between columns */
+    align-items: center;  /* Vertically centers content */
+}
+
+/* Timeline component (used on home page) */
+.timeline {
+    display: flex;          /* Vertical stack */
+    flex-direction: column; /* Items stack top to bottom */
+    gap: 2rem;             /* 32px space between items */
+}
+
+/* FAQ (Frequently Asked Questions) list */
+.faq-list {
+    max-width: 800px;  /* Limits width for readability */
+    margin: 0 auto;    /* Centers the list */
+}
+
+/* Individual FAQ item */
+.faq-item {
+    margin-bottom: 2rem;      /* 32px space below each question */
+    padding-bottom: 2rem;     /* 32px padding at bottom */
+    border-bottom: var(--border);  /* Subtle border between items */
+}
+
+/* Question heading in FAQ */
+.faq-item h4 {
+    margin-bottom: 0.5rem;  /* 8px space below question */
+}
+
+/* Answer paragraph in FAQ */
+.faq-item p {
+    color: var(--text-muted);  /* Muted white text */
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - Mobile Styles
+   ============================================
+   These styles only apply when screen width is 768px or less.
+   This makes the site look good on phones and tablets.
+   ============================================ */
+@media (max-width: 768px) {
+    /* Show the mobile menu button */
+    .mobile-menu-btn {
+        display: block;  /* Makes hamburger icon visible */
+    }
+    
+    /* Hide navigation links by default on mobile */
+    .nav-links {
+        display: none;           /* Hidden by default */
+        position: absolute;      /* Positioned absolutely (overlays content) */
+        top: 70px;               /* 70px from top (below navbar) */
+        left: 0;                 /* Starts at left edge */
+        right: 0;                /* Extends to right edge */
+        background: var(--secondary);  /* Dark background */
+        flex-direction: column;  /* Stacks links vertically */
+        padding: 1rem 0;        /* 16px padding top and bottom */
+    }
+    
+    /* Show navigation when mobile menu is opened (via JavaScript) */
+    .nav-links.mobile-open {
+        display: flex;  /* Shows the links */
+    }
+    
+    /* Reduce section padding on mobile */
+    section {
+        padding: 60px 0;  /* 60px instead of 100px (smaller screens need less space) */
+    }
+    
+    /* Reduce hero/page header padding on mobile */
+    .hero,
+    .page-header {
+        padding: 120px 0 60px;  /* Less top padding, same bottom */
+    }
+    
+    /* Smaller headings on mobile */
     .hero h1,
     .page-header h1 {
-        font-size: 2.4rem;
-        line-height: 1.2;
+        font-size: 2rem;  /* 32px instead of 48px */
     }
-    .section-header h2 {
-        font-size: 2rem;
+    
+    /* Stack two-column layouts vertically on mobile */
+    .story-content,
+    .feature-content {
+        grid-template-columns: 1fr;  /* Single column instead of two */
     }
-    .founder-story h2,
-    .cta-content h2,
-    .feature-content h2,
-    .feature-comparison h2,
-    .trial-info h2,
-    .story-content h2,
-    .values-section h2,
-    .form-container h2 {
-        font-size: 2rem;
+    
+    /* Stack grid items vertically on mobile */
+    .pricing-grid,
+    .grid-two-col {
+        grid-template-columns: 1fr;  /* Single column */
     }
-}
-/* Utility Classes */
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
+    
+    /* Stack buttons vertically on mobile */
+    .hero-actions,
+    .cta-actions {
+        flex-direction: column;  /* Vertical stack */
+        align-items: stretch;    /* Buttons take full width */
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+    
+    /* Make buttons full width on mobile */
+    .btn {
+        width: 100%;        /* Full width */
+        text-align: center; /* Centers text */
     }
 }
-/* Smooth scrolling for the whole page */
-html {
-    scroll-behavior: smooth;
-}
-.business-notice {
-    background: #e3f2fd;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-    border-left: 4px solid #4086bf;
-    color: #2c3e50;
-    font-size: 14px;
-}
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #ffffff;
-    font-weight: 500;
-}
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
-    color: #2c3e50;
-    background: white;
-}
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: #2196f3;
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-}
-.form-group input::placeholder {
-    color: #999999;
-}
-
-/* Contact form placeholder fix - targeting all contact inputs specifically */
-#contact-role::placeholder,
-#contact-timezone::placeholder,
-.contact-form input::placeholder,
-.contact-form textarea::placeholder {
-    color: #6B7280 !important;
-    opacity: 1 !important;
-}
-
-/* Vendor prefixes for broader browser support */
-#contact-role::-webkit-input-placeholder,
-#contact-timezone::-webkit-input-placeholder,
-.contact-form input::-webkit-input-placeholder,
-.contact-form textarea::-webkit-input-placeholder {
-    color: #6B7280 !important;
-    opacity: 1 !important;
-}
-
-#contact-role:-ms-input-placeholder,
-#contact-timezone:-ms-input-placeholder,
-.contact-form input:-ms-input-placeholder,
-.contact-form textarea:-ms-input-placeholder {
-    color: #6B7280 !important;
-    opacity: 1 !important;
-}
-.form-group small {
-    color: rgba(255,255,255,0.8);
-    font-size: 12px;
-    margin-top: 5px;
-    display: block;
-}
-.terms-group {
-    margin: 25px 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #4086bf;
-}
-.terms-group label {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 14px;
-    line-height: 1.5;
-    cursor: pointer;
-    color: #2c3e50;
-}
-.terms-group input[type="checkbox"] {
-    width: auto;
-    margin-top: 2px;
-}
-.auth-links p {
-    color: #666;
-    margin: 8px 0;
-}
-#card-element {
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-    margin: 15px 0;
-    transition: border-color 0.3s ease;
-}
-#card-element:focus-within {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-#card-errors {
-    color: #e53e3e;
-    margin: 10px 0;
-    font-size: 0.9rem;
-}
-.dashboard-header {
-    /* We removed background, padding, border-radius, and box-shadow */
-    /* All that's left is spacing for below the header */
-    margin-bottom: 1rem;
-    padding-left: 2rem;
-}
-
-.welcome-section h1 {
-    /* Change the text color to white */
-    color: #ffffff;
-    font-size: 2.2rem;
-    margin-bottom: 0.5rem; /* Add a little space above the sub-text */
-}
-
-.welcome-section p {
-    /* Change the text color to a semi-transparent white for a softer look */
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-    font-size: 1.1rem;
-}
-.card h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.free-analyses .number {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #2d5a41;
-    margin-bottom: 5px;
-}
-.credits-display .number {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-.usage-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-.stat-item {
-    text-align: center;
-    padding: 15px;
-    background: #212f3c;
-    border-radius: 8px;
-}
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 5px;
-}
-.stat-label {
-    color: #9f9d9d;
-    font-size: 0.9rem;
-}
-
-/* Subscription Card Styling - Dashboard Overview */
-.subscription-display {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 0;
-}
-
-.subscription-plan {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    text-align: center;
-}
-
-.plan-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.plan-status {
-    display: inline-block;
-    padding: 6px 16px;
-    border-radius: 16px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.plan-status.trial {
-    background: #e3f2fd;
-    color: #1976d2;
-}
-
-.plan-status.active {
-    background: #e8f5e9;
-    color: #388e3c;
-}
-
-.plan-status.past-due {
-    background: #ffebee;
-    color: #c62828;
-}
-
-.plan-status.cancelling {
-    background: #fff3e0;
-    color: #e65100;
-}
-
-.plan-status.cancelled {
-    background: #fce4ec;
-    color: #c62828;
-}
-
-.plan-status.expired {
-    background: #ffebee;
-    color: #b71c1c;
-}
-
-.plan-status.inactive {
-    background: #f5f5f5;
-    color: #9e9e9e;
-}
-
-.word-allowance {
-    margin: 0;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 12px;
-    text-align: center;
-}
-
-.words-remaining {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-
-.words-remaining .number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2d5a41;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.words-total {
-    font-size: 0.95rem;
-    color: #666;
-    margin: 0;
-}
-
-.renewal-info {
-    font-size: 0.9rem;
-    color: #b0b0b0;
-    margin: 0;
-    text-align: center;
-}
-
-.recent-analyses .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
-}
-.recent-analyses .empty-state div {
-    font-size: 3rem;
-    margin-bottom: 15px;
-}
-.empty-state .btn {
-    margin-top: 15px;
-}
-.profile-field:last-child {
-    border-bottom: none;
-}
-
-/* --- Dashboard Inline Login Form (Unified Dark Theme) --- */
-.login-form-container {
-    /* This is the key fix for centering */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: calc(100vh - 120px); /* Fill the vertical space */
-    padding: 2rem;
-}
-
-.login-form {
-    /* Style the form itself to match the dark theme */
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 2.5rem;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-}
-
-.login-form h2 {
-    color: #ffffff;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-}
-
-.login-form p {
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 2rem;
-}
-
-/* Use the standard .form-group styles for consistency */
-.login-form .form-group {
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
-
-.login-form .form-group label {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* Use the standard dark input styles */
-.login-form .form-group input {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #ffffff;
-    width: 100%;
-    padding: 0.85rem 1rem;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.login-form .form-group input:focus {
-    background: #ffffff;
-    color: #2c3e50;
-    border-color: rgba(255,255,255,0.6);
-}
-
-/* Use the standard .form-submit class for the button */
-.login-form .form-submit {
-    width: 100%;
-}
-
-.login-links {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.login-links p {
-    margin: 0.5rem 0;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.login-links a {
-    color: #ffffff;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-}
-.network-error .btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    display: inline-block;
-    background: #667eea;
-    color: white;
-}
-.network-error .btn:hover {
-    background: #5a67d8;
-}
-.action-buttons .btn:hover {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    transform: translateY(-1px);
-}
-.action-buttons a.btn {
-    color: #333333;
-}
-.auth-form .form-group {
-    margin-bottom: 20px;
-}
-.auth-form .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #2c3e50;
-    font-weight: 500;
-}
-.auth-form .form-group input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
-}
-.auth-form .form-group input:focus {
-    outline: none;
-    border-color: #667eea;
-}
-/* Password Feedback */
-.password-feedback {
-    margin-top: 8px;
-    font-size: 14px;
-    min-height: 20px;
-}
-.password-feedback.valid {
-    color: #28a745;
-    font-weight: 500;
-}
-.password-feedback.invalid {
-    color: #dc3545;
-    font-weight: 500;
-}
-.auth-links {
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #e1e8ed;
-}
-.auth-links a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 500;
-}
-.auth-links a:hover {
-    text-decoration: underline;
-}
-.auth-form 
-.auth-form 
-.loading {
-    opacity: 0.7;
-    poPoppins-events: none;
-}
-.verify-card .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    margin: 0 10px 10px 0;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-}
-.verify-card .btn-primary {
-    background: #667eea;
-    color: white;
-}
-.verify-card .btn-primary:hover {
-    background: #5a67d8;
-}
-.verify-card .btn-secondary {
-    background: transparent;
-    color: #667eea;
-    border: 2px solid #667eea;
-}
-.verify-card .btn-secondary:hover {
-    background: #667eea;
-    color: white;
-}
-/* Navigation Auth Buttons */
-.nav-auth-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-/* Focus styles for accessibility */
-button:focus,
-input:focus,
-textarea:focus,
-select:focus,
-a:focus {
-    outline: 2px solid rgba(255,255,255,0.5);
-    outline-offset: 2px;
-}
-/* Print styles */
-@media print {
-    .navbar,
-    .footer,
-    .cta-section {
-        display: none;
-    }
-    body {
-        background: white;
-        color: black;
-    }
-    .container {
-        max-width: none;
-        padding: 0;
-    }
-}.nav-user-greeting { color: rgba(255,255,255,0.9); font-weight: 500; margin: 0 1rem; }
-/* Dashboard Sidebar Layout */
-.dashboard-container {
-    display: flex;
-    min-height: calc(100vh - 100px);
-    background: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
-}
-.dashboard-sidebar {
-    width: 280px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 100px);
-    position: fixed;
-    left: 0;
-    top: 100px;
-    z-index: 10;
-}
-.dashboard-main {
-    flex: 1;
-    margin-left: 280px;
-    padding: 0;
-    background: transparent;
-}
-.sidebar-header {
-    padding: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-.sidebar-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: #ffffff;
-    margin: 0;
-    font-weight: 700;
-}
-.sidebar-nav {
-    flex: 1;
-    padding: 1rem 0;
-}
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 2rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    gap: 0.5rem;
-}
-.nav-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border-left-color: rgba(255, 255, 255, 0.5);
-}
-.nav-item.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
-    border-left-color: #ffffff;
-}
-.nav-icon {
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-}
-.nav-text {
-    font-size: 0.95rem;
-}
-.sidebar-footer {
-    padding: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-/* Dashboard Sections */
-.dashboard-section {
-    display: none;
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-.dashboard-section.active {
-    display: block;
-}
-.section-header {
-    margin-bottom: 2rem;
-}
-.dashboard-section .section-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin: 0 0 0.5rem 0;
-    font-weight: 700;
-}
-/* Dashboard Grid Updates */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-.profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-}
-/* Enhanced Card Styling */
-.card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-.balance-card, .stats-card, .actions-card {
-    text-align: center;
-}
-.balance-card h2, .stats-card h2, .actions-card h2,
-.credit-purchase-card h3, .credit-purchase-card h2, .profile-info-card h3, .password-card h3 {
-    font-family: 'Playfair Display', serif;
-    color: #ffffff;
-    margin-bottom: 1.5rem;
-    font-weight: 700;
-}
-
-/* --- Dashboard Card Button Layout --- */
-.balance-card .btn {
-    width: 100%;
-    margin-top: 1.5rem;
-}
-.amount-input-group .btn {
-    margin: 0;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-}
-/* Profile Fields */
-.profile-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-.profile-field {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-.field-label {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 500;
-}
-.field-value {
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* Role Badge */
-.role-badge {
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-.role-badge.owner {
-    background: linear-gradient(135deg, #2d5a41, #3a7050);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.role-badge.member {
-    background: rgba(100, 100, 100, 0.3);
-    color: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-/* Analysis Type Badges */
-.badge-analysis {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    margin-left: 0.5rem;
-    background: linear-gradient(135deg, #2d5a41, #3a7050);
-    color: #fff;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    vertical-align: middle;
-}
-
-.badge-review {
-    display: inline-block;
-    padding: 0.2rem 0.5rem;
-    margin-left: 0.5rem;
-    background: linear-gradient(135deg, #5a4a2d, #705a38);
-    color: #fff;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    vertical-align: middle;
-}
-
-/* Organization Usage Message */
-.org-usage-message {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    background: rgba(45, 90, 65, 0.1);
-    border: 1px solid rgba(45, 90, 65, 0.3);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-/* --- Profile Page Redesign --- */
-
-/* 1. Style the new main title and intro paragraph */
-.profile-main-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #ffffff;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-
-    text-align: center; /* CHANGE THIS to center */
-}
-
-.profile-intro {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-    line-height: 1.7;
-    max-width: 600px; /* Add a max-width for readability */
-
-    /* Center the block itself and add space below */
-    margin: 0 auto 2.5rem auto; 
-
-    text-align: center; /* CHANGE THIS to center */
-}
-
-/* 2. Style the card subheadings ("Account Information", "Change Password") */
-.profile-info-card h3,
-.password-card h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin-top: 0;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* --- History Page Redesign --- */
-
-.history-main-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #ffffff;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    text-align: center; 
-}
-
-.history-intro {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-    line-height: 1.7;
-    max-width: 600px;
-    margin: 0 auto 2.5rem auto; 
-    text-align: center;
-}
-/* --- Subscription Management Page Styling --- */
-
-/* Upgrade Plan Cards Container */
-.subscription-plans {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-/* Individual Plan Option Cards */
-.plan-option {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-}
-
-.plan-option:hover {
-    border-color: rgba(74, 144, 226, 0.5);
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* Most Popular Badge */
-.plan-option.popular {
-    border-color: #4a90e2;
-    background: rgba(74, 144, 226, 0.1);
-}
-
-.popular-badge {
-    position: absolute;
-    top: -12px;
-    right: 20px;
-    background: linear-gradient(135deg, #4a90e2, #357abd);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Plan Option Header */
-.plan-option-header {
-    text-align: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.plan-option-header h4 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 0.5rem 0;
-}
-
-.plan-option-price {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #4a90e2;
-    margin: 0;
-}
-
-.plan-option-price span {
-    font-size: 1rem;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Plan Features List */
-.plan-option-features {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 1.5rem 0;
-    flex-grow: 1;
-}
-
-.plan-option-features li {
-    padding: 0.5rem 0;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    display: flex;
-    align-items: center;
-}
-
-.plan-option-features li:before {
-    content: "✓";
-    color: #4a90e2;
-    font-weight: bold;
-    margin-right: 0.5rem;
-    font-size: 1.1rem;
-}
-
-/* Upgrade Buttons Inside Plan Cards */
-.plan-option .btn {
-    width: 100%;
-    margin-top: auto;
-}
-
-/* Billing Management Section */
-.billing-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.billing-actions .btn {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.billing-actions .btn .nav-icon {
-    font-size: 1.25rem;
-}
-
-.billing-actions .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.billing-actions .btn-tertiary {
-    background: rgba(255, 0, 0, 0.1);
-    border: 2px solid rgba(255, 0, 0, 0.3);
-    color: #ff6b6b;
-}
-
-.billing-actions .btn-tertiary:hover {
-    background: rgba(255, 0, 0, 0.2);
-    border-color: rgba(255, 0, 0, 0.5);
-    transform: translateY(-2px);
-}
-
-/* Enhanced Button Styling for Dashboard */
-.dashboard-section .btn {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-}
-
-.dashboard-section .btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Invoice Modal Styling */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    padding: 20px;
-}
-
-.modal-content {
-    background: linear-gradient(135deg, #1e2936 0%, #2c3e50 100%);
-    border-radius: 16px;
-    max-width: 900px;
-    width: 100%;
-    max-height: 90vh;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.modal-header h3 {
-    color: #ffffff;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 2rem;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-    color: #ffffff;
-    transform: scale(1.1);
-}
-
-.modal-body {
-    padding: 2rem;
-    overflow-y: auto;
-    max-height: calc(90vh - 100px);
-}
-
-/* Invoice Table */
-.invoice-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.invoice-table thead {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.invoice-table th {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-    padding: 1rem;
-    text-align: left;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.invoice-table td {
-    color: rgba(255, 255, 255, 0.8);
-    padding: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.invoice-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.invoice-status {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: capitalize;
-}
-
-.invoice-status.paid {
-    background: #e8f5e9;
-    color: #388e3c;
-}
-
-.invoice-status.open {
-    background: #fff3e0;
-    color: #f57c00;
-}
-
-.invoice-status.draft {
-    background: #f5f5f5;
-    color: #616161;
-}
-
-.invoice-status.void {
-    background: #ffebee;
-    color: #c62828;
-}
-
-.btn-small {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    background: rgba(74, 144, 226, 0.2);
-    border: 1px solid rgba(74, 144, 226, 0.4);
-    color: #4a90e2;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    display: inline-block;
-}
-
-.btn-small:hover {
-    background: rgba(74, 144, 226, 0.3);
-    border-color: rgba(74, 144, 226, 0.6);
-}
-
-/* History Card */
-.history-card {
-    min-height: 400px;
-}
-.recent-analyses {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-/* Analysis History Table */
-.analysis-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.analysis-table thead {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.analysis-table th {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 600;
-    padding: 1rem 1.25rem;
-    text-align: left;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-}
-
-.analysis-table td {
-    color: rgba(255, 255, 255, 0.8);
-    padding: 1rem 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    white-space: nowrap;
-}
-
-.analysis-table tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-.analysis-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.analysis-table .btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    color: #ffffff;
-}
-
-/* Empty State Styling */
-.empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-.empty-state div {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-.empty-state p {
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-/* Review Process Timeline */
-.timeline {
-  position: relative;
-  margin: 1.5rem auto 0;
-  padding-left: 2rem;
-  max-width: 720px;
-}
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 1rem;
-  top: 0.25rem;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08));
-}
-.timeline-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 1rem;
-  padding: 0.75rem 0 1.25rem;
-}
-.timeline-marker {
-  width: 2rem; height: 2rem; border-radius: 50%;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.35);
-  color: #fff; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 0 8px rgba(255,255,255,0.15);
-  z-index: 1;
-}
-.timeline-content {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: var(--border-radius);
-  padding: 1rem 1.25rem;
-  backdrop-filter: blur(10px);
-}
-.timeline-content h4 { margin: 0 0 0.25rem; color: #fff; font-size: 1.05rem; }
-.timeline-content p { margin: 0; color: var(--color-text-muted); font-size: 0.95rem; }
-
-/* --- Password Helper Tooltip Styles --- */
-.password-wrapper {
-    position: relative; /* This is essential for positioning the icon */
-}
-
-.password-helper {
-    position: absolute;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%);
-}
-
-.password-helper-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    color: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.password-tooltip {
-    display: none; /* Hidden by default */
-    position: absolute;
-    bottom: 120%; /* Position above the icon */
-    right: -10px;
-    width: 280px;
-    background: #333;
-    color: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    z-index: 10;
-}
 
-/* Show the tooltip on hover */
-.password-helper:hover .password-tooltip {
-    display: block;
-}
+/* ============================================
+   LEGAL PAGES (Terms, Privacy)
+   ============================================ */
 
-.password-tooltip ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
+   main {
+    padding: var(--space) 0;
+    min-height: calc(100vh - 200px); /* Ensures content doesn't get cut off */
 }
-
-/* ==========================================================================
-   10. LEGAL & POLICY PAGE FORMATTING (Privacy, Terms, etc.)
-   ========================================================================== */
 
-/* This container class now styles both privacy.html and terms.html */
 .legal-content-container {
     max-width: 900px;
-    margin: 60px auto;
-    padding: 20px;
-    color: rgba(255, 255, 255, 0.85);
+    margin: 0 auto;
+    padding: 2rem 0;
 }
 
-/* Style the main page title */
 .legal-content-container h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    margin-top: 3rem;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+    text-align: left;
 }
 
-/* Style the "Last updated" text */
-.legal-content-container p em {
-    display: block;
-    margin-bottom: 3rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Style the main section headings (h2) for clear separation */
 .legal-content-container h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #ffffff;
-    padding-top: 2rem;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-/* Style the subheadings (h3) */
-.legal-content-container h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #ffffff;
+    font-size: 1.75rem;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
+    color: var(--text);
+    text-align: left;
 }
 
-/* Improve readability of all paragraphs */
 .legal-content-container p {
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
 }
 
-/* Style all lists for clarity and spacing */
 .legal-content-container ul {
     list-style: disc;
-    padding-left: 25px;
+    margin-left: 1.5rem;
     margin-bottom: 1.5rem;
+    color: var(--text-muted);
 }
 
 .legal-content-container li {
-    line-height: 1.8;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
     padding-left: 0.5rem;
 }
 
-/* Style links within the content to be clear */
 .legal-content-container a {
-    color: #ffffff;
+    color: var(--text);
     text-decoration: underline;
-    text-underline-offset: 4px;
-    transition: color 0.2s ease-in-out;
 }
 
 .legal-content-container a:hover {
-    color: #a7c5ff;
+    color: var(--text-muted);
 }
 
-/* --- Email Verification Page Styles --- */
-.verification-status {
-    text-align: center;
-    padding: 2rem 0;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.loading-spinner {
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    border-top: 4px solid #ffffff; /* White spinner to match theme */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* On-brand message styles */
-.success-message, .error-message, .info-message {
-    padding: 1.25rem;
-    border-radius: 8px;
-    margin: 1rem 0;
-    font-weight: 500;
-    border: 1px solid transparent;
-}
-/* ================================
-   Dashboard Styles
-   ================================ */
-
-/* Verification Section Styles */
-.verification-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-    padding: 2rem;
-}
-
-.verification-card {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-    border-radius: 16px;
-    padding: 3rem;
-    max-width: 600px;
-    width: 100%;
-    color: white;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.verification-header h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.75rem;
-    font-weight: 700;
-}
-
-.verification-header p {
-    margin: 0 0 2rem 0;
-    opacity: 0.9;
-    font-size: 1.1rem;
-}
-
-.email-display {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    text-align: center;
-}
-
-.email-label {
-    display: block;
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 0.5rem;
-}
-
-.email-address {
-    font-size: 1.2rem;
+.legal-content-container strong {
+    color: var(--text);
     font-weight: 600;
-    color: #fbbf24;
 }
 
-.verification-instructions {
-    margin: 2rem 0;
+.legal-content-container em {
+    color: var(--text-muted);
+    font-style: italic;
 }
 
-.verification-instructions h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1.25rem;
-}
-
-.verification-instructions ol {
-    padding-left: 1.5rem;
-}
-
-.verification-instructions li {
-    margin: 0.75rem 0;
-    line-height: 1.6;
-}
-
-.verification-actions {
-    display: flex;
-    gap: 1rem;
-    margin: 2rem 0;
-    flex-wrap: wrap;
-}
-
-.verification-actions .btn {
-    flex: 1;
-    min-width: 200px;
-    justify-content: center;
-}
-
-.verification-help {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-top: 2rem;
-}
-
-.verification-help h4 {
-    margin: 0 0 1rem 0;
-    font-size: 1.1rem;
-}
-
-.verification-help ul {
-    padding-left: 1.5rem;
-    margin: 0;
-}
-
-.verification-help li {
-    margin: 0.5rem 0;
-    line-height: 1.5;
-}
-
-.verification-message {
-    margin: 1rem 0;
-    min-height: 1.5rem;
-}
-
-.success-message {
-    background-color: #10b981;
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.error-message {
-    background-color: #ef4444;
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-/* Platform Status Styles */
-.platform-status-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-
-}
-
-.platform-status {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-.platform-status-card h2 {
-    color: #ffffff;
-}
-
-.status-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
-}
-
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.status-dot.online {
-    background: #4ade80;
-    animation: pulse 2s infinite;
-}
-
-.status-dot.checking {
-    background: #fbbf24;
-    animation: pulse 1s infinite;
-}
-
-.status-dot.offline {
-    background: #ef4444;
-    animation: none;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.status-label {
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.status-value {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.platform-actions {
-    margin-top: 1.5rem;
-}
-/* --- Support Card Styles --- */
-
-.support-card {
-    /* This horizontally centers the text content inside the card */
-    text-align: left;
-}
-
-.support-card h2 {
-    /* This fixes the vertical alignment and color of the header */
-    display: flex;
-    align-items: left;
-    justify-content: left; /* Centers the icon and text as a group */
-    gap: 0.75rem; /* Space between icon and text */
-    color: #ffffff; /* Ensures the header text is white */
-}
-
-.support-content {
-    /* Adds some space below the header */
-    margin-top: 1rem;
-}
-
-.support-content p {
-    /* Styles the main paragraph text */
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.7;
-    margin: 0;
-}
-
-.support-content a {
-    /* Styles the email link to be prominent and clear */
-    color: #ffffff;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    transition: color 0.2s ease;
-}
-
-.support-content a:hover {
-    /* Adds a subtle hover effect to the link */
-    color: #a7c5ff;
-}
-
-.action-buttons .btn {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-    border-radius: 8px;
-}
-
-/* Enhanced Navigation Bar */
-.platform-nav-item {
-    position: relative;
-}
-
-.platform-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.platform-nav-link:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-1px);
-}
-
-.platform-nav-link.platform-unavailable {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.platform-nav-link.platform-unavailable:hover {
-    transform: none;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    flex-shrink: 0;
-}
-
-.nav-status-dot.online {
-    background: #4ade80;
-    animation: nav-pulse 2s infinite;
-}
-
-.nav-status-dot.checking {
-    background: #fbbf24;
-    animation: nav-pulse 1s infinite;
-}
-
-.nav-status-dot.offline {
-    background: #ef4444;
-    animation: none;
-}
-
-@keyframes nav-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-
-.nav-platform-text {
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.nav-platform-status {
-    font-size: 0.75rem;
-    opacity: 0.8;
-    white-space: nowrap;
-    color: #fbbf24;
-}
-
-/* Navigation enhancement for platform connectivity */
-.navbar .nav-links li:has(.platform-nav-link) {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 0.2rem;
-}
-
-/* ================================
-   Utility Classes
-   ================================ */
-
-.pt-fixed-nav {
-    padding-top: 100px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.mt-md {
-    margin-top: 15px;
-}
-
-/* ========================================
-   Research Assistant Mockup Styles
-   ======================================== */
-
-.assistant-mockup {
-    /* Remove outer box - just container for spacing */
-    padding: 0;
-}
-
-.assistant-mockup h4 {
-    color: #ffffff;
-    margin-bottom: 1.25rem;
-    font-size: 1.1rem;
-    text-align: center;
-}
-
-/* Standard selector section */
-.mockup-selector {
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mockup-selector label {
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.mockup-dropdown {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
-    padding: 0.65rem 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.9rem;
-}
-
-/* Question input section */
-.mockup-question {
-    margin-bottom: 1.25rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mockup-question label {
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.mockup-textarea {
-    background: rgba(255, 255, 255, 0.05);
-    color: #ffffff;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    margin-bottom: 0.75rem;
-    min-height: 60px;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.mockup-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.mockup-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-/* Conversation section */
-.mockup-conversation {
-    margin-top: 0.5rem;
-}
-
-.mockup-conversation-header {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.mockup-response {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.mockup-response p {
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
-}
-
-.mockup-citation {
-    color: rgba(102, 126, 234, 0.9) !important;
-    font-size: 0.85rem !important;
-    font-weight: 500;
-    padding: 0.25rem 0;
-    margin-bottom: 0.75rem !important;
-}
-
-.mockup-suggestions {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mockup-suggestions strong {
-    color: rgba(255, 255, 255, 0.9);
-    display: block;
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
-}
-
-.mockup-suggestion-buttons {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-}
-
-.mockup-suggestion-buttons button {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.9rem;
-    text-align: left;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    font-family: inherit;
-}
-
-.mockup-suggestion-buttons button:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(102, 126, 234, 0.5);
-    transform: translateX(4px);
-}
-
-/* ================================
-   DEMO PAGE STYLES
-   ================================ */
-.demo-hero {
-    background: var(--gradient-primary);
-    padding: 140px 0 80px;
-    text-align: center;
-    border-bottom: var(--border-subtle);
-}
-
-.demo-hero-content {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.demo-badge {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--color-accent);
-    padding: 0.5rem 1.5rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.demo-hero h1 {
-    font-size: 3rem;
-    color: var(--color-accent);
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-
-.demo-subtitle {
-    font-size: 1.3rem;
-    color: var(--color-text-muted);
-    margin-bottom: 3rem;
-}
-
-.demo-details-list {
-    list-style: none;
-    padding: 0;
-    margin: 2rem auto 0;
-    max-width: 600px;
-    text-align: left;
-}
-
-.demo-details-list li {
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    line-height: 1.5;
-    padding: 0.5rem 0;
-}
-
-.demo-details-list li strong {
-    color: var(--color-accent);
-}
-
-.demo-registration-section {
-    background: var(--gradient-quaternary);
-    padding: 80px 0;
-}
-
-.demo-form-container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 3rem;
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--shadow-card);
-}
-
-.demo-form-container h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    color: var(--color-accent);
-    margin-bottom: 0.5rem;
-}
-
-.demo-form-subtitle {
-    text-align: center;
-    color: var(--color-text-muted);
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-}
-
-.demo-form-microcopy {
-    text-align: center;
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
-    margin-top: 1rem;
-}
-
-.demo-form-container .form-success {
-    text-align: center;
-}
-
-.demo-form-container .form-success p {
-    margin: 0;
-}
-
-.required {
-    color: #ff6b6b;
-}
-
-/* Tablet/Medium Width - 2 Column Pricing Grid */
-@media (max-width: 1000px) {
-    .pricing-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-/* Mobile - Responsive addon services and cost comparison */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .addon-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
+    .legal-content-container {
+        padding: 1.5rem 0;
     }
     
-    .addon-card {
-        padding: 2rem;
-    }
-    
-    .comparison-cards {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .comparison-card {
-        padding: 2rem;
-    }
-    
-    .cost-comparison .comparison-subtitle {
-        padding: 0 1rem;
-        font-size: 0.95rem;
-    }
-    
-    .pricing-explainer-bar p {
-        padding: 0 2rem;
-        font-size: 0.95rem;
-    }
-}
-
-/* Responsive adjustments for demo page */
-@media (max-width: 768px) {
-    .demo-hero {
-        padding: 120px 0 60px;
-    }
-    
-    .demo-hero h1 {
+    .legal-content-container h1 {
         font-size: 2rem;
     }
     
-    .demo-subtitle {
-        font-size: 1.1rem;
+    .legal-content-container h2 {
+        font-size: 1.5rem;
+        margin-top: 2rem;
     }
-    
-    .demo-details-list {
-        font-size: 0.95rem;
-    }
-    
-    .demo-what-section,
-    .demo-about-section {
-        padding: 40px 0;
-    }
-    
-    .demo-what-section h2,
-    .demo-about-section h2 {
-        font-size: 1.75rem;
-    }
-    
-    .demo-what-text,
-    .demo-about-text {
-        font-size: 1rem;
-    }
-    
-    .demo-form-container {
-        padding: 2rem 1.5rem;
-    }
-    
-    .demo-form-container h2 {
-        font-size: 2rem;
-    }
-    
-    .demo-registration-section {
-        padding: 60px 0;
-    }
-    
-    /* Mobile Navigation */
-    .mobile-menu-btn {
-        display: block;
-    }
-    
-    .nav-links {
-        display: none;
-        position: absolute;
-        top: 70px;
-        left: 0;
-        right: 0;
-        background: var(--color-dark-bg);
-        flex-direction: column;
-        padding: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-    
-    .nav-links.mobile-open {
-        display: flex;
-    }
-    
-    .nav-links li {
-        margin: 0;
-        padding: 0.75rem 2rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .nav-auth-buttons {
-        display: none;
-    }
-    
-    /* Mobile Pricing - Fix Banner Text Wrapping */
-    .pricing-explainer-bar p {
-        padding: 0 1rem;
-        font-size: 0.95rem;
-    }
-    
-    /* Mobile Pricing Grid - Stack Cards Vertically */
-    .pricing-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 0 1rem;
-    }
-    
-    .pricing-card {
-        max-width: 100%;
-    }
-    
-    /* Mobile Two-Column Sections - Stack Vertically */
-    .feature-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .feature-content.two-column {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .story-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .about-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .review-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-}
-
-/* Domain Check Message Styles */
-.domain-check-message {
-    margin-top: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.domain-check-message.success {
-    background: rgba(45, 90, 65, 0.15);
-    border: 1px solid rgba(45, 90, 65, 0.4);
-    color: #4CAF50;
-}
-
-.domain-check-message.info {
-    background: rgba(33, 150, 243, 0.15);
-    border: 1px solid rgba(33, 150, 243, 0.4);
-    color: #2196F3;
-}
-
-.domain-check-message.error {
-    background: rgba(244, 67, 54, 0.15);
-    border: 1px solid rgba(244, 67, 54, 0.4);
-    color: #f44336;
 }

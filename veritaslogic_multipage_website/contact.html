@@ -34,12 +34,12 @@
                 <li><a href="features.html">Technology</a></li>
                 <li><a href="pricing.html">Pricing</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="blog.html">Blog</a></li>
+                <!-- <li><a href="blog.html">Blog</a></li> -->
                 <li><a href="contact.html" class="active">Contact</a></li>
             </ul>
-            <button class="mobile-menu-btn">☰</button>
+            <button class="mobile-menu-btn" aria-label="Toggle mobile menu">☰</button>
             <div class="nav-auth-buttons">
-                <a href="contact.html#contact-form" class="nav-cta primary">Request a Draft</a>
+                <a href="contact.html#contact-form" class="nav-cta primary">Get Started</a>
             </div>
         </div>
     </nav>
@@ -48,7 +48,7 @@
     <section class="page-header">
         <div class="container">
             <h1>Get in Touch</h1>
-            <p>We respond within a business day.</p>
+            <p>Let us know how we can help.</p>
         </div>
     </section>
 
@@ -62,7 +62,9 @@
                     <div class="form-group">
                         <label for="inquiry-type">How can we help?</label>
                         <select id="inquiry-type" name="inquiry_type" required>
-                            <option value="new-memo" selected>Request a Memo Draft (Standard or Complex)</option>
+                            <option value="preparation" selected>Request Memo Preparation</option>
+                            <option value="review">Request Memo Review</option>
+                            <option value="complex">Complex Transaction (Custom Quote)</option>
                             <option value="enterprise">Enterprise / Volume Inquiry</option>
                             <option value="general">General Question</option>
                         </select>
@@ -100,7 +102,7 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="form-submit">Request Review</button>
+                    <button type="submit" class="form-submit">Submit Request</button>
                     
                     <!-- Success Message -->
                     <div id="form-success-message" class="form-success">
@@ -117,8 +119,6 @@
         </div>
     </section>
 
-
-
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -127,21 +127,21 @@
                     <h4>VeritasLogic.ai</h4>
                     <p>Empowering accounting professionals with AI-driven expertise</p>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Services</h4>
                     <a href="features.html">Technology</a>
                     <a href="pricing.html">Pricing</a>
-                    <a href="contact.html#contact-form">Request Quote</a>
+                    <a href="contact.html#contact-form">Request Service</a>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Company</h4>
                     <a href="about.html">About Us</a>
-                    <a href="blog.html">Blog</a>
+                    <!-- <a href="blog.html">Blog</a> -->
                     <a href="contact.html">Contact</a>
                 </div>
-                
+
                 <div class="footer-section">
                     <h4>Legal</h4>
                     <a href="privacy.html">Privacy Policy</a>
@@ -149,9 +149,9 @@
                     <a href="features.html#security">Security Overview</a>
                 </div>
             </div>
-            
+
             <div class="footer-trust-badges">
-                
+
                 <div class="footer-trust-badges-icons">
                     <a href="https://marketplace.microsoft.com/en-us/product/saas/veritaslogic.veritaslogic-ai-platform" target="_blank" rel="noopener" title="Available on Microsoft AppSource">
                         <img src="images/ms-appsource-badge.png" alt="Get it from Microsoft AppSource">
@@ -162,9 +162,9 @@
                     </a>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
-                <p>&copy; 2025 VeritasLogic.ai. All rights reserved.</p>
+                <p>&copy; 2026 VeritasLogic.ai. All rights reserved.</p>
             </div>
         </div>
     </footer>

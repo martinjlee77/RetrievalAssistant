@@ -1,0 +1,80 @@
+/* ================================
+   BASE STYLES
+   Reset, Variables, Typography
+   ================================ */
+
+/* ================================
+   1. CSS RESET & BASE STYLES
+   ================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* ================================
+   CSS DESIGN TOKENS
+   ================================ */
+:root {
+    /* Colors */
+    --color-primary: #212F3C;
+    --color-primary-light: #2C3E50;
+    --color-secondary: #1A252F;
+    --color-accent: #ffffff;
+    --color-text: #ffffff;
+    --color-text-muted: rgba(255,255,255,0.8);
+    /* Navbar Colors */
+    --navbar-bg: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    --navbar-active-bg: linear-gradient(135deg, #2A353F 0%, #31434C 100%);
+    --navbar-active-light: rgba(42, 53, 63, 0.8);
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, #212F3C 0%, #2C3E50 50%, #212F3C 100%);
+    --gradient-secondary: linear-gradient(135deg, #1A252F 0%, #212F3C 100%);
+    --gradient-tertiary: linear-gradient(135deg, #1A252F 0%, #212F3C 50%, #1A252F 100%);
+    --gradient-quaternary: linear-gradient(135deg, #212F3C 0%, #1A252F 100%);
+    /* Spacing */
+    --space-section: 100px;
+    --space-section-sm: 80px;
+    --space-section-lg: 120px;
+    --space-content: 4rem;f
+    --space-header: 2rem;
+    /* Typography */
+    --font-size-h1: 3rem;
+    --font-size-h2: 2.5rem;
+    --font-size-h3: 2rem;
+    --font-size-body: 1rem;
+    --font-size-large: 1.2rem;
+    /* Effects */
+    --shadow-card: 0 12px 40px rgba(0,0,0,0.3);
+    --shadow-hover: 0 6px 18px rgba(255,255,255,0.3);
+    --border-subtle: 1px solid rgba(255,255,255,0.1);
+    --border-radius: 12px;
+    --border-radius-sm: 8px;
+    /* Navigation */
+    --nav-gap: 1rem; /* Controls spacing between buttons */
+    --nav-pad-x: 0.5rem; /* Controls button width */
+    --nav-pad-y: 0.5rem; /* Controls button height */
+}
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-primary);
+    overflow-x: hidden;
+}
+/* ================================
+   2. TYPOGRAPHY & FONTS
+   ================================ */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', Times, serif;
+    line-height: 1.2;
+}
+/* ================================
+   3. GLOBAL CONTAINERS & LAYOUT
+   ================================ */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+}

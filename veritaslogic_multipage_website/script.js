@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Intersection Observer for Animations
+    /*
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -100px 0px'
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '.feature-card, .value-card, .pricing-card, .blog-card, .contact-card, .addon-card, .faq-item'
     );
     animateElements.forEach(el => observer.observe(el));
+    */
 
     // Form Validation and Submission
     const forms = document.querySelectorAll('form');
