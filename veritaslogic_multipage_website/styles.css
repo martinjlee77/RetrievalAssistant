@@ -1043,9 +1043,11 @@ section {
         gap: 0.25rem;         /* Minimal gap between items */
         min-width: 0;         /* Allow shrinking */
         width: 100%;          /* Full width */
-        max-width: 100%;      /* Don't exceed viewport */
+        max-width: 100vw;     /* Don't exceed viewport width */
         box-sizing: border-box; /* Include padding in width */
         justify-content: space-between; /* Space items properly */
+        align-items: center;  /* Vertically center items */
+        overflow: hidden;     /* Prevent any overflow */
     }
     
     /* Hide nav links on mobile */
@@ -1074,12 +1076,13 @@ section {
     
     /* Smaller logo on mobile */
     .logo {
-        font-size: 1.3rem;   /* Smaller logo text */
+        font-size: 1.2rem;   /* Smaller logo text */
         flex: 0 1 auto;      /* Can shrink but don't grow */
         min-width: 0;        /* Allow flex shrinking */
         overflow: hidden;    /* Prevent overflow */
         text-overflow: ellipsis; /* Add ellipsis if too long */
-        max-width: 50%;      /* Max 50% of container */
+        max-width: calc(100vw - 160px); /* Leave room for buttons (160px for CTA + hamburger + padding) */
+        white-space: nowrap; /* Prevent text wrapping */
     }
     
     /* Show the mobile menu button */
@@ -1104,10 +1107,13 @@ section {
     }
     
     .nav-cta {
-        padding: 0.5rem 0.7rem;   /* Smaller padding */
-        font-size: 0.75rem;       /* Smaller font */
+        padding: 0.5rem 0.6rem;   /* Smaller padding */
+        font-size: 0.7rem;        /* Smaller font */
         white-space: nowrap;       /* Prevent text wrapping */
         flex-shrink: 0;            /* Don't shrink */
+        max-width: 90px;          /* Limit button width */
+        overflow: hidden;         /* Prevent overflow */
+        text-overflow: ellipsis;   /* Add ellipsis if needed */
     }
     
     /* Individual nav links on mobile */
