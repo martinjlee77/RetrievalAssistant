@@ -111,6 +111,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;     /* Bold */
     color: white;          /* White text */
     text-decoration: none;  /* Removes underline from link */
+    white-space: nowrap;   /* Prevent logo text from wrapping */
+    flex-shrink: 1;        /* Allow logo to shrink if needed */
+    min-width: 0;          /* Allow flex shrinking */
 }
 
 /* Navigation links container (the <ul> element) */
@@ -1029,33 +1032,45 @@ section {
     /* Navbar optimizations */
     .navbar {
         padding: 0.75rem 0;  /* Reduced padding on mobile */
+        overflow: hidden;    /* Prevent overflow */
     }
     
     .nav-container {
-        padding: 0 1rem;     /* Reduced horizontal padding */
-        flex-wrap: wrap;      /* Allow wrapping if needed */
+        padding: 0 0.75rem;  /* Reduced horizontal padding */
+        flex-wrap: nowrap;    /* Prevent wrapping */
+        gap: 0.5rem;          /* Small gap between items */
+        min-width: 0;         /* Allow shrinking */
     }
     
     /* Smaller logo on mobile */
     .logo {
-        font-size: 1.5rem;   /* Smaller logo text */
+        font-size: 1.4rem;   /* Smaller logo text */
+        flex-shrink: 1;      /* Allow logo to shrink */
+        min-width: 0;        /* Allow flex shrinking */
+        overflow: hidden;    /* Prevent overflow */
+        text-overflow: ellipsis; /* Add ellipsis if too long */
+        max-width: calc(100vw - 200px); /* Leave room for buttons */
     }
     
     /* Show the mobile menu button */
     .mobile-menu-btn {
         display: flex !important;  /* Makes hamburger icon visible */
         order: 3;                  /* Position after nav-cta */
+        flex-shrink: 0;            /* Don't shrink button */
+        margin-left: 0.5rem;       /* Small margin */
     }
     
     /* Hide nav-cta on mobile (or make it smaller) */
     .nav-auth-buttons {
         order: 2;                  /* Position before menu button */
         margin-left: auto;         /* Push to right */
+        flex-shrink: 0;            /* Don't shrink button container */
     }
     
     .nav-cta {
-        padding: 0.6rem 1rem;     /* Smaller padding */
-        font-size: 0.85rem;       /* Smaller font */
+        padding: 0.6rem 0.75rem;  /* Smaller padding */
+        font-size: 0.8rem;        /* Smaller font */
+        white-space: nowrap;       /* Prevent text wrapping */
     }
     
     /* Hide navigation links by default on mobile */
@@ -1112,12 +1127,12 @@ section {
     /* Smaller headings on mobile */
     .hero h1,
     .page-header h1 {
-        font-size: 1.75rem;  /* 28px instead of 48px */
+        font-size: 2rem;     /* 32px - larger than section headers */
         line-height: 1.3;     /* Tighter line height */
     }
     
     .section-header h2 {
-        font-size: 1.5rem;   /* Smaller section headers */
+        font-size: 1.5rem;   /* 24px - smaller than hero */
     }
     
     /* Stack two-column layouts vertically on mobile */
@@ -1250,25 +1265,33 @@ section {
 /* Extra small devices (phones in portrait, < 480px) */
 @media (max-width: 480px) {
     .nav-container {
-        padding: 0 0.75rem;  /* Even less padding on very small screens */
+        padding: 0 0.5rem;   /* Even less padding on very small screens */
+        gap: 0.25rem;        /* Smaller gap */
     }
     
     .logo {
-        font-size: 1.3rem;   /* Even smaller logo */
+        font-size: 1.2rem;   /* Even smaller logo */
+        max-width: calc(100vw - 180px); /* More room for buttons */
     }
     
     .nav-cta {
-        padding: 0.5rem 0.75rem;  /* Smaller button */
-        font-size: 0.8rem;       /* Smaller text */
+        padding: 0.5rem 0.6rem;  /* Smaller button */
+        font-size: 0.75rem;      /* Smaller text */
+    }
+    
+    .mobile-menu-btn {
+        padding: 0.4rem;     /* Smaller button padding */
+        min-width: 40px;     /* Slightly smaller touch target */
+        min-height: 40px;
     }
     
     .hero h1,
     .page-header h1 {
-        font-size: 1.5rem;   /* Even smaller on very small screens */
+        font-size: 1.75rem;  /* 28px - still larger than section headers */
     }
     
     .section-header h2 {
-        font-size: 1.25rem;  /* Smaller section headers */
+        font-size: 1.25rem;  /* 20px - smaller than hero */
     }
     
     .container {
