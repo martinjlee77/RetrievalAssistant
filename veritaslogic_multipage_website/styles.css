@@ -1032,66 +1032,68 @@ section {
     /* Navbar optimizations */
     .navbar {
         padding: 0.75rem 0;  /* Reduced padding on mobile */
-        overflow: hidden;    /* Prevent overflow */
+        overflow-x: hidden; /* Prevent horizontal overflow */
+        width: 100%;        /* Full width */
+        box-sizing: border-box; /* Include padding in width */
     }
     
     .nav-container {
-        padding: 0 0.75rem;  /* Reduced horizontal padding */
+        padding: 0 0.5rem;   /* Minimal horizontal padding */
         flex-wrap: nowrap;    /* Prevent wrapping */
-        gap: 0.5rem;          /* Small gap between items */
+        gap: 0.25rem;         /* Minimal gap between items */
         min-width: 0;         /* Allow shrinking */
+        width: 100%;          /* Full width */
+        max-width: 100%;      /* Don't exceed viewport */
+        box-sizing: border-box; /* Include padding in width */
+        justify-content: space-between; /* Space items properly */
+    }
+    
+    /* Hide nav links on mobile */
+    .nav-links {
+        display: none !important; /* Always hidden on mobile */
     }
     
     /* Smaller logo on mobile */
     .logo {
-        font-size: 1.4rem;   /* Smaller logo text */
-        flex-shrink: 1;      /* Allow logo to shrink */
+        font-size: 1.3rem;   /* Smaller logo text */
+        flex: 0 1 auto;      /* Can shrink but don't grow */
         min-width: 0;        /* Allow flex shrinking */
         overflow: hidden;    /* Prevent overflow */
         text-overflow: ellipsis; /* Add ellipsis if too long */
-        max-width: calc(100vw - 200px); /* Leave room for buttons */
+        max-width: 50%;      /* Max 50% of container */
     }
     
     /* Show the mobile menu button */
     .mobile-menu-btn {
         display: flex !important;  /* Makes hamburger icon visible */
+        flex: 0 0 auto;           /* Don't shrink or grow */
         order: 3;                  /* Position after nav-cta */
-        flex-shrink: 0;            /* Don't shrink button */
-        margin-left: 0.5rem;       /* Small margin */
+        margin-left: 0.25rem;      /* Small margin */
+        min-width: 44px;           /* Touch target size */
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
     }
     
-    /* Hide nav-cta on mobile (or make it smaller) */
+    /* Nav auth buttons container */
     .nav-auth-buttons {
         order: 2;                  /* Position before menu button */
-        margin-left: auto;         /* Push to right */
-        flex-shrink: 0;            /* Don't shrink button container */
+        flex: 0 0 auto;           /* Don't shrink or grow */
+        display: flex;             /* Flex container */
+        align-items: center;       /* Center vertically */
+        gap: 0.25rem;              /* Small gap */
     }
     
     .nav-cta {
-        padding: 0.6rem 0.75rem;  /* Smaller padding */
-        font-size: 0.8rem;        /* Smaller font */
+        padding: 0.5rem 0.7rem;   /* Smaller padding */
+        font-size: 0.75rem;       /* Smaller font */
         white-space: nowrap;       /* Prevent text wrapping */
+        flex-shrink: 0;            /* Don't shrink */
     }
     
-    /* Hide navigation links by default on mobile */
-    .nav-links {
-        display: none;           /* Hidden by default */
-        position: fixed;         /* Fixed position for overlay */
-        top: 60px;               /* Below navbar */
-        left: 0;                 /* Starts at left edge */
-        right: 0;                /* Extends to right edge */
-        bottom: 0;               /* Full height overlay */
-        background: rgba(26, 37, 47, 0.98);  /* Dark background with slight transparency */
-        backdrop-filter: blur(10px);  /* Blur effect */
-        flex-direction: column;  /* Stacks links vertically */
-        padding: 2rem 1rem;     /* More padding for touch targets */
-        z-index: 999;           /* Above content */
-        overflow-y: auto;       /* Allow scrolling if menu is long */
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);  /* Shadow for depth */
-    }
-    
+    /* Mobile menu overlay - shown when mobile-open class is added */
     /* Individual nav links on mobile */
-    .nav-links a {
+    .nav-links.mobile-open a {
         padding: 1rem 1.5rem;   /* Larger touch targets */
         font-size: 1.1rem;      /* Slightly larger text */
         border-bottom: 1px solid rgba(255,255,255,0.1);  /* Separator */
@@ -1099,13 +1101,8 @@ section {
         display: block;          /* Block display for full width */
     }
     
-    .nav-links a:last-child {
+    .nav-links.mobile-open a:last-child {
         border-bottom: none;     /* No border on last item */
-    }
-    
-    /* Show navigation when mobile menu is opened (via JavaScript) */
-    .nav-links.mobile-open {
-        display: flex;  /* Shows the links */
     }
     
     /* Container adjustments */
@@ -1127,12 +1124,12 @@ section {
     /* Smaller headings on mobile */
     .hero h1,
     .page-header h1 {
-        font-size: 2rem;     /* 32px - larger than section headers */
+        font-size: 2.25rem;  /* 36px - larger than section headers */
         line-height: 1.3;     /* Tighter line height */
     }
     
     .section-header h2 {
-        font-size: 1.5rem;   /* 24px - smaller than hero */
+        font-size: 1.75rem;  /* 28px - bigger but still smaller than hero */
     }
     
     /* Stack two-column layouts vertically on mobile */
@@ -1270,8 +1267,17 @@ section {
     }
     
     .logo {
-        font-size: 1.2rem;   /* Even smaller logo */
-        max-width: calc(100vw - 180px); /* More room for buttons */
+        font-size: 1.1rem;   /* Even smaller logo */
+        max-width: 40%;      /* Max 40% of container */
+    }
+    
+    .nav-container {
+        padding: 0 0.4rem;   /* Even less padding */
+    }
+    
+    .nav-cta {
+        padding: 0.45rem 0.6rem;  /* Smaller button */
+        font-size: 0.7rem;         /* Smaller text */
     }
     
     .nav-cta {
