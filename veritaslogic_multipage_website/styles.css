@@ -216,6 +216,15 @@ section {
     padding-top: 180px;  /* More top padding so content isn't hidden behind navbar */
 }
 
+/* Hero container - centers content similar to .container */
+.hero-container {
+    max-width: 1200px;  /* Maximum width of content */
+    margin: 0 auto;     /* Centers the container horizontally */
+    padding: 0 2rem;    /* Adds 2rem (32px) padding on left and right sides */
+    width: 100%;        /* Full width on smaller screens */
+    box-sizing: border-box;  /* Include padding in width calculation */
+}
+
 /* Headings inside page headers and hero sections */
 .page-header h1,
 .hero h1 {
@@ -1162,6 +1171,11 @@ section {
     
     /* Container adjustments */
     .container {
+        padding: 0 1rem;  /* Reduced padding on mobile */
+    }
+    
+    /* Hero container mobile adjustments */
+    .hero-container {
         padding: 0 1rem;  /* Reduced padding on mobile */
     }
     
