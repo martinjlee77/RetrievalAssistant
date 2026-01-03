@@ -73,6 +73,8 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 1200px;  /* Maximum width of content (prevents it from being too wide on large screens) */
     margin: 0 auto;     /* Centers the container horizontally (auto margins on left/right) */
     padding: 0 2rem;    /* Adds 2rem (32px) padding on left and right sides */
+    width: 100%;        /* Full width on smaller screens */
+    box-sizing: border-box;  /* Include padding in width calculation */
 }
 
 /* ============================================
@@ -93,12 +95,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Container inside navbar that holds logo and links */
 .nav-container {
-    max-width: clamp(1000px, 95vw, 1200px);  /* Responsive width: minimum 1000px, max 1200px, or 95% of viewport */
+    max-width: 1200px;  /* Maximum width on large screens */
     margin: 0 auto;      /* Centers horizontally */
     display: flex;       /* Makes children (logo, links, button) sit side-by-side */
     justify-content: space-between;  /* Pushes logo to left, links/button to right */
     align-items: center; /* Vertically centers all items */
     padding: 0 2rem;    /* Horizontal padding */
+    width: 100%;        /* Full width on smaller screens */
 }
 
 /* Logo text styling */
@@ -144,6 +147,12 @@ h1, h2, h3, h4, h5, h6 {
     color: white;        /* White icon/text */
     font-size: 1.5rem;  /* 24px - larger icon */
     cursor: pointer;     /* Shows hand cursor on hover */
+    padding: 0.5rem;    /* Touch-friendly padding */
+    min-width: 44px;    /* Minimum touch target size */
+    min-height: 44px;   /* Minimum touch target size */
+    display: flex;      /* Flex for centering */
+    align-items: center;
+    justify-content: center;
 }
 
 /* Call-to-action button in navigation (e.g., "Request a Draft") */
@@ -156,6 +165,8 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;            /* Semi-bold */
     transition: transform 0.2s ease;  /* Smooth animation when hovered */
     display: inline-block; /*Needed for the hover effect to work*/
+    white-space: nowrap;        /* Prevents text wrapping */
+    font-size: 0.9rem;          /* Slightly smaller for mobile */
 }
 
 /* CTA button when hovered */
@@ -1015,21 +1026,66 @@ section {
    This makes the site look good on phones and tablets.
    ============================================ */
 @media (max-width: 768px) {
+    /* Navbar optimizations */
+    .navbar {
+        padding: 0.75rem 0;  /* Reduced padding on mobile */
+    }
+    
+    .nav-container {
+        padding: 0 1rem;     /* Reduced horizontal padding */
+        flex-wrap: wrap;      /* Allow wrapping if needed */
+    }
+    
+    /* Smaller logo on mobile */
+    .logo {
+        font-size: 1.5rem;   /* Smaller logo text */
+    }
+    
     /* Show the mobile menu button */
     .mobile-menu-btn {
-        display: block;  /* Makes hamburger icon visible */
+        display: flex !important;  /* Makes hamburger icon visible */
+        order: 3;                  /* Position after nav-cta */
+    }
+    
+    /* Hide nav-cta on mobile (or make it smaller) */
+    .nav-auth-buttons {
+        order: 2;                  /* Position before menu button */
+        margin-left: auto;         /* Push to right */
+    }
+    
+    .nav-cta {
+        padding: 0.6rem 1rem;     /* Smaller padding */
+        font-size: 0.85rem;       /* Smaller font */
     }
     
     /* Hide navigation links by default on mobile */
     .nav-links {
         display: none;           /* Hidden by default */
-        position: absolute;      /* Positioned absolutely (overlays content) */
-        top: 70px;               /* 70px from top (below navbar) */
+        position: fixed;         /* Fixed position for overlay */
+        top: 60px;               /* Below navbar */
         left: 0;                 /* Starts at left edge */
         right: 0;                /* Extends to right edge */
-        background: var(--secondary);  /* Dark background */
+        bottom: 0;               /* Full height overlay */
+        background: rgba(26, 37, 47, 0.98);  /* Dark background with slight transparency */
+        backdrop-filter: blur(10px);  /* Blur effect */
         flex-direction: column;  /* Stacks links vertically */
-        padding: 1rem 0;        /* 16px padding top and bottom */
+        padding: 2rem 1rem;     /* More padding for touch targets */
+        z-index: 999;           /* Above content */
+        overflow-y: auto;       /* Allow scrolling if menu is long */
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);  /* Shadow for depth */
+    }
+    
+    /* Individual nav links on mobile */
+    .nav-links a {
+        padding: 1rem 1.5rem;   /* Larger touch targets */
+        font-size: 1.1rem;      /* Slightly larger text */
+        border-bottom: 1px solid rgba(255,255,255,0.1);  /* Separator */
+        width: 100%;            /* Full width */
+        display: block;          /* Block display for full width */
+    }
+    
+    .nav-links a:last-child {
+        border-bottom: none;     /* No border on last item */
     }
     
     /* Show navigation when mobile menu is opened (via JavaScript) */
@@ -1037,33 +1093,54 @@ section {
         display: flex;  /* Shows the links */
     }
     
+    /* Container adjustments */
+    .container {
+        padding: 0 1rem;  /* Reduced padding on mobile */
+    }
+    
     /* Reduce section padding on mobile */
     section {
-        padding: 60px 0;  /* 60px instead of 100px (smaller screens need less space) */
+        padding: 3rem 0;  /* 48px instead of 100px */
     }
     
     /* Reduce hero/page header padding on mobile */
     .hero,
     .page-header {
-        padding: 120px 0 60px;  /* Less top padding, same bottom */
+        padding: 100px 0 3rem;  /* Less top padding, reduced bottom */
     }
     
     /* Smaller headings on mobile */
     .hero h1,
     .page-header h1 {
-        font-size: 2rem;  /* 32px instead of 48px */
+        font-size: 1.75rem;  /* 28px instead of 48px */
+        line-height: 1.3;     /* Tighter line height */
+    }
+    
+    .section-header h2 {
+        font-size: 1.5rem;   /* Smaller section headers */
     }
     
     /* Stack two-column layouts vertically on mobile */
     .story-content,
     .feature-content {
         grid-template-columns: 1fr;  /* Single column instead of two */
+        gap: 2rem;                    /* Reduced gap */
     }
     
     /* Stack grid items vertically on mobile */
     .pricing-grid,
     .grid-two-col {
         grid-template-columns: 1fr;  /* Single column */
+        gap: 1.5rem;                  /* Reduced gap */
+    }
+    
+    /* Service cards on mobile */
+    .service-card {
+        padding: 1.5rem;      /* Reduced padding */
+    }
+    
+    .service-card h4 {
+        font-size: 1.25rem;   /* Smaller heading */
     }
     
     /* Stack buttons vertically on mobile */
@@ -1071,12 +1148,165 @@ section {
     .cta-actions {
         flex-direction: column;  /* Vertical stack */
         align-items: stretch;    /* Buttons take full width */
+        gap: 1rem;               /* Space between buttons */
     }
     
     /* Make buttons full width on mobile */
     .btn {
         width: 100%;        /* Full width */
         text-align: center; /* Centers text */
+        padding: 0.875rem 1.5rem;  /* Comfortable touch target */
+    }
+    
+    /* Form optimizations */
+    .form-container {
+        padding: 1.5rem 1rem;  /* Reduced padding */
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px;  /* Prevents zoom on iOS */
+        padding: 1rem;     /* Larger touch targets */
+    }
+    
+    /* Table optimizations */
+    .comparison-table-wrapper {
+        margin-left: -1rem;  /* Negative margin to extend to edges */
+        margin-right: -1rem;
+        padding: 0 1rem;      /* Padding for scroll */
+    }
+    
+    .comparison-table {
+        font-size: 0.875rem;  /* Smaller text */
+        min-width: 600px;     /* Minimum width for readability */
+    }
+    
+    .comparison-table th,
+    .comparison-table td {
+        padding: 0.75rem 0.5rem;  /* Reduced padding */
+    }
+    
+    /* Standards list on mobile */
+    .standards-list {
+        flex-direction: column;  /* Stack vertically */
+        gap: 1rem;              /* Space between items */
+    }
+    
+    .standard-item {
+        flex-direction: column;  /* Stack code and name */
+        align-items: flex-start; /* Left align */
+        gap: 0.5rem;            /* Space between code and name */
+    }
+    
+    /* Footer adjustments */
+    .footer-content {
+        grid-template-columns: 1fr;  /* Single column */
+        gap: 2rem;                    /* Space between sections */
+        text-align: center;           /* Center align */
+    }
+    
+    .footer-section {
+        text-align: center;  /* Center align footer sections */
+    }
+    
+    /* Video and images */
+    video,
+    img {
+        max-width: 100%;  /* Responsive images */
+        height: auto;     /* Maintain aspect ratio */
+    }
+    
+    video {
+        width: 100%;      /* Full width videos */
+    }
+    
+    /* Custom quote box */
+    .custom-quote-box {
+        padding: 1.5rem 1rem;  /* Reduced padding */
+        font-size: 0.9rem;      /* Slightly smaller text */
+    }
+    
+    /* Cost comparison cards */
+    .comparison-cards {
+        flex-direction: column;  /* Stack vertically */
+        gap: 1.5rem;             /* Space between cards */
+    }
+    
+    .comparison-card {
+        width: 100%;  /* Full width */
+    }
+    
+    /* FAQ items */
+    .faq-item {
+        padding: 1.5rem 1rem;  /* Reduced padding */
+    }
+    
+    .faq-item h4 {
+        font-size: 1.1rem;  /* Smaller heading */
+    }
+}
+
+/* Extra small devices (phones in portrait, < 480px) */
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0 0.75rem;  /* Even less padding on very small screens */
+    }
+    
+    .logo {
+        font-size: 1.3rem;   /* Even smaller logo */
+    }
+    
+    .nav-cta {
+        padding: 0.5rem 0.75rem;  /* Smaller button */
+        font-size: 0.8rem;       /* Smaller text */
+    }
+    
+    .hero h1,
+    .page-header h1 {
+        font-size: 1.5rem;   /* Even smaller on very small screens */
+    }
+    
+    .section-header h2 {
+        font-size: 1.25rem;  /* Smaller section headers */
+    }
+    
+    .container {
+        padding: 0 0.75rem;  /* Less padding */
+    }
+    
+    section {
+        padding: 2rem 0;     /* Less section padding */
+    }
+    
+    .hero,
+    .page-header {
+        padding: 90px 0 2rem;  /* Less top padding */
+    }
+    
+    .service-card {
+        padding: 1.25rem;    /* Less card padding */
+    }
+    
+    .btn {
+        padding: 0.75rem 1.25rem;  /* Smaller button padding */
+        font-size: 0.9rem;          /* Smaller button text */
+    }
+    
+    .form-container {
+        padding: 1rem 0.75rem;  /* Less form padding */
+    }
+    
+    .legal-content-container {
+        padding: 1rem 0.75rem;  /* Less legal page padding */
+    }
+    
+    .legal-content-container h1 {
+        font-size: 1.5rem;  /* Smaller legal page heading */
+    }
+    
+    .legal-content-container h2 {
+        font-size: 1.2rem;  /* Smaller legal page subheadings */
     }
 }
 
@@ -1151,15 +1381,25 @@ section {
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .legal-content-container {
-        padding: 1.5rem 0;
+        padding: 1.5rem 1rem;  /* Add horizontal padding */
     }
     
     .legal-content-container h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;     /* Smaller on mobile */
+        line-height: 1.3;
     }
     
     .legal-content-container h2 {
-        font-size: 1.5rem;
-        margin-top: 2rem;
+        font-size: 1.35rem;     /* Smaller on mobile */
+        margin-top: 1.5rem;
+    }
+    
+    .legal-content-container p,
+    .legal-content-container li {
+        font-size: 0.95rem;     /* Slightly smaller for readability */
+    }
+    
+    .legal-content-container ul {
+        margin-left: 1rem;      /* Reduced margin */
     }
 }
