@@ -1053,6 +1053,25 @@ section {
         display: none !important; /* Always hidden on mobile */
     }
     
+    /* Show mobile menu when mobile-open class is added */
+    .nav-links.mobile-open {
+        display: flex !important;  /* Show menu when open */
+        position: fixed;         /* Fixed position for overlay */
+        top: 60px;               /* Below navbar */
+        left: 0;                 /* Starts at left edge */
+        right: 0;                /* Extends to right edge */
+        bottom: 0;               /* Full height overlay */
+        background: rgba(26, 37, 47, 0.98);  /* Dark background with slight transparency */
+        backdrop-filter: blur(10px);  /* Blur effect */
+        flex-direction: column;  /* Stacks links vertically */
+        padding: 2rem 1rem;     /* More padding for touch targets */
+        z-index: 999;           /* Above content */
+        overflow-y: auto;       /* Allow scrolling if menu is long */
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);  /* Shadow for depth */
+        list-style: none;       /* Remove list bullets */
+        margin: 0;              /* Remove margin */
+    }
+    
     /* Smaller logo on mobile */
     .logo {
         font-size: 1.3rem;   /* Smaller logo text */
@@ -1091,7 +1110,6 @@ section {
         flex-shrink: 0;            /* Don't shrink */
     }
     
-    /* Mobile menu overlay - shown when mobile-open class is added */
     /* Individual nav links on mobile */
     .nav-links.mobile-open a {
         padding: 1rem 1.5rem;   /* Larger touch targets */
@@ -1101,8 +1119,19 @@ section {
         display: block;          /* Block display for full width */
     }
     
+    .nav-links.mobile-open li {
+        width: 100%;            /* Full width list items */
+        margin: 0;              /* No margin */
+        list-style: none;       /* Remove bullets */
+    }
+    
     .nav-links.mobile-open a:last-child {
         border-bottom: none;     /* No border on last item */
+    }
+    
+    .nav-links.mobile-open a:hover,
+    .nav-links.mobile-open a.active {
+        background: rgba(255, 255, 255, 0.15);  /* Highlight on hover */
     }
     
     /* Container adjustments */

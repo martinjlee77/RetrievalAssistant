@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (mobileMenuBtn && navLinks) {
         // Toggle menu on button click
-        mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             navLinks.classList.toggle('mobile-open');
             this.classList.toggle('active');
             // Prevent body scroll when menu is open
@@ -31,6 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (navLinks.classList.contains('mobile-open') && 
                 !navLinks.contains(e.target) && 
                 !mobileMenuBtn.contains(e.target)) {
+                navLinks.classList.remove('mobile-open');
+                mobileMenuBtn.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navLinks.classList.contains('mobile-open')) {
                 navLinks.classList.remove('mobile-open');
                 mobileMenuBtn.classList.remove('active');
                 document.body.style.overflow = '';
