@@ -3252,7 +3252,7 @@ def contact_form():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['inquiry_type', 'name', 'email', 'company', 'role', 'message']
+        required_fields = ['inquiry_type', 'name', 'email', 'company', 'message']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({'error': f'{field} is required'}), 400
@@ -3267,7 +3267,7 @@ def contact_form():
         name = data.get('name')
         email = data.get('email')
         company = data.get('company')
-        role = data.get('role')
+        role = data.get('role', 'Not provided')
         message = data.get('message')
         
         # Get optional conditional fields
@@ -3277,6 +3277,12 @@ def contact_form():
         
         # Create subject line based on inquiry type
         subject_map = {
+            'preparation': 'Memo Preparation Request',
+            'review': 'Memo Review Request',
+            'complex': 'Complex Transaction Inquiry',
+            'enterprise': 'Enterprise / Volume Inquiry',
+            'general': 'General Question',
+            # Legacy inquiry types (for backwards compatibility)
             'professional-services': 'Professional Services Inquiry',
             'enterprise-sales': 'Enterprise Sales Inquiry',
             'demo-request': 'Demo Request',
@@ -3286,6 +3292,9 @@ def contact_form():
         subject = subject_map.get(inquiry_type, 'Contact Form Submission')
         
         # Create email body
+        # Format inquiry type for display
+        inquiry_display = subject_map.get(inquiry_type, inquiry_type.replace('-', ' ').title())
+        
         email_body = f"""
 New contact form submission from VeritasLogic.ai
 
@@ -3294,7 +3303,7 @@ Contact Information:
 - Email: {email}
 - Company: {company}
 - Role: {role}
-- Inquiry Type: {inquiry_type.replace('-', ' ').title()}
+- Inquiry Type: {inquiry_display}
 
 """
         
@@ -3305,6 +3314,11 @@ Contact Information:
             email_body += f"- Team Size: {team_size}\n"
         if implementation_timeframe:
             email_body += f"- Implementation Timeframe: {implementation_timeframe}\n"
+        
+        # Add NDA request if present
+        nda_request = data.get('nda_request', 'no')
+        if nda_request and nda_request.lower() in ['yes', 'true', '1']:
+            email_body += "- NDA Requested: Yes\n"
         
         email_body += f"""
 Message:
